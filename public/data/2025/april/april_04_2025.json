@@ -1,0 +1,126 @@
+{
+  "date": "2025-04-04",
+  "games": [
+    {
+      "homeTeam": "DET",
+      "awayTeam": "CWS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Comerica Park",
+      "attendance": 0,
+      "originalId": 101,
+      "dateTime": "2025-04-04 17:10:00Z",
+      "round": 2
+    },
+    {
+      "homeTeam": "BOS",
+      "awayTeam": "STL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Fenway Park",
+      "attendance": 0,
+      "originalId": 102,
+      "dateTime": "2025-04-04 18:10:00Z",
+      "round": 2
+    },
+    {
+      "homeTeam": "CHC",
+      "awayTeam": "SD",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Wrigley Field",
+      "attendance": 0,
+      "originalId": 103,
+      "dateTime": "2025-04-04 18:20:00Z",
+      "round": 2
+    },
+    {
+      "homeTeam": "NYM",
+      "awayTeam": "TOR",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citi Field",
+      "attendance": 0,
+      "originalId": 104,
+      "dateTime": "2025-04-04 19:10:00Z",
+      "round": 2
+    },
+    {
+      "homeTeam": "PIT",
+      "awayTeam": "NYY",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "PNC Park",
+      "attendance": 0,
+      "originalId": 106,
+      "dateTime": "2025-04-04 20:12:00Z",
+      "round": 2
+    },
+    {
+      "homeTeam": "SF",
+      "awayTeam": "SEA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Oracle Park",
+      "attendance": 0,
+      "originalId": 107,
+      "dateTime": "2025-04-04 20:35:00Z",
+      "round": 2
+    },
+    {
+      "homeTeam": "WSH",
+      "awayTeam": "ARI",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Nationals Park",
+      "attendance": 0,
+      "originalId": 108,
+      "dateTime": "2025-04-04 22:45:00Z",
+      "round": 2
+    },
+    {
+      "homeTeam": "PHI",
+      "awayTeam": "LAD",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citizens Bank Park",
+      "attendance": 0,
+      "originalId": 109,
+      "dateTime": "2025-04-04 22:45:00Z",
+      "round": 2
+    },
+    {
+      "homeTeam": "ATL",
+      "awayTeam": "MIA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Truist Park",
+      "attendance": 0,
+      "originalId": 110,
+      "dateTime": "2025-04-04 23:15:00Z",
+      "round": 2
+    },
+    {
+      "homeTeam": "KC",
+      "awayTeam": "BAL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Kauffman Stadium",
+      "attendance": 0,
+      "originalId": 111,
+      "dateTime": "2025-04-04 23:40:00Z",
+      "round": 2
+    }
+  ],
+  "players": []
+}

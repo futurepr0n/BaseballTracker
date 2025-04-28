@@ -1,0 +1,150 @@
+{
+  "date": "2025-07-03",
+  "games": [
+    {
+      "homeTeam": "CHC",
+      "awayTeam": "CLE",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Wrigley Field",
+      "attendance": 0,
+      "originalId": 1296,
+      "dateTime": "2025-07-03 00:05:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "TEX",
+      "awayTeam": "BAL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Globe Life Field",
+      "attendance": 0,
+      "originalId": 1297,
+      "dateTime": "2025-07-03 00:05:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "COL",
+      "awayTeam": "HOU",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Coors Field",
+      "attendance": 0,
+      "originalId": 1298,
+      "dateTime": "2025-07-03 00:40:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "SEA",
+      "awayTeam": "KC",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "T-Mobile Park",
+      "attendance": 0,
+      "originalId": 1299,
+      "dateTime": "2025-07-03 01:40:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "ARI",
+      "awayTeam": "SF",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Chase Field",
+      "attendance": 0,
+      "originalId": 1300,
+      "dateTime": "2025-07-03 01:40:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "LAD",
+      "awayTeam": "CWS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Dodger Stadium",
+      "attendance": 0,
+      "originalId": 1301,
+      "dateTime": "2025-07-03 02:10:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "MIA",
+      "awayTeam": "MIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "LoanDepot Park",
+      "attendance": 0,
+      "originalId": 1302,
+      "dateTime": "2025-07-03 16:10:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "COL",
+      "awayTeam": "HOU",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Coors Field",
+      "attendance": 0,
+      "originalId": 1303,
+      "dateTime": "2025-07-03 19:10:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "WSH",
+      "awayTeam": "DET",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Nationals Park",
+      "attendance": 0,
+      "originalId": 1304,
+      "dateTime": "2025-07-03 22:45:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "TOR",
+      "awayTeam": "NYY",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Rogers Centre",
+      "attendance": 0,
+      "originalId": 1305,
+      "dateTime": "2025-07-03 23:07:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "NYM",
+      "awayTeam": "MIL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citi Field",
+      "attendance": 0,
+      "originalId": 1306,
+      "dateTime": "2025-07-03 23:10:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "ATL",
+      "awayTeam": "LAA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Truist Park",
+      "attendance": 0,
+      "originalId": 1307,
+      "dateTime": "2025-07-03 23:15:00Z",
+      "round": 15
+    }
+  ],
+  "players": []
+}

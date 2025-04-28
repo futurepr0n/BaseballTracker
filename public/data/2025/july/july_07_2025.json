@@ -1,0 +1,90 @@
+{
+  "date": "2025-07-07",
+  "games": [
+    {
+      "homeTeam": "SD",
+      "awayTeam": "TEX",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Petco Park",
+      "attendance": 0,
+      "originalId": 1355,
+      "dateTime": "2025-07-07 01:10:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "DET",
+      "awayTeam": "TB",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Comerica Park",
+      "attendance": 0,
+      "originalId": 1357,
+      "dateTime": "2025-07-07 22:40:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "BOS",
+      "awayTeam": "COL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Fenway Park",
+      "attendance": 0,
+      "originalId": 1358,
+      "dateTime": "2025-07-07 23:10:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "CIN",
+      "awayTeam": "MIA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Great American Ball Park",
+      "attendance": 0,
+      "originalId": 1359,
+      "dateTime": "2025-07-07 23:10:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "KC",
+      "awayTeam": "PIT",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Kauffman Stadium",
+      "attendance": 0,
+      "originalId": 1360,
+      "dateTime": "2025-07-07 23:40:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "CWS",
+      "awayTeam": "TOR",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Guaranteed Rate Field",
+      "attendance": 0,
+      "originalId": 1361,
+      "dateTime": "2025-07-07 23:40:00Z",
+      "round": 15
+    },
+    {
+      "homeTeam": "MIL",
+      "awayTeam": "LAD",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "American Family Field",
+      "attendance": 0,
+      "originalId": 1362,
+      "dateTime": "2025-07-07 23:40:00Z",
+      "round": 15
+    }
+  ],
+  "players": []
+}

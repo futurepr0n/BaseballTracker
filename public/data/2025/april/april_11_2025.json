@@ -1,0 +1,78 @@
+{
+  "date": "2025-04-11",
+  "games": [
+    {
+      "homeTeam": "CLE",
+      "awayTeam": "KC",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Progressive Field",
+      "attendance": 0,
+      "originalId": 192,
+      "dateTime": "2025-04-11 22:10:00Z",
+      "round": 3
+    },
+    {
+      "homeTeam": "CIN",
+      "awayTeam": "PIT",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Great American Ball Park",
+      "attendance": 0,
+      "originalId": 193,
+      "dateTime": "2025-04-11 22:40:00Z",
+      "round": 3
+    },
+    {
+      "homeTeam": "TB",
+      "awayTeam": "ATL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Tropicana Field",
+      "attendance": 0,
+      "originalId": 195,
+      "dateTime": "2025-04-11 23:05:00Z",
+      "round": 3
+    },
+    {
+      "homeTeam": "NYY",
+      "awayTeam": "SF",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Yankee Stadium",
+      "attendance": 0,
+      "originalId": 196,
+      "dateTime": "2025-04-11 23:05:00Z",
+      "round": 3
+    },
+    {
+      "homeTeam": "MIA",
+      "awayTeam": "WSH",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "LoanDepot Park",
+      "attendance": 0,
+      "originalId": 197,
+      "dateTime": "2025-04-11 23:10:00Z",
+      "round": 3
+    },
+    {
+      "homeTeam": "CWS",
+      "awayTeam": "BOS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Guaranteed Rate Field",
+      "attendance": 0,
+      "originalId": 198,
+      "dateTime": "2025-04-11 23:40:00Z",
+      "round": 3
+    }
+  ],
+  "players": []
+}

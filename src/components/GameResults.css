@@ -1,0 +1,209 @@
+/* GameResults Component Styling */
+
+.game-results {
+    padding: 20px;
+  }
+  
+  .game-results h2 {
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    color: #333;
+  }
+  
+  /* Game cards grid */
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  /* Game card styling */
+  .game-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  }
+  
+  .game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .game-status {
+    font-weight: 700;
+    color: #0056b3;
+  }
+  
+  .game-venue {
+    font-size: 0.85rem;
+    color: #666;
+  }
+  
+  /* Teams container */
+  .teams-container {
+    padding: 15px;
+  }
+  
+  .team {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+  }
+  
+  .away-team {
+    border-bottom: 1px dashed #eee;
+  }
+  
+  .team-logo {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    border-radius: 4px;
+    margin-right: 12px;
+  }
+  
+  .team-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .team-name {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .team-record {
+    font-size: 0.75rem;
+    color: #666;
+  }
+  
+  .team-score {
+    font-size: 1.5rem;
+    font-weight: 700;
+    min-width: 40px;
+    text-align: right;
+  }
+  
+  /* Game statistics */
+  .game-stats {
+    display: flex;
+    background-color: #f8f9fa;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .stat {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    border-right: 1px dashed #ddd;
+  }
+  
+  .stat:last-child {
+    border-right: none;
+  }
+  
+  .stat-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #666;
+    margin-bottom: 5px;
+  }
+  
+  .stat-value {
+    font-weight: 600;
+    color: #333;
+  }
+  
+  /* Attendance */
+  .attendance {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .attendance-icon {
+    margin-right: 8px;
+  }
+  
+  .attendance-value {
+    font-weight: 500;
+  }
+  
+  /* No games message */
+  .no-games {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    text-align: center;
+    color: #666;
+  }
+  
+  /* Games summary */
+  .games-summary {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  
+  .games-summary h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    color: #333;
+  }
+  
+  .summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+  }
+  
+  .summary-stat {
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    padding: 15px;
+    text-align: center;
+  }
+  
+  .summary-label {
+    display: block;
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 8px;
+  }
+  
+  .summary-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0056b3;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .games-grid {
+      grid-template-columns: 1fr;
+    }
+  }

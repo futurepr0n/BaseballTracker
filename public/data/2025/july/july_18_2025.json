@@ -1,0 +1,114 @@
+{
+  "date": "2025-07-18",
+  "games": [
+    {
+      "homeTeam": "CHC",
+      "awayTeam": "BOS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Wrigley Field",
+      "attendance": 0,
+      "originalId": 1452,
+      "dateTime": "2025-07-18 18:20:00Z",
+      "round": 17
+    },
+    {
+      "homeTeam": "PIT",
+      "awayTeam": "CWS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "PNC Park",
+      "attendance": 0,
+      "originalId": 1453,
+      "dateTime": "2025-07-18 22:40:00Z",
+      "round": 17
+    },
+    {
+      "homeTeam": "WSH",
+      "awayTeam": "SD",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Nationals Park",
+      "attendance": 0,
+      "originalId": 1454,
+      "dateTime": "2025-07-18 22:45:00Z",
+      "round": 17
+    },
+    {
+      "homeTeam": "PHI",
+      "awayTeam": "LAA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citizens Bank Park",
+      "attendance": 0,
+      "originalId": 1455,
+      "dateTime": "2025-07-18 22:45:00Z",
+      "round": 17
+    },
+    {
+      "homeTeam": "TOR",
+      "awayTeam": "SF",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Rogers Centre",
+      "attendance": 0,
+      "originalId": 1456,
+      "dateTime": "2025-07-18 23:07:00Z",
+      "round": 17
+    },
+    {
+      "homeTeam": "NYM",
+      "awayTeam": "CIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citi Field",
+      "attendance": 0,
+      "originalId": 1457,
+      "dateTime": "2025-07-18 23:10:00Z",
+      "round": 17
+    },
+    {
+      "homeTeam": "MIA",
+      "awayTeam": "KC",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "LoanDepot Park",
+      "attendance": 0,
+      "originalId": 1459,
+      "dateTime": "2025-07-18 23:10:00Z",
+      "round": 17
+    },
+    {
+      "homeTeam": "ATL",
+      "awayTeam": "NYY",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Truist Park",
+      "attendance": 0,
+      "originalId": 1460,
+      "dateTime": "2025-07-18 23:15:00Z",
+      "round": 17
+    },
+    {
+      "homeTeam": "TB",
+      "awayTeam": "BAL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Tropicana Field",
+      "attendance": 0,
+      "originalId": 1461,
+      "dateTime": "2025-07-18 23:35:00Z",
+      "round": 17
+    }
+  ],
+  "players": []
+}

@@ -1,0 +1,78 @@
+{
+  "date": "2025-08-11",
+  "games": [
+    {
+      "homeTeam": "CIN",
+      "awayTeam": "PHI",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Great American Ball Park",
+      "attendance": 0,
+      "originalId": 1776,
+      "dateTime": "2025-08-11 22:10:00Z",
+      "round": 20
+    },
+    {
+      "homeTeam": "NYY",
+      "awayTeam": "MIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Yankee Stadium",
+      "attendance": 0,
+      "originalId": 1777,
+      "dateTime": "2025-08-11 23:05:00Z",
+      "round": 20
+    },
+    {
+      "homeTeam": "KC",
+      "awayTeam": "WSH",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Kauffman Stadium",
+      "attendance": 0,
+      "originalId": 1778,
+      "dateTime": "2025-08-11 23:40:00Z",
+      "round": 20
+    },
+    {
+      "homeTeam": "CWS",
+      "awayTeam": "DET",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Guaranteed Rate Field",
+      "attendance": 0,
+      "originalId": 1779,
+      "dateTime": "2025-08-11 23:40:00Z",
+      "round": 20
+    },
+    {
+      "homeTeam": "MIL",
+      "awayTeam": "PIT",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "American Family Field",
+      "attendance": 0,
+      "originalId": 1780,
+      "dateTime": "2025-08-11 23:40:00Z",
+      "round": 20
+    },
+    {
+      "homeTeam": "STL",
+      "awayTeam": "COL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Busch Stadium",
+      "attendance": 0,
+      "originalId": 1781,
+      "dateTime": "2025-08-11 23:45:00Z",
+      "round": 20
+    }
+  ],
+  "players": []
+}

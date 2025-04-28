@@ -1,0 +1,114 @@
+{
+  "date": "2025-06-20",
+  "games": [
+    {
+      "homeTeam": "LAD",
+      "awayTeam": "SD",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Dodger Stadium",
+      "attendance": 0,
+      "originalId": 1125,
+      "dateTime": "2025-06-20 02:10:00Z",
+      "round": 13
+    },
+    {
+      "homeTeam": "CHC",
+      "awayTeam": "SEA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Wrigley Field",
+      "attendance": 0,
+      "originalId": 1126,
+      "dateTime": "2025-06-20 18:20:00Z",
+      "round": 13
+    },
+    {
+      "homeTeam": "PIT",
+      "awayTeam": "TEX",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "PNC Park",
+      "attendance": 0,
+      "originalId": 1127,
+      "dateTime": "2025-06-20 22:40:00Z",
+      "round": 13
+    },
+    {
+      "homeTeam": "TB",
+      "awayTeam": "DET",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Tropicana Field",
+      "attendance": 0,
+      "originalId": 1128,
+      "dateTime": "2025-06-20 23:05:00Z",
+      "round": 13
+    },
+    {
+      "homeTeam": "NYY",
+      "awayTeam": "BAL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Yankee Stadium",
+      "attendance": 0,
+      "originalId": 1129,
+      "dateTime": "2025-06-20 23:05:00Z",
+      "round": 13
+    },
+    {
+      "homeTeam": "TOR",
+      "awayTeam": "CWS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Rogers Centre",
+      "attendance": 0,
+      "originalId": 1130,
+      "dateTime": "2025-06-20 23:07:00Z",
+      "round": 13
+    },
+    {
+      "homeTeam": "MIA",
+      "awayTeam": "ATL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "LoanDepot Park",
+      "attendance": 0,
+      "originalId": 1131,
+      "dateTime": "2025-06-20 23:10:00Z",
+      "round": 13
+    },
+    {
+      "homeTeam": "STL",
+      "awayTeam": "CIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Busch Stadium",
+      "attendance": 0,
+      "originalId": 1132,
+      "dateTime": "2025-06-20 23:15:00Z",
+      "round": 13
+    },
+    {
+      "homeTeam": "PHI",
+      "awayTeam": "NYM",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citizens Bank Park",
+      "attendance": 0,
+      "originalId": 1133,
+      "dateTime": "2025-06-20 23:15:00Z",
+      "round": 13
+    }
+  ],
+  "players": []
+}

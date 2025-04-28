@@ -1,0 +1,150 @@
+{
+  "date": "2025-08-28",
+  "games": [
+    {
+      "homeTeam": "TEX",
+      "awayTeam": "LAA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Globe Life Field",
+      "attendance": 0,
+      "originalId": 2001,
+      "dateTime": "2025-08-28 00:05:00Z",
+      "round": 23
+    },
+    {
+      "homeTeam": "HOU",
+      "awayTeam": "COL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Minute Maid Park",
+      "attendance": 0,
+      "originalId": 2002,
+      "dateTime": "2025-08-28 00:10:00Z",
+      "round": 23
+    },
+    {
+      "homeTeam": "LAD",
+      "awayTeam": "CIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Dodger Stadium",
+      "attendance": 0,
+      "originalId": 2003,
+      "dateTime": "2025-08-28 00:40:00Z",
+      "round": 23
+    },
+    {
+      "homeTeam": "SF",
+      "awayTeam": "CHC",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Oracle Park",
+      "attendance": 0,
+      "originalId": 2004,
+      "dateTime": "2025-08-28 01:45:00Z",
+      "round": 23
+    },
+    {
+      "homeTeam": "BAL",
+      "awayTeam": "BOS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Camden Yards",
+      "attendance": 0,
+      "originalId": 2006,
+      "dateTime": "2025-08-28 17:05:00Z",
+      "round": 23
+    },
+    {
+      "homeTeam": "HOU",
+      "awayTeam": "COL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Minute Maid Park",
+      "attendance": 0,
+      "originalId": 2007,
+      "dateTime": "2025-08-28 18:10:00Z",
+      "round": 23
+    },
+    {
+      "homeTeam": "MIL",
+      "awayTeam": "ARI",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "American Family Field",
+      "attendance": 0,
+      "originalId": 2008,
+      "dateTime": "2025-08-28 18:10:00Z",
+      "round": 23
+    },
+    {
+      "homeTeam": "STL",
+      "awayTeam": "PIT",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Busch Stadium",
+      "attendance": 0,
+      "originalId": 2009,
+      "dateTime": "2025-08-28 18:15:00Z",
+      "round": 23
+    },
+    {
+      "homeTeam": "SF",
+      "awayTeam": "CHC",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Oracle Park",
+      "attendance": 0,
+      "originalId": 2010,
+      "dateTime": "2025-08-28 19:45:00Z",
+      "round": 23
+    },
+    {
+      "homeTeam": "PHI",
+      "awayTeam": "ATL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citizens Bank Park",
+      "attendance": 0,
+      "originalId": 2011,
+      "dateTime": "2025-08-28 22:45:00Z",
+      "round": 23
+    },
+    {
+      "homeTeam": "NYM",
+      "awayTeam": "MIA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citi Field",
+      "attendance": 0,
+      "originalId": 2012,
+      "dateTime": "2025-08-28 23:10:00Z",
+      "round": 23
+    },
+    {
+      "homeTeam": "CWS",
+      "awayTeam": "NYY",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Guaranteed Rate Field",
+      "attendance": 0,
+      "originalId": 2013,
+      "dateTime": "2025-08-28 23:40:00Z",
+      "round": 23
+    }
+  ],
+  "players": []
+}

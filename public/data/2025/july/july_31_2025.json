@@ -1,0 +1,42 @@
+{
+  "date": "2025-07-31",
+  "games": [
+    {
+      "homeTeam": "LAA",
+      "awayTeam": "TEX",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Angel Stadium",
+      "attendance": 0,
+      "originalId": 1635,
+      "dateTime": "2025-07-31 01:38:00Z",
+      "round": 19
+    },
+    {
+      "homeTeam": "NYY",
+      "awayTeam": "TB",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Yankee Stadium",
+      "attendance": 0,
+      "originalId": 1637,
+      "dateTime": "2025-07-31 17:05:00Z",
+      "round": 19
+    },
+    {
+      "homeTeam": "CIN",
+      "awayTeam": "ATL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Great American Ball Park",
+      "attendance": 0,
+      "originalId": 1638,
+      "dateTime": "2025-07-31 23:10:00Z",
+      "round": 19
+    }
+  ],
+  "players": []
+}

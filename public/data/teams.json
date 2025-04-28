@@ -1,0 +1,272 @@
+{
+    "ARI": {
+      "name": "Arizona Diamondbacks",
+      "abbreviation": "ARI",
+      "league": "NL",
+      "division": "West",
+      "primaryColor": "#A71930",
+      "secondaryColor": "#E3D4AD",
+      "logoUrl": "/logos/arizona-diamondbacks.svg"
+    },
+    "ATL": {
+      "name": "Atlanta Braves",
+      "abbreviation": "ATL",
+      "league": "NL",
+      "division": "East",
+      "primaryColor": "#CE1141",
+      "secondaryColor": "#13274F",
+      "logoUrl": "/logos/atlanta-braves.svg"
+    },
+    "BAL": {
+      "name": "Baltimore Orioles",
+      "abbreviation": "BAL",
+      "league": "AL",
+      "division": "East",
+      "primaryColor": "#DF4601",
+      "secondaryColor": "#000000",
+      "logoUrl": "/logos/baltimore-orioles.svg"
+    },
+    "BOS": {
+      "name": "Boston Red Sox",
+      "abbreviation": "BOS",
+      "league": "AL",
+      "division": "East",
+      "primaryColor": "#BD3039",
+      "secondaryColor": "#0C2340",
+      "logoUrl": "/logos/boston-red-sox.svg"
+    },
+    "CHC": {
+      "name": "Chicago Cubs",
+      "abbreviation": "CHC",
+      "league": "NL",
+      "division": "Central",
+      "primaryColor": "#0E3386",
+      "secondaryColor": "#CC3433",
+      "logoUrl": "/logos/chicago-cubs.svg"
+    },
+    "CWS": {
+      "name": "Chicago White Sox",
+      "abbreviation": "CWS",
+      "league": "AL",
+      "division": "Central",
+      "primaryColor": "#27251F",
+      "secondaryColor": "#C4CED4",
+      "logoUrl": "/logos/chicago-white-sox.svg"
+    },
+    "CIN": {
+      "name": "Cincinnati Reds",
+      "abbreviation": "CIN",
+      "league": "NL",
+      "division": "Central",
+      "primaryColor": "#C6011F",
+      "secondaryColor": "#000000",
+      "logoUrl": "/logos/cincinnati-reds.svg"
+    },
+    "CLE": {
+      "name": "Cleveland Guardians",
+      "abbreviation": "CLE",
+      "league": "AL",
+      "division": "Central",
+      "primaryColor": "#00385D",
+      "secondaryColor": "#E31937",
+      "logoUrl": "/logos/cleveland-guardians.svg"
+    },
+    "COL": {
+      "name": "Colorado Rockies",
+      "abbreviation": "COL",
+      "league": "NL",
+      "division": "West",
+      "primaryColor": "#33006F",
+      "secondaryColor": "#C4CED4",
+      "logoUrl": "/logos/colorado-rockies.svg"
+    },
+    "DET": {
+      "name": "Detroit Tigers",
+      "abbreviation": "DET",
+      "league": "AL",
+      "division": "Central",
+      "primaryColor": "#0C2340",
+      "secondaryColor": "#FA4616",
+      "logoUrl": "/logos/detroit-tigers.svg"
+    },
+    "HOU": {
+      "name": "Houston Astros",
+      "abbreviation": "HOU",
+      "league": "AL",
+      "division": "West",
+      "primaryColor": "#002D62",
+      "secondaryColor": "#EB6E1F",
+      "logoUrl": "/logos/houston-astros.svg"
+    },
+    "KC": {
+      "name": "Kansas City Royals",
+      "abbreviation": "KC",
+      "league": "AL",
+      "division": "Central",
+      "primaryColor": "#004687",
+      "secondaryColor": "#BD9B60",
+      "logoUrl": "/logos/kansas-city-royals.svg"
+    },
+    "LAA": {
+      "name": "Los Angeles Angels",
+      "abbreviation": "LAA",
+      "league": "AL",
+      "division": "West",
+      "primaryColor": "#BA0021",
+      "secondaryColor": "#003263",
+      "logoUrl": "/logos/los-angeles-angels.svg"
+    },
+    "LAD": {
+      "name": "Los Angeles Dodgers",
+      "abbreviation": "LAD",
+      "league": "NL",
+      "division": "West",
+      "primaryColor": "#005A9C",
+      "secondaryColor": "#A5ACAF",
+      "logoUrl": "/logos/los-angeles-dodgers.svg"
+    },
+    "MIA": {
+      "name": "Miami Marlins",
+      "abbreviation": "MIA",
+      "league": "NL",
+      "division": "East",
+      "primaryColor": "#00A3E0",
+      "secondaryColor": "#EF3340",
+      "logoUrl": "/logos/miami-marlins.svg"
+    },
+    "MIL": {
+      "name": "Milwaukee Brewers",
+      "abbreviation": "MIL",
+      "league": "NL",
+      "division": "Central",
+      "primaryColor": "#0A2351",
+      "secondaryColor": "#FFC52F",
+      "logoUrl": "/logos/milwaukee-brewers.svg"
+    },
+    "MIN": {
+      "name": "Minnesota Twins",
+      "abbreviation": "MIN",
+      "league": "AL",
+      "division": "Central",
+      "primaryColor": "#002B5C",
+      "secondaryColor": "#D31145",
+      "logoUrl": "/logos/minnesota-twins.svg"
+    },
+    "NYM": {
+      "name": "New York Mets",
+      "abbreviation": "NYM",
+      "league": "NL",
+      "division": "East",
+      "primaryColor": "#002D72",
+      "secondaryColor": "#FF5910",
+      "logoUrl": "/logos/new-york-mets.svg"
+    },
+    "NYY": {
+      "name": "New York Yankees",
+      "abbreviation": "NYY",
+      "league": "AL",
+      "division": "East",
+      "primaryColor": "#003087",
+      "secondaryColor": "#E4002C",
+      "logoUrl": "/logos/new-york-yankees.svg"
+    },
+    "OAK": {
+      "name": "Oakland Athletics",
+      "abbreviation": "OAK",
+      "league": "AL",
+      "division": "West",
+      "primaryColor": "#003831",
+      "secondaryColor": "#EFB21E",
+      "logoUrl": "/logos/oakland-athletics.svg"
+    },
+    "PHI": {
+      "name": "Philadelphia Phillies",
+      "abbreviation": "PHI",
+      "league": "NL",
+      "division": "East",
+      "primaryColor": "#E81828",
+      "secondaryColor": "#002D72",
+      "logoUrl": "/logos/philadelphia-phillies.svg"
+    },
+    "PIT": {
+      "name": "Pittsburgh Pirates",
+      "abbreviation": "PIT",
+      "league": "NL",
+      "division": "Central",
+      "primaryColor": "#27251F",
+      "secondaryColor": "#FDB827",
+      "logoUrl": "/logos/pittsburgh-pirates.svg"
+    },
+    "SD": {
+      "name": "San Diego Padres",
+      "abbreviation": "SD",
+      "league": "NL",
+      "division": "West",
+      "primaryColor": "#2F241D",
+      "secondaryColor": "#FFC425",
+      "logoUrl": "/logos/san-diego-padres.svg"
+    },
+    "SF": {
+      "name": "San Francisco Giants",
+      "abbreviation": "SF",
+      "league": "NL",
+      "division": "West",
+      "primaryColor": "#FD5A1E",
+      "secondaryColor": "#27251F",
+      "logoUrl": "/logos/san-francisco-giants.svg"
+    },
+    "SEA": {
+      "name": "Seattle Mariners",
+      "abbreviation": "SEA",
+      "league": "AL",
+      "division": "West",
+      "primaryColor": "#0C2C56",
+      "secondaryColor": "#005C5C",
+      "logoUrl": "/logos/seattle-mariners.svg"
+    },
+    "STL": {
+      "name": "St. Louis Cardinals",
+      "abbreviation": "STL",
+      "league": "NL",
+      "division": "Central",
+      "primaryColor": "#C41E3A",
+      "secondaryColor": "#0C2340",
+      "logoUrl": "/logos/st-louis-cardinals.svg"
+    },
+    "TB": {
+      "name": "Tampa Bay Rays",
+      "abbreviation": "TB",
+      "league": "AL",
+      "division": "East",
+      "primaryColor": "#092C5C",
+      "secondaryColor": "#8FBCE6",
+      "logoUrl": "/logos/tampa-bay-rays.svg"
+    },
+    "TEX": {
+      "name": "Texas Rangers",
+      "abbreviation": "TEX",
+      "league": "AL",
+      "division": "West",
+      "primaryColor": "#003278",
+      "secondaryColor": "#C0111F",
+      "logoUrl": "/logos/texas-rangers.svg"
+    },
+    "TOR": {
+      "name": "Toronto Blue Jays",
+      "abbreviation": "TOR",
+      "league": "AL",
+      "division": "East",
+      "primaryColor": "#134A8E",
+      "secondaryColor": "#1D2D5C",
+      "logoUrl": "/logos/toronto-blue-jays.svg"
+    },
+    "WSH": {
+      "name": "Washington Nationals",
+      "abbreviation": "WSH",
+      "league": "NL",
+      "division": "East",
+      "primaryColor": "#AB0003",
+      "secondaryColor": "#14225A",
+      "logoUrl": "/logos/washington-nationals.svg"
+    }
+  }

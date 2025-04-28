@@ -1,0 +1,114 @@
+{
+  "date": "2025-03-31",
+  "games": [
+    {
+      "homeTeam": "CWS",
+      "awayTeam": "MIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Guaranteed Rate Field",
+      "attendance": 0,
+      "originalId": 54,
+      "dateTime": "2025-03-31 18:10:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "MIL",
+      "awayTeam": "KC",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "American Family Field",
+      "attendance": 0,
+      "originalId": 55,
+      "dateTime": "2025-03-31 18:10:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "BAL",
+      "awayTeam": "BOS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Camden Yards",
+      "attendance": 0,
+      "originalId": 56,
+      "dateTime": "2025-03-31 18:35:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "PHI",
+      "awayTeam": "COL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citizens Bank Park",
+      "attendance": 0,
+      "originalId": 57,
+      "dateTime": "2025-03-31 19:05:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "CIN",
+      "awayTeam": "TEX",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Great American Ball Park",
+      "attendance": 0,
+      "originalId": 58,
+      "dateTime": "2025-03-31 22:40:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "MIA",
+      "awayTeam": "NYM",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "LoanDepot Park",
+      "attendance": 0,
+      "originalId": 59,
+      "dateTime": "2025-03-31 22:40:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "TB",
+      "awayTeam": "PIT",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Tropicana Field",
+      "attendance": 0,
+      "originalId": 60,
+      "dateTime": "2025-03-31 23:05:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "TOR",
+      "awayTeam": "WSH",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Rogers Centre",
+      "attendance": 0,
+      "originalId": 61,
+      "dateTime": "2025-03-31 23:07:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "STL",
+      "awayTeam": "LAA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Busch Stadium",
+      "attendance": 0,
+      "originalId": 62,
+      "dateTime": "2025-03-31 23:45:00Z",
+      "round": 1
+    }
+  ],
+  "players": []
+}

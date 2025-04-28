@@ -1,0 +1,138 @@
+{
+  "date": "2025-08-21",
+  "games": [
+    {
+      "homeTeam": "CHC",
+      "awayTeam": "MIL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Wrigley Field",
+      "attendance": 0,
+      "originalId": 1906,
+      "dateTime": "2025-08-21 00:05:00Z",
+      "round": 22
+    },
+    {
+      "homeTeam": "COL",
+      "awayTeam": "LAD",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Coors Field",
+      "attendance": 0,
+      "originalId": 1907,
+      "dateTime": "2025-08-21 00:40:00Z",
+      "round": 22
+    },
+    {
+      "homeTeam": "LAA",
+      "awayTeam": "CIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Angel Stadium",
+      "attendance": 0,
+      "originalId": 1908,
+      "dateTime": "2025-08-21 01:38:00Z",
+      "round": 22
+    },
+    {
+      "homeTeam": "SD",
+      "awayTeam": "SF",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Petco Park",
+      "attendance": 0,
+      "originalId": 1909,
+      "dateTime": "2025-08-21 01:40:00Z",
+      "round": 22
+    },
+    {
+      "homeTeam": "KC",
+      "awayTeam": "TEX",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Kauffman Stadium",
+      "attendance": 0,
+      "originalId": 1911,
+      "dateTime": "2025-08-21 18:10:00Z",
+      "round": 22
+    },
+    {
+      "homeTeam": "CHC",
+      "awayTeam": "MIL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Wrigley Field",
+      "attendance": 0,
+      "originalId": 1912,
+      "dateTime": "2025-08-21 18:20:00Z",
+      "round": 22
+    },
+    {
+      "homeTeam": "COL",
+      "awayTeam": "LAD",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Coors Field",
+      "attendance": 0,
+      "originalId": 1913,
+      "dateTime": "2025-08-21 19:10:00Z",
+      "round": 22
+    },
+    {
+      "homeTeam": "WSH",
+      "awayTeam": "NYM",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Nationals Park",
+      "attendance": 0,
+      "originalId": 1914,
+      "dateTime": "2025-08-21 20:05:00Z",
+      "round": 22
+    },
+    {
+      "homeTeam": "SD",
+      "awayTeam": "SF",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Petco Park",
+      "attendance": 0,
+      "originalId": 1915,
+      "dateTime": "2025-08-21 20:10:00Z",
+      "round": 22
+    },
+    {
+      "homeTeam": "BAL",
+      "awayTeam": "HOU",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Camden Yards",
+      "attendance": 0,
+      "originalId": 1916,
+      "dateTime": "2025-08-21 23:15:00Z",
+      "round": 22
+    },
+    {
+      "homeTeam": "NYY",
+      "awayTeam": "BOS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Yankee Stadium",
+      "attendance": 0,
+      "originalId": 1917,
+      "dateTime": "2025-08-21 23:15:00Z",
+      "round": 22
+    }
+  ],
+  "players": []
+}

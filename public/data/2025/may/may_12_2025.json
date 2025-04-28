@@ -1,0 +1,78 @@
+{
+  "date": "2025-05-12",
+  "games": [
+    {
+      "homeTeam": "CLE",
+      "awayTeam": "MIL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Progressive Field",
+      "attendance": 0,
+      "originalId": 610,
+      "dateTime": "2025-05-12 22:10:00Z",
+      "round": 7
+    },
+    {
+      "homeTeam": "DET",
+      "awayTeam": "BOS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Comerica Park",
+      "attendance": 0,
+      "originalId": 611,
+      "dateTime": "2025-05-12 22:40:00Z",
+      "round": 7
+    },
+    {
+      "homeTeam": "PHI",
+      "awayTeam": "STL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citizens Bank Park",
+      "attendance": 0,
+      "originalId": 612,
+      "dateTime": "2025-05-12 22:45:00Z",
+      "round": 7
+    },
+    {
+      "homeTeam": "NYM",
+      "awayTeam": "PIT",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citi Field",
+      "attendance": 0,
+      "originalId": 613,
+      "dateTime": "2025-05-12 23:10:00Z",
+      "round": 7
+    },
+    {
+      "homeTeam": "ATL",
+      "awayTeam": "WSH",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Truist Park",
+      "attendance": 0,
+      "originalId": 614,
+      "dateTime": "2025-05-12 23:15:00Z",
+      "round": 7
+    },
+    {
+      "homeTeam": "CHC",
+      "awayTeam": "MIA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Wrigley Field",
+      "attendance": 0,
+      "originalId": 615,
+      "dateTime": "2025-05-12 23:40:00Z",
+      "round": 7
+    }
+  ],
+  "players": []
+}

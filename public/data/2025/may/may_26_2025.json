@@ -1,0 +1,114 @@
+{
+  "date": "2025-05-26",
+  "games": [
+    {
+      "homeTeam": "DET",
+      "awayTeam": "SF",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Comerica Park",
+      "attendance": 0,
+      "originalId": 798,
+      "dateTime": "2025-05-26 17:10:00Z",
+      "round": 9
+    },
+    {
+      "homeTeam": "MIL",
+      "awayTeam": "BOS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "American Family Field",
+      "attendance": 0,
+      "originalId": 799,
+      "dateTime": "2025-05-26 18:10:00Z",
+      "round": 9
+    },
+    {
+      "homeTeam": "CHC",
+      "awayTeam": "COL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Wrigley Field",
+      "attendance": 0,
+      "originalId": 800,
+      "dateTime": "2025-05-26 18:20:00Z",
+      "round": 9
+    },
+    {
+      "homeTeam": "BAL",
+      "awayTeam": "STL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Camden Yards",
+      "attendance": 0,
+      "originalId": 801,
+      "dateTime": "2025-05-26 19:05:00Z",
+      "round": 9
+    },
+    {
+      "homeTeam": "TEX",
+      "awayTeam": "TOR",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Globe Life Field",
+      "attendance": 0,
+      "originalId": 802,
+      "dateTime": "2025-05-26 20:05:00Z",
+      "round": 9
+    },
+    {
+      "homeTeam": "KC",
+      "awayTeam": "CIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Kauffman Stadium",
+      "attendance": 0,
+      "originalId": 803,
+      "dateTime": "2025-05-26 20:10:00Z",
+      "round": 9
+    },
+    {
+      "homeTeam": "NYM",
+      "awayTeam": "CWS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citi Field",
+      "attendance": 0,
+      "originalId": 804,
+      "dateTime": "2025-05-26 20:10:00Z",
+      "round": 9
+    },
+    {
+      "homeTeam": "CLE",
+      "awayTeam": "LAD",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Progressive Field",
+      "attendance": 0,
+      "originalId": 805,
+      "dateTime": "2025-05-26 22:10:00Z",
+      "round": 9
+    },
+    {
+      "homeTeam": "TB",
+      "awayTeam": "MIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Tropicana Field",
+      "attendance": 0,
+      "originalId": 806,
+      "dateTime": "2025-05-26 23:05:00Z",
+      "round": 9
+    }
+  ],
+  "players": []
+}

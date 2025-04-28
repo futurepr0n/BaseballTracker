@@ -1,0 +1,78 @@
+{
+  "date": "2025-04-03",
+  "games": [
+    {
+      "homeTeam": "LAD",
+      "awayTeam": "ATL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Dodger Stadium",
+      "attendance": 0,
+      "originalId": 95,
+      "dateTime": "2025-04-03 00:38:00Z",
+      "round": 2
+    },
+    {
+      "homeTeam": "BAL",
+      "awayTeam": "BOS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Camden Yards",
+      "attendance": 0,
+      "originalId": 96,
+      "dateTime": "2025-04-03 17:05:00Z",
+      "round": 2
+    },
+    {
+      "homeTeam": "PHI",
+      "awayTeam": "COL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citizens Bank Park",
+      "attendance": 0,
+      "originalId": 97,
+      "dateTime": "2025-04-03 17:05:00Z",
+      "round": 2
+    },
+    {
+      "homeTeam": "MIN",
+      "awayTeam": "HOU",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Target Field",
+      "attendance": 0,
+      "originalId": 98,
+      "dateTime": "2025-04-03 20:10:00Z",
+      "round": 2
+    },
+    {
+      "homeTeam": "NYY",
+      "awayTeam": "ARI",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Yankee Stadium",
+      "attendance": 0,
+      "originalId": 99,
+      "dateTime": "2025-04-03 23:05:00Z",
+      "round": 2
+    },
+    {
+      "homeTeam": "MIL",
+      "awayTeam": "CIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "American Family Field",
+      "attendance": 0,
+      "originalId": 100,
+      "dateTime": "2025-04-03 23:40:00Z",
+      "round": 2
+    }
+  ],
+  "players": []
+}

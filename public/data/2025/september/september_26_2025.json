@@ -1,0 +1,138 @@
+{
+  "date": "2025-09-26",
+  "games": [
+    {
+      "homeTeam": "LAA",
+      "awayTeam": "KC",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Angel Stadium",
+      "attendance": 0,
+      "originalId": 2384,
+      "dateTime": "2025-09-26 01:38:00Z",
+      "round": 27
+    },
+    {
+      "homeTeam": "SEA",
+      "awayTeam": "COL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "T-Mobile Park",
+      "attendance": 0,
+      "originalId": 2385,
+      "dateTime": "2025-09-26 01:40:00Z",
+      "round": 27
+    },
+    {
+      "homeTeam": "CHC",
+      "awayTeam": "STL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Wrigley Field",
+      "attendance": 0,
+      "originalId": 2386,
+      "dateTime": "2025-09-26 18:20:00Z",
+      "round": 27
+    },
+    {
+      "homeTeam": "PHI",
+      "awayTeam": "MIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citizens Bank Park",
+      "attendance": 0,
+      "originalId": 2387,
+      "dateTime": "2025-09-26 22:45:00Z",
+      "round": 27
+    },
+    {
+      "homeTeam": "WSH",
+      "awayTeam": "CWS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Nationals Park",
+      "attendance": 0,
+      "originalId": 2388,
+      "dateTime": "2025-09-26 22:45:00Z",
+      "round": 27
+    },
+    {
+      "homeTeam": "NYY",
+      "awayTeam": "BAL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Yankee Stadium",
+      "attendance": 0,
+      "originalId": 2389,
+      "dateTime": "2025-09-26 23:05:00Z",
+      "round": 27
+    },
+    {
+      "homeTeam": "TOR",
+      "awayTeam": "TB",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Rogers Centre",
+      "attendance": 0,
+      "originalId": 2390,
+      "dateTime": "2025-09-26 23:07:00Z",
+      "round": 27
+    },
+    {
+      "homeTeam": "BOS",
+      "awayTeam": "DET",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Fenway Park",
+      "attendance": 0,
+      "originalId": 2391,
+      "dateTime": "2025-09-26 23:10:00Z",
+      "round": 27
+    },
+    {
+      "homeTeam": "CLE",
+      "awayTeam": "TEX",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Progressive Field",
+      "attendance": 0,
+      "originalId": 2392,
+      "dateTime": "2025-09-26 23:10:00Z",
+      "round": 27
+    },
+    {
+      "homeTeam": "MIA",
+      "awayTeam": "NYM",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "LoanDepot Park",
+      "attendance": 0,
+      "originalId": 2393,
+      "dateTime": "2025-09-26 23:10:00Z",
+      "round": 27
+    },
+    {
+      "homeTeam": "ATL",
+      "awayTeam": "PIT",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Truist Park",
+      "attendance": 0,
+      "originalId": 2394,
+      "dateTime": "2025-09-26 23:15:00Z",
+      "round": 27
+    }
+  ],
+  "players": []
+}

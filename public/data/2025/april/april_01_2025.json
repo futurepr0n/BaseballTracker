@@ -1,0 +1,150 @@
+{
+  "date": "2025-04-01",
+  "games": [
+    {
+      "homeTeam": "HOU",
+      "awayTeam": "SF",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Minute Maid Park",
+      "attendance": 0,
+      "originalId": 63,
+      "dateTime": "2025-04-01 00:10:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "SD",
+      "awayTeam": "CLE",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Petco Park",
+      "attendance": 0,
+      "originalId": 64,
+      "dateTime": "2025-04-01 01:40:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "SEA",
+      "awayTeam": "DET",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "T-Mobile Park",
+      "attendance": 0,
+      "originalId": 65,
+      "dateTime": "2025-04-01 01:40:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "LAD",
+      "awayTeam": "ATL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Dodger Stadium",
+      "attendance": 0,
+      "originalId": 67,
+      "dateTime": "2025-04-01 02:10:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "CIN",
+      "awayTeam": "TEX",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Great American Ball Park",
+      "attendance": 0,
+      "originalId": 68,
+      "dateTime": "2025-04-01 22:40:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "MIA",
+      "awayTeam": "NYM",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "LoanDepot Park",
+      "attendance": 0,
+      "originalId": 69,
+      "dateTime": "2025-04-01 22:40:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "TB",
+      "awayTeam": "PIT",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Tropicana Field",
+      "attendance": 0,
+      "originalId": 70,
+      "dateTime": "2025-04-01 23:05:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "NYY",
+      "awayTeam": "ARI",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Yankee Stadium",
+      "attendance": 0,
+      "originalId": 71,
+      "dateTime": "2025-04-01 23:05:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "TOR",
+      "awayTeam": "WSH",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Rogers Centre",
+      "attendance": 0,
+      "originalId": 72,
+      "dateTime": "2025-04-01 23:07:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "CWS",
+      "awayTeam": "MIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Guaranteed Rate Field",
+      "attendance": 0,
+      "originalId": 73,
+      "dateTime": "2025-04-01 23:40:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "MIL",
+      "awayTeam": "KC",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "American Family Field",
+      "attendance": 0,
+      "originalId": 74,
+      "dateTime": "2025-04-01 23:40:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "STL",
+      "awayTeam": "LAA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Busch Stadium",
+      "attendance": 0,
+      "originalId": 75,
+      "dateTime": "2025-04-01 23:45:00Z",
+      "round": 1
+    }
+  ],
+  "players": []
+}

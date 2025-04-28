@@ -1,0 +1,18 @@
+{
+  "date": "2025-03-18",
+  "games": [
+    {
+      "homeTeam": "CHC",
+      "awayTeam": "LAD",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Wrigley Field",
+      "attendance": 0,
+      "originalId": 1,
+      "dateTime": "2025-03-18 10:10:00Z",
+      "round": 1
+    }
+  ],
+  "players": []
+}

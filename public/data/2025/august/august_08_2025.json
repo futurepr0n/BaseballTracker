@@ -1,0 +1,66 @@
+{
+  "date": "2025-08-08",
+  "games": [
+    {
+      "homeTeam": "PIT",
+      "awayTeam": "CIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "PNC Park",
+      "attendance": 0,
+      "originalId": 1731,
+      "dateTime": "2025-08-08 22:40:00Z",
+      "round": 20
+    },
+    {
+      "homeTeam": "NYY",
+      "awayTeam": "HOU",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Yankee Stadium",
+      "attendance": 0,
+      "originalId": 1733,
+      "dateTime": "2025-08-08 23:05:00Z",
+      "round": 20
+    },
+    {
+      "homeTeam": "DET",
+      "awayTeam": "LAA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Comerica Park",
+      "attendance": 0,
+      "originalId": 1734,
+      "dateTime": "2025-08-08 23:10:00Z",
+      "round": 20
+    },
+    {
+      "homeTeam": "ATL",
+      "awayTeam": "MIA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Truist Park",
+      "attendance": 0,
+      "originalId": 1735,
+      "dateTime": "2025-08-08 23:15:00Z",
+      "round": 20
+    },
+    {
+      "homeTeam": "CWS",
+      "awayTeam": "CLE",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Guaranteed Rate Field",
+      "attendance": 0,
+      "originalId": 1736,
+      "dateTime": "2025-08-08 23:40:00Z",
+      "round": 20
+    }
+  ],
+  "players": []
+}

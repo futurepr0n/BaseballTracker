@@ -1,0 +1,126 @@
+{
+  "date": "2025-06-13",
+  "games": [
+    {
+      "homeTeam": "CHC",
+      "awayTeam": "PIT",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Wrigley Field",
+      "attendance": 0,
+      "originalId": 1028,
+      "dateTime": "2025-06-13 00:05:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "HOU",
+      "awayTeam": "CWS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Minute Maid Park",
+      "attendance": 0,
+      "originalId": 1029,
+      "dateTime": "2025-06-13 00:10:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "CHC",
+      "awayTeam": "PIT",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Wrigley Field",
+      "attendance": 0,
+      "originalId": 1030,
+      "dateTime": "2025-06-13 18:20:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "PHI",
+      "awayTeam": "TOR",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citizens Bank Park",
+      "attendance": 0,
+      "originalId": 1031,
+      "dateTime": "2025-06-13 22:45:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "WSH",
+      "awayTeam": "MIA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Nationals Park",
+      "attendance": 0,
+      "originalId": 1032,
+      "dateTime": "2025-06-13 22:45:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "BAL",
+      "awayTeam": "LAA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Camden Yards",
+      "attendance": 0,
+      "originalId": 1033,
+      "dateTime": "2025-06-13 23:05:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "DET",
+      "awayTeam": "CIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Comerica Park",
+      "attendance": 0,
+      "originalId": 1034,
+      "dateTime": "2025-06-13 23:10:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "NYM",
+      "awayTeam": "TB",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citi Field",
+      "attendance": 0,
+      "originalId": 1035,
+      "dateTime": "2025-06-13 23:10:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "BOS",
+      "awayTeam": "NYY",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Fenway Park",
+      "attendance": 0,
+      "originalId": 1036,
+      "dateTime": "2025-06-13 23:10:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "ATL",
+      "awayTeam": "COL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Truist Park",
+      "attendance": 0,
+      "originalId": 1037,
+      "dateTime": "2025-06-13 23:15:00Z",
+      "round": 12
+    }
+  ],
+  "players": []
+}

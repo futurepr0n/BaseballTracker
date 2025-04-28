@@ -1,0 +1,150 @@
+{
+  "date": "2025-05-06",
+  "games": [
+    {
+      "homeTeam": "ARI",
+      "awayTeam": "NYM",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Chase Field",
+      "attendance": 0,
+      "originalId": 525,
+      "dateTime": "2025-05-06 01:40:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "MIA",
+      "awayTeam": "LAD",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "LoanDepot Park",
+      "attendance": 0,
+      "originalId": 527,
+      "dateTime": "2025-05-06 22:40:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "WSH",
+      "awayTeam": "CLE",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Nationals Park",
+      "attendance": 0,
+      "originalId": 528,
+      "dateTime": "2025-05-06 22:45:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "BOS",
+      "awayTeam": "TEX",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Fenway Park",
+      "attendance": 0,
+      "originalId": 529,
+      "dateTime": "2025-05-06 22:45:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "TB",
+      "awayTeam": "PHI",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Tropicana Field",
+      "attendance": 0,
+      "originalId": 530,
+      "dateTime": "2025-05-06 23:05:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "NYY",
+      "awayTeam": "SD",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Yankee Stadium",
+      "attendance": 0,
+      "originalId": 531,
+      "dateTime": "2025-05-06 23:05:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "ATL",
+      "awayTeam": "CIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Truist Park",
+      "attendance": 0,
+      "originalId": 532,
+      "dateTime": "2025-05-06 23:15:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "CHC",
+      "awayTeam": "SF",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Wrigley Field",
+      "attendance": 0,
+      "originalId": 533,
+      "dateTime": "2025-05-06 23:40:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "MIN",
+      "awayTeam": "BAL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Target Field",
+      "attendance": 0,
+      "originalId": 534,
+      "dateTime": "2025-05-06 23:40:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "KC",
+      "awayTeam": "CWS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Kauffman Stadium",
+      "attendance": 0,
+      "originalId": 535,
+      "dateTime": "2025-05-06 23:40:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "MIL",
+      "awayTeam": "HOU",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "American Family Field",
+      "attendance": 0,
+      "originalId": 536,
+      "dateTime": "2025-05-06 23:40:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "STL",
+      "awayTeam": "PIT",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Busch Stadium",
+      "attendance": 0,
+      "originalId": 537,
+      "dateTime": "2025-05-06 23:45:00Z",
+      "round": 6
+    }
+  ],
+  "players": []
+}

@@ -1,0 +1,66 @@
+{
+  "date": "2025-08-07",
+  "games": [
+    {
+      "homeTeam": "ARI",
+      "awayTeam": "SD",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Chase Field",
+      "attendance": 0,
+      "originalId": 1725,
+      "dateTime": "2025-08-07 01:40:00Z",
+      "round": 20
+    },
+    {
+      "homeTeam": "SEA",
+      "awayTeam": "CWS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "T-Mobile Park",
+      "attendance": 0,
+      "originalId": 1726,
+      "dateTime": "2025-08-07 01:40:00Z",
+      "round": 20
+    },
+    {
+      "homeTeam": "SEA",
+      "awayTeam": "CWS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "T-Mobile Park",
+      "attendance": 0,
+      "originalId": 1728,
+      "dateTime": "2025-08-07 20:10:00Z",
+      "round": 20
+    },
+    {
+      "homeTeam": "PIT",
+      "awayTeam": "CIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "PNC Park",
+      "attendance": 0,
+      "originalId": 1729,
+      "dateTime": "2025-08-07 22:40:00Z",
+      "round": 20
+    },
+    {
+      "homeTeam": "ATL",
+      "awayTeam": "MIA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Truist Park",
+      "attendance": 0,
+      "originalId": 1730,
+      "dateTime": "2025-08-07 23:15:00Z",
+      "round": 20
+    }
+  ],
+  "players": []
+}

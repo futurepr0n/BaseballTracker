@@ -1,0 +1,138 @@
+{
+  "date": "2025-06-17",
+  "games": [
+    {
+      "homeTeam": "SEA",
+      "awayTeam": "BOS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "T-Mobile Park",
+      "attendance": 0,
+      "originalId": 1079,
+      "dateTime": "2025-06-17 01:40:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "LAD",
+      "awayTeam": "SD",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Dodger Stadium",
+      "attendance": 0,
+      "originalId": 1081,
+      "dateTime": "2025-06-17 02:10:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "DET",
+      "awayTeam": "PIT",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Comerica Park",
+      "attendance": 0,
+      "originalId": 1082,
+      "dateTime": "2025-06-17 22:40:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "MIA",
+      "awayTeam": "PHI",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "LoanDepot Park",
+      "attendance": 0,
+      "originalId": 1083,
+      "dateTime": "2025-06-17 22:40:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "WSH",
+      "awayTeam": "COL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Nationals Park",
+      "attendance": 0,
+      "originalId": 1084,
+      "dateTime": "2025-06-17 22:45:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "NYY",
+      "awayTeam": "LAA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Yankee Stadium",
+      "attendance": 0,
+      "originalId": 1085,
+      "dateTime": "2025-06-17 23:05:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "TOR",
+      "awayTeam": "ARI",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Rogers Centre",
+      "attendance": 0,
+      "originalId": 1086,
+      "dateTime": "2025-06-17 23:07:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "CIN",
+      "awayTeam": "MIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Great American Ball Park",
+      "attendance": 0,
+      "originalId": 1087,
+      "dateTime": "2025-06-17 23:10:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "ATL",
+      "awayTeam": "NYM",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Truist Park",
+      "attendance": 0,
+      "originalId": 1088,
+      "dateTime": "2025-06-17 23:15:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "TB",
+      "awayTeam": "BAL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Tropicana Field",
+      "attendance": 0,
+      "originalId": 1089,
+      "dateTime": "2025-06-17 23:35:00Z",
+      "round": 12
+    },
+    {
+      "homeTeam": "CWS",
+      "awayTeam": "STL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Guaranteed Rate Field",
+      "attendance": 0,
+      "originalId": 1090,
+      "dateTime": "2025-06-17 23:40:00Z",
+      "round": 12
+    }
+  ],
+  "players": []
+}

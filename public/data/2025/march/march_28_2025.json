@@ -1,0 +1,54 @@
+{
+  "date": "2025-03-28",
+  "games": [
+    {
+      "homeTeam": "ARI",
+      "awayTeam": "CHC",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Chase Field",
+      "attendance": 0,
+      "originalId": 15,
+      "dateTime": "2025-03-28 02:10:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "TB",
+      "awayTeam": "COL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Tropicana Field",
+      "attendance": 0,
+      "originalId": 17,
+      "dateTime": "2025-03-28 20:10:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "TOR",
+      "awayTeam": "BAL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Rogers Centre",
+      "attendance": 0,
+      "originalId": 18,
+      "dateTime": "2025-03-28 23:07:00Z",
+      "round": 1
+    },
+    {
+      "homeTeam": "MIA",
+      "awayTeam": "PIT",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "LoanDepot Park",
+      "attendance": 0,
+      "originalId": 19,
+      "dateTime": "2025-03-28 23:10:00Z",
+      "round": 1
+    }
+  ],
+  "players": []
+}

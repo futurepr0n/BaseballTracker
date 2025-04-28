@@ -1,0 +1,54 @@
+{
+  "date": "2025-06-02",
+  "games": [
+    {
+      "homeTeam": "MIA",
+      "awayTeam": "COL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "LoanDepot Park",
+      "attendance": 0,
+      "originalId": 889,
+      "dateTime": "2025-06-02 22:40:00Z",
+      "round": 10
+    },
+    {
+      "homeTeam": "BOS",
+      "awayTeam": "LAA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Fenway Park",
+      "attendance": 0,
+      "originalId": 890,
+      "dateTime": "2025-06-02 23:10:00Z",
+      "round": 10
+    },
+    {
+      "homeTeam": "CIN",
+      "awayTeam": "MIL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Great American Ball Park",
+      "attendance": 0,
+      "originalId": 891,
+      "dateTime": "2025-06-02 23:10:00Z",
+      "round": 10
+    },
+    {
+      "homeTeam": "CWS",
+      "awayTeam": "DET",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Guaranteed Rate Field",
+      "attendance": 0,
+      "originalId": 892,
+      "dateTime": "2025-06-02 23:40:00Z",
+      "round": 10
+    }
+  ],
+  "players": []
+}

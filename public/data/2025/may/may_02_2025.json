@@ -1,0 +1,138 @@
+{
+  "date": "2025-05-02",
+  "games": [
+    {
+      "homeTeam": "LAA",
+      "awayTeam": "DET",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Angel Stadium",
+      "attendance": 0,
+      "originalId": 470,
+      "dateTime": "2025-05-02 01:38:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "SF",
+      "awayTeam": "COL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Oracle Park",
+      "attendance": 0,
+      "originalId": 471,
+      "dateTime": "2025-05-02 01:45:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "CIN",
+      "awayTeam": "WSH",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Great American Ball Park",
+      "attendance": 0,
+      "originalId": 472,
+      "dateTime": "2025-05-02 22:10:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "PIT",
+      "awayTeam": "SD",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "PNC Park",
+      "attendance": 0,
+      "originalId": 473,
+      "dateTime": "2025-05-02 22:40:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "PHI",
+      "awayTeam": "ARI",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citizens Bank Park",
+      "attendance": 0,
+      "originalId": 474,
+      "dateTime": "2025-05-02 22:45:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "BAL",
+      "awayTeam": "KC",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Camden Yards",
+      "attendance": 0,
+      "originalId": 475,
+      "dateTime": "2025-05-02 23:05:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "NYY",
+      "awayTeam": "TB",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Yankee Stadium",
+      "attendance": 0,
+      "originalId": 476,
+      "dateTime": "2025-05-02 23:05:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "TOR",
+      "awayTeam": "CLE",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Rogers Centre",
+      "attendance": 0,
+      "originalId": 477,
+      "dateTime": "2025-05-02 23:07:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "BOS",
+      "awayTeam": "MIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Fenway Park",
+      "attendance": 0,
+      "originalId": 478,
+      "dateTime": "2025-05-02 23:10:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "ATL",
+      "awayTeam": "LAD",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Truist Park",
+      "attendance": 0,
+      "originalId": 480,
+      "dateTime": "2025-05-02 23:15:00Z",
+      "round": 6
+    },
+    {
+      "homeTeam": "CWS",
+      "awayTeam": "HOU",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Guaranteed Rate Field",
+      "attendance": 0,
+      "originalId": 481,
+      "dateTime": "2025-05-02 23:40:00Z",
+      "round": 6
+    }
+  ],
+  "players": []
+}

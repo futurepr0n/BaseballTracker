@@ -1,0 +1,192 @@
+/* PlayerStats Component Styling */
+
+.player-stats {
+  margin: 20px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.player-stats h2 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+/* Player Type Toggle */
+.player-type-toggle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.player-type-toggle button {
+  padding: 10px 20px;
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.player-type-toggle button:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.player-type-toggle button:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.player-type-toggle button.active {
+  background-color: #0056b3;
+  color: white;
+  border-color: #0056b3;
+}
+
+/* Filters section */
+.filters {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.search-filter {
+  flex: 1;
+  min-width: 250px;
+}
+
+.search-filter input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.team-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.team-filter label {
+  font-weight: 500;
+}
+
+.team-filter select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 1rem;
+}
+
+/* Table styling */
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.stats-table th {
+  background-color: #f8f8f8;
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #ddd;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  white-space: nowrap;
+}
+
+.stats-table th:hover {
+  background-color: #f0f0f0;
+}
+
+.stats-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.stats-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.player-name {
+  font-weight: 500;
+}
+
+.no-data {
+  text-align: center;
+  color: #888;
+  padding: 30px !important;
+}
+
+/* Stats summary section */
+.stats-summary {
+  background-color: #f8f8f8;
+  padding: 15px 20px;
+  border-radius: 6px;
+  margin-top: 20px;
+}
+
+.stats-summary h3 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.stats-summary ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.stats-summary li {
+  padding: 10px 15px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  flex: 1;
+  min-width: 150px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+  }
+  
+  .player-type-toggle {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .player-type-toggle button {
+    width: 100%;
+    border-radius: 4px;
+  }
+  
+  .team-filter {
+    width: 100%;
+  }
+  
+  .stats-summary ul {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

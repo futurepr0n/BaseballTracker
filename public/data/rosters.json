@@ -1,0 +1,4132 @@
+[
+  {
+    "name": "A. Abbott",
+    "team": "CIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Amador",
+    "team": "COL",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Banda",
+    "team": "LAD",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Barger",
+    "team": "TOR",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Barnes",
+    "team": "LAD",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Bender",
+    "team": "MIA",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Benintendi",
+    "team": "CHW",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Bohm",
+    "team": "PHI",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Bregman",
+    "team": "BOS",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Bummer",
+    "team": "ATL",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Burleson",
+    "team": "STL",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Call",
+    "team": "WSH",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Canario",
+    "team": "PIT",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Chapman",
+    "team": "BOS",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Chivilli",
+    "team": "COL",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Diaz",
+    "team": "CIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Frazier",
+    "team": "PIT",
+    "type": "hitter"
+  },
+  {
+    "name": "A. García",
+    "team": "TEX",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Gimenez",
+    "team": "TOR",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Hays",
+    "team": "CIN",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Heaney",
+    "team": "PIT",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Hedges",
+    "team": "CLE",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Hedges",
+    "team": "CLE",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Ibanez",
+    "team": "DET",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Jacob",
+    "team": "SD",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Judge",
+    "team": "NYY",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Kirk",
+    "team": "TOR",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Martinez",
+    "team": "CLE",
+    "type": "hitter"
+  },
+  {
+    "name": "A. McCutchen",
+    "team": "PIT",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Morejon",
+    "team": "SD",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Munoz",
+    "team": "SEA",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Nola",
+    "team": "PHI",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Pages",
+    "team": "LAD",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Pallante",
+    "team": "STL",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Ramirez",
+    "team": "MIA",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Riley",
+    "team": "ATL",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Roden",
+    "team": "TOR",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Rosario",
+    "team": "WSH",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Rutschman",
+    "team": "BAL",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Santander",
+    "team": "TOR",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Schunk",
+    "team": "COL",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Senzatela",
+    "team": "COL",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Thomas",
+    "team": "ARI",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Trejo",
+    "team": "COL",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Uribe",
+    "team": "MIL",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Vaughn",
+    "team": "CHW",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Veneziano",
+    "team": "MIA",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Verdugo",
+    "team": "ATL",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Vesia",
+    "team": "LAD",
+    "type": "pitcher"
+  },
+  {
+    "name": "A. Volpe",
+    "team": "NYY",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Wells",
+    "team": "NYY",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Wynns",
+    "team": "CIN",
+    "type": "hitter"
+  },
+  {
+    "name": "A. Zerpa",
+    "team": "KC",
+    "type": "pitcher"
+  },
+  {
+    "name": "A.J. Minter",
+    "team": "NYM",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Abreu",
+    "team": "HOU",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Baldwin",
+    "team": "CHW",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Baty",
+    "team": "NYM",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Bello",
+    "team": "BOS",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Bernardino",
+    "team": "BOS",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Bichette",
+    "team": "TOR",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Blalock",
+    "team": "COL",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Brown",
+    "team": "CHC",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Burke",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Buxton",
+    "team": "MIN",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Casparius",
+    "team": "LAD",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Dalbec",
+    "team": "CHW",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Donovan",
+    "team": "STL",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Doyle",
+    "team": "COL",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Dunn",
+    "team": "CIN",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Eisert",
+    "team": "CHW",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Elder",
+    "team": "ATL",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Falter",
+    "team": "PIT",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Francis",
+    "team": "TOR",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Fulford",
+    "team": "COL",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Hanifee",
+    "team": "DET",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Harper",
+    "team": "PHI",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Horn",
+    "team": "DET",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Hudson",
+    "team": "MIL",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Hurter",
+    "team": "DET",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Keller",
+    "team": "CHC",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. King",
+    "team": "HOU",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Lee",
+    "team": "MIN",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Little",
+    "team": "TOR",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Lord",
+    "team": "WSH",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Lowe",
+    "team": "TB",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Miller",
+    "team": "SEA",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Naylor",
+    "team": "CLE",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Nimmo",
+    "team": "NYM",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Ober",
+    "team": "MIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Pfaadt",
+    "team": "ARI",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Reynolds",
+    "team": "PIT",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Rice",
+    "team": "NYY",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Rocchio",
+    "team": "CLE",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Rodgers",
+    "team": "HOU",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Rooker",
+    "team": "OAK",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Rortvedt",
+    "team": "TB",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Sabol",
+    "team": "BOS",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Singer",
+    "team": "CIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Sousa",
+    "team": "HOU",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Stewart",
+    "team": "MIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Stott",
+    "team": "PHI",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Suter",
+    "team": "CIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Turang",
+    "team": "MIL",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Williamson",
+    "team": "SEA",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Wilson",
+    "team": "CHW",
+    "type": "pitcher"
+  },
+  {
+    "name": "B. Witt Jr.",
+    "team": "KC",
+    "type": "hitter"
+  },
+  {
+    "name": "B. Woo",
+    "team": "SEA",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Abrams",
+    "team": "WSH",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Bassitt",
+    "team": "TOR",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Bellinger",
+    "team": "NYY",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Biggio",
+    "team": "KC",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Booser",
+    "team": "CHW",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Boushley",
+    "team": "TEX",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Burnes",
+    "team": "ARI",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Carrasco",
+    "team": "NYY",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Carroll",
+    "team": "ARI",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Correa",
+    "team": "MIN",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Dollander",
+    "team": "COL",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Doval",
+    "team": "SF",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Durbin",
+    "team": "MIL",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Edwards Jr.",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Estevez",
+    "team": "KC",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Faucher",
+    "team": "MIA",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Ferguson",
+    "team": "PIT",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Gibson",
+    "team": "MIA",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Gillispie",
+    "team": "MIA",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Green",
+    "team": "TOR",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Henry",
+    "team": "WSH",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Hernandez",
+    "team": "PHI",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Holderman",
+    "team": "PIT",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Holmes",
+    "team": "NYM",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Joe",
+    "team": "SD",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Keith",
+    "team": "DET",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Kelly",
+    "team": "CHC",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Koss",
+    "team": "SF",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Koss",
+    "team": "SF",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Lawrence",
+    "team": "SEA",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Lee",
+    "team": "DET",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Legumina",
+    "team": "SEA",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Martin",
+    "team": "TEX",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. McCormick",
+    "team": "HOU",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Mead",
+    "team": "TB",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Meidroth",
+    "team": "CHW",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Mlodzinski",
+    "team": "PIT",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Morel",
+    "team": "TB",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Morton",
+    "team": "BAL",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Mullins",
+    "team": "BAL",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Narvaez",
+    "team": "BOS",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Norby",
+    "team": "MIA",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Paddack",
+    "team": "MIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Patrick",
+    "team": "MIL",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Perez",
+    "team": "BAL",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Poche",
+    "team": "WSH",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Poteet",
+    "team": "BAL",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Povich",
+    "team": "BAL",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Quantrill",
+    "team": "MIA",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Rafaela",
+    "team": "BOS",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Raleigh",
+    "team": "SEA",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Rea",
+    "team": "CHC",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Rodon",
+    "team": "NYY",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Sale",
+    "team": "ATL",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Sanchez",
+    "team": "PHI",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Sands",
+    "team": "MIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Santana",
+    "team": "CLE",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Schmidt",
+    "team": "NYY",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Seager",
+    "team": "TEX",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Selby",
+    "team": "BAL",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Shugart",
+    "team": "PIT",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Simpson",
+    "team": "TB",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Smith",
+    "team": "CLE",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Smith",
+    "team": "HOU",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Snider",
+    "team": "SEA",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Stevenson",
+    "team": "PHI",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Stratton",
+    "team": "KC",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Taylor",
+    "team": "LAD",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Thielbar",
+    "team": "CHC",
+    "type": "pitcher"
+  },
+  {
+    "name": "C. Vazquez",
+    "team": "MIN",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Walker",
+    "team": "HOU",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Yelich",
+    "team": "MIL",
+    "type": "hitter"
+  },
+  {
+    "name": "C. Yoho",
+    "team": "MIL",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Baldwin",
+    "team": "ATL",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Bednar",
+    "team": "PIT",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Cameron",
+    "team": "MIL",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Carlson",
+    "team": "BAL",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Cease",
+    "team": "SD",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Coulombe",
+    "team": "MIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Crews",
+    "team": "WSH",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Daniel",
+    "team": "ATL",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Dingler",
+    "team": "DET",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Festa",
+    "team": "MIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Hamilton",
+    "team": "BOS",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Harris",
+    "team": "TEX",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Hernandez",
+    "team": "ATL",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Jameson",
+    "team": "ARI",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Jameson",
+    "team": "ARI",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Jansen",
+    "team": "TB",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Keirsey Jr.",
+    "team": "MIN",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Kremer",
+    "team": "BAL",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Lee",
+    "team": "ATL",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Lynch",
+    "team": "KC",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Martin",
+    "team": "CHW",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. May",
+    "team": "LAD",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Moore",
+    "team": "SEA",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Myers",
+    "team": "MIA",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Nikhazy",
+    "team": "CLE",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Palencia",
+    "team": "CHC",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Peterson",
+    "team": "NYM",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Pomeranz",
+    "team": "CHC",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Rasmussen",
+    "team": "TB",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Santana",
+    "team": "PIT",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Schneemann",
+    "team": "CLE",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Solano",
+    "team": "SEA",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Swanson",
+    "team": "CHC",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Tate",
+    "team": "TOR",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Villar",
+    "team": "SF",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Waters",
+    "team": "KC",
+    "type": "hitter"
+  },
+  {
+    "name": "D. Williams",
+    "team": "NYY",
+    "type": "pitcher"
+  },
+  {
+    "name": "D. Young",
+    "team": "NYM",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Bazardo",
+    "team": "SEA",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Cabrera",
+    "team": "MIA",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Clase",
+    "team": "CLE",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Clement",
+    "team": "TOR",
+    "type": "hitter"
+  },
+  {
+    "name": "E. De La Cruz",
+    "team": "CIN",
+    "type": "hitter"
+  },
+  {
+    "name": "E. De Los Santos",
+    "team": "ATL",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Diaz",
+    "team": "SD",
+    "type": "hitter"
+  },
+  {
+    "name": "E. Diaz",
+    "team": "NYM",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Fedde",
+    "team": "STL",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Haase",
+    "team": "MIL",
+    "type": "hitter"
+  },
+  {
+    "name": "E. Hancock",
+    "team": "SEA",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Hernández",
+    "team": "LAD",
+    "type": "hitter"
+  },
+  {
+    "name": "E. Julien",
+    "team": "MIN",
+    "type": "hitter"
+  },
+  {
+    "name": "E. Lucas",
+    "team": "TOR",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Miller",
+    "team": "SF",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Orze",
+    "team": "TB",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Pagan",
+    "team": "CIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Phillips",
+    "team": "LAD",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Quero",
+    "team": "CHW",
+    "type": "hitter"
+  },
+  {
+    "name": "E. Roberts",
+    "team": "CHC",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Rodriguez",
+    "team": "ARI",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Salazar",
+    "team": "WSH",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Sosa",
+    "team": "PHI",
+    "type": "hitter"
+  },
+  {
+    "name": "E. Suarez",
+    "team": "ARI",
+    "type": "hitter"
+  },
+  {
+    "name": "E. Uceta",
+    "team": "TB",
+    "type": "pitcher"
+  },
+  {
+    "name": "E. Valdez",
+    "team": "PIT",
+    "type": "hitter"
+  },
+  {
+    "name": "E. Wagaman",
+    "team": "MIA",
+    "type": "hitter"
+  },
+  {
+    "name": "E. White",
+    "team": "ATL",
+    "type": "hitter"
+  },
+  {
+    "name": "F. Alvarez",
+    "team": "NYM",
+    "type": "hitter"
+  },
+  {
+    "name": "F. Bautista",
+    "team": "BAL",
+    "type": "pitcher"
+  },
+  {
+    "name": "F. Cruz",
+    "team": "NYY",
+    "type": "pitcher"
+  },
+  {
+    "name": "F. Fermin",
+    "team": "KC",
+    "type": "hitter"
+  },
+  {
+    "name": "F. Freeman",
+    "team": "LAD",
+    "type": "hitter"
+  },
+  {
+    "name": "F. Lindor",
+    "team": "NYM",
+    "type": "hitter"
+  },
+  {
+    "name": "F. Peralta",
+    "team": "MIL",
+    "type": "pitcher"
+  },
+  {
+    "name": "F. Tatis Jr.",
+    "team": "SD",
+    "type": "hitter"
+  },
+  {
+    "name": "F. Valdez",
+    "team": "HOU",
+    "type": "pitcher"
+  },
+  {
+    "name": "F. Whitley",
+    "team": "HOU",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Anderson",
+    "team": "MIL",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Arias",
+    "team": "CLE",
+    "type": "hitter"
+  },
+  {
+    "name": "G. Ashcraft",
+    "team": "CIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Canning",
+    "team": "NYM",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Cleavinger",
+    "team": "TB",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Crochet",
+    "team": "BOS",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Hampson",
+    "team": "ARI",
+    "type": "hitter"
+  },
+  {
+    "name": "G. Henderson",
+    "team": "BAL",
+    "type": "hitter"
+  },
+  {
+    "name": "G. Hollowell",
+    "team": "CHC",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Holman",
+    "team": "OAK",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Holmes",
+    "team": "ATL",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Jax",
+    "team": "MIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Lux",
+    "team": "CIN",
+    "type": "hitter"
+  },
+  {
+    "name": "G. McDaniels",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Mitchell",
+    "team": "MIL",
+    "type": "hitter"
+  },
+  {
+    "name": "G. Moreno",
+    "team": "ARI",
+    "type": "hitter"
+  },
+  {
+    "name": "G. Pauley",
+    "team": "MIA",
+    "type": "hitter"
+  },
+  {
+    "name": "G. Perdomo",
+    "team": "ARI",
+    "type": "hitter"
+  },
+  {
+    "name": "G. Sanchez",
+    "team": "BAL",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Sanchez",
+    "team": "BAL",
+    "type": "hitter"
+  },
+  {
+    "name": "G. Sheets",
+    "team": "SD",
+    "type": "hitter"
+  },
+  {
+    "name": "G. Soriano",
+    "team": "MIA",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Soto",
+    "team": "BAL",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Speier",
+    "team": "SEA",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Springer",
+    "team": "TOR",
+    "type": "hitter"
+  },
+  {
+    "name": "G. Torres",
+    "team": "DET",
+    "type": "hitter"
+  },
+  {
+    "name": "G. Urshela",
+    "team": "OAK",
+    "type": "hitter"
+  },
+  {
+    "name": "G. Weissert",
+    "team": "BOS",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Whitlock",
+    "team": "BOS",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Williams",
+    "team": "CLE",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Wolfram",
+    "team": "BAL",
+    "type": "pitcher"
+  },
+  {
+    "name": "G. Workman",
+    "team": "CHW",
+    "type": "hitter"
+  },
+  {
+    "name": "H. Bader",
+    "team": "MIN",
+    "type": "hitter"
+  },
+  {
+    "name": "H. Bigge",
+    "team": "TB",
+    "type": "pitcher"
+  },
+  {
+    "name": "H. Birdsong",
+    "team": "SF",
+    "type": "pitcher"
+  },
+  {
+    "name": "H. Brazoban",
+    "team": "NYM",
+    "type": "pitcher"
+  },
+  {
+    "name": "H. Brown",
+    "team": "HOU",
+    "type": "pitcher"
+  },
+  {
+    "name": "H. Davis",
+    "team": "PIT",
+    "type": "hitter"
+  },
+  {
+    "name": "H. Gaddis",
+    "team": "CLE",
+    "type": "pitcher"
+  },
+  {
+    "name": "H. Goodman",
+    "team": "COL",
+    "type": "hitter"
+  },
+  {
+    "name": "H. Greene",
+    "team": "CIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "H. Harris",
+    "team": "OAK",
+    "type": "pitcher"
+  },
+  {
+    "name": "H. Kjerstad",
+    "team": "BAL",
+    "type": "hitter"
+  },
+  {
+    "name": "H. Milner",
+    "team": "TEX",
+    "type": "pitcher"
+  },
+  {
+    "name": "H. Ramos",
+    "team": "SF",
+    "type": "hitter"
+  },
+  {
+    "name": "H. Renfroe",
+    "team": "KC",
+    "type": "hitter"
+  },
+  {
+    "name": "H. Senger",
+    "team": "NYM",
+    "type": "hitter"
+  },
+  {
+    "name": "H. Wesneski",
+    "team": "HOU",
+    "type": "pitcher"
+  },
+  {
+    "name": "I. Anderson",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "I. Collins",
+    "team": "MIL",
+    "type": "hitter"
+  },
+  {
+    "name": "I. Gibaut",
+    "team": "CIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "I. Hamilton",
+    "team": "NYY",
+    "type": "pitcher"
+  },
+  {
+    "name": "I. Happ",
+    "team": "CHC",
+    "type": "hitter"
+  },
+  {
+    "name": "I. Kiner-Falefa",
+    "team": "PIT",
+    "type": "hitter"
+  },
+  {
+    "name": "I. Paredes",
+    "team": "HOU",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Adam",
+    "team": "SD",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Adell",
+    "team": "LAA",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Alcala",
+    "team": "MIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Altuve",
+    "team": "HOU",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Alvarado",
+    "team": "PHI",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Amaya",
+    "team": "CHW",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Aranda",
+    "team": "TB",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Azocar",
+    "team": "NYM",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Baez",
+    "team": "DET",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Barrosa",
+    "team": "ARI",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Bart",
+    "team": "PIT",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Bauers",
+    "team": "MIL",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Beck",
+    "team": "COL",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Beeks",
+    "team": "ARI",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Bell",
+    "team": "WSH",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Berrios",
+    "team": "TOR",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Berti",
+    "team": "CHC",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Bird",
+    "team": "COL",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Bleday",
+    "team": "OAK",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Bowlan",
+    "team": "KC",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Bride",
+    "team": "MIN",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Burger",
+    "team": "TEX",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Butto",
+    "team": "NYM",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Caballero",
+    "team": "TB",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Caminero",
+    "team": "TB",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Candelario",
+    "team": "CIN",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Cannon",
+    "team": "CHW",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Cantillo",
+    "team": "CLE",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Chavez",
+    "team": "ATL",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Chisholm Jr.",
+    "team": "NYY",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Chourio",
+    "team": "MIL",
+    "type": "hitter"
+  },
+  {
+    "name": "J. deGrom",
+    "team": "TEX",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Dominguez",
+    "team": "NYY",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Dreyer",
+    "team": "LAD",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Duran",
+    "team": "BOS",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Duran",
+    "team": "MIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Eder",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Estrada",
+    "team": "SD",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Fermin",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Ferrer",
+    "team": "WSH",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Flaherty",
+    "team": "DET",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Fraley",
+    "team": "CIN",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Hader",
+    "team": "HOU",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Heim",
+    "team": "TEX",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Herget",
+    "team": "COL",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Herrera",
+    "team": "ARI",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Hicks",
+    "team": "SF",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Hill",
+    "team": "COL",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Hoffman",
+    "team": "TOR",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Holliday",
+    "team": "BAL",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Iglesias",
+    "team": "SD",
+    "type": "hitter"
+  },
+  {
+    "name": "J. India",
+    "team": "KC",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Irvin",
+    "team": "WSH",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Jung",
+    "team": "DET",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Junis",
+    "team": "CLE",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Kelenic",
+    "team": "ATL",
+    "type": "hitter"
+  },
+  {
+    "name": "J. King",
+    "team": "STL",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Kochanowicz",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Koenig",
+    "team": "MIL",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Latz",
+    "team": "TEX",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Lawrence",
+    "team": "PIT",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Leasure",
+    "team": "CHW",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Leclerc",
+    "team": "OAK",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Lee",
+    "team": "SF",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Leiter",
+    "team": "TEX",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Lopez",
+    "team": "WSH",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Luzardo",
+    "team": "PHI",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Malloy",
+    "team": "DET",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Mangum",
+    "team": "TB",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Martinez",
+    "team": "ARI",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Mateo",
+    "team": "BAL",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Mateo",
+    "team": "BAL",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. McNeil",
+    "team": "NYM",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Mejia",
+    "team": "COL",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Merryweather",
+    "team": "CHC",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Meyers",
+    "team": "HOU",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Morillo",
+    "team": "ARI",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Naylor",
+    "team": "ARI",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Noel",
+    "team": "CLE",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Ortiz",
+    "team": "MIL",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Palacios",
+    "team": "CHW",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Payamps",
+    "team": "MIL",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Pederson",
+    "team": "TEX",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Pena",
+    "team": "HOU",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Pereda",
+    "team": "OAK",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Polanco",
+    "team": "SEA",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Quintana",
+    "team": "MIL",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Ramirez",
+    "team": "CLE",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Rodriguez",
+    "team": "SEA",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Rojas",
+    "team": "PHI",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Romano",
+    "team": "PHI",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Romero",
+    "team": "STL",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Ross",
+    "team": "PHI",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Ruiz",
+    "team": "PHI",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Rutledge",
+    "team": "WSH",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Ryan",
+    "team": "MIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Sánchez",
+    "team": "MIA",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Sanoja",
+    "team": "MIA",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Sanoja",
+    "team": "MIA",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Schreiber",
+    "team": "KC",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Sears",
+    "team": "OAK",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Shuster",
+    "team": "CHW",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Slaten",
+    "team": "BOS",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Smith",
+    "team": "TEX",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Soler",
+    "team": "LAA",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Soriano",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Soto",
+    "team": "NYM",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Springs",
+    "team": "OAK",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Stallings",
+    "team": "COL",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Sterner",
+    "team": "OAK",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Suwinski",
+    "team": "PIT",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Taillon",
+    "team": "CHC",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Tena",
+    "team": "WSH",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Tinoco",
+    "team": "MIA",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Topa",
+    "team": "MIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Trevino",
+    "team": "CIN",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Triolo",
+    "team": "PIT",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Turner",
+    "team": "CHC",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Verlander",
+    "team": "SF",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Walker",
+    "team": "STL",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Walker",
+    "team": "TOR",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Webb",
+    "team": "TEX",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Wentz",
+    "team": "PIT",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Westburg",
+    "team": "BAL",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Wicks",
+    "team": "CHC",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Wilson",
+    "team": "OAK",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Wilson",
+    "team": "BOS",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Winckowski",
+    "team": "BOS",
+    "type": "pitcher"
+  },
+  {
+    "name": "J. Winker",
+    "team": "NYM",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Wood",
+    "team": "WSH",
+    "type": "hitter"
+  },
+  {
+    "name": "J. Young",
+    "team": "WSH",
+    "type": "hitter"
+  },
+  {
+    "name": "J.C. Escarra",
+    "team": "NYY",
+    "type": "hitter"
+  },
+  {
+    "name": "J.D. Davis",
+    "team": "LAA",
+    "type": "hitter"
+  },
+  {
+    "name": "J.P. Crawford",
+    "team": "SEA",
+    "type": "hitter"
+  },
+  {
+    "name": "J.P. Feyereisen",
+    "team": "ARI",
+    "type": "pitcher"
+  },
+  {
+    "name": "J.T. Ginn",
+    "team": "OAK",
+    "type": "pitcher"
+  },
+  {
+    "name": "J.T. Realmuto",
+    "team": "PHI",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Akin",
+    "team": "BAL",
+    "type": "pitcher"
+  },
+  {
+    "name": "K. Allard",
+    "team": "CLE",
+    "type": "pitcher"
+  },
+  {
+    "name": "K. Bubic",
+    "team": "KC",
+    "type": "pitcher"
+  },
+  {
+    "name": "K. Campbell",
+    "team": "BOS",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Carpenter",
+    "team": "DET",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Clemens",
+    "team": "PHI",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Farmer",
+    "team": "COL",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Finnegan",
+    "team": "WSH",
+    "type": "pitcher"
+  },
+  {
+    "name": "K. Freeland",
+    "team": "COL",
+    "type": "pitcher"
+  },
+  {
+    "name": "K. Gausman",
+    "team": "TOR",
+    "type": "pitcher"
+  },
+  {
+    "name": "K. Hart",
+    "team": "SD",
+    "type": "pitcher"
+  },
+  {
+    "name": "K. Hayes",
+    "team": "PIT",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Hendricks",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "K. Higashioka",
+    "team": "TEX",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Isbel",
+    "team": "KC",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Jansen",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "K. Leahy",
+    "team": "STL",
+    "type": "pitcher"
+  },
+  {
+    "name": "K. Maeda",
+    "team": "DET",
+    "type": "pitcher"
+  },
+  {
+    "name": "K. Manzardo",
+    "team": "CLE",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Misner",
+    "team": "TB",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Montero",
+    "team": "DET",
+    "type": "pitcher"
+  },
+  {
+    "name": "K. Newman",
+    "team": "LAA",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Nicolas",
+    "team": "PIT",
+    "type": "pitcher"
+  },
+  {
+    "name": "K. Paris",
+    "team": "LAA",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Pillar",
+    "team": "TEX",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Rocker",
+    "team": "TEX",
+    "type": "pitcher"
+  },
+  {
+    "name": "K. Ruiz",
+    "team": "WSH",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Schwarber",
+    "team": "PHI",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Senga",
+    "team": "NYM",
+    "type": "pitcher"
+  },
+  {
+    "name": "K. Stowers",
+    "team": "MIA",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Tucker",
+    "team": "CHC",
+    "type": "hitter"
+  },
+  {
+    "name": "K. Yates",
+    "team": "LAD",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Acuna",
+    "team": "NYM",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Allen",
+    "team": "CLE",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Arias",
+    "team": "MIA",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Arraez",
+    "team": "SD",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Bachar",
+    "team": "MIA",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Baker",
+    "team": "STL",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Butler",
+    "team": "OAK",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Castillo",
+    "team": "SEA",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Erceg",
+    "team": "KC",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Evans",
+    "team": "SEA",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Garcia",
+    "team": "LAD",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Garcia Jr.",
+    "team": "WSH",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Gilbert",
+    "team": "SEA",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Gillaspie",
+    "team": "SD",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Guerrero",
+    "team": "BOS",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Gurriel Jr.",
+    "team": "ARI",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Henderson",
+    "team": "MIL",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Hendriks",
+    "team": "BOS",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Hicks",
+    "team": "MIA",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Jackson",
+    "team": "TEX",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Keaschall",
+    "team": "MIN",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Matos",
+    "team": "SF",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Nootbaar",
+    "team": "STL",
+    "type": "hitter"
+  },
+  {
+    "name": "L. O'Hoppe",
+    "team": "LAA",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Ortiz",
+    "team": "CLE",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Raley",
+    "team": "SEA",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Rengifo",
+    "team": "LAA",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Richardson",
+    "team": "CIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Rivas",
+    "team": "SEA",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Robert Jr.",
+    "team": "CHW",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Roupp",
+    "team": "SF",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Severino",
+    "team": "OAK",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Sims",
+    "team": "WSH",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Sosa",
+    "team": "CHW",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Taveras",
+    "team": "TEX",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Torrens",
+    "team": "NYM",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Trivino",
+    "team": "SF",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Urias",
+    "team": "OAK",
+    "type": "hitter"
+  },
+  {
+    "name": "L. VanWey",
+    "team": "HOU",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Varland",
+    "team": "MIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Wade Jr.",
+    "team": "SF",
+    "type": "hitter"
+  },
+  {
+    "name": "L. Weaver",
+    "team": "NYY",
+    "type": "pitcher"
+  },
+  {
+    "name": "L. Webb",
+    "team": "SF",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Amaya",
+    "team": "CHC",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Andujar",
+    "team": "OAK",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Betts",
+    "team": "LAD",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Bowman",
+    "team": "BAL",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Boyd",
+    "team": "CHC",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Busch",
+    "team": "CHC",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Canha",
+    "team": "KC",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Chapman",
+    "team": "SF",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Conforto",
+    "team": "LAD",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Darrell-Hicks",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Dubon",
+    "team": "HOU",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Englert",
+    "team": "TB",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Fluharty",
+    "team": "TOR",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Fried",
+    "team": "NYY",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Garcia",
+    "team": "KC",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Garver",
+    "team": "SEA",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Gasper",
+    "team": "MIN",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Gore",
+    "team": "WSH",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Gorski",
+    "team": "PIT",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Harris",
+    "team": "ATL",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Keller",
+    "team": "PIT",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Kelly",
+    "team": "ARI",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Kepler",
+    "team": "PHI",
+    "type": "hitter"
+  },
+  {
+    "name": "M. King",
+    "team": "SD",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Kranick",
+    "team": "NYM",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Leiter Jr.",
+    "team": "NYY",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Liberatore",
+    "team": "STL",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Lorenzen",
+    "team": "KC",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Machado",
+    "team": "SD",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Maldonado",
+    "team": "SD",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Massey",
+    "team": "KC",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Mastrobuoni",
+    "team": "SEA",
+    "type": "hitter"
+  },
+  {
+    "name": "M. McCoy",
+    "team": "SD",
+    "type": "hitter"
+  },
+  {
+    "name": "M. McLain",
+    "team": "CIN",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Mervis",
+    "team": "MIA",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Meyer",
+    "team": "MIA",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Mikolas",
+    "team": "STL",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Miller",
+    "team": "OAK",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Moniak",
+    "team": "COL",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Montgomery",
+    "team": "TB",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Muncy",
+    "team": "OAK",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Olson",
+    "team": "ATL",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Ozuna",
+    "team": "ATL",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Parker",
+    "team": "WSH",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Rodriguez",
+    "team": "TB",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Rojas",
+    "team": "LAD",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Schuemann",
+    "team": "OAK",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Semien",
+    "team": "TEX",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Siani",
+    "team": "STL",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Spence",
+    "team": "OAK",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Strahm",
+    "team": "PHI",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Straw",
+    "team": "TOR",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Svanson",
+    "team": "STL",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Taylor",
+    "team": "CHW",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Thaiss",
+    "team": "CHW",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Toglia",
+    "team": "COL",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Trout",
+    "team": "LAA",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Vargas",
+    "team": "CHW",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Vasil",
+    "team": "CHW",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Vientos",
+    "team": "NYM",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Wacha",
+    "team": "KC",
+    "type": "pitcher"
+  },
+  {
+    "name": "M. Winn",
+    "team": "STL",
+    "type": "hitter"
+  },
+  {
+    "name": "M. Yastrzemski",
+    "team": "SF",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Ahmed",
+    "team": "TEX",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Allen",
+    "team": "ATL",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Arenado",
+    "team": "STL",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Castellanos",
+    "team": "PHI",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Davis",
+    "team": "LAD",
+    "type": "pitcher"
+  },
+  {
+    "name": "N. Eovaldi",
+    "team": "TEX",
+    "type": "pitcher"
+  },
+  {
+    "name": "N. Gorman",
+    "team": "STL",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Hoerner",
+    "team": "CHC",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Jones",
+    "team": "CLE",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Kurtz",
+    "team": "OAK",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Lodolo",
+    "team": "CIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "N. Lopez",
+    "team": "CHC",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Lowe",
+    "team": "WSH",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Lukes",
+    "team": "TOR",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Marte",
+    "team": "CIN",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Martinez",
+    "team": "CIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "N. Martini",
+    "team": "COL",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Maton",
+    "team": "CHW",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Mears",
+    "team": "MIL",
+    "type": "pitcher"
+  },
+  {
+    "name": "N. Murdock",
+    "team": "OAK",
+    "type": "pitcher"
+  },
+  {
+    "name": "N. Nunez",
+    "team": "WSH",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Pivetta",
+    "team": "SD",
+    "type": "pitcher"
+  },
+  {
+    "name": "N. Schanuel",
+    "team": "LAA",
+    "type": "hitter"
+  },
+  {
+    "name": "N. Wiles",
+    "team": "ATL",
+    "type": "pitcher"
+  },
+  {
+    "name": "O. Albies",
+    "team": "ATL",
+    "type": "hitter"
+  },
+  {
+    "name": "O. Arcia",
+    "team": "ATL",
+    "type": "hitter"
+  },
+  {
+    "name": "O. Bido",
+    "team": "OAK",
+    "type": "pitcher"
+  },
+  {
+    "name": "O. Cabrera",
+    "team": "NYY",
+    "type": "hitter"
+  },
+  {
+    "name": "O. Cruz",
+    "team": "PIT",
+    "type": "hitter"
+  },
+  {
+    "name": "O. Gonzalez",
+    "team": "SD",
+    "type": "hitter"
+  },
+  {
+    "name": "O. Kerkering",
+    "team": "PHI",
+    "type": "pitcher"
+  },
+  {
+    "name": "O. Lopez",
+    "team": "MIA",
+    "type": "hitter"
+  },
+  {
+    "name": "O. Miller",
+    "team": "COL",
+    "type": "hitter"
+  },
+  {
+    "name": "P. Alonso",
+    "team": "NYM",
+    "type": "hitter"
+  },
+  {
+    "name": "P. Bailey",
+    "team": "SF",
+    "type": "hitter"
+  },
+  {
+    "name": "P. Corbin",
+    "team": "TEX",
+    "type": "pitcher"
+  },
+  {
+    "name": "P. Crow-Armstrong",
+    "team": "CHC",
+    "type": "hitter"
+  },
+  {
+    "name": "P. Fairbanks",
+    "team": "TB",
+    "type": "pitcher"
+  },
+  {
+    "name": "P. Goldschmidt",
+    "team": "NYY",
+    "type": "hitter"
+  },
+  {
+    "name": "P. Hodge",
+    "team": "CHC",
+    "type": "pitcher"
+  },
+  {
+    "name": "P. Johnson",
+    "team": "ATL",
+    "type": "pitcher"
+  },
+  {
+    "name": "P. Lopez",
+    "team": "MIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "P. Maton",
+    "team": "STL",
+    "type": "pitcher"
+  },
+  {
+    "name": "P. Murfee",
+    "team": "CHW",
+    "type": "pitcher"
+  },
+  {
+    "name": "P. Pages",
+    "team": "STL",
+    "type": "hitter"
+  },
+  {
+    "name": "P. Reyes",
+    "team": "NYY",
+    "type": "hitter"
+  },
+  {
+    "name": "P. Schultz",
+    "team": "TOR",
+    "type": "pitcher"
+  },
+  {
+    "name": "P. Sewald",
+    "team": "CLE",
+    "type": "pitcher"
+  },
+  {
+    "name": "P. Skenes",
+    "team": "PIT",
+    "type": "pitcher"
+  },
+  {
+    "name": "P. Smith",
+    "team": "ARI",
+    "type": "hitter"
+  },
+  {
+    "name": "Q. Priester",
+    "team": "MIL",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Adams",
+    "team": "WSH",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Arozarena",
+    "team": "SEA",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Bergert",
+    "team": "SD",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Blanco",
+    "team": "HOU",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Borucki",
+    "team": "PIT",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Brantly",
+    "team": "MIA",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Detmers",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Devers",
+    "team": "BOS",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Feltner",
+    "team": "COL",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Fernandez",
+    "team": "STL",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Garcia",
+    "team": "TEX",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Garrett",
+    "team": "NYM",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Gonzalez",
+    "team": "BOS",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Greene",
+    "team": "DET",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Grichuk",
+    "team": "ARI",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Gusto",
+    "team": "HOU",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Helsley",
+    "team": "STL",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Henriquez",
+    "team": "MIA",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Hoskins",
+    "team": "MIL",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Iglesias",
+    "team": "ATL",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Jeffers",
+    "team": "MIN",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Johnson",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Kreidler",
+    "team": "DET",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Laureano",
+    "team": "BAL",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Marchan",
+    "team": "PHI",
+    "type": "hitter"
+  },
+  {
+    "name": "R. McMahon",
+    "team": "COL",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Montero",
+    "team": "ATL",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Mountcastle",
+    "team": "BAL",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Nelson",
+    "team": "ARI",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. O'Brien",
+    "team": "STL",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. O'Hearn",
+    "team": "BAL",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Olson",
+    "team": "DET",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Pepiot",
+    "team": "TB",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Pressly",
+    "team": "CHC",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Ray",
+    "team": "SF",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Refsnyder",
+    "team": "BOS",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Rodriguez",
+    "team": "SF",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Sasaki",
+    "team": "LAD",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Simon",
+    "team": "MIA",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Stanek",
+    "team": "NYM",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Suarez",
+    "team": "SD",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Tellez",
+    "team": "SEA",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Thompson",
+    "team": "ARI",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Urias",
+    "team": "BAL",
+    "type": "hitter"
+  },
+  {
+    "name": "R. Vasquez",
+    "team": "SD",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Walker",
+    "team": "SF",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Wynne",
+    "team": "CIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Yarbrough",
+    "team": "NYY",
+    "type": "pitcher"
+  },
+  {
+    "name": "R. Zeferjahn",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Alcantara",
+    "team": "MIA",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Alexander",
+    "team": "COL",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Armstrong",
+    "team": "TEX",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Barlow",
+    "team": "CIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Baz",
+    "team": "TB",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Bivens",
+    "team": "SF",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Blewett",
+    "team": "ATL",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Bouchard",
+    "team": "COL",
+    "type": "hitter"
+  },
+  {
+    "name": "S. Brown",
+    "team": "OAK",
+    "type": "hitter"
+  },
+  {
+    "name": "S. Burke",
+    "team": "CHW",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Cruz",
+    "team": "KC",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Dominguez",
+    "team": "BAL",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Espinal",
+    "team": "CIN",
+    "type": "hitter"
+  },
+  {
+    "name": "S. Fairchild",
+    "team": "ATL",
+    "type": "hitter"
+  },
+  {
+    "name": "S. Frelick",
+    "team": "MIL",
+    "type": "hitter"
+  },
+  {
+    "name": "S. Gray",
+    "team": "STL",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Guenther",
+    "team": "DET",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Halvorsen",
+    "team": "COL",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Huff",
+    "team": "SF",
+    "type": "hitter"
+  },
+  {
+    "name": "S. Imanaga",
+    "team": "CHC",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Kwan",
+    "team": "CLE",
+    "type": "hitter"
+  },
+  {
+    "name": "S. Langeliers",
+    "team": "OAK",
+    "type": "hitter"
+  },
+  {
+    "name": "S. Lao",
+    "team": "SEA",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Lugo",
+    "team": "KC",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Marte",
+    "team": "NYM",
+    "type": "hitter"
+  },
+  {
+    "name": "S. Matz",
+    "team": "STL",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Miller",
+    "team": "ARI",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Miller",
+    "team": "ARI",
+    "type": "hitter"
+  },
+  {
+    "name": "S. Murphy",
+    "team": "ATL",
+    "type": "hitter"
+  },
+  {
+    "name": "S. Newcomb",
+    "team": "BOS",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Ohtani",
+    "team": "LAD",
+    "type": "hitter"
+  },
+  {
+    "name": "S. Okert",
+    "team": "HOU",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Perez",
+    "team": "KC",
+    "type": "hitter"
+  },
+  {
+    "name": "S. Schwellenbach",
+    "team": "ATL",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Smith",
+    "team": "CHW",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Steer",
+    "team": "CIN",
+    "type": "hitter"
+  },
+  {
+    "name": "S. Suzuki",
+    "team": "CHC",
+    "type": "hitter"
+  },
+  {
+    "name": "S. Torkelson",
+    "team": "DET",
+    "type": "hitter"
+  },
+  {
+    "name": "S. Wilson",
+    "team": "CHW",
+    "type": "pitcher"
+  },
+  {
+    "name": "S. Woods Richardson",
+    "team": "MIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Alexander",
+    "team": "MIL",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Banks",
+    "team": "PHI",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Bibee",
+    "team": "CLE",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Bradley",
+    "team": "TB",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Casas",
+    "team": "BOS",
+    "type": "hitter"
+  },
+  {
+    "name": "T. d'Arnaud",
+    "team": "LAA",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Edman",
+    "team": "LAD",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Ferguson",
+    "team": "OAK",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Fitzgerald",
+    "team": "SF",
+    "type": "hitter"
+  },
+  {
+    "name": "T. France",
+    "team": "MIN",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Friedl",
+    "team": "CIN",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Gilbert",
+    "team": "CHW",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Glasnow",
+    "team": "LAD",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Grisham",
+    "team": "NYY",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Heineman",
+    "team": "TOR",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Hernández",
+    "team": "LAD",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Herrin",
+    "team": "CLE",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Hill",
+    "team": "NYY",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Holton",
+    "team": "DET",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Houck",
+    "team": "BOS",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Jankowski",
+    "team": "TB",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Kahnle",
+    "team": "DET",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Kinley",
+    "team": "COL",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Larnach",
+    "team": "MIN",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Lipscomb",
+    "team": "WSH",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Mahle",
+    "team": "TEX",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Megill",
+    "team": "MIL",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Myers",
+    "team": "MIL",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Nido",
+    "team": "DET",
+    "type": "hitter"
+  },
+  {
+    "name": "T. O'Neill",
+    "team": "BAL",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Ornelas",
+    "team": "SD",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Pham",
+    "team": "PIT",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Phillips",
+    "team": "MIA",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Rogers",
+    "team": "SF",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Saggese",
+    "team": "STL",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Santillan",
+    "team": "CIN",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Saucedo",
+    "team": "SEA",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Scott",
+    "team": "HOU",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Skubal",
+    "team": "DET",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Soderstrom",
+    "team": "OAK",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Story",
+    "team": "BOS",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Sugano",
+    "team": "BAL",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Sweeney",
+    "team": "DET",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Tawa",
+    "team": "ARI",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Taylor",
+    "team": "NYM",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Taylor",
+    "team": "SEA",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Thornton",
+    "team": "SEA",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Tolbert",
+    "team": "KC",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Turner",
+    "team": "PHI",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Wade",
+    "team": "SD",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Walker",
+    "team": "PHI",
+    "type": "pitcher"
+  },
+  {
+    "name": "T. Walls",
+    "team": "TB",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Ward",
+    "team": "LAA",
+    "type": "hitter"
+  },
+  {
+    "name": "T. Williams",
+    "team": "WSH",
+    "type": "pitcher"
+  },
+  {
+    "name": "T.J. McFarland",
+    "team": "OAK",
+    "type": "pitcher"
+  },
+  {
+    "name": "Tim Anderson",
+    "team": "LAA",
+    "type": "hitter"
+  },
+  {
+    "name": "Ty. Anderson",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "V. Brujan",
+    "team": "CHC",
+    "type": "hitter"
+  },
+  {
+    "name": "V. Capra",
+    "team": "MIL",
+    "type": "hitter"
+  },
+  {
+    "name": "V. Caratini",
+    "team": "HOU",
+    "type": "hitter"
+  },
+  {
+    "name": "V. Guerrero Jr.",
+    "team": "TOR",
+    "type": "hitter"
+  },
+  {
+    "name": "V. Mederos",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "V. Pasquantino",
+    "team": "KC",
+    "type": "hitter"
+  },
+  {
+    "name": "V. Scott",
+    "team": "STL",
+    "type": "hitter"
+  },
+  {
+    "name": "W. Abreu",
+    "team": "BOS",
+    "type": "hitter"
+  },
+  {
+    "name": "W. Adames",
+    "team": "SF",
+    "type": "hitter"
+  },
+  {
+    "name": "W. Buehler",
+    "team": "BOS",
+    "type": "pitcher"
+  },
+  {
+    "name": "W. Contreras",
+    "team": "MIL",
+    "type": "hitter"
+  },
+  {
+    "name": "W. Flores",
+    "team": "SF",
+    "type": "hitter"
+  },
+  {
+    "name": "W. Langford",
+    "team": "TEX",
+    "type": "hitter"
+  },
+  {
+    "name": "W. Peralta",
+    "team": "SD",
+    "type": "pitcher"
+  },
+  {
+    "name": "W. Smith",
+    "team": "LAD",
+    "type": "hitter"
+  },
+  {
+    "name": "W. Vest",
+    "team": "DET",
+    "type": "pitcher"
+  },
+  {
+    "name": "W. Wagner",
+    "team": "TOR",
+    "type": "hitter"
+  },
+  {
+    "name": "W. Warren",
+    "team": "NYY",
+    "type": "pitcher"
+  },
+  {
+    "name": "W. Wilson",
+    "team": "CLE",
+    "type": "hitter"
+  },
+  {
+    "name": "X. Bogaerts",
+    "team": "SD",
+    "type": "hitter"
+  },
+  {
+    "name": "X. Edwards",
+    "team": "MIA",
+    "type": "hitter"
+  },
+  {
+    "name": "Y. Alvarez",
+    "team": "HOU",
+    "type": "hitter"
+  },
+  {
+    "name": "Y. Cano",
+    "team": "BAL",
+    "type": "pitcher"
+  },
+  {
+    "name": "Y. Diaz",
+    "team": "TB",
+    "type": "hitter"
+  },
+  {
+    "name": "Y. Diaz",
+    "team": "ARI",
+    "type": "pitcher"
+  },
+  {
+    "name": "Y. Garcia",
+    "team": "TOR",
+    "type": "pitcher"
+  },
+  {
+    "name": "Y. Gomez",
+    "team": "NYY",
+    "type": "pitcher"
+  },
+  {
+    "name": "Y. Gurriel",
+    "team": "SD",
+    "type": "hitter"
+  },
+  {
+    "name": "Y. Kikuchi",
+    "team": "LAA",
+    "type": "pitcher"
+  },
+  {
+    "name": "Y. Matsui",
+    "team": "SD",
+    "type": "pitcher"
+  },
+  {
+    "name": "Y. Pozo",
+    "team": "STL",
+    "type": "hitter"
+  },
+  {
+    "name": "Y. Rodriguez",
+    "team": "TOR",
+    "type": "pitcher"
+  },
+  {
+    "name": "Y. Yamamoto",
+    "team": "LAD",
+    "type": "pitcher"
+  },
+  {
+    "name": "Z. Agnos",
+    "team": "COL",
+    "type": "pitcher"
+  },
+  {
+    "name": "Z. Dezenzo",
+    "team": "HOU",
+    "type": "hitter"
+  },
+  {
+    "name": "Z. Gallen",
+    "team": "ARI",
+    "type": "pitcher"
+  },
+  {
+    "name": "Z. Kelly",
+    "team": "BOS",
+    "type": "pitcher"
+  },
+  {
+    "name": "Z. Kent",
+    "team": "CLE",
+    "type": "pitcher"
+  },
+  {
+    "name": "Z. Littell",
+    "team": "TB",
+    "type": "pitcher"
+  },
+  {
+    "name": "Z. McKinstry",
+    "team": "DET",
+    "type": "hitter"
+  },
+  {
+    "name": "Z. Neto",
+    "team": "LAA",
+    "type": "hitter"
+  },
+  {
+    "name": "Z. Veen",
+    "team": "COL",
+    "type": "hitter"
+  },
+  {
+    "name": "Z. Wheeler",
+    "team": "PHI",
+    "type": "pitcher"
+  }
+]

@@ -1,0 +1,138 @@
+{
+  "date": "2025-04-18",
+  "games": [
+    {
+      "homeTeam": "TEX",
+      "awayTeam": "LAA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Globe Life Field",
+      "attendance": 0,
+      "originalId": 286,
+      "dateTime": "2025-04-18 00:05:00Z",
+      "round": 4
+    },
+    {
+      "homeTeam": "CHC",
+      "awayTeam": "ARI",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Wrigley Field",
+      "attendance": 0,
+      "originalId": 287,
+      "dateTime": "2025-04-18 18:20:00Z",
+      "round": 4
+    },
+    {
+      "homeTeam": "DET",
+      "awayTeam": "KC",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Comerica Park",
+      "attendance": 0,
+      "originalId": 288,
+      "dateTime": "2025-04-18 22:40:00Z",
+      "round": 4
+    },
+    {
+      "homeTeam": "PIT",
+      "awayTeam": "CLE",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "PNC Park",
+      "attendance": 0,
+      "originalId": 289,
+      "dateTime": "2025-04-18 22:40:00Z",
+      "round": 4
+    },
+    {
+      "homeTeam": "PHI",
+      "awayTeam": "MIA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citizens Bank Park",
+      "attendance": 0,
+      "originalId": 290,
+      "dateTime": "2025-04-18 22:45:00Z",
+      "round": 4
+    },
+    {
+      "homeTeam": "BAL",
+      "awayTeam": "CIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Camden Yards",
+      "attendance": 0,
+      "originalId": 291,
+      "dateTime": "2025-04-18 23:05:00Z",
+      "round": 4
+    },
+    {
+      "homeTeam": "TB",
+      "awayTeam": "NYY",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Tropicana Field",
+      "attendance": 0,
+      "originalId": 292,
+      "dateTime": "2025-04-18 23:05:00Z",
+      "round": 4
+    },
+    {
+      "homeTeam": "TOR",
+      "awayTeam": "SEA",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Rogers Centre",
+      "attendance": 0,
+      "originalId": 293,
+      "dateTime": "2025-04-18 23:07:00Z",
+      "round": 4
+    },
+    {
+      "homeTeam": "NYM",
+      "awayTeam": "STL",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Citi Field",
+      "attendance": 0,
+      "originalId": 294,
+      "dateTime": "2025-04-18 23:10:00Z",
+      "round": 4
+    },
+    {
+      "homeTeam": "BOS",
+      "awayTeam": "CWS",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Fenway Park",
+      "attendance": 0,
+      "originalId": 295,
+      "dateTime": "2025-04-18 23:10:00Z",
+      "round": 4
+    },
+    {
+      "homeTeam": "ATL",
+      "awayTeam": "MIN",
+      "homeScore": null,
+      "awayScore": null,
+      "status": "Scheduled",
+      "venue": "Truist Park",
+      "attendance": 0,
+      "originalId": 296,
+      "dateTime": "2025-04-18 23:15:00Z",
+      "round": 4
+    }
+  ],
+  "players": []
+}
