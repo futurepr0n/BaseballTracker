@@ -14,6 +14,13 @@ import {
  * @param {Array} handicappers - Handicapper objects
  * @returns {Object} Player with game history
  */
+/**
+ * Create player objects with game history
+ * @param {Object} player - Player object
+ * @param {Object} dateRangeData - Date range data
+ * @param {Array} handicappers - Handicapper objects
+ * @returns {Object} Player with game history
+ */
 export const createPlayerWithGameHistory = (player, dateRangeData, handicappers = []) => {
 
   const handicappersArray = Array.isArray(handicappers) ? handicappers : [];

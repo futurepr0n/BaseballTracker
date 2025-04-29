@@ -1,0 +1,111 @@
+/* Styles for the Hitter Handicap Summary component */
+
+.hitter-handicap-summary {
+    margin: 25px 0;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .summary-header {
+    background-color: #0056b3;
+    color: white;
+    padding: 12px 20px;
+    font-size: 1.2rem;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .summary-header .count-badge {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: normal;
+  }
+  
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  
+  .summary-table th,
+  .summary-table td {
+    padding: 10px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .summary-table th {
+    background-color: #f8f8f8;
+    font-weight: 600;
+    border-bottom: 2px solid #ddd;
+  }
+  
+  .summary-table tbody tr:hover {
+    background-color: #f5f8fa;
+  }
+  
+  .hitter-name {
+    font-weight: 500;
+  }
+  
+  .bet-type {
+    font-weight: 600;
+    text-align: center;
+    background-color: #f0f8ff;
+    border-radius: 4px;
+    padding: 3px 8px;
+    display: inline-block;
+    min-width: 30px;
+  }
+  
+  .handicappers-list {
+    max-width: 300px;
+    white-space: normal; /* Allow wrapping for long lists */
+  }
+  
+  .heat-cell {
+    text-align: center;
+  }
+  
+  .heat-indicator {
+    font-size: 1.2rem;
+    letter-spacing: -2px;
+  }
+  
+  /* Empty state styling */
+  .no-data-message {
+    padding: 30px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .summary-table th,
+    .summary-table td {
+      padding: 8px 10px;
+      font-size: 0.85rem;
+    }
+    
+    .handicappers-list {
+      max-width: 200px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .summary-header {
+      padding: 10px 15px;
+      font-size: 1.1rem;
+    }
+    
+    .heat-indicator {
+      font-size: 1rem;
+    }
+  }
