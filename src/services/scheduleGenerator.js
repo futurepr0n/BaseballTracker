@@ -146,9 +146,8 @@ function handleResponse(response, resolve, reject) {
     });
 }
 
-
 /**
- * Group games by date
+ * Group games by Eastern Time (ET) date instead of UTC date
  * @param {Array} games - Array of games from fixturedownload
  * @returns {Object} Object with dates (YYYY-MM-DD) as keys and arrays of games as values
  */
@@ -160,13 +159,67 @@ function groupGamesByDate(games) {
         console.warn(`Skipping game with missing DateUtc field.`);
         return;
     }
-    // Ensure we ONLY use the date part (YYYY-MM-DD) for grouping
-    // Use substring for robustness, assuming format YYYY-MM-DD...
-    const gameDate = game.DateUtc.substring(0, 10);
+
+    // Parse the UTC date
+    const utcDate = new Date(game.DateUtc);
+    
+    // Convert to Eastern Time (ET)
+    let gameDate;
+    
+    try {
+      // Primary method: Use Intl API for proper timezone conversion (including DST)
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/New_York',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      
+      const parts = formatter.formatToParts(utcDate);
+      const year = parts.find(part => part.type === 'year').value;
+      const month = parts.find(part => part.type === 'month').value;
+      const day = parts.find(part => part.type === 'day').value;
+      
+      gameDate = `${year}-${month}-${day}`;
+    } catch (error) {
+      // Fallback method with improved DST detection
+      console.warn(`Falling back to manual timezone conversion: ${error.message}`);
+      
+      // Create a new Date object using UTC components to avoid browser timezone shifts
+      const utcYear = utcDate.getUTCFullYear();
+      const utcMonth = utcDate.getUTCMonth();
+      const utcDay = utcDate.getUTCDate();
+      const utcHours = utcDate.getUTCHours();
+      const utcMinutes = utcDate.getUTCMinutes();
+      
+      // More accurate DST detection using date ranges for the specific year
+      // This will need to be updated for different years
+      const isDST = isDaylightSavingTime(utcDate);
+      
+      // Apply Eastern Time offset (EST = UTC-5, EDT = UTC-4)
+      const etOffset = isDST ? -4 : -5;
+      
+      // Create a new date with the ET offset applied
+      // We'll use UTC methods to avoid browser timezone interference
+      const etDate = new Date(Date.UTC(
+        utcYear, 
+        utcMonth, 
+        utcDay, 
+        utcHours + etOffset, 
+        utcMinutes
+      ));
+      
+      // Format the ET date as YYYY-MM-DD
+      const year = etDate.getUTCFullYear();
+      const month = String(etDate.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(etDate.getUTCDate()).padStart(2, '0');
+      
+      gameDate = `${year}-${month}-${day}`;
+    }
 
     if (!gameDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        console.warn(`Skipping game with invalid date format: ${game.DateUtc}`);
-        return; // Skip if the date format isn't YYYY-MM-DD
+        console.warn(`Skipping game with invalid date format after timezone conversion: ${game.DateUtc} -> ${gameDate}`);
+        return;
     }
 
     if (!gamesByDate[gameDate]) {
@@ -179,8 +232,6 @@ function groupGamesByDate(games) {
 
     if (!homeTeam || !awayTeam) {
       console.warn(`Unknown team name found in game on ${gameDate}: Home='${game.HomeTeam}', Away='${game.AwayTeam}'. Skipping game.`);
-      // Log the full mapping for debugging if needed
-      // console.log("Current TEAM_MAPPING:", TEAM_MAPPING);
       return; // Skip this game
     }
 
@@ -202,6 +253,53 @@ function groupGamesByDate(games) {
   });
 
   return gamesByDate;
+}
+
+/**
+ * Determine if a UTC date is during Daylight Saving Time in Eastern Time
+ * @param {Date} utcDate - Date object in UTC
+ * @returns {boolean} True if date is during DST in Eastern Time
+ */
+function isDaylightSavingTime(utcDate) {
+  const year = utcDate.getUTCFullYear();
+  
+  // Calculate start date of DST (second Sunday in March)
+  const dstStart = getNthSundayOfMonth(year, 2, 3); // 2nd Sunday of March
+  
+  // Calculate end date of DST (first Sunday in November)
+  const dstEnd = getNthSundayOfMonth(year, 10, 1); // 1st Sunday of November
+  
+  // Convert DST dates to UTC for accurate comparison (2 AM local time is transition time)
+  // During EST (non-DST), 2 AM ET = 7 AM UTC
+  // During EDT (DST), 2 AM ET = 6 AM UTC
+  const dstStartUTC = new Date(Date.UTC(year, 2, dstStart, 7, 0, 0)); // 2 AM ET on start day
+  const dstEndUTC = new Date(Date.UTC(year, 10, dstEnd, 6, 0, 0));   // 2 AM ET on end day
+  
+  // Check if the current UTC date is between start and end
+  return utcDate >= dstStartUTC && utcDate < dstEndUTC;
+}
+
+/**
+ * Get the nth day of week in a given month
+ * @param {number} year - The year
+ * @param {number} month - The month (0-11)
+ * @param {number} n - Which occurrence (1-5)
+ * @param {number} dayOfWeek - Day of week (0=Sunday, 1=Monday, etc)
+ * @returns {number} The day of the month
+ */
+function getNthSundayOfMonth(year, month, n) {
+  const dayOfWeek = 0; // Sunday
+  
+  // Find the first day of the specified month
+  const firstDay = new Date(year, month, 1);
+  
+  // Calculate days until first occurrence of the day
+  let daysUntilFirst = (dayOfWeek - firstDay.getDay() + 7) % 7;
+  
+  // Calculate the date of the nth occurrence
+  const dateOfNth = 1 + daysUntilFirst + (n - 1) * 7;
+  
+  return dateOfNth;
 }
 
 /**
