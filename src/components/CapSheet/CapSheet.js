@@ -9,6 +9,7 @@ import StatsSummary from './components/StatsSummary';
 import HandicapperList from './components/HandicapperList';
 import HitterHandicapperList from './components/HitterHandicapperList';
 import PitcherHandicapperList from './components/PitcherHandicapperList';
+import PitcherHandicapSummary from './components/PitcherHandicapSummary';
 
 // Import modals
 import AddHandicapperModal from './modals/AddHandicapperModal';
@@ -517,6 +518,15 @@ function CapSheet({ playerData, gameData, currentDate }) {
                 />
               </section>
             </>
+          )}
+
+          {/* Pitcher Handicap Summary */}
+          {selectedPlayers.pitchers.length > 0 && pitcherHandicappers.length > 0 && (
+            <PitcherHandicapSummary 
+              pitchers={selectedPlayers.pitchers} 
+              handicappers={pitcherHandicappers} 
+              teams={teams} 
+            />
           )}
     
           {/* Statistics Summary */}

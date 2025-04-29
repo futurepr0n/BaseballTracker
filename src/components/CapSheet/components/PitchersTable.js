@@ -1,9 +1,11 @@
 import React from 'react';
 import PitcherRow from './TableRow/PitcherRow';
 import PlayerSelector from './PlayerSelector';
+import './PitcherPerformanceLineChart.css'; // Make sure to import the CSS file
 
 /**
  * Component for displaying the pitchers table section
+ * Updated with visual performance trend instead of individual game statistics columns
  * 
  * @param {Object} props - Component props
  */
@@ -34,6 +36,38 @@ const PitchersTable = ({
         />
       </div>
 
+      {/* Legend for the performance chart */}
+      <div className="pitcher-chart-legend">
+        <span className="legend-title">Performance Chart:</span>
+        <div className="legend-item">
+          <div className="legend-line legend-up"></div>
+          <span>Improving K/IP</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-line legend-down"></div>
+          <span>Declining K/IP</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-circle legend-er-0"></div>
+          <span>0 ER</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-circle legend-er-1"></div>
+          <span>1 ER</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-circle legend-er-2"></div>
+          <span>2-3 ER</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-circle legend-er-4"></div>
+          <span>4+ ER</span>
+        </div>
+        <div className="legend-note">
+          (Games shown oldest to newest)
+        </div>
+      </div>
+
       <div className="table-container">
         {isLoadingPlayers && pitchers.length === 0 ? (
           <div className="loading-indicator">Loading player data...</div>
@@ -46,21 +80,10 @@ const PitchersTable = ({
                 <th className="stat-header">IP Last</th>
                 <th className="stat-header">K Last</th>
                 <th className="stat-header">ER Last</th>
-                {/* Game 1 */}
-                <th className="avg-header">G1 Date</th>
-                <th className="avg-header">G1 IP</th>
-                <th className="avg-header">G1 K</th>
-                <th className="avg-header">G1 ER</th>
-                {/* Game 2 */}
-                <th className="avg-header">G2 Date</th>
-                <th className="avg-header">G2 IP</th>
-                <th className="avg-header">G2 K</th>
-                <th className="avg-header">G2 ER</th>
-                {/* Game 3 */}
-                <th className="avg-header">G3 Date</th>
-                <th className="avg-header">G3 IP</th>
-                <th className="avg-header">G3 K</th>
-                <th className="avg-header">G3 ER</th>
+                
+                {/* Single column for performance chart instead of 12 game stats columns */}
+                <th className="avg-header">Performance Trend</th>
+                
                 <th>Opponent</th>
                 <th>Pitch Count</th>
                 <th>Exp K</th>
@@ -99,8 +122,8 @@ const PitchersTable = ({
                 ))
               ) : (
                 <tr>
-                  {/* Adjusted colspan: 24 base + handicappers + 1 action */}
-                  <td colSpan={24 + handicappers.length + 1} className="no-data">
+                  {/* Adjusted colspan for new table structure */}
+                  <td colSpan={13 + handicappers.length} className="no-data">
                     No pitchers added. Search and select pitchers above to track them.
                   </td>
                 </tr>

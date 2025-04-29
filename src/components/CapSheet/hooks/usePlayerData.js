@@ -4,131 +4,17 @@ import {
   fetchRosterData, 
   formatDateString,
   findMultiGamePlayerStats,
-  formatDateForDisplay
+  formatDateForDisplay,
+  fetchPlayerDataForDateRange
 } from '../../../services/dataService';
 
-/**
- * Create player objects with game history
- * @param {Object} player - Player object
- * @param {Object} dateRangeData - Date range data
- * @param {Array} handicappers - Handicapper objects
- * @returns {Object} Player with game history
- */
-/**
- * Create player objects with game history
- * @param {Object} player - Player object
- * @param {Object} dateRangeData - Date range data
- * @param {Array} handicappers - Handicapper objects
- * @returns {Object} Player with game history
- */
-export const createPlayerWithGameHistory = (player, dateRangeData, handicappers = []) => {
-
-  const handicappersArray = Array.isArray(handicappers) ? handicappers : [];
-
-  // Get the last 3 games for this player
-  const gameHistory = findMultiGamePlayerStats(
-    dateRangeData, 
-    player.name, 
-    player.team,
-    3 // Get 3 games
-  );
-  
-  // Get stats from the most recent game (if available)
-  const mostRecentGame = gameHistory.length > 0 ? gameHistory[0] : null;
-  const mostRecentStats = mostRecentGame?.data || null;
-  
-  // Get the game dates for display
-  const gameDates = gameHistory.map(game => game.date || '');
-  
-  if (player.type === 'hitter') {
-    return {
-      id: player.name + '-' + player.team,
-      name: player.name,
-      team: player.team,
-      playerType: 'hitter',
-      // Most recent game stats
-      prevGameHR: mostRecentStats?.HR || '0',
-      prevGameAB: mostRecentStats?.AB || '0',
-      prevGameH: mostRecentStats?.H || '0',
-      // Game 1 stats (most recent)
-      game1Date: gameDates[0] || '',
-      game1HR: gameHistory[0]?.data?.HR || '0',
-      game1AB: gameHistory[0]?.data?.AB || '0',
-      game1H: gameHistory[0]?.data?.H || '0',
-      // Game 2 stats
-      game2Date: gameDates[1] || '',
-      game2HR: gameHistory[1]?.data?.HR || '0',
-      game2AB: gameHistory[1]?.data?.AB || '0',
-      game2H: gameHistory[1]?.data?.H || '0',
-      // Game 3 stats (oldest)
-      game3Date: gameDates[2] || '',
-      game3HR: gameHistory[2]?.data?.HR || '0',
-      game3AB: gameHistory[2]?.data?.AB || '0',
-      game3H: gameHistory[2]?.data?.H || '0',
-      // Fields for user input
-      pitcher: '',
-      pitcherId: '',
-      opponentTeam: '',
-      pitcherHand: '',
-      expectedSO: '',
-      stadium: '',
-      gameOU: '',
-      betTypes: { H: false, HR: false, B: false },
-      handicapperPicks: handicappersArray.reduce((acc, handicapper) => {
-        acc[handicapper.id] = {
-          public: false, private: false, straight: false,
-          H: false, HR: false, B: false
-        };
-        return acc;
-      }, {})
-    };
-  } else {
-    return {
-      id: player.name + '-' + player.team,
-      name: player.name,
-      team: player.team,
-      playerType: 'pitcher',
-      // Additional pitcher attributes
-      throwingArm: player.throwingArm || '',
-      // Most recent game stats
-      prevGameIP: mostRecentStats?.IP || '0',
-      prevGameK: mostRecentStats?.K || '0',
-      prevGameER: mostRecentStats?.ER || '0',
-      // Game 1 stats (most recent)
-      game1Date: gameDates[0] || '',
-      game1IP: gameHistory[0]?.data?.IP || '0',
-      game1K: gameHistory[0]?.data?.K || '0',
-      game1ER: gameHistory[0]?.data?.ER || '0',
-      // Game 2 stats
-      game2Date: gameDates[1] || '',
-      game2IP: gameHistory[1]?.data?.IP || '0',
-      game2K: gameHistory[1]?.data?.K || '0',
-      game2ER: gameHistory[1]?.data?.ER || '0',
-      // Game 3 stats (oldest)
-      game3Date: gameDates[2] || '',
-      game3IP: gameHistory[2]?.data?.IP || '0',
-      game3K: gameHistory[2]?.data?.K || '0',
-      game3ER: gameHistory[2]?.data?.ER || '0',
-      // Fields for user input
-      opponent: '',
-      expectedPitch: '',
-      expectedK: '',
-      stadium: '',
-      gameOU: '',
-      betTypes: { K: false, OU: false },
-      handicapperPicks: handicappersArray.reduce((acc, handicapper) => {
-        acc[handicapper.id] = {
-          public: false, private: false, straight: false,
-          K: false, OU: false
-        };
-        return acc;
-      }, {})
-    };
-  }
-};
+// Import our enhanced player history function
+import { createPlayerWithGameHistory } from './playerHistoryUtils';
 
 /**
  * Custom hook to manage player data
+ * Enhanced with extended pitcher game history retrieval
+ * 
  * @param {Array} playerData - Current day player data from parent component
  * @param {Array} gameData - Current day game data from parent component
  * @param {Date} currentDate - Current selected date
@@ -152,6 +38,7 @@ const usePlayerData = (playerData, gameData, currentDate) => {
   const [isLoadingPlayers, setIsLoadingPlayers] = useState(false);
   const [hasProcessedData, setHasProcessedData] = useState(false);
   const [playerStatsHistory, setPlayerStatsHistory] = useState({});
+  const [extendedPitcherData, setExtendedPitcherData] = useState({});
 
   // Format date for display
   const formattedDate = currentDate.toLocaleDateString('en-US', { 
@@ -186,6 +73,180 @@ const usePlayerData = (playerData, gameData, currentDate) => {
   useEffect(() => {
     setHasProcessedData(false);
   }, [currentDate]);
+
+  // Load players from roster and enhance with historical data
+  useEffect(() => {
+    const loadPlayerData = async () => {
+      if (hasProcessedData) return;
+      
+      setIsLoadingPlayers(true);
+      console.log("[usePlayerData] Loading players from roster");
+      
+      try {
+        // 1. Load the roster data
+        const rosterData = await fetchRosterData();
+        if (!rosterData || rosterData.length === 0) {
+          console.error("[usePlayerData] Failed to load roster data");
+          setIsLoadingPlayers(false);
+          return;
+        }
+        console.log(`[usePlayerData] Loaded ${rosterData.length} players from roster`);
+        
+        // 2. Split into hitters and pitchers
+        const hitters = rosterData.filter(player => 
+          player && player.name && player.team && player.type === 'hitter'
+        );
+        
+        const pitchers = rosterData.filter(player => 
+          player && player.name && player.team && player.type === 'pitcher'
+        );
+        
+        // Store the full pitcher roster for later use in dropdowns
+        setFullPitcherRoster(pitchers);
+        
+        console.log(`[usePlayerData] Roster contains ${hitters.length} hitters and ${pitchers.length} pitchers`);
+        
+        // 3. Fetch player data for the past 14 days (for hitters)
+        console.log("[usePlayerData] Fetching player data for date range");
+        const dateRangeData = await fetchPlayerDataForDateRange(currentDate, 14);
+        const datesWithData = Object.keys(dateRangeData);
+        console.log(`[usePlayerData] Found data for ${datesWithData.length} days`);
+        
+        // 4. Keep track of player game history
+        const newPlayerStatsHistory = {};
+        
+        // 5. Create hitter objects with game history (standard 14-day window)
+        const hittersPromises = hitters.map(async player => {
+          // Get the game history from standard window
+          const gameHistory = findMultiGamePlayerStats(
+            dateRangeData, 
+            player.name, 
+            player.team,
+            3
+          );
+          
+          // Store the player's game history
+          newPlayerStatsHistory[`${player.name}-${player.team}`] = gameHistory;
+          
+          // Use the imported function (no extended search for hitters)
+          return await createPlayerWithGameHistory(player, dateRangeData, [], false);
+        });
+        
+        const hittersData = await Promise.all(hittersPromises);
+        
+        // 6. Create pitcher objects with extended game history search (up to 30 days back)
+        console.log("[usePlayerData] Fetching extended pitcher data (up to 30 days back)");
+        
+        // Create a separate extended data window for pitchers (last 30 days)
+        const pitcherDateRangeData = { ...dateRangeData };
+        
+        // Only fetch extended data if we have games in initial window
+        if (datesWithData.length > 0) {
+          // Get earliest date in current window
+          const earliestDate = new Date(datesWithData.sort()[0]);
+          
+          // Create start date for extended window (30 more days back)
+          const extendedStartDate = new Date(earliestDate);
+          extendedStartDate.setDate(extendedStartDate.getDate() - 30);
+          
+          // Fetch extended data
+          console.log(`[usePlayerData] Fetching additional pitcher data from ${extendedStartDate.toISOString()}`);
+          const extendedData = await fetchPlayerDataForDateRange(extendedStartDate, 30);
+          
+          // Merge with existing data (without overwriting)
+          Object.keys(extendedData).forEach(date => {
+            if (!pitcherDateRangeData[date]) {
+              pitcherDateRangeData[date] = extendedData[date];
+            }
+          });
+          
+          console.log(`[usePlayerData] Extended data window now has ${Object.keys(pitcherDateRangeData).length} days of data`);
+          
+          // Store the extended pitcher data
+          setExtendedPitcherData(pitcherDateRangeData);
+        }
+        
+        const pitchersPromises = pitchers.map(async player => {
+          // Get the game history with extended window
+          const gameHistory = findMultiGamePlayerStats(
+            pitcherDateRangeData, 
+            player.name, 
+            player.team,
+            3
+          );
+          
+          // Store the player's game history
+          newPlayerStatsHistory[`${player.name}-${player.team}`] = gameHistory;
+          
+          // Use the imported function (with extended search for pitchers)
+          return await createPlayerWithGameHistory(player, pitcherDateRangeData, [], true);
+        });
+        
+        const pitchersData = await Promise.all(pitchersPromises);
+        
+        // 7. Update the player stats history state
+        setPlayerStatsHistory(newPlayerStatsHistory);
+        console.log(`[usePlayerData] Built game history for ${Object.keys(newPlayerStatsHistory).length} players`);
+        
+        // 8. Only show players from teams playing today if we have game data
+        const teamsPlayingToday = new Set();
+        if (gameData && gameData.length > 0) {
+          gameData.forEach(game => {
+            teamsPlayingToday.add(game.homeTeam);
+            teamsPlayingToday.add(game.awayTeam);
+          });
+          
+          console.log(`[usePlayerData] Teams playing today: ${Array.from(teamsPlayingToday).join(', ')}`);
+        }
+        
+        // Filter players to only include those from teams playing today
+        const filteredHitters = teamsPlayingToday.size > 0 
+          ? hittersData.filter(player => teamsPlayingToday.has(player.team))
+          : hittersData;
+        
+        const filteredPitchers = teamsPlayingToday.size > 0
+          ? pitchersData.filter(player => teamsPlayingToday.has(player.team))
+          : pitchersData;
+        
+        console.log(`[usePlayerData] Final available players: ${filteredHitters.length} hitters, ${filteredPitchers.length} pitchers`);
+        
+        // Update state with processed players
+        setAvailablePlayers({
+          hitters: filteredHitters,
+          pitchers: filteredPitchers
+        });
+        
+        // Update data source indicator based on whether we have current day data
+        if (datesWithData.length > 0 && !datesWithData.includes(formatDateString(currentDate))) {
+          setPlayerDataSource('historical');
+          // Find the most recent date with data
+          const mostRecent = datesWithData.sort().reverse()[0];
+          setHistoricalDate(new Date(mostRecent));
+        } else {
+          setPlayerDataSource('current');
+        }
+        
+        setHasProcessedData(true);
+      } catch (error) {
+        console.error('[usePlayerData] Error processing player data:', error);
+      } finally {
+        setIsLoadingPlayers(false);
+      }
+    };
+    
+    // Run the load function
+    loadPlayerData();
+  }, [
+    currentDate, 
+    gameData,  
+    hasProcessedData,
+    setAvailablePlayers,
+    setFullPitcherRoster,
+    setHasProcessedData,
+    setIsLoadingPlayers,
+    setPlayerDataSource,
+    setPlayerStatsHistory
+  ]);
 
   // Function to get pitcher options for a specific opponent team
   const getPitcherOptionsForOpponent = (opponentTeam) => {
@@ -237,7 +298,7 @@ const usePlayerData = (playerData, gameData, currentDate) => {
 
     const selectedPlayer = availablePlayers.hitters.find(p => p.id === playerId);
     if (!selectedPlayer) {
-      console.error("[CapSheet] Could not find hitter with ID:", playerId);
+      console.error("[usePlayerData] Could not find hitter with ID:", playerId);
       alert("Error: Could not find selected hitter data.");
       return;
     }
@@ -269,7 +330,7 @@ const usePlayerData = (playerData, gameData, currentDate) => {
 
     const selectedPlayer = availablePlayers.pitchers.find(p => p.id === playerId);
     if (!selectedPlayer) {
-      console.error("[CapSheet] Could not find pitcher with ID:", playerId);
+      console.error("[usePlayerData] Could not find pitcher with ID:", playerId);
       alert("Error: Could not find selected pitcher data.");
       return;
     }
@@ -479,10 +540,10 @@ const usePlayerData = (playerData, gameData, currentDate) => {
     setHasProcessedData,
     playerStatsHistory,
     setPlayerStatsHistory,
+    extendedPitcherData,
     formattedDate,
     formattedPreviousDate,
     // Methods
-    createPlayerWithGameHistory,
     getPitcherOptionsForOpponent,
     hitterSelectOptions,
     pitcherSelectOptions,

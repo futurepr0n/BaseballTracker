@@ -1,0 +1,142 @@
+/* Styles for the Pitcher Performance Line Chart */
+
+/* Chart Container */
+.performance-chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 90px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+  }
+  
+  .performance-line-chart {
+    /* SVG container styles */
+    max-width: 100%;
+  }
+  
+  /* Cell holding the chart */
+  .performance-chart-cell {
+    padding: 0 !important;
+    width: 260px;
+    min-width: 260px;
+    background-color: #f8f9fa;
+  }
+  
+  /* Pitcher chart specific legend */
+  .pitcher-chart-legend {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    margin: 5px 0;
+    background-color: #f0f8ff;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    flex-wrap: wrap;
+    gap: 5px 16px;
+  }
+  
+  .legend-title {
+    font-weight: 600;
+    margin-right: 16px;
+    white-space: nowrap;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    margin-right: 16px;
+    white-space: nowrap;
+  }
+  
+  .legend-line {
+    width: 16px;
+    height: 2px;
+    margin-right: 6px;
+  }
+  
+  .legend-up {
+    background-color: #22c55e; /* green */
+  }
+  
+  .legend-down {
+    background-color: #ef4444; /* red */
+  }
+  
+  .legend-circle {
+    width: 10px;
+    height: 10px;
+    margin-right: 6px;
+    border-radius: 50%;
+  }
+  
+  .legend-er-0 {
+    background-color: #22c55e; /* green */
+  }
+  
+  .legend-er-1 {
+    background-color: #fbbf24; /* yellow */
+  }
+  
+  .legend-er-2 {
+    background-color: #f97316; /* orange */
+  }
+  
+  .legend-er-4 {
+    background-color: #ef4444; /* red */
+  }
+  
+  .legend-note {
+    font-style: italic;
+    color: #666;
+    margin-left: auto;
+    font-size: 0.8rem;
+  }
+  
+  /* No data message */
+  .no-game-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 90px;
+    color: #666;
+    font-style: italic;
+    font-size: 0.9rem;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 1200px) {
+    .performance-chart-cell {
+      width: 240px;
+      min-width: 240px;
+    }
+  }
+  
+  @media (max-width: 992px) {
+    .performance-chart-cell {
+      width: 220px;
+      min-width: 220px;
+    }
+    
+    .pitcher-chart-legend {
+      flex-wrap: wrap;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .pitcher-chart-legend {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      padding: 8px 12px;
+    }
+  
+    .legend-note {
+      margin-left: 0;
+      margin-top: 4px;
+    }
+  }

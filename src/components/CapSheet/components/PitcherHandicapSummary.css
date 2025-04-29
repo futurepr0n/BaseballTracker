@@ -1,0 +1,136 @@
+/* Styles for the Pitcher Handicap Summary component */
+
+.pitcher-handicap-summary {
+    margin: 25px 0;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .pitcher-handicap-summary .summary-header {
+    background-color: #0056b3;
+    color: white;
+    padding: 12px 20px;
+    font-size: 1.2rem;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .pitcher-handicap-summary .summary-header .count-badge {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: normal;
+  }
+  
+  .pitcher-handicap-summary .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  
+  .pitcher-handicap-summary .summary-table th,
+  .pitcher-handicap-summary .summary-table td {
+    padding: 10px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  
+  /* Make the Position column header and data centered */
+  .pitcher-handicap-summary .summary-table th:nth-child(3),
+  .pitcher-handicap-summary .summary-table td:nth-child(3) {
+    text-align: center;
+  }
+  
+  .pitcher-handicap-summary .summary-table th {
+    background-color: #f8f8f8;
+    font-weight: 600;
+    border-bottom: 2px solid #ddd;
+  }
+  
+  .pitcher-handicap-summary .summary-table tbody tr:hover {
+    background-color: #f5f8fa;
+  }
+  
+  .pitcher-handicap-summary .pitcher-name {
+    font-weight: 500;
+  }
+  
+  /* Container for proper centering of position values */
+  .pitcher-handicap-summary .position-value-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+  
+  /* Style for the position values (K, OU) */
+  .pitcher-handicap-summary .position-value {
+    display: inline-block;
+    background-color: #f0f8ff;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-weight: 600;
+    min-width: 30px;
+    text-align: center;
+  }
+  
+  .pitcher-handicap-summary .handicappers-list {
+    max-width: 250px;
+    white-space: normal; /* Allow wrapping for long lists */
+  }
+  
+  .pitcher-handicap-summary .trend-cell {
+    width: 220px;
+    padding: 0;
+    background-color: #f8f9fa;
+  }
+  
+  .pitcher-handicap-summary .heat-cell {
+    text-align: center;
+  }
+  
+  .pitcher-handicap-summary .heat-indicator {
+    font-size: 1.2rem;
+    letter-spacing: -2px;
+  }
+  
+  /* Empty state styling */
+  .pitcher-handicap-summary .no-data-message {
+    padding: 30px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .pitcher-handicap-summary .summary-table th,
+    .pitcher-handicap-summary .summary-table td {
+      padding: 8px 10px;
+      font-size: 0.85rem;
+    }
+    
+    .pitcher-handicap-summary .handicappers-list {
+      max-width: 200px;
+    }
+    
+    .pitcher-handicap-summary .trend-cell {
+      width: 180px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .pitcher-handicap-summary .summary-header {
+      padding: 10px 15px;
+      font-size: 1.1rem;
+    }
+    
+    .pitcher-handicap-summary .heat-indicator {
+      font-size: 1rem;
+    }
+  }
