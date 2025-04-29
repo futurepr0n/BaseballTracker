@@ -1,0 +1,1035 @@
+/* Enhanced CapSheet Component Styling */
+
+.cap-sheet {
+  margin: 20px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cap-sheet h2 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 1.8rem;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+/* Historical data notice */
+.historical-data-notice {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 4px;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  color: #856404;
+}
+
+.historical-data-notice p {
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Control Actions */
+.control-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 12px;
+  background-color: #f8f8f8;
+  border-radius: 6px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  color: white;
+  font-size: 0.9rem; /* Slightly smaller buttons */
+}
+
+.save-btn { background-color: #28a745; }
+.save-btn:hover { background-color: #218838; }
+.load-btn { background-color: #17a2b8; }
+.load-btn:hover { background-color: #138496; }
+.export-btn { background-color: #6c757d; }
+.export-btn:hover { background-color: #5a6268; }
+.import-btn { background-color: #fd7e14; }
+.import-btn:hover { background-color: #e8710c; }
+.remove-btn {
+    background-color: #dc3545;
+    padding: 3px 6px; /* Smaller remove button */
+    font-size: 0.8rem;
+    line-height: 1;
+    margin-left: 5px; /* Space from name */
+}
+.remove-btn:hover { background-color: #bd2130; }
+
+.action-icon {
+  font-size: 1rem; /* Adjusted icon size */
+}
+
+.import-container {
+  /* Container for the import button and hidden input */
+}
+
+/* Section Container */
+.section-container {
+  margin-bottom: 30px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden; /* Needed for border-radius on tables */
+}
+
+.section-header {
+  background-color: #0056b3;
+  color: white;
+  margin: 0;
+  padding: 12px 20px;
+  font-size: 1.4rem;
+}
+
+/* Control bar */
+.control-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eee;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 10px;
+}
+
+/* Player Selector using react-select */
+.player-selector {
+  display: flex; /* Keep display flex */
+  align-items: center;
+  gap: 10px;
+  flex: 1; /* Allow it to take available space */
+  min-width: 250px; /* Ensure it has a decent minimum width */
+}
+
+/* Styling for react-select component */
+.player-search-select {
+  flex-grow: 1; /* Allow the select container to grow */
+  position: relative; /* Needed for absolute positioning of messages if desired */
+  min-width: 300px; /* Give it a good starting width */
+}
+
+.react-select-container .react-select__control {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-height: 38px; /* Match button height */
+  box-shadow: none;
+  background-color: white; /* Ensure background is white */
+}
+.react-select-container .react-select__control--is-disabled {
+    background-color: #f8f9fa; /* Grey out when disabled */
+}
+
+.react-select-container .react-select__control--is-focused {
+  border-color: #0056b3;
+  box-shadow: 0 0 0 1px #0056b3; /* Add focus outline */
+}
+
+.react-select-container .react-select__placeholder,
+.react-select-container .react-select__input-container {
+  color: #aaa;
+  margin: 0 2px; /* Adjust input position */
+  padding: 0;
+}
+.react-select-container .react-select__value-container{
+    padding: 0 8px; /* Adjust padding */
+}
+.react-select-container .react-select__indicators{
+    padding: 0 4px;
+}
+.react-select-container .react-select__indicator-separator{
+    width: 0; /* Hide separator */
+}
+
+.react-select-container .react-select__menu {
+  margin-top: 4px;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  z-index: 10; /* Ensure dropdown appears above table */
+  background-color: white;
+}
+
+.react-select-container .react-select__menu-list {
+    padding: 4px 0; /* Add some padding */
+    max-height: 300px; /* Limit dropdown height */
+}
+
+.react-select-container .react-select__option {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.react-select-container .react-select__option--is-focused {
+  background-color: #e8f4f8;
+}
+
+.react-select-container .react-select__option--is-selected {
+  background-color: #0056b3;
+  color: white;
+}
+.react-select-container .react-select__option--is-disabled {
+    color: #ccc;
+}
+
+.react-select-container .react-select__no-options-message {
+    padding: 8px 12px;
+    color: #888;
+}
+
+/* Message for no players found next to select */
+.no-players-message {
+    font-size: 0.85rem;
+    color: #888;
+    margin-left: 10px;
+    padding: 8px 0;
+    white-space: nowrap;
+}
+
+/* Add Player Button (Removed, selection happens via react-select onChange) */
+/* .add-player-btn (If you kept it for some reason) */
+
+.add-handicapper-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 12px; /* Match action button size */
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  font-size: 0.9rem;
+  white-space: nowrap; /* Prevent wrapping */
+}
+
+.add-handicapper-btn:hover {
+  background-color: #218838;
+}
+
+/* Loading indicator */
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 0;
+  font-size: 1.1rem;
+  color: #666;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.loading-indicator::after { /* Use ::after for pseudo-element */
+  content: '...';
+  display: inline-block;
+  width: 1em; /* Adjust width as needed */
+  text-align: left;
+  animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60% { content: '...'; }
+  80%, 100% { content: ''; } /* Changed from . to empty for clearer blink */
+}
+
+
+/* Table styling */
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 0; /* Remove default margin if section-container handles it */
+  max-width: 100%;
+}
+
+.capsheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem; /* Slightly smaller font */
+  min-width: 1200px; /* Set a min-width to encourage horizontal scrolling */
+}
+
+.capsheet-table th,
+.capsheet-table td {
+  padding: 10px 12px; /* Adjust padding */
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap; /* Prevent text wrapping */
+  vertical-align: middle;
+}
+
+.capsheet-table th {
+  background-color: #f8f8f8;
+  font-weight: 600;
+  border-bottom: 2px solid #ddd;
+  position: sticky;
+  top: 0;
+  z-index: 2; /* Ensure header is above dropdown menu content if scrolling */
+}
+
+/* Stat header styling */
+.stat-header { background-color: #f0f0f0; border-bottom-color: #ddd; }
+.avg-header { background-color: #e8f4f8; border-bottom-color: #bde0f0; }
+.avg-cell { background-color: #f5fbfd; font-weight: 500; color: #0056b3; }
+
+.capsheet-table tbody tr:hover { background-color: #f9f9f9; }
+.capsheet-table tbody tr:hover .avg-cell { background-color: #e8f4f8; }
+
+.player-name { font-weight: 500; }
+
+.no-data {
+  text-align: center;
+  color: #888;
+  padding: 30px !important; /* Ensure padding overrides defaults */
+  white-space: normal; /* Allow text wrapping for messages */
+}
+
+.editable-cell {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px 8px; /* Smaller padding */
+  width: calc(100% - 18px); /* Adjust width to fit padding/border */
+  font-size: 0.9em; /* Match table font size */
+  box-sizing: border-box; /* Include padding/border in width */
+}
+.editable-cell[type="text"] { min-width: 80px; } /* Give text inputs a min width */
+.editable-cell select { width: 60px; } /* Smaller select for R/L */
+
+.editable-cell:focus {
+  outline: none;
+  border-color: #0056b3;
+  background-color: #fff;
+  box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.2);
+}
+
+/* Checkbox styling */
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px; /* Adjust gap */
+  align-items: flex-start; /* Align labels left */
+  padding: 2px 0; /* Add slight vertical padding */
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* Adjust gap */
+  font-size: 0.85rem; /* Slightly larger */
+  color: #555;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.custom-checkbox {
+  width: 15px; /* Adjust size */
+  height: 15px;
+  cursor: pointer;
+  vertical-align: middle; /* Align checkbox better */
+}
+
+.eye-checkbox { display: none; } /* Hide the actual checkbox */
+
+.eye-icon {
+  font-size: 1rem; /* Adjust icon size */
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.eye-checkbox:checked + .eye-icon { opacity: 1; color: #0056b3; }
+
+.bet-type-checkboxes {
+  display: flex;
+  gap: 6px; /* Space between mini labels */
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px dashed #eee;
+}
+
+.mini-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.75rem; /* Slightly smaller */
+  color: #666;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mini-checkbox {
+  width: 12px;
+  height: 12px;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+/* Add handicapper modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Darker overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px; /* Add padding for smaller screens */
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 8px;
+  padding: 25px; /* More padding */
+  width: 450px; /* Slightly wider modal */
+  max-width: 95%;
+  max-height: 90vh; /* Limit height */
+  overflow-y: auto;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.25);
+}
+
+.slip-gallery-modal { width: 650px; } /* Wider gallery */
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 { margin: 0; font-size: 1.4rem; color: #333; }
+
+.close-modal-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.8rem; /* Larger close button */
+  cursor: pointer;
+  color: #aaa;
+  padding: 0 5px;
+  line-height: 1;
+}
+.close-modal-btn:hover { color: #777; }
+
+.modal-form { display: flex; flex-direction: column; gap: 18px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-weight: 500; color: #555; font-size: 0.9rem; }
+.form-group input, .form-group select {
+  padding: 9px 12px;
+  border: 1px solid #ccc; /* Slightly darker border */
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+.form-group input:focus { outline: none; border-color: #0056b3; box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.2); }
+
+.handicapper-list {
+  margin-top: 5px; /* Reduced margin */
+  max-height: 180px; /* Adjust height */
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  background-color: #fdfdfd;
+}
+
+.handicapper-option {
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 0.9rem;
+}
+.handicapper-option:hover { background-color: #f0f0f0; }
+.handicapper-option:not(:last-child) { border-bottom: 1px solid #eee; }
+
+.no-results {
+    padding: 9px 12px;
+    color: #888;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 25px; }
+
+.cancel-btn, .submit-btn {
+  padding: 9px 18px; /* Larger buttons */
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+.cancel-btn { background-color: #f2f2f2; color: #333; border: 1px solid #ddd; }
+.cancel-btn:hover { background-color: #e2e2e2; }
+.submit-btn { background-color: #0056b3; color: white; border: none; }
+.submit-btn:hover { background-color: #004494; }
+
+/* Slip Gallery */
+.slip-gallery { display: flex; flex-direction: column; gap: 15px; max-height: 450px; overflow-y: auto; padding-right: 10px; /* Space for scrollbar */ }
+.slip-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border-left: 5px solid #17a2b8; /* Use load color */
+}
+
+.slip-details h4 { margin: 0 0 6px 0; font-size: 1.15rem; color: #333; }
+.slip-details p { margin: 4px 0; font-size: 0.9rem; color: #666; }
+
+.slip-actions { display: flex; gap: 10px; flex-shrink: 0; /* Prevent shrinking */ }
+.slip-action-btn {
+  padding: 7px 14px; /* Adjust padding */
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  color: white;
+  font-weight: 500;
+}
+.slip-action-btn.load-btn { background-color: #17a2b8; }
+.slip-action-btn.load-btn:hover { background-color: #138496; }
+.slip-action-btn.delete-btn { background-color: #dc3545; }
+.slip-action-btn.delete-btn:hover { background-color: #c82333; }
+
+.no-slips-message { text-align: center; padding: 30px; color: #888; font-size: 1.1rem; }
+
+/* Statistics summary */
+.stats-summary {
+  background-color: #f8f8f8;
+  padding: 20px 25px; /* More padding */
+  border-radius: 6px;
+  margin-top: 30px; /* More space above summary */
+  border: 1px solid #eee;
+}
+
+.stats-summary h3 { font-size: 1.3rem; margin-bottom: 15px; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 8px;}
+.stats-summary ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 15px; }
+.stats-summary li {
+  padding: 12px 18px; /* More padding */
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  flex: 1;
+  min-width: 180px; /* Wider items */
+  font-size: 0.95rem;
+  border-left: 4px solid #0056b3;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  /* Encourage scrolling sooner */
+  .capsheet-table { min-width: 1000px; }
+}
+
+@media (max-width: 992px) {
+  .control-bar {
+      /* Already wraps, ensure spacing is okay */
+  }
+  .player-search-select {
+    min-width: 250px; /* Reduce min-width */
+  }
+  .capsheet-table { min-width: 800px; font-size: 0.85rem; }
+  .capsheet-table th, .capsheet-table td { padding: 8px 10px; }
+  .stats-summary ul { gap: 10px; }
+  .stats-summary li { min-width: 150px; padding: 10px 15px; }
+}
+
+@media (max-width: 768px) {
+  .cap-sheet { margin: 10px; padding: 15px; }
+  .control-actions { flex-direction: column; align-items: stretch; }
+  .control-bar { padding: 10px; }
+  .player-search-select { min-width: 100%; margin-right: 0; } /* Full width */
+  .add-handicapper-btn { align-self: flex-start; } /* Align button left if it wraps */
+
+  .capsheet-table { min-width: 600px; /* Allow more content visibility before forced scroll */ }
+  .stats-summary ul { flex-direction: column; }
+  .stats-summary li { min-width: 100%; } /* Full width list items */
+  .modal-content { width: 90%; }
+  .slip-gallery-modal { width: 90%; }
+  .slip-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .slip-actions { align-self: flex-end; }
+}
+
+@media (max-width: 576px) {
+    .cap-sheet h2 { font-size: 1.5rem; }
+    .section-header { font-size: 1.2rem; padding: 10px 15px; }
+    .capsheet-table { font-size: 0.8rem; }
+    .capsheet-table th, .capsheet-table td { padding: 6px 8px; }
+    .action-btn { font-size: 0.85rem; padding: 6px 10px; }
+    .remove-btn { padding: 2px 5px; font-size: 0.75rem; }
+    .editable-cell { font-size: 0.8em; padding: 4px 6px; }
+    .checkbox-label { font-size: 0.8rem; }
+    .mini-checkbox-label { font-size: 0.7rem; }
+    .modal-content { padding: 15px; }
+    .modal-header h3 { font-size: 1.2rem; }
+    .modal-actions { margin-top: 15px; }
+    .cancel-btn, .submit-btn { font-size: 0.9rem; padding: 8px 15px; }
+    .slip-action-btn { font-size: 0.85rem; padding: 6px 12px; }
+}
+
+
+/* Handicapper List Styling */
+
+.handicapper-list-container {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.handicapper-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.handicapper-list-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.handicapper-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 5px 0;
+}
+
+.handicapper-chip {
+  display: flex;
+  align-items: center;
+  background-color: #e8f4f8;
+  border: 1px solid #bde0f0;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.handicapper-name {
+  color: #0056b3;
+  font-weight: 500;
+}
+
+.remove-handicapper-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  background-color: transparent;
+  border: none;
+  color: #dc3545;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0 3px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.remove-handicapper-btn:hover {
+  opacity: 1;
+}
+
+.show-more-btn,
+.show-less-btn {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.show-more-btn:hover,
+.show-less-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.no-handicappers-message {
+  background-color: white;
+  border: 1px dashed #ddd;
+  border-radius: 6px;
+  padding: 15px;
+  text-align: center;
+  color: #666;
+}
+
+.no-handicappers-message p {
+  margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .handicapper-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .handicapper-chip {
+    padding: 4px 10px;
+    font-size: 0.85rem;
+  }
+}
+
+
+
+/* Handicapper List Styling */
+
+.handicapper-list-container {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.handicapper-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.handicapper-list-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.handicapper-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.handicapper-select-container {
+  width: 250px;
+}
+
+.handicapper-select .handicapper-select__control {
+  min-height: 36px;
+  border-color: #ddd;
+}
+
+.handicapper-select .handicapper-select__control:hover {
+  border-color: #bbb;
+}
+
+.handicapper-select .handicapper-select__control--is-focused {
+  border-color: #0056b3;
+  box-shadow: 0 0 0 1px #0056b3;
+}
+
+.handicapper-select .handicapper-select__menu {
+  z-index: 3;
+}
+
+.handicapper-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 5px 0;
+}
+
+.handicapper-chip {
+  display: flex;
+  align-items: center;
+  background-color: #e8f4f8;
+  border: 1px solid #bde0f0;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.handicapper-name {
+  color: #0056b3;
+  font-weight: 500;
+}
+
+.remove-handicapper-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  background-color: transparent;
+  border: none;
+  color: #dc3545;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0 3px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.remove-handicapper-btn:hover {
+  opacity: 1;
+}
+
+.show-more-btn,
+.show-less-btn {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.show-more-btn:hover,
+.show-less-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.no-handicappers-message {
+  background-color: white;
+  border: 1px dashed #ddd;
+  border-radius: 6px;
+  padding: 15px;
+  text-align: center;
+  color: #666;
+}
+
+.no-handicappers-message p {
+  margin: 0;
+}
+
+.handicapper-stats {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: #777;
+  text-align: right;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .handicapper-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .handicapper-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .handicapper-select-container {
+    width: 100%;
+  }
+  
+  .handicapper-chip {
+    padding: 4px 10px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Handicapper List Styling */
+
+.handicapper-list-container {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+/* Style for the second handicapper list */
+.pitcher-handicapper-list {
+  margin-top: 10px;
+}
+
+.handicapper-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.handicapper-list-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.handicapper-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.handicapper-select-container {
+  width: 250px;
+}
+
+.handicapper-select .handicapper-select__control {
+  min-height: 36px;
+  border-color: #ddd;
+}
+
+.handicapper-select .handicapper-select__control:hover {
+  border-color: #bbb;
+}
+
+.handicapper-select .handicapper-select__control--is-focused {
+  border-color: #0056b3;
+  box-shadow: 0 0 0 1px #0056b3;
+}
+
+.handicapper-select .handicapper-select__menu {
+  z-index: 3;
+}
+
+.handicapper-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 5px 0;
+}
+
+.handicapper-chip {
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/* Hitter handicapper specific style */
+.hitter-handicapper {
+  background-color: #e8f4f8;
+  border: 1px solid #bde0f0;
+}
+
+/* Pitcher handicapper specific style */
+.pitcher-handicapper {
+  background-color: #f0f8e8;
+  border: 1px solid #d0e8b0;
+}
+
+.handicapper-name {
+  font-weight: 500;
+}
+
+/* Hitter name color */
+.hitter-handicapper .handicapper-name {
+  color: #0056b3;
+}
+
+/* Pitcher name color */
+.pitcher-handicapper .handicapper-name {
+  color: #2a802a;
+}
+
+.remove-handicapper-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  background-color: transparent;
+  border: none;
+  color: #dc3545;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0 3px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.remove-handicapper-btn:hover {
+  opacity: 1;
+}
+
+.show-more-btn,
+.show-less-btn {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.show-more-btn:hover,
+.show-less-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.no-handicappers-message {
+  background-color: white;
+  border: 1px dashed #ddd;
+  border-radius: 6px;
+  padding: 15px;
+  text-align: center;
+  color: #666;
+}
+
+.no-handicappers-message p {
+  margin: 0;
+}
+
+.handicapper-stats {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: #777;
+  text-align: right;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .handicapper-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .handicapper-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .handicapper-select-container {
+    width: 100%;
+  }
+  
+  .handicapper-chip {
+    padding: 4px 10px;
+    font-size: 0.85rem;
+  }
+}
