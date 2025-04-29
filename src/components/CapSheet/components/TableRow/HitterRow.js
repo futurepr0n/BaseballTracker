@@ -1,9 +1,11 @@
 import React from 'react';
 import Select from 'react-select';
-import { formatGameDate, getTeamColors } from '../../utils/formatters';
+import { getTeamColors } from '../../utils/formatters';
+import HitterPerformanceLineChart from '../HitterPerformanceLineChart';
 
 /**
  * Component for a hitter row in the table
+ * Enhanced with visual performance line chart
  * 
  * @param {Object} player - Hitter player object
  * @param {Object} teams - Teams data for styling
@@ -27,11 +29,6 @@ const HitterRow = ({
   onRemove
 }) => {
   const teamColors = getTeamColors(player.team, teams);
-  
-  // Format dates for display (MM/DD)
-  const game1Date = formatGameDate(player.game1Date);
-  const game2Date = formatGameDate(player.game2Date);
-  const game3Date = formatGameDate(player.game3Date);
 
   return (
     <tr style={teamColors}>
@@ -41,23 +38,10 @@ const HitterRow = ({
       <td>{player.prevGameAB}</td>
       <td>{player.prevGameH}</td>
       
-      {/* Game 1 Stats */}
-      <td className="avg-cell">{game1Date}</td>
-      <td className="avg-cell">{player.game1HR}</td>
-      <td className="avg-cell">{player.game1AB}</td>
-      <td className="avg-cell">{player.game1H}</td>
-      
-      {/* Game 2 Stats */}
-      <td className="avg-cell">{game2Date}</td>
-      <td className="avg-cell">{player.game2HR}</td>
-      <td className="avg-cell">{player.game2AB}</td>
-      <td className="avg-cell">{player.game2H}</td>
-      
-      {/* Game 3 Stats */}
-      <td className="avg-cell">{game3Date}</td>
-      <td className="avg-cell">{player.game3HR}</td>
-      <td className="avg-cell">{player.game3AB}</td>
-      <td className="avg-cell">{player.game3H}</td>
+      {/* Performance Line Chart - Replaces 12 individual cells */}
+      <td className="performance-chart-cell">
+        <HitterPerformanceLineChart player={player} />
+      </td>
       
       {/* Pitcher selection */}
       <td>

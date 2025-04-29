@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
 import { getTeamColors } from '../utils/formatters';
+import ColoredPerformanceLineChart from './ColoredPerformanceLineChart';
+import './HitterHandicapSummary.css';
 
 /**
  * Component for summarizing handicapper activity on hitters
@@ -29,6 +31,7 @@ const HitterHandicapSummary = ({ hitters, handicappers, teams }) => {
 
         if (handicappersOnPosition.length > 0) {
           allCombinations.push({
+            hitter: hitter, // Store the entire hitter object for performance chart
             hitterId: hitter.id,
             hitterName: hitter.name,
             team: hitter.team,
@@ -87,6 +90,7 @@ const HitterHandicapSummary = ({ hitters, handicappers, teams }) => {
               <th>Team</th>
               <th>Position</th>
               <th>Handicappers</th>
+              <th>Performance Trend</th>
               <th>Heat</th>
             </tr>
           </thead>
@@ -98,8 +102,16 @@ const HitterHandicapSummary = ({ hitters, handicappers, teams }) => {
                 <tr key={`${row.hitterId}-${row.betType}`} style={teamColors}>
                   <td className="hitter-name">{row.hitterName}</td>
                   <td>{row.team}</td>
-                  <td className="bet-type">{row.betType}</td>
+                  <td>
+                    {/* Wrap the position value in a div for proper centering */}
+                    <div className="position-value-container">
+                      <span className="position-value">{row.betType}</span>
+                    </div>
+                  </td>
                   <td className="handicappers-list">{row.handicappers}</td>
+                  <td className="trend-cell">
+                    <ColoredPerformanceLineChart player={row.hitter} width={220} height={80} />
+                  </td>
                   <td className="heat-cell">{renderHeatIndicator(row.handicapperCount)}</td>
                 </tr>
               );

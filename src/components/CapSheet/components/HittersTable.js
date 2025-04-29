@@ -2,10 +2,11 @@ import React from 'react';
 import HitterRow from './TableRow/HitterRow';
 import PlayerSelector from './PlayerSelector';
 import HitterHandicapSummary from './HitterHandicapSummary';
-import './HitterHandicapSummary.css';
+import './HitterPerformanceLineChart.css'; // Add this CSS file for styling
 
 /**
  * Component for displaying the hitters table section
+ * Updated with visual performance line chart instead of individual game statistics columns
  * 
  * @param {Object} props - Component props
  */
@@ -40,6 +41,26 @@ const HittersTable = ({
           />
         </div>
 
+        {/* Legend for the performance chart */}
+        <div className="line-chart-legend">
+          <span className="legend-title">Performance Chart:</span>
+          <div className="chart-legend-item">
+            <div className="chart-legend-line"></div>
+            <span>Batting Avg Trend</span>
+          </div>
+          <div className="chart-legend-item">
+            <div className="chart-legend-point"></div>
+            <span>Hits/At-Bats</span>
+          </div>
+          <div className="chart-legend-item">
+            <div className="chart-legend-hr"></div>
+            <span>Home Runs</span>
+          </div>
+          <div className="legend-note">
+            (Games shown oldest to newest)
+          </div>
+        </div>
+
         <div className="table-container">
           {isLoadingPlayers && hitters.length === 0 ? (
             <div className="loading-indicator">Loading player data...</div>
@@ -52,21 +73,10 @@ const HittersTable = ({
                   <th className="stat-header">HR Last</th>
                   <th className="stat-header">AB Last</th>
                   <th className="stat-header">H Last</th>
-                  {/* Game 1 */}
-                  <th className="avg-header">G1 Date</th>
-                  <th className="avg-header">G1 HR</th>
-                  <th className="avg-header">G1 AB</th>
-                  <th className="avg-header">G1 H</th>
-                  {/* Game 2 */}
-                  <th className="avg-header">G2 Date</th>
-                  <th className="avg-header">G2 HR</th>
-                  <th className="avg-header">G2 AB</th>
-                  <th className="avg-header">G2 H</th>
-                  {/* Game 3 */}
-                  <th className="avg-header">G3 Date</th>
-                  <th className="avg-header">G3 HR</th>
-                  <th className="avg-header">G3 AB</th>
-                  <th className="avg-header">G3 H</th>
+                  
+                  {/* Single column for performance chart instead of 12 game stats columns */}
+                  <th className="avg-header">Performance Trend</th>
+                  
                   <th>Pitcher</th>
                   <th>Throws</th>
                   <th>Exp SO</th>
@@ -115,8 +125,8 @@ const HittersTable = ({
                   })
                 ) : (
                   <tr>
-                    {/* Adjusted colspan: 25 base + handicappers + 1 action */}
-                    <td colSpan={25 + handicappers.length + 1} className="no-data">
+                    {/* Adjusted colspan for new table structure */}
+                    <td colSpan={14 + handicappers.length} className="no-data">
                       No hitters added. Search and select hitters above to track them.
                     </td>
                   </tr>
