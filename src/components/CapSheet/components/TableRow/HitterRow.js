@@ -205,6 +205,14 @@ const HitterRow = ({
                 <input 
                   type="checkbox" 
                   className="mini-checkbox" 
+                  checked={player.handicapperPicks[handicapper.id]?.H || false} 
+                  onChange={(e) => onPickChange(player.id, handicapper.id, 'H', e.target.checked)} 
+                /> H
+              </label>
+              <label className="mini-checkbox-label" title="Home Runs">
+                <input 
+                  type="checkbox" 
+                  className="mini-checkbox" 
                   checked={player.handicapperPicks[handicapper.id]?.HR || false} 
                   onChange={(e) => onPickChange(player.id, handicapper.id, 'HR', e.target.checked)} 
                 /> HR
@@ -236,4 +244,4 @@ const HitterRow = ({
   );
 };
 
-export default HitterRow; 
+export default HitterRow;
