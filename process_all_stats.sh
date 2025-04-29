@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Directory containing the CSV files
-CSV_DIR="../../../Python/CappingProScraper"
+CSV_DIR="../BaseballScraper"
 
 # Check if CSV_DIR exists and is a directory
 if [ ! -d "$CSV_DIR" ]; then
