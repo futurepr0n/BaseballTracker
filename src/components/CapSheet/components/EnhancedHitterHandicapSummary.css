@@ -1,0 +1,191 @@
+/* Styles for the Enhanced Hitter Handicap Summary component */
+
+.enhanced-hitter-summary {
+    margin: 25px 0;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .enhanced-hitter-summary .summary-header {
+    background-color: #0056b3;
+    color: white;
+    padding: 12px 20px;
+    font-size: 1.2rem;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .enhanced-hitter-summary .count-badge {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: normal;
+  }
+  
+  .enhanced-hitter-summary .table-container {
+    overflow-x: auto;
+    max-height: 700px; /* Set a max height for large tables */
+    overflow-y: auto;
+  }
+  
+  .enhanced-hitter-summary .summary-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.9rem;
+  }
+  
+  .enhanced-hitter-summary .summary-table th {
+    background-color: #f8f8f8;
+    font-weight: 600;
+    border-bottom: 2px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    text-align: left;
+    padding: 10px 15px;
+    white-space: nowrap;
+  }
+  
+  /* Column widths */
+  .enhanced-hitter-summary .summary-table .player-col {
+    width: 15%;
+  }
+  
+  .enhanced-hitter-summary .summary-table .team-col {
+    width: 10%;
+  }
+  
+  .enhanced-hitter-summary .summary-table .trend-col {
+    width: 30%;
+  }
+  
+  .enhanced-hitter-summary .summary-table .position-col {
+    width: 10%;
+    text-align: center;
+  }
+  
+  .enhanced-hitter-summary .summary-table .handicappers-col {
+    width: 25%;
+  }
+  
+  .enhanced-hitter-summary .summary-table .heat-col {
+    width: 10%;
+    text-align: center;
+  }
+  
+  .enhanced-hitter-summary .summary-table td {
+    padding: 10px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+  }
+  
+  .enhanced-hitter-summary .summary-table tbody tr:hover {
+    background-color: rgba(245, 248, 250, 0.5);
+  }
+  
+  .enhanced-hitter-summary .player-name {
+    font-weight: 500;
+  }
+  
+  /* Style for the position values (H, HR, B) */
+  .enhanced-hitter-summary .position-value-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    text-align: center;
+  }
+  
+  .enhanced-hitter-summary .position-value {
+    display: inline-block;
+    background-color: #f0f8ff;
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-weight: 600;
+    min-width: 30px;
+    text-align: center;
+  }
+  
+  .enhanced-hitter-summary .handicappers-list {
+    max-width: 250px;
+    white-space: normal; /* Allow wrapping for long lists */
+  }
+  
+  .enhanced-hitter-summary .trend-cell {
+    padding: 0;
+    background-color: #f8f9fa;
+  }
+  
+  .enhanced-hitter-summary .heat-cell {
+    text-align: center;
+  }
+  
+  .enhanced-hitter-summary .heat-indicator {
+    font-size: 1.2rem;
+    letter-spacing: -2px;
+  }
+  
+  /* Styling to visually differentiate player rows */
+  .enhanced-hitter-summary .first-player-row {
+    border-top: 2px solid #eee;
+  }
+  
+  .enhanced-hitter-summary .subsequent-player-row td {
+    background-color: rgba(240, 248, 255, 0.1);
+  }
+  
+  /* Empty state styling */
+  .enhanced-hitter-summary .no-data-message {
+    padding: 30px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 1200px) {
+    .enhanced-hitter-summary .handicappers-list {
+      max-width: 200px;
+    }
+  }
+  
+  @media (max-width: 992px) {
+    .enhanced-hitter-summary .summary-table td,
+    .enhanced-hitter-summary .summary-table th {
+      padding: 8px 10px;
+    }
+    
+    .enhanced-hitter-summary .trend-cell {
+      width: 180px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .enhanced-hitter-summary .summary-header {
+      padding: 10px 15px;
+      font-size: 1.1rem;
+    }
+    
+    .enhanced-hitter-summary .summary-table td,
+    .enhanced-hitter-summary .summary-table th {
+      font-size: 0.85rem;
+    }
+    
+    .enhanced-hitter-summary .handicappers-list {
+      max-width: 150px;
+    }
+    
+    .enhanced-hitter-summary .heat-indicator {
+      font-size: 1rem;
+    }
+  }

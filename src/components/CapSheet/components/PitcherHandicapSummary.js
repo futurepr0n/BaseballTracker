@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { getTeamColors } from '../utils/formatters';
 import PitcherPerformanceLineChart from './PitcherPerformanceLineChart';
-import './PitcherHandicapSummary.css'; // Ensure we're importing our styles
+import './EnhancedPitcherHandicapSummary'; // Ensure we're importing our styles
 
 /**
  * Component for summarizing handicapper activity on pitchers

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { formatGameDate } from '../utils/formatters';
+import './PitcherPerformanceLineChart.css'; // Ensure we're importing our styles
 
 /**
  * A line graph visualization of a pitcher's performance over their last 3 games

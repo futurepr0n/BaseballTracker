@@ -1,7 +1,6 @@
 import React from 'react';
 import HitterRow from './TableRow/HitterRow';
 import PlayerSelector from './PlayerSelector';
-import HitterHandicapSummary from './HitterHandicapSummary';
 import './HitterPerformanceLineChart.css'; // Add this CSS file for styling
 
 /**
@@ -137,14 +136,7 @@ const HittersTable = ({
         </div>
       </div>
       
-      {/* Add the HitterHandicapSummary component */}
-      {hitters.length > 0 && handicappers.length > 0 && (
-        <HitterHandicapSummary 
-          hitters={hitters} 
-          handicappers={handicappers} 
-          teams={teams} 
-        />
-      )}
+      
     </>
   );
 };

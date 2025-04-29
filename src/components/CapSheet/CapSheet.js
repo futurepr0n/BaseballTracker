@@ -9,7 +9,10 @@ import StatsSummary from './components/StatsSummary';
 import HandicapperList from './components/HandicapperList';
 import HitterHandicapperList from './components/HitterHandicapperList';
 import PitcherHandicapperList from './components/PitcherHandicapperList';
-import PitcherHandicapSummary from './components/PitcherHandicapSummary';
+//import PitcherHandicapSummary from './components/PitcherHandicapSummary';
+
+import EnhancedHitterHandicapSummary from './components/EnhancedHitterHandicapSummary';
+import EnhancedPitcherHandicapSummary from './components/EnhancedPitcherHandicapSummary';
 
 // Import modals
 import AddHandicapperModal from './modals/AddHandicapperModal';
@@ -489,8 +492,15 @@ function CapSheet({ playerData, gameData, currentDate }) {
                   getPitcherOptionsForOpponent={getPitcherOptionsForOpponent}
                 />
               </section>
-    
-              {/* Pitchers Section */}
+{/* Add the EnhancedHitterHandicapSummary component */}
+{selectedPlayers.hitters.length > 0 && hitterHandicappers.length > 0 && (
+  <EnhancedHitterHandicapSummary 
+    hitters={selectedPlayers.hitters} 
+    handicappers={hitterHandicappers} 
+    teams={teams} 
+  />
+)}
+
               <section>
                 {/* Pitcher Handicapper List */}
                 <PitcherHandicapperList 
@@ -521,14 +531,15 @@ function CapSheet({ playerData, gameData, currentDate }) {
           )}
 
           {/* Pitcher Handicap Summary */}
+          {/* Pitcher Handicap Summary */}
           {selectedPlayers.pitchers.length > 0 && pitcherHandicappers.length > 0 && (
-            <PitcherHandicapSummary 
-              pitchers={selectedPlayers.pitchers} 
-              handicappers={pitcherHandicappers} 
-              teams={teams} 
-            />
-          )}
-    
+  <EnhancedPitcherHandicapSummary
+    pitchers={selectedPlayers.pitchers} 
+    handicappers={pitcherHandicappers} 
+    teams={teams} 
+  />
+)}
+              
           {/* Statistics Summary */}
           <StatsSummary
             selectedPlayers={selectedPlayers}

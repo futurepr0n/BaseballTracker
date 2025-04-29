@@ -1033,3 +1033,53 @@
     font-size: 0.85rem;
   }
 }
+
+
+/* Table container with fixed height to enable scrolling */
+.section-container .table-container {
+  max-height: 70vh; /* Adjust height as needed */
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Sticky headers for all tables */
+.capsheet-table th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #f8f8f8; /* Ensure background color is set */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Optional shadow for visual separation */
+}
+
+/* Ensure the sticky header doesn't overlap with other elements when scrolling */
+.capsheet-table thead {
+  z-index: 2;
+}
+
+/* Adjust section headers to also be sticky but above the table headers */
+.section-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+/* Ensure proper z-index stacking when multiple tables are on the page */
+.section-container {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 2rem; /* Add more space between tables */
+}
+
+/* Adjust specific header styles */
+.stat-header { background-color: #f0f0f0; border-bottom-color: #ddd; }
+.avg-header { background-color: #e8f4f8; border-bottom-color: #bde0f0; }
+
+/* When using sticky headers, we need to ensure proper styling for hover states */
+.capsheet-table tbody tr:hover td {
+  background-color: #f5fbfd;
+}
+
+/* Fix for any dropdowns or overlays that might be cut off due to overflow */
+.player-selector .react-select__menu {
+  z-index: 30; /* Ensure dropdowns appear above sticky headers */
+}
