@@ -1,360 +1,461 @@
-import { formatDateForFilename } from './formatters';
+// Enhanced CSV import functionality for src/components/CapSheet/utils/exportImport.js
 
 /**
- * Export player data to CSV
- * @param {Object} selectedPlayers - Object containing hitters and pitchers arrays
- * @param {Array} handicappers - Array of handicapper objects
- * @returns {void}
- */
-export const exportToCSV = (selectedPlayers, handicappers = []) => {
-  let csvContent = "data:text/csv;charset=utf-8,";
-  
-  // Hitters
-  if (selectedPlayers.hitters && selectedPlayers.hitters.length > 0) {
-    csvContent += "HITTERS\n";
-    // Make sure header count matches data columns
-    csvContent += "Player,Team,Last HR,Last AB,Last H,Game 1 Date,Game 1 HR,Game 1 AB,Game 1 H,Game 2 Date,Game 2 HR,Game 2 AB,Game 2 H,Game 3 Date,Game 3 HR,Game 3 AB,Game 3 H,Pitcher,Pitcher ID,Opponent Team,Throws,Exp SO,Stadium,Game O/U,Bet H,Bet HR,Bet B\n";
-    selectedPlayers.hitters.forEach(p => {
-      const row = [
-        `"${p.name.replace(/"/g, '""')}"`, p.team, 
-        p.prevGameHR || '', p.prevGameAB || '', p.prevGameH || '',
-        p.game1Date || '', p.game1HR || '', p.game1AB || '', p.game1H || '',
-        p.game2Date || '', p.game2HR || '', p.game2AB || '', p.game2H || '',
-        p.game3Date || '', p.game3HR || '', p.game3AB || '', p.game3H || '',
-        `"${(p.pitcher || '').replace(/"/g, '""')}"`, 
-        p.pitcherId || '', 
-        p.opponentTeam || '', 
-        p.pitcherHand || '', p.expectedSO || '',
-        `"${(p.stadium || '').replace(/"/g, '""')}"`, p.gameOU || '', 
-        p.betTypes?.H ? "Yes" : "No", p.betTypes?.HR ? "Yes" : "No", p.betTypes?.B ? "Yes" : "No"
-      ];
-      csvContent += row.join(",") + "\n";
-    });
-    csvContent += "\n";
-  }
-  
-  // Pitchers
-  if (selectedPlayers.pitchers && selectedPlayers.pitchers.length > 0) {
-    csvContent += "PITCHERS\n";
-    // Make sure header count matches data columns
-    csvContent += "Player,Team,Last IP,Last K,Last ER,Game 1 Date,Game 1 IP,Game 1 K,Game 1 ER,Game 2 Date,Game 2 IP,Game 2 K,Game 2 ER,Game 3 Date,Game 3 IP,Game 3 K,Game 3 ER,Opponent,Pitch Count,Exp K,Stadium,Game O/U,Bet K,Bet O/U\n";
-    selectedPlayers.pitchers.forEach(p => {
-      const row = [
-        `"${p.name.replace(/"/g, '""')}"`, p.team, 
-        p.prevGameIP || '', p.prevGameK || '', p.prevGameER || '',
-        p.game1Date || '', p.game1IP || '', p.game1K || '', p.game1ER || '',
-        p.game2Date || '', p.game2IP || '', p.game2K || '', p.game2ER || '',
-        p.game3Date || '', p.game3IP || '', p.game3K || '', p.game3ER || '',
-        `"${(p.opponent || '').replace(/"/g, '""')}"`, p.expectedPitch || '', p.expectedK || '',
-        `"${(p.stadium || '').replace(/"/g, '""')}"`, p.gameOU || '', 
-        p.betTypes?.K ? "Yes" : "No", p.betTypes?.OU ? "Yes" : "No"
-      ];
-      csvContent += row.join(",") + "\n";
-    });
-    csvContent += "\n";
-  }
-  
-  // Handicapper Picks - only add this section if we have handicappers
-  if (handicappers && handicappers.length > 0 && 
-      ((selectedPlayers.hitters && selectedPlayers.hitters.length > 0) || 
-       (selectedPlayers.pitchers && selectedPlayers.pitchers.length > 0))) {
-    
-    csvContent += "HANDICAPPER PICKS\n";
-    csvContent += "Handicapper ID,Handicapper Name,Player Name,Player Team,Player Type,Public,Private,Straight,Bet Type H,Bet Type HR,Bet Type B,Bet Type K,Bet Type OU\n";
-
-    const addPicksToCSV = (player, playerType) => {
-      if (!player.handicapperPicks) return;
-      
-      Object.entries(player.handicapperPicks).forEach(([handicapperId, pick]) => {
-        // Only include rows where there is at least one pick
-        if (pick && (pick.public || pick.private || pick.straight || 
-            pick.H || pick.HR || pick.B || pick.K || pick.OU)) {
-          
-          const handicapper = handicappers.find(h => h.id === handicapperId);
-          const row = [
-            handicapperId,
-            `"${(handicapper ? handicapper.name : handicapperId).replace(/"/g, '""')}"`,
-            `"${player.name.replace(/"/g, '""')}"`,
-            player.team,
-            playerType,
-            pick.public ? "Yes" : "No",
-            pick.private ? "Yes" : "No",
-            pick.straight ? "Yes" : "No",
-            pick.H ? "Yes" : "No",
-            pick.HR ? "Yes" : "No",
-            pick.B ? "Yes" : "No",
-            pick.K ? "Yes" : "No",
-            pick.OU ? "Yes" : "No"
-          ];
-          csvContent += row.join(",") + "\n";
-        }
-      });
-    };
-    
-    if (selectedPlayers.hitters) {
-      selectedPlayers.hitters.forEach(p => addPicksToCSV(p, 'Hitter'));
-    }
-    if (selectedPlayers.pitchers) {
-      selectedPlayers.pitchers.forEach(p => addPicksToCSV(p, 'Pitcher'));
-    }
-  }
-
-  // Add date information to the CSV
-  csvContent += "\nEXPORT INFO\n";
-  csvContent += "Export Date," + new Date().toISOString() + "\n";
-  csvContent += "Target Date," + formatDateForFilename(new Date()) + "\n";
-
-  // Trigger download
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", `capsheet_${formatDateForFilename(new Date())}.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
-
-/**
- * Parse CSV content from imported file
+ * Parse CSV content from imported file with improved error handling and CSV parsing
  * @param {string} content - CSV file content
- * @param {Array} handicappers - Array of handicapper objects
  * @returns {Object|null} Parsed player data or null if error
  */
-export const parseImportedCSV = (content, handicappers) => {
+export const parseImportedCSV = (content) => {
   try {
-    const lines = content.split('\n').map(l => l.trim()).filter(l => l); // Trim lines and remove empty ones
-
+    console.log("[Import] Starting CSV parsing");
+    
+    // First, check if content exists and is not empty
+    if (!content || content.trim() === '') {
+      console.error("[Import] CSV content is empty");
+      return null;
+    }
+    
+    // Split content into lines and remove empty ones
+    const lines = content.split('\n').map(l => l.trim()).filter(l => l);
+    console.log(`[Import] Found ${lines.length} non-empty lines in CSV`);
+    
+    // Basic validation - check for required headers
+    if (!lines.some(line => line === 'HITTERS' || line === 'PITCHERS')) {
+      console.error("[Import] CSV missing required section headers (HITTERS or PITCHERS)");
+      return null;
+    }
+    
     let currentSection = '';
     const importedHitters = [];
     const importedPitchers = [];
-    const importedPicks = {}; // Store picks temporarily: { 'playerName-playerTeam': { 'handicapperId': {...picks} } }
-
+    const importedPicks = {}; // Store picks temporarily
+    let exportInfo = {}; // Store export metadata
+    
     let headerMap = {};
-
+    
+    // Parse CSV with improved handling for quoted fields
+    const parseCSVLine = (line) => {
+      const values = [];
+      let inQuotes = false;
+      let currentValue = '';
+      
+      for (let i = a; i < line.length; i++) {
+        const char = line[i];
+        
+        if (char === '"') {
+          if (inQuotes && i < line.length - 1 && line[i + 1] === '"') {
+            // Handle escaped quotes (two quotes together)
+            currentValue += '"';
+            i++; // Skip the next quote
+          } else {
+            // Toggle quote state
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          // End of field
+          values.push(currentValue);
+          currentValue = '';
+        } else {
+          currentValue += char;
+        }
+      }
+      
+      // Add the last value
+      values.push(currentValue);
+      
+      return values;
+    };
+    
+    // Fix typo in parseCSVLine function
+    const fixedParseCSVLine = (line) => {
+      const values = [];
+      let inQuotes = false;
+      let currentValue = '';
+      
+      for (let i = 0; i < line.length; i++) { // Fixed typo: "a" → "0"
+        const char = line[i];
+        
+        if (char === '"') {
+          if (inQuotes && i < line.length - 1 && line[i + 1] === '"') {
+            // Handle escaped quotes (two quotes together)
+            currentValue += '"';
+            i++; // Skip the next quote
+          } else {
+            // Toggle quote state
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          // End of field
+          values.push(currentValue);
+          currentValue = '';
+        } else {
+          currentValue += char;
+        }
+      }
+      
+      // Add the last value
+      values.push(currentValue);
+      
+      return values;
+    };
+    
+    // Process each line
     lines.forEach((line, index) => {
       // Detect section headers
-      if (line === 'HITTERS') { currentSection = 'hitters'; headerMap = {}; return; }
-      if (line === 'PITCHERS') { currentSection = 'pitchers'; headerMap = {}; return; }
-      if (line === 'HANDICAPPER PICKS') { currentSection = 'picks'; headerMap = {}; return; }
-
-      // Skip empty lines just in case
-      if (!line) return;
-
-      // Process Header Row
-      if (Object.keys(headerMap).length === 0 && index > 0) { // Check index > 0 to avoid processing section header as data header
-        const headers = line.split(',').map(h => h.trim());
-        headers.forEach((h, i) => { headerMap[h] = i; });
-        console.log(`[CapSheet Import] Detected ${currentSection} headers:`, headerMap);
-        return; // Skip processing the header row itself
+      if (line === 'HITTERS') { 
+        console.log("[Import] Found HITTERS section");
+        currentSection = 'hitters'; 
+        headerMap = {}; 
+        return; 
       }
-
-      // Process data rows based on section
-      const values = line.split(','); // Simple split, assumes no commas in quoted fields for now
-
-      if (currentSection === 'hitters' && headerMap['Player'] !== undefined) {
-        // Use headerMap to get indices safely
-        const name = values[headerMap['Player']]?.replace(/^"|"$/g, '');
-        const team = values[headerMap['Team']];
-        if (!name || !team) return; // Skip row if essential data missing
-
-        // Create basic hitter object with standard fields
-        const hitter = {
-          id: `${name}-${team}`, name, team, playerType: 'hitter',
-          handicapperPicks: {} // Initialize, will be populated later
-        };
-        
-        // Map all possible fields from CSV
-        // Note: This approach handles both old and new CSV formats
-        const fieldMappings = {
-          'Last HR': 'prevGameHR',
-          'Last AB': 'prevGameAB', 
-          'Last H': 'prevGameH',
-          'Prev Game HR': 'prevGameHR', 
-          'Prev Game AB': 'prevGameAB', 
-          'Prev Game H': 'prevGameH',
-          'Game 1 Date': 'game1Date',
-          'Game 1 HR': 'game1HR',
-          'Game 1 AB': 'game1AB',
-          'Game 1 H': 'game1H',
-          'Game 2 Date': 'game2Date',
-          'Game 2 HR': 'game2HR',
-          'Game 2 AB': 'game2AB',
-          'Game 2 H': 'game2H',
-          'Game 3 Date': 'game3Date',
-          'Game 3 HR': 'game3HR',
-          'Game 3 AB': 'game3AB',
-          'Game 3 H': 'game3H',
-          'Avg HR (3G)': 'avgHR',
-          'Avg AB (3G)': 'avgAB',
-          'Avg H (3G)': 'avgH',
-          'Pitcher': 'pitcher',
-          'Pitcher ID': 'pitcherId',
-          'Opponent Team': 'opponentTeam',
-          'Throws': 'pitcherHand',
-          'Exp SO': 'expectedSO',
-          'Stadium': 'stadium',
-          'Game O/U': 'gameOU',
-          'Bet H': 'betH',
-          'Bet HR': 'betHR',
-          'Bet B': 'betB'
-        };
-        
-        // Add each field that exists in the CSV
-        Object.entries(fieldMappings).forEach(([csvField, objectField]) => {
-          if (headerMap[csvField] !== undefined) {
-            // Special handling for fields that need cleanup
-            if (csvField === 'Pitcher' || csvField === 'Stadium') {
-              hitter[objectField] = values[headerMap[csvField]]?.replace(/^"|"$/g, '') || '';
-            } 
-            // Special handling for boolean fields
-            else if (csvField.startsWith('Bet ')) {
-              if (!hitter.betTypes) hitter.betTypes = {};
-              const betType = csvField.replace('Bet ', '');
-              hitter.betTypes[betType] = values[headerMap[csvField]] === 'Yes';
-            }
-            // Normal field handling
-            else {
-              hitter[objectField] = values[headerMap[csvField]] || '';
-            }
+      if (line === 'PITCHERS') { 
+        console.log("[Import] Found PITCHERS section");
+        currentSection = 'pitchers'; 
+        headerMap = {}; 
+        return; 
+      }
+      if (line === 'HANDICAPPER PICKS') { 
+        console.log("[Import] Found HANDICAPPER PICKS section");
+        currentSection = 'picks'; 
+        headerMap = {}; 
+        return; 
+      }
+      if (line === 'EXPORT INFO') { 
+        console.log("[Import] Found EXPORT INFO section");
+        currentSection = 'info'; 
+        headerMap = {}; 
+        return; 
+      }
+      
+      // Skip empty lines
+      if (!line) return;
+      
+      // Skip lines in unrecognized sections
+      if (!currentSection) return;
+      
+      try {
+        // Process header row
+        if (Object.keys(headerMap).length === 0) {
+          try {
+            // For simple header parsing, we'll use the split method
+            // This is less likely to cause issues with headers
+            const headers = line.split(',').map(h => h.trim());
+            headers.forEach((h, i) => { headerMap[h] = i; });
+            console.log(`[Import] Detected ${currentSection} headers:`, headerMap);
+            return; // Skip processing the header row itself
+          } catch (err) {
+            console.error(`[Import] Error parsing header for ${currentSection}:`, err);
+            return;
           }
-        });
-        
-        // Ensure betTypes exists
-        if (!hitter.betTypes) {
-          hitter.betTypes = { H: false, HR: false, B: false };
         }
         
-        importedHitters.push(hitter);
-      } else if (currentSection === 'pitchers' && headerMap['Player'] !== undefined) {
-        const name = values[headerMap['Player']]?.replace(/^"|"$/g, '');
-        const team = values[headerMap['Team']];
-        if (!name || !team) return;
-
-        // Create basic pitcher object
-        const pitcher = {
-          id: `${name}-${team}`, 
-          name, 
-          team, 
-          playerType: 'pitcher',
-          handicapperPicks: {} // Initialize
-        };
-        
-        // Map fields from CSV
-        const fieldMappings = {
-          'Last IP': 'prevGameIP',
-          'Last K': 'prevGameK', 
-          'Last ER': 'prevGameER',
-          'Prev Game IP': 'prevGameIP', 
-          'Prev Game K': 'prevGameK', 
-          'Prev Game ER': 'prevGameER',
-          'Game 1 Date': 'game1Date',
-          'Game 1 IP': 'game1IP',
-          'Game 1 K': 'game1K',
-          'Game 1 ER': 'game1ER',
-          'Game 2 Date': 'game2Date',
-          'Game 2 IP': 'game2IP',
-          'Game 2 K': 'game2K',
-          'Game 2 ER': 'game2ER',
-          'Game 3 Date': 'game3Date',
-          'Game 3 IP': 'game3IP',
-          'Game 3 K': 'game3K',
-          'Game 3 ER': 'game3ER',
-          'Avg IP (3G)': 'avgIP',
-          'Avg K (3G)': 'avgK',
-          'Avg ER (3G)': 'avgER',
-          'Opponent': 'opponent',
-          'Pitch Count': 'expectedPitch',
-          'Exp K': 'expectedK',
-          'Stadium': 'stadium',
-          'Game O/U': 'gameOU',
-          'Bet K': 'betK',
-          'Bet O/U': 'betOU'
-        };
-        
-        // Add each field that exists in the CSV
-        Object.entries(fieldMappings).forEach(([csvField, objectField]) => {
-          if (headerMap[csvField] !== undefined) {
-            // Special handling for fields that need cleanup
-            if (csvField === 'Opponent' || csvField === 'Stadium') {
-              pitcher[objectField] = values[headerMap[csvField]]?.replace(/^"|"$/g, '') || '';
-            } 
-            // Special handling for boolean fields
-            else if (csvField.startsWith('Bet ')) {
-              if (!pitcher.betTypes) pitcher.betTypes = {};
-              const betType = csvField.replace('Bet ', '');
-              pitcher.betTypes[betType] = values[headerMap[csvField]] === 'Yes';
-            }
-            // Normal field handling
-            else {
-              pitcher[objectField] = values[headerMap[csvField]] || '';
-            }
-          }
-        });
-        
-        // Ensure betTypes exists
-        if (!pitcher.betTypes) {
-          pitcher.betTypes = { K: false, OU: false };
+        // Process data rows based on section
+        // For data rows, use the more robust parsing
+        let values;
+        try {
+          values = fixedParseCSVLine(line);
+        } catch (err) {
+          console.error(`[Import] Error parsing line ${index}, falling back to simple split:`, err);
+          values = line.split(','); // Fallback to simple split
         }
         
-        importedPitchers.push(pitcher);
-      } else if (currentSection === 'picks' && headerMap['Player Name'] !== undefined) {
-        const playerName = values[headerMap['Player Name']]?.replace(/^"|"$/g, '');
-        const playerTeam = values[headerMap['Player Team']];
-        const handicapperId = values[headerMap['Handicapper ID']];
-        if (!playerName || !playerTeam || !handicapperId) return; // Skip if key info missing
-
-        const playerKey = `${playerName}-${playerTeam}`;
-        if (!importedPicks[playerKey]) importedPicks[playerKey] = {};
-
-        importedPicks[playerKey][handicapperId] = {
-          public: values[headerMap['Public']] === 'Yes',
-          private: values[headerMap['Private']] === 'Yes',
-          straight: values[headerMap['Straight']] === 'Yes',
-          H: values[headerMap['Bet Type H']] === 'Yes',
-          HR: values[headerMap['Bet Type HR']] === 'Yes',
-          B: values[headerMap['Bet Type B']] === 'Yes',
-          K: values[headerMap['Bet Type K']] === 'Yes',
-          OU: values[headerMap['Bet Type OU']] === 'Yes'
-        };
+        if (currentSection === 'hitters' && headerMap['Player'] !== undefined) {
+          const playerIndex = headerMap['Player'];
+          const teamIndex = headerMap['Team'];
+          
+          if (playerIndex === undefined || teamIndex === undefined || 
+              !values[playerIndex] || !values[teamIndex]) {
+            console.warn(`[Import] Skipping invalid hitter row at line ${index}`);
+            return;
+          }
+          
+          // Extract player name, removing quotes if present
+          const name = values[playerIndex].replace(/^"|"$/g, '');
+          const team = values[teamIndex];
+          
+          // Create basic hitter object
+          const hitter = {
+            id: `${name}-${team}`,
+            name,
+            team,
+            playerType: 'hitter',
+            handicapperPicks: {}
+          };
+          
+          // Map all possible fields from CSV
+          const fieldMappings = {
+            'Last HR': 'prevGameHR',
+            'Last AB': 'prevGameAB', 
+            'Last H': 'prevGameH',
+            'Game 1 Date': 'game1Date',
+            'Game 1 HR': 'game1HR',
+            'Game 1 AB': 'game1AB',
+            'Game 1 H': 'game1H',
+            'Game 2 Date': 'game2Date',
+            'Game 2 HR': 'game2HR',
+            'Game 2 AB': 'game2AB',
+            'Game 2 H': 'game2H',
+            'Game 3 Date': 'game3Date',
+            'Game 3 HR': 'game3HR',
+            'Game 3 AB': 'game3AB',
+            'Game 3 H': 'game3H',
+            'Pitcher': 'pitcher',
+            'Pitcher ID': 'pitcherId',
+            'Opponent Team': 'opponentTeam',
+            'Throws': 'pitcherHand',
+            'Exp SO': 'expectedSO',
+            'Stadium': 'stadium',
+            'Game O/U': 'gameOU'
+          };
+          
+          // Add each field that exists in the CSV
+          Object.entries(fieldMappings).forEach(([csvField, objectField]) => {
+            if (headerMap[csvField] !== undefined) {
+              const value = values[headerMap[csvField]];
+              if (value !== undefined) {
+                // Special handling for text fields with quotes
+                if (csvField === 'Pitcher' || csvField === 'Stadium') {
+                  hitter[objectField] = value.replace(/^"|"$/g, '') || '';
+                } else {
+                  hitter[objectField] = value || '';
+                }
+              }
+            }
+          });
+          
+          // Handle bet types
+          hitter.betTypes = {
+            H: values[headerMap['Bet H']] === 'Yes',
+            HR: values[headerMap['Bet HR']] === 'Yes',
+            B: values[headerMap['Bet B']] === 'Yes'
+          };
+          
+          importedHitters.push(hitter);
+          console.log(`[Import] Added hitter: ${name} (${team})`);
+        }
+        else if (currentSection === 'pitchers' && headerMap['Player'] !== undefined) {
+          const playerIndex = headerMap['Player'];
+          const teamIndex = headerMap['Team']; 
+          
+          if (playerIndex === undefined || teamIndex === undefined || 
+              !values[playerIndex] || !values[teamIndex]) {
+            console.warn(`[Import] Skipping invalid pitcher row at line ${index}`);
+            return;
+          }
+          
+          // Extract player name, removing quotes if present
+          const name = values[playerIndex].replace(/^"|"$/g, '');
+          const team = values[teamIndex];
+          
+          // Create basic pitcher object
+          const pitcher = {
+            id: `${name}-${team}`,
+            name,
+            team,
+            playerType: 'pitcher',
+            handicapperPicks: {}
+          };
+          
+          // Map fields from CSV
+          const fieldMappings = {
+            'Last IP': 'prevGameIP',
+            'Last K': 'prevGameK', 
+            'Last ER': 'prevGameER',
+            'Game 1 Date': 'game1Date',
+            'Game 1 IP': 'game1IP',
+            'Game 1 K': 'game1K',
+            'Game 1 ER': 'game1ER',
+            'Game 2 Date': 'game2Date',
+            'Game 2 IP': 'game2IP',
+            'Game 2 K': 'game2K',
+            'Game 2 ER': 'game2ER',
+            'Game 3 Date': 'game3Date',
+            'Game 3 IP': 'game3IP',
+            'Game 3 K': 'game3K',
+            'Game 3 ER': 'game3ER',
+            'Opponent': 'opponent',
+            'Pitch Count': 'expectedPitch',
+            'Exp K': 'expectedK',
+            'Stadium': 'stadium',
+            'Game O/U': 'gameOU'
+          };
+          
+          // Add each field that exists in the CSV
+          Object.entries(fieldMappings).forEach(([csvField, objectField]) => {
+            if (headerMap[csvField] !== undefined) {
+              const value = values[headerMap[csvField]];
+              if (value !== undefined) {
+                // Special handling for text fields with quotes
+                if (csvField === 'Opponent' || csvField === 'Stadium') {
+                  pitcher[objectField] = value.replace(/^"|"$/g, '') || '';
+                } else {
+                  pitcher[objectField] = value || '';
+                }
+              }
+            }
+          });
+          
+          // Handle bet types
+          pitcher.betTypes = {
+            K: values[headerMap['Bet K']] === 'Yes',
+            OU: values[headerMap['Bet O/U']] === 'Yes'
+          };
+          
+          importedPitchers.push(pitcher);
+          console.log(`[Import] Added pitcher: ${name} (${team})`);
+        }
+        else if (currentSection === 'picks' && headerMap['Player Name'] !== undefined) {
+          const playerNameIndex = headerMap['Player Name'];
+          const playerTeamIndex = headerMap['Player Team'];
+          const handicapperIdIndex = headerMap['Handicapper ID'];
+          const playerTypeIndex = headerMap['Player Type'];
+          
+          if (playerNameIndex === undefined || playerTeamIndex === undefined || 
+              handicapperIdIndex === undefined || playerTypeIndex === undefined ||
+              !values[playerNameIndex] || !values[playerTeamIndex] || 
+              !values[handicapperIdIndex] || !values[playerTypeIndex]) {
+            console.warn(`[Import] Skipping invalid handicapper pick row at line ${index}`);
+            return;
+          }
+          
+          const playerName = values[playerNameIndex].replace(/^"|"$/g, '');
+          const playerTeam = values[playerTeamIndex];
+          const handicapperId = values[handicapperIdIndex];
+          const playerType = values[playerTypeIndex];
+          
+          const playerKey = `${playerName}-${playerTeam}`;
+          if (!importedPicks[playerKey]) {
+            importedPicks[playerKey] = {};
+          }
+          
+          importedPicks[playerKey][handicapperId] = {
+            public: values[headerMap['Public']] === 'Yes',
+            private: values[headerMap['Private']] === 'Yes',
+            straight: values[headerMap['Straight']] === 'Yes',
+            H: values[headerMap['Bet Type H']] === 'Yes',
+            HR: values[headerMap['Bet Type HR']] === 'Yes',
+            B: values[headerMap['Bet Type B']] === 'Yes',
+            K: values[headerMap['Bet Type K']] === 'Yes',
+            OU: values[headerMap['Bet Type OU']] === 'Yes'
+          };
+          
+          console.log(`[Import] Added pick for ${playerName} (${playerTeam}) - handicapper: ${handicapperId}`);
+        }
+        else if (currentSection === 'info') {
+          // Process export info - simpler parsing for key-value pairs
+          if (values.length >= 2) {
+            const key = values[0]?.trim();
+            const value = values[1]?.trim();
+            if (key && value) {
+              exportInfo[key] = value;
+              console.log(`[Import] Export info: ${key} = ${value}`);
+            }
+          }
+        }
+      } catch (err) {
+        console.error(`[Import] Error processing line ${index} in ${currentSection}:`, err, "Line:", line);
       }
     });
-
+    
     // Combine imported players with their picks
-    const assignPicks = (player) => {
+    // For hitters
+    importedHitters.forEach(player => {
       const playerKey = `${player.name}-${player.team}`;
-      const picksForPlayer = importedPicks[playerKey];
-      if (picksForPlayer) {
-        // Initialize all known handicappers first
-        const initialPicks = handicappers.reduce((acc, h) => {
-          acc[h.id] = player.playerType === 'hitter'
-            ? { public: false, private: false, straight: false, H: false, HR: false, B: false }
-            : { public: false, private: false, straight: false, K: false, OU: false };
-          return acc;
-        }, {});
-        // Merge imported picks over the defaults
-        player.handicapperPicks = { ...initialPicks, ...picksForPlayer };
-      } else {
-        // If no picks found in CSV, initialize with defaults for known handicappers
-        player.handicapperPicks = handicappers.reduce((acc, h) => {
-          acc[h.id] = player.playerType === 'hitter'
-            ? { public: false, private: false, straight: false, H: false, HR: false, B: false }
-            : { public: false, private: false, straight: false, K: false, OU: false };
-          return acc;
-        }, {});
+      if (importedPicks[playerKey]) {
+        player.handicapperPicks = importedPicks[playerKey];
       }
-      return player;
-    };
-
-    const finalHitters = importedHitters.map(assignPicks);
-    const finalPitchers = importedPitchers.map(assignPicks);
-
+    });
+    
+    // For pitchers
+    importedPitchers.forEach(player => {
+      const playerKey = `${player.name}-${player.team}`;
+      if (importedPicks[playerKey]) {
+        player.handicapperPicks = importedPicks[playerKey];
+      }
+    });
+    
+    console.log(`[Import] Parsed ${importedHitters.length} hitters, ${importedPitchers.length} pitchers`);
+    
     // Return the parsed data
     return {
-      hitters: finalHitters,
-      pitchers: finalPitchers
+      hitters: importedHitters,
+      pitchers: importedPitchers,
+      exportInfo
     };
+    
   } catch (error) {
-    console.error('Error parsing imported CSV:', error);
+    console.error('[Import] Error parsing imported CSV:', error);
     return null;
   }
+};
+
+// Improved file selection handler for CapSheet.js
+const handleFileSelect = (event) => {
+  const file = event.target.files[0];
+  if (!file) {
+    console.log("[Import] No file selected");
+    return;
+  }
+  
+  // Check file extension
+  if (!file.name.toLowerCase().endsWith('.csv')) {
+    alert('Please select a CSV file');
+    return;
+  }
+  
+  console.log(`[Import] Processing file: ${file.name}, size: ${file.size} bytes`);
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const content = e.target.result;
+      
+      if (!content || content.length === 0) {
+        throw new Error('File is empty');
+      }
+      
+      console.log(`[Import] File loaded, content length: ${content.length} bytes`);
+      console.log(`[Import] Content preview: ${content.substring(0, 100)}...`);
+      
+      // Parse the CSV content
+      const parsedData = parseImportedCSV(content);
+      
+      if (!parsedData) {
+        throw new Error('Failed to parse CSV data');
+      }
+      
+      if (parsedData.hitters.length === 0 && parsedData.pitchers.length === 0) {
+        throw new Error('No valid player data found in CSV');
+      }
+      
+      // Update the players state
+      setSelectedPlayers({
+        hitters: parsedData.hitters || [],
+        pitchers: parsedData.pitchers || []
+      });
+      
+      // If there's date information in the export, you might want to use it
+      if (parsedData.exportInfo && parsedData.exportInfo['Target Date']) {
+        console.log(`[Import] Target date from file: ${parsedData.exportInfo['Target Date']}`);
+        // You could potentially set the date here if needed
+      }
+      
+      alert(`Data imported successfully! ${parsedData.hitters.length} hitters and ${parsedData.pitchers.length} pitchers loaded.`);
+    } catch (error) {
+      console.error('[Import] Error importing data:', error);
+      alert(`Failed to import betting slip. ${error.message || ''}\nPlease check the file format and content.`);
+    } finally {
+      // Reset file input value to allow selecting the same file again
+      if (event.target) {
+        event.target.value = null;
+      }
+    }
+  };
+  
+  reader.onerror = (error) => {
+    console.error('[Import] Error reading file:', error);
+    alert('Error reading file: ' + (error.message || 'Unknown error'));
+  };
+  
+  reader.readAsText(file);
 };
