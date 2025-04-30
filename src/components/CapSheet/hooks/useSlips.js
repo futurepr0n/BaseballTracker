@@ -34,18 +34,20 @@ const useSlips = (formattedDate) => {
       alert('Please enter a name for this slip');
       return false;
     }
-
+  
     const newSlip = {
       id: generateSlipId(),
       name: slipName,
-      date: formattedDate,
+      date: formattedDate, // This already exists
+      // Add the actual Date object for better date operations
+      dateObj: new Date().toISOString(),
       timestamp: Date.now(),
       data: playerData
     };
-
+  
     const updatedSlips = [...savedSlips, newSlip];
     setSavedSlips(updatedSlips);
-
+  
     try {
       localStorage.setItem('capsheet_slips', JSON.stringify(updatedSlips));
       alert(`Slip "${slipName}" saved successfully!`);

@@ -6,24 +6,24 @@ import { formatDateForFilename } from './formatters';
  * @param {Array} handicappers - Array of handicapper objects
  * @returns {void}
  */
-export const exportToCSV = (selectedPlayers, handicappers) => {
+export const exportToCSV = (selectedPlayers, handicappers = []) => {
   let csvContent = "data:text/csv;charset=utf-8,";
   
   // Hitters
-  if (selectedPlayers.hitters.length > 0) {
+  if (selectedPlayers.hitters && selectedPlayers.hitters.length > 0) {
     csvContent += "HITTERS\n";
     // Make sure header count matches data columns
     csvContent += "Player,Team,Last HR,Last AB,Last H,Game 1 Date,Game 1 HR,Game 1 AB,Game 1 H,Game 2 Date,Game 2 HR,Game 2 AB,Game 2 H,Game 3 Date,Game 3 HR,Game 3 AB,Game 3 H,Pitcher,Pitcher ID,Opponent Team,Throws,Exp SO,Stadium,Game O/U,Bet H,Bet HR,Bet B\n";
     selectedPlayers.hitters.forEach(p => {
       const row = [
         `"${p.name.replace(/"/g, '""')}"`, p.team, 
-        p.prevGameHR, p.prevGameAB, p.prevGameH,
-        p.game1Date, p.game1HR, p.game1AB, p.game1H,
-        p.game2Date, p.game2HR, p.game2AB, p.game2H,
-        p.game3Date, p.game3HR, p.game3AB, p.game3H,
+        p.prevGameHR || '', p.prevGameAB || '', p.prevGameH || '',
+        p.game1Date || '', p.game1HR || '', p.game1AB || '', p.game1H || '',
+        p.game2Date || '', p.game2HR || '', p.game2AB || '', p.game2H || '',
+        p.game3Date || '', p.game3HR || '', p.game3AB || '', p.game3H || '',
         `"${(p.pitcher || '').replace(/"/g, '""')}"`, 
-        p.pitcherId || '', // Include pitcher ID
-        p.opponentTeam || '', // Include opponent team
+        p.pitcherId || '', 
+        p.opponentTeam || '', 
         p.pitcherHand || '', p.expectedSO || '',
         `"${(p.stadium || '').replace(/"/g, '""')}"`, p.gameOU || '', 
         p.betTypes?.H ? "Yes" : "No", p.betTypes?.HR ? "Yes" : "No", p.betTypes?.B ? "Yes" : "No"
@@ -34,17 +34,17 @@ export const exportToCSV = (selectedPlayers, handicappers) => {
   }
   
   // Pitchers
-  if (selectedPlayers.pitchers.length > 0) {
+  if (selectedPlayers.pitchers && selectedPlayers.pitchers.length > 0) {
     csvContent += "PITCHERS\n";
     // Make sure header count matches data columns
     csvContent += "Player,Team,Last IP,Last K,Last ER,Game 1 Date,Game 1 IP,Game 1 K,Game 1 ER,Game 2 Date,Game 2 IP,Game 2 K,Game 2 ER,Game 3 Date,Game 3 IP,Game 3 K,Game 3 ER,Opponent,Pitch Count,Exp K,Stadium,Game O/U,Bet K,Bet O/U\n";
     selectedPlayers.pitchers.forEach(p => {
       const row = [
         `"${p.name.replace(/"/g, '""')}"`, p.team, 
-        p.prevGameIP, p.prevGameK, p.prevGameER,
-        p.game1Date, p.game1IP, p.game1K, p.game1ER,
-        p.game2Date, p.game2IP, p.game2K, p.game2ER,
-        p.game3Date, p.game3IP, p.game3K, p.game3ER,
+        p.prevGameIP || '', p.prevGameK || '', p.prevGameER || '',
+        p.game1Date || '', p.game1IP || '', p.game1K || '', p.game1ER || '',
+        p.game2Date || '', p.game2IP || '', p.game2K || '', p.game2ER || '',
+        p.game3Date || '', p.game3IP || '', p.game3K || '', p.game3ER || '',
         `"${(p.opponent || '').replace(/"/g, '""')}"`, p.expectedPitch || '', p.expectedK || '',
         `"${(p.stadium || '').replace(/"/g, '""')}"`, p.gameOU || '', 
         p.betTypes?.K ? "Yes" : "No", p.betTypes?.OU ? "Yes" : "No"
@@ -54,15 +54,22 @@ export const exportToCSV = (selectedPlayers, handicappers) => {
     csvContent += "\n";
   }
   
-  // Handicapper Picks
-  if (handicappers.length > 0 && (selectedPlayers.hitters.length > 0 || selectedPlayers.pitchers.length > 0)) {
+  // Handicapper Picks - only add this section if we have handicappers
+  if (handicappers && handicappers.length > 0 && 
+      ((selectedPlayers.hitters && selectedPlayers.hitters.length > 0) || 
+       (selectedPlayers.pitchers && selectedPlayers.pitchers.length > 0))) {
+    
     csvContent += "HANDICAPPER PICKS\n";
-    csvContent += "Handicapper ID,Handicapper Name,Player Name,Player Team,Player Type,Public,Private,Straight,Bet Type H,Bet Type HR,Bet Type B,Bet Type K,Bet Type OU\n"; // Expanded bet types
+    csvContent += "Handicapper ID,Handicapper Name,Player Name,Player Team,Player Type,Public,Private,Straight,Bet Type H,Bet Type HR,Bet Type B,Bet Type K,Bet Type OU\n";
 
     const addPicksToCSV = (player, playerType) => {
-      Object.entries(player.handicapperPicks || {}).forEach(([handicapperId, pick]) => {
+      if (!player.handicapperPicks) return;
+      
+      Object.entries(player.handicapperPicks).forEach(([handicapperId, pick]) => {
         // Only include rows where there is at least one pick
-        if (pick.public || pick.private || pick.straight || pick.H || pick.HR || pick.B || pick.K || pick.OU) {
+        if (pick && (pick.public || pick.private || pick.straight || 
+            pick.H || pick.HR || pick.B || pick.K || pick.OU)) {
+          
           const handicapper = handicappers.find(h => h.id === handicapperId);
           const row = [
             handicapperId,
@@ -84,9 +91,18 @@ export const exportToCSV = (selectedPlayers, handicappers) => {
       });
     };
     
-    selectedPlayers.hitters.forEach(p => addPicksToCSV(p, 'Hitter'));
-    selectedPlayers.pitchers.forEach(p => addPicksToCSV(p, 'Pitcher'));
+    if (selectedPlayers.hitters) {
+      selectedPlayers.hitters.forEach(p => addPicksToCSV(p, 'Hitter'));
+    }
+    if (selectedPlayers.pitchers) {
+      selectedPlayers.pitchers.forEach(p => addPicksToCSV(p, 'Pitcher'));
+    }
   }
+
+  // Add date information to the CSV
+  csvContent += "\nEXPORT INFO\n";
+  csvContent += "Export Date," + new Date().toISOString() + "\n";
+  csvContent += "Target Date," + formatDateForFilename(new Date()) + "\n";
 
   // Trigger download
   const encodedUri = encodeURI(csvContent);

@@ -428,7 +428,10 @@ function CapSheet({ playerData, gameData, currentDate }) {
 
   // Handle export to CSV
   const handleExportToCsv = () => {
-    exportToCSV(selectedPlayers);
+    // Combine both hitter and pitcher handicappers
+    const allHandicappers = [...hitterHandicappers, ...pitcherHandicappers];
+    // Pass both selectedPlayers and the combined handicappers list
+    exportToCSV(selectedPlayers, allHandicappers);
   };
 
   // Modified data description based on source

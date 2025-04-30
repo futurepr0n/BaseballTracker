@@ -22,11 +22,14 @@ const AddHandicapperModal = ({
   setNewHandicapperName,
   handicapperSearch,
   setHandicapperSearch,
-  filteredHandicappers,
+  filteredHandicappers = [],
   handleSelectHandicapper,
   handleAddHandicapper
 }) => {
   if (!show) return null;
+
+  // Ensure filteredHandicappers is always an array
+  const safeFilteredHandicappers = Array.isArray(filteredHandicappers) ? filteredHandicappers : [];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -48,7 +51,7 @@ const AddHandicapperModal = ({
             <input 
               id="handicapper-name" 
               type="text" 
-              value={newHandicapperName} 
+              value={newHandicapperName || ''} 
               onChange={(e) => setNewHandicapperName(e.target.value)} 
               placeholder="Enter handicapper name (e.g., @CapperJoe)"
               autoFocus
@@ -63,12 +66,12 @@ const AddHandicapperModal = ({
             <input 
               type="text" 
               placeholder="Search existing handicappers..." 
-              value={handicapperSearch} 
+              value={handicapperSearch || ''} 
               onChange={(e) => setHandicapperSearch(e.target.value)}
             />
             <div className="handicapper-list">
-              {filteredHandicappers.length > 0 ? (
-                filteredHandicappers.slice(0, 10).map(handicapper => (
+              {safeFilteredHandicappers.length > 0 ? (
+                safeFilteredHandicappers.slice(0, 10).map(handicapper => (
                   <div 
                     key={handicapper.id} 
                     className="handicapper-option" 
@@ -89,7 +92,7 @@ const AddHandicapperModal = ({
             <button 
               type="submit" 
               className="submit-btn" 
-              disabled={!newHandicapperName.trim()}
+              disabled={!newHandicapperName || !newHandicapperName.trim()}
             >
               Add Handicapper
             </button>
