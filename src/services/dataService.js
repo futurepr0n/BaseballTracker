@@ -105,8 +105,10 @@ export const fetchPlayerData = async (dateStr) => {
   
   try {
     // Extract year and month from the date string
-    const [year, /* month - not used */, day] = dateStr.split('-');
-    const monthName = new Date(dateStr).toLocaleString('default', { month: 'long' }).toLowerCase();
+    const [year, month, day] = dateStr.split('-');
+    // Create date with explicit year, month (0-based), day
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    const monthName = date.toLocaleString('default', { month: 'long' }).toLowerCase();
     
     // Construct the file path
     const filePath = `/data/${year}/${monthName}/${monthName}_${day}_${year}.json`;
@@ -314,8 +316,10 @@ export const fetchGameData = async (dateStr) => {
   }
 
   try {
-    const [year, /* month - not used */, day] = dateStr.split('-');
-    const monthName = new Date(dateStr).toLocaleString('default', { month: 'long' }).toLowerCase();
+    const [year, month, day] = dateStr.split('-');
+// Create date with explicit year, month (0-based), day
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    const monthName = date.toLocaleString('default', { month: 'long' }).toLowerCase();
     const filePath = `/data/${year}/${monthName}/${monthName}_${day}_${year}.json`;
 
     console.log(`Loading game data from: ${filePath}`);
