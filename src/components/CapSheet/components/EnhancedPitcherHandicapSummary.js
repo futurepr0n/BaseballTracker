@@ -4,14 +4,24 @@ import PitcherPerformanceLineChart from './PitcherPerformanceLineChart';
 import './EnhancedPitcherHandicapSummary.css';
 
 /**
+ * Helper function to get a message about the games history setting
+ * @param {number} gamesHistory - Number of games in history setting
+ * @returns {string} Formatted message about games history
+ */
+const getGameHistoryMessage = (gamesHistory) => {
+  return `Performance trends showing ${gamesHistory} ${gamesHistory === 1 ? 'game' : 'games'} of history`;
+};
+
+/**
  * Enhanced component for summarizing handicapper activity on pitchers
  * Uses a consolidated layout to group the same player data and reduce repetition
  * 
  * @param {Array} pitchers - Array of pitcher objects with handicapper picks
  * @param {Array} handicappers - Array of handicapper objects
  * @param {Object} teams - Teams data for styling
+ * @param {number} gamesHistory - Number of games to display in history (default: 3)
  */
-const EnhancedPitcherHandicapSummary = ({ pitchers, handicappers, teams }) => {
+const EnhancedPitcherHandicapSummary = ({ pitchers, handicappers, teams, gamesHistory = 3 }) => {
   // Process the data to calculate handicapper activity and group by player
   const summaryData = useMemo(() => {
     if (!pitchers || pitchers.length === 0 || !handicappers || handicappers.length === 0) {
@@ -104,6 +114,7 @@ const EnhancedPitcherHandicapSummary = ({ pitchers, handicappers, teams }) => {
       <h3 className="summary-header">
         Popular Pitcher Positions
         <span className="count-badge">{summaryData.totalPositions} positions tracked</span>
+        <span className="games-history-badge">{getGameHistoryMessage(gamesHistory)}</span>
       </h3>
       <div className="table-container">
         <table className="summary-table">

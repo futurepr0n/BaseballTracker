@@ -4,38 +4,39 @@ import { formatGameDate } from '../utils/formatters';
 import './PitcherPerformanceLineChart.css'; // Ensure we're importing our styles
 
 /**
- * A line graph visualization of a pitcher's performance over their last 3 games
+ * A line graph visualization of a pitcher's performance over their recent games
  * Shows strikeout trend and earned runs with color-coded markers
+ * Supports dynamic number of game history entries
  * 
  * @param {Object} player - The pitcher player object with game data
  * @param {number} width - Width of the chart (default: full width)
  * @param {number} height - Height of the chart (default: 90px)
  */
 const PitcherPerformanceLineChart = ({ player, width = 260, height = 90 }) => {
-  // Format and prepare game data
-  const games = [
-    { 
-      date: player.game3Date, 
-      ip: parseFloat(player.game3IP) || 0, 
-      k: parseInt(player.game3K) || 0, 
-      er: parseInt(player.game3ER) || 0,
-      kPerIP: parseFloat(player.game3IP) > 0 ? parseInt(player.game3K) / parseFloat(player.game3IP) : 0
-    },
-    { 
-      date: player.game2Date, 
-      ip: parseFloat(player.game2IP) || 0, 
-      k: parseInt(player.game2K) || 0, 
-      er: parseInt(player.game2ER) || 0,
-      kPerIP: parseFloat(player.game2IP) > 0 ? parseInt(player.game2K) / parseFloat(player.game2IP) : 0
-    },
-    { 
-      date: player.game1Date, 
-      ip: parseFloat(player.game1IP) || 0, 
-      k: parseInt(player.game1K) || 0, 
-      er: parseInt(player.game1ER) || 0,
-      kPerIP: parseFloat(player.game1IP) > 0 ? parseInt(player.game1K) / parseFloat(player.game1IP) : 0
+  // Determine how many games are available in the player object
+  const getAvailableGames = () => {
+    const games = [];
+    let gameIndex = 1;
+    
+    // Keep adding games as long as we find date properties in the player object
+    while (player[`game${gameIndex}Date`] !== undefined) {
+      games.push({
+        date: player[`game${gameIndex}Date`],
+        ip: parseFloat(player[`game${gameIndex}IP`]) || 0,
+        k: parseInt(player[`game${gameIndex}K`]) || 0,
+        er: parseInt(player[`game${gameIndex}ER`]) || 0,
+        kPerIP: parseFloat(player[`game${gameIndex}IP`]) > 0 
+          ? parseInt(player[`game${gameIndex}K`]) / parseFloat(player[`game${gameIndex}IP`]) 
+          : 0
+      });
+      gameIndex++;
     }
-  ];
+    
+    return games.reverse(); // Display oldest to newest (left to right)
+  };
+  
+  // Get all available games
+  const games = getAvailableGames();
   
   // Filter out games with no innings pitched
   const validGames = games.filter(game => game.ip > 0);
@@ -220,18 +221,10 @@ const PitcherPerformanceLineChart = ({ player, width = 260, height = 90 }) => {
 
 PitcherPerformanceLineChart.propTypes = {
   player: PropTypes.shape({
-    game1Date: PropTypes.string,
-    game1IP: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    game1K: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    game1ER: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    game2Date: PropTypes.string,
-    game2IP: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    game2K: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    game2ER: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    game3Date: PropTypes.string,
-    game3IP: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    game3K: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    game3ER: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    // Dynamic PropTypes validation for variable game history
+    // We only require the player object itself
+    name: PropTypes.string.isRequired,
+    team: PropTypes.string.isRequired,
   }).isRequired,
   width: PropTypes.number,
   height: PropTypes.number

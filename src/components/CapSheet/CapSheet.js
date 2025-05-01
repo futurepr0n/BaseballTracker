@@ -1,4 +1,3 @@
-// src/components/CapSheet/CapSheet.js
 import React, { useState, useEffect } from 'react';
 import './CapSheet.css';
 
@@ -11,6 +10,8 @@ import HitterHandicapperList from './components/HitterHandicapperList';
 import PitcherHandicapperList from './components/PitcherHandicapperList';
 import EnhancedHitterHandicapSummary from './components/EnhancedHitterHandicapSummary';
 import EnhancedPitcherHandicapSummary from './components/EnhancedPitcherHandicapSummary';
+import GamesHistoryConfig from './components/GameHistoryConfig';
+import GameHistoryLegend from './components/GameHistoryLegend';
 
 // Import modals
 import AddHandicapperModal from './modals/AddHandicapperModal';
@@ -29,13 +30,19 @@ import { saveHandicapper } from '../../services/handicapperService';
 
 /**
  * Enhanced CapSheet component - Allows users to track and analyze player betting opportunities
- * Now with multi-game history display and smart pitcher selection
+ * Now with configurable multi-game history display and smart pitcher selection
  */
 function CapSheet({ playerData, gameData, currentDate }) {
+  // State for games history configuration (default: 3, range: 1-7)
+  const [gamesHistory, setGamesHistory] = useState(3);
+  
+  // State to track if game history legend is expanded
+  const [showLegend, setShowLegend] = useState(false);
+  
   // Local state for historical date to avoid dependency issues
   const [localHistoricalDate, setLocalHistoricalDate] = useState(null);
   
-  // Initialize player data hook
+  // Initialize player data hook with games history parameter
   const {
     selectedPlayers,
     setSelectedPlayers,
@@ -70,7 +77,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
     handlePitcherPickChange,
     updatePlayersWithNewHandicapper,
     removeHandicapperFromPlayers
-  } = usePlayerData(playerData, gameData, currentDate);
+  } = usePlayerData(playerData, gameData, currentDate, gamesHistory);
 
   // Initialize handicappers hook
   const {
@@ -112,35 +119,12 @@ function CapSheet({ playerData, gameData, currentDate }) {
   // Calculate statistics
   const calculatedStats = useCalculations(selectedPlayers);
 
-  // Load players from roster and enhance with historical data
+  // Update localHistoricalDate when playerDataSource changes
   useEffect(() => {
-    const loadPlayerData = async () => {
-      if (hasProcessedData) return;
-      
-      setIsLoadingPlayers(true);
-      console.log("[CapSheet] Loading players from roster");
-      
-      try {
-        // Process player data as needed
-        // This is a simplified version - your actual implementation may be more complex
-        
-        setHasProcessedData(true);
-      } catch (error) {
-        console.error('[CapSheet] Error processing player data:', error);
-      } finally {
-        setIsLoadingPlayers(false);
-      }
-    };
-    
-    // Run the load function
-    loadPlayerData();
-  }, [
-    currentDate, 
-    gameData,  
-    hasProcessedData,
-    setIsLoadingPlayers,
-    setHasProcessedData
-  ]);
+    if (playerDataSource === 'historical') {
+      setLocalHistoricalDate(new Date());
+    }
+  }, [playerDataSource]);
 
   // Handle handicapper modification with player data update
   const handleAddHitterHandicapperWithUpdate = (playerType) => {
@@ -233,6 +217,23 @@ function CapSheet({ playerData, gameData, currentDate }) {
     }));
   };
 
+  // Handle Games History change
+  const handleGamesHistoryChange = (newValue) => {
+    if (newValue !== gamesHistory) {
+      setGamesHistory(newValue);
+      // This will trigger a reload of player data in the usePlayerData hook
+      setHasProcessedData(false);
+      
+      // Show the legend when changing the value
+      setShowLegend(true);
+    }
+  };
+
+  // Toggle game history legend visibility
+  const toggleLegend = () => {
+    setShowLegend(!showLegend);
+  };
+
   // Handle save button click
   const handleSaveButtonClick = () => {
     setShowSaveModal(true);
@@ -251,7 +252,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
     }
   };
 
-  // Handle export to CSV - UPDATED FOR FIX
+  // Handle export to CSV
   const handleExportToCsv = () => {
     // Combine both hitter and pitcher handicappers for export
     const allHandicappers = [
@@ -274,7 +275,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
     exportToCSV(selectedPlayers, uniqueHandicappers);
   };
 
-  // Handle file selection for import - UPDATED FOR FIX
+  // Handle file selection for import
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (!file) {
@@ -428,13 +429,46 @@ function CapSheet({ playerData, gameData, currentDate }) {
         </div>
       )}
 
-      {/* Control Actions Section */}
-      <ControlActions
-        onShowSaveModal={handleSaveButtonClick}
-        onShowSlipGallery={() => setShowSlipGallery(true)}
-        onExport={handleExportToCsv}
-        onImport={handleFileSelect}
-      />
+      {/* Control Actions Section with Games History Configuration */}
+      <div className="cap-sheet-controls">
+        <ControlActions
+          onShowSaveModal={handleSaveButtonClick}
+          onShowSlipGallery={() => setShowSlipGallery(true)}
+          onExport={handleExportToCsv}
+          onImport={handleFileSelect}
+        />
+        
+        {/* Add Games History Configuration Component */}
+        <div className="games-history-section">
+          <GamesHistoryConfig 
+            gamesHistory={gamesHistory}
+            setGamesHistory={handleGamesHistoryChange}
+            minGames={1}
+            maxGames={7}
+          />
+          
+          <button 
+            className="toggle-legend-btn"
+            onClick={toggleLegend}
+            aria-expanded={showLegend}
+          >
+            {showLegend ? 'Hide Details' : 'Learn About Games History'}
+          </button>
+        </div>
+      </div>
+      
+      {/* Game History Legend (collapsible) */}
+      {showLegend && (
+        <GameHistoryLegend gamesHistory={gamesHistory} />
+      )}
+
+      {/* Loading state during data refresh */}
+      {isLoadingPlayers && hasProcessedData === false && (
+        <div className="loading-indicator">
+          <div className="loading-spinner"></div>
+          <span>Updating player data for {gamesHistory} games history...</span>
+        </div>
+      )}
 
       {/* Conditional rendering based on loading state */}
       {isLoadingHandicappers ? (
@@ -469,6 +503,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
               onAddHandicapper={() => setShowHitterModal(true)}
               onRemoveHandicapper={handleRemoveHitterHandicapperWithUpdate}
               getPitcherOptionsForOpponent={getPitcherOptionsForOpponent}
+              gamesHistory={gamesHistory}
             />
           </section>
 
@@ -478,6 +513,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
               hitters={selectedPlayers.hitters} 
               handicappers={hitterHandicappers} 
               teams={teams} 
+              gamesHistory={gamesHistory}
             />
           )}
 
@@ -505,6 +541,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
               onBetTypeChange={handlePitcherBetTypeChange}
               onPickChange={handlePitcherPickChange}
               onRemoveHandicapper={handleRemovePitcherHandicapperWithUpdate}
+              gamesHistory={gamesHistory}
             />
           </section>
         </>
@@ -516,6 +553,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
           pitchers={selectedPlayers.pitchers} 
           handicappers={pitcherHandicappers} 
           teams={teams} 
+          gamesHistory={gamesHistory}
         />
       )}
           

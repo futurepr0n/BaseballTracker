@@ -5,7 +5,7 @@ import { findMultiGamePlayerStats } from '../../../services/dataService';
  * @param {Object} dateRangeData - Initial date range data
  * @param {string} playerName - Player name
  * @param {string} teamAbbr - Team abbreviation
- * @param {number} numGames - Number of games to retrieve
+ * @param {number} numGames - Number of games to retrieve (default: 3)
  * @param {number} maxAdditionalDays - Max additional days to look back for pitchers
  * @returns {Array} Array of player game data objects
  */
@@ -20,9 +20,10 @@ export const findPitcherGames = (dateRangeData, playerName, teamAbbr, numGames =
  * @param {Object} dateRangeData - Date range data
  * @param {Array} handicappers - Handicapper objects
  * @param {boolean} isExtendedSearch - Whether to use extended search for pitchers
+ * @param {number} numGames - Number of games to retrieve (default: 3)
  * @returns {Object} Player with game history
  */
-export const createPlayerWithGameHistory = (player, dateRangeData, handicappers = [], isExtendedSearch = false) => {
+export const createPlayerWithGameHistory = (player, dateRangeData, handicappers = [], isExtendedSearch = false, numGames = 3) => {
   const handicappersArray = Array.isArray(handicappers) ? handicappers : [];
 
   // Determine if we need to use extended search for pitchers
@@ -32,7 +33,7 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
       dateRangeData, 
       player.name, 
       player.team,
-      3 // Get 3 games
+      numGames // Use configurable number of games
     );
   } else {
     // Use the standard approach for hitters or if extended search isn't needed
@@ -40,7 +41,7 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
       dateRangeData, 
       player.name, 
       player.team,
-      3 // Get 3 games
+      numGames // Use configurable number of games
     );
   }
   
@@ -51,8 +52,9 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
   // Get the game dates for display
   const gameDates = gameHistory.map(game => game.date || '');
   
+  // Create a player object with the appropriate number of game history entries
   if (player.type === 'hitter') {
-    return {
+    const playerObj = {
       id: player.name + '-' + player.team,
       name: player.name,
       team: player.team,
@@ -61,21 +63,6 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
       prevGameHR: mostRecentStats?.HR || '0',
       prevGameAB: mostRecentStats?.AB || '0',
       prevGameH: mostRecentStats?.H || '0',
-      // Game 1 stats (most recent)
-      game1Date: gameDates[0] || '',
-      game1HR: gameHistory[0]?.data?.HR || '0',
-      game1AB: gameHistory[0]?.data?.AB || '0',
-      game1H: gameHistory[0]?.data?.H || '0',
-      // Game 2 stats
-      game2Date: gameDates[1] || '',
-      game2HR: gameHistory[1]?.data?.HR || '0',
-      game2AB: gameHistory[1]?.data?.AB || '0',
-      game2H: gameHistory[1]?.data?.H || '0',
-      // Game 3 stats (oldest)
-      game3Date: gameDates[2] || '',
-      game3HR: gameHistory[2]?.data?.HR || '0',
-      game3AB: gameHistory[2]?.data?.AB || '0',
-      game3H: gameHistory[2]?.data?.H || '0',
       // Fields for user input
       pitcher: '',
       pitcherId: '',
@@ -93,8 +80,21 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
         return acc;
       }, {})
     };
+    
+    // Dynamically add game data based on numGames
+    for (let i = 0; i < numGames; i++) {
+      const gameNum = i + 1;
+      const gameData = gameHistory[i]?.data || {};
+      
+      playerObj[`game${gameNum}Date`] = gameDates[i] || '';
+      playerObj[`game${gameNum}HR`] = gameData.HR || '0';
+      playerObj[`game${gameNum}AB`] = gameData.AB || '0';
+      playerObj[`game${gameNum}H`] = gameData.H || '0';
+    }
+    
+    return playerObj;
   } else {
-    return {
+    const playerObj = {
       id: player.name + '-' + player.team,
       name: player.name,
       team: player.team,
@@ -105,21 +105,6 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
       prevGameIP: mostRecentStats?.IP || '0',
       prevGameK: mostRecentStats?.K || '0',
       prevGameER: mostRecentStats?.ER || '0',
-      // Game 1 stats (most recent)
-      game1Date: gameDates[0] || '',
-      game1IP: gameHistory[0]?.data?.IP || '0',
-      game1K: gameHistory[0]?.data?.K || '0',
-      game1ER: gameHistory[0]?.data?.ER || '0',
-      // Game 2 stats
-      game2Date: gameDates[1] || '',
-      game2IP: gameHistory[1]?.data?.IP || '0',
-      game2K: gameHistory[1]?.data?.K || '0',
-      game2ER: gameHistory[1]?.data?.ER || '0',
-      // Game 3 stats (oldest)
-      game3Date: gameDates[2] || '',
-      game3IP: gameHistory[2]?.data?.IP || '0',
-      game3K: gameHistory[2]?.data?.K || '0',
-      game3ER: gameHistory[2]?.data?.ER || '0',
       // Fields for user input
       opponent: '',
       expectedPitch: '',
@@ -135,6 +120,19 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
         return acc;
       }, {})
     };
+    
+    // Dynamically add game data based on numGames
+    for (let i = 0; i < numGames; i++) {
+      const gameNum = i + 1;
+      const gameData = gameHistory[i]?.data || {};
+      
+      playerObj[`game${gameNum}Date`] = gameDates[i] || '';
+      playerObj[`game${gameNum}IP`] = gameData.IP || '0';
+      playerObj[`game${gameNum}K`] = gameData.K || '0';
+      playerObj[`game${gameNum}ER`] = gameData.ER || '0';
+    }
+    
+    return playerObj;
   }
 };
 
@@ -145,26 +143,48 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
  * @returns {string} Descriptive message about data availability
  */
 export const getPlayerDataMessage = (player, isPitcher) => {
-  const hasGame1 = player.game1Date && (isPitcher ? player.game1IP > 0 : player.game1AB > 0);
-  const hasGame2 = player.game2Date && (isPitcher ? player.game2IP > 0 : player.game2AB > 0);
-  const hasGame3 = player.game3Date && (isPitcher ? player.game3IP > 0 : player.game3AB > 0);
+  // Count how many game entries the player has
+  let gameCount = 0;
+  let i = 1;
   
-  const gameCount = [hasGame1, hasGame2, hasGame3].filter(Boolean).length;
+  // Count games dynamically by checking for properties
+  while (player[`game${i}Date`] !== undefined) {
+    const hasGameData = player[`game${i}Date`] && 
+      (isPitcher ? 
+        parseFloat(player[`game${i}IP`]) > 0 : 
+        parseInt(player[`game${i}AB`]) > 0);
+        
+    if (hasGameData) {
+      gameCount++;
+    }
+    i++;
+  }
+  
+  // Calculate max possible games from the object structure
+  const maxPossibleGames = i - 1;
   
   if (gameCount === 0) {
     return "No recent game data found";
-  } else if (gameCount < 3) {
-    return `Found data for ${gameCount} of 3 recent games`;
+  } else if (gameCount < maxPossibleGames) {
+    return `Found data for ${gameCount} of ${maxPossibleGames} recent games`;
   }
   
-  const daysBack = player.game3Date ? getDaysBetween(player.game1Date, player.game3Date) : 0;
+  // Calculate number of days between first and last game
+  const lastGameDate = player.game1Date;
+  const firstGameDate = player[`game${maxPossibleGames}Date`];
+  
+  if (!lastGameDate || !firstGameDate) {
+    return `Found ${gameCount} games`;
+  }
+  
+  const daysBack = getDaysBetween(lastGameDate, firstGameDate);
   
   if (isPitcher) {
     return daysBack > 14 
-      ? `Found all 3 games (spanning ${daysBack} days)` 
-      : "Found all 3 recent games";
+      ? `Found all ${gameCount} games (spanning ${daysBack} days)` 
+      : `Found all ${gameCount} recent games`;
   } else {
-    return "Found all 3 recent games";
+    return `Found all ${gameCount} recent games`;
   }
 };
 

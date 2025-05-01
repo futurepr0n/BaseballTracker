@@ -5,36 +5,37 @@ import { formatGameDate } from '../utils/formatters';
 /**
  * A line graph visualization of a hitter's performance with trend-based coloring
  * Color changes based on trend direction: green (positive), red (negative), blue (neutral)
+ * Supports dynamic number of game history entries
  * 
  * @param {Object} player - The hitter player object with game data
  * @param {number} width - Width of the chart (default: full width)
  * @param {number} height - Height of the chart (default: 90px)
  */
 const ColoredPerformanceLineChart = ({ player, width = 260, height = 90 }) => {
-  // Format and prepare game data
-  const games = [
-    { 
-      date: player.game3Date, 
-      ab: parseInt(player.game3AB) || 0, 
-      h: parseInt(player.game3H) || 0, 
-      hr: parseInt(player.game3HR) || 0,
-      avg: parseInt(player.game3AB) > 0 ? parseInt(player.game3H) / parseInt(player.game3AB) : 0
-    },
-    { 
-      date: player.game2Date, 
-      ab: parseInt(player.game2AB) || 0, 
-      h: parseInt(player.game2H) || 0, 
-      hr: parseInt(player.game2HR) || 0,
-      avg: parseInt(player.game2AB) > 0 ? parseInt(player.game2H) / parseInt(player.game2AB) : 0
-    },
-    { 
-      date: player.game1Date, 
-      ab: parseInt(player.game1AB) || 0, 
-      h: parseInt(player.game1H) || 0, 
-      hr: parseInt(player.game1HR) || 0,
-      avg: parseInt(player.game1AB) > 0 ? parseInt(player.game1H) / parseInt(player.game1AB) : 0
+  // Determine how many games are available in the player object
+  const getAvailableGames = () => {
+    const games = [];
+    let gameIndex = 1;
+    
+    // Keep adding games as long as we find date properties in the player object
+    while (player[`game${gameIndex}Date`] !== undefined) {
+      games.push({
+        date: player[`game${gameIndex}Date`],
+        ab: parseInt(player[`game${gameIndex}AB`]) || 0,
+        h: parseInt(player[`game${gameIndex}H`]) || 0,
+        hr: parseInt(player[`game${gameIndex}HR`]) || 0,
+        avg: parseInt(player[`game${gameIndex}AB`]) > 0 
+          ? parseInt(player[`game${gameIndex}H`]) / parseInt(player[`game${gameIndex}AB`]) 
+          : 0
+      });
+      gameIndex++;
     }
-  ];
+    
+    return games.reverse(); // Display oldest to newest (left to right)
+  };
+  
+  // Get all available games
+  const games = getAvailableGames();
   
   // Filter out games with no at-bats
   const validGames = games.filter(game => game.ab > 0);
@@ -221,18 +222,10 @@ const ColoredPerformanceLineChart = ({ player, width = 260, height = 90 }) => {
 
 ColoredPerformanceLineChart.propTypes = {
   player: PropTypes.shape({
-    game1Date: PropTypes.string,
-    game1AB: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    game1H: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    game1HR: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    game2Date: PropTypes.string,
-    game2AB: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    game2H: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    game2HR: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    game3Date: PropTypes.string,
-    game3AB: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    game3H: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    game3HR: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    // Dynamic PropTypes validation for variable game history
+    // We only require the player object itself
+    name: PropTypes.string.isRequired,
+    team: PropTypes.string.isRequired,
   }).isRequired,
   width: PropTypes.number,
   height: PropTypes.number

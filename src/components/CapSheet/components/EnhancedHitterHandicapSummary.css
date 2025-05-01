@@ -189,3 +189,18 @@
       font-size: 1rem;
     }
   }
+
+  .games-history-badge {
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: normal;
+    margin-left: 10px;
+  }
+  
+  @media (max-width: 768px) {
+    .games-history-badge {
+      display: none; /* Hide on smaller screens to save space */
+    }
+  }
