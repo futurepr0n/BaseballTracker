@@ -10,7 +10,7 @@ import HitterHandicapperList from './components/HitterHandicapperList';
 import PitcherHandicapperList from './components/PitcherHandicapperList';
 import EnhancedHitterHandicapSummary from './components/EnhancedHitterHandicapSummary';
 import EnhancedPitcherHandicapSummary from './components/EnhancedPitcherHandicapSummary';
-import GamesHistoryConfig from './components/GameHistoryConfig';
+import GamesHistoryConfig from './components/GamesHistoryConfig';
 import GameHistoryLegend from './components/GameHistoryLegend';
 
 // Import modals
@@ -30,19 +30,21 @@ import { saveHandicapper } from '../../services/handicapperService';
 
 /**
  * Enhanced CapSheet component - Allows users to track and analyze player betting opportunities
- * Now with configurable multi-game history display and smart pitcher selection
+ * Now with separate configurable game history displays for hitters and pitchers
  */
 function CapSheet({ playerData, gameData, currentDate }) {
-  // State for games history configuration (default: 3, range: 1-7)
-  const [gamesHistory, setGamesHistory] = useState(3);
+  // State for separate games history configuration (default: 3, range: 1-7)
+  const [hitterGamesHistory, setHitterGamesHistory] = useState(3);
+  const [pitcherGamesHistory, setPitcherGamesHistory] = useState(3);
   
-  // State to track if game history legend is expanded
-  const [showLegend, setShowLegend] = useState(false);
+  // State to track if game history legends are expanded
+  const [showHitterLegend, setShowHitterLegend] = useState(false);
+  const [showPitcherLegend, setShowPitcherLegend] = useState(false);
   
   // Local state for historical date to avoid dependency issues
   const [localHistoricalDate, setLocalHistoricalDate] = useState(null);
   
-  // Initialize player data hook with games history parameter
+  // Initialize player data hook with separate games history parameters
   const {
     selectedPlayers,
     setSelectedPlayers,
@@ -77,7 +79,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
     handlePitcherPickChange,
     updatePlayersWithNewHandicapper,
     removeHandicapperFromPlayers
-  } = usePlayerData(playerData, gameData, currentDate, gamesHistory);
+  } = usePlayerData(playerData, gameData, currentDate, hitterGamesHistory, pitcherGamesHistory); // Pass both game history values
 
   // Initialize handicappers hook
   const {
@@ -126,7 +128,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
     }
   }, [playerDataSource]);
 
-  // Handle handicapper modification with player data update
+  // Handler for hitter handicapper changes
   const handleAddHitterHandicapperWithUpdate = (playerType) => {
     const newHandicapper = handleAddHandicapper(playerType);
     if (newHandicapper) {
@@ -217,21 +219,38 @@ function CapSheet({ playerData, gameData, currentDate }) {
     }));
   };
 
-  // Handle Games History change
-  const handleGamesHistoryChange = (newValue) => {
-    if (newValue !== gamesHistory) {
-      setGamesHistory(newValue);
+  // Handle Hitter Games History change
+  const handleHitterGamesHistoryChange = (newValue) => {
+    if (newValue !== hitterGamesHistory) {
+      setHitterGamesHistory(newValue);
       // This will trigger a reload of player data in the usePlayerData hook
       setHasProcessedData(false);
       
       // Show the legend when changing the value
-      setShowLegend(true);
+      setShowHitterLegend(true);
     }
   };
 
-  // Toggle game history legend visibility
-  const toggleLegend = () => {
-    setShowLegend(!showLegend);
+  // Handle Pitcher Games History change
+  const handlePitcherGamesHistoryChange = (newValue) => {
+    if (newValue !== pitcherGamesHistory) {
+      setPitcherGamesHistory(newValue);
+      // This will trigger a reload of player data in the usePlayerData hook
+      setHasProcessedData(false);
+      
+      // Show the legend when changing the value
+      setShowPitcherLegend(true);
+    }
+  };
+
+  // Toggle hitter game history legend visibility
+  const toggleHitterLegend = () => {
+    setShowHitterLegend(!showHitterLegend);
+  };
+
+  // Toggle pitcher game history legend visibility
+  const togglePitcherLegend = () => {
+    setShowPitcherLegend(!showPitcherLegend);
   };
 
   // Handle save button click
@@ -429,7 +448,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
         </div>
       )}
 
-      {/* Control Actions Section with Games History Configuration */}
+      {/* Control Actions Section */}
       <div className="cap-sheet-controls">
         <ControlActions
           onShowSaveModal={handleSaveButtonClick}
@@ -437,36 +456,13 @@ function CapSheet({ playerData, gameData, currentDate }) {
           onExport={handleExportToCsv}
           onImport={handleFileSelect}
         />
-        
-        {/* Add Games History Configuration Component */}
-        <div className="games-history-section">
-          <GamesHistoryConfig 
-            gamesHistory={gamesHistory}
-            setGamesHistory={handleGamesHistoryChange}
-            minGames={1}
-            maxGames={7}
-          />
-          
-          <button 
-            className="toggle-legend-btn"
-            onClick={toggleLegend}
-            aria-expanded={showLegend}
-          >
-            {showLegend ? 'Hide Details' : 'Learn About Games History'}
-          </button>
-        </div>
       </div>
       
-      {/* Game History Legend (collapsible) */}
-      {showLegend && (
-        <GameHistoryLegend gamesHistory={gamesHistory} />
-      )}
-
       {/* Loading state during data refresh */}
       {isLoadingPlayers && hasProcessedData === false && (
         <div className="loading-indicator">
           <div className="loading-spinner"></div>
-          <span>Updating player data for {gamesHistory} games history...</span>
+          <span>Updating player data with new game history settings...</span>
         </div>
       )}
 
@@ -477,6 +473,30 @@ function CapSheet({ playerData, gameData, currentDate }) {
         <>
           {/* Hitters Section */}
           <section>
+            {/* Hitter Games History Configuration */}
+            <div className="games-history-section">
+              <GamesHistoryConfig 
+                gamesHistory={hitterGamesHistory}
+                setGamesHistory={handleHitterGamesHistoryChange}
+                minGames={1}
+                maxGames={7}
+                label="Hitter Games History:"
+              />
+              
+              <button 
+                className="toggle-legend-btn"
+                onClick={toggleHitterLegend}
+                aria-expanded={showHitterLegend}
+              >
+                {showHitterLegend ? 'Hide Details' : 'Learn About Games History'}
+              </button>
+            </div>
+            
+            {/* Hitter Game History Legend (collapsible) */}
+            {showHitterLegend && (
+              <GameHistoryLegend gamesHistory={hitterGamesHistory} playerType="hitter" />
+            )}
+
             {/* Hitter Handicapper List */}
             <HitterHandicapperList 
               activeHandicappers={hitterHandicappers}
@@ -492,7 +512,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
               hitters={selectedPlayers.hitters}
               hitterOptions={hitterSelectOptions}
               teams={teams}
-              handicappers={hitterHandicappers}  // Use hitter handicappers
+              handicappers={hitterHandicappers}
               isLoadingPlayers={isLoadingPlayers}
               onAddHitter={handleAddHitterById}
               onRemovePlayer={handleRemovePlayer}
@@ -503,7 +523,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
               onAddHandicapper={() => setShowHitterModal(true)}
               onRemoveHandicapper={handleRemoveHitterHandicapperWithUpdate}
               getPitcherOptionsForOpponent={getPitcherOptionsForOpponent}
-              gamesHistory={gamesHistory}
+              gamesHistory={hitterGamesHistory} // Use hitter-specific games history
             />
           </section>
 
@@ -513,11 +533,35 @@ function CapSheet({ playerData, gameData, currentDate }) {
               hitters={selectedPlayers.hitters} 
               handicappers={hitterHandicappers} 
               teams={teams} 
-              gamesHistory={gamesHistory}
+              gamesHistory={hitterGamesHistory} // Use hitter-specific games history
             />
           )}
 
           <section>
+            {/* Pitcher Games History Configuration */}
+            <div className="games-history-section">
+              <GamesHistoryConfig 
+                gamesHistory={pitcherGamesHistory}
+                setGamesHistory={handlePitcherGamesHistoryChange}
+                minGames={1}
+                maxGames={7}
+                label="Pitcher Games History:"
+              />
+              
+              <button 
+                className="toggle-legend-btn"
+                onClick={togglePitcherLegend}
+                aria-expanded={showPitcherLegend}
+              >
+                {showPitcherLegend ? 'Hide Details' : 'Learn About Games History'}
+              </button>
+            </div>
+            
+            {/* Pitcher Game History Legend (collapsible) */}
+            {showPitcherLegend && (
+              <GameHistoryLegend gamesHistory={pitcherGamesHistory} playerType="pitcher" />
+            )}
+
             {/* Pitcher Handicapper List */}
             <PitcherHandicapperList 
               activeHandicappers={pitcherHandicappers}
@@ -533,7 +577,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
               pitchers={selectedPlayers.pitchers}
               pitcherOptions={pitcherSelectOptions}
               teams={teams}
-              handicappers={pitcherHandicappers}  // Use pitcher handicappers
+              handicappers={pitcherHandicappers}
               isLoadingPlayers={isLoadingPlayers}
               onAddPitcher={handleAddPitcherById}
               onRemovePlayer={handleRemovePlayer}
@@ -541,7 +585,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
               onBetTypeChange={handlePitcherBetTypeChange}
               onPickChange={handlePitcherPickChange}
               onRemoveHandicapper={handleRemovePitcherHandicapperWithUpdate}
-              gamesHistory={gamesHistory}
+              gamesHistory={pitcherGamesHistory} // Use pitcher-specific games history
             />
           </section>
         </>
@@ -553,7 +597,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
           pitchers={selectedPlayers.pitchers} 
           handicappers={pitcherHandicappers} 
           teams={teams} 
-          gamesHistory={gamesHistory}
+          gamesHistory={pitcherGamesHistory} // Use pitcher-specific games history
         />
       )}
           

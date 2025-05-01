@@ -7,12 +7,14 @@ import React from 'react';
  * @param {function} setGamesHistory - Function to update the games history setting
  * @param {number} minGames - Minimum number of games allowed (default: 1)
  * @param {number} maxGames - Maximum number of games allowed (default: 7)
+ * @param {string} label - Custom label for the selector (default: "Games History:")
  */
 const GamesHistoryConfig = ({ 
   gamesHistory, 
   setGamesHistory, 
   minGames = 1, 
-  maxGames = 7 
+  maxGames = 7,
+  label = "Games History:"
 }) => {
   // Generate options for select
   const options = [];
@@ -23,7 +25,7 @@ const GamesHistoryConfig = ({
   return (
     <div className="games-history-config">
       <label htmlFor="games-history-select">
-        Games History:
+        {label}
         <select
           id="games-history-select"
           value={gamesHistory}

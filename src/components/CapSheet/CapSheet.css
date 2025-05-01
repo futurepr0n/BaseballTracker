@@ -1,5 +1,5 @@
 /* Enhanced CapSheet Component Styling */
-@import './components/GameHistoryConfig.css';
+@import './components/GamesHistoryConfig.css';
 .cap-sheet {
   margin: 20px;
   padding: 20px;

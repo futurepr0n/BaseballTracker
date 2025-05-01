@@ -5,13 +5,17 @@ import React from 'react';
  * Explains to users what the setting does and how it affects performance charts
  * 
  * @param {number} gamesHistory - Current number of games setting
+ * @param {string} playerType - Type of player (hitter or pitcher) this legend applies to
  */
-const GameHistoryLegend = ({ gamesHistory }) => {
+const GameHistoryLegend = ({ gamesHistory, playerType = "player" }) => {
+  // Format player type for display
+  const formattedPlayerType = playerType.charAt(0).toUpperCase() + playerType.slice(1);
+  
   return (
-    <div className="game-history-legend">
-      <h4>About Games History Setting</h4>
+    <div className={`game-history-legend ${playerType}-legend`}>
+      <h4>About {formattedPlayerType} Games History Setting</h4>
       <p>
-        The "Games History" setting controls how many previous games are displayed in performance charts.
+        The "{formattedPlayerType} Games History" setting controls how many previous games are displayed in {playerType} performance charts.
         Currently set to show <strong>{gamesHistory} {gamesHistory === 1 ? 'game' : 'games'}</strong> of history.
       </p>
       
@@ -35,7 +39,7 @@ const GameHistoryLegend = ({ gamesHistory }) => {
       </div>
       
       <p className="legend-note">
-        Note: Changing this setting refreshes all player data and may take a moment to load.
+        Note: Changing this setting refreshes {playerType} data and may take a moment to load.
       </p>
     </div>
   );
