@@ -99,3 +99,92 @@
       flex-wrap: wrap;
     }
   }
+
+  /* Pitcher selection container with toggle */
+.pitcher-selection-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+
+.pitcher-selection-container .editable-cell {
+  flex-grow: 1;
+}
+
+/* Overlay toggle button */
+.overlay-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid #ddd;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.overlay-toggle-btn:hover {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+}
+
+.overlay-toggle-btn.active {
+  background-color: #e8f4f8;
+  border-color: #b8daff;
+  color: #0056b3;
+}
+
+.overlay-icon {
+  font-size: 14px;
+}
+
+/* Overlay chart legend */
+.overlay-legend text {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.loading-pitcher-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  gap: 8px;
+}
+
+.chart-loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e9ecef;
+  border-top: 2px solid #22c55e;
+  border-radius: 50%;
+  animation: spinner-rotate 1s linear infinite;
+}
+
+@keyframes spinner-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-pitcher-data span {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Enhanced overlay toggle button */
+.overlay-toggle-btn.active {
+  background-color: #e8f4f8;
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+.overlay-toggle-btn.active .overlay-icon {
+  color: #22c55e;
+}

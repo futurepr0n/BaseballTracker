@@ -61,6 +61,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
     setHasProcessedData,
     playerStatsHistory,
     setPlayerStatsHistory,
+    fetchPitcherById,
     formattedDate,
     formattedPreviousDate,
     // Methods
@@ -511,6 +512,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
             <HittersTable
               hitters={selectedPlayers.hitters}
               hitterOptions={hitterSelectOptions}
+              fetchPitcherById={fetchPitcherById} 
               teams={teams}
               handicappers={hitterHandicappers}
               isLoadingPlayers={isLoadingPlayers}
@@ -526,6 +528,28 @@ function CapSheet({ playerData, gameData, currentDate }) {
               gamesHistory={hitterGamesHistory} // Use hitter-specific games history
             />
           </section>
+          {selectedPlayers.hitters.some(h => h.pitcherId) && (
+            <div className="chart-overlay-legend">
+              <h4>About Pitcher Overlay</h4>
+              <p>
+                When you select a pitcher for a hitter, you can enable the overlay toggle <span className="legend-icon">📊</span> to compare the pitcher's performance with the hitter's performance.
+              </p>
+              <div className="legend-items">
+                <div className="legend-item">
+                  <div className="legend-color" style={{backgroundColor: "#3b82f6"}}></div>
+                  <span>Hitter performance (Batting Average)</span>
+                </div>
+                <div className="legend-item">
+                  <div className="legend-color" style={{backgroundColor: "#22c55e"}}></div>
+                  <span>Pitcher performance (K/IP ratio)</span>
+                </div>
+                <div className="legend-item">
+                  <div className="legend-color" style={{backgroundColor: "#ef4444"}}></div>
+                  <span>Home runs (Hitter) / Earned runs (Pitcher)</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Hitter Handicap Summary */}
           {selectedPlayers.hitters.length > 0 && hitterHandicappers.length > 0 && (

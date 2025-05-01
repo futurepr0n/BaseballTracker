@@ -12,6 +12,7 @@ import './HitterPerformanceLineChart.css'; // Add this CSS file for styling
 const HittersTable = ({
   hitters,
   hitterOptions,
+  fetchPitcherById, 
   teams,
   handicappers,
   isLoadingPlayers,
@@ -114,6 +115,7 @@ const HittersTable = ({
                         teams={teams}
                         handicappers={handicappers}
                         pitcherOptions={pitcherOptions}
+                        fetchPitcherById={fetchPitcherById}
                         onFieldChange={onFieldChange}
                         onPitcherSelect={onPitcherSelect}
                         onBetTypeChange={onBetTypeChange}

@@ -67,6 +67,67 @@ const usePlayerData = (
     day: 'numeric'
   });
 
+  const fetchPitcherById = async (pitcherId) => {
+    if (!pitcherId) return null;
+    
+    // Split the ID format (name-team)
+    const [pitcherName, pitcherTeam] = pitcherId.split('-');
+    
+    // Check if this pitcher is already in selectedPlayers.pitchers
+    const existingPitcher = selectedPlayers.pitchers.find(p => p.id === pitcherId);
+    if (existingPitcher) {
+      return existingPitcher;
+    }
+    
+    // If not found in selected pitchers, look in available pitchers
+    const availablePitcher = availablePlayers.pitchers.find(p => p.id === pitcherId);
+    if (availablePitcher) {
+      return availablePitcher;
+    }
+    
+    // If not found anywhere, create a minimal pitcher object
+    console.log(`Creating minimal pitcher object for ${pitcherName} (${pitcherTeam})`);
+    const basicPitcher = {
+      id: pitcherId,
+      name: pitcherName,
+      team: pitcherTeam,
+      type: 'pitcher',
+      playerType: 'pitcher'
+    };
+    
+    try {
+      // Use the same date range data that was already loaded
+      if (extendedPitcherData && Object.keys(extendedPitcherData).length > 0) {
+        // Find game history for this pitcher
+        const gameHistory = findMultiGamePlayerStats(
+          extendedPitcherData, 
+          pitcherName, 
+          pitcherTeam,
+          pitcherGamesHistory
+        );
+        
+        // Manually add game history properties to the pitcher object
+        for (let i = 0; i < gameHistory.length; i++) {
+          const gameNum = i + 1;
+          const gameData = gameHistory[i]?.data || {};
+          const gameDate = gameHistory[i]?.date || '';
+          
+          basicPitcher[`game${gameNum}Date`] = gameDate;
+          basicPitcher[`game${gameNum}IP`] = gameData.IP || '0';
+          basicPitcher[`game${gameNum}K`] = gameData.K || '0';
+          basicPitcher[`game${gameNum}ER`] = gameData.ER || '0';
+        }
+        
+        console.log(`Added ${gameHistory.length} games of history for ${pitcherName}`);
+      }
+      
+      return basicPitcher;
+    } catch (error) {
+      console.error(`Error fetching data for pitcher ${pitcherId}:`, error);
+      return basicPitcher; // Return basic info if history fetch fails
+    }
+  };
+
   // Load team data for styling
   useEffect(() => {
     const loadTeamData = async () => {
@@ -581,7 +642,8 @@ const usePlayerData = (
     handleHitterPickChange,
     handlePitcherPickChange,
     updatePlayersWithNewHandicapper,
-    removeHandicapperFromPlayers
+    removeHandicapperFromPlayers,
+    fetchPitcherById // Add this line
   };
 };
 

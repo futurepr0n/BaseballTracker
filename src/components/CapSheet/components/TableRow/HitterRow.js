@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import { getTeamColors } from '../../utils/formatters';
-import HitterPerformanceLineChart from '../HitterPerformanceLineChart';
+import OverlayPerformanceChart from '../OverlayPerformanceChart';
 
 /**
  * Component for a hitter row in the table
- * Enhanced with visual performance line chart
+ * Enhanced with visual performance line chart and pitcher overlay capability
  * 
  * @param {Object} player - Hitter player object
  * @param {Object} teams - Teams data for styling
  * @param {Array} handicappers - Array of handicapper objects
  * @param {Array} pitcherOptions - Options for pitcher selection
+ * @param {Array} pitcherData - Array of available pitchers for overlay
  * @param {function} onFieldChange - Function to handle field changes
  * @param {function} onPitcherSelect - Function to handle pitcher selection
  * @param {function} onBetTypeChange - Function to handle bet type changes
@@ -22,13 +23,43 @@ const HitterRow = ({
   teams,
   handicappers,
   pitcherOptions,
+  fetchPitcherById,  // Added this prop
   onFieldChange,
   onPitcherSelect,
   onBetTypeChange,
   onPickChange,
   onRemove
 }) => {
+  const [showPitcherOverlay, setShowPitcherOverlay] = useState(false);
+  const [selectedPitcher, setSelectedPitcher] = useState(null);
+  const [isLoadingPitcher, setIsLoadingPitcher] = useState(false);
   const teamColors = getTeamColors(player.team, teams);
+  
+
+
+   // Effect to fetch pitcher data when pitcherId changes
+  useEffect(() => {
+    const loadPitcherData = async () => {
+      if (!player.pitcherId) {
+        setSelectedPitcher(null);
+        setShowPitcherOverlay(false);
+        return;
+      }
+      
+      setIsLoadingPitcher(true);
+      try {
+        const pitcher = await fetchPitcherById(player.pitcherId);
+        setSelectedPitcher(pitcher);
+      } catch (error) {
+        console.error("Error loading pitcher data:", error);
+        setSelectedPitcher(null);
+      } finally {
+        setIsLoadingPitcher(false);
+      }
+    };
+    
+    loadPitcherData();
+  }, [player.pitcherId, fetchPitcherById]);
 
   return (
     <tr style={teamColors}>
@@ -38,40 +69,61 @@ const HitterRow = ({
       <td>{player.prevGameAB}</td>
       <td>{player.prevGameH}</td>
       
-      {/* Performance Line Chart - Replaces 12 individual cells */}
+      {/* Performance Line Chart - Now uses OverlayPerformanceChart */}
       <td className="performance-chart-cell">
-        <HitterPerformanceLineChart player={player} />
+        <OverlayPerformanceChart 
+          hitter={player} 
+          pitcher={selectedPitcher}
+          showPitcherOverlay={showPitcherOverlay && selectedPitcher !== null}
+          isLoadingPitcher={isLoadingPitcher}
+        />
       </td>
-      
-      {/* Pitcher selection */}
+            
+      {/* Pitcher selection with overlay toggle */}
       <td>
         {pitcherOptions.length > 0 ? (
-          <Select
-            className="editable-cell"
-            classNamePrefix="select"
-            options={pitcherOptions}
-            value={player.pitcherId ? { value: player.pitcherId, label: player.pitcher } : null}
-            onChange={(option) => onPitcherSelect(player.id, option ? option.value : null)}
-            isClearable
-            placeholder="Select pitcher..."
-            styles={{
-              control: (base) => ({
-                ...base,
-                minHeight: '30px',
-                height: '30px',
-                fontSize: '0.9em'
-              }),
-              valueContainer: (base) => ({
-                ...base,
-                padding: '0 8px',
-                height: '30px'
-              }),
-              indicatorsContainer: (base) => ({
-                ...base,
-                height: '30px'
-              })
-            }}
-          />
+          <div className="pitcher-selection-container">
+            <Select
+              className="editable-cell"
+              classNamePrefix="select"
+              options={pitcherOptions}
+              value={player.pitcherId ? { value: player.pitcherId, label: player.pitcher } : null}
+              onChange={(option) => {
+                onPitcherSelect(player.id, option ? option.value : null);
+                if (!option) {
+                  setShowPitcherOverlay(false);
+                }
+              }}
+              isClearable
+              placeholder="Select pitcher..."
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  minHeight: '30px',
+                  height: '30px',
+                  fontSize: '0.9em'
+                }),
+                valueContainer: (base) => ({
+                  ...base,
+                  padding: '0 8px',
+                  height: '30px'
+                }),
+                indicatorsContainer: (base) => ({
+                  ...base,
+                  height: '30px'
+                })
+              }}
+            />
+            {player.pitcherId && (
+              <button 
+                className={`overlay-toggle-btn ${showPitcherOverlay ? 'active' : ''}`}
+                onClick={() => setShowPitcherOverlay(!showPitcherOverlay)}
+                title={showPitcherOverlay ? "Hide pitcher overlay" : "Show pitcher overlay"}
+              >
+                <span className="overlay-icon">📊</span>
+              </button>
+            )}
+          </div>
         ) : (
           <input 
             type="text" 

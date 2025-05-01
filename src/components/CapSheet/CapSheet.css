@@ -1217,3 +1217,52 @@
     align-self: flex-start;
   }
 }
+
+
+.chart-overlay-legend {
+  margin: 0 0 25px;
+  padding: 15px;
+  background-color: #f0f8ff;
+  border: 1px solid #bde0f0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.chart-overlay-legend h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #0056b3;
+  font-size: 1.1rem;
+  border-bottom: 1px solid #d3e9f6;
+  padding-bottom: 8px;
+}
+
+.chart-overlay-legend p {
+  margin: 0 0 12px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.legend-icon {
+  font-size: 1.1em;
+  vertical-align: middle;
+}
+
+.legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
