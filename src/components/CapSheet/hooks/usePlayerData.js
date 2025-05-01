@@ -70,35 +70,108 @@ const usePlayerData = (
   const fetchPitcherById = async (pitcherId) => {
     if (!pitcherId) return null;
     
+    console.log(`Fetching data for pitcher: ${pitcherId}`);
+    
     // Split the ID format (name-team)
     const [pitcherName, pitcherTeam] = pitcherId.split('-');
     
     // Check if this pitcher is already in selectedPlayers.pitchers
     const existingPitcher = selectedPlayers.pitchers.find(p => p.id === pitcherId);
     if (existingPitcher) {
+      console.log(`Found pitcher in selectedPlayers: ${pitcherName}`);
       return existingPitcher;
     }
     
     // If not found in selected pitchers, look in available pitchers
     const availablePitcher = availablePlayers.pitchers.find(p => p.id === pitcherId);
     if (availablePitcher) {
+      console.log(`Found pitcher in availablePlayers: ${pitcherName}`);
       return availablePitcher;
     }
     
-    // If not found anywhere, create a minimal pitcher object
-    console.log(`Creating minimal pitcher object for ${pitcherName} (${pitcherTeam})`);
-    const basicPitcher = {
+    // Create a basic pitcher object with defaults
+    let basicPitcher = {
       id: pitcherId,
       name: pitcherName,
       team: pitcherTeam,
       type: 'pitcher',
-      playerType: 'pitcher'
+      playerType: 'pitcher',
+      // Initialize with defaults
+      PC_ST: 'N/A',
+      K: 'N/A',
+      HR: 'N/A'
     };
     
     try {
-      // Use the same date range data that was already loaded
+      // First, look for pitcher in current playerData
+      console.log("Looking for pitcher in current player data...");
+      console.log(`Current player data has ${playerData?.length || 0} players`);
+      
+      // Try a simple name match first
+      const matchingPitchers = playerData.filter(p => 
+        p.name === pitcherName && 
+        p.team === pitcherTeam
+      );
+      
+      if (matchingPitchers.length > 0) {
+        const matchingPitcher = matchingPitchers[0];
+        console.log(`Found pitcher in current data: ${pitcherName}`, matchingPitcher);
+        
+        // Copy stats to our pitcher object
+        basicPitcher.PC_ST = matchingPitcher.PC_ST || 'N/A';
+        basicPitcher.K = matchingPitcher.K || 'N/A';
+        basicPitcher.HR = matchingPitcher.HR || 'N/A';
+        basicPitcher.IP = matchingPitcher.IP || 'N/A';
+        basicPitcher.ER = matchingPitcher.ER || 'N/A';
+        basicPitcher.prevGameIP = matchingPitcher.IP || '0';
+        basicPitcher.prevGameK = matchingPitcher.K || '0';
+        basicPitcher.prevGameER = matchingPitcher.ER || '0';
+      }
+      // If not found in current data, search in extended data
+      else if (extendedPitcherData && Object.keys(extendedPitcherData).length > 0) {
+        console.log("Searching for pitcher in extended data...");
+        
+        // Sort dates newest to oldest
+        const sortedDates = Object.keys(extendedPitcherData).sort().reverse();
+        
+        // Search through dates
+        let found = false;
+        for (const dateStr of sortedDates) {
+          const dateData = extendedPitcherData[dateStr];
+          console.log(`Checking date ${dateStr} with ${dateData.length} players`);
+          
+          // Find pitcher in this date
+          const pitcherInDate = dateData.find(p => 
+            p.name === pitcherName && 
+            p.team === pitcherTeam
+          );
+          
+          if (pitcherInDate) {
+            console.log(`Found pitcher in date ${dateStr}`);
+            
+            // Copy stats
+            basicPitcher.PC_ST = pitcherInDate.PC_ST || 'N/A';
+            basicPitcher.K = pitcherInDate.K || 'N/A';
+            basicPitcher.HR = pitcherInDate.HR || 'N/A';
+            basicPitcher.IP = pitcherInDate.IP || 'N/A';
+            basicPitcher.ER = pitcherInDate.ER || 'N/A';
+            basicPitcher.prevGameIP = pitcherInDate.IP || '0';
+            basicPitcher.prevGameK = pitcherInDate.K || '0';
+            basicPitcher.prevGameER = pitcherInDate.ER || '0';
+            
+            found = true;
+            break;
+          }
+        }
+        
+        if (!found) {
+          console.log(`No matching data found for pitcher: ${pitcherName}`);
+        }
+      }
+      
+      // Regardless of whether we found stats, add game history
       if (extendedPitcherData && Object.keys(extendedPitcherData).length > 0) {
-        // Find game history for this pitcher
+        console.log(`Getting game history for pitcher: ${pitcherName}`);
         const gameHistory = findMultiGamePlayerStats(
           extendedPitcherData, 
           pitcherName, 
@@ -106,7 +179,9 @@ const usePlayerData = (
           pitcherGamesHistory
         );
         
-        // Manually add game history properties to the pitcher object
+        console.log(`Found ${gameHistory.length} games for pitcher`);
+        
+        // Add game history to pitcher object
         for (let i = 0; i < gameHistory.length; i++) {
           const gameNum = i + 1;
           const gameData = gameHistory[i]?.data || {};
@@ -117,14 +192,13 @@ const usePlayerData = (
           basicPitcher[`game${gameNum}K`] = gameData.K || '0';
           basicPitcher[`game${gameNum}ER`] = gameData.ER || '0';
         }
-        
-        console.log(`Added ${gameHistory.length} games of history for ${pitcherName}`);
       }
       
+      console.log(`Finished creating pitcher object: ${pitcherName}`, basicPitcher);
       return basicPitcher;
     } catch (error) {
-      console.error(`Error fetching data for pitcher ${pitcherId}:`, error);
-      return basicPitcher; // Return basic info if history fetch fails
+      console.error(`Error creating pitcher data: ${error.message}`);
+      return basicPitcher; // Return basic object even if there's an error
     }
   };
 

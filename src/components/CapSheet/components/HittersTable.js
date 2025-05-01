@@ -43,23 +43,35 @@ const HittersTable = ({
 
         {/* Legend for the performance chart */}
         <div className="line-chart-legend">
-          <span className="legend-title">Performance Chart:</span>
-          <div className="chart-legend-item">
-            <div className="chart-legend-line"></div>
-            <span>Batting Avg Trend</span>
-          </div>
-          <div className="chart-legend-item">
-            <div className="chart-legend-point"></div>
-            <span>Hits/At-Bats</span>
-          </div>
-          <div className="chart-legend-item">
-            <div className="chart-legend-hr"></div>
-            <span>Home Runs</span>
-          </div>
-          <div className="legend-note">
-            (Games shown oldest to newest)
-          </div>
-        </div>
+  <span className="legend-title">Performance Chart:</span>
+  <div className="chart-legend-item">
+    <div className="chart-legend-line"></div>
+    <span>Batting Avg Trend</span>
+  </div>
+  <div className="chart-legend-item">
+    <div className="chart-legend-point"></div>
+    <span>Hits/At-Bats</span>
+  </div>
+  <div className="chart-legend-item">
+    <div className="chart-legend-hr"></div>
+    <span>Home Runs</span>
+  </div>
+  
+  {/* Add pitcher overlay legend items */}
+  <div className="chart-legend-item">
+    <div className="chart-legend-line" style={{backgroundColor: "#22c55e", borderStyle: "dashed"}}></div>
+    <span>Primary Pitcher (K/IP)</span>
+  </div>
+  <div className="chart-legend-item">
+    <div className="chart-legend-line" style={{backgroundColor: "#16a34a", borderStyle: "dashed"}}></div>
+    <span>Second Pitcher (K/IP)</span>
+  </div>
+  
+  <div className="legend-note">
+    (Games shown oldest to newest)
+  </div>
+</div>
+
 
         <div className="table-container">
           {isLoadingPlayers && hitters.length === 0 ? (
@@ -67,39 +79,50 @@ const HittersTable = ({
           ) : (
             <table className="capsheet-table">
               <thead>
-                <tr>
-                  <th>Player</th>
-                  <th>Team</th>
-                  <th className="stat-header">HR Last</th>
-                  <th className="stat-header">AB Last</th>
-                  <th className="stat-header">H Last</th>
-                  
-                  {/* Single column for performance chart instead of 12 game stats columns */}
-                  <th className="avg-header">Performance Trend</th>
-                  
-                  <th>Pitcher</th>
-                  <th>Throws</th>
-                  <th>Exp SO</th>
-                  <th>Stadium</th>
-                  <th>Game O/U</th>
-                  <th>H</th>
-                  <th>HR</th>
-                  <th>B</th>
-                  {handicappers.map(handicapper => (
-                    <th key={handicapper.id}>
-                      {handicapper.name.replace('@', '')}
-                      <button
-                        className="action-btn remove-btn"
-                        onClick={() => onRemoveHandicapper(handicapper.id)}
-                        title={`Remove ${handicapper.name}`}
-                      >
-                        ×
-                      </button>
-                    </th>
-                  ))}
-                  <th>Actions</th>
-                </tr>
-              </thead>
+  <tr>
+    <th>Player</th>
+    <th>Team</th>
+    <th className="stat-header">HR Last</th>
+    <th className="stat-header">AB Last</th>
+    <th className="stat-header">H Last</th>
+    
+    {/* Performance Chart */}
+    <th className="avg-header">Performance Trend</th>
+    
+    {/* Primary Pitcher */}
+    <th>Pitcher</th>
+    <th className="stat-header">PC_ST</th>
+    <th className="stat-header">K</th>
+    <th className="stat-header">HR</th>
+    
+    {/* Second Pitcher */}
+    <th>Second Pitcher</th>
+    <th className="stat-header">PC_ST</th>
+    <th className="stat-header">K</th>
+    <th className="stat-header">HR</th>
+    <th>Throws</th>
+    {/* Rest of the columns */}
+    <th>Exp SO</th>
+    <th>Stadium</th>
+    <th>Game O/U</th>
+    <th>H</th>
+    <th>HR</th>
+    <th>B</th>
+    {handicappers.map(handicapper => (
+      <th key={handicapper.id}>
+        {handicapper.name.replace('@', '')}
+        <button
+          className="action-btn remove-btn"
+          onClick={() => onRemoveHandicapper(handicapper.id)}
+          title={`Remove ${handicapper.name}`}
+        >
+          ×
+        </button>
+      </th>
+    ))}
+    <th>Actions</th>
+  </tr>
+</thead>
               <tbody>
                 {hitters.length > 0 ? (
                   hitters.map(player => {

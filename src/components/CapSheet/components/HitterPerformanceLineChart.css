@@ -188,3 +188,35 @@
 .overlay-toggle-btn.active .overlay-icon {
   color: #22c55e;
 }
+
+/* Pitcher stats cells */
+.pitcher-stat {
+  text-align: center;
+  font-family: monospace;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  background-color: #f8f9fa;
+}
+
+/* Add pitcher button */
+.add-pitcher-btn {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  background-color: #22c55e;
+  white-space: nowrap;
+}
+
+.add-pitcher-btn:hover {
+  background-color: #16a34a;
+}
+
+/* Second pitcher overlay */
+.overlay-toggle-btn.green-active {
+  background-color: #e8f8f0;
+  border-color: #16a34a;
+  color: #16a34a;
+}
+
+.overlay-toggle-btn.green-active .overlay-icon {
+  color: #16a34a;
+}
