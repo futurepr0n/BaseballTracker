@@ -13,14 +13,22 @@ import { createPlayerWithGameHistory } from './playerHistoryUtils';
 
 /**
  * Custom hook to manage player data
- * Enhanced with extended pitcher game history retrieval
+ * Enhanced with separate hitter and pitcher game history retrieval
  * 
  * @param {Array} playerData - Current day player data from parent component
  * @param {Array} gameData - Current day game data from parent component
  * @param {Date} currentDate - Current selected date
+ * @param {number} hitterGamesHistory - Number of games to display in hitter history (default: 3)
+ * @param {number} pitcherGamesHistory - Number of games to display in pitcher history (default: 3)
  * @returns {Object} Player data and related utilities
  */
-const usePlayerData = (playerData, gameData, currentDate) => {
+const usePlayerData = (
+  playerData, 
+  gameData, 
+  currentDate, 
+  hitterGamesHistory = 3, 
+  pitcherGamesHistory = 3
+) => {
   // State for the component
   const [selectedPlayers, setSelectedPlayers] = useState({
     hitters: [],
@@ -69,10 +77,10 @@ const usePlayerData = (playerData, gameData, currentDate) => {
     loadTeamData();
   }, []);
 
-  // Reset processing flag when date changes
+  // Reset processing flag when date changes or game history settings change
   useEffect(() => {
     setHasProcessedData(false);
-  }, [currentDate]);
+  }, [currentDate, hitterGamesHistory, pitcherGamesHistory]);
 
   // Load players from roster and enhance with historical data
   useEffect(() => {
@@ -80,7 +88,8 @@ const usePlayerData = (playerData, gameData, currentDate) => {
       if (hasProcessedData) return;
       
       setIsLoadingPlayers(true);
-      console.log("[usePlayerData] Loading players from roster");
+      console.log("[usePlayerData] Loading players from roster with hitter history:", 
+        hitterGamesHistory, "and pitcher history:", pitcherGamesHistory);
       
       try {
         // 1. Load the roster data
@@ -106,7 +115,7 @@ const usePlayerData = (playerData, gameData, currentDate) => {
         
         console.log(`[usePlayerData] Roster contains ${hitters.length} hitters and ${pitchers.length} pitchers`);
         
-        // 3. Fetch player data for the past 14 days (for hitters)
+        // 3. Fetch player data for the past 14 days (base window for both player types)
         console.log("[usePlayerData] Fetching player data for date range");
         const dateRangeData = await fetchPlayerDataForDateRange(currentDate, 14);
         const datesWithData = Object.keys(dateRangeData);
@@ -115,21 +124,27 @@ const usePlayerData = (playerData, gameData, currentDate) => {
         // 4. Keep track of player game history
         const newPlayerStatsHistory = {};
         
-        // 5. Create hitter objects with game history (standard 14-day window)
+        // 5. Create hitter objects with game history (using hitterGamesHistory)
         const hittersPromises = hitters.map(async player => {
-          // Get the game history from standard window
+          // Get the game history with hitter-specific history count
           const gameHistory = findMultiGamePlayerStats(
             dateRangeData, 
             player.name, 
             player.team,
-            3
+            hitterGamesHistory // Use hitter-specific games history
           );
           
           // Store the player's game history
           newPlayerStatsHistory[`${player.name}-${player.team}`] = gameHistory;
           
-          // Use the imported function (no extended search for hitters)
-          return await createPlayerWithGameHistory(player, dateRangeData, [], false);
+          // Use the imported function with hitter-specific history
+          return await createPlayerWithGameHistory(
+            player, 
+            dateRangeData, 
+            [], 
+            false, 
+            hitterGamesHistory // Pass hitter games history
+          );
         });
         
         const hittersData = await Promise.all(hittersPromises);
@@ -167,19 +182,25 @@ const usePlayerData = (playerData, gameData, currentDate) => {
         }
         
         const pitchersPromises = pitchers.map(async player => {
-          // Get the game history with extended window
+          // Get the game history with extended window and pitcher-specific history count
           const gameHistory = findMultiGamePlayerStats(
             pitcherDateRangeData, 
             player.name, 
             player.team,
-            3
+            pitcherGamesHistory // Use pitcher-specific games history
           );
           
           // Store the player's game history
           newPlayerStatsHistory[`${player.name}-${player.team}`] = gameHistory;
           
-          // Use the imported function (with extended search for pitchers)
-          return await createPlayerWithGameHistory(player, pitcherDateRangeData, [], true);
+          // Use the imported function with pitcher-specific history
+          return await createPlayerWithGameHistory(
+            player, 
+            pitcherDateRangeData, 
+            [], 
+            true,
+            pitcherGamesHistory // Pass pitcher games history
+          );
         });
         
         const pitchersData = await Promise.all(pitchersPromises);
@@ -240,6 +261,8 @@ const usePlayerData = (playerData, gameData, currentDate) => {
     currentDate, 
     gameData,  
     hasProcessedData,
+    hitterGamesHistory, // Add dependency on hitter games history
+    pitcherGamesHistory, // Add dependency on pitcher games history
     setAvailablePlayers,
     setFullPitcherRoster,
     setHasProcessedData,

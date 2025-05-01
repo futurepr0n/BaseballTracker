@@ -1,0 +1,104 @@
+/* Styling for the Game History Legend component */
+
+.game-history-legend {
+    margin: 15px 0 25px;
+    padding: 15px;
+    background-color: #f0f8ff;
+    border: 1px solid #bde0f0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+  }
+  
+  .game-history-legend h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #0056b3;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #d3e9f6;
+    padding-bottom: 8px;
+  }
+  
+  .game-history-legend p {
+    margin: 0 0 12px;
+    line-height: 1.5;
+    color: #333;
+  }
+  
+  .legend-benefits {
+    margin: 15px 0;
+  }
+  
+  .legend-benefits h5 {
+    margin: 0 0 8px;
+    font-size: 0.95rem;
+    color: #444;
+  }
+  
+  .legend-benefits ul {
+    margin: 0;
+    padding-left: 20px;
+  }
+  
+  .legend-benefits li {
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+  
+  .legend-examples {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 15px 0;
+    padding: 12px;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid #e6f2fb;
+  }
+  
+  .legend-example {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .legend-bar {
+    height: 16px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  
+  .shorter-history {
+    width: 60px;
+    background: linear-gradient(to right, #3b82f6, #22c55e);
+  }
+  
+  .longer-history {
+    width: 130px;
+    background: linear-gradient(to right, #3b82f6, #22c55e, #ef4444, #fbbf24);
+  }
+  
+  .legend-note {
+    font-style: italic;
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: 15px !important;
+    padding-top: 10px;
+    border-top: 1px dashed #d3e9f6;
+  }
+  
+  /* Media queries for responsive layout */
+  @media (min-width: 768px) {
+    .legend-examples {
+      flex-direction: row;
+      justify-content: space-around;
+    }
+    
+    .legend-example {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .legend-bar {
+      margin-bottom: 8px;
+    }
+  }

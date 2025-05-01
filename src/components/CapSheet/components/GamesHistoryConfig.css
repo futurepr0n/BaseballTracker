@@ -1,0 +1,51 @@
+/* Games History Configuration Styling */
+
+.games-history-config {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .games-history-config label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+  }
+  
+  .games-history-select {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 0.9rem;
+    min-width: 100px;
+    cursor: pointer;
+  }
+  
+  .games-history-select:focus {
+    outline: none;
+    border-color: #0056b3;
+    box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.2);
+  }
+  
+  .games-history-info {
+    color: #666;
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+  
+  @media (max-width: 768px) {
+    .games-history-config {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }

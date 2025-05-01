@@ -1,5 +1,5 @@
 /* Enhanced CapSheet Component Styling */
-
+@import './components/GamesHistoryConfig.css';
 .cap-sheet {
   margin: 20px;
   padding: 20px;
@@ -36,11 +36,64 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-bottom: 20px;
   padding: 12px;
   background-color: #f8f8f8;
-  border-radius: 6px;
+  border-radius: 6px 6px 0 0; /* Rounded top corners only */
+  border: 1px solid #eee;
+  border-bottom: none; /* Remove bottom border since GamesHistoryConfig will connect with it */
 }
+
+.control-actions.standalone {
+  border-radius: 6px;
+  border-bottom: 1px solid #eee;
+}
+
+/* Legend for game counts */
+.game-count-legend {
+  display: flex;
+  align-items: center;
+  margin: 0 0 5px auto;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.game-count-indicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 5px;
+  background-color: #0056b3;
+}
+
+/* Media queries for responsive layout */
+@media (min-width: 768px) {
+  .cap-sheet-controls {
+    flex-direction: row;
+    align-items: stretch;
+  }
+  
+  .control-actions {
+    flex: 3;
+    border-radius: 6px 0 0 6px; /* Rounded left corners only */
+    border-bottom: 1px solid #eee;
+    border-right: none; /* Remove right border since GamesHistoryConfig will be next to it */
+  }
+  
+  .games-history-config {
+    flex: 1;
+    border-radius: 0 6px 6px 0; /* Rounded right corners only */
+    margin: 0 !important;
+    border-left: none; /* Remove left border to connect with control-actions */
+  }
+  
+  /* When the control bar appears alone, restore its full rounded corners */
+  .control-actions.standalone {
+    border-radius: 6px;
+    border-right: 1px solid #eee;
+  }
+}
+
 
 .action-btn {
   display: flex;
@@ -1082,4 +1135,85 @@
 /* Fix for any dropdowns or overlays that might be cut off due to overflow */
 .player-selector .react-select__menu {
   z-index: 30; /* Ensure dropdowns appear above sticky headers */
+}
+
+
+
+/* Games History Section */
+.games-history-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+/* Toggle Legend Button */
+.toggle-legend-btn {
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  background-color: #f0f8ff;
+  border: 1px solid #bde0f0;
+  border-radius: 4px;
+  color: #0056b3;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.toggle-legend-btn:hover {
+  background-color: #e0f1ff;
+}
+
+.toggle-legend-btn::after {
+  content: '▼';
+  font-size: 0.7rem;
+  margin-left: 5px;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.toggle-legend-btn[aria-expanded="true"]::after {
+  transform: rotate(180deg);
+}
+
+/* Loading Indicator */
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: #f5f9ff;
+  border-radius: 6px;
+  margin: 15px 0;
+  color: #0056b3;
+  font-weight: 500;
+  border: 1px solid #d3e5ff;
+}
+
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e0edff;
+  border-top: 3px solid #0056b3;
+  border-radius: 50%;
+  margin-right: 12px;
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Media queries for responsive layout */
+@media (max-width: 768px) {
+  .games-history-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .toggle-legend-btn {
+    align-self: flex-start;
+  }
 }
