@@ -1217,3 +1217,202 @@
     align-self: flex-start;
   }
 }
+
+
+.chart-overlay-legend {
+  margin: 0 0 25px;
+  padding: 15px;
+  background-color: #f0f8ff;
+  border: 1px solid #bde0f0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.chart-overlay-legend h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #0056b3;
+  font-size: 1.1rem;
+  border-bottom: 1px solid #d3e9f6;
+  padding-bottom: 8px;
+}
+
+.chart-overlay-legend p {
+  margin: 0 0 12px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.legend-icon {
+  font-size: 1.1em;
+  vertical-align: middle;
+}
+
+.legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+
+/* Add these styles to your existing CSS file for the CapSheet component */
+
+/* Pitcher selection container with overlay button */
+.pitcher-selection-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+
+.pitcher-selection-container .editable-cell {
+  flex-grow: 1;
+}
+
+/* Overlay toggle button */
+.overlay-toggle-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.overlay-toggle-btn:hover {
+  background-color: #e8f4f8;
+}
+
+.overlay-toggle-btn.active {
+  background-color: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.overlay-toggle-btn.green-active {
+  background-color: #16a34a;
+  color: white;
+  border-color: #16a34a;
+}
+
+.overlay-icon {
+  font-size: 12px;
+  line-height: 1;
+}
+
+/* Add Pitcher button */
+.add-pitcher-btn {
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  background-color: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.add-pitcher-btn:hover {
+  background-color: #16a34a;
+}
+
+/* Pitcher stat cells */
+.pitcher-stat {
+  text-align: center;
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Throws display */
+.throws-display {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+
+.primary-throws {
+  font-weight: 500;
+}
+
+.second-throws {
+  font-size: 0.85em;
+  color: #666;
+  font-style: italic;
+}
+
+/* Chart loading spinner */
+.chart-loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-pitcher-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  font-size: 0.85rem;
+  background-color: #f9f9f9;
+}
+
+/* Enhanced performance chart container */
+.performance-chart-container {
+  position: relative;
+}
+
+/* Match header alignment with body cells */
+.capsheet-table th {
+  text-align: center;
+}
+
+/* Make specific columns align left */
+.capsheet-table th:first-child,
+.capsheet-table th:nth-child(2),
+.capsheet-table th:nth-child(7),
+.capsheet-table th:nth-child(11),
+.capsheet-table th:last-child {
+  text-align: left;
+}
+
+/* Similarly align the cells */
+.capsheet-table td {
+  text-align: center;
+}
+
+.capsheet-table td:first-child,
+.capsheet-table td:nth-child(2),
+.capsheet-table td:nth-child(7),
+.capsheet-table td:nth-child(11),
+.capsheet-table td:last-child {
+  text-align: left;
+}
