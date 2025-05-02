@@ -11,24 +11,26 @@ import OverlayPerformanceChart from '../OverlayPerformanceChart';
  * @param {Object} teams - Teams data for styling
  * @param {Array} handicappers - Array of handicapper objects
  * @param {Array} pitcherOptions - Options for pitcher selection
- * @param {Array} pitcherData - Array of available pitchers for overlay
+ * @param {function} fetchPitcherById - Function to fetch pitcher data by ID
  * @param {function} onFieldChange - Function to handle field changes
  * @param {function} onPitcherSelect - Function to handle pitcher selection
  * @param {function} onBetTypeChange - Function to handle bet type changes
  * @param {function} onPickChange - Function to handle handicapper pick changes
  * @param {function} onRemove - Function to handle player removal
+ * @param {boolean} hasAnySecondPitcher - Whether any row has a second pitcher
  */
 const HitterRow = ({
   player,
   teams,
   handicappers,
   pitcherOptions,
-  fetchPitcherById,  // Added this prop
+  fetchPitcherById,
   onFieldChange,
   onPitcherSelect,
   onBetTypeChange,
   onPickChange,
-  onRemove
+  onRemove,
+  hasAnySecondPitcher
 }) => {
   // States for primary pitcher
   const [showPitcherOverlay, setShowPitcherOverlay] = useState(false);
@@ -37,44 +39,41 @@ const HitterRow = ({
   
   // States for second pitcher
   const [showSecondPitcher, setShowSecondPitcher] = useState(false);
-  const [secondPitcherId, setSecondPitcherId] = useState(null);
-  const [secondPitcher, setSecondPitcher] = useState('');
+  const [secondPitcherId, setSecondPitcherId] = useState(player.secondPitcherId || null);
+  const [secondPitcher, setSecondPitcher] = useState(player.secondPitcher || '');
   const [selectedSecondPitcher, setSelectedSecondPitcher] = useState(null);
   const [showSecondPitcherOverlay, setShowSecondPitcherOverlay] = useState(false);
   const [isLoadingSecondPitcher, setIsLoadingSecondPitcher] = useState(false);
   
   const teamColors = getTeamColors(player.team, teams);
 
-   // Effect to fetch pitcher data when pitcherId changes
-    // Effect for primary pitcher
-    useEffect(() => {
-      const loadPitcherData = async () => {
-        if (!player.pitcherId) {
-          setSelectedPitcher(null);
-          setShowPitcherOverlay(false);
-          return;
-        }
-        
-        setIsLoadingPitcher(true);
-        try {
-          console.log("Fetching primary pitcher data for:", player.pitcherId);
-          const pitcher = await fetchPitcherById(player.pitcherId);
-          console.log("Received primary pitcher data:", pitcher);
-          setSelectedPitcher(pitcher);
-        } catch (error) {
-          console.error("Error loading pitcher data:", error);
-          setSelectedPitcher(null);
-        } finally {
-          setIsLoadingPitcher(false);
-        }
-      };
+  // Effect to fetch pitcher data when pitcherId changes
+  useEffect(() => {
+    const loadPitcherData = async () => {
+      if (!player.pitcherId) {
+        setSelectedPitcher(null);
+        setShowPitcherOverlay(false);
+        return;
+      }
       
-      loadPitcherData();
-    }, [player.pitcherId, fetchPitcherById]);
+      setIsLoadingPitcher(true);
+      try {
+        console.log("Fetching primary pitcher data for:", player.pitcherId);
+        const pitcher = await fetchPitcherById(player.pitcherId);
+        console.log("Received primary pitcher data:", pitcher);
+        setSelectedPitcher(pitcher);
+      } catch (error) {
+        console.error("Error loading pitcher data:", error);
+        setSelectedPitcher(null);
+      } finally {
+        setIsLoadingPitcher(false);
+      }
+    };
+    
+    loadPitcherData();
+  }, [player.pitcherId, fetchPitcherById]);
 
-
-    // Effect to fetch second pitcher data
-  // Effect for second pitcher
+  // Effect to fetch second pitcher data
   useEffect(() => {
     const loadSecondPitcherData = async () => {
       if (!secondPitcherId) {
@@ -107,10 +106,48 @@ const HitterRow = ({
     if (!option) {
       setShowSecondPitcherOverlay(false);
     }
+    // Update parent state with second pitcher info
+    onFieldChange(player.id, 'secondPitcherId', option ? option.value : null);
+    onFieldChange(player.id, 'secondPitcher', option ? option.label : '');
+  };
+  
+  // Extract pitcher throwing hand
+  const getPitcherHand = (pitcher) => {
+    return pitcher?.throwingArm || '';
+  };
+  
+  // Extract pitcher stats safely
+  const getPitcherStats = (pitcher) => {
+    if (!pitcher) return { IP: 'N/A', PC_ST: 'N/A', K: 'N/A', HR: 'N/A' };
+    
+    // For Last IP, use the most recent game data directly
+    // First check if we have game data, otherwise fall back to the main data
+    const lastIP = pitcher.game1IP || pitcher.prevGameIP || pitcher.IP || '0';
+    
+    // PC_ST might be in the game data or main data
+    const pcSt = pitcher.game1PC_ST || pitcher.PC_ST || 'N/A';
+    
+    // For other stats, use game data if available
+    const k = pitcher.game1K || pitcher.K || '0';
+    const hr = pitcher.game1HR || pitcher.HR || '0';
+    
+    return {
+      IP: lastIP,
+      PC_ST: pcSt,
+      K: k,
+      HR: hr,
+      throwingArm: pitcher.throwingArm || ''
+    };
   };
 
+  const primaryPitcherStats = getPitcherStats(selectedPitcher);
+  const secondPitcherStats = getPitcherStats(selectedSecondPitcher);
+  
+  // Determine if we should show second pitcher columns
+  const hasSecondPitcher = selectedSecondPitcher !== null;
+
   return (
-    <tr style={teamColors}>
+    <tr style={teamColors} data-hitter-id={player.id}>
       <td className="player-name">{player.name}</td>
       <td>{player.team}</td>
       <td>{player.prevGameHR}</td>
@@ -187,25 +224,26 @@ const HitterRow = ({
         )}
       </td>
       
-      {/* Throws */}
+      {/* Primary Pitcher Stats */}
+      <td className="pitcher-stat">{primaryPitcherStats.IP}</td>
+      <td className="pitcher-stat">{primaryPitcherStats.PC_ST}</td>
+      <td className="pitcher-stat">{primaryPitcherStats.K}</td>
+      <td className="pitcher-stat">{primaryPitcherStats.HR}</td>
+      
+      {/* Primary Pitcher Throws */}
       <td>
         <input 
           type="text" 
           className="editable-cell" 
-          value={player.pitcherHand || ''} 
+          value={player.pitcherHand || primaryPitcherStats.throwingArm} 
           onChange={(e) => onFieldChange(player.id, 'pitcherHand', e.target.value)} 
           placeholder="R/L" 
-          readOnly={player.pitcherId !== ''}
+          maxLength="1"
         />
       </td>
       
-      {/* Primary Pitcher Stats */}
-      <td className="pitcher-stat">{selectedPitcher ? selectedPitcher.PC_ST : 'N/A'}</td>
-      <td className="pitcher-stat">{selectedPitcher ? selectedPitcher.K : 'N/A'}</td>
-      <td className="pitcher-stat">{selectedPitcher ? selectedPitcher.HR : 'N/A'}</td>
-      
-      {/* Second Pitcher */}
-      <td>
+      {/* Second Pitcher - Add/Select Section */}
+      <td className="second-pitcher-container">
         {player.pitcherId && !showSecondPitcher ? (
           <button 
             className="action-btn add-pitcher-btn"
@@ -257,10 +295,27 @@ const HitterRow = ({
         )}
       </td>
       
-      {/* Second Pitcher Stats */}
-      <td className="pitcher-stat">{selectedSecondPitcher ? selectedSecondPitcher.PC_ST : 'N/A'}</td>
-      <td className="pitcher-stat">{selectedSecondPitcher ? selectedSecondPitcher.K : 'N/A'}</td>
-      <td className="pitcher-stat">{selectedSecondPitcher ? selectedSecondPitcher.HR : 'N/A'}</td>
+      {/* Second Pitcher Stats - Always render cells if any row has second pitcher */}
+      {hasAnySecondPitcher && (
+        <>
+          <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.IP : ''}</td>
+          <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.PC_ST : ''}</td>
+          <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.K : ''}</td>
+          <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.HR : ''}</td>
+          <td>
+            {hasSecondPitcher ? (
+              <input 
+                type="text" 
+                className="editable-cell" 
+                value={player.secondPitcherHand || secondPitcherStats.throwingArm} 
+                onChange={(e) => onFieldChange(player.id, 'secondPitcherHand', e.target.value)} 
+                placeholder="R/L" 
+                maxLength="1"
+              />
+            ) : null}
+          </td>
+        </>
+      )}
       
       {/* Expected SO */}
       <td>
@@ -295,7 +350,7 @@ const HitterRow = ({
         />
       </td>
       
-      {/* Rest of the columns remain the same */}
+      {/* Bet Types */}
       <td>
         <input 
           type="checkbox" 
