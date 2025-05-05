@@ -134,12 +134,57 @@ const fetchPlayerGameHistory = useCallback(async (player, historyCount) => {
     console.error(`Error fetching game history for ${player.name}:`, error);
     return player;
   }
-}, [playerStatsHistory, extendedPitcherData, findMultiGamePlayerStats]);
+}, [playerStatsHistory, extendedPitcherData]);
 
 
 const updatePlayerWithGameHistory = useCallback(async (player, historyCount) => {
   return await fetchPlayerGameHistory(player, historyCount);
 }, [fetchPlayerGameHistory]);
+
+const updateAllPlayersGameHistory = useCallback(async (playerType, newHistoryCount) => {
+  if (playerType !== 'hitter' && playerType !== 'pitcher') return;
+  
+  const isHitter = playerType === 'hitter';
+  const players = isHitter ? selectedPlayers.hitters : selectedPlayers.pitchers;
+  
+  if (players.length === 0) return;
+  
+  // Set the appropriate loading state
+  if (isHitter) {
+    setIsRefreshingHitters(true);
+  } else {
+    setIsRefreshingPitchers(true);
+  }
+  
+  try {
+    // Update all players in parallel
+    const updatedPlayers = await Promise.all(
+      players.map(player => fetchPlayerGameHistory(player, newHistoryCount))
+    );
+    
+    // Update state
+    setSelectedPlayers(prev => ({
+      ...prev,
+      [isHitter ? 'hitters' : 'pitchers']: updatedPlayers
+    }));
+    
+    // Update the current games history setting
+    if (isHitter) {
+      setCurrentHitterGamesHistory(newHistoryCount);
+    } else {
+      setCurrentPitcherGamesHistory(newHistoryCount);
+    }
+  } catch (error) {
+    console.error(`Error updating ${playerType} game history:`, error);
+  } finally {
+    // Reset loading state
+    if (isHitter) {
+      setIsRefreshingHitters(false);
+    } else {
+      setIsRefreshingPitchers(false);
+    }
+  }
+}, [selectedPlayers, fetchPlayerGameHistory, setIsRefreshingHitters, setIsRefreshingPitchers]);
 
   // Add this function to the hook
   const requestHistoryRefresh = useCallback((playerType, historyCount) => {
@@ -847,50 +892,7 @@ const handleAddPitcherById = async (playerId) => {
   }));
 };
 
-const updateAllPlayersGameHistory = useCallback(async (playerType, newHistoryCount) => {
-  if (playerType !== 'hitter' && playerType !== 'pitcher') return;
-  
-  const isHitter = playerType === 'hitter';
-  const players = isHitter ? selectedPlayers.hitters : selectedPlayers.pitchers;
-  
-  if (players.length === 0) return;
-  
-  // Set the appropriate loading state
-  if (isHitter) {
-    setIsRefreshingHitters(true);
-  } else {
-    setIsRefreshingPitchers(true);
-  }
-  
-  try {
-    // Update all players in parallel
-    const updatedPlayers = await Promise.all(
-      players.map(player => fetchPlayerGameHistory(player, newHistoryCount))
-    );
-    
-    // Update state
-    setSelectedPlayers(prev => ({
-      ...prev,
-      [isHitter ? 'hitters' : 'pitchers']: updatedPlayers
-    }));
-    
-    // Update the current games history setting
-    if (isHitter) {
-      setCurrentHitterGamesHistory(newHistoryCount);
-    } else {
-      setCurrentPitcherGamesHistory(newHistoryCount);
-    }
-  } catch (error) {
-    console.error(`Error updating ${playerType} game history:`, error);
-  } finally {
-    // Reset loading state
-    if (isHitter) {
-      setIsRefreshingHitters(false);
-    } else {
-      setIsRefreshingPitchers(false);
-    }
-  }
-}, [selectedPlayers, fetchPlayerGameHistory, setIsRefreshingHitters, setIsRefreshingPitchers]);
+
 
 
 
