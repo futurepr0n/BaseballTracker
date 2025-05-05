@@ -16,6 +16,7 @@ const HittersTable = ({
   teams,
   handicappers,
   isLoadingPlayers,
+  isRefreshingHitters, // New prop
   onAddHitter,
   onRemovePlayer,
   onFieldChange,
@@ -24,7 +25,8 @@ const HittersTable = ({
   onPickChange,
   onAddHandicapper,
   onRemoveHandicapper,
-  getPitcherOptionsForOpponent
+  getPitcherOptionsForOpponent,
+  gamesHistory
 }) => {
   // Check if any hitter has a second pitcher to determine if we need those columns
   const hasAnySecondPitcher = hitters.some(hitter => {
@@ -39,7 +41,12 @@ const HittersTable = ({
 
   return (
     <div className="section-container">
-      <h3 className="section-header">Hitters</h3>
+      <h3 className="section-header">Hitters{isRefreshingHitters && (
+          <span className="refreshing-indicator">
+            <div className="refreshing-spinner"></div>
+            Refreshing charts...
+          </span>
+        )}</h3>
       <div className="control-bar">
         <PlayerSelector
           options={hitterOptions}

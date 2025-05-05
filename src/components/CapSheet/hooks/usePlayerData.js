@@ -47,6 +47,159 @@ const usePlayerData = (
   const [hasProcessedData, setHasProcessedData] = useState(false);
   const [playerStatsHistory, setPlayerStatsHistory] = useState({});
   const [extendedPitcherData, setExtendedPitcherData] = useState({});
+  const [isRefreshingHitters, setIsRefreshingHitters] = useState(false);
+  const [isRefreshingPitchers, setIsRefreshingPitchers] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState({ 
+    type: null, 
+    gamesCount: 0,
+    timestamp: 0 
+  });
+
+  // Add this function to the hook
+  const requestHistoryRefresh = (playerType, gamesCount) => {
+    console.log(`[usePlayerData] Refreshing ${playerType} history with ${gamesCount} games`);
+    setRefreshTrigger({
+      type: playerType,
+      gamesCount,
+      timestamp: Date.now() // Add timestamp to ensure state change
+    });
+  };
+
+  // Add this useEffect to handle refreshing player history
+  useEffect(() => {
+    const refreshPlayerHistory = async () => {
+      if (!refreshTrigger.type || !refreshTrigger.gamesCount) return;
+      
+      const playerType = refreshTrigger.type;
+      const gamesCount = refreshTrigger.gamesCount;
+      
+      console.log(`[usePlayerData] Processing refresh for ${playerType}s with ${gamesCount} games`);
+      
+      if (playerType === 'hitter' && isRefreshingHitters) {
+        // Get current date range data or fetch it if needed
+        let currentDateRangeData = playerStatsHistory;
+        if (Object.keys(currentDateRangeData).length === 0) {
+          currentDateRangeData = await fetchPlayerDataForDateRange(currentDate, 30, 180);
+        }
+        
+        // Refresh history for all hitters currently in the table
+        const updatedHitters = await Promise.all(
+          selectedPlayers.hitters.map(async (hitter) => {
+            try {
+              // Find player's game history data
+              const games = findMultiGamePlayerStats(
+                currentDateRangeData,
+                hitter.name,
+                hitter.team,
+                gamesCount
+              );
+              
+              // Create a fresh copy of the player object
+              const updatedHitter = { ...hitter };
+              
+              // Get the game dates for display
+              const gameDates = games.map(game => game.date || '');
+              
+              // Update game history data based on new games count
+              for (let i = 0; i < gamesCount; i++) {
+                const gameNum = i + 1;
+                const gameData = i < games.length ? games[i]?.data || {} : {};
+                
+                updatedHitter[`game${gameNum}Date`] = i < games.length ? gameDates[i] || '' : '';
+                updatedHitter[`game${gameNum}HR`] = gameData.HR || '0';
+                updatedHitter[`game${gameNum}AB`] = gameData.AB || '0';
+                updatedHitter[`game${gameNum}H`] = gameData.H || '0';
+              }
+              
+              return updatedHitter;
+            } catch (error) {
+              console.error(`[usePlayerData] Error refreshing hitter ${hitter.name}:`, error);
+              return hitter; // Return original on error
+            }
+          })
+        );
+        
+        // Update state with refreshed players
+        setSelectedPlayers(prev => ({
+          ...prev,
+          hitters: updatedHitters
+        }));
+        
+        setIsRefreshingHitters(false);
+        console.log(`[usePlayerData] Refreshed ${updatedHitters.length} hitters`);
+      }
+      
+      if (playerType === 'pitcher' && isRefreshingPitchers) {
+        // Get current date range data or fetch it if needed
+        let currentDateRangeData = extendedPitcherData;
+        if (Object.keys(currentDateRangeData).length === 0) {
+          currentDateRangeData = await fetchPlayerDataForDateRange(currentDate, 30, 180);
+        }
+        
+        // Refresh history for all pitchers currently in the table
+        const updatedPitchers = await Promise.all(
+          selectedPlayers.pitchers.map(async (pitcher) => {
+            try {
+              // Find player's game history data
+              const games = findMultiGamePlayerStats(
+                currentDateRangeData,
+                pitcher.name,
+                pitcher.team,
+                gamesCount
+              );
+              
+              // Create a fresh copy of the player object
+              const updatedPitcher = { ...pitcher };
+              
+              // Get the game dates for display
+              const gameDates = games.map(game => game.date || '');
+              
+              // Update game history data based on new games count
+              for (let i = 0; i < gamesCount; i++) {
+                const gameNum = i + 1;
+                const gameData = i < games.length ? games[i]?.data || {} : {};
+                
+                updatedPitcher[`game${gameNum}Date`] = i < games.length ? gameDates[i] || '' : '';
+                updatedPitcher[`game${gameNum}IP`] = gameData.IP || '0';
+                updatedPitcher[`game${gameNum}K`] = gameData.K || '0';
+                updatedPitcher[`game${gameNum}ER`] = gameData.ER || '0';
+                updatedPitcher[`game${gameNum}H`] = gameData.H || '0';
+                updatedPitcher[`game${gameNum}R`] = gameData.R || '0';
+                updatedPitcher[`game${gameNum}BB`] = gameData.BB || '0';
+                updatedPitcher[`game${gameNum}HR`] = gameData.HR || '0';
+                updatedPitcher[`game${gameNum}PC_ST`] = gameData.PC_ST || 'N/A';
+              }
+              
+              return updatedPitcher;
+            } catch (error) {
+              console.error(`[usePlayerData] Error refreshing pitcher ${pitcher.name}:`, error);
+              return pitcher; // Return original on error
+            }
+          })
+        );
+        
+        // Update state with refreshed players
+        setSelectedPlayers(prev => ({
+          ...prev,
+          pitchers: updatedPitchers
+        }));
+        
+        setIsRefreshingPitchers(false);
+        console.log(`[usePlayerData] Refreshed ${updatedPitchers.length} pitchers`);
+      }
+    };
+    
+    refreshPlayerHistory();
+  }, [
+    refreshTrigger,
+    isRefreshingHitters,
+    isRefreshingPitchers,
+    selectedPlayers.hitters,
+    selectedPlayers.pitchers,
+    playerStatsHistory,
+    extendedPitcherData,
+    currentDate
+  ]);
 
   // Format date for display
   const formattedDate = currentDate.toLocaleDateString('en-US', { 
@@ -743,7 +896,12 @@ const fetchPitcherById = async (pitcherId) => {
     handlePitcherPickChange,
     updatePlayersWithNewHandicapper,
     removeHandicapperFromPlayers,
-    fetchPitcherById // Add this line
+    fetchPitcherById, 
+    isRefreshingHitters,
+    setIsRefreshingHitters,
+    isRefreshingPitchers,
+    setIsRefreshingPitchers,
+    requestHistoryRefresh
   };
 };
 

@@ -229,9 +229,17 @@ function CapSheet({ playerData, gameData, currentDate }) {
       
       // Show the legend when changing the value
       setShowHitterLegend(true);
+      
+      // NEW: Trigger refresh of existing hitters in the table
+      if (selectedPlayers.hitters.length > 0) {
+        setIsRefreshingHitters(true);
+        
+        // This will be handled by the updated useEffect in usePlayerData
+        requestHistoryRefresh('hitter', newValue);
+      }
     }
   };
-
+  
   // Handle Pitcher Games History change
   const handlePitcherGamesHistoryChange = (newValue) => {
     if (newValue !== pitcherGamesHistory) {
@@ -241,6 +249,14 @@ function CapSheet({ playerData, gameData, currentDate }) {
       
       // Show the legend when changing the value
       setShowPitcherLegend(true);
+      
+      // NEW: Trigger refresh of existing pitchers in the table
+      if (selectedPlayers.pitchers.length > 0) {
+        setIsRefreshingPitchers(true);
+        
+        // This will be handled by the updated useEffect in usePlayerData
+        requestHistoryRefresh('pitcher', newValue);
+      }
     }
   };
 

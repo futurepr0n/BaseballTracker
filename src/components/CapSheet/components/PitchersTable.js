@@ -15,6 +15,7 @@ const PitchersTable = ({
   teams,
   handicappers,
   isLoadingPlayers,
+  isRefreshingPitchers, // New prop
   onAddPitcher,
   onRemovePlayer,
   onFieldChange,
@@ -25,7 +26,12 @@ const PitchersTable = ({
 }) => {
   return (
     <div className="section-container">
-      <h3 className="section-header">Pitchers</h3>
+      <h3 className="section-header">Pitchers{isRefreshingPitchers && (
+          <span className="refreshing-indicator">
+            <div className="refreshing-spinner"></div>
+            Refreshing charts...
+          </span>
+        )}</h3>
       <div className="control-bar">
         <PlayerSelector
           options={pitcherOptions}
