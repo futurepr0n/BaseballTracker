@@ -16,7 +16,7 @@ const HittersTable = ({
   teams,
   handicappers,
   isLoadingPlayers,
-  isRefreshingHitters, // New prop
+  isRefreshingHitters,
   onAddHitter,
   onRemovePlayer,
   onFieldChange,
@@ -26,17 +26,13 @@ const HittersTable = ({
   onAddHandicapper,
   onRemoveHandicapper,
   getPitcherOptionsForOpponent,
-  gamesHistory
+  gamesHistory,
+  refreshKey // Add refresh key to force re-render when needed
 }) => {
   // Check if any hitter has a second pitcher to determine if we need those columns
   const hasAnySecondPitcher = hitters.some(hitter => {
-    // Check if second pitcher exists in the state
-    const rowElement = document.querySelector(`tr[data-hitter-id="${hitter.id}"]`);
-    if (rowElement) {
-      const secondPitcherSelect = rowElement.querySelector('.second-pitcher-container select');
-      return secondPitcherSelect && secondPitcherSelect.value !== '';
-    }
-    return false;
+    // Check if second pitcher exists in the player object
+    return hitter.secondPitcherId || hitter.secondPitcher;
   });
 
   return (
@@ -55,6 +51,7 @@ const HittersTable = ({
           isDisabled={isLoadingPlayers || hitterOptions.length === 0}
           placeholder="Search and select a hitter..."
           noOptionsMessage="No hitters found"
+          selectId="hitter-selector" // Add unique ID for select
         />
       </div>
 
@@ -153,7 +150,7 @@ const HittersTable = ({
             </thead>
             <tbody>
               {hitters.length > 0 ? (
-                hitters.map(player => {
+                hitters.map((player, index) => {
                   // Get pitcher options for this hitter (based on opponent team)
                   const pitcherOptions = player.opponentTeam
                     ? getPitcherOptionsForOpponent(player.opponentTeam)
@@ -161,7 +158,7 @@ const HittersTable = ({
 
                   return (
                     <HitterRow
-                      key={player.id}
+                      key={`${player.id}-${refreshKey}-${index}`} // Include refresh key in the key to force re-render
                       player={player}
                       teams={teams}
                       handicappers={handicappers}
@@ -173,6 +170,8 @@ const HittersTable = ({
                       onPickChange={onPickChange}
                       onRemove={onRemovePlayer}
                       hasAnySecondPitcher={hasAnySecondPitcher}
+                      gamesHistory={gamesHistory} // Pass down games history value 
+                      rowIndex={index} // Add index to help create unique IDs
                     />
                   );
                 })

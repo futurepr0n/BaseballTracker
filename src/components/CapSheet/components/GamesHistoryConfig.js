@@ -8,13 +8,15 @@ import React from 'react';
  * @param {number} minGames - Minimum number of games allowed (default: 1)
  * @param {number} maxGames - Maximum number of games allowed (default: 7)
  * @param {string} label - Custom label for the selector (default: "Games History:")
+ * @param {string} id - Unique ID for the select element (required to avoid duplicate IDs)
  */
 const GamesHistoryConfig = ({ 
   gamesHistory, 
   setGamesHistory, 
   minGames = 1, 
   maxGames = 7,
-  label = "Games History:"
+  label = "Games History:",
+  id = "games-history-select" // Default ID, but can be overridden
 }) => {
   // Generate options for select
   const options = [];
@@ -24,10 +26,10 @@ const GamesHistoryConfig = ({
 
   return (
     <div className="games-history-config">
-      <label htmlFor="games-history-select">
+      <label htmlFor={id}>
         {label}
         <select
-          id="games-history-select"
+          id={id}
           value={gamesHistory}
           onChange={(e) => setGamesHistory(Number(e.target.value))}
           className="games-history-select"

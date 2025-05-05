@@ -15,14 +15,15 @@ const PitchersTable = ({
   teams,
   handicappers,
   isLoadingPlayers,
-  isRefreshingPitchers, // New prop
+  isRefreshingPitchers,
   onAddPitcher,
   onRemovePlayer,
   onFieldChange,
   onBetTypeChange,
   onPickChange,
   onRemoveHandicapper,
-  gamesHistory
+  gamesHistory,
+  refreshKey // Add refresh key to force re-render when needed
 }) => {
   return (
     <div className="section-container">
@@ -40,6 +41,7 @@ const PitchersTable = ({
           isDisabled={isLoadingPlayers || pitcherOptions.length === 0}
           placeholder="Search and select a pitcher..."
           noOptionsMessage="No pitchers found"
+          selectId="pitcher-selector" // Add unique ID for select
         />
       </div>
 
@@ -121,9 +123,9 @@ const PitchersTable = ({
             </thead>
             <tbody>
               {pitchers.length > 0 ? (
-                pitchers.map(player => (
+                pitchers.map((player, index) => (
                   <PitcherRow
-                    key={player.id}
+                    key={`${player.id}-${refreshKey}-${index}`} // Include refresh key in the key to force re-render
                     player={player}
                     teams={teams}
                     handicappers={handicappers}
@@ -131,6 +133,8 @@ const PitchersTable = ({
                     onBetTypeChange={onBetTypeChange}
                     onPickChange={onPickChange}
                     onRemove={onRemovePlayer}
+                    gamesHistory={gamesHistory} // Pass down games history value
+                    rowIndex={index} // Add index to help create unique IDs
                   />
                 ))
               ) : (

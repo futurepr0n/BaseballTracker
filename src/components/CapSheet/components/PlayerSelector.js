@@ -10,6 +10,7 @@ import Select from 'react-select';
  * @param {boolean} isDisabled - Whether the selector is disabled
  * @param {string} placeholder - Placeholder text
  * @param {string} noOptionsMessage - Message to show when no options are available
+ * @param {string} selectId - Unique ID for the select element (required to avoid duplicate IDs)
  */
 const PlayerSelector = ({
   options,
@@ -17,7 +18,8 @@ const PlayerSelector = ({
   isLoading,
   isDisabled,
   placeholder = "Search and select a player...",
-  noOptionsMessage = "No players found"
+  noOptionsMessage = "No players found",
+  selectId = "player-selector" // Default ID, but should be overridden by parent
 }) => {
   return (
     <div className="player-selector player-search-select">
@@ -37,6 +39,8 @@ const PlayerSelector = ({
         className="react-select-container"
         classNamePrefix="react-select"
         noOptionsMessage={() => isLoading ? 'Loading players...' : noOptionsMessage}
+        // Add a unique ID for the select element to fix duplicate ID issue
+        inputId={selectId}
       />
       {options.length === 0 && !isLoading && (
         <span className="no-players-message">No players found for this date.</span>
