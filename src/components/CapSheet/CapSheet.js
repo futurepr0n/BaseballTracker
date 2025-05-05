@@ -44,6 +44,10 @@ function CapSheet({ playerData, gameData, currentDate }) {
   // Local state for historical date to avoid dependency issues
   const [localHistoricalDate, setLocalHistoricalDate] = useState(null);
   
+  // Local state for refreshing indicators
+  const [isRefreshingHitters, setIsRefreshingHitters] = useState(false);
+  const [isRefreshingPitchers, setIsRefreshingPitchers] = useState(false);
+  
   // Initialize player data hook with separate games history parameters
   const {
     selectedPlayers,
@@ -80,11 +84,6 @@ function CapSheet({ playerData, gameData, currentDate }) {
     handlePitcherPickChange,
     updatePlayersWithNewHandicapper,
     removeHandicapperFromPlayers,
-    // Add these missing state variables and functions
-    isRefreshingHitters,
-    setIsRefreshingHitters,
-    isRefreshingPitchers,
-    setIsRefreshingPitchers,
     requestHistoryRefresh
   } = usePlayerData(playerData, gameData, currentDate, hitterGamesHistory, pitcherGamesHistory); // Pass both game history values
 
@@ -134,6 +133,58 @@ function CapSheet({ playerData, gameData, currentDate }) {
       setLocalHistoricalDate(new Date());
     }
   }, [playerDataSource]);
+
+  // Effect to handle refreshing data after game history changes
+  useEffect(() => {
+    const refreshPlayerData = async () => {
+      if (isRefreshingHitters) {
+        try {
+          console.log("[CapSheet] Refreshing hitter data with new game history settings...");
+          
+          // Use the requestHistoryRefresh helper to update hitter data
+          await requestHistoryRefresh('hitter', hitterGamesHistory);
+          
+          // Update UI once the refresh is complete
+          setTimeout(() => {
+            setIsRefreshingHitters(false);
+            console.log("[CapSheet] Hitter data refresh complete");
+          }, 1000); // Small timeout to ensure UI updates
+          
+        } catch (error) {
+          console.error("[CapSheet] Error refreshing hitter data:", error);
+          setIsRefreshingHitters(false);
+        }
+      }
+    };
+    
+    refreshPlayerData();
+  }, [isRefreshingHitters, hitterGamesHistory, requestHistoryRefresh]);
+
+  // Similar effect for pitchers
+  useEffect(() => {
+    const refreshPlayerData = async () => {
+      if (isRefreshingPitchers) {
+        try {
+          console.log("[CapSheet] Refreshing pitcher data with new game history settings...");
+          
+          // Use the requestHistoryRefresh helper to update pitcher data
+          await requestHistoryRefresh('pitcher', pitcherGamesHistory);
+          
+          // Update UI once the refresh is complete
+          setTimeout(() => {
+            setIsRefreshingPitchers(false);
+            console.log("[CapSheet] Pitcher data refresh complete");
+          }, 1000); // Small timeout to ensure UI updates
+          
+        } catch (error) {
+          console.error("[CapSheet] Error refreshing pitcher data:", error);
+          setIsRefreshingPitchers(false);
+        }
+      }
+    };
+    
+    refreshPlayerData();
+  }, [isRefreshingPitchers, pitcherGamesHistory, requestHistoryRefresh]);
 
   // Handler for hitter handicapper changes
   const handleAddHitterHandicapperWithUpdate = (playerType) => {
@@ -239,9 +290,6 @@ function CapSheet({ playerData, gameData, currentDate }) {
       // NEW: Trigger refresh of existing hitters in the table
       if (selectedPlayers.hitters.length > 0) {
         setIsRefreshingHitters(true);
-        
-        // This will be handled by the updated useEffect in usePlayerData
-        requestHistoryRefresh('hitter', newValue);
       }
     }
   };
@@ -259,9 +307,6 @@ function CapSheet({ playerData, gameData, currentDate }) {
       // NEW: Trigger refresh of existing pitchers in the table
       if (selectedPlayers.pitchers.length > 0) {
         setIsRefreshingPitchers(true);
-        
-        // This will be handled by the updated useEffect in usePlayerData
-        requestHistoryRefresh('pitcher', newValue);
       }
     }
   };
