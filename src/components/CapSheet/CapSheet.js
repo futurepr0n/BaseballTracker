@@ -267,9 +267,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
     }));
   };
 
-  // Handle Hitter Games History change
-// Handle Hitter Games History change
-// Handle Hitter Games History change
+// In the handleHitterGamesHistoryChange function:
 const handleHitterGamesHistoryChange = (newValue) => {
   if (newValue !== hitterGamesHistory) {
     setHitterGamesHistory(newValue);
@@ -277,15 +275,18 @@ const handleHitterGamesHistoryChange = (newValue) => {
     // Show the legend when changing the value
     setShowHitterLegend(true);
     
-    // Only trigger refresh if we have players in the table
+    // Immediately trigger refresh for all existing hitters
     if (selectedPlayers.hitters.length > 0) {
       setIsRefreshingHitters(true);
-      setHitterRefreshKey(Date.now()); // Force re-render when data changes
+      // Request refresh with new value (this will update all hitters)
+      requestHistoryRefresh('hitter', newValue);
+      // Force re-render of the hitter table
+      setHitterRefreshKey(Date.now());
     }
   }
 };
 
-// Handle Pitcher Games History change
+// In the handlePitcherGamesHistoryChange function:
 const handlePitcherGamesHistoryChange = (newValue) => {
   if (newValue !== pitcherGamesHistory) {
     setPitcherGamesHistory(newValue);
@@ -293,10 +294,13 @@ const handlePitcherGamesHistoryChange = (newValue) => {
     // Show the legend when changing the value
     setShowPitcherLegend(true);
     
-    // Only trigger refresh if we have players in the table
+    // Immediately trigger refresh for all existing pitchers
     if (selectedPlayers.pitchers.length > 0) {
       setIsRefreshingPitchers(true);
-      setPitcherRefreshKey(Date.now()); // Force re-render when data changes
+      // Request refresh with new value (this will update all pitchers)
+      requestHistoryRefresh('pitcher', newValue);
+      // Force re-render of the pitcher table
+      setPitcherRefreshKey(Date.now());
     }
   }
 };

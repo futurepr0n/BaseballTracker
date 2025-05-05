@@ -45,6 +45,7 @@ const usePlayerData = (
   const [historicalDate, setHistoricalDate] = useState(null);
   const [isLoadingPlayers, setIsLoadingPlayers] = useState(false);
   const [hasProcessedData, setHasProcessedData] = useState(false);
+  // Store the maximum number of games data per player to avoid refetching
   const [playerStatsHistory, setPlayerStatsHistory] = useState({});
   const [extendedPitcherData, setExtendedPitcherData] = useState({});
   const [isRefreshingHitters, setIsRefreshingHitters] = useState(false);
@@ -54,44 +55,45 @@ const usePlayerData = (
     gamesCount: 0,
     timestamp: 0 
   });
+  // Store latest settings to track changes
   const [currentHitterGamesHistory, setCurrentHitterGamesHistory] = useState(hitterGamesHistory);
   const [currentPitcherGamesHistory, setCurrentPitcherGamesHistory] = useState(pitcherGamesHistory);
-  
-  // Add a ref to track ongoing refreshes to prevent multiple simultaneous refreshes
+
+  // Use a ref to track ongoing refreshes and prevent multiple simultaneous refreshes
   const isRefreshingRef = useRef({
     hitter: false,
     pitcher: false
   });
 
+  // Store complete data cache for up to MAX_GAMES_HISTORY (7) games
+  const MAX_GAMES_HISTORY = 7;
+  const playerDataCacheRef = useRef({
+    hitters: {}, // playerId -> full player data with MAX_GAMES_HISTORY
+    pitchers: {}  // playerId -> full player data with MAX_GAMES_HISTORY
+  });
+
+  // Improved function to get player game history from cache or fetch if needed
   const fetchPlayerGameHistory = useCallback(async (player, historyCount) => {
     if (!player || !player.name || !player.team) return null;
     
     const isHitter = player.playerType === 'hitter';
     const isPitcher = player.playerType === 'pitcher';
+    const playerId = player.id;
     
     // Skip if player type is unknown
     if (!isHitter && !isPitcher) return player;
     
-    // Determine which date range data to use
-    const dateData = isPitcher ? extendedPitcherData : playerStatsHistory;
+    // Check if we already have cached data for this player with the max history
+    const playerCache = isHitter 
+      ? playerDataCacheRef.current.hitters[playerId]
+      : playerDataCacheRef.current.pitchers[playerId];
     
-    // If we don't have date data yet, just return the original player
-    if (Object.keys(dateData).length === 0) return player;
-    
-    try {
-      // Find game history for this player
-      const games = findMultiGamePlayerStats(
-        dateData,
-        player.name,
-        player.team,
-        historyCount
-      );
-      
-      // Make a copy of the player to update
+    if (playerCache && playerCache.maxGamesHistory >= MAX_GAMES_HISTORY) {
+      // We have complete cached data, just need to create a subset with the requested history count
       const updatedPlayer = { ...player };
       
       // Clear existing game data
-      for (let i = 1; i <= 7; i++) {
+      for (let i = 1; i <= MAX_GAMES_HISTORY; i++) {
         if (isHitter) {
           delete updatedPlayer[`game${i}Date`];
           delete updatedPlayer[`game${i}HR`];
@@ -110,7 +112,85 @@ const usePlayerData = (
         }
       }
       
-      // Add new game data
+      // Add game data for the requested history count
+      for (let i = 0; i < historyCount && i < playerCache.games.length; i++) {
+        const gameNum = i + 1;
+        const gameData = playerCache.games[i]?.data || {};
+        const gameDate = playerCache.games[i]?.date || '';
+        
+        if (isHitter) {
+          updatedPlayer[`game${gameNum}Date`] = gameDate;
+          updatedPlayer[`game${gameNum}HR`] = gameData.HR || '0';
+          updatedPlayer[`game${gameNum}AB`] = gameData.AB || '0';
+          updatedPlayer[`game${gameNum}H`] = gameData.H || '0';
+        } else {
+          updatedPlayer[`game${gameNum}Date`] = gameDate;
+          updatedPlayer[`game${gameNum}IP`] = gameData.IP || '0';
+          updatedPlayer[`game${gameNum}K`] = gameData.K || '0';
+          updatedPlayer[`game${gameNum}ER`] = gameData.ER || '0';
+          updatedPlayer[`game${gameNum}H`] = gameData.H || '0';
+          updatedPlayer[`game${gameNum}R`] = gameData.R || '0';
+          updatedPlayer[`game${gameNum}BB`] = gameData.BB || '0';
+          updatedPlayer[`game${gameNum}HR`] = gameData.HR || '0';
+          updatedPlayer[`game${gameNum}PC_ST`] = gameData.PC_ST || 'N/A';
+        }
+      }
+      
+      return updatedPlayer;
+    }
+    
+    // If we don't have cached data or need to fetch more, get it from date range data
+    const dateData = isPitcher ? extendedPitcherData : playerStatsHistory;
+    
+    // If we don't have date data yet, just return the original player
+    if (Object.keys(dateData).length === 0) return player;
+    
+    try {
+      // Find game history for this player - always try to get MAX_GAMES_HISTORY
+      const games = findMultiGamePlayerStats(
+        dateData,
+        player.name,
+        player.team,
+        MAX_GAMES_HISTORY // Always fetch the maximum number of games
+      );
+      
+      // Store the complete data in the cache
+      if (isHitter) {
+        playerDataCacheRef.current.hitters[playerId] = {
+          maxGamesHistory: MAX_GAMES_HISTORY,
+          games: games
+        };
+      } else {
+        playerDataCacheRef.current.pitchers[playerId] = {
+          maxGamesHistory: MAX_GAMES_HISTORY,
+          games: games
+        };
+      }
+      
+      // Make a copy of the player to update
+      const updatedPlayer = { ...player };
+      
+      // Clear existing game data
+      for (let i = 1; i <= MAX_GAMES_HISTORY; i++) {
+        if (isHitter) {
+          delete updatedPlayer[`game${i}Date`];
+          delete updatedPlayer[`game${i}HR`];
+          delete updatedPlayer[`game${i}AB`];
+          delete updatedPlayer[`game${i}H`];
+        } else {
+          delete updatedPlayer[`game${i}Date`];
+          delete updatedPlayer[`game${i}IP`];
+          delete updatedPlayer[`game${i}K`];
+          delete updatedPlayer[`game${i}ER`];
+          delete updatedPlayer[`game${i}H`];
+          delete updatedPlayer[`game${i}R`];
+          delete updatedPlayer[`game${i}BB`];
+          delete updatedPlayer[`game${i}HR`];
+          delete updatedPlayer[`game${i}PC_ST`];
+        }
+      }
+      
+      // Add only the requested number of games to the player object
       for (let i = 0; i < historyCount && i < games.length; i++) {
         const gameNum = i + 1;
         const gameData = games[i]?.data || {};
@@ -141,11 +221,12 @@ const usePlayerData = (
     }
   }, [playerStatsHistory, extendedPitcherData]);
 
-
+  // Helper function to update a single player's game history
   const updatePlayerWithGameHistory = useCallback(async (player, historyCount) => {
     return await fetchPlayerGameHistory(player, historyCount);
   }, [fetchPlayerGameHistory]);
 
+  // Updated function to refresh all players of a specific type
   const updateAllPlayersGameHistory = useCallback(async (playerType, newHistoryCount) => {
     // Check if we're already refreshing this player type
     if (isRefreshingRef.current[playerType]) {
@@ -163,7 +244,7 @@ const usePlayerData = (
     
     const isHitter = playerType === 'hitter';
     
-    // Get a copy of the current players to avoid dependency issues
+    // Get a copy of the current players
     let playersToUpdate = [];
     
     // Use a function to get the latest player data without adding a dependency
@@ -185,6 +266,8 @@ const usePlayerData = (
     }
     
     try {
+      console.log(`[usePlayerData] Refreshing ${playersToUpdate.length} ${playerType}s with ${newHistoryCount} games`);
+      
       // Update all players in parallel
       const updatedPlayers = await Promise.all(
         playersToUpdate.map(player => fetchPlayerGameHistory(player, newHistoryCount))
@@ -216,10 +299,12 @@ const usePlayerData = (
       // Reset the refreshing flag
       isRefreshingRef.current[playerType] = false;
     }
-  }, [fetchPlayerGameHistory]); // Removed selectedPlayers from dependency array
+  }, [fetchPlayerGameHistory]);
 
-  // Add this function to the hook
+  // Function to request a history refresh (exposed to parent components)
   const requestHistoryRefresh = useCallback((playerType, historyCount) => {
+    console.log(`[usePlayerData] History refresh requested for ${playerType}s with ${historyCount} games`);
+    
     // Set refresh trigger with timestamp to ensure it's recognized as a new trigger
     setRefreshTrigger({
       type: playerType,
@@ -230,46 +315,41 @@ const usePlayerData = (
     return updateAllPlayersGameHistory(playerType, historyCount);
   }, [updateAllPlayersGameHistory]);
 
-  // Use a separate effect to detect hitter games history changes
+  // Effect to detect global history setting changes and refresh players
   useEffect(() => {
-    if (currentHitterGamesHistory !== hitterGamesHistory && 
+    if (hitterGamesHistory !== currentHitterGamesHistory && 
         selectedPlayers.hitters.length > 0 && 
         !isRefreshingRef.current.hitter) {
       console.log(`[usePlayerData] Hitter games history changed from ${currentHitterGamesHistory} to ${hitterGamesHistory}`);
-      updateAllPlayersGameHistory('hitter', hitterGamesHistory);
+      requestHistoryRefresh('hitter', hitterGamesHistory);
     }
-  }, [hitterGamesHistory, currentHitterGamesHistory, selectedPlayers.hitters.length, updateAllPlayersGameHistory]);
+  }, [hitterGamesHistory, currentHitterGamesHistory, selectedPlayers.hitters.length, requestHistoryRefresh]);
   
-  // Use a separate effect to detect pitcher games history changes
   useEffect(() => {
-    if (currentPitcherGamesHistory !== pitcherGamesHistory && 
+    if (pitcherGamesHistory !== currentPitcherGamesHistory && 
         selectedPlayers.pitchers.length > 0 && 
         !isRefreshingRef.current.pitcher) {
       console.log(`[usePlayerData] Pitcher games history changed from ${currentPitcherGamesHistory} to ${pitcherGamesHistory}`);
-      updateAllPlayersGameHistory('pitcher', pitcherGamesHistory);
+      requestHistoryRefresh('pitcher', pitcherGamesHistory);
     }
-  }, [pitcherGamesHistory, currentPitcherGamesHistory, selectedPlayers.pitchers.length, updateAllPlayersGameHistory]);
+  }, [pitcherGamesHistory, currentPitcherGamesHistory, selectedPlayers.pitchers.length, requestHistoryRefresh]);
 
   // Handle explicit refresh triggered via refreshTrigger
   useEffect(() => {
-    const refreshPlayerHistory = async () => {
-      const { type, gamesCount, timestamp } = refreshTrigger;
-      
-      if (!type || !gamesCount || !timestamp) return;
-      
-      // Skip if already refreshing this player type
-      if (isRefreshingRef.current[type]) {
-        console.log(`[usePlayerData] Already refreshing ${type}s, skipping triggered update`);
-        return;
-      }
-      
-      console.log(`[usePlayerData] Processing refresh trigger for ${type}s with ${gamesCount} games (timestamp: ${timestamp})`);
-      
-      // Call updateAllPlayersGameHistory with the trigger parameters
-      await updateAllPlayersGameHistory(type, gamesCount);
-    };
+    const { type, gamesCount, timestamp } = refreshTrigger;
     
-    refreshPlayerHistory();
+    if (!type || !gamesCount || !timestamp) return;
+    
+    // Skip if already refreshing this player type
+    if (isRefreshingRef.current[type]) {
+      console.log(`[usePlayerData] Already refreshing ${type}s, skipping triggered update`);
+      return;
+    }
+    
+    console.log(`[usePlayerData] Processing refresh trigger for ${type}s with ${gamesCount} games (timestamp: ${timestamp})`);
+    
+    // Call updateAllPlayersGameHistory with the trigger parameters
+    updateAllPlayersGameHistory(type, gamesCount);
   }, [refreshTrigger, updateAllPlayersGameHistory]);
 
   // Format date for display
@@ -420,13 +500,20 @@ const usePlayerData = (
           extendedPitcherData, 
           pitcherName, 
           pitcherTeam,
-          pitcherGamesHistory
+          MAX_GAMES_HISTORY // Always fetch all available games
         );
         
         console.log(`Found ${gameHistory.length} games for pitcher`);
         
-        // Add game history to pitcher object
-        for (let i = 0; i < gameHistory.length; i++) {
+        // Cache the complete game history
+        playerDataCacheRef.current.pitchers[pitcherId] = {
+          maxGamesHistory: MAX_GAMES_HISTORY,
+          games: gameHistory
+        };
+        
+        // Add only the requested number of games to display
+        const gamesCountToAdd = pitcherGamesHistory;
+        for (let i = 0; i < gamesCountToAdd && i < gameHistory.length; i++) {
           const gameNum = i + 1;
           const gameData = gameHistory[i]?.data || {};
           const gameDate = gameHistory[i]?.date || '';
@@ -499,44 +586,50 @@ const usePlayerData = (
         
         console.log(`[usePlayerData] Roster contains ${hitters.length} hitters and ${pitchers.length} pitchers`);
         
-        // 3. Fetch player data for the past 14 days (base window for both player types)
-        console.log("[usePlayerData] Fetching player data for date range");
-        const dateRangeData = await fetchPlayerDataForDateRange(currentDate, 14);
+        // 3. Fetch player data for the past 30 days (expanded to ensure we have enough history)
+        console.log("[usePlayerData] Fetching player data for date range (30 days)");
+        const dateRangeData = await fetchPlayerDataForDateRange(currentDate, 30);
         const datesWithData = Object.keys(dateRangeData);
         console.log(`[usePlayerData] Found data for ${datesWithData.length} days`);
         
         // 4. Keep track of player game history
         const newPlayerStatsHistory = {};
         
-        // 5. Create hitter objects with game history (using hitterGamesHistory)
+        // 5. Create hitter objects with MAX_GAMES_HISTORY
         const hittersPromises = hitters.map(async player => {
-          // Get the game history with hitter-specific history count
+          // Get the maximum game history
           const gameHistory = findMultiGamePlayerStats(
             dateRangeData, 
             player.name, 
             player.team,
-            hitterGamesHistory // Use hitter-specific games history
+            MAX_GAMES_HISTORY // Always fetch the maximum
           );
           
           // Store the player's game history
           newPlayerStatsHistory[`${player.name}-${player.team}`] = gameHistory;
           
-          // Use the imported function with hitter-specific history
+          // Cache the complete history
+          playerDataCacheRef.current.hitters[`${player.name}-${player.team}`] = {
+            maxGamesHistory: MAX_GAMES_HISTORY,
+            games: gameHistory
+          };
+          
+          // Use the imported function but always store maximum data
           return await createPlayerWithGameHistory(
             player, 
             dateRangeData, 
             [], 
             false, 
-            hitterGamesHistory // Pass hitter games history
+            hitterGamesHistory // Only display the requested number
           );
         });
         
         const hittersData = await Promise.all(hittersPromises);
         
-        // 6. Create pitcher objects with extended game history search (up to 30 days back)
-        console.log("[usePlayerData] Fetching extended pitcher data (up to 30 days back)");
+        // 6. Create pitcher objects with extended game history search (up to 45 days back)
+        console.log("[usePlayerData] Fetching extended pitcher data (up to 45 days back)");
         
-        // Create a separate extended data window for pitchers (last 30 days)
+        // Create a separate extended data window for pitchers (last 45 days) - pitchers typically have fewer appearances
         const pitcherDateRangeData = { ...dateRangeData };
         
         // Only fetch extended data if we have games in initial window
@@ -544,13 +637,13 @@ const usePlayerData = (
           // Get earliest date in current window
           const earliestDate = new Date(datesWithData.sort()[0]);
           
-          // Create start date for extended window (30 more days back)
+          // Create start date for extended window (45 more days back)
           const extendedStartDate = new Date(earliestDate);
-          extendedStartDate.setDate(extendedStartDate.getDate() - 30);
+          extendedStartDate.setDate(extendedStartDate.getDate() - 45);
           
           // Fetch extended data
           console.log(`[usePlayerData] Fetching additional pitcher data from ${extendedStartDate.toISOString()}`);
-          const extendedData = await fetchPlayerDataForDateRange(extendedStartDate, 30);
+          const extendedData = await fetchPlayerDataForDateRange(extendedStartDate, 45);
           
           // Merge with existing data (without overwriting)
           Object.keys(extendedData).forEach(date => {
@@ -566,24 +659,30 @@ const usePlayerData = (
         }
         
         const pitchersPromises = pitchers.map(async player => {
-          // Get the game history with extended window and pitcher-specific history count
+          // Get the game history with extended window and MAX_GAMES_HISTORY
           const gameHistory = findMultiGamePlayerStats(
             pitcherDateRangeData, 
             player.name, 
             player.team,
-            pitcherGamesHistory // Use pitcher-specific games history
+            MAX_GAMES_HISTORY // Always fetch the maximum
           );
           
           // Store the player's game history
           newPlayerStatsHistory[`${player.name}-${player.team}`] = gameHistory;
           
-          // Use the imported function with pitcher-specific history
+          // Cache the complete history
+          playerDataCacheRef.current.pitchers[`${player.name}-${player.team}`] = {
+            maxGamesHistory: MAX_GAMES_HISTORY,
+            games: gameHistory
+          };
+          
+          // Use the imported function but with capped display
           return await createPlayerWithGameHistory(
             player, 
             pitcherDateRangeData, 
             [], 
             true,
-            pitcherGamesHistory // Pass pitcher games history
+            pitcherGamesHistory // Only display the requested number
           );
         });
         
