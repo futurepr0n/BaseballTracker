@@ -4,7 +4,7 @@ import PitcherPerformanceLineChart from '../PitcherPerformanceLineChart';
 
 /**
  * Component for a pitcher row in the table
- * Enhanced with visual performance line chart
+ * Enhanced with visual performance line chart and additional statistics
  * 
  * @param {Object} player - Pitcher player object
  * @param {Object} teams - Teams data for styling
@@ -37,6 +37,12 @@ const PitcherRow = ({
       <td>{player.prevGameIP}</td>
       <td>{player.prevGameK}</td>
       <td>{player.prevGameER}</td>
+      <td>{player.prevGameH || player.H || '0'}</td>
+      <td>{player.prevGameR || player.R || '0'}</td>
+      <td>{player.prevGameBB || player.BB || '0'}</td>
+      <td>{player.prevGameHR || player.HR || '0'}</td>
+      <td>{player.prevGamePC_ST || player.PC_ST || 'N/A'}</td>
+      <td>{player.ERA || '0.00'}</td>
       
       {/* Performance Line Chart - Replaces 12 individual cells */}
       <td className="performance-chart-cell">

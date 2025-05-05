@@ -88,11 +88,16 @@ const fetchPitcherById = async (pitcherId) => {
       type: 'pitcher',
       playerType: 'pitcher',
       throwingArm: existingPitcher.throwingArm || '',
+      // Get all stats with appropriate fallbacks
       PC_ST: existingPitcher.PC_ST || existingPitcher.prevGamePC_ST || 'N/A',
       K: existingPitcher.K || existingPitcher.prevGameK || 'N/A',
-      HR: existingPitcher.HR || 'N/A',
+      HR: existingPitcher.HR || existingPitcher.prevGameHR || 'N/A',
       IP: existingPitcher.IP || existingPitcher.prevGameIP || '0',
       ER: existingPitcher.ER || existingPitcher.prevGameER || 'N/A',
+      H: existingPitcher.H || existingPitcher.prevGameH || '0',
+      R: existingPitcher.R || existingPitcher.prevGameR || '0',
+      BB: existingPitcher.BB || existingPitcher.prevGameBB || '0',
+      ERA: existingPitcher.ERA || '0.00',
       // Include history data
       ...Object.entries(existingPitcher)
         .filter(([key]) => key.startsWith('game'))
@@ -111,11 +116,16 @@ const fetchPitcherById = async (pitcherId) => {
       type: 'pitcher',
       playerType: 'pitcher',
       throwingArm: availablePitcher.throwingArm || '',
+      // Get all stats with appropriate fallbacks
       PC_ST: availablePitcher.PC_ST || availablePitcher.prevGamePC_ST || 'N/A',
       K: availablePitcher.K || availablePitcher.prevGameK || 'N/A',
-      HR: availablePitcher.HR || 'N/A',
+      HR: availablePitcher.HR || availablePitcher.prevGameHR || 'N/A',
       IP: availablePitcher.IP || availablePitcher.prevGameIP || '0',
       ER: availablePitcher.ER || availablePitcher.prevGameER || 'N/A',
+      H: availablePitcher.H || availablePitcher.prevGameH || '0',
+      R: availablePitcher.R || availablePitcher.prevGameR || '0',
+      BB: availablePitcher.BB || availablePitcher.prevGameBB || '0',
+      ERA: availablePitcher.ERA || '0.00',
       // Include history data
       ...Object.entries(availablePitcher)
         .filter(([key]) => key.startsWith('game'))
@@ -123,7 +133,7 @@ const fetchPitcherById = async (pitcherId) => {
     };
   }
   
-  // Create a basic pitcher object with defaults
+  // Create a basic pitcher object with defaults for all fields
   let basicPitcher = {
     id: pitcherId,
     name: pitcherName,
@@ -131,17 +141,21 @@ const fetchPitcherById = async (pitcherId) => {
     type: 'pitcher',
     playerType: 'pitcher',
     throwingArm: '',
-    // Initialize with defaults
+    // Initialize with defaults for all stats
     PC_ST: 'N/A',
     K: 'N/A',
-    HR: 'N/A',
-    IP: '0'
+    HR: '0',
+    IP: '0',
+    ER: '0',
+    H: '0',
+    R: '0',
+    BB: '0',
+    ERA: '0.00'
   };
   
   try {
-    // First, look for pitcher in current playerData
+    // Look for pitcher in current playerData
     console.log("Looking for pitcher in current player data...");
-    console.log(`Current player data has ${playerData?.length || 0} players`);
     
     // Try a simple name match first
     const matchingPitchers = playerData.filter(p => 
@@ -153,66 +167,30 @@ const fetchPitcherById = async (pitcherId) => {
       const matchingPitcher = matchingPitchers[0];
       console.log(`Found pitcher in current data: ${pitcherName}`, matchingPitcher);
       
-      // Copy stats to our pitcher object with proper string handling
+      // Copy all stats to our pitcher object with proper string handling
       basicPitcher.throwingArm = matchingPitcher.throwingArm || '';
       basicPitcher.PC_ST = matchingPitcher.PC_ST || matchingPitcher.prevGamePC_ST || 'N/A';
       basicPitcher.K = matchingPitcher.K || matchingPitcher.prevGameK || 'N/A';
-      basicPitcher.HR = matchingPitcher.HR || 'N/A';
+      basicPitcher.HR = matchingPitcher.HR || matchingPitcher.prevGameHR || '0';
       basicPitcher.IP = matchingPitcher.IP || matchingPitcher.prevGameIP || '0';
-      basicPitcher.ER = matchingPitcher.ER || matchingPitcher.prevGameER || 'N/A';
+      basicPitcher.ER = matchingPitcher.ER || matchingPitcher.prevGameER || '0';
+      basicPitcher.H = matchingPitcher.H || matchingPitcher.prevGameH || '0';
+      basicPitcher.R = matchingPitcher.R || matchingPitcher.prevGameR || '0';
+      basicPitcher.BB = matchingPitcher.BB || matchingPitcher.prevGameBB || '0';
+      basicPitcher.ERA = matchingPitcher.ERA || '0.00';
+      
+      // Set up the "prevGame*" fields for display in the table
       basicPitcher.prevGameIP = matchingPitcher.IP || '0';
       basicPitcher.prevGameK = matchingPitcher.K || '0';
       basicPitcher.prevGameER = matchingPitcher.ER || '0';
+      basicPitcher.prevGameH = matchingPitcher.H || '0';
+      basicPitcher.prevGameR = matchingPitcher.R || '0';
+      basicPitcher.prevGameBB = matchingPitcher.BB || '0';
+      basicPitcher.prevGameHR = matchingPitcher.HR || '0';
       basicPitcher.prevGamePC_ST = matchingPitcher.PC_ST || 'N/A';
-      
-      console.log('Retrieved PC_ST:', basicPitcher.PC_ST);
-    }
-    // If not found in current data, search in extended data
-    else if (extendedPitcherData && Object.keys(extendedPitcherData).length > 0) {
-      console.log("Searching for pitcher in extended data...");
-      
-      // Sort dates newest to oldest
-      const sortedDates = Object.keys(extendedPitcherData).sort().reverse();
-      
-      // Search through dates
-      let found = false;
-      for (const dateStr of sortedDates) {
-        const dateData = extendedPitcherData[dateStr];
-        console.log(`Checking date ${dateStr} with ${dateData.length} players`);
-        
-        // Find pitcher in this date
-        const pitcherInDate = dateData.find(p => 
-          p.name === pitcherName && 
-          p.team === pitcherTeam
-        );
-        
-        if (pitcherInDate) {
-          console.log(`Found pitcher in date ${dateStr}`);
-          
-          // Copy stats
-          basicPitcher.throwingArm = pitcherInDate.throwingArm || '';
-          basicPitcher.PC_ST = pitcherInDate.PC_ST || pitcherInDate.prevGamePC_ST || 'N/A';
-          basicPitcher.K = pitcherInDate.K || pitcherInDate.prevGameK || 'N/A';
-          basicPitcher.HR = pitcherInDate.HR || 'N/A';
-          basicPitcher.IP = pitcherInDate.IP || pitcherInDate.prevGameIP || '0';
-          basicPitcher.ER = pitcherInDate.ER || pitcherInDate.prevGameER || 'N/A';
-          basicPitcher.prevGameIP = pitcherInDate.IP || '0';
-          basicPitcher.prevGameK = pitcherInDate.K || '0';
-          basicPitcher.prevGameER = pitcherInDate.ER || '0';
-          basicPitcher.prevGamePC_ST = pitcherInDate.PC_ST || 'N/A';
-          
-          console.log('Retrieved PC_ST from history:', basicPitcher.PC_ST);
-          found = true;
-          break;
-        }
-      }
-      
-      if (!found) {
-        console.log(`No matching data found for pitcher: ${pitcherName}`);
-      }
     }
     
-    // Regardless of whether we found stats, add game history
+    // If not found or found, add game history regardless
     if (extendedPitcherData && Object.keys(extendedPitcherData).length > 0) {
       console.log(`Getting game history for pitcher: ${pitcherName}`);
       const gameHistory = findMultiGamePlayerStats(
@@ -235,10 +213,14 @@ const fetchPitcherById = async (pitcherId) => {
         basicPitcher[`game${gameNum}K`] = gameData.K || '0';
         basicPitcher[`game${gameNum}ER`] = gameData.ER || '0';
         basicPitcher[`game${gameNum}PC_ST`] = gameData.PC_ST || '0-0';
+        // Add the additional stats to game history
+        basicPitcher[`game${gameNum}H`] = gameData.H || '0';
+        basicPitcher[`game${gameNum}R`] = gameData.R || '0';
+        basicPitcher[`game${gameNum}BB`] = gameData.BB || '0';
+        basicPitcher[`game${gameNum}HR`] = gameData.HR || '0';
       }
     }
     
-    console.log(`Finished creating pitcher object: ${pitcherName}`, basicPitcher);
     return basicPitcher;
   } catch (error) {
     console.error(`Error creating pitcher data: ${error.message}`);

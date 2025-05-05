@@ -101,10 +101,16 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
       playerType: 'pitcher',
       // Additional pitcher attributes
       throwingArm: player.throwingArm || '',
-      // Most recent game stats
+      // Most recent game stats with all new fields
       prevGameIP: mostRecentStats?.IP || '0',
       prevGameK: mostRecentStats?.K || '0',
       prevGameER: mostRecentStats?.ER || '0',
+      prevGameH: mostRecentStats?.H || '0',
+      prevGameR: mostRecentStats?.R || '0',
+      prevGameBB: mostRecentStats?.BB || '0',
+      prevGameHR: mostRecentStats?.HR || '0',
+      prevGamePC_ST: mostRecentStats?.PC_ST || 'N/A',
+      ERA: mostRecentStats?.ERA || '0.00',
       // Fields for user input
       opponent: '',
       expectedPitch: '',
@@ -130,6 +136,12 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
       playerObj[`game${gameNum}IP`] = gameData.IP || '0';
       playerObj[`game${gameNum}K`] = gameData.K || '0';
       playerObj[`game${gameNum}ER`] = gameData.ER || '0';
+      // Add the additional stats to game history
+      playerObj[`game${gameNum}H`] = gameData.H || '0';
+      playerObj[`game${gameNum}R`] = gameData.R || '0';
+      playerObj[`game${gameNum}BB`] = gameData.BB || '0';
+      playerObj[`game${gameNum}HR`] = gameData.HR || '0';
+      playerObj[`game${gameNum}PC_ST`] = gameData.PC_ST || 'N/A';
     }
     
     return playerObj;
