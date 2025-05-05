@@ -58,10 +58,18 @@ const usePlayerData = (
   // Add this function to the hook
   const requestHistoryRefresh = (playerType, gamesCount) => {
     console.log(`[usePlayerData] Refreshing ${playerType} history with ${gamesCount} games`);
+    
+    if (playerType === 'hitter') {
+      setIsRefreshingHitters(true);
+    } else if (playerType === 'pitcher') {
+      setIsRefreshingPitchers(true);
+    }
+    
+    // Set refresh trigger with timestamp to ensure state change
     setRefreshTrigger({
       type: playerType,
       gamesCount,
-      timestamp: Date.now() // Add timestamp to ensure state change
+      timestamp: Date.now()
     });
   };
 
@@ -75,117 +83,162 @@ const usePlayerData = (
       
       console.log(`[usePlayerData] Processing refresh for ${playerType}s with ${gamesCount} games`);
       
-      if (playerType === 'hitter' && isRefreshingHitters) {
-        // Get current date range data or fetch it if needed
-        let currentDateRangeData = playerStatsHistory;
-        if (Object.keys(currentDateRangeData).length === 0) {
-          currentDateRangeData = await fetchPlayerDataForDateRange(currentDate, 30, 180);
-        }
+      if (playerType === 'hitter') {
+        // Don't proceed if we're not refreshing hitters or we have no hitters to refresh
+        if (!isRefreshingHitters || selectedPlayers.hitters.length === 0) return;
         
-        // Refresh history for all hitters currently in the table
-        const updatedHitters = await Promise.all(
-          selectedPlayers.hitters.map(async (hitter) => {
-            try {
-              // Find player's game history data
-              const games = findMultiGamePlayerStats(
-                currentDateRangeData,
-                hitter.name,
-                hitter.team,
-                gamesCount
-              );
-              
-              // Create a fresh copy of the player object
-              const updatedHitter = { ...hitter };
-              
-              // Get the game dates for display
-              const gameDates = games.map(game => game.date || '');
-              
-              // Update game history data based on new games count
-              for (let i = 0; i < gamesCount; i++) {
-                const gameNum = i + 1;
-                const gameData = i < games.length ? games[i]?.data || {} : {};
+        try {
+          console.log(`[usePlayerData] Refreshing ${selectedPlayers.hitters.length} hitters with ${gamesCount} games history`);
+          
+          // Get current date range data or fetch it if needed
+          let currentDateRangeData = playerStatsHistory;
+          if (Object.keys(currentDateRangeData).length === 0) {
+            console.log('[usePlayerData] Fetching date range data for hitters refresh');
+            currentDateRangeData = await fetchPlayerDataForDateRange(currentDate, 30, 180);
+            setPlayerStatsHistory(currentDateRangeData);
+          }
+          
+          // Create updated copies of players with new game history
+          const updatedHitters = await Promise.all(
+            selectedPlayers.hitters.map(async (hitter) => {
+              try {
+                // Find player's game history data with the new games count
+                const games = findMultiGamePlayerStats(
+                  currentDateRangeData,
+                  hitter.name,
+                  hitter.team,
+                  gamesCount // Use the new games count
+                );
                 
-                updatedHitter[`game${gameNum}Date`] = i < games.length ? gameDates[i] || '' : '';
-                updatedHitter[`game${gameNum}HR`] = gameData.HR || '0';
-                updatedHitter[`game${gameNum}AB`] = gameData.AB || '0';
-                updatedHitter[`game${gameNum}H`] = gameData.H || '0';
+                // Get the game dates for display
+                const gameDates = games.map(game => game.date || '');
+                
+                // Create a fresh copy of the player
+                const updatedHitter = { ...hitter };
+                
+                // Clear existing game data fields (important!)
+                for (let i = 1; i <= Math.max(7, gamesCount); i++) {
+                  delete updatedHitter[`game${i}Date`];
+                  delete updatedHitter[`game${i}HR`];
+                  delete updatedHitter[`game${i}AB`];
+                  delete updatedHitter[`game${i}H`];
+                }
+                
+                // Update game history data based on new games count
+                for (let i = 0; i < gamesCount; i++) {
+                  const gameNum = i + 1;
+                  const gameData = i < games.length ? games[i]?.data || {} : {};
+                  
+                  updatedHitter[`game${gameNum}Date`] = i < games.length ? gameDates[i] || '' : '';
+                  updatedHitter[`game${gameNum}HR`] = gameData.HR || '0';
+                  updatedHitter[`game${gameNum}AB`] = gameData.AB || '0';
+                  updatedHitter[`game${gameNum}H`] = gameData.H || '0';
+                }
+                
+                return updatedHitter;
+              } catch (error) {
+                console.error(`[usePlayerData] Error refreshing hitter ${hitter.name}:`, error);
+                return hitter; // Return original on error
               }
-              
-              return updatedHitter;
-            } catch (error) {
-              console.error(`[usePlayerData] Error refreshing hitter ${hitter.name}:`, error);
-              return hitter; // Return original on error
-            }
-          })
-        );
-        
-        // Update state with refreshed players
-        setSelectedPlayers(prev => ({
-          ...prev,
-          hitters: updatedHitters
-        }));
-        
-        setIsRefreshingHitters(false);
-        console.log(`[usePlayerData] Refreshed ${updatedHitters.length} hitters`);
+            })
+          );
+          
+          // Update state with refreshed players
+          setSelectedPlayers(prev => ({
+            ...prev,
+            hitters: updatedHitters
+          }));
+          
+          console.log(`[usePlayerData] Successfully refreshed ${updatedHitters.length} hitters with ${gamesCount} games history`);
+        } catch (error) {
+          console.error('[usePlayerData] Error refreshing hitters:', error);
+        } finally {
+          setIsRefreshingHitters(false);
+        }
       }
       
-      if (playerType === 'pitcher' && isRefreshingPitchers) {
-        // Get current date range data or fetch it if needed
-        let currentDateRangeData = extendedPitcherData;
-        if (Object.keys(currentDateRangeData).length === 0) {
-          currentDateRangeData = await fetchPlayerDataForDateRange(currentDate, 30, 180);
-        }
+      if (playerType === 'pitcher') {
+        // Don't proceed if we're not refreshing pitchers or we have no pitchers to refresh
+        if (!isRefreshingPitchers || selectedPlayers.pitchers.length === 0) return;
         
-        // Refresh history for all pitchers currently in the table
-        const updatedPitchers = await Promise.all(
-          selectedPlayers.pitchers.map(async (pitcher) => {
-            try {
-              // Find player's game history data
-              const games = findMultiGamePlayerStats(
-                currentDateRangeData,
-                pitcher.name,
-                pitcher.team,
-                gamesCount
-              );
-              
-              // Create a fresh copy of the player object
-              const updatedPitcher = { ...pitcher };
-              
-              // Get the game dates for display
-              const gameDates = games.map(game => game.date || '');
-              
-              // Update game history data based on new games count
-              for (let i = 0; i < gamesCount; i++) {
-                const gameNum = i + 1;
-                const gameData = i < games.length ? games[i]?.data || {} : {};
+        try {
+          console.log(`[usePlayerData] Refreshing ${selectedPlayers.pitchers.length} pitchers with ${gamesCount} games history`);
+          
+          // Get current date range data or fetch it if needed
+          let currentDateRangeData = extendedPitcherData;
+          if (Object.keys(currentDateRangeData).length === 0) {
+            console.log('[usePlayerData] Fetching date range data for pitchers refresh');
+            currentDateRangeData = await fetchPlayerDataForDateRange(currentDate, 30, 180);
+            setExtendedPitcherData(currentDateRangeData);
+          }
+          
+          // Create updated copies of players with new game history
+          const updatedPitchers = await Promise.all(
+            selectedPlayers.pitchers.map(async (pitcher) => {
+              try {
+                // Find player's game history data with the new games count
+                const games = findMultiGamePlayerStats(
+                  currentDateRangeData,
+                  pitcher.name,
+                  pitcher.team,
+                  gamesCount // Use the new games count
+                );
                 
-                updatedPitcher[`game${gameNum}Date`] = i < games.length ? gameDates[i] || '' : '';
-                updatedPitcher[`game${gameNum}IP`] = gameData.IP || '0';
-                updatedPitcher[`game${gameNum}K`] = gameData.K || '0';
-                updatedPitcher[`game${gameNum}ER`] = gameData.ER || '0';
-                updatedPitcher[`game${gameNum}H`] = gameData.H || '0';
-                updatedPitcher[`game${gameNum}R`] = gameData.R || '0';
-                updatedPitcher[`game${gameNum}BB`] = gameData.BB || '0';
-                updatedPitcher[`game${gameNum}HR`] = gameData.HR || '0';
-                updatedPitcher[`game${gameNum}PC_ST`] = gameData.PC_ST || 'N/A';
+                // Get the game dates for display
+                const gameDates = games.map(game => game.date || '');
+                
+                // Create a fresh copy of the player
+                const updatedPitcher = { ...pitcher };
+                
+                // Clear existing game data fields (important!)
+                for (let i = 1; i <= Math.max(7, gamesCount); i++) {
+                  delete updatedPitcher[`game${i}Date`];
+                  delete updatedPitcher[`game${i}IP`];
+                  delete updatedPitcher[`game${i}K`];
+                  delete updatedPitcher[`game${i}ER`];
+                  delete updatedPitcher[`game${i}H`];
+                  delete updatedPitcher[`game${i}R`];
+                  delete updatedPitcher[`game${i}BB`];
+                  delete updatedPitcher[`game${i}HR`];
+                  delete updatedPitcher[`game${i}PC_ST`];
+                }
+                
+                // Update game history data based on new games count
+                for (let i = 0; i < gamesCount; i++) {
+                  const gameNum = i + 1;
+                  const gameData = i < games.length ? games[i]?.data || {} : {};
+                  
+                  updatedPitcher[`game${gameNum}Date`] = i < games.length ? gameDates[i] || '' : '';
+                  updatedPitcher[`game${gameNum}IP`] = gameData.IP || '0';
+                  updatedPitcher[`game${gameNum}K`] = gameData.K || '0';
+                  updatedPitcher[`game${gameNum}ER`] = gameData.ER || '0';
+                  updatedPitcher[`game${gameNum}H`] = gameData.H || '0';
+                  updatedPitcher[`game${gameNum}R`] = gameData.R || '0';
+                  updatedPitcher[`game${gameNum}BB`] = gameData.BB || '0';
+                  updatedPitcher[`game${gameNum}HR`] = gameData.HR || '0';
+                  updatedPitcher[`game${gameNum}PC_ST`] = gameData.PC_ST || 'N/A';
+                }
+                
+                return updatedPitcher;
+              } catch (error) {
+                console.error(`[usePlayerData] Error refreshing pitcher ${pitcher.name}:`, error);
+                return pitcher; // Return original on error
               }
-              
-              return updatedPitcher;
-            } catch (error) {
-              console.error(`[usePlayerData] Error refreshing pitcher ${pitcher.name}:`, error);
-              return pitcher; // Return original on error
-            }
-          })
-        );
-        
-        // Update state with refreshed players
-        setSelectedPlayers(prev => ({
-          ...prev,
-          pitchers: updatedPitchers
-        }));
-        
-        setIsRefreshingPitchers(false);
-        console.log(`[usePlayerData] Refreshed ${updatedPitchers.length} pitchers`);
+            })
+          );
+          
+          // Update state with refreshed players
+          setSelectedPlayers(prev => ({
+            ...prev,
+            pitchers: updatedPitchers
+          }));
+          
+          console.log(`[usePlayerData] Successfully refreshed ${updatedPitchers.length} pitchers with ${gamesCount} games history`);
+        } catch (error) {
+          console.error('[usePlayerData] Error refreshing pitchers:', error);
+        } finally {
+          setIsRefreshingPitchers(false);
+        }
       }
     };
     
@@ -198,7 +251,14 @@ const usePlayerData = (
     selectedPlayers.pitchers,
     playerStatsHistory,
     extendedPitcherData,
-    currentDate
+    currentDate,
+    setSelectedPlayers,
+    setIsRefreshingHitters,
+    setIsRefreshingPitchers,
+    setPlayerStatsHistory,
+    setExtendedPitcherData,
+    findMultiGamePlayerStats,
+    fetchPlayerDataForDateRange
   ]);
 
   // Format date for display

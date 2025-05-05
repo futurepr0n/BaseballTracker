@@ -139,125 +139,28 @@ function CapSheet({ playerData, gameData, currentDate }) {
   }, [playerDataSource]);
 
   // Function to refresh hitters with new game history
-  const refreshHittersData = useCallback(async () => {
+  const refreshHittersData = useCallback(() => {
     if (!isRefreshingHitters || selectedPlayers.hitters.length === 0) return;
     
-    try {
-      console.log("[CapSheet] Refreshing hitter data with history setting:", hitterGamesHistory);
-      
-      // Create a deep copy of the current hitters to update
-      const updatedHitters = JSON.parse(JSON.stringify(selectedPlayers.hitters));
-      
-      // Process each hitter to refresh their game history
-      for (let i = 0; i < updatedHitters.length; i++) {
-        const hitter = updatedHitters[i];
-        try {
-          // Fetch updated data for this hitter using the current history setting
-          const updatedHitterData = await requestHistoryRefresh('hitter', hitter.id, hitterGamesHistory);
-          
-          if (updatedHitterData) {
-            // Update game history fields based on the new data
-            for (let gameNum = 1; gameNum <= hitterGamesHistory; gameNum++) {
-              const dateKey = `game${gameNum}Date`;
-              const hrKey = `game${gameNum}HR`;
-              const abKey = `game${gameNum}AB`;
-              const hKey = `game${gameNum}H`;
-              
-              // Update each game history field if data is available
-              if (updatedHitterData[dateKey] !== undefined) {
-                updatedHitters[i][dateKey] = updatedHitterData[dateKey];
-                updatedHitters[i][hrKey] = updatedHitterData[hrKey] || '0';
-                updatedHitters[i][abKey] = updatedHitterData[abKey] || '0';
-                updatedHitters[i][hKey] = updatedHitterData[hKey] || '0';
-              }
-            }
-          }
-        } catch (error) {
-          console.error(`[CapSheet] Error refreshing hitter ${hitter.name}:`, error);
-        }
-      }
-      
-      // Update the state with the refreshed hitters
-      setSelectedPlayers(prev => ({
-        ...prev,
-        hitters: updatedHitters
-      }));
-      
-      // Force a re-render of the hitters table
-      setHitterRefreshKey(Date.now());
-      
-    } catch (error) {
-      console.error("[CapSheet] Error in refreshHittersData:", error);
-    } finally {
-      // End the refreshing state
-      setIsRefreshingHitters(false);
-    }
+    console.log("[CapSheet] Initiating hitter data refresh with history setting:", hitterGamesHistory);
+    
+    // This now just triggers the refresh via the requestHistoryRefresh function
+    requestHistoryRefresh('hitter', hitterGamesHistory);
+    
+    // The actual refresh will be handled by the useEffect in usePlayerData.js
   }, [isRefreshingHitters, selectedPlayers.hitters, hitterGamesHistory, requestHistoryRefresh]);
+  
 
   // Function to refresh pitchers with new game history
-  const refreshPitchersData = useCallback(async () => {
+  const refreshPitchersData = useCallback(() => {
     if (!isRefreshingPitchers || selectedPlayers.pitchers.length === 0) return;
     
-    try {
-      console.log("[CapSheet] Refreshing pitcher data with history setting:", pitcherGamesHistory);
-      
-      // Create a deep copy of the current pitchers to update
-      const updatedPitchers = JSON.parse(JSON.stringify(selectedPlayers.pitchers));
-      
-      // Process each pitcher to refresh their game history
-      for (let i = 0; i < updatedPitchers.length; i++) {
-        const pitcher = updatedPitchers[i];
-        try {
-          // Fetch updated data for this pitcher using the current history setting
-          const updatedPitcherData = await requestHistoryRefresh('pitcher', pitcher.id, pitcherGamesHistory);
-          
-          if (updatedPitcherData) {
-            // Update game history fields based on the new data
-            for (let gameNum = 1; gameNum <= pitcherGamesHistory; gameNum++) {
-              const dateKey = `game${gameNum}Date`;
-              const ipKey = `game${gameNum}IP`;
-              const kKey = `game${gameNum}K`;
-              const erKey = `game${gameNum}ER`;
-              const pcStKey = `game${gameNum}PC_ST`;
-              const hKey = `game${gameNum}H`;
-              const rKey = `game${gameNum}R`;
-              const bbKey = `game${gameNum}BB`;
-              const hrKey = `game${gameNum}HR`;
-              
-              // Update each game history field if data is available
-              if (updatedPitcherData[dateKey] !== undefined) {
-                updatedPitchers[i][dateKey] = updatedPitcherData[dateKey];
-                updatedPitchers[i][ipKey] = updatedPitcherData[ipKey] || '0';
-                updatedPitchers[i][kKey] = updatedPitcherData[kKey] || '0';
-                updatedPitchers[i][erKey] = updatedPitcherData[erKey] || '0';
-                updatedPitchers[i][pcStKey] = updatedPitcherData[pcStKey] || 'N/A';
-                updatedPitchers[i][hKey] = updatedPitcherData[hKey] || '0';
-                updatedPitchers[i][rKey] = updatedPitcherData[rKey] || '0';
-                updatedPitchers[i][bbKey] = updatedPitcherData[bbKey] || '0';
-                updatedPitchers[i][hrKey] = updatedPitcherData[hrKey] || '0';
-              }
-            }
-          }
-        } catch (error) {
-          console.error(`[CapSheet] Error refreshing pitcher ${pitcher.name}:`, error);
-        }
-      }
-      
-      // Update the state with the refreshed pitchers
-      setSelectedPlayers(prev => ({
-        ...prev,
-        pitchers: updatedPitchers
-      }));
-      
-      // Force a re-render of the pitchers table
-      setPitcherRefreshKey(Date.now());
-      
-    } catch (error) {
-      console.error("[CapSheet] Error in refreshPitchersData:", error);
-    } finally {
-      // End the refreshing state
-      setIsRefreshingPitchers(false);
-    }
+    console.log("[CapSheet] Initiating pitcher data refresh with history setting:", pitcherGamesHistory);
+    
+    // This now just triggers the refresh via the requestHistoryRefresh function
+    requestHistoryRefresh('pitcher', pitcherGamesHistory);
+    
+    // The actual refresh will be handled by the useEffect in usePlayerData.js
   }, [isRefreshingPitchers, selectedPlayers.pitchers, pitcherGamesHistory, requestHistoryRefresh]);
 
   // Effect hooks to trigger the refresh functions when the refresh state changes
@@ -365,38 +268,43 @@ function CapSheet({ playerData, gameData, currentDate }) {
   };
 
   // Handle Hitter Games History change
-  const handleHitterGamesHistoryChange = (newValue) => {
-    if (newValue !== hitterGamesHistory) {
-      setHitterGamesHistory(newValue);
-      // This will trigger a reload of player data in the usePlayerData hook
-      setHasProcessedData(false);
-      
-      // Show the legend when changing the value
-      setShowHitterLegend(true);
-      
-      // Trigger refresh of existing hitters in the table
-      if (selectedPlayers.hitters.length > 0) {
-        setIsRefreshingHitters(true);
-      }
+// Handle Hitter Games History change
+const handleHitterGamesHistoryChange = (newValue) => {
+  if (newValue !== hitterGamesHistory) {
+    setHitterGamesHistory(newValue);
+    
+    // Show the legend when changing the value
+    setShowHitterLegend(true);
+    
+    // Properly request history refresh for hitters
+    if (selectedPlayers.hitters.length > 0) {
+      setIsRefreshingHitters(true);
+      // Directly call requestHistoryRefresh with the player type and new games count
+      requestHistoryRefresh('hitter', newValue);
+      // Force a re-render of the component
+      setHitterRefreshKey(Date.now());
     }
-  };
-  
-  // Handle Pitcher Games History change
-  const handlePitcherGamesHistoryChange = (newValue) => {
-    if (newValue !== pitcherGamesHistory) {
-      setPitcherGamesHistory(newValue);
-      // This will trigger a reload of player data in the usePlayerData hook
-      setHasProcessedData(false);
-      
-      // Show the legend when changing the value
-      setShowPitcherLegend(true);
-      
-      // Trigger refresh of existing pitchers in the table
-      if (selectedPlayers.pitchers.length > 0) {
-        setIsRefreshingPitchers(true);
-      }
+  }
+};
+
+// Handle Pitcher Games History change
+const handlePitcherGamesHistoryChange = (newValue) => {
+  if (newValue !== pitcherGamesHistory) {
+    setPitcherGamesHistory(newValue);
+    
+    // Show the legend when changing the value
+    setShowPitcherLegend(true);
+    
+    // Properly request history refresh for pitchers
+    if (selectedPlayers.pitchers.length > 0) {
+      setIsRefreshingPitchers(true);
+      // Directly call requestHistoryRefresh with the player type and new games count
+      requestHistoryRefresh('pitcher', newValue);
+      // Force a re-render of the component
+      setPitcherRefreshKey(Date.now());
     }
-  };
+  }
+};
 
   // Toggle hitter game history legend visibility
   const toggleHitterLegend = () => {
