@@ -299,7 +299,7 @@ const usePlayerData = (
       // Reset the refreshing flag
       isRefreshingRef.current[playerType] = false;
     }
-  }, [fetchPlayerGameHistory]);
+  }, [fetchPlayerGameHistory, hitterGamesHistory, pitcherGamesHistory]);
 
   // Function to request a history refresh (exposed to parent components)
   const requestHistoryRefresh = useCallback((playerType, historyCount) => {
@@ -819,10 +819,11 @@ const usePlayerData = (
       stadium,
       opponentTeam
     };
-
-    // Update with current games history
-    const playerWithHistory = await updatePlayerWithGameHistory(basePlayer, currentHitterGamesHistory);
-
+  
+    // IMPORTANT CHANGE: Use hitterGamesHistory directly instead of currentHitterGamesHistory
+    // This ensures new players get the current UI setting rather than the internal tracking value
+    const playerWithHistory = await updatePlayerWithGameHistory(basePlayer, hitterGamesHistory);
+  
     setSelectedPlayers(prev => ({
       ...prev,
       hitters: [...prev.hitters, playerWithHistory]
@@ -857,7 +858,7 @@ const usePlayerData = (
     };
 
     // Update with current games history
-    const playerWithHistory = await updatePlayerWithGameHistory(basePlayer, currentPitcherGamesHistory);
+    const playerWithHistory = await updatePlayerWithGameHistory(basePlayer, pitcherGamesHistory);
 
     setSelectedPlayers(prev => ({
       ...prev,
