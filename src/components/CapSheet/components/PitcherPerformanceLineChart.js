@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { formatGameDate } from '../utils/formatters';
-import './PitcherPerformanceLineChart.css'; // Ensure we're importing our styles
+import './PitcherPerformanceLineChart.css';
 
 /**
  * A line graph visualization of a pitcher's performance over their recent games
  * Shows strikeout trend and earned runs with color-coded markers
- * Supports dynamic number of game history entries
+ * Enhanced with more robust data validation and fallbacks
  * 
  * @param {Object} player - The pitcher player object with game data
  * @param {number} width - Width of the chart (default: full width)
@@ -20,40 +20,62 @@ const PitcherPerformanceLineChart = ({ player, width = 260, height = 90 }) => {
     
     // Keep adding games as long as we find date properties in the player object
     while (player[`game${gameIndex}Date`] !== undefined) {
+      // Only add the game if it has a valid date
+      if (player[`game${gameIndex}Date`]) {
+        games.push({
+          date: player[`game${gameIndex}Date`],
+          ip: parseFloat(player[`game${gameIndex}IP`] || '0') || 0,
+          k: parseInt(player[`game${gameIndex}K`] || '0') || 0,
+          er: parseInt(player[`game${gameIndex}ER`] || '0') || 0,
+          kPerIP: parseFloat(player[`game${gameIndex}IP`] || '0') > 0 
+            ? parseInt(player[`game${gameIndex}K`] || '0') / parseFloat(player[`game${gameIndex}IP`] || '0') 
+            : 0
+        });
+      }
+      gameIndex++;
+    }
+    
+    // Add game 0 data (most recent game) if we have it but no game1 data
+    if (games.length === 0 && player.prevGameIP && parseFloat(player.prevGameIP) > 0) {
       games.push({
-        date: player[`game${gameIndex}Date`],
-        ip: parseFloat(player[`game${gameIndex}IP`]) || 0,
-        k: parseInt(player[`game${gameIndex}K`]) || 0,
-        er: parseInt(player[`game${gameIndex}ER`]) || 0,
-        kPerIP: parseFloat(player[`game${gameIndex}IP`]) > 0 
-          ? parseInt(player[`game${gameIndex}K`]) / parseFloat(player[`game${gameIndex}IP`]) 
+        date: 'Last Game',
+        ip: parseFloat(player.prevGameIP || '0') || 0,
+        k: parseInt(player.prevGameK || '0') || 0,
+        er: parseInt(player.prevGameER || '0') || 0,
+        kPerIP: parseFloat(player.prevGameIP || '0') > 0 
+          ? parseInt(player.prevGameK || '0') / parseFloat(player.prevGameIP || '0') 
           : 0
       });
-      gameIndex++;
     }
     
     return games.reverse(); // Display oldest to newest (left to right)
   };
   
-  // Get all available games
+  // Get all available games with better validation
   const games = getAvailableGames();
   
-  // Filter out games with no innings pitched
-  const validGames = games.filter(game => game.ip > 0);
+  // Filter out games with minimal innings pitched (might be relief appearances too short to be relevant)
+  // You could adjust this threshold based on your preference
+  const validGames = games.filter(game => game.ip >= 0.1);
   
-  // Check if we have enough data to show a trend
-  const hasEnoughData = validGames.length > 1;
+  // Enhanced data availability check - if we have at least 2 valid games, or at least 1 with good stats
+  const hasEnoughDataForTrend = validGames.length >= 2 || 
+                               (validGames.length === 1 && 
+                                validGames[0].ip >= 1.0 && 
+                                validGames[0].k >= 1);
   
   // Visual constants
   const padding = { top: 15, right: 20, bottom: 25, left: 40 };
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
   
-  // No data to display
-  if (!hasEnoughData) {
+  // No data to display with better message
+  if (!hasEnoughDataForTrend) {
     return (
       <div className="no-game-data">
-        Not enough game data for trend display
+        {validGames.length === 0 
+          ? "No game data available for performance trend" 
+          : "Not enough game data for complete trend display"}
       </div>
     );
   }
@@ -76,7 +98,11 @@ const PitcherPerformanceLineChart = ({ player, width = 260, height = 90 }) => {
   
   // Calculate positions for the chart
   const getX = (index, total) => {
-    // If only 2 games, space them out more
+    // If only 1 or 2 games, space them more reasonably
+    if (total <= 2) {
+      return padding.left + (index * (chartWidth / 2));
+    }
+    // Otherwise use regular spacing
     const divisor = Math.max(1, total - 1);
     return padding.left + (index * (chartWidth / divisor));
   };
@@ -146,7 +172,9 @@ const PitcherPerformanceLineChart = ({ player, width = 260, height = 90 }) => {
         {/* Data points */}
         {points.map((point, i) => {
           // Format date for display (MM/DD)
-          const formattedDate = formatGameDate(point.date);
+          const formattedDate = typeof point.date === 'string' && point.date === 'Last Game'
+            ? 'Last' 
+            : formatGameDate(point.date);
           
           // Determine circle color based on earned runs (darker red for more ER)
           const erColor = point.er === 0 ? '#22c55e' : // green for 0 ER
