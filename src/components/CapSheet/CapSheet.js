@@ -269,6 +269,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
 
   // Handle Hitter Games History change
 // Handle Hitter Games History change
+// Handle Hitter Games History change
 const handleHitterGamesHistoryChange = (newValue) => {
   if (newValue !== hitterGamesHistory) {
     setHitterGamesHistory(newValue);
@@ -276,13 +277,10 @@ const handleHitterGamesHistoryChange = (newValue) => {
     // Show the legend when changing the value
     setShowHitterLegend(true);
     
-    // Properly request history refresh for hitters
+    // Only trigger refresh if we have players in the table
     if (selectedPlayers.hitters.length > 0) {
       setIsRefreshingHitters(true);
-      // Directly call requestHistoryRefresh with the player type and new games count
-      requestHistoryRefresh('hitter', newValue);
-      // Force a re-render of the component
-      setHitterRefreshKey(Date.now());
+      setHitterRefreshKey(Date.now()); // Force re-render when data changes
     }
   }
 };
@@ -295,13 +293,10 @@ const handlePitcherGamesHistoryChange = (newValue) => {
     // Show the legend when changing the value
     setShowPitcherLegend(true);
     
-    // Properly request history refresh for pitchers
+    // Only trigger refresh if we have players in the table
     if (selectedPlayers.pitchers.length > 0) {
       setIsRefreshingPitchers(true);
-      // Directly call requestHistoryRefresh with the player type and new games count
-      requestHistoryRefresh('pitcher', newValue);
-      // Force a re-render of the component
-      setPitcherRefreshKey(Date.now());
+      setPitcherRefreshKey(Date.now()); // Force re-render when data changes
     }
   }
 };

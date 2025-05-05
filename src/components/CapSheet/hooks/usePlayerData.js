@@ -54,24 +54,109 @@ const usePlayerData = (
     gamesCount: 0,
     timestamp: 0 
   });
+  const [currentHitterGamesHistory, setCurrentHitterGamesHistory] = useState(hitterGamesHistory);
+const [currentPitcherGamesHistory, setCurrentPitcherGamesHistory] = useState(pitcherGamesHistory);
 
-  // Add this function to the hook
-  const requestHistoryRefresh = (playerType, gamesCount) => {
-    console.log(`[usePlayerData] Refreshing ${playerType} history with ${gamesCount} games`);
+
+const fetchPlayerGameHistory = useCallback(async (player, historyCount) => {
+  if (!player || !player.name || !player.team) return null;
+  
+  const isHitter = player.playerType === 'hitter';
+  const isPitcher = player.playerType === 'pitcher';
+  
+  // Skip if player type is unknown
+  if (!isHitter && !isPitcher) return player;
+  
+  // Determine which date range data to use
+  const dateData = isPitcher ? extendedPitcherData : playerStatsHistory;
+  
+  // If we don't have date data yet, just return the original player
+  if (Object.keys(dateData).length === 0) return player;
+  
+  try {
+    // Find game history for this player
+    const games = findMultiGamePlayerStats(
+      dateData,
+      player.name,
+      player.team,
+      historyCount
+    );
     
-    if (playerType === 'hitter') {
-      setIsRefreshingHitters(true);
-    } else if (playerType === 'pitcher') {
-      setIsRefreshingPitchers(true);
+    // Make a copy of the player to update
+    const updatedPlayer = { ...player };
+    
+    // Clear existing game data
+    for (let i = 1; i <= 7; i++) {
+      if (isHitter) {
+        delete updatedPlayer[`game${i}Date`];
+        delete updatedPlayer[`game${i}HR`];
+        delete updatedPlayer[`game${i}AB`];
+        delete updatedPlayer[`game${i}H`];
+      } else {
+        delete updatedPlayer[`game${i}Date`];
+        delete updatedPlayer[`game${i}IP`];
+        delete updatedPlayer[`game${i}K`];
+        delete updatedPlayer[`game${i}ER`];
+        delete updatedPlayer[`game${i}H`];
+        delete updatedPlayer[`game${i}R`];
+        delete updatedPlayer[`game${i}BB`];
+        delete updatedPlayer[`game${i}HR`];
+        delete updatedPlayer[`game${i}PC_ST`];
+      }
     }
     
-    // Set refresh trigger with timestamp to ensure state change
-    setRefreshTrigger({
-      type: playerType,
-      gamesCount,
-      timestamp: Date.now()
-    });
-  };
+    // Add new game data
+    for (let i = 0; i < historyCount && i < games.length; i++) {
+      const gameNum = i + 1;
+      const gameData = games[i]?.data || {};
+      const gameDate = games[i]?.date || '';
+      
+      if (isHitter) {
+        updatedPlayer[`game${gameNum}Date`] = gameDate;
+        updatedPlayer[`game${gameNum}HR`] = gameData.HR || '0';
+        updatedPlayer[`game${gameNum}AB`] = gameData.AB || '0';
+        updatedPlayer[`game${gameNum}H`] = gameData.H || '0';
+      } else {
+        updatedPlayer[`game${gameNum}Date`] = gameDate;
+        updatedPlayer[`game${gameNum}IP`] = gameData.IP || '0';
+        updatedPlayer[`game${gameNum}K`] = gameData.K || '0';
+        updatedPlayer[`game${gameNum}ER`] = gameData.ER || '0';
+        updatedPlayer[`game${gameNum}H`] = gameData.H || '0';
+        updatedPlayer[`game${gameNum}R`] = gameData.R || '0';
+        updatedPlayer[`game${gameNum}BB`] = gameData.BB || '0';
+        updatedPlayer[`game${gameNum}HR`] = gameData.HR || '0';
+        updatedPlayer[`game${gameNum}PC_ST`] = gameData.PC_ST || 'N/A';
+      }
+    }
+    
+    return updatedPlayer;
+  } catch (error) {
+    console.error(`Error fetching game history for ${player.name}:`, error);
+    return player;
+  }
+}, [playerStatsHistory, extendedPitcherData, findMultiGamePlayerStats]);
+
+
+const updatePlayerWithGameHistory = useCallback(async (player, historyCount) => {
+  return await fetchPlayerGameHistory(player, historyCount);
+}, [fetchPlayerGameHistory]);
+
+  // Add this function to the hook
+  const requestHistoryRefresh = useCallback((playerType, historyCount) => {
+    return updateAllPlayersGameHistory(playerType, historyCount);
+  }, [updateAllPlayersGameHistory]);
+
+  useEffect(() => {
+    if (currentHitterGamesHistory !== hitterGamesHistory && selectedPlayers.hitters.length > 0) {
+      updateAllPlayersGameHistory('hitter', hitterGamesHistory);
+    }
+  }, [hitterGamesHistory, currentHitterGamesHistory, selectedPlayers.hitters.length, updateAllPlayersGameHistory]);
+  
+  useEffect(() => {
+    if (currentPitcherGamesHistory !== pitcherGamesHistory && selectedPlayers.pitchers.length > 0) {
+      updateAllPlayersGameHistory('pitcher', pitcherGamesHistory);
+    }
+  }, [pitcherGamesHistory, currentPitcherGamesHistory, selectedPlayers.pitchers.length, updateAllPlayersGameHistory]);
 
   // Add this useEffect to handle refreshing player history
   useEffect(() => {
@@ -690,69 +775,137 @@ const fetchPitcherById = async (pitcherId) => {
   }, [availablePlayers.pitchers, playerStatsHistory]);
 
   // Player add/remove handlers
-  const handleAddHitterById = (playerId) => {
+  const handleAddHitterById = async (playerId) => {
     if (!playerId) return;
-
+  
     const selectedPlayer = availablePlayers.hitters.find(p => p.id === playerId);
     if (!selectedPlayer) {
       console.error("[usePlayerData] Could not find hitter with ID:", playerId);
       alert("Error: Could not find selected hitter data.");
       return;
     }
-
+  
     if (selectedPlayers.hitters.some(p => p.id === selectedPlayer.id)) {
       alert(`${selectedPlayer.name} is already in your hitters list.`);
       return;
     }
-
+  
     const playerTeam = selectedPlayer.team;
     const game = gameData.find(g => g.homeTeam === playerTeam || g.awayTeam === playerTeam);
     let stadium = game ? game.venue || '' : '';
     let opponentTeam = game ? (game.homeTeam === playerTeam ? game.awayTeam : game.homeTeam) : '';
-
-    const newPlayer = {
+  
+    // Create a new player with basic info
+    const basePlayer = {
       ...selectedPlayer,
       stadium,
       opponentTeam
     };
 
-    setSelectedPlayers(prev => ({
-      ...prev,
-      hitters: [...prev.hitters, newPlayer]
-    }));
+      // Update with current games history
+  const playerWithHistory = await updatePlayerWithGameHistory(basePlayer, currentHitterGamesHistory);
+
+  setSelectedPlayers(prev => ({
+    ...prev,
+    hitters: [...prev.hitters, playerWithHistory]
+  }));
+};
+
+const handleAddPitcherById = async (playerId) => {
+  if (!playerId) return;
+
+  const selectedPlayer = availablePlayers.pitchers.find(p => p.id === playerId);
+  if (!selectedPlayer) {
+    console.error("[usePlayerData] Could not find pitcher with ID:", playerId);
+    alert("Error: Could not find selected pitcher data.");
+    return;
+  }
+
+  if (selectedPlayers.pitchers.some(p => p.id === selectedPlayer.id)) {
+    alert(`${selectedPlayer.name} is already in your pitchers list.`);
+    return;
+  }
+
+  const playerTeam = selectedPlayer.team;
+  const game = gameData.find(g => g.homeTeam === playerTeam || g.awayTeam === playerTeam);
+  let stadium = game ? game.venue || '' : '';
+  let opponent = game ? (game.homeTeam === playerTeam ? game.awayTeam : game.homeTeam) : '';
+
+  // Create a new player with basic info
+  const basePlayer = {
+    ...selectedPlayer,
+    stadium,
+    opponent
   };
 
-  const handleAddPitcherById = (playerId) => {
-    if (!playerId) return;
+  // Update with current games history
+  const playerWithHistory = await updatePlayerWithGameHistory(basePlayer, currentPitcherGamesHistory);
 
-    const selectedPlayer = availablePlayers.pitchers.find(p => p.id === playerId);
-    if (!selectedPlayer) {
-      console.error("[usePlayerData] Could not find pitcher with ID:", playerId);
-      alert("Error: Could not find selected pitcher data.");
-      return;
-    }
+  setSelectedPlayers(prev => ({
+    ...prev,
+    pitchers: [...prev.pitchers, playerWithHistory]
+  }));
+};
 
-    if (selectedPlayers.pitchers.some(p => p.id === selectedPlayer.id)) {
-      alert(`${selectedPlayer.name} is already in your pitchers list.`);
-      return;
-    }
-
-    const playerTeam = selectedPlayer.team;
-    const game = gameData.find(g => g.homeTeam === playerTeam || g.awayTeam === playerTeam);
-    let stadium = game ? game.venue || '' : '';
-    let opponent = game ? (game.homeTeam === playerTeam ? game.awayTeam : game.homeTeam) : '';
-
-    const newPlayer = {
-      ...selectedPlayer,
-      stadium,
-      opponent
-    };
-
+const updateAllPlayersGameHistory = useCallback(async (playerType, newHistoryCount) => {
+  if (playerType !== 'hitter' && playerType !== 'pitcher') return;
+  
+  const isHitter = playerType === 'hitter';
+  const players = isHitter ? selectedPlayers.hitters : selectedPlayers.pitchers;
+  
+  if (players.length === 0) return;
+  
+  // Set the appropriate loading state
+  if (isHitter) {
+    setIsRefreshingHitters(true);
+  } else {
+    setIsRefreshingPitchers(true);
+  }
+  
+  try {
+    // Update all players in parallel
+    const updatedPlayers = await Promise.all(
+      players.map(player => fetchPlayerGameHistory(player, newHistoryCount))
+    );
+    
+    // Update state
     setSelectedPlayers(prev => ({
       ...prev,
-      pitchers: [...prev.pitchers, newPlayer]
+      [isHitter ? 'hitters' : 'pitchers']: updatedPlayers
     }));
-  };
+    
+    // Update the current games history setting
+    if (isHitter) {
+      setCurrentHitterGamesHistory(newHistoryCount);
+    } else {
+      setCurrentPitcherGamesHistory(newHistoryCount);
+    }
+  } catch (error) {
+    console.error(`Error updating ${playerType} game history:`, error);
+  } finally {
+    // Reset loading state
+    if (isHitter) {
+      setIsRefreshingHitters(false);
+    } else {
+      setIsRefreshingPitchers(false);
+    }
+  }
+}, [selectedPlayers, fetchPlayerGameHistory, setIsRefreshingHitters, setIsRefreshingPitchers]);
+
+
+
+
+useEffect(() => {
+  if (currentHitterGamesHistory !== hitterGamesHistory && selectedPlayers.hitters.length > 0) {
+    updateAllPlayersGameHistory('hitter', hitterGamesHistory);
+  }
+}, [hitterGamesHistory, currentHitterGamesHistory, selectedPlayers.hitters.length, updateAllPlayersGameHistory]);
+
+useEffect(() => {
+  if (currentPitcherGamesHistory !== pitcherGamesHistory && selectedPlayers.pitchers.length > 0) {
+    updateAllPlayersGameHistory('pitcher', pitcherGamesHistory);
+  }
+}, [pitcherGamesHistory, currentPitcherGamesHistory, selectedPlayers.pitchers.length, updateAllPlayersGameHistory]);
 
   const handleRemovePlayer = (playerId, playerType) => {
     setSelectedPlayers(prev => ({
