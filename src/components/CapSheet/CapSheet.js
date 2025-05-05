@@ -79,7 +79,13 @@ function CapSheet({ playerData, gameData, currentDate }) {
     handleHitterPickChange,
     handlePitcherPickChange,
     updatePlayersWithNewHandicapper,
-    removeHandicapperFromPlayers
+    removeHandicapperFromPlayers,
+    // Add these missing state variables and functions
+    isRefreshingHitters,
+    setIsRefreshingHitters,
+    isRefreshingPitchers,
+    setIsRefreshingPitchers,
+    requestHistoryRefresh
   } = usePlayerData(playerData, gameData, currentDate, hitterGamesHistory, pitcherGamesHistory); // Pass both game history values
 
   // Initialize handicappers hook
@@ -532,6 +538,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
               teams={teams}
               handicappers={hitterHandicappers}
               isLoadingPlayers={isLoadingPlayers}
+              isRefreshingHitters={isRefreshingHitters} 
               onAddHitter={handleAddHitterById}
               onRemovePlayer={handleRemovePlayer}
               onFieldChange={handleHitterFieldChange}
@@ -619,6 +626,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
               teams={teams}
               handicappers={pitcherHandicappers}
               isLoadingPlayers={isLoadingPlayers}
+              isRefreshingPitchers={isRefreshingPitchers}
               onAddPitcher={handleAddPitcherById}
               onRemovePlayer={handleRemovePlayer}
               onFieldChange={handlePitcherFieldChange}
