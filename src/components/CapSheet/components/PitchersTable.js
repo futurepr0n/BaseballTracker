@@ -5,7 +5,7 @@ import './PitcherPerformanceLineChart.css'; // Make sure to import the CSS file
 
 /**
  * Component for displaying the pitchers table section
- * Updated with visual performance trend instead of individual game statistics columns
+ * Updated with visual performance trend and additional statistics
  * 
  * @param {Object} props - Component props
  */
@@ -15,16 +15,23 @@ const PitchersTable = ({
   teams,
   handicappers,
   isLoadingPlayers,
+  isRefreshingPitchers, // New prop
   onAddPitcher,
   onRemovePlayer,
   onFieldChange,
   onBetTypeChange,
   onPickChange,
-  onRemoveHandicapper
+  onRemoveHandicapper,
+  gamesHistory
 }) => {
   return (
     <div className="section-container">
-      <h3 className="section-header">Pitchers</h3>
+      <h3 className="section-header">Pitchers{isRefreshingPitchers && (
+          <span className="refreshing-indicator">
+            <div className="refreshing-spinner"></div>
+            Refreshing charts...
+          </span>
+        )}</h3>
       <div className="control-bar">
         <PlayerSelector
           options={pitcherOptions}
@@ -80,6 +87,12 @@ const PitchersTable = ({
                 <th className="stat-header">IP Last</th>
                 <th className="stat-header">K Last</th>
                 <th className="stat-header">ER Last</th>
+                <th className="stat-header">H Last</th>
+                <th className="stat-header">R Last</th>
+                <th className="stat-header">BB Last</th>
+                <th className="stat-header">HR Last</th>
+                <th className="stat-header">PC_ST</th>
+                <th className="stat-header">ERA</th>
                 
                 {/* Single column for performance chart instead of 12 game stats columns */}
                 <th className="avg-header">Performance Trend</th>
@@ -123,7 +136,7 @@ const PitchersTable = ({
               ) : (
                 <tr>
                   {/* Adjusted colspan for new table structure */}
-                  <td colSpan={13 + handicappers.length} className="no-data">
+                  <td colSpan={19 + handicappers.length} className="no-data">
                     No pitchers added. Search and select pitchers above to track them.
                   </td>
                 </tr>

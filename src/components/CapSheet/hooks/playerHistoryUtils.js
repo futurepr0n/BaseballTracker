@@ -2,16 +2,21 @@ import { findMultiGamePlayerStats } from '../../../services/dataService';
 
 /**
  * Extended data loading for pitchers - looks back further to find enough games
+ * Uses an adaptive approach to search progressively more days if needed
+ *
  * @param {Object} dateRangeData - Initial date range data
  * @param {string} playerName - Player name
  * @param {string} teamAbbr - Team abbreviation
  * @param {number} numGames - Number of games to retrieve (default: 3)
- * @param {number} maxAdditionalDays - Max additional days to look back for pitchers
  * @returns {Array} Array of player game data objects
  */
 export const findPitcherGames = (dateRangeData, playerName, teamAbbr, numGames = 3) => {
-  // Use extended date range for pitchers - will include data from further back
-  return findMultiGamePlayerStats(dateRangeData, playerName, teamAbbr, numGames);
+  // Attempt to find the requested number of games in the data
+  const games = findMultiGamePlayerStats(dateRangeData, playerName, teamAbbr, numGames);
+  
+  console.log(`[findPitcherGames] Found ${games.length}/${numGames} games for ${playerName} (${teamAbbr})`);
+  
+  return games;
 };
 
 /**
@@ -43,6 +48,13 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
       player.team,
       numGames // Use configurable number of games
     );
+  }
+  
+  // Log the success or failure of finding enough games
+  if (gameHistory.length >= numGames) {
+    console.log(`[createPlayerWithGameHistory] Successfully found ${gameHistory.length}/${numGames} games for ${player.name} (${player.team})`);
+  } else {
+    console.warn(`[createPlayerWithGameHistory] Only found ${gameHistory.length}/${numGames} games for ${player.name} (${player.team})`);
   }
   
   // Get stats from the most recent game (if available)
@@ -84,9 +96,9 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
     // Dynamically add game data based on numGames
     for (let i = 0; i < numGames; i++) {
       const gameNum = i + 1;
-      const gameData = gameHistory[i]?.data || {};
+      const gameData = i < gameHistory.length ? gameHistory[i]?.data || {} : {};
       
-      playerObj[`game${gameNum}Date`] = gameDates[i] || '';
+      playerObj[`game${gameNum}Date`] = i < gameHistory.length ? gameDates[i] || '' : '';
       playerObj[`game${gameNum}HR`] = gameData.HR || '0';
       playerObj[`game${gameNum}AB`] = gameData.AB || '0';
       playerObj[`game${gameNum}H`] = gameData.H || '0';
@@ -101,10 +113,16 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
       playerType: 'pitcher',
       // Additional pitcher attributes
       throwingArm: player.throwingArm || '',
-      // Most recent game stats
+      // Most recent game stats with all fields
       prevGameIP: mostRecentStats?.IP || '0',
       prevGameK: mostRecentStats?.K || '0',
       prevGameER: mostRecentStats?.ER || '0',
+      prevGameH: mostRecentStats?.H || '0',
+      prevGameR: mostRecentStats?.R || '0',
+      prevGameBB: mostRecentStats?.BB || '0',
+      prevGameHR: mostRecentStats?.HR || '0',
+      prevGamePC_ST: mostRecentStats?.PC_ST || 'N/A',
+      ERA: mostRecentStats?.ERA || '0.00',
       // Fields for user input
       opponent: '',
       expectedPitch: '',
@@ -124,12 +142,18 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
     // Dynamically add game data based on numGames
     for (let i = 0; i < numGames; i++) {
       const gameNum = i + 1;
-      const gameData = gameHistory[i]?.data || {};
+      const gameData = i < gameHistory.length ? gameHistory[i]?.data || {} : {};
       
-      playerObj[`game${gameNum}Date`] = gameDates[i] || '';
+      playerObj[`game${gameNum}Date`] = i < gameHistory.length ? gameDates[i] || '' : '';
       playerObj[`game${gameNum}IP`] = gameData.IP || '0';
       playerObj[`game${gameNum}K`] = gameData.K || '0';
       playerObj[`game${gameNum}ER`] = gameData.ER || '0';
+      // Add the additional stats to game history
+      playerObj[`game${gameNum}H`] = gameData.H || '0';
+      playerObj[`game${gameNum}R`] = gameData.R || '0';
+      playerObj[`game${gameNum}BB`] = gameData.BB || '0';
+      playerObj[`game${gameNum}HR`] = gameData.HR || '0';
+      playerObj[`game${gameNum}PC_ST`] = gameData.PC_ST || 'N/A';
     }
     
     return playerObj;

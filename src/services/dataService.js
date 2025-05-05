@@ -145,14 +145,15 @@ export const fetchPlayerData = async (dateStr) => {
 };
 
 /**
- * Fetch player data for a range of dates
+ * Fetch player data for a range of dates with adaptive loading strategy
  * @param {Date} startDate - The starting date
- * @param {number} daysToLookBack - Number of days to look back
+ * @param {number} initialDaysToLookBack - Initial number of days to look back (default: 30)
+ * @param {number} maxDaysToLookBack - Maximum days to look back for season data (default: 180)
  * @returns {Promise<Object>} Map of date -> player data arrays
  */
-export const fetchPlayerDataForDateRange = async (startDate, daysToLookBack = 14) => {
+export const fetchPlayerDataForDateRange = async (startDate, initialDaysToLookBack = 30, maxDaysToLookBack = 180) => {
   // Generate a unique cache key for this range
-  const cacheKey = `${formatDateString(startDate)}_${daysToLookBack}`;
+  const cacheKey = `${formatDateString(startDate)}_${initialDaysToLookBack}`;
   
   // Check cache first
   if (dataCache.dateRangeData[cacheKey]) {
@@ -160,14 +161,19 @@ export const fetchPlayerDataForDateRange = async (startDate, daysToLookBack = 14
     return dataCache.dateRangeData[cacheKey];
   }
   
-  console.log(`[DataService] Fetching player data for ${daysToLookBack} days starting from ${formatDateString(startDate)}`);
+  console.log(`[DataService] Fetching player data for ${initialDaysToLookBack} days starting from ${formatDateString(startDate)}`);
   const result = {};
   
-  // For each day in the range
-  for (let daysBack = 0; daysBack <= daysToLookBack; daysBack++) {
+  // Track how many days we've searched and dates with data
+  let daysSearched = 0;
+  let datesWithData = 0;
+  
+  // First pass: search the initial window
+  for (let daysBack = 0; daysBack < initialDaysToLookBack; daysBack++) {
     const searchDate = new Date(startDate);
     searchDate.setDate(searchDate.getDate() - daysBack);
     const dateStr = formatDateString(searchDate);
+    daysSearched++;
     
     try {
       // Get player data for this date
@@ -176,6 +182,7 @@ export const fetchPlayerDataForDateRange = async (startDate, daysToLookBack = 14
       if (playersForDate && playersForDate.length > 0) {
         console.log(`[DataService] Found ${playersForDate.length} player records for ${dateStr}`);
         result[dateStr] = playersForDate;
+        datesWithData++;
       } else {
         console.log(`[DataService] No player data found for ${dateStr}`);
       }
@@ -184,10 +191,52 @@ export const fetchPlayerDataForDateRange = async (startDate, daysToLookBack = 14
     }
   }
   
+  // Second pass: If we need more data, extend the search
+  // This is particularly helpful for pitchers who might not play frequently
+  if (datesWithData < Math.min(10, initialDaysToLookBack / 3)) {
+    console.log(`[DataService] Found only ${datesWithData} dates with data. Extending search to find more historical data...`);
+    
+    // Calculate how many more days to search
+    const additionalDaysToSearch = Math.min(
+      maxDaysToLookBack - initialDaysToLookBack,  // Don't exceed max days
+      180  // Reasonable limit for extended search
+    );
+    
+    // Only proceed if we have more days to search
+    if (additionalDaysToSearch > 0) {
+      // Skip days we've already searched
+      for (let daysBack = initialDaysToLookBack; daysBack < initialDaysToLookBack + additionalDaysToSearch; daysBack++) {
+        const searchDate = new Date(startDate);
+        searchDate.setDate(searchDate.getDate() - daysBack);
+        const dateStr = formatDateString(searchDate);
+        daysSearched++;
+        
+        try {
+          // Check if we've found enough dates with data
+          if (datesWithData >= 30) {
+            console.log(`[DataService] Found ${datesWithData} dates with data, stopping extended search`);
+            break;
+          }
+          
+          // Get player data for this date
+          const playersForDate = await fetchPlayerData(dateStr);
+          
+          if (playersForDate && playersForDate.length > 0) {
+            console.log(`[DataService] Found ${playersForDate.length} player records for ${dateStr}`);
+            result[dateStr] = playersForDate;
+            datesWithData++;
+          }
+        } catch (error) {
+          console.error(`[DataService] Error fetching player data for ${dateStr}:`, error);
+        }
+      }
+    }
+  }
+  
   // Store in cache
   dataCache.dateRangeData[cacheKey] = result;
   
-  console.log(`[DataService] Completed fetching data for ${Object.keys(result).length} dates`);
+  console.log(`[DataService] Completed fetching data for ${Object.keys(result).length} dates (searched ${daysSearched} days)`);
   return result;
 };
 
