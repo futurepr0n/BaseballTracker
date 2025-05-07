@@ -1010,9 +1010,24 @@ const fetchHitterById = async (hitterId) => {
       stadium,
       opponentTeam
     };
-  
-    // IMPORTANT CHANGE: Use hitterGamesHistory directly instead of currentHitterGamesHistory
-    // This ensures new players get the current UI setting rather than the internal tracking value
+    
+    // Check if any other hitters from the same team already have a pitcher set
+    const teamHitters = selectedPlayers.hitters.filter(h => 
+      h.team === playerTeam && h.opponentTeam === opponentTeam
+    );
+    
+    // Find a team hitter with a pitcher already set
+    const hitterWithPitcher = teamHitters.find(h => h.pitcherId);
+    
+    // If we found a teammate with a pitcher set, use the same pitcher
+    if (hitterWithPitcher && hitterWithPitcher.pitcherId) {
+      basePlayer.pitcher = hitterWithPitcher.pitcher;
+      basePlayer.pitcherId = hitterWithPitcher.pitcherId;
+      basePlayer.pitcherHand = hitterWithPitcher.pitcherHand;
+      console.log(`Auto-assigned pitcher ${basePlayer.pitcher} for new hitter ${basePlayer.name} based on teammates.`);
+    }
+    
+    // Get player with game history data
     const playerWithHistory = await updatePlayerWithGameHistory(basePlayer, hitterGamesHistory);
   
     setSelectedPlayers(prev => ({
@@ -1088,8 +1103,15 @@ const fetchHitterById = async (hitterId) => {
 
   // Pitcher selection handler
   const handlePitcherSelect = (playerId, pitcherId) => {
+    // First, find the current hitter to get their team
+    const currentHitter = selectedPlayers.hitters.find(h => h.id === playerId);
+    if (!currentHitter) return;
+    
+    const hitterTeam = currentHitter.team;
+    const opponentTeam = currentHitter.opponentTeam;
+    
     if (!pitcherId) {
-      // If empty selection, just clear the pitcher fields
+      // If empty selection, just clear the pitcher fields for this specific hitter
       setSelectedPlayers(prev => ({
         ...prev,
         hitters: prev.hitters.map(player => {
@@ -1104,7 +1126,7 @@ const fetchHitterById = async (hitterId) => {
       }));
       return;
     }
-
+  
     // Find the selected pitcher from the roster
     const selectedPitcherId = pitcherId;
     const [pitcherName, pitcherTeam] = selectedPitcherId.split('-');
@@ -1114,19 +1136,24 @@ const fetchHitterById = async (hitterId) => {
       p.name === pitcherName && p.team === pitcherTeam
     );
     
-    // Update the hitter with pitcher details
+    // Update all hitters from the same team with the same pitcher details
     setSelectedPlayers(prev => ({
       ...prev,
       hitters: prev.hitters.map(player => {
-        if (player.id !== playerId) return player;
-        return { 
-          ...player, 
-          pitcher: pitcherName,
-          pitcherId: selectedPitcherId,
-          pitcherHand: pitcherData?.throwingArm || '' 
-        };
+        // Update this player and all other players from the same team facing same opponent
+        if (player.id === playerId || (player.team === hitterTeam && player.opponentTeam === opponentTeam)) {
+          return { 
+            ...player, 
+            pitcher: pitcherName,
+            pitcherId: selectedPitcherId,
+            pitcherHand: pitcherData?.throwingArm || '' 
+          };
+        }
+        return player;
       })
     }));
+    
+    console.log(`Updated pitcher to ${pitcherName} for all ${hitterTeam} hitters facing ${opponentTeam}.`);
   };
 
   // Bet type handlers
