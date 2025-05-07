@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { getTeamColors } from '../../utils/formatters';
 import PitcherPerformanceLineChart from '../PitcherPerformanceLineChart';
 
 /**
  * Component for a pitcher row in the table
  * Enhanced with visual performance line chart and additional statistics
+ * Now with proper refreshing when game history changes
  * 
  * @param {Object} player - Pitcher player object
  * @param {Object} teams - Teams data for styling
@@ -13,6 +14,10 @@ import PitcherPerformanceLineChart from '../PitcherPerformanceLineChart';
  * @param {function} onBetTypeChange - Function to handle bet type changes
  * @param {function} onPickChange - Function to handle handicapper pick changes
  * @param {function} onRemove - Function to handle player removal
+ * @param {number} gamesHistory - Number of games to display in history
+ * @param {number} refreshKey - Key to force re-render when data refreshes
+ * @param {boolean} isRefreshingPitchers - Whether pitcher data is currently refreshing
+ * @param {function} fetchPitcherById - Function to fetch pitcher data by ID
  */
 const PitcherRow = ({
   player,
@@ -21,32 +26,83 @@ const PitcherRow = ({
   onFieldChange,
   onBetTypeChange,
   onPickChange,
-  onRemove
+  onRemove,
+  gamesHistory,
+  refreshKey,
+  isRefreshingPitchers,
+  fetchPitcherById // Add this prop to fetch pitcher data
 }) => {
+  // State for the pitcher data to handle updates
+  const [selectedPitcher, setSelectedPitcher] = useState(player);
+  const [isLoadingPitcher, setIsLoadingPitcher] = useState(false);
+
   const teamColors = getTeamColors(player.team, teams);
 
+  // Effect to fetch pitcher data when gamesHistory or refreshKey changes
+  useEffect(() => {
+    const loadPitcherData = async () => {
+      if (!player.id) {
+        setSelectedPitcher(player); // Fallback to prop data if no ID
+        return;
+      }
+
+      setIsLoadingPitcher(true);
+      try {
+        console.log(`[PitcherRow] Fetching pitcher data for: ${player.id} with ${gamesHistory} games history`);
+        const pitcher = await fetchPitcherById(player.id);
+        console.log(`[PitcherRow] Received updated pitcher data:`, pitcher);
+        setSelectedPitcher(pitcher);
+      } catch (error) {
+        console.error(`[PitcherRow] Error loading pitcher data:`, error);
+        setSelectedPitcher(player); // Fallback to prop data on error
+      } finally {
+        setIsLoadingPitcher(false);
+      }
+    };
+
+    loadPitcherData();
+  }, [player.id, fetchPitcherById, gamesHistory, refreshKey]);
+
+  // Debugging helper - render a small indicator to show full re-renders
+  const renderCount = React.useRef(0);
+  React.useEffect(() => {
+    renderCount.current += 1;
+  });
+
   // Display the pitcher's throwing arm
-  const throwingArm = player.throwingArm ? ` (${player.throwingArm})` : '';
+  const throwingArm = selectedPitcher.throwingArm ? ` (${selectedPitcher.throwingArm})` : '';
 
   return (
-    <tr style={teamColors}>
+    <tr 
+      style={teamColors}
+      data-pitcher-id={player.id}
+      data-render-count={renderCount.current}
+      data-games-history={gamesHistory}
+      className={isRefreshingPitchers || isLoadingPitcher ? "loading-row" : ""}
+    >
       <td className="player-name">
-        {player.name}{throwingArm}
+        {selectedPitcher.name}{throwingArm}
+        {(isRefreshingPitchers || isLoadingPitcher) && <span className="loading-indicator">⟳</span>}
       </td>
-      <td>{player.team}</td>
-      <td>{player.prevGameIP}</td>
-      <td>{player.prevGameK}</td>
-      <td>{player.prevGameER}</td>
-      <td>{player.prevGameH || player.H || '0'}</td>
-      <td>{player.prevGameR || player.R || '0'}</td>
-      <td>{player.prevGameBB || player.BB || '0'}</td>
-      <td>{player.prevGameHR || player.HR || '0'}</td>
-      <td>{player.prevGamePC_ST || player.PC_ST || 'N/A'}</td>
-      <td>{player.ERA || '0.00'}</td>
+      <td>{selectedPitcher.team}</td>
+      <td>{selectedPitcher.prevGameIP}</td>
+      <td>{selectedPitcher.prevGameK}</td>
+      <td>{selectedPitcher.prevGameER}</td>
+      <td>{selectedPitcher.prevGameH || selectedPitcher.H || '0'}</td>
+      <td>{selectedPitcher.prevGameR || selectedPitcher.R || '0'}</td>
+      <td>{selectedPitcher.prevGameBB || selectedPitcher.BB || '0'}</td>
+      <td>{selectedPitcher.prevGameHR || selectedPitcher.HR || '0'}</td>
+      <td>{selectedPitcher.prevGamePC_ST || selectedPitcher.PC_ST || 'N/A'}</td>
+      <td>{selectedPitcher.ERA || '0.00'}</td>
       
-      {/* Performance Line Chart - Replaces 12 individual cells */}
+      {/* Performance Line Chart - Now using the selectedPitcher with refreshed data */}
       <td className="performance-chart-cell">
-        <PitcherPerformanceLineChart player={player} />
+        <PitcherPerformanceLineChart 
+          key={`chart-${player.id}-${refreshKey}-${gamesHistory}`} 
+          player={selectedPitcher}
+          gamesHistory={gamesHistory}
+          isLoading={isLoadingPitcher || isRefreshingPitchers}
+        />
       </td>
       
       {/* Opponent */}
