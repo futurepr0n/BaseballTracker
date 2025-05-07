@@ -5,19 +5,7 @@ import OverlayPerformanceChart from '../OverlayPerformanceChart';
 
 /**
  * Component for a hitter row in the table
- * Enhanced with visual performance line chart and pitcher overlay capability
- * 
- * @param {Object} player - Hitter player object
- * @param {Object} teams - Teams data for styling
- * @param {Array} handicappers - Array of handicapper objects
- * @param {Array} pitcherOptions - Options for pitcher selection
- * @param {function} fetchPitcherById - Function to fetch pitcher data by ID
- * @param {function} onFieldChange - Function to handle field changes
- * @param {function} onPitcherSelect - Function to handle pitcher selection
- * @param {function} onBetTypeChange - Function to handle bet type changes
- * @param {function} onPickChange - Function to handle handicapper pick changes
- * @param {function} onRemove - Function to handle player removal
- * @param {boolean} hasAnySecondPitcher - Whether any row has a second pitcher
+ * Simplified to focus on rendering the latest player props directly
  */
 const HitterRow = ({
   player,
@@ -25,12 +13,17 @@ const HitterRow = ({
   handicappers,
   pitcherOptions,
   fetchPitcherById,
+  fetchHitterById,
   onFieldChange,
   onPitcherSelect,
   onBetTypeChange,
   onPickChange,
   onRemove,
-  hasAnySecondPitcher
+  hasAnySecondPitcher,
+  gamesHistory,
+  refreshKey,
+  rowIndex,
+  isRefreshingHitters
 }) => {
   // States for primary pitcher
   const [showPitcherOverlay, setShowPitcherOverlay] = useState(false);
@@ -45,9 +38,52 @@ const HitterRow = ({
   const [showSecondPitcherOverlay, setShowSecondPitcherOverlay] = useState(false);
   const [isLoadingSecondPitcher, setIsLoadingSecondPitcher] = useState(false);
   
+  // New states for hitter data
+  const [selectedHitter, setSelectedHitter] = useState(player);
+  const [isLoadingHitter, setIsLoadingHitter] = useState(false);
+
   const teamColors = getTeamColors(player.team, teams);
 
-  // Effect to fetch pitcher data when pitcherId changes
+  // Debug log to track player prop updates and refreshes
+  useEffect(() => {
+    console.log(`[HitterRow] Rendering player ${player.name} with ${gamesHistory} games history (refresh key: ${refreshKey})`);
+    
+    // Log the available game data
+    let gameCount = 0;
+    let i = 1;
+    while (player[`game${i}Date`]) {
+      gameCount++;
+      i++;
+    }
+    console.log(`[HitterRow] Player ${player.name} has ${gameCount} game history entries`);
+  }, [player, gamesHistory, refreshKey]);
+
+  // Effect to fetch hitter data when gamesHistory or refreshKey changes
+  useEffect(() => {
+    const loadHitterData = async () => {
+      if (!player.id) {
+        setSelectedHitter(player); // Fallback to prop data if no ID
+        return;
+      }
+
+      setIsLoadingHitter(true);
+      try {
+        console.log(`[HitterRow] Fetching hitter data for: ${player.id} with ${gamesHistory} games history`);
+        const hitter = await fetchHitterById(player.id, gamesHistory);
+        console.log(`[HitterRow] Received hitter data:`, hitter);
+        setSelectedHitter(hitter);
+      } catch (error) {
+        console.error(`[HitterRow] Error loading hitter data:`, error);
+        setSelectedHitter(player); // Fallback to prop data on error
+      } finally {
+        setIsLoadingHitter(false);
+      }
+    };
+
+    loadHitterData();
+  }, [player.id, fetchHitterById, gamesHistory, refreshKey]);
+
+  // Effect to fetch primary pitcher data when pitcherId changes
   useEffect(() => {
     const loadPitcherData = async () => {
       if (!player.pitcherId) {
@@ -58,12 +94,12 @@ const HitterRow = ({
       
       setIsLoadingPitcher(true);
       try {
-        console.log("Fetching primary pitcher data for:", player.pitcherId);
+        console.log(`[HitterRow] Fetching primary pitcher data for: ${player.pitcherId}`);
         const pitcher = await fetchPitcherById(player.pitcherId);
-        console.log("Received primary pitcher data:", pitcher);
+        console.log(`[HitterRow] Received primary pitcher data:`, pitcher);
         setSelectedPitcher(pitcher);
       } catch (error) {
-        console.error("Error loading pitcher data:", error);
+        console.error(`[HitterRow] Error loading pitcher data:`, error);
         setSelectedPitcher(null);
       } finally {
         setIsLoadingPitcher(false);
@@ -71,7 +107,7 @@ const HitterRow = ({
     };
     
     loadPitcherData();
-  }, [player.pitcherId, fetchPitcherById]);
+  }, [player.pitcherId, fetchPitcherById, refreshKey]);
 
   // Effect to fetch second pitcher data
   useEffect(() => {
@@ -84,12 +120,12 @@ const HitterRow = ({
       
       setIsLoadingSecondPitcher(true);
       try {
-        console.log("Fetching second pitcher data for:", secondPitcherId);
+        console.log(`[HitterRow] Fetching second pitcher data for: ${secondPitcherId}`);
         const pitcher = await fetchPitcherById(secondPitcherId);
-        console.log("Received second pitcher data:", pitcher);
+        console.log(`[HitterRow] Received second pitcher data:`, pitcher);
         setSelectedSecondPitcher(pitcher);
       } catch (error) {
-        console.error("Error loading second pitcher data:", error);
+        console.error(`[HitterRow] Error loading second pitcher data:`, error);
         setSelectedSecondPitcher(null);
       } finally {
         setIsLoadingSecondPitcher(false);
@@ -97,7 +133,7 @@ const HitterRow = ({
     };
     
     loadSecondPitcherData();
-  }, [secondPitcherId, fetchPitcherById]);
+  }, [secondPitcherId, fetchPitcherById, refreshKey]);
   
   // Handle second pitcher selection
   const handleSecondPitcherSelect = (option) => {
@@ -111,23 +147,12 @@ const HitterRow = ({
     onFieldChange(player.id, 'secondPitcher', option ? option.label : '');
   };
   
-  // Extract pitcher throwing hand
-  const getPitcherHand = (pitcher) => {
-    return pitcher?.throwingArm || '';
-  };
-  
   // Extract pitcher stats safely
   const getPitcherStats = (pitcher) => {
     if (!pitcher) return { IP: 'N/A', PC_ST: 'N/A', K: 'N/A', HR: 'N/A' };
     
-    // For Last IP, use the most recent game data directly
-    // First check if we have game data, otherwise fall back to the main data
     const lastIP = pitcher.game1IP || pitcher.prevGameIP || pitcher.IP || '0';
-    
-    // PC_ST might be in the game data or main data
     const pcSt = pitcher.game1PC_ST || pitcher.PC_ST || 'N/A';
-    
-    // For other stats, use game data if available
     const k = pitcher.game1K || pitcher.K || '0';
     const hr = pitcher.game1HR || pitcher.HR || '0';
     
@@ -143,27 +168,43 @@ const HitterRow = ({
   const primaryPitcherStats = getPitcherStats(selectedPitcher);
   const secondPitcherStats = getPitcherStats(selectedSecondPitcher);
   
-  // Determine if we should show second pitcher columns
   const hasSecondPitcher = selectedSecondPitcher !== null;
 
+  // Debugging helper - render a small indicator to show full re-renders
+  const renderCount = React.useRef(0);
+  React.useEffect(() => {
+    renderCount.current += 1;
+  });
+
   return (
-    <tr style={teamColors} data-hitter-id={player.id}>
-      <td className="player-name">{player.name}</td>
-      <td>{player.team}</td>
-      <td>{player.prevGameHR}</td>
-      <td>{player.prevGameAB}</td>
-      <td>{player.prevGameH}</td>
+    <tr 
+      style={teamColors} 
+      data-hitter-id={player.id} 
+      data-render-count={renderCount.current} 
+      data-games-history={gamesHistory}
+      className={isRefreshingHitters || isLoadingHitter ? "loading-row" : ""}
+    >
+      <td className="player-name">
+        {selectedHitter.name}
+        {(isRefreshingHitters || isLoadingHitter) && <span className="loading-indicator">⟳</span>}
+      </td>
+      <td>{selectedHitter.team}</td>
+      <td>{selectedHitter.prevGameHR}</td>
+      <td>{selectedHitter.prevGameAB}</td>
+      <td>{selectedHitter.prevGameH}</td>
       
       {/* Performance Chart */}
       <td className="performance-chart-cell">
         <OverlayPerformanceChart 
-          hitter={player} 
+          key={`chart-${player.id}-${refreshKey}-${gamesHistory}`}
+          hitter={selectedHitter} // Use locally fetched hitter data
           pitcher={selectedPitcher}
           secondPitcher={selectedSecondPitcher}
           showPitcherOverlay={showPitcherOverlay && selectedPitcher !== null}
           showSecondPitcherOverlay={showSecondPitcherOverlay && selectedSecondPitcher !== null}
           isLoadingPitcher={isLoadingPitcher}
           isLoadingSecondPitcher={isLoadingSecondPitcher}
+          isLoadingHitter={isLoadingHitter || isRefreshingHitters}
         />
       </td>
       
@@ -322,7 +363,7 @@ const HitterRow = ({
         <input 
           type="text" 
           className="editable-cell" 
-          value={player.expectedSO || ''} 
+          value={selectedHitter.expectedSO || ''} 
           onChange={(e) => onFieldChange(player.id, 'expectedSO', e.target.value)} 
           placeholder="0.0" 
         />
@@ -333,7 +374,7 @@ const HitterRow = ({
         <input 
           type="text" 
           className="editable-cell" 
-          value={player.stadium || ''} 
+          value={selectedHitter.stadium || ''} 
           onChange={(e) => onFieldChange(player.id, 'stadium', e.target.value)} 
           placeholder="Stadium" 
         />
@@ -344,7 +385,7 @@ const HitterRow = ({
         <input 
           type="text" 
           className="editable-cell" 
-          value={player.gameOU || ''} 
+          value={selectedHitter.gameOU || ''} 
           onChange={(e) => onFieldChange(player.id, 'gameOU', e.target.value)} 
           placeholder="0.0" 
         />
@@ -355,7 +396,7 @@ const HitterRow = ({
         <input 
           type="checkbox" 
           className="custom-checkbox" 
-          checked={player.betTypes?.H || false} 
+          checked={selectedHitter.betTypes?.H || false} 
           onChange={(e) => onBetTypeChange(player.id, 'H', e.target.checked)} 
         />
       </td>
@@ -363,7 +404,7 @@ const HitterRow = ({
         <input 
           type="checkbox" 
           className="custom-checkbox" 
-          checked={player.betTypes?.HR || false} 
+          checked={selectedHitter.betTypes?.HR || false} 
           onChange={(e) => onBetTypeChange(player.id, 'HR', e.target.checked)} 
         />
       </td>
@@ -371,7 +412,7 @@ const HitterRow = ({
         <input 
           type="checkbox" 
           className="custom-checkbox" 
-          checked={player.betTypes?.B || false} 
+          checked={selectedHitter.betTypes?.B || false} 
           onChange={(e) => onBetTypeChange(player.id, 'B', e.target.checked)} 
         />
       </td>
@@ -384,7 +425,7 @@ const HitterRow = ({
               <input 
                 type="checkbox" 
                 className="custom-checkbox eye-checkbox" 
-                checked={player.handicapperPicks[handicapper.id]?.public || false} 
+                checked={selectedHitter.handicapperPicks[handicapper.id]?.public || false} 
                 onChange={(e) => onPickChange(player.id, handicapper.id, 'public', e.target.checked)} 
               />
               <span className="eye-icon">👁️</span>
@@ -393,7 +434,7 @@ const HitterRow = ({
               <input 
                 type="checkbox" 
                 className="custom-checkbox" 
-                checked={player.handicapperPicks[handicapper.id]?.private || false} 
+                checked={selectedHitter.handicapperPicks[handicapper.id]?.private || false} 
                 onChange={(e) => onPickChange(player.id, handicapper.id, 'private', e.target.checked)} 
               /> $
             </label>
@@ -401,7 +442,7 @@ const HitterRow = ({
               <input 
                 type="checkbox" 
                 className="custom-checkbox" 
-                checked={player.handicapperPicks[handicapper.id]?.straight || false} 
+                checked={selectedHitter.handicapperPicks[handicapper.id]?.straight || false} 
                 onChange={(e) => onPickChange(player.id, handicapper.id, 'straight', e.target.checked)} 
               /> S
             </label>
@@ -410,7 +451,7 @@ const HitterRow = ({
                 <input 
                   type="checkbox" 
                   className="mini-checkbox" 
-                  checked={player.handicapperPicks[handicapper.id]?.H || false} 
+                  checked={selectedHitter.handicapperPicks[handicapper.id]?.H || false} 
                   onChange={(e) => onPickChange(player.id, handicapper.id, 'H', e.target.checked)} 
                 /> H
               </label>
@@ -418,7 +459,7 @@ const HitterRow = ({
                 <input 
                   type="checkbox" 
                   className="mini-checkbox" 
-                  checked={player.handicapperPicks[handicapper.id]?.HR || false} 
+                  checked={selectedHitter.handicapperPicks[handicapper.id]?.HR || false} 
                   onChange={(e) => onPickChange(player.id, handicapper.id, 'HR', e.target.checked)} 
                 /> HR
               </label>
@@ -426,7 +467,7 @@ const HitterRow = ({
                 <input 
                   type="checkbox" 
                   className="mini-checkbox" 
-                  checked={player.handicapperPicks[handicapper.id]?.B || false} 
+                  checked={selectedHitter.handicapperPicks[handicapper.id]?.B || false} 
                   onChange={(e) => onPickChange(player.id, handicapper.id, 'B', e.target.checked)} 
                 /> B
               </label>

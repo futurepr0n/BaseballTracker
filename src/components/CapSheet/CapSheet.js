@@ -70,6 +70,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
     playerStatsHistory,
     setPlayerStatsHistory,
     fetchPitcherById,
+    fetchHitterById,
     formattedDate,
     formattedPreviousDate,
     // Methods
@@ -268,8 +269,13 @@ function CapSheet({ playerData, gameData, currentDate }) {
   };
 
 // In the handleHitterGamesHistoryChange function:
+/**
+ * Handler for hitter games history changes with direct refresh trigger
+ * @param {number} newValue - New number of games to display
+ */
 const handleHitterGamesHistoryChange = (newValue) => {
   if (newValue !== hitterGamesHistory) {
+    console.log(`[CapSheet] Hitter games history changing from ${hitterGamesHistory} to ${newValue}`);
     setHitterGamesHistory(newValue);
     
     // Show the legend when changing the value
@@ -277,14 +283,26 @@ const handleHitterGamesHistoryChange = (newValue) => {
     
     // Immediately trigger refresh for all existing hitters
     if (selectedPlayers.hitters.length > 0) {
+      console.log(`[CapSheet] Explicitly requesting hitter history refresh with ${newValue} games for ${selectedPlayers.hitters.length} hitters`);
+      
+      // IMPORTANT: Set refreshing flag first
       setIsRefreshingHitters(true);
-      // Request refresh with new value (this will update all hitters)
-      requestHistoryRefresh('hitter', newValue);
-      // Force re-render of the hitter table
-      setHitterRefreshKey(Date.now());
+      
+      // Then call the refresh function with explicit Promise handling
+      requestHistoryRefresh('hitter', newValue)
+        .then(() => {
+          console.log(`[CapSheet] Hitter history refresh complete for ${newValue} games`);
+          // Force a re-render with a new key
+          setHitterRefreshKey(Date.now());
+        })
+        .finally(() => {
+          // Clear the refreshing flag when done or on error
+          setIsRefreshingHitters(false);
+        });
     }
   }
 };
+
 
 // In the handlePitcherGamesHistoryChange function:
 const handlePitcherGamesHistoryChange = (newValue) => {
@@ -583,6 +601,7 @@ const handlePitcherGamesHistoryChange = (newValue) => {
               hitters={selectedPlayers.hitters}
               hitterOptions={hitterSelectOptions}
               fetchPitcherById={fetchPitcherById} 
+              fetchHitterById={fetchHitterById} // Add this new prop
               teams={teams}
               handicappers={hitterHandicappers}
               isLoadingPlayers={isLoadingPlayers}
@@ -596,8 +615,8 @@ const handlePitcherGamesHistoryChange = (newValue) => {
               onAddHandicapper={() => setShowHitterModal(true)}
               onRemoveHandicapper={handleRemoveHitterHandicapperWithUpdate}
               getPitcherOptionsForOpponent={getPitcherOptionsForOpponent}
-              gamesHistory={hitterGamesHistory} // Use hitter-specific games history
-              refreshKey={hitterRefreshKey} // Pass refresh key to trigger re-render
+              gamesHistory={hitterGamesHistory} 
+              refreshKey={hitterRefreshKey} 
             />
           </section>
           {selectedPlayers.hitters.some(h => h.pitcherId) && (

@@ -73,15 +73,31 @@ const usePlayerData = (
   });
 
   // Improved function to get player game history from cache or fetch if needed
+  /**
+ * Enhanced function to get player game history from cache or fetch if needed
+ * With improved logging and validation for hitter data refreshes
+ * 
+ * @param {Object} player - The player object
+ * @param {number} historyCount - Number of games to include in history
+ * @returns {Promise<Object>} Updated player object with game history
+ */
   const fetchPlayerGameHistory = useCallback(async (player, historyCount) => {
-    if (!player || !player.name || !player.team) return null;
+    if (!player || !player.name || !player.team) {
+      console.error("[usePlayerData] Invalid player passed to fetchPlayerGameHistory:", player);
+      return player;
+    }
     
     const isHitter = player.playerType === 'hitter';
     const isPitcher = player.playerType === 'pitcher';
     const playerId = player.id;
     
     // Skip if player type is unknown
-    if (!isHitter && !isPitcher) return player;
+    if (!isHitter && !isPitcher) {
+      console.warn(`[usePlayerData] Unknown player type for ${player.name}, skipping refresh`);
+      return player;
+    }
+    
+    console.log(`[usePlayerData] fetchPlayerGameHistory for ${player.name} (${isHitter ? 'hitter' : 'pitcher'}) with ${historyCount} games`);
     
     // Check if we already have cached data for this player with the max history
     const playerCache = isHitter 
@@ -89,6 +105,8 @@ const usePlayerData = (
       : playerDataCacheRef.current.pitchers[playerId];
     
     if (playerCache && playerCache.maxGamesHistory >= MAX_GAMES_HISTORY) {
+      console.log(`[usePlayerData] Using cached data for ${player.name} with ${playerCache.maxGamesHistory} max games`);
+      
       // We have complete cached data, just need to create a subset with the requested history count
       const updatedPlayer = { ...player };
       
@@ -119,6 +137,8 @@ const usePlayerData = (
         const gameDate = playerCache.games[i]?.date || '';
         
         if (isHitter) {
+          console.log(`[usePlayerData] Setting game${gameNum} data for ${player.name} to date ${gameDate}`);
+          
           updatedPlayer[`game${gameNum}Date`] = gameDate;
           updatedPlayer[`game${gameNum}HR`] = gameData.HR || '0';
           updatedPlayer[`game${gameNum}AB`] = gameData.AB || '0';
@@ -136,6 +156,7 @@ const usePlayerData = (
         }
       }
       
+      console.log(`[usePlayerData] Returning updated ${isHitter ? 'hitter' : 'pitcher'} ${player.name} with ${historyCount} games history`);
       return updatedPlayer;
     }
     
@@ -143,9 +164,14 @@ const usePlayerData = (
     const dateData = isPitcher ? extendedPitcherData : playerStatsHistory;
     
     // If we don't have date data yet, just return the original player
-    if (Object.keys(dateData).length === 0) return player;
+    if (Object.keys(dateData).length === 0) {
+      console.warn(`[usePlayerData] No historical data available for ${player.name}, returning original data`);
+      return player;
+    }
     
     try {
+      console.log(`[usePlayerData] Fetching game history for ${player.name} from date range data`);
+      
       // Find game history for this player - always try to get MAX_GAMES_HISTORY
       const games = findMultiGamePlayerStats(
         dateData,
@@ -153,6 +179,8 @@ const usePlayerData = (
         player.team,
         MAX_GAMES_HISTORY // Always fetch the maximum number of games
       );
+      
+      console.log(`[usePlayerData] Found ${games.length} games for ${player.name}`);
       
       // Store the complete data in the cache
       if (isHitter) {
@@ -197,6 +225,8 @@ const usePlayerData = (
         const gameDate = games[i]?.date || '';
         
         if (isHitter) {
+          console.log(`[usePlayerData] Setting game${gameNum} data for ${player.name} to date ${gameDate}`);
+          
           updatedPlayer[`game${gameNum}Date`] = gameDate;
           updatedPlayer[`game${gameNum}HR`] = gameData.HR || '0';
           updatedPlayer[`game${gameNum}AB`] = gameData.AB || '0';
@@ -214,9 +244,10 @@ const usePlayerData = (
         }
       }
       
+      console.log(`[usePlayerData] Successfully updated ${player.name} with ${historyCount} games history`);
       return updatedPlayer;
     } catch (error) {
-      console.error(`Error fetching game history for ${player.name}:`, error);
+      console.error(`[usePlayerData] Error fetching game history for ${player.name}:`, error);
       return player;
     }
   }, [playerStatsHistory, extendedPitcherData]);
@@ -227,6 +258,12 @@ const usePlayerData = (
   }, [fetchPlayerGameHistory]);
 
   // Updated function to refresh all players of a specific type
+  /**
+ * Enhanced function to refresh all players of a specific type with proper logging
+ * @param {string} playerType - Type of players to update ('hitter' or 'pitcher')
+ * @param {number} newHistoryCount - New number of games to display
+ * @returns {Promise<void>}
+ */
   const updateAllPlayersGameHistory = useCallback(async (playerType, newHistoryCount) => {
     // Check if we're already refreshing this player type
     if (isRefreshingRef.current[playerType]) {
@@ -266,18 +303,72 @@ const usePlayerData = (
     }
     
     try {
-      console.log(`[usePlayerData] Refreshing ${playersToUpdate.length} ${playerType}s with ${newHistoryCount} games`);
+      console.log(`[usePlayerData] ===== STARTING REFRESH: ${playersToUpdate.length} ${playerType}s with ${newHistoryCount} games =====`);
       
-      // Update all players in parallel
+      // Log the players we're updating for debugging
+      playersToUpdate.forEach((player, index) => {
+        console.log(`[usePlayerData] Player ${index+1}/${playersToUpdate.length} to update: ${player.name} (${player.id})`);
+        
+        // Log current game data for the first player to help debug
+        if (index === 0) {
+          let gameCount = 0;
+          for (let i = 1; i <= 7; i++) {
+            if (player[`game${i}Date`]) {
+              gameCount++;
+              console.log(`[usePlayerData] Current game${i}Date: ${player[`game${i}Date`]}`);
+            }
+          }
+          console.log(`[usePlayerData] Player currently has ${gameCount} game history entries`);
+        }
+      });
+      
+      // Update all players in parallel with detailed logging
       const updatedPlayers = await Promise.all(
-        playersToUpdate.map(player => fetchPlayerGameHistory(player, newHistoryCount))
+        playersToUpdate.map(async (player, index) => {
+          // Add more detailed logging for the first player
+          const isFirstPlayer = index === 0;
+          
+          if (isFirstPlayer) {
+            console.log(`[usePlayerData] Starting refresh for first player: ${player.name}`);
+          }
+          
+          // Get the updated player data
+          const updatedPlayer = await fetchPlayerGameHistory(player, newHistoryCount);
+          
+          if (isFirstPlayer) {
+            console.log(`[usePlayerData] Completed refresh for first player: ${player.name}`);
+            
+            // Log the updated game data for debugging
+            let updatedGameCount = 0;
+            for (let i = 1; i <= 7; i++) {
+              if (updatedPlayer[`game${i}Date`]) {
+                updatedGameCount++;
+                console.log(`[usePlayerData] Updated game${i}Date: ${updatedPlayer[`game${i}Date`]}`);
+              }
+            }
+            console.log(`[usePlayerData] Player now has ${updatedGameCount} game history entries`);
+            
+            // Verify game count matches request
+            if (updatedGameCount !== Math.min(newHistoryCount, MAX_GAMES_HISTORY)) {
+              console.warn(`[usePlayerData] WARNING: Updated game count (${updatedGameCount}) doesn't match requested count (${newHistoryCount})`);
+            }
+          }
+          
+          return updatedPlayer;
+        })
       );
       
-      // Update state using functional updates to avoid stale state references
-      setSelectedPlayers(prev => ({
-        ...prev,
-        [isHitter ? 'hitters' : 'pitchers']: updatedPlayers
-      }));
+      console.log(`[usePlayerData] Successfully updated ${updatedPlayers.length} ${playerType}s with ${newHistoryCount} games history`);
+      
+      // CRITICAL: Actually update the state with the refreshed players
+      // This is what was potentially missing in the original implementation
+      setSelectedPlayers(prev => {
+        console.log(`[usePlayerData] Updating global state with ${updatedPlayers.length} refreshed ${playerType}s`);
+        return {
+          ...prev,
+          [isHitter ? 'hitters' : 'pitchers']: updatedPlayers
+        };
+      });
       
       // Update the current games history setting
       if (isHitter) {
@@ -286,9 +377,9 @@ const usePlayerData = (
         setCurrentPitcherGamesHistory(newHistoryCount);
       }
       
-      console.log(`[usePlayerData] Successfully updated ${updatedPlayers.length} ${playerType}s with ${newHistoryCount} games history`);
+      console.log(`[usePlayerData] ===== COMPLETED REFRESH: ${updatedPlayers.length} ${playerType}s with ${newHistoryCount} games =====`);
     } catch (error) {
-      console.error(`Error updating ${playerType} game history:`, error);
+      console.error(`[usePlayerData] Error updating ${playerType} game history:`, error);
     } finally {
       // Reset loading state
       if (isHitter) {
@@ -299,7 +390,7 @@ const usePlayerData = (
       // Reset the refreshing flag
       isRefreshingRef.current[playerType] = false;
     }
-  }, [fetchPlayerGameHistory, hitterGamesHistory, pitcherGamesHistory]);
+  }, [fetchPlayerGameHistory, MAX_GAMES_HISTORY]);
 
   // Function to request a history refresh (exposed to parent components)
   const requestHistoryRefresh = useCallback((playerType, historyCount) => {
@@ -370,6 +461,106 @@ const usePlayerData = (
     month: 'long',
     day: 'numeric'
   });
+
+
+
+
+
+  /**
+ * Fetch hitter data by ID with the current game history setting
+ * Similar to fetchPitcherById but for hitters
+ * @param {string} hitterId - Hitter ID in format "name-team"
+ * @returns {Promise<Object>} Hitter data with game history
+ */
+const fetchHitterById = async (hitterId) => {
+  if (!hitterId) return null;
+  
+  console.log(`[usePlayerData] Fetching data for hitter: ${hitterId}`);
+  
+  // Split the ID format (name-team)
+  const [hitterName, hitterTeam] = hitterId.split('-');
+  
+  // Check if this hitter is already in selectedPlayers.hitters
+  const existingHitter = selectedPlayers.hitters.find(h => h.id === hitterId);
+  if (existingHitter) {
+    console.log(`[usePlayerData] Found hitter in selectedPlayers: ${hitterName}`);
+    
+    // Instead of just returning the existing hitter, apply the current game history setting
+    return fetchPlayerGameHistory(existingHitter, hitterGamesHistory);
+  }
+  
+  // If not found in selected hitters, look in available hitters
+  const availableHitter = availablePlayers.hitters.find(h => h.id === hitterId);
+  if (availableHitter) {
+    console.log(`[usePlayerData] Found hitter in availablePlayers: ${hitterName}`);
+    
+    // Apply the current game history setting
+    return fetchPlayerGameHistory(availableHitter, hitterGamesHistory);
+  }
+  
+  // If not found anywhere, create a basic hitter with defaults
+  console.log(`[usePlayerData] Hitter not found in existing data: ${hitterName}`);
+  let basicHitter = {
+    id: hitterId,
+    name: hitterName,
+    team: hitterTeam,
+    type: 'hitter',
+    playerType: 'hitter',
+    // Initialize with defaults for all stats
+    AB: '0',
+    H: '0',
+    HR: '0',
+    R: '0',
+    RBI: '0',
+    AVG: '.000',
+    prevGameHR: '0',
+    prevGameAB: '0',
+    prevGameH: '0'
+  };
+  
+  try {
+    // Look for hitter in current playerData
+    console.log("[usePlayerData] Looking for hitter in current player data...");
+    
+    // Try a simple name match
+    const matchingHitters = playerData.filter(p => 
+      p.name === hitterName && 
+      p.team === hitterTeam
+    );
+    
+    if (matchingHitters.length > 0) {
+      const matchingHitter = matchingHitters[0];
+      console.log(`[usePlayerData] Found hitter in current data: ${hitterName}`, matchingHitter);
+      
+      // Copy stats to our hitter object
+      basicHitter.AB = matchingHitter.AB || '0';
+      basicHitter.H = matchingHitter.H || '0';
+      basicHitter.HR = matchingHitter.HR || '0';
+      basicHitter.R = matchingHitter.R || '0';
+      basicHitter.RBI = matchingHitter.RBI || '0';
+      basicHitter.AVG = matchingHitter.AVG || '.000';
+      basicHitter.prevGameHR = matchingHitter.HR || '0';
+      basicHitter.prevGameAB = matchingHitter.AB || '0';
+      basicHitter.prevGameH = matchingHitter.H || '0';
+    }
+    
+    // Get game history for this hitter
+    if (playerStatsHistory && Object.keys(playerStatsHistory).length > 0) {
+      console.log(`[usePlayerData] Getting game history for hitter: ${hitterName}`);
+      
+      // Apply the current game history setting
+      return fetchPlayerGameHistory(basicHitter, hitterGamesHistory);
+    }
+    
+    return basicHitter;
+  } catch (error) {
+    console.error(`[usePlayerData] Error creating hitter data: ${error.message}`);
+    return basicHitter;
+  }
+};
+
+
+
 
   // Enhanced fetchPitcherById function
   const fetchPitcherById = async (pitcherId) => {
@@ -1042,7 +1233,6 @@ const usePlayerData = (
     teams,
     playerDataSource,
     setPlayerDataSource,
-    historicalDate,
     isLoadingPlayers,
     setIsLoadingPlayers, 
     hasProcessedData,
@@ -1069,6 +1259,7 @@ const usePlayerData = (
     updatePlayersWithNewHandicapper,
     removeHandicapperFromPlayers,
     fetchPitcherById, 
+    fetchHitterById, // Add this new function
     isRefreshingHitters,
     setIsRefreshingHitters,
     isRefreshingPitchers,
