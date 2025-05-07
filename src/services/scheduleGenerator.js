@@ -38,7 +38,7 @@ const TEAM_MAPPING = {
   'Minnesota Twins': 'MIN',
   'New York Mets': 'NYM',
   'New York Yankees': 'NYY',
-  'Oakland Athletics': 'OAK',
+  'Athletics': 'OAK',
   'Philadelphia Phillies': 'PHI',
   'Pittsburgh Pirates': 'PIT',
   'San Diego Padres': 'SD',
