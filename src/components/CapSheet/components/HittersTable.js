@@ -5,7 +5,7 @@ import './HitterPerformanceLineChart.css';
 
 /**
  * Component for displaying the hitters table section
- * Updated with visual performance line chart and pitcher overlay capability
+ * Updated to pass fetchHitterById for individual hitter refreshes
  * 
  * @param {Object} props - Component props
  */
@@ -13,6 +13,7 @@ const HittersTable = ({
   hitters,
   hitterOptions,
   fetchPitcherById, 
+  fetchHitterById, // New prop to pass down to HitterRow
   teams,
   handicappers,
   isLoadingPlayers,
@@ -37,12 +38,18 @@ const HittersTable = ({
 
   return (
     <div className="section-container">
-      <h3 className="section-header">Hitters{isRefreshingHitters && (
+      <h3 className="section-header">
+        Hitters
+        {isRefreshingHitters && (
           <span className="refreshing-indicator">
             <div className="refreshing-spinner"></div>
             Refreshing charts...
           </span>
-        )}</h3>
+        )}
+        <span className="games-history-indicator">
+          Showing {gamesHistory} game{gamesHistory !== 1 ? 's' : ''} of history
+        </span>
+      </h3>
       <div className="control-bar">
         <PlayerSelector
           options={hitterOptions}
@@ -51,7 +58,7 @@ const HittersTable = ({
           isDisabled={isLoadingPlayers || hitterOptions.length === 0}
           placeholder="Search and select a hitter..."
           noOptionsMessage="No hitters found"
-          selectId="hitter-selector" // Add unique ID for select
+          selectId="hitter-selector"
         />
       </div>
 
@@ -164,14 +171,17 @@ const HittersTable = ({
                       handicappers={handicappers}
                       pitcherOptions={pitcherOptions}
                       fetchPitcherById={fetchPitcherById}
+                      fetchHitterById={fetchHitterById} // Pass the new function
                       onFieldChange={onFieldChange}
                       onPitcherSelect={onPitcherSelect}
                       onBetTypeChange={onBetTypeChange}
                       onPickChange={onPickChange}
                       onRemove={onRemovePlayer}
                       hasAnySecondPitcher={hasAnySecondPitcher}
-                      gamesHistory={gamesHistory} // Pass down games history value 
-                      rowIndex={index} // Add index to help create unique IDs
+                      gamesHistory={gamesHistory}
+                      refreshKey={refreshKey}
+                      rowIndex={index}
+                      isRefreshingHitters={isRefreshingHitters}
                     />
                   );
                 })
