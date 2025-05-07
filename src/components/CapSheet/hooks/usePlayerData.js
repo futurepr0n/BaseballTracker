@@ -1011,20 +1011,53 @@ const fetchHitterById = async (hitterId) => {
       opponentTeam
     };
     
-    // Check if any other hitters from the same team already have a pitcher set
+    // Check if any other hitters from the same team already have values we can copy
     const teamHitters = selectedPlayers.hitters.filter(h => 
       h.team === playerTeam && h.opponentTeam === opponentTeam
     );
     
-    // Find a team hitter with a pitcher already set
-    const hitterWithPitcher = teamHitters.find(h => h.pitcherId);
-    
-    // If we found a teammate with a pitcher set, use the same pitcher
-    if (hitterWithPitcher && hitterWithPitcher.pitcherId) {
-      basePlayer.pitcher = hitterWithPitcher.pitcher;
-      basePlayer.pitcherId = hitterWithPitcher.pitcherId;
-      basePlayer.pitcherHand = hitterWithPitcher.pitcherHand;
-      console.log(`Auto-assigned pitcher ${basePlayer.pitcher} for new hitter ${basePlayer.name} based on teammates.`);
+    if (teamHitters.length > 0) {
+      // Find existing team hitter with the most data to copy from
+      const sourceHitter = teamHitters.reduce((best, current) => {
+        // Prefer hitters that have pitcher and other fields set
+        const bestScore = (best.pitcherId ? 10 : 0) + 
+                         (best.gameOU ? 5 : 0) + 
+                         (best.stadium ? 3 : 0) + 
+                         (best.expectedSO ? 2 : 0);
+                         
+        const currentScore = (current.pitcherId ? 10 : 0) + 
+                            (current.gameOU ? 5 : 0) + 
+                            (current.stadium ? 3 : 0) + 
+                            (current.expectedSO ? 2 : 0);
+                            
+        return currentScore > bestScore ? current : best;
+      }, teamHitters[0]);
+      
+      // Copy pitcher assignment if available
+      if (sourceHitter.pitcherId) {
+        basePlayer.pitcher = sourceHitter.pitcher;
+        basePlayer.pitcherId = sourceHitter.pitcherId;
+        basePlayer.pitcherHand = sourceHitter.pitcherHand;
+        console.log(`Auto-assigned pitcher ${basePlayer.pitcher} for new hitter ${basePlayer.name}`);
+        
+        // If this pitcher has ExpSO value, copy that too
+        if (sourceHitter.expectedSO) {
+          basePlayer.expectedSO = sourceHitter.expectedSO;
+          console.log(`Auto-assigned Expected SO: ${basePlayer.expectedSO} for new hitter ${basePlayer.name}`);
+        }
+      }
+      
+      // Copy Game O/U if available
+      if (sourceHitter.gameOU) {
+        basePlayer.gameOU = sourceHitter.gameOU;
+        console.log(`Auto-assigned Game O/U: ${basePlayer.gameOU} for new hitter ${basePlayer.name}`);
+      }
+      
+      // Copy Stadium if available and still empty
+      if (sourceHitter.stadium && !basePlayer.stadium) {
+        basePlayer.stadium = sourceHitter.stadium;
+        console.log(`Auto-assigned Stadium: ${basePlayer.stadium} for new hitter ${basePlayer.name}`);
+      }
     }
     
     // Get player with game history data
@@ -1038,34 +1071,78 @@ const fetchHitterById = async (hitterId) => {
 
   const handleAddPitcherById = async (playerId) => {
     if (!playerId) return;
-
+  
     const selectedPlayer = availablePlayers.pitchers.find(p => p.id === playerId);
     if (!selectedPlayer) {
       console.error("[usePlayerData] Could not find pitcher with ID:", playerId);
       alert("Error: Could not find selected pitcher data.");
       return;
     }
-
+  
     if (selectedPlayers.pitchers.some(p => p.id === selectedPlayer.id)) {
       alert(`${selectedPlayer.name} is already in your pitchers list.`);
       return;
     }
-
+  
     const playerTeam = selectedPlayer.team;
     const game = gameData.find(g => g.homeTeam === playerTeam || g.awayTeam === playerTeam);
     let stadium = game ? game.venue || '' : '';
     let opponent = game ? (game.homeTeam === playerTeam ? game.awayTeam : game.homeTeam) : '';
-
+  
     // Create a new player with basic info
     const basePlayer = {
       ...selectedPlayer,
       stadium,
       opponent
     };
-
+    
+    // Check for existing pitchers from the same team to copy values from
+    const teamPitchers = selectedPlayers.pitchers.filter(p => p.team === playerTeam);
+    
+    if (teamPitchers.length > 0) {
+      // Find existing team pitcher with game data to copy
+      const sourcePitcher = teamPitchers.find(p => p.gameOU || p.stadium);
+      
+      if (sourcePitcher) {
+        // Copy Game O/U if available
+        if (sourcePitcher.gameOU) {
+          basePlayer.gameOU = sourcePitcher.gameOU;
+          console.log(`Auto-assigned Game O/U: ${basePlayer.gameOU} for new pitcher ${basePlayer.name}`);
+        }
+        
+        // Copy Stadium if available and still empty
+        if (sourcePitcher.stadium && !basePlayer.stadium) {
+          basePlayer.stadium = sourcePitcher.stadium;
+          console.log(`Auto-assigned Stadium: ${basePlayer.stadium} for new pitcher ${basePlayer.name}`);
+        }
+      }
+    }
+    
+    // Alternatively, we can check hitters from the same team
+    else {
+      const teamHitters = selectedPlayers.hitters.filter(h => h.team === playerTeam);
+      if (teamHitters.length > 0) {
+        const sourceHitter = teamHitters.find(h => h.gameOU || h.stadium);
+        
+        if (sourceHitter) {
+          // Copy Game O/U if available
+          if (sourceHitter.gameOU) {
+            basePlayer.gameOU = sourceHitter.gameOU;
+            console.log(`Auto-assigned Game O/U: ${basePlayer.gameOU} for new pitcher ${basePlayer.name} from hitter data`);
+          }
+          
+          // Copy Stadium if available and still empty
+          if (sourceHitter.stadium && !basePlayer.stadium) {
+            basePlayer.stadium = sourceHitter.stadium;
+            console.log(`Auto-assigned Stadium: ${basePlayer.stadium} for new pitcher ${basePlayer.name} from hitter data`);
+          }
+        }
+      }
+    }
+  
     // Update with current games history
     const playerWithHistory = await updatePlayerWithGameHistory(basePlayer, pitcherGamesHistory);
-
+  
     setSelectedPlayers(prev => ({
       ...prev,
       pitchers: [...prev.pitchers, playerWithHistory]
@@ -1082,23 +1159,180 @@ const fetchHitterById = async (hitterId) => {
 
   // Field change handlers
   const handleHitterFieldChange = (playerId, field, value) => {
-    setSelectedPlayers(prev => ({
-      ...prev,
-      hitters: prev.hitters.map(player => {
-        if (player.id !== playerId) return player;
-        return { ...player, [field]: value };
-      })
-    }));
+    // Get the current hitter to determine context
+    const currentHitter = selectedPlayers.hitters.find(h => h.id === playerId);
+    if (!currentHitter) {
+      // If hitter not found, just update that specific field as normal
+      setSelectedPlayers(prev => ({
+        ...prev,
+        hitters: prev.hitters.map(player => {
+          if (player.id !== playerId) return player;
+          return { ...player, [field]: value };
+        })
+      }));
+      return;
+    }
+    
+    // For Game O/U, we want to update all players in the same game
+    if (field === 'gameOU') {
+      const hitterTeam = currentHitter.team;
+      const opponentTeam = currentHitter.opponentTeam;
+      
+      // Update the Game O/U for all hitters AND pitchers in this game
+      setSelectedPlayers(prev => ({
+        ...prev,
+        // Update hitters in the same game
+        hitters: prev.hitters.map(player => {
+          if ((player.team === hitterTeam && player.opponentTeam === opponentTeam) || 
+              (player.team === opponentTeam && player.opponentTeam === hitterTeam)) {
+            return { ...player, [field]: value };
+          }
+          return player;
+        }),
+        // Also update pitchers in the same game
+        pitchers: prev.pitchers.map(player => {
+          if ((player.team === hitterTeam && player.opponent === opponentTeam) || 
+              (player.team === opponentTeam && player.opponent === hitterTeam)) {
+            return { ...player, [field]: value };
+          }
+          return player;
+        })
+      }));
+      
+      console.log(`Updated Game O/U to ${value} for all players in the ${hitterTeam} vs ${opponentTeam} game.`);
+    } 
+    // For Expected SO, update only hitters with the same pitcher and same team
+    else if (field === 'expectedSO' && currentHitter.pitcherId) {
+      const hitterTeam = currentHitter.team;
+      const currentPitcherId = currentHitter.pitcherId;
+      
+      setSelectedPlayers(prev => ({
+        ...prev,
+        hitters: prev.hitters.map(player => {
+          // Apply to players on same team with the same pitcher assignment
+          if (player.id !== playerId && 
+              player.team === hitterTeam && 
+              player.pitcherId === currentPitcherId) {
+            return { ...player, [field]: value };
+          }
+          // Always update the current player
+          else if (player.id === playerId) {
+            return { ...player, [field]: value };
+          }
+          return player;
+        })
+      }));
+      
+      console.log(`Updated Expected SO to ${value} for all ${hitterTeam} hitters facing the same pitcher.`);
+    } 
+    // For stadium field, update all players from the same team
+    else if (field === 'stadium') {
+      const hitterTeam = currentHitter.team;
+      
+      setSelectedPlayers(prev => ({
+        ...prev,
+        hitters: prev.hitters.map(player => {
+          if (player.team === hitterTeam) {
+            return { ...player, [field]: value };
+          }
+          return player;
+        }),
+        pitchers: prev.pitchers.map(player => {
+          if (player.team === hitterTeam) {
+            return { ...player, [field]: value };
+          }
+          return player;
+        })
+      }));
+      
+      console.log(`Updated Stadium to ${value} for all ${hitterTeam} players.`);
+    }
+    // For all other fields, just update the individual player
+    else {
+      setSelectedPlayers(prev => ({
+        ...prev,
+        hitters: prev.hitters.map(player => {
+          if (player.id !== playerId) return player;
+          return { ...player, [field]: value };
+        })
+      }));
+    }
   };
 
   const handlePitcherFieldChange = (playerId, field, value) => {
-    setSelectedPlayers(prev => ({
-      ...prev,
-      pitchers: prev.pitchers.map(player => {
-        if (player.id !== playerId) return player;
-        return { ...player, [field]: value };
-      })
-    }));
+    // Get the current pitcher
+    const currentPitcher = selectedPlayers.pitchers.find(p => p.id === playerId);
+    if (!currentPitcher) {
+      // If pitcher not found, just update normally
+      setSelectedPlayers(prev => ({
+        ...prev,
+        pitchers: prev.pitchers.map(player => {
+          if (player.id !== playerId) return player;
+          return { ...player, [field]: value };
+        })
+      }));
+      return;
+    }
+    
+    // For Game O/U, update all players in the same game
+    if (field === 'gameOU') {
+      const pitcherTeam = currentPitcher.team;
+      const opponentTeam = currentPitcher.opponent;
+      
+      setSelectedPlayers(prev => ({
+        ...prev,
+        // Update pitchers in the same game
+        pitchers: prev.pitchers.map(player => {
+          if ((player.team === pitcherTeam && player.opponent === opponentTeam) || 
+              (player.team === opponentTeam && player.opponent === pitcherTeam)) {
+            return { ...player, [field]: value };
+          }
+          return player;
+        }),
+        // Also update hitters in the same game
+        hitters: prev.hitters.map(player => {
+          if ((player.team === pitcherTeam && player.opponentTeam === opponentTeam) || 
+              (player.team === opponentTeam && player.opponentTeam === pitcherTeam)) {
+            return { ...player, [field]: value };
+          }
+          return player;
+        })
+      }));
+      
+      console.log(`Updated Game O/U to ${value} for all players in the ${pitcherTeam} vs ${opponentTeam} game.`);
+    }
+    // For stadium field, update all players from the same team
+    else if (field === 'stadium') {
+      const pitcherTeam = currentPitcher.team;
+      
+      setSelectedPlayers(prev => ({
+        ...prev,
+        pitchers: prev.pitchers.map(player => {
+          if (player.team === pitcherTeam) {
+            return { ...player, [field]: value };
+          }
+          return player;
+        }),
+        hitters: prev.hitters.map(player => {
+          if (player.team === pitcherTeam) {
+            return { ...player, [field]: value };
+          }
+          return player;
+        })
+      }));
+      
+      console.log(`Updated Stadium to ${value} for all ${pitcherTeam} players.`);
+    }
+    // For all other fields, just update the individual pitcher
+    else {
+      setSelectedPlayers(prev => ({
+        ...prev,
+        pitchers: prev.pitchers.map(player => {
+          if (player.id !== playerId) return player;
+          return { ...player, [field]: value };
+        })
+      }));
+    }
   };
 
   // Pitcher selection handler
