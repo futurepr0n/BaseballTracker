@@ -85,15 +85,15 @@ const PitcherRow = ({
         {(isRefreshingPitchers || isLoadingPitcher) && <span className="loading-indicator">⟳</span>}
       </td>
       <td>{selectedPitcher.team}</td>
-      <td>{selectedPitcher.prevGameIP}</td>
-      <td>{selectedPitcher.prevGameK}</td>
-      <td>{selectedPitcher.prevGameER}</td>
-      <td>{selectedPitcher.prevGameH || selectedPitcher.H || '0'}</td>
-      <td>{selectedPitcher.prevGameR || selectedPitcher.R || '0'}</td>
-      <td>{selectedPitcher.prevGameBB || selectedPitcher.BB || '0'}</td>
-      <td>{selectedPitcher.prevGameHR || selectedPitcher.HR || '0'}</td>
-      <td>{selectedPitcher.prevGamePC_ST || selectedPitcher.PC_ST || 'N/A'}</td>
-      <td>{selectedPitcher.ERA || '0.00'}</td>
+      <td>{selectedPitcher.prevGameIP || selectedPitcher.IP || '0'}</td>
+<td>{selectedPitcher.prevGameK || selectedPitcher.K || '0'}</td>
+<td>{selectedPitcher.prevGameER || selectedPitcher.ER || '0'}</td>
+<td>{selectedPitcher.prevGameH || selectedPitcher.H || '0'}</td>
+<td>{selectedPitcher.prevGameR || selectedPitcher.R || '0'}</td>
+<td>{selectedPitcher.prevGameBB || selectedPitcher.BB || '0'}</td>
+<td>{selectedPitcher.prevGameHR || selectedPitcher.HR || '0'}</td>
+<td>{selectedPitcher.prevGamePC_ST || selectedPitcher.PC_ST || 'N/A'}</td>
+<td>{selectedPitcher.ERA || '0.00'}</td>
       
       {/* Performance Line Chart - Now using the selectedPitcher with refreshed data */}
       <td className="performance-chart-cell">
