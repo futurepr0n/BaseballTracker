@@ -599,6 +599,79 @@ const fetchHitterById = async (hitterId) => {
       };
     }
     
+    // To this (adding explicit prevGame* properties):
+    if (existingPitcher) {
+      console.log(`Found pitcher in selectedPlayers: ${pitcherName}`);
+      return {
+        id: existingPitcher.id,
+        name: existingPitcher.name,
+        team: existingPitcher.team,
+        type: 'pitcher',
+        playerType: 'pitcher',
+        throwingArm: existingPitcher.throwingArm || '',
+        // Get all stats with appropriate fallbacks
+        PC_ST: existingPitcher.PC_ST || existingPitcher.prevGamePC_ST || 'N/A',
+        K: existingPitcher.K || existingPitcher.prevGameK || 'N/A',
+        HR: existingPitcher.HR || existingPitcher.prevGameHR || 'N/A',
+        IP: existingPitcher.IP || existingPitcher.prevGameIP || '0',
+        ER: existingPitcher.ER || existingPitcher.prevGameER || 'N/A',
+        H: existingPitcher.H || existingPitcher.prevGameH || '0',
+        R: existingPitcher.R || existingPitcher.prevGameR || '0',
+        BB: existingPitcher.BB || existingPitcher.prevGameBB || '0',
+        ERA: existingPitcher.ERA || '0.00',
+        // Explicitly set the prevGame* properties for display
+        prevGameIP: existingPitcher.IP || existingPitcher.prevGameIP || '0',
+        prevGameK: existingPitcher.K || existingPitcher.prevGameK || '0',
+        prevGameER: existingPitcher.ER || existingPitcher.prevGameER || '0',
+        prevGameH: existingPitcher.H || existingPitcher.prevGameH || '0',
+        prevGameR: existingPitcher.R || existingPitcher.prevGameR || '0',
+        prevGameBB: existingPitcher.BB || existingPitcher.prevGameBB || '0',
+        prevGameHR: existingPitcher.HR || existingPitcher.prevGameHR || '0',
+        prevGamePC_ST: existingPitcher.PC_ST || existingPitcher.prevGamePC_ST || 'N/A',
+        // Include history data
+        ...Object.entries(existingPitcher)
+          .filter(([key]) => key.startsWith('game'))
+          .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
+      };
+    }
+    
+    // Also do the same fix for the availablePlayers section (around line 729)
+    // Change this part too:
+    if (availablePitcher) {
+      console.log(`Found pitcher in availablePlayers: ${pitcherName}`);
+      return {
+        id: availablePitcher.id,
+        name: availablePitcher.name,
+        team: availablePitcher.team,
+        type: 'pitcher',
+        playerType: 'pitcher',
+        throwingArm: availablePitcher.throwingArm || '',
+        // Get all stats with appropriate fallbacks
+        PC_ST: availablePitcher.PC_ST || availablePitcher.prevGamePC_ST || 'N/A',
+        K: availablePitcher.K || availablePitcher.prevGameK || 'N/A',
+        HR: availablePitcher.HR || availablePitcher.prevGameHR || 'N/A',
+        IP: availablePitcher.IP || availablePitcher.prevGameIP || '0',
+        ER: availablePitcher.ER || availablePitcher.prevGameER || 'N/A',
+        H: availablePitcher.H || availablePitcher.prevGameH || '0',
+        R: availablePitcher.R || availablePitcher.prevGameR || '0',
+        BB: availablePitcher.BB || availablePitcher.prevGameBB || '0',
+        ERA: availablePitcher.ERA || '0.00',
+        // Explicitly add the prevGame* properties
+        prevGameIP: availablePitcher.IP || availablePitcher.prevGameIP || '0',
+        prevGameK: availablePitcher.K || availablePitcher.prevGameK || '0',
+        prevGameER: availablePitcher.ER || availablePitcher.prevGameER || '0',
+        prevGameH: availablePitcher.H || availablePitcher.prevGameH || '0',
+        prevGameR: availablePitcher.R || availablePitcher.prevGameR || '0',
+        prevGameBB: availablePitcher.BB || availablePitcher.prevGameBB || '0',
+        prevGameHR: availablePitcher.HR || availablePitcher.prevGameHR || '0',
+        prevGamePC_ST: availablePitcher.PC_ST || availablePitcher.prevGamePC_ST || 'N/A',
+        // Include history data
+        ...Object.entries(availablePitcher)
+          .filter(([key]) => key.startsWith('game'))
+          .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
+      };
+    }
+    
     // If not found in selected pitchers, look in available pitchers
     const availablePitcher = availablePlayers.pitchers.find(p => p.id === pitcherId);
     if (availablePitcher) {
