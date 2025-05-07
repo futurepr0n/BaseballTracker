@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { formatGameDate } from '../utils/formatters';
 import './PitcherPerformanceLineChart.css';
@@ -6,20 +6,33 @@ import './PitcherPerformanceLineChart.css';
 /**
  * A line graph visualization of a pitcher's performance over their recent games
  * Shows strikeout trend and earned runs with color-coded markers
- * Enhanced with more robust data validation and fallbacks
+ * Enhanced with memoization and game history awareness
  * 
  * @param {Object} player - The pitcher player object with game data
+ * @param {number} gamesHistory - Number of games to display in history (default: 3)
+ * @param {boolean} isLoading - Whether the pitcher data is loading
  * @param {number} width - Width of the chart (default: full width)
  * @param {number} height - Height of the chart (default: 90px)
  */
-const PitcherPerformanceLineChart = ({ player, width = 260, height = 90 }) => {
-  // Determine how many games are available in the player object
-  const getAvailableGames = () => {
+const PitcherPerformanceLineChart = ({ 
+  player, 
+  gamesHistory = 3,
+  isLoading = false,
+  width = 260, 
+  height = 90 
+}) => {
+  // Logging to help debug when this component renders
+  console.log(`[PitcherPerformanceLineChart] Rendering for ${player.name} with ${gamesHistory} games history`);
+  
+  // Must place ALL hooks at the top, before any conditional returns
+  // Determine how many games are available in the player object - now with memoization
+  const availableGames = useMemo(() => {
+    console.log(`[PitcherPerformanceLineChart] Calculating available games for ${player.name}`);
     const games = [];
     let gameIndex = 1;
     
     // Keep adding games as long as we find date properties in the player object
-    while (player[`game${gameIndex}Date`] !== undefined) {
+    while (player[`game${gameIndex}Date`] !== undefined && gameIndex <= gamesHistory) {
       // Only add the game if it has a valid date
       if (player[`game${gameIndex}Date`]) {
         games.push({
@@ -35,42 +48,107 @@ const PitcherPerformanceLineChart = ({ player, width = 260, height = 90 }) => {
       gameIndex++;
     }
     
-    // Add game 0 data (most recent game) if we have it but no game1 data
-    if (games.length === 0 && player.prevGameIP && parseFloat(player.prevGameIP) > 0) {
-      games.push({
-        date: 'Last Game',
-        ip: parseFloat(player.prevGameIP || '0') || 0,
-        k: parseInt(player.prevGameK || '0') || 0,
-        er: parseInt(player.prevGameER || '0') || 0,
-        kPerIP: parseFloat(player.prevGameIP || '0') > 0 
-          ? parseInt(player.prevGameK || '0') / parseFloat(player.prevGameIP || '0') 
-          : 0
-      });
-    }
+    console.log(`[PitcherPerformanceLineChart] Found ${games.length} games for ${player.name}`);
     
     return games.reverse(); // Display oldest to newest (left to right)
-  };
+  }, [player, gamesHistory]);
   
-  // Get all available games with better validation
-  const games = getAvailableGames();
+  // Filter out games with minimal innings pitched - also memoized
+  const validGames = useMemo(() => {
+    const filteredGames = availableGames.filter(game => game.ip >= 0.1);
+    console.log(`[PitcherPerformanceLineChart] After filtering, ${filteredGames.length} valid games`);
+    return filteredGames;
+  }, [availableGames]);
   
-  // Filter out games with minimal innings pitched (might be relief appearances too short to be relevant)
-  // You could adjust this threshold based on your preference
-  const validGames = games.filter(game => game.ip >= 0.1);
-  
-  // Enhanced data availability check - if we have at least 2 valid games, or at least 1 with good stats
-  const hasEnoughDataForTrend = validGames.length >= 2 || 
-                               (validGames.length === 1 && 
-                                validGames[0].ip >= 1.0 && 
-                                validGames[0].k >= 1);
+  // Check if we have enough data to show a trend
+  const hasEnoughData = useMemo(() => validGames.length > 1, [validGames]);
   
   // Visual constants
   const padding = { top: 15, right: 20, bottom: 25, left: 40 };
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
   
+  // Calculate trend direction and max K/IP only if we have enough data
+  const { lineColor, maxKPerIP } = useMemo(() => {
+    if (!hasEnoughData) {
+      return {
+        lineColor: '#3b82f6', // Default blue
+        maxKPerIP: 3 // Default scale
+      };
+    }
+    
+    // Calculate trend direction (green for upward K/IP, red for downward)
+    const firstGameKRate = validGames[0].kPerIP;
+    const lastGameKRate = validGames[validGames.length - 1].kPerIP;
+    
+    // Determine trend direction and set color accordingly
+    const trendDirection = lastGameKRate > firstGameKRate ? 'up' : 
+                          lastGameKRate < firstGameKRate ? 'down' : 
+                          'neutral';
+    
+    const color = trendDirection === 'up' ? '#22c55e' : // green
+                      trendDirection === 'down' ? '#ef4444' : // red
+                      '#3b82f6'; // blue for neutral
+    
+    // Maximum K/IP in the dataset for scaling (at least 3 to ensure proper scaling)
+    const maxValue = Math.max(3, ...validGames.map(g => g.kPerIP));
+    
+    return {
+      lineColor: color,
+      maxKPerIP: maxValue
+    };
+  }, [hasEnoughData, validGames]);
+  
+  // Pre-calculate X and Y position functions
+  const getX = useMemo(() => {
+    return (index, total) => {
+      // If only 1 or 2 games, space them more reasonably
+      if (total <= 2) {
+        return padding.left + (index * (chartWidth / 2));
+      }
+      // Otherwise use regular spacing
+      const divisor = Math.max(1, total - 1);
+      return padding.left + (index * (chartWidth / divisor));
+    };
+  }, [padding.left, chartWidth]);
+  
+  const getY = useMemo(() => {
+    return (kPerIP) => padding.top + chartHeight - ((kPerIP / maxKPerIP) * chartHeight);
+  }, [padding.top, chartHeight, maxKPerIP]);
+  
+  // Create points for the line - now memoized
+  const points = useMemo(() => {
+    if (!hasEnoughData) return [];
+    
+    return validGames.map((game, i) => ({
+      x: getX(i, validGames.length),
+      y: getY(game.kPerIP),
+      ...game
+    }));
+  }, [validGames, hasEnoughData, getX, getY]);
+  
+  // Create the path for the line if we have multiple points - also memoized
+  const linePath = useMemo(() => {
+    if (!hasEnoughData || points.length < 2) return "";
+    
+    return points.map((point, i) => 
+      (i === 0 ? "M" : "L") + point.x + "," + point.y
+    ).join(" ");
+  }, [points, hasEnoughData]);
+
+  // Now we can have conditional returns
+  // Display loading state
+  if (isLoading) {
+    return (
+      <div className="loading-pitcher-data" style={{ width, height }}>
+        <div className="chart-loading-spinner"></div>
+        <span>Updating pitcher data...</span>
+      </div>
+    );
+  }
+  
   // No data to display with better message
-  if (!hasEnoughDataForTrend) {
+  if (!hasEnoughData) {
     return (
       <div className="no-game-data">
         {validGames.length === 0 
@@ -80,48 +158,7 @@ const PitcherPerformanceLineChart = ({ player, width = 260, height = 90 }) => {
     );
   }
   
-  // Calculate trend direction (green for upward K/IP, red for downward)
-  const firstGameKRate = validGames[0].kPerIP;
-  const lastGameKRate = validGames[validGames.length - 1].kPerIP;
-  
-  // Determine trend direction and set color accordingly
-  const trendDirection = lastGameKRate > firstGameKRate ? 'up' : 
-                        lastGameKRate < firstGameKRate ? 'down' : 
-                        'neutral';
-  
-  const lineColor = trendDirection === 'up' ? '#22c55e' : // green
-                    trendDirection === 'down' ? '#ef4444' : // red
-                    '#3b82f6'; // blue for neutral
-  
-  // Maximum K/IP in the dataset for scaling (at least 3 to ensure proper scaling)
-  const maxKPerIP = Math.max(3, ...validGames.map(g => g.kPerIP));
-  
-  // Calculate positions for the chart
-  const getX = (index, total) => {
-    // If only 1 or 2 games, space them more reasonably
-    if (total <= 2) {
-      return padding.left + (index * (chartWidth / 2));
-    }
-    // Otherwise use regular spacing
-    const divisor = Math.max(1, total - 1);
-    return padding.left + (index * (chartWidth / divisor));
-  };
-  
-  // Scale K/IP to chart height
-  const getY = (kPerIP) => padding.top + chartHeight - ((kPerIP / maxKPerIP) * chartHeight);
-  
-  // Create points for the line
-  const points = validGames.map((game, i) => ({
-    x: getX(i, validGames.length),
-    y: getY(game.kPerIP),
-    ...game
-  }));
-  
-  // Create the path for the line if we have multiple points
-  const linePath = points.length > 1 
-    ? points.map((point, i) => (i === 0 ? "M" : "L") + point.x + "," + point.y).join(" ")
-    : "";
-  
+  // Render the chart if we have data
   return (
     <div className="performance-chart-container">
       <svg width={width} height={height} className="performance-line-chart">
@@ -157,7 +194,7 @@ const PitcherPerformanceLineChart = ({ player, width = 260, height = 90 }) => {
           K/IP
         </text>
         
-        {/* Line chart representing K/IP (only if multiple points) */}
+        {/* Line chart representing K/IP */}
         {points.length > 1 && (
           <path 
             d={linePath} 
@@ -249,13 +286,13 @@ const PitcherPerformanceLineChart = ({ player, width = 260, height = 90 }) => {
 
 PitcherPerformanceLineChart.propTypes = {
   player: PropTypes.shape({
-    // Dynamic PropTypes validation for variable game history
-    // We only require the player object itself
     name: PropTypes.string.isRequired,
     team: PropTypes.string.isRequired,
   }).isRequired,
+  gamesHistory: PropTypes.number,
+  isLoading: PropTypes.bool,
   width: PropTypes.number,
   height: PropTypes.number
 };
 
-export default PitcherPerformanceLineChart;
+export default React.memo(PitcherPerformanceLineChart);

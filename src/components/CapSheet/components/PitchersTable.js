@@ -1,11 +1,12 @@
 import React from 'react';
 import PitcherRow from './TableRow/PitcherRow';
 import PlayerSelector from './PlayerSelector';
-import './PitcherPerformanceLineChart.css'; // Make sure to import the CSS file
+import './PitcherPerformanceLineChart.css';
 
 /**
  * Component for displaying the pitchers table section
  * Updated with visual performance trend and additional statistics
+ * Now properly passing fetchPitcherById and isRefreshingPitchers props
  * 
  * @param {Object} props - Component props
  */
@@ -23,16 +24,23 @@ const PitchersTable = ({
   onPickChange,
   onRemoveHandicapper,
   gamesHistory,
-  refreshKey // Add refresh key to force re-render when needed
+  refreshKey,
+  fetchPitcherById // Add this prop to pass down to PitcherRow
 }) => {
   return (
     <div className="section-container">
-      <h3 className="section-header">Pitchers{isRefreshingPitchers && (
+      <h3 className="section-header">
+        Pitchers
+        {isRefreshingPitchers && (
           <span className="refreshing-indicator">
             <div className="refreshing-spinner"></div>
             Refreshing charts...
           </span>
-        )}</h3>
+        )}
+        <span className="games-history-indicator">
+          Showing {gamesHistory} game{gamesHistory !== 1 ? 's' : ''} of history
+        </span>
+      </h3>
       <div className="control-bar">
         <PlayerSelector
           options={pitcherOptions}
@@ -134,6 +142,9 @@ const PitchersTable = ({
                     onPickChange={onPickChange}
                     onRemove={onRemovePlayer}
                     gamesHistory={gamesHistory} // Pass down games history value
+                    refreshKey={refreshKey} // Pass down refresh key
+                    isRefreshingPitchers={isRefreshingPitchers} // Pass loading state
+                    fetchPitcherById={fetchPitcherById} // Pass down the fetch function
                     rowIndex={index} // Add index to help create unique IDs
                   />
                 ))

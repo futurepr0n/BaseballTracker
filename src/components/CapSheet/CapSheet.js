@@ -307,6 +307,7 @@ const handleHitterGamesHistoryChange = (newValue) => {
 // In the handlePitcherGamesHistoryChange function:
 const handlePitcherGamesHistoryChange = (newValue) => {
   if (newValue !== pitcherGamesHistory) {
+    console.log(`[CapSheet] Pitcher games history changing from ${pitcherGamesHistory} to ${newValue}`);
     setPitcherGamesHistory(newValue);
     
     // Show the legend when changing the value
@@ -314,11 +315,22 @@ const handlePitcherGamesHistoryChange = (newValue) => {
     
     // Immediately trigger refresh for all existing pitchers
     if (selectedPlayers.pitchers.length > 0) {
+      console.log(`[CapSheet] Explicitly requesting pitcher history refresh with ${newValue} games for ${selectedPlayers.pitchers.length} pitchers`);
+      
+      // IMPORTANT: Set refreshing flag first
       setIsRefreshingPitchers(true);
-      // Request refresh with new value (this will update all pitchers)
-      requestHistoryRefresh('pitcher', newValue);
-      // Force re-render of the pitcher table
-      setPitcherRefreshKey(Date.now());
+      
+      // Then call the refresh function with explicit Promise handling
+      requestHistoryRefresh('pitcher', newValue)
+        .then(() => {
+          console.log(`[CapSheet] Pitcher history refresh complete for ${newValue} games`);
+          // Force a re-render with a new key
+          setPitcherRefreshKey(Date.now());
+        })
+        .finally(() => {
+          // Clear the refreshing flag when done or on error
+          setIsRefreshingPitchers(false);
+        });
     }
   }
 };
@@ -707,9 +719,11 @@ const handlePitcherGamesHistoryChange = (newValue) => {
               onBetTypeChange={handlePitcherBetTypeChange}
               onPickChange={handlePitcherPickChange}
               onRemoveHandicapper={handleRemovePitcherHandicapperWithUpdate}
-              gamesHistory={pitcherGamesHistory} // Use pitcher-specific games history
-              refreshKey={pitcherRefreshKey} // Pass refresh key to trigger re-render
+              gamesHistory={pitcherGamesHistory}
+              refreshKey={pitcherRefreshKey}
+              fetchPitcherById={fetchPitcherById} // Add this prop
             />
+
           </section>
         </>
       )}
