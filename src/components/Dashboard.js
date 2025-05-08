@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 
+// Helper function to format date for display
+const formatDate = (dateString) => {
+  if (!dateString) return 'N/A';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
 /**
  * Dashboard component - Home page displaying summary of MLB data
  * With static HR prediction loading from pre-generated JSON file
@@ -15,6 +26,14 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     strikeouts: []
   });
   const [statsLoading, setStatsLoading] = useState(true);
+  const [playerPerformance, setPlayerPerformance] = useState(null);
+  const [topPerformers, setTopPerformers] = useState({
+    hrRate: [],
+    improved: [],
+    recent: [],
+    overPerforming: [],
+    underPerforming: []
+  });
   
   // Format date for display
   const formattedDate = currentDate.toLocaleDateString('en-US', { 
@@ -61,6 +80,78 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     
     loadHRPredictions();
   }, [currentDate]);
+  
+  // Load player performance data and calculate top performers
+  useEffect(() => {
+    const loadPlayerPerformance = async () => {
+      try {
+        const response = await fetch('/data/predictions/player_performance_latest.json');
+        if (response.ok) {
+          const data = await response.json();
+          setPlayerPerformance(data);
+          
+          // Process top performers if we have player data
+          if (data && data.players && data.players.length > 0) {
+            const players = data.players;
+            
+            // 1. Top players by HR rate this season
+            const hrRate = [...players]
+              .filter(player => player.gamesPlayed > 0 && player.homeRunsThisSeason > 0)
+              .sort((a, b) => (b.homeRunsThisSeason / b.gamesPlayed) - (a.homeRunsThisSeason / a.gamesPlayed))
+              .slice(0, 10);
+            
+            // 2. Top players with improved HR rate compared to historical
+            const improved = [...players]
+              .filter(player => player.actualHRRate > player.historicalHRRate)
+              .sort((a, b) => (b.actualHRRate - b.historicalHRRate) - (a.actualHRRate - a.historicalHRRate))
+              .slice(0, 10);
+            
+            // 3. Players who hit home runs most recently
+            const recent = [...players]
+              .filter(player => player.lastHRDate)
+              .sort((a, b) => {
+                // First sort by date (newest first)
+                const dateA = new Date(a.lastHRDate);
+                const dateB = new Date(b.lastHRDate);
+                if (dateB - dateA !== 0) return dateB - dateA;
+                
+                // If same date, sort by total home runs
+                return b.homeRunsThisSeason - a.homeRunsThisSeason;
+              })
+              .slice(0, 10);
+            
+            // 4. Over-performing players
+            const overPerforming = [...players]
+              .filter(player => player.status === "over-performing")
+              .sort((a, b) => b.performanceIndicator - a.performanceIndicator)
+              .slice(0, 10);
+            
+            // 5. Under-performing players
+            const underPerforming = [...players]
+              .filter(player => player.status === "under-performing")
+              .sort((a, b) => a.performanceIndicator - b.performanceIndicator)
+              .slice(0, 10);
+            
+            setTopPerformers({
+              hrRate,
+              improved,
+              recent,
+              overPerforming,
+              underPerforming
+            });
+          }
+        } else {
+          console.warn('No player performance data found');
+          setPlayerPerformance(null);
+        }
+      } catch (error) {
+        console.error('Error loading player performance data:', error);
+        setPlayerPerformance(null);
+      }
+    };
+    
+    loadPlayerPerformance();
+  }, []);
   
   // Load rolling 7-day stats or previous day if today is empty
   useEffect(() => {
@@ -165,8 +256,47 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
               strikeouts: topStrikeoutPitchers
             });
           } else {
-            // Fallback to the current playerData
-            processCurrentData();
+            // No historical data available, check if we have player performance data
+            if (playerPerformance && playerPerformance.players) {
+              // Transform player performance data for use in dashboard
+              const players = playerPerformance.players;
+              
+              // Create homers list based on homeRunsThisSeason
+              const homers = [...players]
+                .filter(player => player.homeRunsThisSeason)
+                .sort((a, b) => b.homeRunsThisSeason - a.homeRunsThisSeason)
+                .slice(0, 5)
+                .map(player => ({
+                  name: player.fullName || player.name,
+                  team: player.team,
+                  HR: player.homeRunsThisSeason,
+                  games: player.gamesPlayed || 1
+                }));
+              
+              // Create hitters list based on performance indicators
+              const hitters = [...players]
+                .filter(player => player.performanceIndicator)
+                .sort((a, b) => b.performanceIndicator - a.performanceIndicator)
+                .slice(0, 5)
+                .map(player => ({
+                  name: player.fullName || player.name,
+                  team: player.team,
+                  H: Math.round(player.expectedHRs * 2), // Estimated hits based on HR rate
+                  games: player.gamesPlayed || 1
+                }));
+              
+              // We don't have pitcher data, so leave strikeouts empty
+              const strikeouts = [];
+              
+              setRollingStats({
+                hitters,
+                homers,
+                strikeouts
+              });
+            } else {
+              // Fallback to the current playerData
+              processCurrentData();
+            }
           }
         } else {
           // Use the current day's data
@@ -212,7 +342,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     };
     
     loadRollingStats();
-  }, [playerData, currentDate]);
+  }, [playerData, currentDate, playerPerformance]);
   
   // Separate batting and pitching stats from current data
   const batterData = playerData.filter(player => 
@@ -241,7 +371,13 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
   // Helper function to display the time period
   const getTimePeriodText = () => {
     const hasDataForToday = playerData && playerData.length > 0;
-    return hasDataForToday ? "Today" : "Last 7 Days";
+    const hasHistoricalData = rollingStats.hitters.length > 0 || 
+                             rollingStats.homers.length > 0 || 
+                             rollingStats.strikeouts.length > 0;
+    
+    if (hasDataForToday) return "Today";
+    if (hasHistoricalData && !playerPerformance) return "Last 7 Days";
+    return "Season Performance";
   };
   
   return (
@@ -370,31 +506,164 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
           )}
         </div>
         
-        {/* Strikeout Leaders Card */}
-        <div className="card k-leaders">
-          <h3>Strikeout Leaders ({getTimePeriodText()})</h3>
-          {statsLoading ? (
-            <div className="loading-indicator">Loading stats...</div>
-          ) : rollingStats.strikeouts.length > 0 ? (
-            <ul className="player-list">
-              {rollingStats.strikeouts.map((player, index) => (
-                <li key={index} className="player-item">
-                  <div className="player-rank">{index + 1}</div>
-                  <div className="player-info">
-                    <span className="player-name">{player.name}</span>
-                    <span className="player-team">{player.team}</span>
-                  </div>
-                  <div className="player-stat">
-                    {player.K} K
-                    {player.games > 1 && <span className="stat-note">({player.games} games)</span>}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="no-data">No pitching data available for this period</p>
-          )}
-        </div>
+        {/* Strikeout Leaders Card - Only show if data is available */}
+        {rollingStats.strikeouts.length > 0 && (
+          <div className="card k-leaders">
+            <h3>Strikeout Leaders ({getTimePeriodText()})</h3>
+            {statsLoading ? (
+              <div className="loading-indicator">Loading stats...</div>
+            ) : (
+              <ul className="player-list">
+                {rollingStats.strikeouts.map((player, index) => (
+                  <li key={index} className="player-item">
+                    <div className="player-rank">{index + 1}</div>
+                    <div className="player-info">
+                      <span className="player-name">{player.name}</span>
+                      <span className="player-team">{player.team}</span>
+                    </div>
+                    <div className="player-stat">
+                      {player.K} K
+                      {player.games > 1 && <span className="stat-note">({player.games} games)</span>}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+        
+        {/* NEW CARD: Top Home Run Rate Card */}
+        {topPerformers.hrRate.length > 0 && (
+          <div className="card hr-rate">
+            <h3>Top HR Rate This Season</h3>
+            <div className="scrollable-container">
+              <ul className="player-list">
+                {topPerformers.hrRate.map((player, index) => (
+                  <li key={index} className="player-item">
+                    <div className="player-rank">{index + 1}</div>
+                    <div className="player-info">
+                      <span className="player-name">{player.fullName || player.name}</span>
+                      <span className="player-team">{player.team}</span>
+                    </div>
+                    <div className="player-stat">
+                      <div className="stat-highlight">
+                        {(player.homeRunsThisSeason / player.gamesPlayed).toFixed(3)} HR/G
+                      </div>
+                      <small>{player.homeRunsThisSeason} HR in {player.gamesPlayed} games</small>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+        
+        {/* NEW CARD: Most Improved HR Rate Card */}
+        {topPerformers.improved.length > 0 && (
+          <div className="card improved-rate">
+            <h3>Most Improved HR Rate</h3>
+            <div className="scrollable-container">
+              <ul className="player-list">
+                {topPerformers.improved.map((player, index) => (
+                  <li key={index} className="player-item">
+                    <div className="player-rank">{index + 1}</div>
+                    <div className="player-info">
+                      <span className="player-name">{player.fullName || player.name}</span>
+                      <span className="player-team">{player.team}</span>
+                    </div>
+                    <div className="player-stat">
+                      <div className="stat-highlight">
+                        +{((player.actualHRRate - player.historicalHRRate) * 100).toFixed(1)}%
+                      </div>
+                      <small>Current: {(player.actualHRRate * 100).toFixed(1)}%</small>
+                      <small>Historical: {(player.historicalHRRate * 100).toFixed(1)}%</small>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+        
+        {/* NEW CARD: Most Recent Home Runs Card */}
+        {topPerformers.recent.length > 0 && (
+          <div className="card recent-hr">
+            <h3>Most Recent Home Runs</h3>
+            <div className="scrollable-container">
+              <ul className="player-list">
+                {topPerformers.recent.map((player, index) => (
+                  <li key={index} className="player-item">
+                    <div className="player-rank">{index + 1}</div>
+                    <div className="player-info">
+                      <span className="player-name">{player.fullName || player.name}</span>
+                      <span className="player-team">{player.team}</span>
+                    </div>
+                    <div className="player-stat">
+                      <div className="stat-highlight">
+                        {formatDate(player.lastHRDate)}
+                      </div>
+                      <small>{player.homeRunsThisSeason} HR this season</small>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+        
+        {/* NEW CARD: Over-Performing Players Card */}
+        {topPerformers.overPerforming.length > 0 && (
+          <div className="card over-performing">
+            <h3>Top Over-Performing Players</h3>
+            <div className="scrollable-container">
+              <ul className="player-list">
+                {topPerformers.overPerforming.map((player, index) => (
+                  <li key={index} className="player-item">
+                    <div className="player-rank">{index + 1}</div>
+                    <div className="player-info">
+                      <span className="player-name">{player.fullName || player.name}</span>
+                      <span className="player-team">{player.team}</span>
+                    </div>
+                    <div className="player-stat">
+                      <div className="stat-highlight">
+                        +{player.performanceIndicator.toFixed(1)}%
+                      </div>
+                      <small>Actual: {player.homeRunsThisSeason} HR</small>
+                      <small>Expected: {player.expectedHRs.toFixed(1)} HR</small>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+        
+        {/* NEW CARD: Under-Performing Players Card */}
+        {topPerformers.underPerforming.length > 0 && (
+          <div className="card under-performing">
+            <h3>Top Under-Performing Players</h3>
+            <div className="scrollable-container">
+              <ul className="player-list">
+                {topPerformers.underPerforming.map((player, index) => (
+                  <li key={index} className="player-item">
+                    <div className="player-rank">{index + 1}</div>
+                    <div className="player-info">
+                      <span className="player-name">{player.fullName || player.name}</span>
+                      <span className="player-team">{player.team}</span>
+                    </div>
+                    <div className="player-stat">
+                      <div className="stat-highlight">
+                        {player.performanceIndicator.toFixed(1)}%
+                      </div>
+                      <small>Actual: {player.homeRunsThisSeason} HR</small>
+                      <small>Expected: {player.expectedHRs.toFixed(1)} HR</small>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
         
         {/* Recent Updates Card */}
         <div className="card recent-updates">
@@ -407,17 +676,19 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
             <div className="update-item">
               <span className="update-icon">🏆</span>
               <span className="update-text">
-                {rollingStats.homers.length > 0 
-                  ? `${rollingStats.homers[0].name} leads with ${rollingStats.homers[0].HR} home runs` 
-                  : 'No home runs recorded recently'}
+                {topPerformers.hrRate.length > 0 
+                  ? `${topPerformers.hrRate[0].fullName || topPerformers.hrRate[0].name} leads with ${topPerformers.hrRate[0].homeRunsThisSeason} home runs` 
+                  : (rollingStats.homers.length > 0 
+                    ? `${rollingStats.homers[0].name} leads with ${rollingStats.homers[0].HR} home runs` 
+                    : 'No home runs recorded recently')}
               </span>
             </div>
             <div className="update-item">
-              <span className="update-icon">⚾</span>
+              <span className="update-icon">📈</span>
               <span className="update-text">
-                {rollingStats.strikeouts.length > 0 
-                  ? `${rollingStats.strikeouts[0].name} leads with ${rollingStats.strikeouts[0].K} strikeouts` 
-                  : 'No pitching data recorded recently'}
+                {topPerformers.overPerforming.length > 0 
+                  ? `${topPerformers.overPerforming[0].fullName || topPerformers.overPerforming[0].name} over-performing by ${topPerformers.overPerforming[0].performanceIndicator.toFixed(1)}%` 
+                  : 'No performance indicators available'}
               </span>
             </div>
             <div className="update-item">
