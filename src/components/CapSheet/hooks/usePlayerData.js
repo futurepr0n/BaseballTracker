@@ -592,33 +592,6 @@ const fetchHitterById = async (hitterId) => {
         R: existingPitcher.R || existingPitcher.prevGameR || '0',
         BB: existingPitcher.BB || existingPitcher.prevGameBB || '0',
         ERA: existingPitcher.ERA || '0.00',
-        // Include history data
-        ...Object.entries(existingPitcher)
-          .filter(([key]) => key.startsWith('game'))
-          .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
-      };
-    }
-    
-    // To this (adding explicit prevGame* properties):
-    if (existingPitcher) {
-      console.log(`Found pitcher in selectedPlayers: ${pitcherName}`);
-      return {
-        id: existingPitcher.id,
-        name: existingPitcher.name,
-        team: existingPitcher.team,
-        type: 'pitcher',
-        playerType: 'pitcher',
-        throwingArm: existingPitcher.throwingArm || '',
-        // Get all stats with appropriate fallbacks
-        PC_ST: existingPitcher.PC_ST || existingPitcher.prevGamePC_ST || 'N/A',
-        K: existingPitcher.K || existingPitcher.prevGameK || 'N/A',
-        HR: existingPitcher.HR || existingPitcher.prevGameHR || 'N/A',
-        IP: existingPitcher.IP || existingPitcher.prevGameIP || '0',
-        ER: existingPitcher.ER || existingPitcher.prevGameER || 'N/A',
-        H: existingPitcher.H || existingPitcher.prevGameH || '0',
-        R: existingPitcher.R || existingPitcher.prevGameR || '0',
-        BB: existingPitcher.BB || existingPitcher.prevGameBB || '0',
-        ERA: existingPitcher.ERA || '0.00',
         // Explicitly set the prevGame* properties for display
         prevGameIP: existingPitcher.IP || existingPitcher.prevGameIP || '0',
         prevGameK: existingPitcher.K || existingPitcher.prevGameK || '0',
@@ -635,8 +608,8 @@ const fetchHitterById = async (hitterId) => {
       };
     }
     
-    // Also do the same fix for the availablePlayers section (around line 729)
-    // Change this part too:
+    // If not found in selected pitchers, look in available pitchers
+    const availablePitcher = availablePlayers.pitchers.find(p => p.id === pitcherId);
     if (availablePitcher) {
       console.log(`Found pitcher in availablePlayers: ${pitcherName}`);
       return {
@@ -671,34 +644,11 @@ const fetchHitterById = async (hitterId) => {
           .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
       };
     }
-    
-    // If not found in selected pitchers, look in available pitchers
-    const availablePitcher = availablePlayers.pitchers.find(p => p.id === pitcherId);
-    if (availablePitcher) {
-      console.log(`Found pitcher in availablePlayers: ${pitcherName}`);
-      return {
-        id: availablePitcher.id,
-        name: availablePitcher.name,
-        team: availablePitcher.team,
-        type: 'pitcher',
-        playerType: 'pitcher',
-        throwingArm: availablePitcher.throwingArm || '',
-        // Get all stats with appropriate fallbacks
-        PC_ST: availablePitcher.PC_ST || availablePitcher.prevGamePC_ST || 'N/A',
-        K: availablePitcher.K || availablePitcher.prevGameK || 'N/A',
-        HR: availablePitcher.HR || availablePitcher.prevGameHR || 'N/A',
-        IP: availablePitcher.IP || availablePitcher.prevGameIP || '0',
-        ER: availablePitcher.ER || availablePitcher.prevGameER || 'N/A',
-        H: availablePitcher.H || availablePitcher.prevGameH || '0',
-        R: availablePitcher.R || availablePitcher.prevGameR || '0',
-        BB: availablePitcher.BB || availablePitcher.prevGameBB || '0',
-        ERA: availablePitcher.ERA || '0.00',
-        // Include history data
-        ...Object.entries(availablePitcher)
-          .filter(([key]) => key.startsWith('game'))
-          .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
-      };
-    }
+  
+    // NEW SECTION: Check the fullPitcherRoster if pitcher is not in selectedPlayers or availablePlayers
+    const rosterPitcher = fullPitcherRoster.find(p => 
+      p.name === pitcherName && p.team === pitcherTeam
+    );
     
     // Create a basic pitcher object with defaults for all fields
     let basicPitcher = {
@@ -707,7 +657,7 @@ const fetchHitterById = async (hitterId) => {
       team: pitcherTeam,
       type: 'pitcher',
       playerType: 'pitcher',
-      throwingArm: '',
+      throwingArm: rosterPitcher?.throwingArm || '',  // Use roster data if available
       // Initialize with defaults for all stats
       PC_ST: 'N/A',
       K: 'N/A',
@@ -735,7 +685,7 @@ const fetchHitterById = async (hitterId) => {
         console.log(`Found pitcher in current data: ${pitcherName}`, matchingPitcher);
         
         // Copy all stats to our pitcher object with proper string handling
-        basicPitcher.throwingArm = matchingPitcher.throwingArm || '';
+        basicPitcher.throwingArm = matchingPitcher.throwingArm || basicPitcher.throwingArm;
         basicPitcher.PC_ST = matchingPitcher.PC_ST || matchingPitcher.prevGamePC_ST || 'N/A';
         basicPitcher.K = matchingPitcher.K || matchingPitcher.prevGameK || 'N/A';
         basicPitcher.HR = matchingPitcher.HR || matchingPitcher.prevGameHR || '0';
@@ -757,9 +707,34 @@ const fetchHitterById = async (hitterId) => {
         basicPitcher.prevGamePC_ST = matchingPitcher.PC_ST || 'N/A';
       }
       
-      // If not found or found, add game history regardless
-      if (extendedPitcherData && Object.keys(extendedPitcherData).length > 0) {
-        console.log(`Getting game history for pitcher: ${pitcherName}`);
+      // First check the cache for this pitcher's game history
+      const cachedPitcherData = playerDataCacheRef.current.pitchers[pitcherId];
+      
+      if (cachedPitcherData && cachedPitcherData.games && cachedPitcherData.games.length > 0) {
+        console.log(`Found ${cachedPitcherData.games.length} games in cache for pitcher: ${pitcherName}`);
+        
+        // Add only the requested number of games to display
+        const gamesCountToAdd = pitcherGamesHistory;
+        for (let i = 0; i < gamesCountToAdd && i < cachedPitcherData.games.length; i++) {
+          const gameNum = i + 1;
+          const gameData = cachedPitcherData.games[i]?.data || {};
+          const gameDate = cachedPitcherData.games[i]?.date || '';
+          
+          basicPitcher[`game${gameNum}Date`] = gameDate;
+          basicPitcher[`game${gameNum}IP`] = gameData.IP || '0';
+          basicPitcher[`game${gameNum}K`] = gameData.K || '0';
+          basicPitcher[`game${gameNum}ER`] = gameData.ER || '0';
+          basicPitcher[`game${gameNum}PC_ST`] = gameData.PC_ST || 'N/A';
+          // Add the additional stats to game history
+          basicPitcher[`game${gameNum}H`] = gameData.H || '0';
+          basicPitcher[`game${gameNum}R`] = gameData.R || '0';
+          basicPitcher[`game${gameNum}BB`] = gameData.BB || '0';
+          basicPitcher[`game${gameNum}HR`] = gameData.HR || '0';
+        }
+      }
+      // If not found in cache, use the extendedPitcherData directly to find game history
+      else if (extendedPitcherData && Object.keys(extendedPitcherData).length > 0) {
+        console.log(`Getting game history for pitcher: ${pitcherName} from extended data`);
         const gameHistory = findMultiGamePlayerStats(
           extendedPitcherData, 
           pitcherName, 
@@ -767,7 +742,7 @@ const fetchHitterById = async (hitterId) => {
           MAX_GAMES_HISTORY // Always fetch all available games
         );
         
-        console.log(`Found ${gameHistory.length} games for pitcher`);
+        console.log(`Found ${gameHistory.length} games for pitcher in extended data`);
         
         // Cache the complete game history
         playerDataCacheRef.current.pitchers[pitcherId] = {
@@ -786,12 +761,50 @@ const fetchHitterById = async (hitterId) => {
           basicPitcher[`game${gameNum}IP`] = gameData.IP || '0';
           basicPitcher[`game${gameNum}K`] = gameData.K || '0';
           basicPitcher[`game${gameNum}ER`] = gameData.ER || '0';
-          basicPitcher[`game${gameNum}PC_ST`] = gameData.PC_ST || '0-0';
+          basicPitcher[`game${gameNum}PC_ST`] = gameData.PC_ST || 'N/A';
           // Add the additional stats to game history
           basicPitcher[`game${gameNum}H`] = gameData.H || '0';
           basicPitcher[`game${gameNum}R`] = gameData.R || '0';
           basicPitcher[`game${gameNum}BB`] = gameData.BB || '0';
           basicPitcher[`game${gameNum}HR`] = gameData.HR || '0';
+        }
+      }
+      // If still no game history, try using the regular playerStatsHistory
+      else if (playerStatsHistory && Object.keys(playerStatsHistory).length > 0) {
+        console.log(`Trying regular playerStatsHistory for pitcher: ${pitcherName}`);
+        const gameHistory = findMultiGamePlayerStats(
+          playerStatsHistory, 
+          pitcherName, 
+          pitcherTeam,
+          MAX_GAMES_HISTORY
+        );
+        
+        console.log(`Found ${gameHistory.length} games in regular stats history`);
+        
+        if (gameHistory.length > 0) {
+          // Cache the complete game history
+          playerDataCacheRef.current.pitchers[pitcherId] = {
+            maxGamesHistory: MAX_GAMES_HISTORY,
+            games: gameHistory
+          };
+          
+          // Add requested games
+          const gamesCountToAdd = pitcherGamesHistory;
+          for (let i = 0; i < gamesCountToAdd && i < gameHistory.length; i++) {
+            const gameNum = i + 1;
+            const gameData = gameHistory[i]?.data || {};
+            const gameDate = gameHistory[i]?.date || '';
+            
+            basicPitcher[`game${gameNum}Date`] = gameDate;
+            basicPitcher[`game${gameNum}IP`] = gameData.IP || '0';
+            basicPitcher[`game${gameNum}K`] = gameData.K || '0';
+            basicPitcher[`game${gameNum}ER`] = gameData.ER || '0';
+            basicPitcher[`game${gameNum}PC_ST`] = gameData.PC_ST || 'N/A';
+            basicPitcher[`game${gameNum}H`] = gameData.H || '0';
+            basicPitcher[`game${gameNum}R`] = gameData.R || '0';
+            basicPitcher[`game${gameNum}BB`] = gameData.BB || '0';
+            basicPitcher[`game${gameNum}HR`] = gameData.HR || '0';
+          }
         }
       }
       

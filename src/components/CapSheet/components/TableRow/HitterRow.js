@@ -5,7 +5,7 @@ import OverlayPerformanceChart from '../OverlayPerformanceChart';
 
 /**
  * Component for a hitter row in the table
- * Simplified to focus on rendering the latest player props directly
+ * Modified to fix dropdown and chart visibility issues on mobile
  */
 const HitterRow = ({
   player,
@@ -176,6 +176,29 @@ const HitterRow = ({
     renderCount.current += 1;
   });
 
+  // Custom styles for select dropdown to fix cutoff issue
+  const customSelectStyles = {
+    // Control is the main input element
+    control: (base) => ({
+      ...base,
+      minHeight: '30px',
+      height: '30px',
+      fontSize: '0.9em'
+    }),
+    // Make sure the menu appears in front of other elements
+    menu: (base) => ({
+      ...base,
+      zIndex: 9999,
+      width: 'auto', // Allow menu to expand beyond control width
+      minWidth: '100%' // But start at control width
+    }),
+    // Make sure the menu portal is positioned correctly
+    menuPortal: (base) => ({
+      ...base,
+      zIndex: 9999
+    })
+  };
+
   return (
     <tr 
       style={teamColors} 
@@ -225,23 +248,10 @@ const HitterRow = ({
               }}
               isClearable
               placeholder="Select pitcher..."
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  minHeight: '30px',
-                  height: '30px',
-                  fontSize: '0.9em'
-                }),
-                valueContainer: (base) => ({
-                  ...base,
-                  padding: '0 8px',
-                  height: '30px'
-                }),
-                indicatorsContainer: (base) => ({
-                  ...base,
-                  height: '30px'
-                })
-              }}
+              styles={customSelectStyles}
+              // Render dropdown in portal to avoid container clipping
+              menuPortalTarget={document.body}
+              menuPosition="fixed"
             />
             {player.pitcherId && (
               <button 
@@ -303,23 +313,10 @@ const HitterRow = ({
               onChange={(option) => handleSecondPitcherSelect(option)}
               isClearable
               placeholder="Select 2nd pitcher..."
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  minHeight: '30px',
-                  height: '30px',
-                  fontSize: '0.9em'
-                }),
-                valueContainer: (base) => ({
-                  ...base,
-                  padding: '0 8px',
-                  height: '30px'
-                }),
-                indicatorsContainer: (base) => ({
-                  ...base,
-                  height: '30px'
-                })
-              }}
+              styles={customSelectStyles}
+              // Render dropdown in portal to avoid container clipping
+              menuPortalTarget={document.body}
+              menuPosition="fixed"
             />
             {secondPitcherId && (
               <button 
