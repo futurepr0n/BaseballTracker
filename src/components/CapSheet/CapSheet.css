@@ -310,11 +310,12 @@
   overflow-x: auto;
   margin-bottom: 0; /* Remove default margin if section-container handles it */
   max-width: 100%;
+  isolation: isolate;
 }
 
 .capsheet-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
   font-size: 0.9rem; /* Slightly smaller font */
   min-width: 1200px; /* Set a min-width to encourage horizontal scrolling */
 }
@@ -326,6 +327,15 @@
   border-bottom: 1px solid #eee;
   white-space: nowrap; /* Prevent text wrapping */
   vertical-align: middle;
+}
+
+.capsheet-table th:first-child,
+.capsheet-table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background-color: inherit; /* Will inherit from tr */
+  box-shadow: 1px 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .capsheet-table th {
@@ -345,7 +355,13 @@
 .capsheet-table tbody tr:hover { background-color: #f9f9f9; }
 .capsheet-table tbody tr:hover .avg-cell { background-color: #e8f4f8; }
 
-.player-name { font-weight: 500; }
+.player-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+  display: block;
+}
 
 .no-data {
   text-align: center;
@@ -624,6 +640,32 @@
   .slip-gallery-modal { width: 90%; }
   .slip-item { flex-direction: column; align-items: flex-start; gap: 10px; }
   .slip-actions { align-self: flex-end; }
+
+
+  .capsheet-table th,
+  .capsheet-table td {
+    padding: 6px 8px;
+    font-size: 0.85rem;
+  }
+  
+  /* Ensure chart fits on mobile */
+  .performance-chart-cell {
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+  }
+  
+  /* Add scroll indicator */
+  .table-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 20px;
+    background: linear-gradient(to right, transparent, rgba(0,0,0,0.05));
+    pointer-events: none;
+  }
 }
 
 @media (max-width: 576px) {
@@ -885,31 +927,7 @@
   text-align: right;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .handicapper-list-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  
-  .handicapper-actions {
-    width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .handicapper-select-container {
-    width: 100%;
-  }
-  
-  .handicapper-chip {
-    padding: 4px 10px;
-    font-size: 0.85rem;
-  }
-}
 
-/* Handicapper List Styling */
 
 .handicapper-list-container {
   margin: 20px 0;
@@ -1201,6 +1219,10 @@
   animation: spin 1.5s linear infinite;
 }
 
+.loading-row td {
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -1270,16 +1292,30 @@
 
 /* Add these styles to your existing CSS file for the CapSheet component */
 
+.performance-chart-cell {
+  width: 260px;
+  min-width: 260px;
+  max-width: 260px;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
 /* Pitcher selection container with overlay button */
 .pitcher-selection-container {
   display: flex;
   align-items: center;
   gap: 5px;
   width: 100%;
+  position: relative;
 }
 
 .pitcher-selection-container .editable-cell {
   flex-grow: 1;
+}
+
+
+.react-select__menu {
+  z-index: 9999 !important;
 }
 
 /* Overlay toggle button */

@@ -5,7 +5,7 @@ import { formatGameDate } from '../utils/formatters';
 /**
  * Enhanced overlay performance chart component
  * Displays hitter performance with optional pitcher overlay
- * Now with loading state for hitter data refreshes
+ * Modified to ensure proper display within table cells
  * 
  * @param {Object} hitter - The hitter player object with game data
  * @param {Object} pitcher - Primary pitcher object (optional)
@@ -15,7 +15,7 @@ import { formatGameDate } from '../utils/formatters';
  * @param {boolean} isLoadingPitcher - Whether primary pitcher data is loading
  * @param {boolean} isLoadingSecondPitcher - Whether second pitcher data is loading
  * @param {boolean} isLoadingHitter - Whether hitter data is refreshing
- * @param {number} width - Width of the chart (default: 260px)
+ * @param {number} width - Width of the chart (default: 100%)
  * @param {number} height - Height of the chart (default: 90px)
  */
 const OverlayPerformanceChart = ({ 
@@ -27,7 +27,7 @@ const OverlayPerformanceChart = ({
   isLoadingPitcher = false,
   isLoadingSecondPitcher = false,
   isLoadingHitter = false,
-  width = 260, 
+  width = '100%', 
   height = 90 
 }) => {
   // Logging to help debug when this component renders
@@ -40,9 +40,9 @@ const OverlayPerformanceChart = ({
     });
   }, [hitter.name, isLoadingHitter]);
 
-  // Visual constants
-  const padding = { top: 15, right: 20, bottom: 35, left: 40 };
-  const chartWidth = width - padding.left - padding.right;
+  // Visual constants - use percentage-based width
+  const padding = { top: 15, right: 20, bottom: 35, left: 30 };
+  const chartWidth = typeof width === 'number' ? width - padding.left - padding.right : '85%';
   const chartHeight = height - padding.top - padding.bottom;
   
   // Helper functions to get game data
@@ -150,13 +150,16 @@ const OverlayPerformanceChart = ({
   
   // Scale functions to convert data values to chart coordinates
   const getX = (index, total) => {
+    // Use relative positioning for a responsive chart
+    const effectiveWidth = typeof chartWidth === 'number' ? chartWidth : 180; // Default if percentage
+    
     // If only 1 or 2 games, space them more reasonably
     if (total <= 2) {
-      return padding.left + (index * (chartWidth / 2));
+      return padding.left + (index * (effectiveWidth / 2));
     }
     // Otherwise use regular spacing
     const divisor = Math.max(1, total - 1);
-    return padding.left + (index * (chartWidth / divisor));
+    return padding.left + (index * (effectiveWidth / divisor));
   };
   
   const getHitterY = (avg) => padding.top + chartHeight - (avg * chartHeight);
@@ -211,7 +214,7 @@ const OverlayPerformanceChart = ({
   // Handle loading states
   if (isLoadingHitter) {
     return (
-      <div className="loading-hitter-data" style={{ width, height }}>
+      <div className="loading-hitter-data" style={{ width: '100%', height }}>
         <div className="chart-loading-spinner"></div>
         <span>Updating hitter data...</span>
       </div>
@@ -220,7 +223,7 @@ const OverlayPerformanceChart = ({
   
   if (isLoadingPitcher && showPitcherOverlay) {
     return (
-      <div className="loading-pitcher-data" style={{ width, height }}>
+      <div className="loading-pitcher-data" style={{ width: '100%', height }}>
         <div className="chart-loading-spinner"></div>
         <span>Loading pitcher data...</span>
       </div>
@@ -229,16 +232,19 @@ const OverlayPerformanceChart = ({
   
   if (!hasHitterData) {
     return (
-      <div className="no-game-data" style={{ width, height }}>
+      <div className="no-game-data" style={{ width: '100%', height }}>
         Not enough game data for trend display
       </div>
     );
   }
 
+  // Calculate appropriate SVG dimensions
+  const svgWidth = typeof width === 'number' ? width : 240; // Default width if percentage
+
   // Render the chart
   return (
     <div className="performance-chart-container">
-      <svg width={width} height={height} className="performance-line-chart">
+      <svg width="100%" height={height} viewBox={`0 0 ${svgWidth} ${height}`} preserveAspectRatio="xMidYMid meet" className="performance-line-chart">
         {/* Y-axis (primary for hitter) */}
         <line 
           x1={padding.left} 
@@ -253,7 +259,7 @@ const OverlayPerformanceChart = ({
         <line 
           x1={padding.left} 
           y1={height - padding.bottom} 
-          x2={width - padding.right} 
+          x2={svgWidth - padding.right} 
           y2={height - padding.bottom} 
           stroke="#ddd" 
           strokeWidth="1" 
@@ -274,11 +280,11 @@ const OverlayPerformanceChart = ({
         {/* Y-axis label for pitcher (right side) if overlay active */}
         {showPitcherOverlay && hasPitcherData && (
           <text 
-            x={width - 10} 
+            x={svgWidth - 10} 
             y={padding.top + chartHeight/2} 
             fontSize="10" 
             textAnchor="middle" 
-            transform={`rotate(-90, ${width - 10}, ${padding.top + chartHeight/2})`}
+            transform={`rotate(-90, ${svgWidth - 10}, ${padding.top + chartHeight/2})`}
             fill="#22c55e" // Green for pitcher
           >
             K/IP
@@ -368,7 +374,7 @@ const OverlayPerformanceChart = ({
                   <circle 
                     cx={point.x} 
                     cy={point.y} 
-                    r={9} 
+                    r={7} 
                     fill="#ef4444" 
                     stroke="white" 
                     strokeWidth="1"
@@ -429,7 +435,7 @@ const OverlayPerformanceChart = ({
               <circle 
                 cx={point.x} 
                 cy={point.y} 
-                r={8} 
+                r={7} 
                 fill={erColor}
                 stroke="white" 
                 strokeWidth="1"
@@ -463,7 +469,7 @@ const OverlayPerformanceChart = ({
           );
         })}
         
-        {/* Second pitcher data points */}
+        {/* Second pitcher data points - simplified for mobile */}
         {showSecondPitcherOverlay && secondPitcherPoints.map((point, i) => {
           // Format date for display (MM/DD)
           const formattedDate = formatGameDate(point.date);
@@ -476,22 +482,24 @@ const OverlayPerformanceChart = ({
           
           return (
             <g key={`second-pitcher-${i}`}>
-              {/* Date labels on x-axis (second pitcher dates at bottom) */}
-              <text 
-                x={point.x} 
-                y={height - padding.bottom + 38} // Position below first pitcher dates
-                fontSize="9" 
-                textAnchor="middle" 
-                fill="#15803d" // Darker green for second pitcher
-              >
-                {formattedDate}
-              </text>
+              {/* Only show date labels on wider screens */}
+              {svgWidth > 200 && (
+                <text 
+                  x={point.x} 
+                  y={height - padding.bottom + 38} // Position below first pitcher dates
+                  fontSize="8" 
+                  textAnchor="middle" 
+                  fill="#15803d" // Darker green for second pitcher
+                >
+                  {formattedDate}
+                </text>
+              )}
               
               {/* Data point circles - color coded by ER */}
               <circle 
                 cx={point.x} 
                 cy={point.y} 
-                r={8} 
+                r={7} 
                 fill={erColor}
                 stroke="white" 
                 strokeWidth="1"
@@ -502,7 +510,7 @@ const OverlayPerformanceChart = ({
               <text 
                 x={point.x} 
                 y={point.y + 3} 
-                fontSize="9" 
+                fontSize="8" 
                 textAnchor="middle" 
                 fill="white" 
                 fontWeight="bold"
@@ -510,11 +518,11 @@ const OverlayPerformanceChart = ({
                 {point.er}
               </text>
               
-              {/* K/IP rate to the right side */}
+              {/* Simplified K/IP display for second pitcher */}
               <text 
                 x={point.x} 
                 y={point.y - 12} 
-                fontSize="9" 
+                fontSize="8" 
                 textAnchor="middle" 
                 fill="#15803d" // Darker green for second pitcher
                 fontWeight="bold"
@@ -538,7 +546,7 @@ OverlayPerformanceChart.propTypes = {
   isLoadingPitcher: PropTypes.bool,
   isLoadingSecondPitcher: PropTypes.bool,
   isLoadingHitter: PropTypes.bool,
-  width: PropTypes.number,
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   height: PropTypes.number
 };
 

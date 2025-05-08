@@ -6,19 +6,19 @@ import './PitcherPerformanceLineChart.css';
 /**
  * A line graph visualization of a pitcher's performance over their recent games
  * Shows strikeout trend and earned runs with color-coded markers
- * Enhanced with memoization and game history awareness
+ * Enhanced with proper mobile display handling
  * 
  * @param {Object} player - The pitcher player object with game data
  * @param {number} gamesHistory - Number of games to display in history (default: 3)
  * @param {boolean} isLoading - Whether the pitcher data is loading
- * @param {number} width - Width of the chart (default: full width)
+ * @param {number} width - Width of the chart (default: 100%)
  * @param {number} height - Height of the chart (default: 90px)
  */
 const PitcherPerformanceLineChart = ({ 
   player, 
   gamesHistory = 3,
   isLoading = false,
-  width = 260, 
+  width = '100%', 
   height = 90 
 }) => {
   // Logging to help debug when this component renders
@@ -63,9 +63,10 @@ const PitcherPerformanceLineChart = ({
   // Check if we have enough data to show a trend
   const hasEnoughData = useMemo(() => validGames.length > 1, [validGames]);
   
-  // Visual constants
-  const padding = { top: 15, right: 20, bottom: 25, left: 40 };
-  const chartWidth = width - padding.left - padding.right;
+  // Visual constants - use responsive width
+  const svgWidth = typeof width === 'number' ? width : 240; // Default if percentage
+  const padding = { top: 15, right: 20, bottom: 25, left: 30 };
+  const chartWidth = typeof width === 'number' ? width - padding.left - padding.right : '85%';
   const chartHeight = height - padding.top - padding.bottom;
   
   // Calculate trend direction and max K/IP only if we have enough data
@@ -99,16 +100,19 @@ const PitcherPerformanceLineChart = ({
     };
   }, [hasEnoughData, validGames]);
   
-  // Pre-calculate X and Y position functions
+  // Pre-calculate X and Y position functions for responsive display
   const getX = useMemo(() => {
     return (index, total) => {
+      // Use a fallback width for percentage-based width
+      const effectiveWidth = typeof chartWidth === 'number' ? chartWidth : 180; // Default if percentage
+      
       // If only 1 or 2 games, space them more reasonably
       if (total <= 2) {
-        return padding.left + (index * (chartWidth / 2));
+        return padding.left + (index * (effectiveWidth / 2));
       }
       // Otherwise use regular spacing
       const divisor = Math.max(1, total - 1);
-      return padding.left + (index * (chartWidth / divisor));
+      return padding.left + (index * (effectiveWidth / divisor));
     };
   }, [padding.left, chartWidth]);
   
@@ -140,7 +144,7 @@ const PitcherPerformanceLineChart = ({
   // Display loading state
   if (isLoading) {
     return (
-      <div className="loading-pitcher-data" style={{ width, height }}>
+      <div className="loading-pitcher-data" style={{ width: '100%', height }}>
         <div className="chart-loading-spinner"></div>
         <span>Updating pitcher data...</span>
       </div>
@@ -158,10 +162,10 @@ const PitcherPerformanceLineChart = ({
     );
   }
   
-  // Render the chart if we have data
+  // Render the chart if we have data - use viewBox for responsive sizing
   return (
     <div className="performance-chart-container">
-      <svg width={width} height={height} className="performance-line-chart">
+      <svg width="100%" height={height} viewBox={`0 0 ${svgWidth} ${height}`} preserveAspectRatio="xMidYMid meet" className="performance-line-chart">
         {/* Y-axis (K/IP) */}
         <line 
           x1={padding.left} 
@@ -176,7 +180,7 @@ const PitcherPerformanceLineChart = ({
         <line 
           x1={padding.left} 
           y1={height - padding.bottom} 
-          x2={width - padding.right} 
+          x2={svgWidth - padding.right} 
           y2={height - padding.bottom} 
           stroke="#ddd" 
           strokeWidth="1" 
@@ -225,7 +229,7 @@ const PitcherPerformanceLineChart = ({
               <text 
                 x={point.x} 
                 y={height - 10} 
-                fontSize="10" 
+                fontSize="9" 
                 textAnchor="middle" 
                 fill="#555"
               >
@@ -247,7 +251,7 @@ const PitcherPerformanceLineChart = ({
               <circle 
                 cx={point.x} 
                 cy={point.y} 
-                r={8} 
+                r={7} 
                 fill={erColor}
                 stroke="white" 
                 strokeWidth="1"
@@ -291,7 +295,7 @@ PitcherPerformanceLineChart.propTypes = {
   }).isRequired,
   gamesHistory: PropTypes.number,
   isLoading: PropTypes.bool,
-  width: PropTypes.number,
+  width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   height: PropTypes.number
 };
 
