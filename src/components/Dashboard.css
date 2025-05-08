@@ -203,7 +203,7 @@
 
 /* Updates List */
 .updates-list {
-  display: flex;
+  display: flex अ;
   flex-direction: column;
 }
 
@@ -244,45 +244,50 @@
   }
 }
 
-/* Updates List */
-.updates-list {
+/* Scrollable container for due players list */
+.scrollable-container {
+  max-height: 350px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.scrollable-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.scrollable-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Due players card */
+.hr-prediction .player-list {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.hr-prediction .player-stat {
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
 }
 
-.update-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
+.hr-prediction .stat-highlight {
+  font-weight: 700;
+  color: #0056b3;
 }
 
-.update-item:last-child {
-  border-bottom: none;
-}
-
-.update-icon {
-  font-size: 1.5rem;
-  margin-right: 15px;
-}
-
-.update-text {
-  color: #333;
-}
-
-.no-data {
-  color: #888;
-  text-align: center;
-  padding: 20px 0;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.hr-prediction small {
+  color: #666;
+  font-size: 0.8rem;
 }
