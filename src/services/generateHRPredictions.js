@@ -333,86 +333,96 @@ function calculateGamesSinceLastHR(gameHistory) {
 /**
  * Generate HR predictions for a specific date
  */
+/**
+ * Generate HR predictions for a specific date by analyzing the entire season's data
+ */
 async function generateHRPredictions(targetDate = new Date()) {
   console.log(`[generateHRPredictions] Generating HR predictions for ${targetDate.toDateString()}`);
   
+  // 1. Load roster data as our base player list
   console.log('[generateHRPredictions] 1. Loading roster data...');
   const rosterData = readJsonFile(ROSTER_PATH);
   if (!rosterData) {
-    console.error('[generateHRPredictions] Failed to load roster data. Aborting HR predictions.');
+    console.error('[generateHRPredictions] Failed to load roster data');
     return false;
   }
   console.log(`[generateHRPredictions] Loaded ${rosterData.length} players from roster.`);
   
+  // Extract hitters from roster
+  const hitters = rosterData.filter(player => 
+    player.type === 'hitter' || !player.type
+  );
+  console.log(`[generateHRPredictions] Found ${hitters.length} hitters in roster.`);
+  
+  // 2. Find today's game data to determine which teams are playing
   console.log('[generateHRPredictions] 2. Finding most recent game data file...');
-  const mostRecentDataFile = findMostRecentDataFile(targetDate);
-  if (!mostRecentDataFile) {
-    console.error('[generateHRPredictions] No suitable game data file found. Aborting HR predictions.');
-    return false;
-  }
-  console.log(`[generateHRPredictions] Using game data file: ${mostRecentDataFile}`);
-  const gameData = readJsonFile(mostRecentDataFile);
-  if (!gameData) {
-    console.error('[generateHRPredictions] Failed to load game data from file. Aborting HR predictions.');
+  const todaysDataFile = findMostRecentDataFile(targetDate);
+  if (!todaysDataFile) {
+    console.error('[generateHRPredictions] No suitable game data found for today');
     return false;
   }
   
+  console.log(`[generateHRPredictions] Using game data file: ${todaysDataFile}`);
+  const todaysData = readJsonFile(todaysDataFile);
+  if (!todaysData) {
+    console.error('[generateHRPredictions] Failed to load today\'s game data');
+    return false;
+  }
+  
+  // 3. Load all season data
   console.log('[generateHRPredictions] 3. Loading all season data for game history...');
   const seasonData = loadAllSeasonData();
-  if (Object.keys(seasonData).length === 0) {
-    console.warn('[generateHRPredictions] Season data is empty. Predictions might be inaccurate or empty.');
-  }
+  console.log(`[generateHRPredictions] Loaded data for ${Object.keys(seasonData).length} dates`);
   
+  // 4. Find teams playing today
   console.log('[generateHRPredictions] 4. Finding players scheduled for today\'s games...');
-  const scheduledPlayerTeams = new Set();
-  if (gameData.games && Array.isArray(gameData.games)) {
-    gameData.games.forEach(game => {
-      if (game.homeTeam) scheduledPlayerTeams.add(game.homeTeam);
-      if (game.awayTeam) scheduledPlayerTeams.add(game.awayTeam);
+  const teamsPlayingToday = new Set();
+  if (todaysData.games && todaysData.games.length > 0) {
+    todaysData.games.forEach(game => {
+      teamsPlayingToday.add(game.homeTeam);
+      teamsPlayingToday.add(game.awayTeam);
     });
+    console.log(`[generateHRPredictions] Found ${teamsPlayingToday.size} teams scheduled to play based on ${todaysDataFile}.`);
   } else {
-    console.warn(`[generateHRPredictions] 'gameData.games' is missing or not an array in ${mostRecentDataFile}. Cannot determine scheduled teams.`);
+    console.warn('[generateHRPredictions] No games found in today\'s data. Including all teams.');
+    // If no games found, include all teams to avoid empty predictions
+    rosterData.forEach(player => {
+      if (player.team) {
+        teamsPlayingToday.add(player.team);
+      }
+    });
   }
-  console.log(`[generateHRPredictions] Found ${scheduledPlayerTeams.size} teams scheduled to play based on ${mostRecentDataFile}.`);
-
-  console.log('[generateHRPredictions] 5. Calculating HR predictions...');
-  const batterData = (gameData.players || []).filter(player => 
-    player.playerType === 'hitter' || !player.playerType);
-  console.log(`[generateHRPredictions] Found ${batterData.length} batters in gameData file.`);
   
-  let processedPlayerCount = 0;
-  const playersWithPredictionDetails = batterData
+  // 5. Process all hitters from the roster
+  console.log('[generateHRPredictions] 5. Calculating HR predictions...');
+  
+  // Track players processed
+  let processedCount = 0;
+  let teamFilteredCount = 0;
+  let sufficientDataCount = 0;
+  let dueCount = 0;
+  
+  // Process each hitter from the roster
+  const playerPredictions = hitters
     .map(player => {
-      processedPlayerCount++;
-      if (!scheduledPlayerTeams.has(player.team)) {
-        // console.log(`[generateHRPredictions] Skipping ${player.name} (${player.team}) - team not in scheduledPlayerTeams.`);
+      processedCount++;
+      
+      // Skip if player's team is not playing today
+      if (!teamsPlayingToday.has(player.team)) {
         return null;
       }
+      teamFilteredCount++;
       
-      const rosterPlayer = rosterData.find(r => 
-        r.name === player.name && r.team === player.team && 
-        (r.type === 'hitter' || !r.type));
-      
-      if (!rosterPlayer) {
-        // console.log(`[generateHRPredictions] Skipping ${player.name} (${player.team}) - not found in roster or not a hitter.`);
-        return null;
-      }
-      
-      const gamesLastYear = rosterPlayer.stats ? (Number(rosterPlayer.stats['2024_Games']) || 0) : 0;
-      const hrsLastYear = rosterPlayer.stats ? (Number(rosterPlayer.stats['2024_HR']) || 0) : 0;
-      
-      if (gamesLastYear <= 0) {
-        // console.log(`[generateHRPredictions] Skipping ${player.name} (${player.team}) - no games played last year or invalid stat.`);
-        return null;
-      }
-      
-      const hrRate = hrsLastYear / gamesLastYear;
-      if (hrRate <= 0) { // If no HRs last year, they can't be "due" by this historical rate logic
-         // console.log(`[generateHRPredictions] Skipping ${player.name} (${player.team}) - HR rate is 0 from last year.`);
-        return null;
-      }
-      
+      // Get player's game history this season
       const gameHistory = findPlayerGameHistory(player.name, player.team, seasonData);
+      
+      // Skip players with no game history
+      if (gameHistory.length === 0) {
+        return null;
+      }
+      sufficientDataCount++;
+      
+      // Calculate statistics
       const { 
         gamesSinceLastHR, 
         daysSinceLastHR, 
@@ -420,78 +430,121 @@ async function generateHRPredictions(targetDate = new Date()) {
         homeRunsThisSeason 
       } = calculateGamesSinceLastHR(gameHistory);
       
-      if (gamesPlayed === 0) { // No games played this season, can't be due yet.
-          // console.log(`[generateHRPredictions] Skipping ${player.name} (${player.team}) - no games played this season.`);
-          return null;
-      }
-
+      // Calculate HR rate (HRs per game)
+      const hrRate = gamesPlayed > 0 ? homeRunsThisSeason / gamesPlayed : 0;
+      
+      // Calculate expected games between HRs
+      const expectedGamesBetweenHRs = hrRate > 0 ? Math.round(1 / hrRate) : 30;
+      
+      // Calculate expected HRs based on games played and rate
       const expectedHRs = hrRate * gamesPlayed;
-      const actualHRs = homeRunsThisSeason;
-      const hrDeficit = expectedHRs - actualHRs;
-      const expectedGamesBetweenHRs = Math.round(1 / hrRate);
       
-      const isDueByDeficit = hrDeficit > HR_DEFICIT_THRESHOLD;
-      const isDueByStreak = gamesSinceLastHR > (expectedGamesBetweenHRs * 1.5);
-      const isDue = isDueByDeficit || isDueByStreak;
+      // Calculate HR deficit (expected - actual)
+      const hrDeficit = expectedHRs - homeRunsThisSeason;
       
-      const dueScore = (hrDeficit * 0.6) + 
-                        ( (expectedGamesBetweenHRs > 0 ? gamesSinceLastHR / expectedGamesBetweenHRs : 0) * 0.4); // Avoid division by zero if expectedGamesBetweenHRs is 0
+      // Calculate "due" score
+      let dueScore = 0;
       
+      if (homeRunsThisSeason > 0) {
+        // Players with HRs this season - score based on games since last HR relative to their pace
+        dueScore = gamesSinceLastHR / (expectedGamesBetweenHRs * 0.75);
+      } else if (gamesPlayed >= 5) {
+        // Players with no HRs but who have played at least 5 games
+        // The more games played without a HR, the more "due" they are
+        dueScore = gamesPlayed / 20;
+      }
+      
+      // Determine if player is "due"
+      // A player is considered due if:
+      // 1. They haven't hit a HR in more than 75% of their expected games between HRs, or
+      // 2. They've played at least 10 games without hitting a HR
+      const isDue = (homeRunsThisSeason > 0 && gamesSinceLastHR >= expectedGamesBetweenHRs * 0.75) || 
+                    (homeRunsThisSeason === 0 && gamesPlayed >= 10);
+      
+      if (isDue) {
+        dueCount++;
+      }
+      
+      // Try to find a full name in the player record
+      const fullName = player.fullName || player.name;
+      
+      // Find last HR date if available
+      let lastHRDate = null;
+      for (let i = gameHistory.length - 1; i >= 0; i--) {
+        if (gameHistory[i].homeRuns > 0) {
+          lastHRDate = gameHistory[i].date;
+          break;
+        }
+      }
+      
+      // Create prediction object with all possible fields initialized
+      // This ensures no undefined values that could cause errors
       return {
-        name: player.name,
-        fullName: rosterPlayer.fullName || player.name,
-        team: player.team,
-        hrRate,
-        expectedHRs,
-        actualHRs,
-        hrDeficit,
-        gamesSinceLastHR,
-        daysSinceLastHR,
-        gamesPlayed,
-        expectedGamesBetweenHRs,
-        isDue,
-        isDueByDeficit, // For logging
-        isDueByStreak,  // For logging
-        dueScore
+        name: player.name || "",
+        fullName: fullName || player.name || "",
+        team: player.team || "",
+        gamesPlayed: gamesPlayed || 0,
+        homeRunsThisSeason: homeRunsThisSeason || 0,
+        hrRate: hrRate || 0,
+        expectedHRs: expectedHRs || 0,
+        actualHRs: homeRunsThisSeason || 0, 
+        hrDeficit: hrDeficit || 0,
+        gamesSinceLastHR: gamesSinceLastHR || 0,
+        daysSinceLastHR: daysSinceLastHR || 0,
+        lastHRDate: lastHRDate || null,
+        expectedGamesBetweenHRs: expectedGamesBetweenHRs || 0,
+        isDue: isDue || false,
+        dueScore: dueScore || 0
       };
     })
-    .filter(Boolean); 
+    .filter(Boolean) // Remove null entries
+    .sort((a, b) => b.dueScore - a.dueScore); // Sort by most due first
   
-  console.log(`[generateHRPredictions] Processed ${processedPlayerCount} batters from gameData. Found ${playersWithPredictionDetails.length} potentially relevant players after initial filters.`);
-
-  if (playersWithPredictionDetails.length > 0 && playersWithPredictionDetails.length < 10) { // Log for a few players if list is small
-    console.log('[generateHRPredictions] Details for some processed players (before final "isDue" filter):');
-    playersWithPredictionDetails.slice(0, 5).forEach(p => {
-      console.log(`  Player: ${p.fullName} (${p.team})`);
-      console.log(`    GamesPlayed (2025): ${p.gamesPlayed}, HR (2025): ${p.actualHRs}`);
-      console.log(`    Hist HR_Rate: ${p.hrRate.toFixed(3)}, Exp. HR (2025): ${p.expectedHRs.toFixed(2)}, HR_Deficit: ${p.hrDeficit.toFixed(2)} (Threshold: ${HR_DEFICIT_THRESHOLD})`);
-      console.log(`    GamesSinceLastHR: ${p.gamesSinceLastHR}, Exp. GamesBetweenHR: ${p.expectedGamesBetweenHRs}`);
-      console.log(`    IsDueByDeficit: ${p.isDueByDeficit}, IsDueByStreak: ${p.isDueByStreak} (Streak > ${p.expectedGamesBetweenHRs * 1.5})`);
-      console.log(`    Overall isDue: ${p.isDue}, DueScore: ${p.dueScore.toFixed(2)}`);
+  console.log(`[generateHRPredictions] Processed ${processedCount} hitters from roster. Found ${teamFilteredCount} on today's teams, ${sufficientDataCount} with game data, and ${dueCount} considered "due" for a HR.`);
+  
+  // Take top 15 players based on due score
+  const predictions = playerPredictions.slice(0, 15);
+  
+  // If no predictions were generated, provide default data to prevent errors
+  if (predictions.length === 0) {
+    console.warn('[generateHRPredictions] No predictions generated. Adding default prediction to prevent errors.');
+    predictions.push({
+      name: "Default Player",
+      fullName: "Default Player",
+      team: "N/A",
+      gamesPlayed: 0,
+      homeRunsThisSeason: 0,
+      hrRate: 0,
+      expectedHRs: 0,
+      actualHRs: 0,
+      hrDeficit: 0,
+      gamesSinceLastHR: 0,
+      daysSinceLastHR: 0,
+      lastHRDate: null,
+      expectedGamesBetweenHRs: 0,
+      isDue: false,
+      dueScore: 0
     });
   }
-
-  const playersActuallyDue = playersWithPredictionDetails
-    .filter(player => player.isDue)
-    .sort((a, b) => b.dueScore - a.dueScore);
   
-  console.log(`[generateHRPredictions] Found ${playersActuallyDue.length} players considered "due" for a HR.`);
-
+  // 6. Prepare and save the output data
   const outputData = {
     date: targetDate.toISOString().split('T')[0],
     updatedAt: new Date().toISOString(),
-    predictions: playersActuallyDue.slice(0, 10) // Top 10 most due
+    predictions: predictions
   };
   
+  // Format output filename based on date
   const year = targetDate.getFullYear();
   const month = String(targetDate.getMonth() + 1).padStart(2, '0');
   const day = String(targetDate.getDate()).padStart(2, '0');
   const outputFileName = `hr_predictions_${year}-${month}-${day}.json`;
   const outputPath = path.join(OUTPUT_DIR, outputFileName);
   
-  console.log(`[generateHRPredictions] Writing ${outputData.predictions.length} predictions to ${outputPath}...`);
+  console.log(`[generateHRPredictions] Writing ${predictions.length} predictions to ${outputPath}...`);
   const success = writeJsonFile(outputPath, outputData);
   
+  // Also write to latest.json for easy access
   if (success) {
     const latestPath = path.join(OUTPUT_DIR, 'hr_predictions_latest.json');
     writeJsonFile(latestPath, outputData);
