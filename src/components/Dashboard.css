@@ -1,171 +1,288 @@
 /* Dashboard Component Styling */
 
 .dashboard {
-    padding: 20px;
+  padding: 20px;
+}
+
+.dashboard-header {
+  margin-bottom: 30px;
+}
+
+.dashboard-header h2 {
+  margin-bottom: 5px;
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.dashboard-header .date {
+  color: #666;
+  font-size: 1rem;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+/* Card Styling */
+.card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.3rem;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+/* Statistics Summary Card */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0056b3;
+}
+
+.stat-label {
+  margin-top: 5px;
+  color: #666;
+}
+
+/* Player Lists */
+.player-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.player-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.player-item:last-child {
+  border-bottom: none;
+}
+
+.player-rank {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0056b3;
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 15px;
+}
+
+.player-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.player-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.player-team {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.player-stat {
+  font-weight: 700;
+  color: #0056b3;
+}
+
+.stat-note {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: #666;
+  margin-top: 3px;
+}
+
+/* HR Prediction Card Specific Styling */
+.hr-prediction .player-item {
+  padding: 12px 0;
+}
+
+.hr-prediction .player-rank {
+  background-color: #e63946; /* Red background for HR prediction ranks */
+}
+
+.hr-prediction .player-stat {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+}
+
+.hr-deficit {
+  font-weight: 700;
+  color: #e63946; /* Red for deficit */
+  font-size: 0.95rem;
+}
+
+.hr-detail {
+  font-size: 0.8rem;
+  font-weight: normal;
+  color: #666;
+  margin-top: 3px;
+}
+
+/* Add striped background for players with long HR droughts */
+.hr-prediction .player-item:nth-child(1) .hr-deficit {
+  background-color: rgba(230, 57, 70, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border-left: 3px solid #e63946;
+}
+
+/* Loading Indicator */
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.loading-indicator:after {
+  content: "...";
+  animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+  0%, 20% {
+    content: ".";
   }
-  
-  .dashboard-header {
-    margin-bottom: 30px;
+  40% {
+    content: "..";
   }
-  
-  .dashboard-header h2 {
-    margin-bottom: 5px;
-    font-size: 1.8rem;
-    color: #333;
+  60% {
+    content: "...";
   }
-  
-  .dashboard-header .date {
-    color: #666;
-    font-size: 1rem;
+  80%, 100% {
+    content: "";
   }
-  
+}
+
+/* Updates List */
+.updates-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.update-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.update-item:last-child {
+  border-bottom: none;
+}
+
+.update-icon {
+  font-size: 1.5rem;
+  margin-right: 15px;
+}
+
+.update-text {
+  color: #333;
+}
+
+.no-data {
+  color: #888;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
   .dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: 1fr;
   }
   
-  /* Card Styling */
-  .card {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    padding: 20px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-  
-  .card h3 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    color: #333;
-    font-size: 1.3rem;
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 10px;
-  }
-  
-  /* Statistics Summary Card */
   .stats-grid {
-    display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+  }
+}
+
+/* Updates List */
+.updates-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.update-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.update-item:last-child {
+  border-bottom: none;
+}
+
+.update-icon {
+  font-size: 1.5rem;
+  margin-right: 15px;
+}
+
+.update-text {
+  color: #333;
+}
+
+.no-data {
+  color: #888;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
   }
   
-  .stat-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 6px;
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-  
-  .stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #0056b3;
-  }
-  
-  .stat-label {
-    margin-top: 5px;
-    color: #666;
-  }
-  
-  /* Player Lists */
-  .player-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .player-item {
-    display: flex;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #f0f0f0;
-  }
-  
-  .player-item:last-child {
-    border-bottom: none;
-  }
-  
-  .player-rank {
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #0056b3;
-    color: white;
-    border-radius: 50%;
-    font-weight: bold;
-    margin-right: 15px;
-  }
-  
-  .player-info {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .player-name {
-    font-weight: 500;
-    color: #333;
-  }
-  
-  .player-team {
-    font-size: 0.85rem;
-    color: #666;
-  }
-  
-  .player-stat {
-    font-weight: 700;
-    color: #0056b3;
-  }
-  
-  /* Updates List */
-  .updates-list {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .update-item {
-    display: flex;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid #f0f0f0;
-  }
-  
-  .update-item:last-child {
-    border-bottom: none;
-  }
-  
-  .update-icon {
-    font-size: 1.5rem;
-    margin-right: 15px;
-  }
-  
-  .update-text {
-    color: #333;
-  }
-  
-  .no-data {
-    color: #888;
-    text-align: center;
-    padding: 20px 0;
-  }
-  
-  /* Responsive Adjustments */
-  @media (max-width: 768px) {
-    .dashboard-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .stats-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
+}
