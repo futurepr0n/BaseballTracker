@@ -289,28 +289,30 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
           {predictionLoading ? (
             <div className="loading-indicator">Loading predictions...</div>
           ) : playersWithHomeRunPrediction.length > 0 ? (
-            <ul className="player-list">
-              {playersWithHomeRunPrediction.slice(0, 5).map((player, index) => (
-                <li key={index} className="player-item">
-                  <div className="player-rank">{index + 1}</div>
-                  <div className="player-info">
-                    <span className="player-name">{player.fullName || player.name}</span>
-                    <span className="player-team">{player.team}</span>
-                  </div>
-                  <div className="player-stat">
-                    <div className="hr-deficit">
-                      {player.gamesSinceLastHR} games without HR
+            <div className="scrollable-container">
+              <ul className="player-list">
+                {playersWithHomeRunPrediction.map((player, index) => (
+                  <li key={index} className="player-item">
+                    <div className="player-rank">{index + 1}</div>
+                    <div className="player-info">
+                      <span className="player-name">{player.fullName || player.name}</span>
+                      <span className="player-team">{player.team}</span>
                     </div>
-                    <div className="hr-detail">
-                      Expected: {player.expectedHRs.toFixed(1)} / Actual: {player.actualHRs}
+                    <div className="player-stat">
+                      <div className="hr-deficit">
+                        {player.gamesSinceLastHR} games without HR
+                      </div>
+                      <div className="hr-detail">
+                        Expected: {player.expectedHRs.toFixed(1)} / Actual: {player.actualHRs}
+                      </div>
+                      <div className="hr-detail">
+                        Last HR: {player.daysSinceLastHR} days ago
+                      </div>
                     </div>
-                    <div className="hr-detail">
-                      Last HR: {player.daysSinceLastHR} days ago
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ) : (
             <p className="no-data">No players due for home runs at this time</p>
           )}
