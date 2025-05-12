@@ -503,7 +503,7 @@ async function generateHRPredictions(targetDate = new Date()) {
   console.log(`[generateHRPredictions] Processed ${processedCount} hitters from roster. Found ${teamFilteredCount} on today's teams, ${sufficientDataCount} with game data, and ${dueCount} considered "due" for a HR.`);
   
   // Take top 15 players based on due score
-  const predictions = playerPredictions.slice(0, 15);
+  const predictions = playerPredictions.slice(0, 25);
   
   // If no predictions were generated, provide default data to prevent errors
   if (predictions.length === 0) {
