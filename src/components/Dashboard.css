@@ -608,3 +608,54 @@
   align-items: flex-end;
   line-height: 1.2;
 }
+
+
+.day-of-week-hits {
+  grid-column: span 1;
+  background-color: #f8f4e5;
+  border-left: 4px solid #ffc107;
+}
+
+.hit-streak {
+  grid-column: span 1;
+  background-color: #e6f7ff;
+  border-left: 4px solid #1890ff;
+}
+
+.likely-to-hit {
+  grid-column: span 1;
+  background-color: #f0f9eb;
+  border-left: 4px solid #52c41a;
+}
+
+.continue-streak {
+  grid-column: span 1;
+  background-color: #fff2e8;
+  border-left: 4px solid #fa8c16;
+}
+
+/* Player list items for streaks */
+.hit-streak .player-item,
+.likely-to-hit .player-item,
+.continue-streak .player-item,
+.day-of-week-hits .player-item {
+  padding: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Highlight the streak number */
+.stat-highlight {
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #1a1a1a;
+}
+
+/* Mobile responsiveness for the new cards */
+@media (max-width: 768px) {
+  .day-of-week-hits,
+  .hit-streak,
+  .likely-to-hit,
+  .continue-streak {
+    grid-column: 1 / -1;
+  }
+}

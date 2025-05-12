@@ -34,6 +34,21 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     overPerforming: [],
     underPerforming: []
   });
+
+  // Add these new state variables inside the Dashboard function
+const [dayOfWeekHits, setDayOfWeekHits] = useState({
+  dayOfWeek: '',
+  topHitsByTotal: [],
+  topHitsByRate: []
+});
+const [hitStreakData, setHitStreakData] = useState({
+  hitStreaks: [],
+  noHitStreaks: [],
+  likelyToGetHit: [],
+  likelyToContinueStreak: []
+});
+const [additionalStatsLoading, setAdditionalStatsLoading] = useState(true);
+
   
   // Format date for display
   const formattedDate = currentDate.toLocaleDateString('en-US', { 
@@ -81,6 +96,70 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     loadHRPredictions();
   }, [currentDate]);
   
+
+useEffect(() => {
+  const loadDayOfWeekHits = async () => {
+    try {
+      setAdditionalStatsLoading(true);
+      
+      // Format date for file name
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+      
+      // Try to load the specific date file first
+      let response = await fetch(`/data/predictions/day_of_week_hits_${dateStr}.json`);
+      
+      // If not found, try to load the latest file
+      if (!response.ok) {
+        response = await fetch('/data/predictions/day_of_week_hits_latest.json');
+      }
+      
+      if (!response.ok) {
+        console.warn('No day of week hit data found');
+        setDayOfWeekHits({
+          dayOfWeek: currentDate.toLocaleDateString('en-US', { weekday: 'long' }),
+          topHitsByTotal: [],
+          topHitsByRate: []
+        });
+      } else {
+        const data = await response.json();
+        setDayOfWeekHits(data);
+      }
+      
+      // Load hit streak data
+      response = await fetch(`/data/predictions/hit_streak_analysis_${dateStr}.json`);
+      
+      // If not found, try to load the latest file
+      if (!response.ok) {
+        response = await fetch('/data/predictions/hit_streak_analysis_latest.json');
+      }
+      
+      if (!response.ok) {
+        console.warn('No hit streak analysis data found');
+        setHitStreakData({
+          hitStreaks: [],
+          noHitStreaks: [],
+          likelyToGetHit: [],
+          likelyToContinueStreak: []
+        });
+      } else {
+        const data = await response.json();
+        setHitStreakData(data);
+      }
+    } catch (error) {
+      console.error('Error loading additional stats:', error);
+    } finally {
+      setAdditionalStatsLoading(false);
+    }
+  };
+  
+  loadDayOfWeekHits();
+}, [currentDate]);
+
+
+
   // Load player performance data and calculate top performers
   useEffect(() => {
     const loadPlayerPerformance = async () => {
@@ -98,13 +177,13 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
             const hrRate = [...players]
               .filter(player => player.gamesPlayed > 0 && player.homeRunsThisSeason > 0)
               .sort((a, b) => (b.homeRunsThisSeason / b.gamesPlayed) - (a.homeRunsThisSeason / a.gamesPlayed))
-              .slice(0, 10);
+              .slice(0, 25);
             
             // 2. Top players with improved HR rate compared to historical
             const improved = [...players]
               .filter(player => player.actualHRRate > player.historicalHRRate)
               .sort((a, b) => (b.actualHRRate - b.historicalHRRate) - (a.actualHRRate - a.historicalHRRate))
-              .slice(0, 10);
+              .slice(0, 25);
             
             // 3. Players who hit home runs most recently
             const recent = [...players]
@@ -118,19 +197,19 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
                 // If same date, sort by total home runs
                 return b.homeRunsThisSeason - a.homeRunsThisSeason;
               })
-              .slice(0, 10);
+              .slice(0, 25);
             
             // 4. Over-performing players
             const overPerforming = [...players]
               .filter(player => player.status === "over-performing")
               .sort((a, b) => b.performanceIndicator - a.performanceIndicator)
-              .slice(0, 10);
+              .slice(0, 25);
             
             // 5. Under-performing players
             const underPerforming = [...players]
               .filter(player => player.status === "under-performing")
               .sort((a, b) => a.performanceIndicator - b.performanceIndicator)
-              .slice(0, 10);
+              .slice(0, 25);
             
             setTopPerformers({
               hrRate,
@@ -238,17 +317,17 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
             const topHitters = [...batters]
               .filter(player => player.H !== 'DNP' && player.H !== null)
               .sort((a, b) => Number(b.H) - Number(a.H))
-              .slice(0, 5);
+              .slice(0, 25);
             
             const topHomers = [...batters]
               .filter(player => player.HR !== 'DNP' && player.HR !== null && Number(player.HR) > 0)
               .sort((a, b) => Number(b.HR) - Number(a.HR))
-              .slice(0, 5);
+              .slice(0, 25);
             
             const topStrikeoutPitchers = [...pitchers]
               .filter(player => player.K !== 'DNP' && player.K !== null)
               .sort((a, b) => Number(b.K) - Number(a.K))
-              .slice(0, 5);
+              .slice(0, 25);
             
             setRollingStats({
               hitters: topHitters,
@@ -265,7 +344,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
               const homers = [...players]
                 .filter(player => player.homeRunsThisSeason)
                 .sort((a, b) => b.homeRunsThisSeason - a.homeRunsThisSeason)
-                .slice(0, 5)
+                .slice(0, 25)
                 .map(player => ({
                   name: player.fullName || player.name,
                   team: player.team,
@@ -276,14 +355,14 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
               // Create hitters list based on performance indicators
               const hitters = [...players]
                 .filter(player => player.performanceIndicator)
-                .sort((a, b) => b.performanceIndicator - a.performanceIndicator)
-                .slice(0, 5)
                 .map(player => ({
                   name: player.fullName || player.name,
                   team: player.team,
                   H: Math.round(player.expectedHRs * 2), // Estimated hits based on HR rate
                   games: player.gamesPlayed || 1
-                }));
+                }))
+                .sort((a, b) => b.H - a.H) // Sort by H after mapping
+                .slice(0, 25); // Increase limit to 20
               
               // We don't have pitcher data, so leave strikeouts empty
               const strikeouts = [];
@@ -322,17 +401,17 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
       const topHitters = [...batters]
         .filter(player => player.H !== 'DNP' && player.H !== null)
         .sort((a, b) => (Number(b.H) || 0) - (Number(a.H) || 0))
-        .slice(0, 5);
+        .slice(0, 25);
       
       const topHomers = [...batters]
         .filter(player => player.HR !== 'DNP' && player.HR !== null && Number(player.HR) > 0)
         .sort((a, b) => (Number(b.HR) || 0) - (Number(a.HR) || 0))
-        .slice(0, 5);
+        .slice(0, 25);
       
       const topStrikeoutPitchers = [...pitchers]
         .filter(player => player.K !== 'DNP' && player.K !== null)
         .sort((a, b) => (Number(b.K) || 0) - (Number(a.K) || 0))
-        .slice(0, 5);
+        .slice(0, 25);
       
       setRollingStats({
         hitters: topHitters,
@@ -455,56 +534,60 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
         </div>
         
         {/* Top Hitters Card */}
-        <div className="card top-hitters">
-          <h3>Top Hitters ({getTimePeriodText()})</h3>
-          {statsLoading ? (
-            <div className="loading-indicator">Loading stats...</div>
-          ) : rollingStats.hitters.length > 0 ? (
-            <ul className="player-list">
-              {rollingStats.hitters.map((player, index) => (
-                <li key={index} className="player-item">
-                  <div className="player-rank">{index + 1}</div>
-                  <div className="player-info">
-                    <span className="player-name">{player.name}</span>
-                    <span className="player-team">{player.team}</span>
-                  </div>
-                  <div className="player-stat">
-                    {player.H} hits
-                    {player.games > 1 && <span className="stat-note">({player.games} games)</span>}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="no-data">No hitting data available for this period</p>
-          )}
-        </div>
+       <div className="card top-hitters">
+  <h3>Top Hitters ({getTimePeriodText()})</h3>
+  {statsLoading ? (
+    <div className="loading-indicator">Loading stats...</div>
+  ) : rollingStats.hitters.length > 0 ? (
+    <div className="scrollable-container"> {/* Make sure this wrapper exists */}
+      <ul className="player-list">
+        {rollingStats.hitters.map((player, index) => (
+          <li key={index} className="player-item">
+            <div className="player-rank">{index + 1}</div>
+            <div className="player-info">
+              <span className="player-name">{player.name}</span>
+              <span className="player-team">{player.team}</span>
+            </div>
+            <div className="player-stat">
+              {player.H} hits
+              {player.games > 1 && <span className="stat-note">({player.games} games)</span>}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ) : (
+    <p className="no-data">No hitting data available for this period</p>
+  )}
+</div>
         
         {/* Home Run Leaders Card */}
         <div className="card hr-leaders">
-          <h3>Home Run Leaders ({getTimePeriodText()})</h3>
-          {statsLoading ? (
-            <div className="loading-indicator">Loading stats...</div>
-          ) : rollingStats.homers.length > 0 ? (
-            <ul className="player-list">
-              {rollingStats.homers.map((player, index) => (
-                <li key={index} className="player-item">
-                  <div className="player-rank">{index + 1}</div>
-                  <div className="player-info">
-                    <span className="player-name">{player.name}</span>
-                    <span className="player-team">{player.team}</span>
-                  </div>
-                  <div className="player-stat">
-                    {player.HR} HR
-                    {player.games > 1 && <span className="stat-note">({player.games} games)</span>}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="no-data">No home run data available for this period</p>
-          )}
-        </div>
+  <h3>Home Run Leaders ({getTimePeriodText()})</h3>
+  {statsLoading ? (
+    <div className="loading-indicator">Loading stats...</div>
+  ) : rollingStats.homers.length > 0 ? (
+    <div className="scrollable-container"> {/* Make sure this wrapper exists */}
+      <ul className="player-list">
+        {rollingStats.homers.map((player, index) => (
+          <li key={index} className="player-item">
+            <div className="player-rank">{index + 1}</div>
+            <div className="player-info">
+              <span className="player-name">{player.name}</span>
+              <span className="player-team">{player.team}</span>
+            </div>
+            <div className="player-stat">
+              {player.HR} HR
+              {player.games > 1 && <span className="stat-note">({player.games} games)</span>}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ) : (
+    <p className="no-data">No home run data available for this period</p>
+  )}
+</div>
         
         {/* Strikeout Leaders Card - Only show if data is available */}
         {rollingStats.strikeouts.length > 0 && (
@@ -697,8 +780,129 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
             </div>
           </div>
         </div>
+
+        {/* Day of Week Hit Leaders Card */}
+<div className="card day-of-week-hits">
+  <h3>{dayOfWeekHits.dayOfWeek} Hit Leaders</h3>
+  {additionalStatsLoading ? (
+    <div className="loading-indicator">Loading stats...</div>
+  ) : dayOfWeekHits.topHitsByTotal.length > 0 ? (
+    <div className="scrollable-container">
+      <ul className="player-list">
+        {dayOfWeekHits.topHitsByTotal.slice(0, 10).map((player, index) => (
+          <li key={index} className="player-item">
+            <div className="player-rank">{index + 1}</div>
+            <div className="player-info">
+              <span className="player-name">{player.name}</span>
+              <span className="player-team">{player.team}</span>
+            </div>
+            <div className="player-stat">
+              <div className="stat-highlight">{player.hits} hits</div>
+              <small>in {player.games} {dayOfWeekHits.dayOfWeek}s</small>
+              <small>({(player.hitRate * 100).toFixed(1)}%)</small>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ) : (
+    <p className="no-data">No {dayOfWeekHits.dayOfWeek} hit data available</p>
+  )}
+</div>
+
+{/* Hit Streak Leaders Card */}
+<div className="card hit-streak">
+  <h3>Current Hit Streaks</h3>
+  {additionalStatsLoading ? (
+    <div className="loading-indicator">Loading stats...</div>
+  ) : hitStreakData.hitStreaks.length > 0 ? (
+    <div className="scrollable-container">
+      <ul className="player-list">
+        {hitStreakData.hitStreaks.slice(0, 10).map((player, index) => (
+          <li key={index} className="player-item">
+            <div className="player-rank">{index + 1}</div>
+            <div className="player-info">
+              <span className="player-name">{player.name}</span>
+              <span className="player-team">{player.team}</span>
+            </div>
+            <div className="player-stat">
+              <div className="stat-highlight">{player.currentStreak} games</div>
+              <small>Avg streak: {player.avgHitStreakLength.toFixed(1)}</small>
+              <small>Continue: {(player.continuationProbability * 100).toFixed(1)}%</small>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ) : (
+    <p className="no-data">No active hitting streaks</p>
+  )}
+</div>
+
+{/* Likely to Get a Hit Card */}
+<div className="card likely-to-hit">
+  <h3>Players Due for a Hit</h3>
+  {additionalStatsLoading ? (
+    <div className="loading-indicator">Loading stats...</div>
+  ) : hitStreakData.likelyToGetHit.length > 0 ? (
+    <div className="scrollable-container">
+      <ul className="player-list">
+        {hitStreakData.likelyToGetHit.slice(0, 10).map((player, index) => (
+          <li key={index} className="player-item">
+            <div className="player-rank">{index + 1}</div>
+            <div className="player-info">
+              <span className="player-name">{player.name}</span>
+              <span className="player-team">{player.team}</span>
+            </div>
+            <div className="player-stat">
+              <div className="stat-highlight">{Math.abs(player.currentStreak)} games without hit</div>
+              <small>Next game hit: {(player.streakEndProbability * 100).toFixed(1)}%</small>
+              <small>Max drought: {player.longestNoHitStreak} games</small>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ) : (
+    <p className="no-data">No players currently predicted for hits</p>
+  )}
+</div>
+
+{/* Likely to Continue Streak Card */}
+<div className="card continue-streak">
+  <h3>Streaks Likely to Continue</h3>
+  {additionalStatsLoading ? (
+    <div className="loading-indicator">Loading stats...</div>
+  ) : hitStreakData.likelyToContinueStreak.length > 0 ? (
+    <div className="scrollable-container">
+      <ul className="player-list">
+        {hitStreakData.likelyToContinueStreak.slice(0, 10).map((player, index) => (
+          <li key={index} className="player-item">
+            <div className="player-rank">{index + 1}</div>
+            <div className="player-info">
+              <span className="player-name">{player.name}</span>
+              <span className="player-team">{player.team}</span>
+            </div>
+            <div className="player-stat">
+              <div className="stat-highlight">{player.currentStreak} game streak</div>
+              <small>Continue: {(player.continuationProbability * 100).toFixed(1)}%</small>
+              <small>Best streak: {player.longestHitStreak} games</small>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ) : (
+    <p className="no-data">No notable streaks likely to continue</p>
+  )}
+</div>
+
+
+
       </div>
     </div>
+    
+    
   );
 }
 
