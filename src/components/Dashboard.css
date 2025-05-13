@@ -336,3 +336,310 @@ body .streak-tooltip {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+
+.streak-tooltip,
+.batter-tooltip,
+.day-hit-tooltip {
+  position: fixed;
+  z-index: 1500;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  max-height: 80vh;
+  overflow-y: auto;
+  transition: opacity 0.15s ease;
+  opacity: 1;
+  min-width: 280px;
+  max-width: 90vw;
+  
+  /* Prevent tooltip content from interfering with parent events */
+  pointer-events: auto;
+}
+
+/* Common tooltip header styles */
+.tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #eee;
+  font-weight: 500;
+  font-size: 0.95rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Better close button styling */
+.close-tooltip {
+  background: none;
+  border: none;
+  height: 28px;
+  width: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #666;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.close-tooltip:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #333;
+}
+
+/* Tooltip backdrop for mobile devices */
+.tooltip-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1400;
+  cursor: pointer;
+}
+
+/* Tooltip container for trigger elements */
+.tooltip-container {
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+
+/* Style adjustments for mobile */
+@media (max-width: 768px) {
+  .streak-tooltip,
+  .batter-tooltip,
+  .day-hit-tooltip {
+    width: 90vw;
+    max-width: 400px;
+    max-height: 70vh;
+    /* Center in the screen */
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  }
+  
+  .tooltip-header {
+    padding: 14px 16px;
+  }
+  
+  .close-tooltip {
+    height: 32px;
+    width: 32px;
+  }
+}
+
+/* Specific tooltip type customizations */
+
+/* Streak tooltip */
+.streak-tooltip .streak-details {
+  padding: 16px;
+}
+
+.streak-tooltip .streak-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+/* Batter tooltip */
+.batter-tooltip .batter-list {
+  padding: 12px;
+  margin: 0;
+}
+
+/* Day hit tooltip */
+.day-hit-tooltip .day-hit-details {
+  padding: 16px;
+}
+
+/* Prevent tooltip flash by fixing z-index conflicts */
+.player-list .player-item {
+  position: relative;
+  z-index: 1;
+}
+
+.player-list .player-item:hover {
+  z-index: 2;
+}
+
+/* Add visual feedback for clickable elements */
+.player-stat.tooltip-container {
+  transition: background-color 0.2s ease;
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.player-stat.tooltip-container:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Animation for tooltips */
+@keyframes tooltipFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.streak-tooltip,
+.batter-tooltip,
+.day-hit-tooltip {
+  animation: tooltipFadeIn 0.2s ease forwards;
+}
+
+
+
+/* Anti-flicker tooltip styles */
+
+/* Base tooltip styles applied to all tooltip types */
+.streak-tooltip,
+.batter-tooltip,
+.day-hit-tooltip {
+  position: fixed;
+  z-index: 1500;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  max-height: 80vh;
+  overflow-y: auto;
+  
+  /* These properties help prevent flickering */
+  pointer-events: auto !important; /* Ensure tooltip receives mouse events */
+  will-change: transform, opacity; /* Performance optimization */
+  transform: translate3d(0, 0, 0); /* Force hardware acceleration */
+  
+  /* Control transition timing */
+  transition: opacity 0.15s ease;
+  opacity: 1;
+  
+  /* Dimensions */
+  min-width: 280px;
+  max-width: 90vw;
+}
+
+/* Make tooltip containers receive mouse events */
+.tooltip-container {
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  user-select: none; /* Prevent text selection */
+}
+
+/* Create a buffer area around triggering elements to prevent accidental mouseout */
+.tooltip-container::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Fix z-index stacking to prevent flickering */
+.player-list .player-item {
+  position: relative;
+  z-index: 1;
+}
+
+.player-list .player-item:hover {
+  z-index: 2;
+}
+
+/* Ensure tooltips are above all other content */
+.tooltip-backdrop {
+  z-index: 1400 !important;
+}
+
+/* Tooltip header styles */
+.tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #eee;
+  font-weight: 500;
+  font-size: 0.95rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  user-select: none; /* Prevent text selection */
+}
+
+/* Better close button styling */
+.close-tooltip {
+  background: none;
+  border: none;
+  height: 28px;
+  width: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #666;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.close-tooltip:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #333;
+}
+
+/* Additional important fixes for tooltip content */
+.streak-details,
+.day-hit-details {
+  pointer-events: auto !important;
+  padding: 16px;
+}
+
+/* Fix tables within tooltips */
+.streak-progression-table {
+  pointer-events: auto !important;
+  user-select: text;
+}
+
+/* Force tooltips to remain stable during mouse movements */
+.streak-tooltip[data-hovered="true"],
+.batter-tooltip[data-hovered="true"],
+.day-hit-tooltip[data-hovered="true"] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .streak-tooltip,
+  .batter-tooltip,
+  .day-hit-tooltip {
+    width: 90vw;
+    max-width: 400px;
+    max-height: 70vh;
+    
+    /* Center in the screen */
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  }
+}
