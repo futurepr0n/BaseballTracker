@@ -1,0 +1,98 @@
+/* HomeRunLeadersCard.css */
+
+.hr-leaders-card {
+  grid-column: span 1;
+  background-color: white;
+}
+
+/* Player list styling */
+.hr-leaders-card .player-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.hr-leaders-card .player-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.hr-leaders-card .player-item:hover {
+  background-color: #f9f9f9;
+}
+
+.hr-leaders-card .player-item:last-child {
+  border-bottom: none;
+}
+
+/* Player rank styling */
+.hr-leaders-card .player-rank {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e63946; /* Red for HR leaders */
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 15px;
+}
+
+/* Player info styling */
+.hr-leaders-card .player-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.hr-leaders-card .player-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.hr-leaders-card .player-team {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Player stats styling */
+.hr-leaders-card .player-stat {
+  font-weight: 700;
+  color: #e63946; /* Red for HR */
+}
+
+.hr-leaders-card .stat-note {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: #666;
+  margin-top: 3px;
+}
+
+/* Loading indicator */
+.hr-leaders-card .loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+/* No data message */
+.hr-leaders-card .no-data {
+  color: #888;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hr-leaders-card {
+    grid-column: 1 / -1;
+  }
+}
