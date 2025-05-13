@@ -1,0 +1,224 @@
+/* DayOfWeekHitsCard.css */
+
+.day-of-week-hits-card {
+  grid-column: span 1;
+  background-color: #f8f4e5;
+  border-left: 4px solid #ffc107;
+}
+
+/* Player list styling */
+.day-of-week-hits-card .player-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.day-of-week-hits-card .player-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition: background-color 0.2s ease;
+}
+
+.day-of-week-hits-card .player-item:hover {
+  background-color: rgba(255, 193, 7, 0.1);
+}
+
+.day-of-week-hits-card .player-item:last-child {
+  border-bottom: none;
+}
+
+/* Player rank styling */
+.day-of-week-hits-card .player-rank {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffc107;
+  color: #7a5900;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 15px;
+}
+
+/* Player info styling */
+.day-of-week-hits-card .player-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.day-of-week-hits-card .player-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.day-of-week-hits-card .player-team {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Player stats styling */
+.day-of-week-hits-card .player-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.day-of-week-hits-card .player-stat:hover {
+  background-color: rgba(255, 193, 7, 0.15);
+}
+
+.day-of-week-hits-card .stat-highlight {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #ffa000;
+}
+
+.day-of-week-hits-card small {
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: #666;
+  line-height: 1.4;
+  text-align: right;
+}
+
+/* Loading indicator */
+.day-of-week-hits-card .loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+/* No data message */
+.day-of-week-hits-card .no-data {
+  color: #888;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* Tooltip styling - rendered at the document level */
+body .day-hit-tooltip {
+  position: fixed;
+  z-index: 1500;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  width: 280px;
+  overflow: hidden;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.day-hit-tooltip .tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background-color: #fffbeb;
+  border-bottom: 1px solid #ffe9a1;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.day-hit-tooltip .close-tooltip {
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #d4a000;
+}
+
+.day-hit-tooltip .close-tooltip:hover {
+  color: #b28600;
+}
+
+/* Day hit details */
+.day-hit-tooltip .day-hit-details {
+  padding: 12px;
+}
+
+.day-hit-tooltip .day-hit-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+  background-color: #fffdf5;
+  padding: 10px;
+  border-radius: 4px;
+  border-left: 3px solid #ffc107;
+}
+
+.day-hit-tooltip .day-hit-summary-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.day-hit-tooltip .summary-label {
+  color: #666;
+}
+
+.day-hit-tooltip .summary-value {
+  font-weight: 500;
+}
+
+.day-hit-tooltip .summary-value.highlight {
+  color: #e6a700;
+  font-weight: 700;
+}
+
+/* Game dates section */
+.day-hit-tooltip .day-hit-games h4 {
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.day-hit-tooltip .day-hit-date-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.day-hit-tooltip .day-hit-date-item {
+  padding: 6px 8px;
+  border-bottom: 1px solid #f5f5f5;
+  font-size: 0.85rem;
+}
+
+.day-hit-tooltip .day-hit-date-item:last-child {
+  border-bottom: none;
+}
+
+.day-hit-tooltip .day-hit-more-dates {
+  text-align: center;
+  font-style: italic;
+  color: #999;
+  font-size: 0.8rem;
+  margin-top: 8px;
+}
+
+.day-hit-tooltip .no-date-data {
+  text-align: center;
+  font-style: italic;
+  color: #999;
+  padding: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .day-of-week-hits-card {
+    grid-column: 1 / -1;
+  }
+}

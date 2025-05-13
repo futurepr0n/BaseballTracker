@@ -1,0 +1,71 @@
+/* StatsSummaryCard.css */
+
+.stats-summary-card {
+  grid-column: span 1;
+  background-color: white;
+}
+
+/* Statistics Summary Grid */
+.stats-summary-card .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.stats-summary-card .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stats-summary-card .stat-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stats-summary-card .stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0056b3;
+}
+
+.stats-summary-card .stat-label {
+  margin-top: 5px;
+  color: #666;
+}
+
+/* Custom stat item styling */
+.stats-summary-card .stat-item:nth-child(1) .stat-value {
+  color: #1890ff; /* Blue for batters */
+}
+
+.stats-summary-card .stat-item:nth-child(2) .stat-value {
+  color: #722ed1; /* Purple for pitchers */
+}
+
+.stats-summary-card .stat-item:nth-child(3) .stat-value {
+  color: #f5222d; /* Red for home runs */
+}
+
+.stats-summary-card .stat-item:nth-child(4) .stat-value {
+  color: #52c41a; /* Green for hits */
+}
+
+.stats-summary-card .stat-item:nth-child(5) .stat-value {
+  color: #fa8c16; /* Orange for strikeouts */
+}
+
+.stats-summary-card .stat-item:nth-child(6) .stat-value {
+  color: #2f54eb; /* Indigo for innings pitched */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .stats-summary-card {
+    grid-column: 1 / -1;
+  }
+}

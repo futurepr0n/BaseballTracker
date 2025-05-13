@@ -320,20 +320,11 @@ async function generateHitStreakAnalysis(targetDate = new Date()) {
     const noHitStreakLengths = [];
     let streak = 0;
     
-    // Track all streaks chronologically to analyze progression
-    const allStreaks = [];
-    
     for (let i = 0; i < games.length; i++) {
       if (games[i].hadHit) {
         if (streak < 0) {
           // End of a no-hit streak
           noHitStreakLengths.push(-streak);
-          // Record the no-hit streak
-          allStreaks.push({
-            type: 'no-hit',
-            length: -streak,
-            endDate: games[i].date
-          });
           streak = 1;
         } else {
           streak++;
@@ -342,12 +333,6 @@ async function generateHitStreakAnalysis(targetDate = new Date()) {
         if (streak > 0) {
           // End of a hit streak
           hitStreakLengths.push(streak);
-          // Record the hit streak
-          allStreaks.push({
-            type: 'hit',
-            length: streak,
-            endDate: games[i].date
-          });
           streak = -1;
         } else {
           streak--;
@@ -358,22 +343,8 @@ async function generateHitStreakAnalysis(targetDate = new Date()) {
       if (i === games.length - 1) {
         if (streak > 0) {
           hitStreakLengths.push(streak);
-          // Record the ongoing hit streak
-          allStreaks.push({
-            type: 'hit',
-            length: streak,
-            endDate: games[i].date,
-            ongoing: true
-          });
         } else if (streak < 0) {
           noHitStreakLengths.push(-streak);
-          // Record the ongoing no-hit streak
-          allStreaks.push({
-            type: 'no-hit',
-            length: -streak,
-            endDate: games[i].date,
-            ongoing: true
-          });
         }
       }
     }
@@ -400,166 +371,27 @@ async function generateHitStreakAnalysis(targetDate = new Date()) {
       noHitStreakFrequency[length] = (noHitStreakFrequency[length] || 0) + 1;
     });
     
-    // Calculate detailed streak progression statistics
-    // For each streak length, calculate how often it continues vs. ends
-    const hitStreakProgression = {};
-    const noHitStreakProgression = {};
-    
-    // Initialize progression stats for all lengths up to the longest streak
-    for (let i = 1; i <= longestHitStreak; i++) {
-      hitStreakProgression[i] = {
-        occurrences: 0,     // Total times player had exactly this streak length
-        continued: 0,       // Times it continued to a longer streak
-        ended: 0,           // Times it ended at this length
-        continuationRate: 0, // Percentage of times it continued
-        nextGameHitRate: 0  // Percentage of times the player got a hit in the next game
-      };
-    }
-    
-    for (let i = 1; i <= longestNoHitStreak; i++) {
-      noHitStreakProgression[i] = {
-        occurrences: 0,
-        continued: 0,
-        ended: 0,
-        continuationRate: 0,
-        nextGameHitRate: 0
-      };
-    }
-    
-    // Analyze hits in streaks chronologically
-    const streaksMap = new Map(); // Temporary map to track in-progress streaks
-    
-    for (let i = 0; i < games.length; i++) {
-      const game = games[i];
-      
-      // Find the current state - in a hit streak, no-hit streak, or neutral
-      let currentStreakType = 'neutral';
-      let currentStreakLength = 0;
-      
-      if (i > 0) {
-        // Look back to determine current streak
-        let backIndex = i - 1;
-        let streakCount = 0;
-        
-        if (games[backIndex].hadHit) {
-          // Check for hit streak
-          while (backIndex >= 0 && games[backIndex].hadHit) {
-            streakCount++;
-            backIndex--;
-          }
-          if (streakCount > 0) {
-            currentStreakType = 'hit';
-            currentStreakLength = streakCount;
-          }
-        } else {
-          // Check for no-hit streak
-          while (backIndex >= 0 && !games[backIndex].hadHit) {
-            streakCount++;
-            backIndex--;
-          }
-          if (streakCount > 0) {
-            currentStreakType = 'no-hit';
-            currentStreakLength = streakCount;
-          }
-        }
-      }
-      
-      // Update progression stats based on current game result
-      if (currentStreakType === 'hit' && currentStreakLength > 0) {
-        if (currentStreakLength <= longestHitStreak) {
-          // Count the occurrence of this streak length
-          hitStreakProgression[currentStreakLength].occurrences++;
-          
-          // Check if the streak continued or ended
-          if (game.hadHit) {
-            hitStreakProgression[currentStreakLength].continued++;
-          } else {
-            hitStreakProgression[currentStreakLength].ended++;
-          }
-        }
-      } else if (currentStreakType === 'no-hit' && currentStreakLength > 0) {
-        if (currentStreakLength <= longestNoHitStreak) {
-          // Count the occurrence of this streak length
-          noHitStreakProgression[currentStreakLength].occurrences++;
-          
-          // Check if the streak continued or ended
-          if (!game.hadHit) {
-            noHitStreakProgression[currentStreakLength].continued++;
-          } else {
-            noHitStreakProgression[currentStreakLength].ended++;
-          }
-        }
-      }
-    }
-    
-    // Calculate continuation rates
-    for (let i = 1; i <= longestHitStreak; i++) {
-      const stats = hitStreakProgression[i];
-      if (stats.occurrences > 0) {
-        stats.continuationRate = stats.continued / stats.occurrences;
-        stats.nextGameHitRate = stats.continued / stats.occurrences;
-      }
-    }
-    
-    for (let i = 1; i <= longestNoHitStreak; i++) {
-      const stats = noHitStreakProgression[i];
-      if (stats.occurrences > 0) {
-        stats.continuationRate = stats.continued / stats.occurrences;
-        stats.nextGameHitRate = stats.ended / stats.occurrences; // For no-hit, next game hit = streak ended
-      }
-    }
-    
-    // Calculate overall continuation probability for current streak
+    // Calculate continuation probability
     let continuationProbability = 0.5; // Default to 50% if we can't calculate
     
     if (currentStreak > 0) {
       // Player is on a hit streak
-      // Try to use the specific streak length probability
-      if (hitStreakProgression[currentStreak] && hitStreakProgression[currentStreak].occurrences > 0) {
-        continuationProbability = hitStreakProgression[currentStreak].continuationRate;
-      } else {
-        // Fall back to general calculation
-        const sameOrLongerStreaks = hitStreakLengths.filter(length => length >= currentStreak).length;
-        const continuedStreaks = hitStreakLengths.filter(length => length > currentStreak).length;
-        
-        if (sameOrLongerStreaks > 0) {
-          continuationProbability = continuedStreaks / sameOrLongerStreaks;
-        }
+      const sameOrLongerStreaks = hitStreakLengths.filter(length => length >= currentStreak).length;
+      const continuedStreaks = hitStreakLengths.filter(length => length > currentStreak).length;
+      
+      if (sameOrLongerStreaks > 0) {
+        continuationProbability = continuedStreaks / sameOrLongerStreaks;
       }
     } else if (currentStreak < 0) {
       // Player is on a no-hit streak
       const noHitStreak = -currentStreak;
+      const sameOrLongerStreaks = noHitStreakLengths.filter(length => length >= noHitStreak).length;
+      const continuedStreaks = noHitStreakLengths.filter(length => length > noHitStreak).length;
       
-      // Try to use the specific streak length probability
-      if (noHitStreakProgression[noHitStreak] && noHitStreakProgression[noHitStreak].occurrences > 0) {
-        continuationProbability = 1 - noHitStreakProgression[noHitStreak].nextGameHitRate;
-      } else {
-        // Fall back to general calculation
-        const sameOrLongerStreaks = noHitStreakLengths.filter(length => length >= noHitStreak).length;
-        const continuedStreaks = noHitStreakLengths.filter(length => length > noHitStreak).length;
-        
-        if (sameOrLongerStreaks > 0) {
-          continuationProbability = continuedStreaks / sameOrLongerStreaks;
-        }
+      if (sameOrLongerStreaks > 0) {
+        continuationProbability = continuedStreaks / sameOrLongerStreaks;
       }
     }
-    
-    // Add full career progression stats
-    const hitStreakProgressionArray = Object.entries(hitStreakProgression)
-      .map(([length, stats]) => ({
-        length: parseInt(length),
-        ...stats
-      }))
-      .filter(item => item.occurrences > 0)
-      .sort((a, b) => b.length - a.length);
-    
-    const noHitStreakProgressionArray = Object.entries(noHitStreakProgression)
-      .map(([length, stats]) => ({
-        length: parseInt(length),
-        ...stats
-      }))
-      .filter(item => item.occurrences > 0)
-      .sort((a, b) => b.length - a.length);
     
     // Add player to stats list
     playerStreakStats.push({
@@ -574,14 +406,10 @@ async function generateHitStreakAnalysis(targetDate = new Date()) {
       longestNoHitStreak,
       hitStreakFrequency,
       noHitStreakFrequency,
-      hitStreakProgression: hitStreakProgressionArray,  // Add detailed progression stats
-      noHitStreakProgression: noHitStreakProgressionArray,
-      // Use specific streak length probability when available
       continuationProbability,
       streakEndProbability: 1 - continuationProbability,
       lastGameDate: games.length > 0 ? games[games.length - 1].date : null,
-      lastGameHadHit: games.length > 0 ? games[games.length - 1].hadHit : false,
-      recentPerformance: games.slice(-10).map(g => g.hadHit ? 1 : 0) // Last 10 games (1=hit, 0=no hit)
+      lastGameHadHit: games.length > 0 ? games[games.length - 1].hadHit : false
     });
   });
   

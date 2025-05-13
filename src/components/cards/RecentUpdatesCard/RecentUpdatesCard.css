@@ -1,0 +1,65 @@
+/* RecentUpdatesCard.css */
+
+.recent-updates-card {
+  grid-column: span 1;
+  background-color: white;
+}
+
+/* Updates List */
+.recent-updates-card .updates-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.recent-updates-card .update-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.recent-updates-card .update-item:last-child {
+  border-bottom: none;
+}
+
+.recent-updates-card .update-icon {
+  font-size: 1.5rem;
+  margin-right: 15px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.recent-updates-card .update-text {
+  color: #333;
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+/* Individual update icons styling */
+.recent-updates-card .update-item:nth-child(1) .update-icon {
+  color: #1890ff; /* Blue for stats update */
+}
+
+.recent-updates-card .update-item:nth-child(2) .update-icon {
+  color: #faad14; /* Gold for leaders */
+}
+
+.recent-updates-card .update-item:nth-child(3) .update-icon {
+  color: #52c41a; /* Green for performance indicators */
+}
+
+.recent-updates-card .update-item:nth-child(4) .update-icon {
+  color: #722ed1; /* Purple for next update */
+}
+
+/* Hover effect */
+.recent-updates-card .update-item:hover {
+  background-color: #f9f9f9;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .recent-updates-card {
+    grid-column: 1 / -1;
+  }
+}

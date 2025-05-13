@@ -1,0 +1,106 @@
+/* HRPredictionCard.css */
+
+.hr-prediction-card {
+  grid-column: span 1;
+  background-color: white;
+}
+
+/* Player Item Styling */
+.hr-prediction-card .player-item {
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.hr-prediction-card .player-item:last-child {
+  border-bottom: none;
+}
+
+.hr-prediction-card .player-item:hover {
+  background-color: rgba(230, 57, 70, 0.02);
+}
+
+/* Player Rank Styling */
+.hr-prediction-card .player-rank {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e63946; /* Red background for HR prediction ranks */
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 15px;
+}
+
+/* Player Info Styling */
+.hr-prediction-card .player-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.hr-prediction-card .player-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.hr-prediction-card .player-team {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Player Stats Styling */
+.hr-prediction-card .player-stat {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  align-items: flex-end;
+  line-height: 1.2;
+}
+
+.hr-prediction-card .hr-deficit {
+  font-weight: 700;
+  color: #e63946; /* Red for deficit */
+  font-size: 0.95rem;
+}
+
+.hr-prediction-card .hr-detail {
+  font-size: 0.8rem;
+  font-weight: normal;
+  color: #666;
+  margin-top: 3px;
+}
+
+/* Highlight players with long HR droughts */
+.hr-prediction-card .player-item:nth-child(1) .hr-deficit {
+  background-color: rgba(230, 57, 70, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border-left: 3px solid #e63946;
+}
+
+.hr-prediction-card .player-item:nth-child(2) .hr-deficit,
+.hr-prediction-card .player-item:nth-child(3) .hr-deficit {
+  padding: 2px 6px;
+  border-radius: 4px;
+  border-left: 3px solid #e63946;
+}
+
+/* Loading & No Data States */
+.hr-prediction-card .loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.hr-prediction-card .no-data {
+  color: #888;
+  text-align: center;
+  padding: 20px 0;
+}

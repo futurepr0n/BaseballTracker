@@ -1,0 +1,371 @@
+/* PitcherMatchupCard.css */
+
+.pitcher-matchup-card {
+  grid-column: span 2;
+  background-color: #f9f9f9;
+  position: relative;
+}
+
+/* Team Selector */
+.team-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.team-button {
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.team-button:hover {
+  background-color: #e0e0e0;
+}
+
+.team-button.active {
+  background-color: #0056b3;
+  color: white;
+}
+
+/* Matchup Actions Row */
+.matchup-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* Sort Toggle */
+.sort-toggle {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.sort-toggle span {
+  margin-right: 10px;
+  color: #666;
+}
+
+.sort-button {
+  padding: 5px 12px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 4px;
+  margin-right: 10px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sort-button:hover {
+  background-color: #e0e0e0;
+}
+
+.sort-button.active {
+  background-color: #0056b3;
+  color: white;
+}
+
+/* Restore Button */
+.restore-button {
+  padding: 5px 12px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #666;
+}
+
+.restore-button:hover {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+/* Pitchers Count */
+.pitchers-count {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 15px;
+  font-style: italic;
+}
+
+/* Pitcher Matchup Item */
+.pitcher-matchup-item {
+  padding: 12px 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.pitcher-matchup-item:hover {
+  background-color: #f5f5f5;
+}
+
+/* Player Name Row with Remove Button */
+.player-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* Hide Pitcher Button */
+.hide-pitcher-button {
+  width: 24px;
+  height: 24px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  color: #999;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+  opacity: 1;
+}
+
+.hide-pitcher-button:hover {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+/* Player Rank Styles */
+.player-rank.tough {
+  background-color: #ff4d4f;
+}
+
+.player-rank.favorable {
+  background-color: #52c41a;
+}
+
+.player-rank.neutral {
+  background-color: #1890ff;
+}
+
+/* Pitcher Details */
+.pitcher-details {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.handedness-badge, .estimated-badge {
+  display: inline-block;
+  padding: 1px 5px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-radius: 3px;
+}
+
+.handedness-badge {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+.estimated-badge {
+  background-color: #ffe58f;
+  color: #ad6800;
+}
+
+/* Matchup Stats */
+.matchup-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  min-width: 140px;
+}
+
+.matchup-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.2;
+  cursor: pointer;
+  position: relative;
+  padding: 3px 6px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.matchup-stat:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.matchup-value {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.matchup-label {
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: #666;
+}
+
+.matchup-stat.tough .matchup-value {
+  color: #ff4d4f;
+}
+
+.matchup-stat.favorable .matchup-value {
+  color: #52c41a;
+}
+
+.opposing-team {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 5px;
+}
+
+/* Fixed Tooltip Container - Positioned on the body element */
+body .batter-tooltip {
+  position: fixed;
+  z-index: 1500;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  width: 280px;
+  overflow: hidden;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #eee;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.close-tooltip {
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #999;
+}
+
+.close-tooltip:hover {
+  color: #333;
+}
+
+.batter-list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.batter-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.batter-item:last-child {
+  border-bottom: none;
+}
+
+.batter-name {
+  font-size: 0.85rem;
+}
+
+.batter-hand {
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background-color: #f0f0f0;
+}
+
+.batter-hand.switch {
+  background-color: #ffe58f;
+}
+
+.no-batters {
+  padding: 12px;
+  color: #999;
+  font-style: italic;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+/* Legend */
+.matchup-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 5px;
+}
+
+.legend-color.tough {
+  background-color: #ff4d4f;
+}
+
+.legend-color.favorable {
+  background-color: #52c41a;
+}
+
+.legend-icon {
+  margin-right: 5px;
+  font-size: 1rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .pitcher-matchup-card {
+    grid-column: 1 / -1;
+  }
+  
+  .team-selector {
+    flex-wrap: nowrap;
+    padding-bottom: 10px;
+  }
+  
+  .matchup-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}

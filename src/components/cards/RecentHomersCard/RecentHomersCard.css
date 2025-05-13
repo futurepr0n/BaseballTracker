@@ -1,0 +1,100 @@
+/* RecentHomersCard.css */
+
+.recent-hr-card {
+  grid-column: span 1;
+  background-color: white;
+}
+
+/* Player Item Styling */
+.recent-hr-card .player-item {
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.recent-hr-card .player-item:last-child {
+  border-bottom: none;
+}
+
+.recent-hr-card .player-item:hover {
+  background-color: rgba(255, 153, 0, 0.05);
+}
+
+/* Player Rank Styling */
+.recent-hr-card .player-rank {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #FF9900; /* Orange background for recent HRs */
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 15px;
+}
+
+/* Player Info Styling */
+.recent-hr-card .player-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.recent-hr-card .player-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.recent-hr-card .player-team {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Player Stats Styling */
+.recent-hr-card .player-stat {
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+  align-items: flex-end;
+  line-height: 1.2;
+}
+
+.recent-hr-card .stat-highlight {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #FF9900;
+}
+
+.recent-hr-card small {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: #666;
+  line-height: 1.4;
+  text-align: right;
+}
+
+/* Highlight most recent */
+.recent-hr-card .player-item:nth-child(1) .stat-highlight,
+.recent-hr-card .player-item:nth-child(2) .stat-highlight {
+  color: #FF6D00; /* Deeper orange for the very recent */
+  font-size: 1.15rem;
+}
+
+/* Loading & No Data States */
+.recent-hr-card .loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.recent-hr-card .no-data {
+  color: #888;
+  text-align: center;
+  padding: 20px 0;
+}

@@ -1,0 +1,139 @@
+/* PerformanceCard.css */
+
+.over-performing-card,
+.under-performing-card {
+  grid-column: span 1;
+  background-color: white;
+}
+
+/* Player Item Styling */
+.over-performing-card .player-item,
+.under-performing-card .player-item {
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.over-performing-card .player-item:last-child,
+.under-performing-card .player-item:last-child {
+  border-bottom: none;
+}
+
+.over-performing-card .player-item:hover {
+  background-color: rgba(33, 150, 243, 0.05);
+}
+
+.under-performing-card .player-item:hover {
+  background-color: rgba(156, 39, 176, 0.05);
+}
+
+/* Player Rank Styling */
+.over-performing-card .player-rank {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #2196F3; /* Blue for over-performing */
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 15px;
+}
+
+.under-performing-card .player-rank {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #9C27B0; /* Purple for under-performing */
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 15px;
+}
+
+/* Player Info Styling */
+.over-performing-card .player-info,
+.under-performing-card .player-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.over-performing-card .player-name,
+.under-performing-card .player-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.over-performing-card .player-team,
+.under-performing-card .player-team {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Player Stats Styling */
+.over-performing-card .player-stat,
+.under-performing-card .player-stat {
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+  align-items: flex-end;
+  line-height: 1.2;
+}
+
+.over-performing-card .stat-highlight {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #2196F3;
+}
+
+.under-performing-card .stat-highlight {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #9C27B0;
+}
+
+.over-performing-card small,
+.under-performing-card small {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: #666;
+  line-height: 1.4;
+  text-align: right;
+}
+
+/* Highlight extremes */
+.over-performing-card .player-item:nth-child(1) .stat-highlight,
+.over-performing-card .player-item:nth-child(2) .stat-highlight {
+  color: #1565C0; /* Deeper blue for most over-performing */
+  font-size: 1.15rem;
+}
+
+.under-performing-card .player-item:nth-child(1) .stat-highlight,
+.under-performing-card .player-item:nth-child(2) .stat-highlight {
+  color: #7B1FA2; /* Deeper purple for most under-performing */
+  font-size: 1.15rem;
+}
+
+/* Loading & No Data States */
+.over-performing-card .loading-indicator,
+.under-performing-card .loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.over-performing-card .no-data,
+.under-performing-card .no-data {
+  color: #888;
+  text-align: center;
+  padding: 20px 0;
+}
