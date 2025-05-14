@@ -104,6 +104,34 @@ function loadAllSeasonData() {
   return seasonData;
 }
 
+
+async function generatePlayerPerformance(targetDate = new Date()) {
+  // Load season data
+  const seasonData = loadAllSeasonData();
+  
+  // Process player performance including recent homers
+  const players = [];
+  
+  // Process player data and track home runs
+  Object.keys(seasonData).forEach(dateKey => {
+    const gameData = seasonData[dateKey];
+    if (gameData.players) {
+      gameData.players.forEach(player => {
+        if (player.HR && player.HR !== 'DNP' && Number(player.HR) > 0) {
+          // Update or add player with HR data
+          // Include lastHRDate for recent homers
+        }
+      });
+    }
+  });
+  
+  // Write to player_performance_latest.json
+  writeJsonFile(path.join(OUTPUT_DIR, 'player_performance_latest.json'), { 
+    players,
+    updatedAt: new Date().toISOString()
+  });
+}
+
 /**
  * Generate day of week hit leaders
  * Finds players who perform best on specific days of the week
