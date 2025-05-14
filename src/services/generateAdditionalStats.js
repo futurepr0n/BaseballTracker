@@ -105,31 +105,140 @@ function loadAllSeasonData() {
 }
 
 
+/**
+ * Generate player performance data including recent home runs
+ */
 async function generatePlayerPerformance(targetDate = new Date()) {
-  // Load season data
+  console.log(`[generatePlayerPerformance] Generating player performance data for ${targetDate.toDateString()}`);
+  
+  // Load roster data
+  console.log('[generatePlayerPerformance] Loading roster data...');
+  const rosterData = readJsonFile(ROSTER_PATH);
+  if (!rosterData) {
+    console.error('[generatePlayerPerformance] Failed to load roster data');
+    return false;
+  }
+  
+  // Load all season data
+  console.log('[generatePlayerPerformance] Loading all season data...');
   const seasonData = loadAllSeasonData();
   
-  // Process player performance including recent homers
-  const players = [];
+  console.log('[generatePlayerPerformance] Analyzing player performance...');
   
-  // Process player data and track home runs
-  Object.keys(seasonData).forEach(dateKey => {
+  // Create a map to store player data
+  const playerMap = new Map();
+  
+  // Get all dates and sort them chronologically
+  const allDates = Object.keys(seasonData).sort();
+  
+  // Process each game date to build player stats
+  allDates.forEach(dateKey => {
     const gameData = seasonData[dateKey];
+    const gameDate = new Date(dateKey);
+    
     if (gameData.players) {
       gameData.players.forEach(player => {
-        if (player.HR && player.HR !== 'DNP' && Number(player.HR) > 0) {
-          // Update or add player with HR data
-          // Include lastHRDate for recent homers
+        // Only process hitters
+        if (player.playerType === 'hitter' || !player.playerType) {
+          const playerKey = `${player.name}_${player.team}`;
+          
+          if (!playerMap.has(playerKey)) {
+            playerMap.set(playerKey, {
+              name: player.name,
+              fullName: player.fullName || player.name,
+              team: player.team,
+              homeRunsThisSeason: 0,
+              gamesPlayed: 0,
+              lastHRDate: null,
+              daysSinceLastHR: 0,
+              historicalHRRate: 0.05, // Default value
+              actualHRRate: 0,
+              expectedHRs: 0,
+              performanceIndicator: 0,
+              status: "neutral"
+            });
+          }
+          
+          const playerData = playerMap.get(playerKey);
+          
+          // Skip DNP entries
+          if (player.H === 'DNP') {
+            return;
+          }
+          
+          // Update games played
+          playerData.gamesPlayed++;
+          
+          // Check for home runs in this game
+          const homeRuns = Number(player.HR) || 0;
+          if (homeRuns > 0) {
+            playerData.homeRunsThisSeason += homeRuns;
+            playerData.lastHRDate = dateKey;
+            
+            // Calculate days since last HR (for display purposes)
+            const timeDiff = targetDate.getTime() - gameDate.getTime();
+            playerData.daysSinceLastHR = Math.floor(timeDiff / (1000 * 3600 * 24));
+          }
         }
       });
     }
   });
   
-  // Write to player_performance_latest.json
-  writeJsonFile(path.join(OUTPUT_DIR, 'player_performance_latest.json'), { 
-    players,
-    updatedAt: new Date().toISOString()
+  // Calculate additional statistics for each player
+  playerMap.forEach(player => {
+    if (player.gamesPlayed > 0) {
+      player.actualHRRate = player.homeRunsThisSeason / player.gamesPlayed;
+      player.expectedHRs = player.historicalHRRate * player.gamesPlayed;
+      
+      // Performance indicator (how far above/below expected)
+      if (player.expectedHRs > 0) {
+        const difference = player.homeRunsThisSeason - player.expectedHRs;
+        player.performanceIndicator = (difference / player.expectedHRs) * 100;
+        
+        if (player.performanceIndicator > 10) {
+          player.status = "over-performing";
+        } else if (player.performanceIndicator < -10) {
+          player.status = "under-performing";
+        }
+      }
+    }
   });
+  
+  // Convert map to array and sort as needed
+  const players = Array.from(playerMap.values())
+    .filter(player => player.gamesPlayed > 0);
+  
+  // Sort players with most recent home runs first
+  const recentHRs = [...players]
+    .filter(player => player.lastHRDate)
+    .sort((a, b) => {
+      // Primary sort by date (most recent first)
+      const dateA = new Date(a.lastHRDate);
+      const dateB = new Date(b.lastHRDate);
+      if (dateB.getTime() !== dateA.getTime()) {
+        return dateB.getTime() - dateA.getTime();
+      }
+      
+      // Secondary sort by total HRs
+      return b.homeRunsThisSeason - a.homeRunsThisSeason;
+    });
+  
+  // Prepare output data
+  const outputData = {
+    date: targetDate.toISOString().split('T')[0],
+    updatedAt: new Date().toISOString(),
+    players: players,
+    recentHRs: recentHRs.slice(0, 50) // Keep top 50 most recent
+  };
+  
+  // Write the output file
+  const outputPath = path.join(OUTPUT_DIR, 'player_performance_latest.json');
+  
+  console.log(`[generatePlayerPerformance] Writing player performance data to ${outputPath}...`);
+  const success = writeJsonFile(outputPath, outputData);
+  
+  console.log('[generatePlayerPerformance] Player performance data generation complete!');
+  return success;
 }
 
 /**
@@ -685,9 +794,13 @@ async function generateAllAdditionalStats(targetDate = new Date()) {
     console.error('Failed to generate hit streak analysis');
   }
   
-  return dayOfWeekSuccess && hitStreakSuccess;
+  const playerPerformanceSuccess = await generatePlayerPerformance(targetDate);
+  if (!playerPerformanceSuccess) {
+    console.error('Failed to generate player performance data');
+  }
+  
+  return dayOfWeekSuccess && hitStreakSuccess && playerPerformanceSuccess;
 }
-
 // Run the generator if this file is executed directly
 if (require.main === module) {
   let targetDate = new Date();
