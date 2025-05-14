@@ -259,30 +259,29 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
 useEffect(() => {
   const loadPlayerPerformance = async () => {
     try {
-      // Add cache-busting parameter to prevent browser caching
-      const cacheBuster = new Date().getTime();
-      const response = await fetch(`/data/predictions/player_performance_latest.json?_=${cacheBuster}`);
+      console.log("Loading performance data for date:", currentDate.toISOString());
+      
+      // Force cache bypass with a random query parameter
+      const timestamp = new Date().getTime() + Math.random();
+      const response = await fetch(`/data/predictions/player_performance_latest.json?nocache=${timestamp}`);
       
       if (response.ok) {
         const data = await response.json();
+        
+        // Debug the raw data
+        console.log("Raw data lastHRDates:", 
+          data.recentHRs?.slice(0, 5).map(p => ({ 
+            name: p.name, 
+            date: p.lastHRDate 
+          }))
+        );
+        
         setPlayerPerformance(data);
         
         // Process top performers if we have player data
         if (data && data.players && data.players.length > 0) {
-          const players = data.players;
-          
-          // Calculate different top performer categories
-          const hrRate = [...players]
-            .filter(player => player.gamesPlayed > 0 && player.homeRunsThisSeason > 0)
-            .sort((a, b) => (b.homeRunsThisSeason / b.gamesPlayed) - (a.homeRunsThisSeason / a.gamesPlayed))
-            .slice(0, 25);
-          
-          const improved = [...players]
-            .filter(player => player.actualHRRate > player.historicalHRRate)
-            .sort((a, b) => (b.actualHRRate - b.historicalHRRate) - (a.actualHRRate - a.historicalHRRate))
-            .slice(0, 25);
-          
-          const recent = [...players]
+          // Create a new array (don't modify the original) to ensure React detects the change
+          const recent = [...data.recentHRs || data.players
             .filter(player => player.lastHRDate)
             .sort((a, b) => {
               // First sort by date (newest first)
@@ -292,19 +291,38 @@ useEffect(() => {
               
               // If same date, sort by total home runs
               return b.homeRunsThisSeason - a.homeRunsThisSeason;
-            })
+            })];
+          
+          // Debug the processed data
+          console.log("Processed recent HRs:", 
+            recent.slice(0, 5).map(p => ({ 
+              name: p.name, 
+              date: p.lastHRDate 
+            }))
+          );
+          
+          // Rest of your code for other categories
+          const hrRate = [...data.players]
+            .filter(player => player.gamesPlayed > 0 && player.homeRunsThisSeason > 0)
+            .sort((a, b) => (b.homeRunsThisSeason / b.gamesPlayed) - (a.homeRunsThisSeason / a.gamesPlayed))
             .slice(0, 25);
           
-          const overPerforming = [...players]
+          const improved = [...data.players]
+            .filter(player => player.actualHRRate > player.historicalHRRate)
+            .sort((a, b) => (b.actualHRRate - b.historicalHRRate) - (a.actualHRRate - a.historicalHRRate))
+            .slice(0, 25);
+          
+          const overPerforming = [...data.players]
             .filter(player => player.status === "over-performing")
             .sort((a, b) => b.performanceIndicator - a.performanceIndicator)
             .slice(0, 25);
           
-          const underPerforming = [...players]
+          const underPerforming = [...data.players]
             .filter(player => player.status === "under-performing")
             .sort((a, b) => a.performanceIndicator - b.performanceIndicator)
             .slice(0, 25);
           
+          // Set state with completely new object to force re-render
           setTopPerformers({
             hrRate,
             improved,
@@ -324,7 +342,7 @@ useEffect(() => {
   };
   
   loadPlayerPerformance();
-}, [currentDate]); // Add currentDate as a dependency
+}, [currentDate]);
   
   // Load rolling stats (with priority: today > yesterday > 7-day rolling > season)
   useEffect(() => {
