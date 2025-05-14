@@ -255,72 +255,76 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
   }, [currentDate]);
   
   // Load player performance data and calculate top performers
-  useEffect(() => {
-    const loadPlayerPerformance = async () => {
-      try {
-        const response = await fetch('/data/predictions/player_performance_latest.json');
-        if (response.ok) {
-          const data = await response.json();
-          setPlayerPerformance(data);
+  // Load player performance data and calculate top performers
+useEffect(() => {
+  const loadPlayerPerformance = async () => {
+    try {
+      // Add cache-busting parameter to prevent browser caching
+      const cacheBuster = new Date().getTime();
+      const response = await fetch(`/data/predictions/player_performance_latest.json?_=${cacheBuster}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setPlayerPerformance(data);
+        
+        // Process top performers if we have player data
+        if (data && data.players && data.players.length > 0) {
+          const players = data.players;
           
-          // Process top performers if we have player data
-          if (data && data.players && data.players.length > 0) {
-            const players = data.players;
-            
-            // Calculate different top performer categories
-            const hrRate = [...players]
-              .filter(player => player.gamesPlayed > 0 && player.homeRunsThisSeason > 0)
-              .sort((a, b) => (b.homeRunsThisSeason / b.gamesPlayed) - (a.homeRunsThisSeason / a.gamesPlayed))
-              .slice(0, 25);
-            
-            const improved = [...players]
-              .filter(player => player.actualHRRate > player.historicalHRRate)
-              .sort((a, b) => (b.actualHRRate - b.historicalHRRate) - (a.actualHRRate - a.historicalHRRate))
-              .slice(0, 25);
-            
-            const recent = [...players]
-              .filter(player => player.lastHRDate)
-              .sort((a, b) => {
-                // First sort by date (newest first)
-                const dateA = new Date(a.lastHRDate);
-                const dateB = new Date(b.lastHRDate);
-                if (dateB - dateA !== 0) return dateB - dateA;
-                
-                // If same date, sort by total home runs
-                return b.homeRunsThisSeason - a.homeRunsThisSeason;
-              })
-              .slice(0, 25);
-            
-            const overPerforming = [...players]
-              .filter(player => player.status === "over-performing")
-              .sort((a, b) => b.performanceIndicator - a.performanceIndicator)
-              .slice(0, 25);
-            
-            const underPerforming = [...players]
-              .filter(player => player.status === "under-performing")
-              .sort((a, b) => a.performanceIndicator - b.performanceIndicator)
-              .slice(0, 25);
-            
-            setTopPerformers({
-              hrRate,
-              improved,
-              recent,
-              overPerforming,
-              underPerforming
-            });
-          }
-        } else {
-          console.warn('No player performance data found');
-          setPlayerPerformance(null);
+          // Calculate different top performer categories
+          const hrRate = [...players]
+            .filter(player => player.gamesPlayed > 0 && player.homeRunsThisSeason > 0)
+            .sort((a, b) => (b.homeRunsThisSeason / b.gamesPlayed) - (a.homeRunsThisSeason / a.gamesPlayed))
+            .slice(0, 25);
+          
+          const improved = [...players]
+            .filter(player => player.actualHRRate > player.historicalHRRate)
+            .sort((a, b) => (b.actualHRRate - b.historicalHRRate) - (a.actualHRRate - a.historicalHRRate))
+            .slice(0, 25);
+          
+          const recent = [...players]
+            .filter(player => player.lastHRDate)
+            .sort((a, b) => {
+              // First sort by date (newest first)
+              const dateA = new Date(a.lastHRDate);
+              const dateB = new Date(b.lastHRDate);
+              if (dateB - dateA !== 0) return dateB - dateA;
+              
+              // If same date, sort by total home runs
+              return b.homeRunsThisSeason - a.homeRunsThisSeason;
+            })
+            .slice(0, 25);
+          
+          const overPerforming = [...players]
+            .filter(player => player.status === "over-performing")
+            .sort((a, b) => b.performanceIndicator - a.performanceIndicator)
+            .slice(0, 25);
+          
+          const underPerforming = [...players]
+            .filter(player => player.status === "under-performing")
+            .sort((a, b) => a.performanceIndicator - b.performanceIndicator)
+            .slice(0, 25);
+          
+          setTopPerformers({
+            hrRate,
+            improved,
+            recent,
+            overPerforming,
+            underPerforming
+          });
         }
-      } catch (error) {
-        console.error('Error loading player performance data:', error);
+      } else {
+        console.warn('No player performance data found');
         setPlayerPerformance(null);
       }
-    };
-    
-    loadPlayerPerformance();
-  }, []);
+    } catch (error) {
+      console.error('Error loading player performance data:', error);
+      setPlayerPerformance(null);
+    }
+  };
+  
+  loadPlayerPerformance();
+}, [currentDate]); // Add currentDate as a dependency
   
   // Load rolling stats (with priority: today > yesterday > 7-day rolling > season)
   useEffect(() => {
