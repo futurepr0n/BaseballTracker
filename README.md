@@ -22,6 +22,12 @@ After you do, you can use:
 
 This will link to create json files based on the matchup data scraped.
 
+Then run 
+`node src/services/generateAdditionalStats.js`
+`node src/services/generatePitcherMatchups.js`
+
+`./daily_update.sh`
+
 npm install
 npm start
 
