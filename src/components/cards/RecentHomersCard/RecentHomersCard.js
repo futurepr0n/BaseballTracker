@@ -8,16 +8,31 @@ const RecentHomersCard = ({
   recentHRPlayers,
   isLoading 
 }) => {
-  // Helper function to format date
+  // Helper function to format date - define it FIRST
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+  if (!dateString) return 'N/A';
+  
+  // Split the date string to get year, month, day
+  const [year, month, day] = dateString.split('-').map(Number);
+  
+  // Create date object with local timezone (not UTC)
+  // Month is 0-indexed in JavaScript Date, so subtract 1
+  const date = new Date(year, month - 1, day);
+  
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+  // Now use it in logging
+  console.log("RecentHomersCard received data:", 
+    recentHRPlayers?.slice(0, 5).map(p => ({ 
+      name: p.name, 
+      date: p.lastHRDate,
+      formatted: formatDate(p.lastHRDate)  
+    }))
+  );
 
   return (
     <div className="card recent-hr-card">
