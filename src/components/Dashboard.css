@@ -629,6 +629,16 @@ body .streak-tooltip {
 
 /* Responsive styles */
 @media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr; /* Single column on mobile */
+  }
+  
+  .card {
+    max-width: 100%; /* Ensure cards don't overflow */
+    overflow-x: hidden; /* Hide horizontal overflow */
+    box-sizing: border-box; /* Include padding in width calculation */
+  }
+  
   .streak-tooltip,
   .batter-tooltip,
   .day-hit-tooltip {
@@ -643,3 +653,4 @@ body .streak-tooltip {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   }
 }
+

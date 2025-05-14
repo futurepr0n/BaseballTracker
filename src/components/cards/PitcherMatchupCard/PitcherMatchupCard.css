@@ -369,3 +369,69 @@ body .batter-tooltip {
     gap: 10px;
   }
 }
+
+/* Add these rules to the bottom of your existing PitcherMatchupCard.css file */
+
+/* Fix for mobile viewport stretching */
+@media (max-width: 768px) {
+  .pitcher-matchup-card {
+    grid-column: 1 / -1; /* Make card full width on mobile */
+    width: 100%;         /* Constrain to container width */
+    max-width: 100vw;    /* Prevent viewport overflow */
+    overflow-x: hidden;  /* Hide horizontal overflow */
+    box-sizing: border-box; /* Include padding in width calculation */
+  }
+  
+  /* Fix team selector overflow */
+  .team-selector {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;    /* Enable horizontal scrolling */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS */
+    padding-bottom: 10px;
+    scrollbar-width: none; /* Hide scrollbar on Firefox */
+    margin-right: -10px;  /* Compensate for container padding */
+    margin-left: -10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    width: calc(100% + 20px);
+  }
+  
+  .team-selector::-webkit-scrollbar {
+    display: none; /* Hide scrollbar on Chrome/Safari */
+  }
+  
+  .team-button {
+    flex: 0 0 auto; /* Prevent team buttons from shrinking */
+  }
+  
+  /* Adjust matchup stats for mobile */
+  .matchup-stats {
+    min-width: 110px; /* Reduce min-width to prevent overflow */
+  }
+  
+  /* Make action buttons wrap properly */
+  .matchup-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .sort-toggle {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  
+  /* Fix player item layout */
+  .player-item.pitcher-matchup-item {
+    flex-wrap: nowrap; /* Prevent wrapping of player items */
+  }
+  
+  /* Ensure tooltips don't cause viewport issues */
+  .batter-tooltip {
+    max-width: 90vw;
+    width: 280px;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+}
