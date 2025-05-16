@@ -187,7 +187,7 @@ function updateGameScores(jsonData, allPlayers) {
     const teamRunsMap = new Map();
     teamsWithStats.forEach(team => {
         const runs = calculateTeamRuns(allPlayers, team);
-        if (runs > 0) { // Only add teams that scored runs (important indicator of actual game data)
+        if (runs >= 0) { // Only add teams that scored runs (important indicator of actual game data)
             teamRunsMap.set(team, runs);
         }
     });
