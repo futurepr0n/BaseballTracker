@@ -69,12 +69,15 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
   const gameDates = gamesToUse.map(game => game.date || '');
   
   // Create a player object with the appropriate number of game history entries
-  if (player.type === 'hitter') {
+    if (player.type === 'hitter') {
     const playerObj = {
       id: player.name + '-' + player.team,
       name: player.name,
       team: player.team,
       playerType: 'hitter',
+      // Add the batting side from roster data
+      bats: player.bats || '',
+      fullName: player.fullName || player.name,
       // Most recent game stats
       prevGameHR: mostRecentStats?.HR || '0',
       prevGameAB: mostRecentStats?.AB || '0',
@@ -117,8 +120,10 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
       name: player.name,
       team: player.team,
       playerType: 'pitcher',
-      // Additional pitcher attributes
-      throwingArm: player.throwingArm || '',
+      // Additional pitcher attributes from roster data
+      throwingArm: player.ph || player.throwingArm || '',
+      pitches: player.pitches || [],
+      fullName: player.fullName || player.name,
       // Most recent game stats with all fields
       prevGameIP: mostRecentStats?.IP || '0',
       prevGameK: mostRecentStats?.K || '0',

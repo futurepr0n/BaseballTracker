@@ -38,6 +38,26 @@ const PitcherRow = ({
 
   const teamColors = getTeamColors(player.team, teams);
 
+  const getPitchFullName = (pitchCode) => {
+  const pitchTypes = {
+    'FF': 'Four-Seam Fastball',
+    'FT': 'Two-Seam Fastball',
+    'FC': 'Cutter',
+    'SI': 'Sinker',
+    'SL': 'Slider',
+    'CH': 'Changeup',
+    'CU': 'Curveball',
+    'KC': 'Knuckle-Curve',
+    'KN': 'Knuckleball',
+    'EP': 'Eephus',
+    'FS': 'Splitter',
+    'FO': 'Fork Ball',
+    'SC': 'Screwball'
+  };
+  
+  return pitchTypes[pitchCode] || pitchCode;
+};
+
   // Effect to fetch pitcher data when gamesHistory or refreshKey changes
   useEffect(() => {
     const loadPitcherData = async () => {
@@ -70,7 +90,7 @@ const PitcherRow = ({
   });
 
   // Display the pitcher's throwing arm
-  const throwingArm = selectedPitcher.throwingArm ? ` (${selectedPitcher.throwingArm})` : '';
+  //const throwingArm = selectedPitcher.throwingArm ? ` (${selectedPitcher.throwingArm})` : '';
 
   return (
     <tr 
@@ -81,9 +101,21 @@ const PitcherRow = ({
       className={isRefreshingPitchers || isLoadingPitcher ? "loading-row" : ""}
     >
       <td className="player-name">
-        {selectedPitcher.name}{throwingArm}
-        {(isRefreshingPitchers || isLoadingPitcher) && <span className="loading-indicator">⟳</span>}
-      </td>
+  {selectedPitcher.fullName || selectedPitcher.name}
+  <span className="player-attribute-badge">{selectedPitcher.throwingArm || ''}</span>
+  {(isRefreshingPitchers || isLoadingPitcher) && <span className="loading-indicator">⟳</span>}
+  
+  {/* Display pitch types if available */}
+  {selectedPitcher.pitches && selectedPitcher.pitches.length > 0 && (
+    <div className="pitch-types">
+      {selectedPitcher.pitches.map((pitch, index) => (
+        <span key={index} className="pitch-type-badge" title={getPitchFullName(pitch)}>
+          {pitch}
+        </span>
+      ))}
+    </div>
+  )}
+</td>
       <td>{selectedPitcher.team}</td>
       <td>{selectedPitcher.prevGameIP || selectedPitcher.IP || '0'}</td>
 <td>{selectedPitcher.prevGameK || selectedPitcher.K || '0'}</td>
