@@ -199,6 +199,45 @@ const HitterRow = ({
     })
   };
 
+  const getMatchupClass = (batterHand, pitcherHand) => {
+  // If either hand is unknown, return neutral
+  if (!batterHand || !pitcherHand) return "neutral-matchup";
+  
+  // For switch hitters, always favorable
+  if (batterHand === 'B') return "favorable-matchup";
+  
+  // Same-handed matchup (generally favorable for hitters)
+  // L vs L or R vs R
+  if (batterHand === pitcherHand) {
+    return "favorable-matchup";
+  }
+  
+  // Opposite-handed matchup (generally favorable for pitchers)
+  // L vs R or R vs L
+  return "unfavorable-matchup";
+};
+
+// Helper to get full pitch name
+const getPitchFullName = (pitchCode) => {
+  const pitchTypes = {
+    'FF': 'Four-Seam Fastball',
+    'FT': 'Two-Seam Fastball',
+    'FC': 'Cutter',
+    'SI': 'Sinker',
+    'SL': 'Slider',
+    'CH': 'Changeup',
+    'CU': 'Curveball',
+    'KC': 'Knuckle-Curve',
+    'KN': 'Knuckleball',
+    'EP': 'Eephus',
+    'FS': 'Splitter',
+    'FO': 'Fork Ball',
+    'SC': 'Screwball'
+  };
+  
+  return pitchTypes[pitchCode] || pitchCode;
+};
+
   return (
     <tr 
       style={teamColors} 
@@ -207,10 +246,21 @@ const HitterRow = ({
       data-games-history={gamesHistory}
       className={isRefreshingHitters || isLoadingHitter ? "loading-row" : ""}
     >
-      <td className="player-name">
-        {selectedHitter.name}
-        {(isRefreshingHitters || isLoadingHitter) && <span className="loading-indicator">⟳</span>}
-      </td>
+     <td className="player-name">
+  {selectedHitter.name || player.name}
+  {/* First try to use selectedHitter.bats, fall back to player.bats */}
+  {(selectedHitter.bats || player.bats) && (
+    <span 
+      className={`player-attribute-badge batter-hand ${getMatchupClass(
+        selectedHitter.bats || player.bats, 
+        selectedPitcher?.throwingArm
+      )}`}
+    >
+      {selectedHitter.bats || player.bats}
+    </span>
+  )}
+  {(isRefreshingHitters || isLoadingHitter) && <span className="loading-indicator">⟳</span>}
+</td>
       <td>{selectedHitter.team}</td>
       <td>{selectedHitter.prevGameHR}</td>
       <td>{selectedHitter.prevGameAB}</td>
@@ -282,16 +332,33 @@ const HitterRow = ({
       <td className="pitcher-stat">{primaryPitcherStats.HR}</td>
       
       {/* Primary Pitcher Throws */}
-      <td>
-        <input 
-          type="text" 
-          className="editable-cell" 
-          value={player.pitcherHand || primaryPitcherStats.throwingArm} 
-          onChange={(e) => onFieldChange(player.id, 'pitcherHand', e.target.value)} 
-          placeholder="R/L" 
-          maxLength="1"
-        />
-      </td>
+      <td className="throws-cell">
+  {selectedPitcher && selectedPitcher.throwingArm ? (
+    <div className="throws-info">
+      <span className={`player-attribute-badge pitcher-hand ${getMatchupClass(selectedHitter.bats || player.bats, selectedPitcher.throwingArm)}`}>
+        {selectedPitcher.throwingArm}
+      </span>
+      {selectedPitcher.pitches && selectedPitcher.pitches.length > 0 && (
+        <div className="pitch-types">
+          {selectedPitcher.pitches.map((pitch, index) => (
+            <span key={index} className="pitch-type-badge" title={getPitchFullName(pitch)}>
+              {pitch}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  ) : (
+    <input 
+      type="text" 
+      className="editable-cell" 
+      value={player.pitcherHand || primaryPitcherStats.throwingArm} 
+      onChange={(e) => onFieldChange(player.id, 'pitcherHand', e.target.value)} 
+      placeholder="R/L" 
+      maxLength="1"
+    />
+  )}
+</td>
       
       {/* Second Pitcher - Add/Select Section */}
       <td className="second-pitcher-container">
@@ -340,18 +407,33 @@ const HitterRow = ({
           <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.PC_ST : ''}</td>
           <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.K : ''}</td>
           <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.HR : ''}</td>
-          <td>
-            {hasSecondPitcher ? (
-              <input 
-                type="text" 
-                className="editable-cell" 
-                value={player.secondPitcherHand || secondPitcherStats.throwingArm} 
-                onChange={(e) => onFieldChange(player.id, 'secondPitcherHand', e.target.value)} 
-                placeholder="R/L" 
-                maxLength="1"
-              />
-            ) : null}
-          </td>
+          <td className="throws-cell">
+  {hasSecondPitcher && selectedSecondPitcher && selectedSecondPitcher.throwingArm ? (
+    <div className="throws-info">
+      <span className={`player-attribute-badge pitcher-hand ${getMatchupClass(selectedHitter.bats || player.bats, selectedSecondPitcher.throwingArm)}`}>
+        {selectedSecondPitcher.throwingArm}
+      </span>
+      {selectedSecondPitcher.pitches && selectedSecondPitcher.pitches.length > 0 && (
+        <div className="pitch-types">
+          {selectedSecondPitcher.pitches.map((pitch, index) => (
+            <span key={index} className="pitch-type-badge" title={getPitchFullName(pitch)}>
+              {pitch}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  ) : hasSecondPitcher ? (
+    <input 
+      type="text" 
+      className="editable-cell" 
+      value={player.secondPitcherHand || secondPitcherStats.throwingArm} 
+      onChange={(e) => onFieldChange(player.id, 'secondPitcherHand', e.target.value)} 
+      placeholder="R/L" 
+      maxLength="1"
+    />
+  ) : null}
+</td>
         </>
       )}
       

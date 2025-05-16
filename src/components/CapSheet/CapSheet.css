@@ -1480,3 +1480,313 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+
+/* Styling for player attribute badges (batting side) */
+.player-attribute-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 5px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-radius: 3px;
+  background-color: #f0f0f0;
+  color: #666;
+  vertical-align: middle;
+}
+
+/* Styling for throwing arm and pitch types */
+.throws-cell {
+  max-width: 80px;
+}
+
+.throws-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.throwing-arm {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.pitch-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 3px;
+}
+
+.pitch-type-badge {
+  display: inline-block;
+  padding: 1px 4px;
+  font-size: 0.65rem;
+  font-weight: bold;
+  border-radius: 3px;
+  background-color: #e8f4ff;
+  color: #0056b3;
+  border: 1px solid #cce5ff;
+  cursor: help;
+}
+
+/* Different pitch type colors based on category */
+.pitch-type-badge[title*="Fastball"],
+.pitch-type-badge[title*="Sinker"],
+.pitch-type-badge[title*="Cutter"] {
+  background-color: #ffebe6;
+  color: #d4380d;
+  border-color: #ffd8cc;
+}
+
+.pitch-type-badge[title*="Slider"],
+.pitch-type-badge[title*="Curveball"],
+.pitch-type-badge[title*="Knuckle"] {
+  background-color: #f0f5ff;
+  color: #1d39c4;
+  border-color: #d6e4ff;
+}
+
+.pitch-type-badge[title*="Changeup"],
+.pitch-type-badge[title*="Splitter"],
+.pitch-type-badge[title*="Fork"] {
+  background-color: #e6fffb;
+  color: #006d75;
+  border-color: #b5f5ec;
+}
+
+.player-attribute-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 5px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-radius: 3px;
+  background-color: #f0f0f0;
+  color: #666;
+  vertical-align: middle;
+}
+
+/* Pitcher details container in hitter row */
+.pitcher-details {
+  display: flex;
+  flex-direction: column;
+  margin-top: 5px;
+  gap: 3px;
+}
+
+/* Matchup styling for handedness badges */
+.player-attribute-badge.batter-hand,
+.player-attribute-badge.pitcher-hand {
+  font-weight: bold;
+}
+
+/* Favorable matchup styling (for the hitter) */
+.player-attribute-badge.favorable-matchup {
+  background-color: #e6ffed;
+  color: #28a745;
+  border: 1px solid #c3e6cb;
+}
+
+/* Unfavorable matchup styling (for the hitter) */
+.player-attribute-badge.unfavorable-matchup {
+  background-color: #ffebee;
+  color: #dc3545;
+  border: 1px solid #f5c6cb;
+}
+
+/* Neutral matchup styling */
+.player-attribute-badge.neutral-matchup {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+/* Style for the batter handedness badge */
+.player-attribute-badge.batter-hand {
+  margin-left: 6px;
+}
+
+/* Special styling for switch hitters */
+.player-attribute-badge.batter-hand:has(span:contains('B')) {
+  background-color: #f8f4ff;
+  color: #6f42c1;
+  border: 1px solid #d9c8fc;
+}
+
+/* CSS selector for B text content (alternative to :contains) */
+tr:has(.player-attribute-badge.batter-hand:contains("B")) .player-attribute-badge.batter-hand {
+  background-color: #f8f4ff;
+  color: #6f42c1;
+  border: 1px solid #d9c8fc;
+}
+
+/* Styling for pitch types */
+.pitch-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 3px;
+}
+
+.pitch-type-badge {
+  display: inline-block;
+  padding: 1px 4px;
+  font-size: 0.65rem;
+  font-weight: bold;
+  border-radius: 3px;
+  background-color: #e8f4ff;
+  color: #0056b3;
+  border: 1px solid #cce5ff;
+  cursor: help;
+}
+
+/* Different pitch type colors based on category */
+.pitch-type-badge[title*="Fastball"],
+.pitch-type-badge[title*="Sinker"],
+.pitch-type-badge[title*="Cutter"] {
+  background-color: #ffebe6;
+  color: #d4380d;
+  border-color: #ffd8cc;
+}
+
+.pitch-type-badge[title*="Slider"],
+.pitch-type-badge[title*="Curveball"],
+.pitch-type-badge[title*="Knuckle"] {
+  background-color: #f0f5ff;
+  color: #1d39c4;
+  border-color: #d6e4ff;
+}
+
+.pitch-type-badge[title*="Changeup"],
+.pitch-type-badge[title*="Splitter"],
+.pitch-type-badge[title*="Fork"] {
+  background-color: #e6fffb;
+  color: #006d75;
+  border-color: #b5f5ec;
+}
+
+/* Make pitch types display better in smaller space */
+.pitcher-selection-container .pitch-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 3px;
+}
+
+.pitcher-selection-container .pitch-type-badge {
+  font-size: 0.6rem;
+  padding: 1px 3px;
+}
+
+
+
+/* Throws cell styling */
+.throws-cell {
+  min-width: 60px;
+  padding: 4px 8px;
+}
+
+.throws-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.throwing-arm {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+/* Styling for player attribute badges (batting side & throwing arm) */
+.player-attribute-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 5px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border-radius: 3px;
+  background-color: #f0f0f0;
+  color: #666;
+  vertical-align: middle;
+}
+
+/* Matchup styling for handedness badges */
+.player-attribute-badge.batter-hand,
+.player-attribute-badge.pitcher-hand {
+  font-weight: bold;
+  margin-left: 0; /* No margin for the pitcher hand in the throws column */
+}
+
+/* Favorable matchup styling (for the hitter) */
+.player-attribute-badge.favorable-matchup {
+  background-color: #e6ffed;
+  color: #28a745;
+  border: 1px solid #c3e6cb;
+}
+
+/* Unfavorable matchup styling (for the hitter) */
+.player-attribute-badge.unfavorable-matchup {
+  background-color: #ffebee;
+  color: #dc3545;
+  border: 1px solid #f5c6cb;
+}
+
+/* Neutral matchup styling */
+.player-attribute-badge.neutral-matchup {
+  background-color: #f0f0f0;
+  color: #666;
+}
+
+/* Styling for pitch types */
+.pitch-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.pitch-type-badge {
+  display: inline-block;
+  padding: 1px 3px;
+  font-size: 0.65rem;
+  font-weight: bold;
+  border-radius: 3px;
+  background-color: #e8f4ff;
+  color: #0056b3;
+  border: 1px solid #cce5ff;
+  cursor: help;
+}
+
+/* Different pitch type colors based on category */
+.pitch-type-badge[title*="Fastball"],
+.pitch-type-badge[title*="Sinker"],
+.pitch-type-badge[title*="Cutter"] {
+  background-color: #ffebe6;
+  color: #d4380d;
+  border-color: #ffd8cc;
+}
+
+.pitch-type-badge[title*="Slider"],
+.pitch-type-badge[title*="Curveball"],
+.pitch-type-badge[title*="Knuckle"] {
+  background-color: #f0f5ff;
+  color: #1d39c4;
+  border-color: #d6e4ff;
+}
+
+.pitch-type-badge[title*="Changeup"],
+.pitch-type-badge[title*="Splitter"],
+.pitch-type-badge[title*="Fork"] {
+  background-color: #e6fffb;
+  color: #006d75;
+  border-color: #b5f5ec;
+}
+
+/* Make pitch types in throws columns more compact */
+.throws-cell .pitch-types {
+  gap: 2px;
+}
+
+.throws-cell .pitch-type-badge {
+  font-size: 0.6rem;
+  padding: 1px 2px;
+}
