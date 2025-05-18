@@ -2,10 +2,15 @@ import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import { getTeamColors } from '../../utils/formatters';
 import OverlayPerformanceChart from '../OverlayPerformanceChart';
+import MatchupAnalysisModal from '../MatchupAnalysisModal';
+import '../../styles/matchup-analysis.css';
 
 /**
  * Component for a hitter row in the table
  * Modified to fix dropdown and chart visibility issues on mobile
+ * Added matchup analysis button to show detailed batter-pitcher analysis
+ * Fixed DOM nesting issue with the modal component
+ * Improved modal handling for player data consistency
  */
 const HitterRow = ({
   player,
@@ -41,6 +46,10 @@ const HitterRow = ({
   // New states for hitter data
   const [selectedHitter, setSelectedHitter] = useState(player);
   const [isLoadingHitter, setIsLoadingHitter] = useState(false);
+  
+  // New state for matchup analysis modal with improved handling
+  const [showMatchupModal, setShowMatchupModal] = useState(false);
+  const [matchupData, setMatchupData] = useState(null);
 
   const teamColors = getTeamColors(player.team, teams);
 
@@ -170,6 +179,20 @@ const HitterRow = ({
   
   const hasSecondPitcher = selectedSecondPitcher !== null;
 
+  // Open the matchup analysis modal with current player data
+  const openMatchupAnalysis = () => {
+    // Create a snapshot of current hitter and pitcher data
+    if (selectedHitter && selectedPitcher) {
+      setMatchupData({
+        hitter: { ...selectedHitter },
+        pitcher: { ...selectedPitcher }
+      });
+      setShowMatchupModal(true);
+    } else {
+      console.warn('[HitterRow] Cannot open matchup analysis - missing hitter or pitcher data');
+    }
+  };
+
   // Debugging helper - render a small indicator to show full re-renders
   const renderCount = React.useRef(0);
   React.useEffect(() => {
@@ -200,372 +223,396 @@ const HitterRow = ({
   };
 
   const getMatchupClass = (batterHand, pitcherHand) => {
-  // If either hand is unknown, return neutral
-  if (!batterHand || !pitcherHand) return "neutral-matchup";
-  
-  // For switch hitters, always favorable
-  if (batterHand === 'B') return "favorable-matchup";
-  
-  // Same-handed matchup (generally favorable for hitters)
-  // L vs L or R vs R
-  if (batterHand === pitcherHand) {
-    return "favorable-matchup";
-  }
-  
-  // Opposite-handed matchup (generally favorable for pitchers)
-  // L vs R or R vs L
-  return "unfavorable-matchup";
-};
-
-// Helper to get full pitch name
-const getPitchFullName = (pitchCode) => {
-  const pitchTypes = {
-    'FF': 'Four-Seam Fastball',
-    'FT': 'Two-Seam Fastball',
-    'FC': 'Cutter',
-    'SI': 'Sinker',
-    'SL': 'Slider',
-    'CH': 'Changeup',
-    'CU': 'Curveball',
-    'KC': 'Knuckle-Curve',
-    'KN': 'Knuckleball',
-    'EP': 'Eephus',
-    'FS': 'Splitter',
-    'FO': 'Fork Ball',
-    'SC': 'Screwball'
+    // If either hand is unknown, return neutral
+    if (!batterHand || !pitcherHand) return "neutral-matchup";
+    
+    // For switch hitters, always favorable
+    if (batterHand === 'B') return "favorable-matchup";
+    
+    // Same-handed matchup (generally favorable for hitters)
+    // L vs L or R vs R
+    if (batterHand === pitcherHand) {
+      return "favorable-matchup";
+    }
+    
+    // Opposite-handed matchup (generally favorable for pitchers)
+    // L vs R or R vs L
+    return "unfavorable-matchup";
   };
-  
-  return pitchTypes[pitchCode] || pitchCode;
-};
+
+  // Helper to get full pitch name
+  const getPitchFullName = (pitchCode) => {
+    const pitchTypes = {
+      'FF': 'Four-Seam Fastball',
+      'FT': 'Two-Seam Fastball',
+      'FC': 'Cutter',
+      'SI': 'Sinker',
+      'SL': 'Slider',
+      'CH': 'Changeup',
+      'CU': 'Curveball',
+      'KC': 'Knuckle-Curve',
+      'KN': 'Knuckleball',
+      'EP': 'Eephus',
+      'FS': 'Splitter',
+      'FO': 'Fork Ball',
+      'SC': 'Screwball'
+    };
+    
+    return pitchTypes[pitchCode] || pitchCode;
+  };
 
   return (
-    <tr 
-      style={teamColors} 
-      data-hitter-id={player.id} 
-      data-render-count={renderCount.current} 
-      data-games-history={gamesHistory}
-      className={isRefreshingHitters || isLoadingHitter ? "loading-row" : ""}
-    >
-     <td className="player-name">
-  {selectedHitter.name || player.name}
-  {/* First try to use selectedHitter.bats, fall back to player.bats */}
-  {(selectedHitter.bats || player.bats) && (
-    <span 
-      className={`player-attribute-badge batter-hand ${getMatchupClass(
-        selectedHitter.bats || player.bats, 
-        selectedPitcher?.throwingArm
-      )}`}
-    >
-      {selectedHitter.bats || player.bats}
-    </span>
-  )}
-  {(isRefreshingHitters || isLoadingHitter) && <span className="loading-indicator">⟳</span>}
-</td>
-      <td>{selectedHitter.team}</td>
-      <td>{selectedHitter.prevGameHR}</td>
-      <td>{selectedHitter.prevGameAB}</td>
-      <td>{selectedHitter.prevGameH}</td>
-      
-      {/* Performance Chart */}
-      <td className="performance-chart-cell">
-        <OverlayPerformanceChart 
-          key={`chart-${player.id}-${refreshKey}-${gamesHistory}`}
-          hitter={selectedHitter} // Use locally fetched hitter data
-          pitcher={selectedPitcher}
-          secondPitcher={selectedSecondPitcher}
-          showPitcherOverlay={showPitcherOverlay && selectedPitcher !== null}
-          showSecondPitcherOverlay={showSecondPitcherOverlay && selectedSecondPitcher !== null}
-          isLoadingPitcher={isLoadingPitcher}
-          isLoadingSecondPitcher={isLoadingSecondPitcher}
-          isLoadingHitter={isLoadingHitter || isRefreshingHitters}
-        />
-      </td>
-      
-      {/* Primary Pitcher */}
-      <td>
-        {pitcherOptions.length > 0 ? (
-          <div className="pitcher-selection-container">
-            <Select
-              className="editable-cell"
-              classNamePrefix="select"
-              options={pitcherOptions}
-              value={player.pitcherId ? { value: player.pitcherId, label: player.pitcher } : null}
-              onChange={(option) => {
-                onPitcherSelect(player.id, option ? option.value : null);
-                if (!option) {
-                  setShowPitcherOverlay(false);
-                }
-              }}
-              isClearable
-              placeholder="Select pitcher..."
-              styles={customSelectStyles}
-              // Render dropdown in portal to avoid container clipping
-              menuPortalTarget={document.body}
-              menuPosition="fixed"
+    <>
+      <tr 
+        style={teamColors} 
+        data-hitter-id={player.id} 
+        data-render-count={renderCount.current} 
+        data-games-history={gamesHistory}
+        className={isRefreshingHitters || isLoadingHitter ? "loading-row" : ""}
+      >
+        <td className="player-name">
+          {selectedHitter.name || player.name}
+          {/* First try to use selectedHitter.bats, fall back to player.bats */}
+          {(selectedHitter.bats || player.bats) && (
+            <span 
+              className={`player-attribute-badge batter-hand ${getMatchupClass(
+                selectedHitter.bats || player.bats, 
+                selectedPitcher?.throwingArm
+              )}`}
+            >
+              {selectedHitter.bats || player.bats}
+            </span>
+          )}
+          {(isRefreshingHitters || isLoadingHitter) && <span className="loading-indicator">⟳</span>}
+        </td>
+        <td>{selectedHitter.team}</td>
+        <td>{selectedHitter.prevGameHR}</td>
+        <td>{selectedHitter.prevGameAB}</td>
+        <td>{selectedHitter.prevGameH}</td>
+        
+        {/* Performance Chart */}
+        <td className="performance-chart-cell">
+          <OverlayPerformanceChart 
+            key={`chart-${player.id}-${refreshKey}-${gamesHistory}`}
+            hitter={selectedHitter} // Use locally fetched hitter data
+            pitcher={selectedPitcher}
+            secondPitcher={selectedSecondPitcher}
+            showPitcherOverlay={showPitcherOverlay && selectedPitcher !== null}
+            showSecondPitcherOverlay={showSecondPitcherOverlay && selectedSecondPitcher !== null}
+            isLoadingPitcher={isLoadingPitcher}
+            isLoadingSecondPitcher={isLoadingSecondPitcher}
+            isLoadingHitter={isLoadingHitter || isRefreshingHitters}
+          />
+        </td>
+        
+        {/* Primary Pitcher */}
+        <td>
+          {pitcherOptions.length > 0 ? (
+            <div className="pitcher-selection-container">
+              <Select
+                className="editable-cell"
+                classNamePrefix="select"
+                options={pitcherOptions}
+                value={player.pitcherId ? { value: player.pitcherId, label: player.pitcher } : null}
+                onChange={(option) => {
+                  onPitcherSelect(player.id, option ? option.value : null);
+                  if (!option) {
+                    setShowPitcherOverlay(false);
+                  }
+                }}
+                isClearable
+                placeholder="Select pitcher..."
+                styles={customSelectStyles}
+                // Render dropdown in portal to avoid container clipping
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+              />
+              {player.pitcherId && selectedPitcher && (
+                <div className="button-group">
+                  <button 
+                    className={`overlay-toggle-btn ${showPitcherOverlay ? 'active' : ''}`}
+                    onClick={() => setShowPitcherOverlay(!showPitcherOverlay)}
+                    title={showPitcherOverlay ? "Hide pitcher overlay" : "Show pitcher overlay"}
+                  >
+                    <span className="overlay-icon">📊</span>
+                  </button>
+                  
+                  {/* Matchup Analysis Button */}
+                  <button 
+                    className="matchup-analysis-btn"
+                    onClick={openMatchupAnalysis}
+                    title="Show detailed matchup analysis"
+                    disabled={!selectedPitcher}
+                  >
+                    <span className="matchup-icon">🔍</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <input 
+              type="text" 
+              className="editable-cell" 
+              value={player.pitcher || ''} 
+              onChange={(e) => onFieldChange(player.id, 'pitcher', e.target.value)} 
+              placeholder={player.opponentTeam ? "No pitchers found" : "Enter name"} 
+              readOnly={!player.opponentTeam}
             />
-            {player.pitcherId && (
-              <button 
-                className={`overlay-toggle-btn ${showPitcherOverlay ? 'active' : ''}`}
-                onClick={() => setShowPitcherOverlay(!showPitcherOverlay)}
-                title={showPitcherOverlay ? "Hide pitcher overlay" : "Show pitcher overlay"}
-              >
-                <span className="overlay-icon">📊</span>
-              </button>
-            )}
-          </div>
-        ) : (
+          )}
+        </td>
+        
+        {/* Primary Pitcher Stats */}
+        <td className="pitcher-stat">{primaryPitcherStats.IP}</td>
+        <td className="pitcher-stat">{primaryPitcherStats.PC_ST}</td>
+        <td className="pitcher-stat">{primaryPitcherStats.K}</td>
+        <td className="pitcher-stat">{primaryPitcherStats.HR}</td>
+        
+        {/* Primary Pitcher Throws */}
+        <td className="throws-cell">
+          {selectedPitcher && selectedPitcher.throwingArm ? (
+            <div className="throws-info">
+              <span className={`player-attribute-badge pitcher-hand ${getMatchupClass(selectedHitter.bats || player.bats, selectedPitcher.throwingArm)}`}>
+                {selectedPitcher.throwingArm}
+              </span>
+              {selectedPitcher.pitches && selectedPitcher.pitches.length > 0 && (
+                <div className="pitch-types">
+                  {selectedPitcher.pitches.map((pitch, index) => (
+                    <span key={index} className="pitch-type-badge" title={getPitchFullName(pitch)}>
+                      {pitch}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <input 
+              type="text" 
+              className="editable-cell" 
+              value={player.pitcherHand || primaryPitcherStats.throwingArm} 
+              onChange={(e) => onFieldChange(player.id, 'pitcherHand', e.target.value)} 
+              placeholder="R/L" 
+              maxLength="1"
+            />
+          )}
+        </td>
+        
+        {/* Second Pitcher - Add/Select Section */}
+        <td className="second-pitcher-container">
+          {player.pitcherId && !showSecondPitcher ? (
+            <button 
+              className="action-btn add-pitcher-btn"
+              onClick={() => setShowSecondPitcher(true)}
+              title="Add a second pitcher"
+            >
+              + Add Pitcher
+            </button>
+          ) : showSecondPitcher ? (
+            <div className="pitcher-selection-container">
+              <Select
+                className="editable-cell"
+                classNamePrefix="select"
+                options={pitcherOptions}
+                value={secondPitcherId ? { value: secondPitcherId, label: secondPitcher } : null}
+                onChange={(option) => handleSecondPitcherSelect(option)}
+                isClearable
+                placeholder="Select 2nd pitcher..."
+                styles={customSelectStyles}
+                // Render dropdown in portal to avoid container clipping
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
+              />
+              {secondPitcherId && (
+                <button 
+                  className={`overlay-toggle-btn ${showSecondPitcherOverlay ? 'active green-active' : ''}`}
+                  onClick={() => setShowSecondPitcherOverlay(!showSecondPitcherOverlay)}
+                  title={showSecondPitcherOverlay ? "Hide second pitcher overlay" : "Show second pitcher overlay"}
+                >
+                  <span className="overlay-icon">📊</span>
+                </button>
+              )}
+            </div>
+          ) : (
+            '-'
+          )}
+        </td>
+        
+        {/* Second Pitcher Stats - Always render cells if any row has second pitcher */}
+        {hasAnySecondPitcher && (
+          <>
+            <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.IP : ''}</td>
+            <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.PC_ST : ''}</td>
+            <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.K : ''}</td>
+            <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.HR : ''}</td>
+            <td className="throws-cell">
+              {hasSecondPitcher && selectedSecondPitcher && selectedSecondPitcher.throwingArm ? (
+                <div className="throws-info">
+                  <span className={`player-attribute-badge pitcher-hand ${getMatchupClass(selectedHitter.bats || player.bats, selectedSecondPitcher.throwingArm)}`}>
+                    {selectedSecondPitcher.throwingArm}
+                  </span>
+                  {selectedSecondPitcher.pitches && selectedSecondPitcher.pitches.length > 0 && (
+                    <div className="pitch-types">
+                      {selectedSecondPitcher.pitches.map((pitch, index) => (
+                        <span key={index} className="pitch-type-badge" title={getPitchFullName(pitch)}>
+                          {pitch}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : hasSecondPitcher ? (
+                <input 
+                  type="text" 
+                  className="editable-cell" 
+                  value={player.secondPitcherHand || secondPitcherStats.throwingArm} 
+                  onChange={(e) => onFieldChange(player.id, 'secondPitcherHand', e.target.value)} 
+                  placeholder="R/L" 
+                  maxLength="1"
+                />
+              ) : null}
+            </td>
+          </>
+        )}
+        
+        {/* Expected SO */}
+        <td>
           <input 
             type="text" 
             className="editable-cell" 
-            value={player.pitcher || ''} 
-            onChange={(e) => onFieldChange(player.id, 'pitcher', e.target.value)} 
-            placeholder={player.opponentTeam ? "No pitchers found" : "Enter name"} 
-            readOnly={!player.opponentTeam}
+            value={selectedHitter.expectedSO || ''} 
+            onChange={(e) => onFieldChange(player.id, 'expectedSO', e.target.value)} 
+            placeholder="0.0" 
           />
-        )}
-      </td>
-      
-      {/* Primary Pitcher Stats */}
-      <td className="pitcher-stat">{primaryPitcherStats.IP}</td>
-      <td className="pitcher-stat">{primaryPitcherStats.PC_ST}</td>
-      <td className="pitcher-stat">{primaryPitcherStats.K}</td>
-      <td className="pitcher-stat">{primaryPitcherStats.HR}</td>
-      
-      {/* Primary Pitcher Throws */}
-      <td className="throws-cell">
-  {selectedPitcher && selectedPitcher.throwingArm ? (
-    <div className="throws-info">
-      <span className={`player-attribute-badge pitcher-hand ${getMatchupClass(selectedHitter.bats || player.bats, selectedPitcher.throwingArm)}`}>
-        {selectedPitcher.throwingArm}
-      </span>
-      {selectedPitcher.pitches && selectedPitcher.pitches.length > 0 && (
-        <div className="pitch-types">
-          {selectedPitcher.pitches.map((pitch, index) => (
-            <span key={index} className="pitch-type-badge" title={getPitchFullName(pitch)}>
-              {pitch}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  ) : (
-    <input 
-      type="text" 
-      className="editable-cell" 
-      value={player.pitcherHand || primaryPitcherStats.throwingArm} 
-      onChange={(e) => onFieldChange(player.id, 'pitcherHand', e.target.value)} 
-      placeholder="R/L" 
-      maxLength="1"
-    />
-  )}
-</td>
-      
-      {/* Second Pitcher - Add/Select Section */}
-      <td className="second-pitcher-container">
-        {player.pitcherId && !showSecondPitcher ? (
-          <button 
-            className="action-btn add-pitcher-btn"
-            onClick={() => setShowSecondPitcher(true)}
-            title="Add a second pitcher"
-          >
-            + Add Pitcher
-          </button>
-        ) : showSecondPitcher ? (
-          <div className="pitcher-selection-container">
-            <Select
-              className="editable-cell"
-              classNamePrefix="select"
-              options={pitcherOptions}
-              value={secondPitcherId ? { value: secondPitcherId, label: secondPitcher } : null}
-              onChange={(option) => handleSecondPitcherSelect(option)}
-              isClearable
-              placeholder="Select 2nd pitcher..."
-              styles={customSelectStyles}
-              // Render dropdown in portal to avoid container clipping
-              menuPortalTarget={document.body}
-              menuPosition="fixed"
-            />
-            {secondPitcherId && (
-              <button 
-                className={`overlay-toggle-btn ${showSecondPitcherOverlay ? 'active green-active' : ''}`}
-                onClick={() => setShowSecondPitcherOverlay(!showSecondPitcherOverlay)}
-                title={showSecondPitcherOverlay ? "Hide second pitcher overlay" : "Show second pitcher overlay"}
-              >
-                <span className="overlay-icon">📊</span>
-              </button>
-            )}
-          </div>
-        ) : (
-          '-'
-        )}
-      </td>
-      
-      {/* Second Pitcher Stats - Always render cells if any row has second pitcher */}
-      {hasAnySecondPitcher && (
-        <>
-          <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.IP : ''}</td>
-          <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.PC_ST : ''}</td>
-          <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.K : ''}</td>
-          <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.HR : ''}</td>
-          <td className="throws-cell">
-  {hasSecondPitcher && selectedSecondPitcher && selectedSecondPitcher.throwingArm ? (
-    <div className="throws-info">
-      <span className={`player-attribute-badge pitcher-hand ${getMatchupClass(selectedHitter.bats || player.bats, selectedSecondPitcher.throwingArm)}`}>
-        {selectedSecondPitcher.throwingArm}
-      </span>
-      {selectedSecondPitcher.pitches && selectedSecondPitcher.pitches.length > 0 && (
-        <div className="pitch-types">
-          {selectedSecondPitcher.pitches.map((pitch, index) => (
-            <span key={index} className="pitch-type-badge" title={getPitchFullName(pitch)}>
-              {pitch}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  ) : hasSecondPitcher ? (
-    <input 
-      type="text" 
-      className="editable-cell" 
-      value={player.secondPitcherHand || secondPitcherStats.throwingArm} 
-      onChange={(e) => onFieldChange(player.id, 'secondPitcherHand', e.target.value)} 
-      placeholder="R/L" 
-      maxLength="1"
-    />
-  ) : null}
-</td>
-        </>
-      )}
-      
-      {/* Expected SO */}
-      <td>
-        <input 
-          type="text" 
-          className="editable-cell" 
-          value={selectedHitter.expectedSO || ''} 
-          onChange={(e) => onFieldChange(player.id, 'expectedSO', e.target.value)} 
-          placeholder="0.0" 
-        />
-      </td>
-      
-      {/* Stadium */}
-      <td>
-        <input 
-          type="text" 
-          className="editable-cell" 
-          value={selectedHitter.stadium || ''} 
-          onChange={(e) => onFieldChange(player.id, 'stadium', e.target.value)} 
-          placeholder="Stadium" 
-        />
-      </td>
-      
-      {/* Game O/U */}
-      <td>
-        <input 
-          type="text" 
-          className="editable-cell" 
-          value={selectedHitter.gameOU || ''} 
-          onChange={(e) => onFieldChange(player.id, 'gameOU', e.target.value)} 
-          placeholder="0.0" 
-        />
-      </td>
-      
-      {/* Bet Types */}
-      <td>
-        <input 
-          type="checkbox" 
-          className="custom-checkbox" 
-          checked={selectedHitter.betTypes?.H || false} 
-          onChange={(e) => onBetTypeChange(player.id, 'H', e.target.checked)} 
-        />
-      </td>
-      <td>
-        <input 
-          type="checkbox" 
-          className="custom-checkbox" 
-          checked={selectedHitter.betTypes?.HR || false} 
-          onChange={(e) => onBetTypeChange(player.id, 'HR', e.target.checked)} 
-        />
-      </td>
-      <td>
-        <input 
-          type="checkbox" 
-          className="custom-checkbox" 
-          checked={selectedHitter.betTypes?.B || false} 
-          onChange={(e) => onBetTypeChange(player.id, 'B', e.target.checked)} 
-        />
-      </td>
-      
-      {/* Handicapper picks */}
-      {handicappers.map(handicapper => (
-        <td key={handicapper.id}>
-          <div className="checkbox-group">
-            <label className="checkbox-label" title="Public">
-              <input 
-                type="checkbox" 
-                className="custom-checkbox eye-checkbox" 
-                checked={selectedHitter.handicapperPicks[handicapper.id]?.public || false} 
-                onChange={(e) => onPickChange(player.id, handicapper.id, 'public', e.target.checked)} 
-              />
-              <span className="eye-icon">👁️</span>
-            </label>
-            <label className="checkbox-label" title="Private">
-              <input 
-                type="checkbox" 
-                className="custom-checkbox" 
-                checked={selectedHitter.handicapperPicks[handicapper.id]?.private || false} 
-                onChange={(e) => onPickChange(player.id, handicapper.id, 'private', e.target.checked)} 
-              /> $
-            </label>
-            <label className="checkbox-label" title="Straight">
-              <input 
-                type="checkbox" 
-                className="custom-checkbox" 
-                checked={selectedHitter.handicapperPicks[handicapper.id]?.straight || false} 
-                onChange={(e) => onPickChange(player.id, handicapper.id, 'straight', e.target.checked)} 
-              /> S
-            </label>
-            <div className="bet-type-checkboxes">
-              <label className="mini-checkbox-label" title="Hits">
-                <input 
-                  type="checkbox" 
-                  className="mini-checkbox" 
-                  checked={selectedHitter.handicapperPicks[handicapper.id]?.H || false} 
-                  onChange={(e) => onPickChange(player.id, handicapper.id, 'H', e.target.checked)} 
-                /> H
-              </label>
-              <label className="mini-checkbox-label" title="Home Runs">
-                <input 
-                  type="checkbox" 
-                  className="mini-checkbox" 
-                  checked={selectedHitter.handicapperPicks[handicapper.id]?.HR || false} 
-                  onChange={(e) => onPickChange(player.id, handicapper.id, 'HR', e.target.checked)} 
-                /> HR
-              </label>
-              <label className="mini-checkbox-label" title="Bases">
-                <input 
-                  type="checkbox" 
-                  className="mini-checkbox" 
-                  checked={selectedHitter.handicapperPicks[handicapper.id]?.B || false} 
-                  onChange={(e) => onPickChange(player.id, handicapper.id, 'B', e.target.checked)} 
-                /> B
-              </label>
-            </div>
-          </div>
         </td>
-      ))}
+        
+        {/* Stadium */}
+        <td>
+          <input 
+            type="text" 
+            className="editable-cell" 
+            value={selectedHitter.stadium || ''} 
+            onChange={(e) => onFieldChange(player.id, 'stadium', e.target.value)} 
+            placeholder="Stadium" 
+          />
+        </td>
+        
+        {/* Game O/U */}
+        <td>
+          <input 
+            type="text" 
+            className="editable-cell" 
+            value={selectedHitter.gameOU || ''} 
+            onChange={(e) => onFieldChange(player.id, 'gameOU', e.target.value)} 
+            placeholder="0.0" 
+          />
+        </td>
+        
+        {/* Bet Types */}
+        <td>
+          <input 
+            type="checkbox" 
+            className="custom-checkbox" 
+            checked={selectedHitter.betTypes?.H || false} 
+            onChange={(e) => onBetTypeChange(player.id, 'H', e.target.checked)} 
+          />
+        </td>
+        <td>
+          <input 
+            type="checkbox" 
+            className="custom-checkbox" 
+            checked={selectedHitter.betTypes?.HR || false} 
+            onChange={(e) => onBetTypeChange(player.id, 'HR', e.target.checked)} 
+          />
+        </td>
+        <td>
+          <input 
+            type="checkbox" 
+            className="custom-checkbox" 
+            checked={selectedHitter.betTypes?.B || false} 
+            onChange={(e) => onBetTypeChange(player.id, 'B', e.target.checked)} 
+          />
+        </td>
+        
+        {/* Handicapper picks */}
+        {handicappers.map(handicapper => (
+          <td key={handicapper.id}>
+            <div className="checkbox-group">
+              <label className="checkbox-label" title="Public">
+                <input 
+                  type="checkbox" 
+                  className="custom-checkbox eye-checkbox" 
+                  checked={selectedHitter.handicapperPicks[handicapper.id]?.public || false} 
+                  onChange={(e) => onPickChange(player.id, handicapper.id, 'public', e.target.checked)} 
+                />
+                <span className="eye-icon">👁️</span>
+              </label>
+              <label className="checkbox-label" title="Private">
+                <input 
+                  type="checkbox" 
+                  className="custom-checkbox" 
+                  checked={selectedHitter.handicapperPicks[handicapper.id]?.private || false} 
+                  onChange={(e) => onPickChange(player.id, handicapper.id, 'private', e.target.checked)} 
+                /> $
+              </label>
+              <label className="checkbox-label" title="Straight">
+                <input 
+                  type="checkbox" 
+                  className="custom-checkbox" 
+                  checked={selectedHitter.handicapperPicks[handicapper.id]?.straight || false} 
+                  onChange={(e) => onPickChange(player.id, handicapper.id, 'straight', e.target.checked)} 
+                /> S
+              </label>
+              <div className="bet-type-checkboxes">
+                <label className="mini-checkbox-label" title="Hits">
+                  <input 
+                    type="checkbox" 
+                    className="mini-checkbox" 
+                    checked={selectedHitter.handicapperPicks[handicapper.id]?.H || false} 
+                    onChange={(e) => onPickChange(player.id, handicapper.id, 'H', e.target.checked)} 
+                  /> H
+                </label>
+                <label className="mini-checkbox-label" title="Home Runs">
+                  <input 
+                    type="checkbox" 
+                    className="mini-checkbox" 
+                    checked={selectedHitter.handicapperPicks[handicapper.id]?.HR || false} 
+                    onChange={(e) => onPickChange(player.id, handicapper.id, 'HR', e.target.checked)} 
+                  /> HR
+                </label>
+                <label className="mini-checkbox-label" title="Bases">
+                  <input 
+                    type="checkbox" 
+                    className="mini-checkbox" 
+                    checked={selectedHitter.handicapperPicks[handicapper.id]?.B || false} 
+                    onChange={(e) => onPickChange(player.id, handicapper.id, 'B', e.target.checked)} 
+                  /> B
+                </label>
+              </div>
+            </div>
+          </td>
+        ))}
+        
+        {/* Actions */}
+        <td>
+          <button 
+            className="action-btn remove-btn" 
+            onClick={() => onRemove(player.id, 'hitter')} 
+            title="Remove player"
+          >
+            Remove
+          </button>
+        </td>
+      </tr>
       
-      {/* Actions */}
-      <td>
-        <button 
-          className="action-btn remove-btn" 
-          onClick={() => onRemove(player.id, 'hitter')} 
-          title="Remove player"
-        >
-          Remove
-        </button>
-      </td>
-    </tr>
+      {/* Modal is now outside the tr element - this fixes the DOM nesting issue */}
+      {showMatchupModal && matchupData && (
+        <MatchupAnalysisModal
+          show={showMatchupModal}
+          onClose={() => setShowMatchupModal(false)}
+          hitter={matchupData.hitter}
+          pitcher={matchupData.pitcher}
+        />
+      )}
+    </>
   );
 };
 
