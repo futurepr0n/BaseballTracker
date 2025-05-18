@@ -83,12 +83,14 @@ const MatchupAnalysisModal = ({
               preSelectedHitter={{
                 name: hitter?.name,
                 fullName: hitter?.fullName,
-                team: hitter?.team
+                team: hitter?.team,
+                bats: hitter?.bats
               }}
               preSelectedPitcher={{
                 name: pitcher?.name,
                 fullName: pitcher?.fullName,
-                team: pitcher?.team
+                team: pitcher?.team,
+                throws: pitcher?.throws
               }}
             />
           )}

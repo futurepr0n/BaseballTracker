@@ -455,7 +455,15 @@ const BatterPitcherMatchup = ({ preSelectedHitter = null, preSelectedPitcher = n
         
         if (foundHitter) {
           console.log("✅ Found matching hitter:", foundHitter);
-          setSelectedHitter(foundHitter);
+          
+          // Combine the found hitter data with any handedness from preselected data
+          const enrichedHitter = {
+            ...foundHitter,
+            bats: preSelectedHitter.bats || foundHitter.bats
+          };
+          
+          console.log("Enriched hitter with handedness:", enrichedHitter);
+          setSelectedHitter(enrichedHitter);
         } else {
           console.log("⚠️ Could not find matching hitter in the database");
           // Fall back to using just the name to try to find a close match
@@ -465,9 +473,18 @@ const BatterPitcherMatchup = ({ preSelectedHitter = null, preSelectedPitcher = n
             
             if (fallbackMatch) {
               console.log("Found fallback match by last name:", fallbackMatch);
-              setSelectedHitter(fallbackMatch);
+              
+              // Combine the fallback match with handedness from preselected data
+              const enrichedFallbackHitter = {
+                ...fallbackMatch,
+                bats: preSelectedHitter.bats || fallbackMatch.bats
+              };
+              
+              setSelectedHitter(enrichedFallbackHitter);
             } else {
               console.error("No match found for hitter, even with fallback methods");
+              // If still no match, use the preselected hitter directly
+              setSelectedHitter(preSelectedHitter);
             }
           }
         }
@@ -492,7 +509,15 @@ const BatterPitcherMatchup = ({ preSelectedHitter = null, preSelectedPitcher = n
         
         if (foundPitcher) {
           console.log("✅ Found matching pitcher:", foundPitcher);
-          setSelectedPitcher(foundPitcher);
+          
+          // Combine the found pitcher data with any handedness from preselected data
+          const enrichedPitcher = {
+            ...foundPitcher,
+            throws: preSelectedPitcher.throws || foundPitcher.throws
+          };
+          
+          console.log("Enriched pitcher with handedness:", enrichedPitcher);
+          setSelectedPitcher(enrichedPitcher);
         } else {
           console.log("⚠️ Could not find matching pitcher in the database");
           // Fall back to using just the name to try to find a close match
@@ -502,9 +527,18 @@ const BatterPitcherMatchup = ({ preSelectedHitter = null, preSelectedPitcher = n
             
             if (fallbackMatch) {
               console.log("Found fallback match by last name:", fallbackMatch);
-              setSelectedPitcher(fallbackMatch);
+              
+              // Combine the fallback match with handedness from preselected data
+              const enrichedFallbackPitcher = {
+                ...fallbackMatch,
+                throws: preSelectedPitcher.throws || fallbackMatch.throws
+              };
+              
+              setSelectedPitcher(enrichedFallbackPitcher);
             } else {
               console.error("No match found for pitcher, even with fallback methods");
+              // If still no match, use the preselected pitcher directly
+              setSelectedPitcher(preSelectedPitcher);
             }
           }
         }
@@ -1041,7 +1075,7 @@ const BatterPitcherMatchup = ({ preSelectedHitter = null, preSelectedPitcher = n
               >
                 <option value="">Select a hitter...</option>
                 {hitters.map((hitter) => (
-                  <option key={hitter.id || hitter.name} value={hitter.name}>
+                  <option key={`hitter-${hitter.id || hitter.name}`} value={hitter.name}>
                     {hitter.name} ({hitter.team}) {hitter.bats !== "Unknown" ? `- ${hitter.bats === "L" ? "Left" : hitter.bats === "R" ? "Right" : "Switch"}` : ""}
                   </option>
                 ))}
@@ -1062,7 +1096,7 @@ const BatterPitcherMatchup = ({ preSelectedHitter = null, preSelectedPitcher = n
               >
                 <option value="">Select a pitcher...</option>
                 {pitchers.map((pitcher) => (
-                  <option key={pitcher.id || pitcher.name} value={pitcher.name}>
+                  <option key={`pitcher-${pitcher.id || pitcher.name}`} value={pitcher.name}>
                     {pitcher.name} ({pitcher.team}) {pitcher.throws !== "Unknown" ? `- ${pitcher.throws === "L" ? "Left" : "Right"}` : ""}
                   </option>
                 ))}
@@ -1077,6 +1111,7 @@ const BatterPitcherMatchup = ({ preSelectedHitter = null, preSelectedPitcher = n
               {preSelectedHitter && (
                 <div className="mt-1">
                   <span className="font-semibold">Hitter:</span> {preSelectedHitter.fullName || preSelectedHitter.name} ({preSelectedHitter.team})
+                  {preSelectedHitter.bats && <span className="ml-2">Bats: {preSelectedHitter.bats}</span>}
                   {selectedHitter && <span className="text-green-600 ml-2">→ Matched to: {selectedHitter.name}</span>}
                   {!selectedHitter && <span className="text-red-600 ml-2">→ No match found in database</span>}
                 </div>
@@ -1084,6 +1119,7 @@ const BatterPitcherMatchup = ({ preSelectedHitter = null, preSelectedPitcher = n
               {preSelectedPitcher && (
                 <div className="mt-1">
                   <span className="font-semibold">Pitcher:</span> {preSelectedPitcher.fullName || preSelectedPitcher.name} ({preSelectedPitcher.team})
+                  {preSelectedPitcher.throws && <span className="ml-2">Throws: {preSelectedPitcher.throws}</span>}
                   {selectedPitcher && <span className="text-green-600 ml-2">→ Matched to: {selectedPitcher.name}</span>}
                   {!selectedPitcher && <span className="text-red-600 ml-2">→ No match found in database</span>}
                 </div>

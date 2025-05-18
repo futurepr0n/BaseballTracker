@@ -181,11 +181,31 @@ const HitterRow = ({
 
   // Open the matchup analysis modal with current player data
   const openMatchupAnalysis = () => {
-    // Create a snapshot of current hitter and pitcher data
+    // Create a snapshot of current hitter and pitcher data with explicit handedness info
     if (selectedHitter && selectedPitcher) {
       setMatchupData({
-        hitter: { ...selectedHitter },
-        pitcher: { ...selectedPitcher }
+        hitter: { 
+          ...selectedHitter,
+          // Ensure handedness is explicitly included
+          bats: selectedHitter.bats || player.bats || "Unknown" 
+        },
+        pitcher: { 
+          ...selectedPitcher,
+          // Ensure handedness is explicitly included
+          throws: selectedPitcher.throwingArm || primaryPitcherStats.throwingArm || "Unknown"
+        }
+      });
+      console.log('[HitterRow] Opening matchup with data:', {
+        hitter: { 
+          name: selectedHitter.name,
+          bats: selectedHitter.bats || player.bats || "Unknown",
+          team: selectedHitter.team
+        },
+        pitcher: {
+          name: selectedPitcher.name,
+          throws: selectedPitcher.throwingArm || primaryPitcherStats.throwingArm || "Unknown",
+          team: selectedPitcher.team
+        }
       });
       setShowMatchupModal(true);
     } else {
