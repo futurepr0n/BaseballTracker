@@ -3,6 +3,9 @@ import Papa from 'papaparse';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, LineChart, Line } from 'recharts';
 import _ from 'lodash';
 
+  // This should be placed near the top of the file, after imports but before the component definition
+import PlayerInfoDisplay from './PlayerInfoDisplay';
+
 const BatterPitcherMatchup = ({ preSelectedHitter = null, preSelectedPitcher = null }) => {
   console.log('Received preselected players:', preSelectedHitter, preSelectedPitcher);
   
@@ -1076,7 +1079,7 @@ const BatterPitcherMatchup = ({ preSelectedHitter = null, preSelectedPitcher = n
                 <option value="">Select a hitter...</option>
                 {hitters.map((hitter) => (
                   <option key={`hitter-${hitter.id || hitter.name}`} value={hitter.name}>
-                    {hitter.name} ({hitter.team}) {hitter.bats !== "Unknown" ? `- ${hitter.bats === "L" ? "Left" : hitter.bats === "R" ? "Right" : "Switch"}` : ""}
+                    {hitter.name} ({hitter.team})
                   </option>
                 ))}
               </select>
@@ -1097,7 +1100,7 @@ const BatterPitcherMatchup = ({ preSelectedHitter = null, preSelectedPitcher = n
                 <option value="">Select a pitcher...</option>
                 {pitchers.map((pitcher) => (
                   <option key={`pitcher-${pitcher.id || pitcher.name}`} value={pitcher.name}>
-                    {pitcher.name} ({pitcher.team}) {pitcher.throws !== "Unknown" ? `- ${pitcher.throws === "L" ? "Left" : "Right"}` : ""}
+                    {pitcher.name} ({pitcher.team})
                   </option>
                 ))}
               </select>
@@ -1129,25 +1132,22 @@ const BatterPitcherMatchup = ({ preSelectedHitter = null, preSelectedPitcher = n
           
           {selectedHitter && selectedPitcher ? (
             <div className="mt-8">
-              <div className="bg-gray-100 p-4 rounded-lg">
-                <div className="flex justify-between items-center">
-                  <div className="text-xl font-medium">
-                    {selectedHitter.name} ({selectedHitter.team})
-                    {selectedHitter.bats !== "Unknown" && (
-                      <span className="ml-2 text-sm bg-gray-200 px-2 py-1 rounded">
-                        {selectedHitter.bats === "L" ? "Left" : selectedHitter.bats === "R" ? "Right" : "Switch"}
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-lg">vs</div>
-                  <div className="text-xl font-medium">
-                    {selectedPitcher.name} ({selectedPitcher.team})
-                    {selectedPitcher.throws !== "Unknown" && (
-                      <span className="ml-2 text-sm bg-gray-200 px-2 py-1 rounded">
-                        {selectedPitcher.throws === "L" ? "Left" : "Right"}
-                      </span>
-                    )}
-                  </div>
+              <h3 className="text-xl font-semibold mb-4">Selected Matchup</h3>
+              <div className="flex flex-col md:flex-row gap-4 mb-6">
+                <div className="flex-1">
+                  <PlayerInfoDisplay 
+                    player={selectedHitter} 
+                    role="batter"
+                  />
+                </div>
+                <div className="flex items-center justify-center">
+                  <div className="text-lg font-bold">vs</div>
+                </div>
+                <div className="flex-1">
+                  <PlayerInfoDisplay 
+                    player={selectedPitcher} 
+                    role="pitcher"
+                  />
                 </div>
               </div>
               

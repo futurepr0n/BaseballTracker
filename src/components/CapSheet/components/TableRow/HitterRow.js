@@ -252,12 +252,12 @@ const HitterRow = ({
     // Same-handed matchup (generally favorable for hitters)
     // L vs L or R vs R
     if (batterHand === pitcherHand) {
-      return "favorable-matchup";
+      return "unfavorable-matchup";
     }
     
     // Opposite-handed matchup (generally favorable for pitchers)
     // L vs R or R vs L
-    return "unfavorable-matchup";
+    return "favorable-matchup";
   };
 
   // Helper to get full pitch name

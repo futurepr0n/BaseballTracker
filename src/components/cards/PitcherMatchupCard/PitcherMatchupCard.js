@@ -162,13 +162,12 @@ const PitcherMatchupCard = ({
                 className={`sort-button ${pitcherSortMethod === 'sameHanded' ? 'active' : ''}`} 
                 onClick={() => toggleSortMethod('sameHanded')}
               >
-                Tough Matchups
-              </button>
+                Favorable Matchups [Pitchers Advantage (Same Hand)]              </button>
               <button 
                 className={`sort-button ${pitcherSortMethod === 'oppositeHanded' ? 'active' : ''}`} 
                 onClick={() => toggleSortMethod('oppositeHanded')}
               >
-                Favorable Matchups
+                Tough Matchups [Hitters Advantage (Opposite Hand)]
               </button>
             </div>
             
@@ -194,8 +193,8 @@ const PitcherMatchupCard = ({
                   <li key={safeId} className="player-item pitcher-matchup-item">
                     <div className={`player-rank ${
                       pitcherSortMethod === 'sameHanded' 
-                        ? pitcher.sameHandednessPercentage > 0.6 ? 'tough' : 'neutral'
-                        : pitcher.oppositeHandednessPercentage > 0.6 ? 'favorable' : 'neutral'
+                        ? pitcher.sameHandednessPercentage > 0.6 ? 'favorable' : 'neutral'
+                        : pitcher.oppositeHandednessPercentage > 0.6 ? 'tough' : 'neutral'
                     }`}>
                       {index + 1}
                     </div>
@@ -227,7 +226,7 @@ const PitcherMatchupCard = ({
                     <div className="player-stat matchup-stats">
                       {/* Same-handed stats with tooltip */}
                       <div 
-                        className={`matchup-stat ${pitcher.sameHandednessPercentage > 0.6 ? 'tough' : ''} tooltip-container`}
+                        className={`matchup-stat ${pitcher.sameHandednessPercentage > 0.6 ? 'favorable' : ''} tooltip-container`}
                         data-tooltip-id={`pitcher_same_${safeId}`}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -241,7 +240,7 @@ const PitcherMatchupCard = ({
                       
                       {/* Opposite-handed stats with tooltip */}
                       <div 
-                        className={`matchup-stat ${pitcher.oppositeHandednessPercentage > 0.6 ? 'favorable' : ''} tooltip-container`}
+                        className={`matchup-stat ${pitcher.oppositeHandednessPercentage > 0.6 ? 'tough' : ''} tooltip-container`}
                         data-tooltip-id={`pitcher_opposite_${safeId}`}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -355,11 +354,11 @@ const PitcherMatchupCard = ({
           <div className="matchup-legend">
             <div className="legend-item">
               <div className="legend-color tough"></div>
-              <span>Tough matchup (same-handed batters)</span>
+              <span>Tough matchup (opposite-handed batters)</span>
             </div>
             <div className="legend-item">
               <div className="legend-color favorable"></div>
-              <span>Favorable matchup (opposite-handed batters)</span>
+              <span>Favorable matchup (same-handed batters)</span>
             </div>
             <div className="legend-item">
               <div className="legend-icon">👆</div>
