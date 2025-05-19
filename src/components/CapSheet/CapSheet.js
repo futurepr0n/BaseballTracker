@@ -29,6 +29,39 @@ import useCalculations from './hooks/useCalculations';
 import { exportToCSV, parseImportedCSV } from './utils/exportImport';
 import { saveHandicapper } from '../../services/handicapperService';
 
+
+// Scan Results Notification Component
+const ScanResultsNotification = ({ results, onDismiss }) => {
+  if (!results) return null;
+  
+  const matchStats = results.matchStats || { 
+    matched: 0, 
+    added: results.player_data?.length || 0, 
+    total: results.player_data?.length || 0 
+  };
+  
+  return (
+    <div className="scan-results-notification">
+      <div className="notification-content">
+        <div>
+          <p className="scan-result-title">
+            <span role="img" aria-label="Success">✅</span> Bet Slip Scan Complete
+          </p>
+          <p className="scan-result-stats">
+            Added {matchStats.added} players to CapSheet
+            {matchStats.matched > 0 && 
+              <span className="stat-detail">
+                ({matchStats.matched} matched with roster)
+              </span>
+            }
+          </p>
+        </div>
+        <button onClick={onDismiss}>Dismiss</button>
+      </div>
+    </div>
+  );
+};
+
 /**
  * Enhanced CapSheet component - Allows users to track and analyze player betting opportunities
  * Now with separate configurable game history displays for hitters and pitchers
@@ -135,79 +168,217 @@ function CapSheet({ playerData, gameData, currentDate }) {
   const [scanResults, setScanResults] = useState(null);
 
   // Handle scan completion
-  const handleScanComplete = (results) => {
+  const handleScanComplete = async (results) => {
   console.log("Scan complete, processing results:", results);
   setScanResults(results);
-  
-  // Process player data from scan results
+
   if (results.player_data && results.player_data.length > 0) {
     console.log(`Processing ${results.player_data.length} players from scan results`);
     
-    // Temporary storage for new players to add
     const newHitters = [];
+    const matchResults = { matched: 0, added: 0, total: results.player_data.length };
     
-    // Process each player from scan results
-    results.player_data.forEach(player => {
-      console.log(`Processing player: ${player.name}, prop type: ${player.prop_type}`);
-      
-      // Check if player already exists in our CapSheet
-      const exists = selectedPlayers.hitters.some(
-        existingPlayer => existingPlayer.name.toLowerCase() === player.name.toLowerCase()
+    const findBestPlayerMatch = (scannedName, scannedTeam) => {
+      // Your existing findBestPlayerMatch implementation
+      if (!scannedName) return null;
+      const cleanName = scannedName.replace(/[^a-zA-Z0-9\s\.]/g, '').trim();
+      let match = hitterSelectOptions.find(option => 
+        option.label.toLowerCase() === cleanName.toLowerCase()
       );
+      if (match) return match;
+      const nameParts = cleanName.split(' ');
+      if (nameParts.length > 1) {
+        const abbreviatedName = `${nameParts[0][0]}. ${nameParts.slice(1).join(' ')}`;
+        match = hitterSelectOptions.find(option => 
+          option.label.toLowerCase().includes(abbreviatedName.toLowerCase())
+        );
+        if (match) return match;
+      }
+      if (nameParts.length > 1) {
+        const lastName = nameParts[nameParts.length - 1];
+        const possibleMatches = hitterSelectOptions.filter(option => 
+          option.label.toLowerCase().includes(lastName.toLowerCase())
+        );
+        if (scannedTeam && possibleMatches.length > 1) {
+          const teamMatches = possibleMatches.filter(option => {
+            const teamInfo = option.label.match(/\(([^)]+)\)/);
+            return teamInfo && teamInfo[1] && 
+                   teamInfo[1].toLowerCase() === scannedTeam.toLowerCase();
+          });
+          if (teamMatches.length > 0) return teamMatches[0];
+        }
+        if (possibleMatches.length > 0) {
+          return possibleMatches.sort((a, b) => a.label.length - b.label.length)[0];
+        }
+      }
+      return null;
+    };
+
+    // Helper function to find current game details for a player's team
+    // Adjust this based on your actual gameData structure
+    const findCurrentGameForPlayerTeam = (playerTeamAbbr, allGames, targetDate) => {
+      if (!playerTeamAbbr || !allGames || !targetDate) return null;
       
-      if (!exists) {
-        console.log(`Adding new player: ${player.name}`);
+      // Ensure targetDate is compared in YYYY-MM-DD format
+      const targetDateString = targetDate.toISOString().split('T')[0];
+
+      for (const game of allGames) {
+        // Assuming game.game_datetime is a string like "YYYY-MM-DDTHH:mm:ssZ" or similar
+        // Or game.date is "YYYY-MM-DD"
+        const gameDateString = game.game_datetime 
+                               ? new Date(game.game_datetime).toISOString().split('T')[0]
+                               : (game.date || ''); // Fallback if game.date exists
+
+        if (gameDateString === targetDateString) {
+          // Check if the player's team is home or away in this game
+          // Adjust property names (home_team_abbr, away_team_abbr, stadium_name, over_under) as per your gameData
+          if (game.home_team_abbr === playerTeamAbbr || game.away_team_abbr === playerTeamAbbr) {
+            const isHomeTeam = game.home_team_abbr === playerTeamAbbr;
+            return {
+              opponentTeam: isHomeTeam ? game.away_team_abbr : game.home_team_abbr,
+              stadium: game.stadium_name || game.stadium || '', // Prefer more specific if available
+              gameOU: game.over_under || game.game_ou || '',    // Prefer more specific
+              // You might need other fields like game_id if your HitterRow uses them
+            };
+          }
+        }
+      }
+      return null; // No game found for this team on this date
+    };
+    
+    for (const scannedPlayer of results.player_data) {
+      console.log(`Processing scanned player: ${scannedPlayer.name}, prop type: ${scannedPlayer.prop_type}`);
+      const match = findBestPlayerMatch(scannedPlayer.name, scannedPlayer.team);
+      
+      if (match) { // Player found in hitterSelectOptions
+        matchResults.matched++;
+        const existingPlayerInSheet = selectedPlayers.hitters.some(p => p.id === match.value);
         
-        // Create a new player object with fields your CapSheet expects
-        const newPlayer = {
-          id: `${player.name.replace(/\s+/g, '-')}-${player.team || 'team'}`,
-          name: player.name,
-          team: player.team || '',
-          playerType: 'hitter',
-          
-          // Set default values for required fields
-          prevGameHR: '0',
-          prevGameAB: '0',
-          prevGameH: '0',
-          
-          // Set up bet types based on prop_type from scanner
-          betTypes: { 
-            H: player.prop_type === 'H',
-            HR: player.prop_type === 'HR',
-            B: player.prop_type === 'B'
-          },
-          
-          // Initialize handicapper picks
+        if (!existingPlayerInSheet) {
+          const fullPlayerData = await fetchHitterById(match.value); 
+
+          if (fullPlayerData) {
+            matchResults.added++;
+            
+            // Fetch current game context using the player's team from fullPlayerData
+            const gameContext = findCurrentGameForPlayerTeam(fullPlayerData.team, gameData, currentDate);
+            
+            if (gameContext) {
+              console.log(`Found game context for ${fullPlayerData.name} (Team: ${fullPlayerData.team}): Opponent - ${gameContext.opponentTeam}, Stadium - ${gameContext.stadium}`);
+            } else {
+              console.warn(`No current game context found for ${fullPlayerData.name} (Team: ${fullPlayerData.team}) on ${currentDate.toISOString().split('T')[0]}. Pitcher dropdown may not populate correctly.`);
+            }
+
+            const newPlayerToAdd = {
+              ...fullPlayerData, // Base player data (id, name, fullName, bats, team, history stats)
+              
+              // Integrate game context if found, otherwise use defaults or existing from fullPlayerData
+              opponentTeam: gameContext ? gameContext.opponentTeam : (fullPlayerData.opponentTeam || ''),
+              stadium: gameContext ? gameContext.stadium : (fullPlayerData.stadium || ''),
+              gameOU: gameContext ? gameContext.gameOU : (fullPlayerData.gameOU || ''),
+              
+              // Ensure these are reset for a new entry, to be selected by user
+              pitcher: '',
+              pitcherId: '',
+              pitcherHand: '',
+              
+              // Set bet types from scan
+              betTypes: { 
+                H: scannedPlayer.prop_type === 'H',
+                HR: scannedPlayer.prop_type === 'HR',
+                B: scannedPlayer.prop_type === 'B'
+              },
+              handicapperPicks: {},
+            };
+            
+            hitterHandicappers.forEach(handicapper => {
+              newPlayerToAdd.handicapperPicks[handicapper.id] = {
+                public: false, private: false, straight: false,
+                H: scannedPlayer.prop_type === 'H',
+                HR: scannedPlayer.prop_type === 'HR', 
+                B: scannedPlayer.prop_type === 'B'
+              };
+            });
+            newHitters.push(newPlayerToAdd);
+
+          } else {
+            // Fallback if fetchHitterById fails (this part remains similar to your previous version)
+            console.warn(`Could not fetch full data for player ID: ${match.value}. Adding with limited info.`);
+            matchResults.added++;
+            let nameFromLabel = match.label;
+            let teamFromLabel = '';
+            const labelTeamRegex = /^(.*?)\s*\(([^)]+)\)\s*$/;
+            const labelParts = match.label.match(labelTeamRegex);
+            if (labelParts) { nameFromLabel = labelParts[1].trim(); teamFromLabel = labelParts[2].trim(); }
+            else { nameFromLabel = match.label.trim(); }
+
+            const gameContextFallback = findCurrentGameForPlayerTeam(teamFromLabel || scannedPlayer.team, gameData, currentDate);
+
+            const fallbackPlayer = {
+              id: match.value, name: nameFromLabel, team: teamFromLabel || scannedPlayer.team || '',
+              playerType: 'hitter', bats: '', fullName: nameFromLabel,
+              prevGameHR: '0', prevGameAB: '0', prevGameH: '0',
+              opponentTeam: gameContextFallback ? gameContextFallback.opponentTeam : '',
+              stadium: gameContextFallback ? gameContextFallback.stadium : '',
+              gameOU: gameContextFallback ? gameContextFallback.gameOU : '',
+              pitcher: '', pitcherId: '', pitcherHand: '', expectedSO: '',
+              betTypes: { H: scannedPlayer.prop_type === 'H', HR: scannedPlayer.prop_type === 'HR', B: scannedPlayer.prop_type === 'B' },
+              handicapperPicks: {}, // Initialize picks
+            };
+            hitterHandicappers.forEach(handicapper => { /* ... initialize picks ... */ });
+            newHitters.push(fallbackPlayer);
+          }
+        } else {
+          console.log(`Player ${match.label} (ID: ${match.value}) already exists in CapSheet, skipping.`);
+        }
+      } else { // No match found in hitterSelectOptions, add based on scanned data only
+        matchResults.added++;
+        console.log(`No match found, adding player with scanned data: ${scannedPlayer.name}`);
+        let nameForNewPlayer = scannedPlayer.name;
+        let teamForNewPlayer = scannedPlayer.team || ''; 
+        const scannedNameTeamRegex = /^(.*?)\s*\(([^)]+)\)\s*$/;
+        const scannedNameParts = scannedPlayer.name.match(scannedNameTeamRegex);
+        if (scannedNameParts) {
+            nameForNewPlayer = scannedNameParts[1].trim();
+            if (!teamForNewPlayer) teamForNewPlayer = scannedNameParts[2].trim();
+        }
+        const newPlayerId = `scanned-${nameForNewPlayer.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}-${Date.now()}`;
+
+        // Try to find game context for this new, unmatched player if we have a team
+        const gameContextForNew = findCurrentGameForPlayerTeam(teamForNewPlayer, gameData, currentDate);
+        
+        const newPlayerFromScan = {
+          id: newPlayerId, name: nameForNewPlayer, team: teamForNewPlayer, playerType: 'hitter',
+          bats: '', fullName: nameForNewPlayer,
+          prevGameHR: '0', prevGameAB: '0', prevGameH: '0',
+          opponentTeam: gameContextForNew ? gameContextForNew.opponentTeam : '',
+          stadium: gameContextForNew ? gameContextForNew.stadium : '',
+          gameOU: gameContextForNew ? gameContextForNew.gameOU : '',
+          pitcher: '', pitcherId: '', pitcherHand: '', expectedSO: '',
+          betTypes: { H: scannedPlayer.prop_type === 'H', HR: scannedPlayer.prop_type === 'HR', B: scannedPlayer.prop_type === 'B' },
           handicapperPicks: {},
         };
-        
-        // If we have active handicappers, initialize them
-        hitterHandicappers.forEach(handicapper => {
-          newPlayer.handicapperPicks[handicapper.id] = {
-            public: false, private: false, straight: false,
-            H: player.prop_type === 'H',
-            HR: player.prop_type === 'HR', 
-            B: player.prop_type === 'B'
-          };
-        });
-        
-        newHitters.push(newPlayer);
+        hitterHandicappers.forEach(handicapper => { /* ... initialize picks ... */ });
+        newHitters.push(newPlayerFromScan);
       }
-    });
+    }
     
-    // Update state to include new players
     if (newHitters.length > 0) {
-      console.log(`Adding ${newHitters.length} new players to CapSheet`);
+      console.log(`Adding ${newHitters.length} new players to CapSheet:`, newHitters.map(p => ({id: p.id, name: p.name, team: p.team, opponent: p.opponentTeam, stadium: p.stadium})));
       setSelectedPlayers(prev => ({
         ...prev,
         hitters: [...prev.hitters, ...newHitters]
       }));
-      
-      // Force a re-render of the hitters table
       setHitterRefreshKey(Date.now());
     }
+    setScanResults(prevResults => ({ ...prevResults, matchStats: matchResults }));
+
+  } else {
+    console.log("Scan results contained no player data.");
+    setScanResults(prevResults => ({ ...prevResults, matchStats: { matched: 0, added: 0, total: 0 } }));
   }
 };
+
 
 
 
@@ -220,6 +391,86 @@ function CapSheet({ playerData, gameData, currentDate }) {
       setLocalHistoricalDate(new Date());
     }
   }, [playerDataSource]);
+
+
+
+   // Add custom CSS for scan notification
+  useEffect(() => {
+    // Add custom styles for scan notification
+    const styleId = 'scan-notification-styles';
+    if (!document.getElementById(styleId)) {
+      const styleEl = document.createElement('style');
+      styleEl.id = styleId;
+      styleEl.innerHTML = `
+        .scan-results-notification {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background-color: #f0fff4;
+          border: 1px solid #16a34a;
+          border-left: 4px solid #16a34a;
+          border-radius: 4px;
+          padding: 12px 20px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          z-index: 100;
+          animation: slide-in 0.3s ease-out;
+          max-width: 400px;
+        }
+        
+        .scan-result-title {
+          font-weight: 600;
+          margin: 0 0 4px 0;
+        }
+        
+        .scan-result-stats {
+          margin: 0;
+          font-size: 0.9rem;
+          color: #555;
+        }
+        
+        .stat-detail {
+          margin-left: 4px;
+          font-style: italic;
+        }
+        
+        .notification-content {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        
+        .notification-content button {
+          background: none;
+          border: none;
+          color: #16a34a;
+          cursor: pointer;
+          font-weight: 500;
+          margin-left: 15px;
+          padding: 5px 10px;
+          border-radius: 4px;
+          transition: background-color 0.2s;
+        }
+        
+        .notification-content button:hover {
+          background-color: rgba(22, 163, 74, 0.1);
+        }
+        
+        @keyframes slide-in {
+          from { transform: translateY(100%); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+      `;
+      document.head.appendChild(styleEl);
+    }
+    
+    // Clean up the style element when the component unmounts
+    return () => {
+      const existingStyle = document.getElementById(styleId);
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+    };
+  }, []);
 
   // Function to refresh hitters with new game history
   const refreshHittersData = useCallback(() => {
@@ -895,12 +1146,10 @@ const handlePitcherGamesHistoryChange = (newValue) => {
       
       {/* If we have scan results, show a notification */}
       {scanResults && (
-        <div className="scan-results-notification">
-          <div className="notification-content">
-            <p>Added {scanResults.player_data.length} players from bet slip.</p>
-            <button onClick={() => setScanResults(null)}>Dismiss</button>
-          </div>
-        </div>
+        <ScanResultsNotification 
+          results={scanResults} 
+          onDismiss={() => setScanResults(null)} 
+        />
       )}
     </div>
   );
