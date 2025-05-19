@@ -81,7 +81,7 @@ function BetSlipScannerModal({ isOpen, onClose, onScanComplete, context }) {
     formData.append('context', context || 'capsheet'); // Send context to API
 
     // API endpoint URL - REPLACE WITH YOUR ACTUAL SERVER
-    const API_URL = 'http://scan.capping.pro/api/scan';
+    const API_URL = 'https://scan.capping.pro/api/scan';
     // Alternatively use: 'http://scan.capping.pro/api/scan'
 
     try {
