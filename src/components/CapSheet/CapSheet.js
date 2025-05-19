@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import BetSlipScannerModal from './BetSlipScannerModal';
 import './CapSheet.css';
 
 // Import components
@@ -128,6 +129,87 @@ function CapSheet({ playerData, gameData, currentDate }) {
     loadSlip,
     deleteSlip
   } = useSlips(formattedDate);
+
+  // New state for the scanner modal
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [scanResults, setScanResults] = useState(null);
+
+  // Handle scan completion
+  const handleScanComplete = (results) => {
+  console.log("Scan complete, processing results:", results);
+  setScanResults(results);
+  
+  // Process player data from scan results
+  if (results.player_data && results.player_data.length > 0) {
+    console.log(`Processing ${results.player_data.length} players from scan results`);
+    
+    // Temporary storage for new players to add
+    const newHitters = [];
+    
+    // Process each player from scan results
+    results.player_data.forEach(player => {
+      console.log(`Processing player: ${player.name}, prop type: ${player.prop_type}`);
+      
+      // Check if player already exists in our CapSheet
+      const exists = selectedPlayers.hitters.some(
+        existingPlayer => existingPlayer.name.toLowerCase() === player.name.toLowerCase()
+      );
+      
+      if (!exists) {
+        console.log(`Adding new player: ${player.name}`);
+        
+        // Create a new player object with fields your CapSheet expects
+        const newPlayer = {
+          id: `${player.name.replace(/\s+/g, '-')}-${player.team || 'team'}`,
+          name: player.name,
+          team: player.team || '',
+          playerType: 'hitter',
+          
+          // Set default values for required fields
+          prevGameHR: '0',
+          prevGameAB: '0',
+          prevGameH: '0',
+          
+          // Set up bet types based on prop_type from scanner
+          betTypes: { 
+            H: player.prop_type === 'H',
+            HR: player.prop_type === 'HR',
+            B: player.prop_type === 'B'
+          },
+          
+          // Initialize handicapper picks
+          handicapperPicks: {},
+        };
+        
+        // If we have active handicappers, initialize them
+        hitterHandicappers.forEach(handicapper => {
+          newPlayer.handicapperPicks[handicapper.id] = {
+            public: false, private: false, straight: false,
+            H: player.prop_type === 'H',
+            HR: player.prop_type === 'HR', 
+            B: player.prop_type === 'B'
+          };
+        });
+        
+        newHitters.push(newPlayer);
+      }
+    });
+    
+    // Update state to include new players
+    if (newHitters.length > 0) {
+      console.log(`Adding ${newHitters.length} new players to CapSheet`);
+      setSelectedPlayers(prev => ({
+        ...prev,
+        hitters: [...prev.hitters, ...newHitters]
+      }));
+      
+      // Force a re-render of the hitters table
+      setHitterRefreshKey(Date.now());
+    }
+  }
+};
+
+
 
   // Calculate statistics
   const calculatedStats = useCalculations(selectedPlayers);
@@ -545,13 +627,29 @@ const handlePitcherGamesHistoryChange = (newValue) => {
       )}
 
       {/* Control Actions Section */}
-      <div className="cap-sheet-controls">
-        <ControlActions
-          onShowSaveModal={handleSaveButtonClick}
-          onShowSlipGallery={() => setShowSlipGallery(true)}
-          onExport={handleExportToCsv}
-          onImport={handleFileSelect}
-        />
+
+      
+
+
+
+     <div className="cap-sheet-controls">
+  <ControlActions
+    onShowSaveModal={handleSaveButtonClick}
+    onShowSlipGallery={() => setShowSlipGallery(true)}
+    onExport={handleExportToCsv}
+    onImport={handleFileSelect}
+  />
+  {/* Add a distinct style for the scan button to make it stand out */}
+  <button 
+    className="action-btn scan-btn" 
+    onClick={() => setIsScannerOpen(true)}
+    style={{
+      backgroundColor: '#22c55e', 
+      marginLeft: '10px'
+    }}
+  >
+          <span className="action-icon">📷</span> Scan Bet Slip
+        </button>
       </div>
       
       {/* Loading state during data refresh */}
@@ -787,6 +885,23 @@ const handlePitcherGamesHistoryChange = (newValue) => {
         onLoadSlip={handleLoadSlip}
         onDeleteSlip={deleteSlip}
       />
+
+      <BetSlipScannerModal 
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onScanComplete={handleScanComplete}
+        context="capsheet"  // Tell scanner this is for CapSheet
+      />
+      
+      {/* If we have scan results, show a notification */}
+      {scanResults && (
+        <div className="scan-results-notification">
+          <div className="notification-content">
+            <p>Added {scanResults.player_data.length} players from bet slip.</p>
+            <button onClick={() => setScanResults(null)}>Dismiss</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
