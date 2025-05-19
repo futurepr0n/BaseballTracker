@@ -176,6 +176,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
     console.log(`Processing ${results.player_data.length} players from scan results`);
     
     const matchResults = { matched: 0, added: 0, total: results.player_data.length };
+    const pendingBetTypeUpdates = []; // Track updates to make after all players are added
     
     // Process each scanned player
     for (const scannedPlayer of results.player_data) {
@@ -219,7 +220,6 @@ function CapSheet({ playerData, gameData, currentDate }) {
       
       const match = findBestPlayerMatch(scannedPlayer.name, scannedPlayer.team);
       
-      // REPLACE THIS ENTIRE SECTION WHERE YOU PREVIOUSLY HANDLED MATCHED PLAYERS
       if (match) {
         matchResults.matched++;
         const playerId = match.value;
@@ -231,22 +231,16 @@ function CapSheet({ playerData, gameData, currentDate }) {
           console.log(`Adding player ${match.label} (ID: ${playerId}) using handleAddHitterById`);
           
           try {
-            // Step 1: Use your existing function to add the player
-            // This will handle all the setup for pitchers, opponents, etc.
-            const addedPlayer = await handleAddHitterById(playerId);
+            // Use your existing function to add the player
+            await handleAddHitterById(playerId);
+            matchResults.added++;
             
-            if (addedPlayer) {
-              matchResults.added++;
-              
-              // Step 2: After player is added, set the bet types based on scan type
-              if (scannedPlayer.prop_type === 'H') {
-                handleHitterBetTypeChange(playerId, 'H', true);
-              } else if (scannedPlayer.prop_type === 'HR') {
-                handleHitterBetTypeChange(playerId, 'HR', true);
-              } else if (scannedPlayer.prop_type === 'B') {
-                handleHitterBetTypeChange(playerId, 'B', true);
-              }
-            }
+            // Track this player's bet type to update after all players are added
+            pendingBetTypeUpdates.push({
+              playerId: playerId,
+              betType: scannedPlayer.prop_type
+            });
+            
           } catch (error) {
             console.error(`Error adding player ${match.label}:`, error);
           }
@@ -255,7 +249,6 @@ function CapSheet({ playerData, gameData, currentDate }) {
         }
       } else {
         // No match found in hitterSelectOptions, add based on scanned data only
-        // You can keep your existing code for this case, or simplify it
         matchResults.added++;
         console.log(`No match found, adding player with scanned data: ${scannedPlayer.name}`);
         
@@ -270,7 +263,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
         
         const newPlayerId = `scanned-${nameForNewPlayer.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}-${Date.now()}`;
         
-        // Create a minimal player without all the complex lookups
+        // Create a minimal player - keep your existing manual creation for unmatched players
         const newPlayerFromScan = {
           id: newPlayerId, 
           name: nameForNewPlayer, 
@@ -279,16 +272,14 @@ function CapSheet({ playerData, gameData, currentDate }) {
           bats: '', 
           fullName: nameForNewPlayer,
           prevGameHR: '0', prevGameAB: '0', prevGameH: '0',
-          
-          // Let app handle this based on team
           opponentTeam: '',
           stadium: '',
           gameOU: '',
-          
           pitcher: '', 
           pitcherId: '', 
           pitcherHand: '', 
           expectedSO: '',
+          // Set bet types directly here for manually added players
           betTypes: { 
             H: scannedPlayer.prop_type === 'H', 
             HR: scannedPlayer.prop_type === 'HR', 
@@ -317,6 +308,58 @@ function CapSheet({ playerData, gameData, currentDate }) {
     
     // Force a re-render of the hitter table
     setHitterRefreshKey(Date.now());
+    
+    // Apply bet types after a small delay to ensure all players are added
+    if (pendingBetTypeUpdates.length > 0) {
+      setTimeout(() => {
+        console.log("Applying pending bet type updates:", pendingBetTypeUpdates);
+        
+        // First approach: Use the handler function
+        pendingBetTypeUpdates.forEach(update => {
+          if (update.betType === 'H') {
+            handleHitterBetTypeChange(update.playerId, 'H', true);
+          } else if (update.betType === 'HR') {
+            handleHitterBetTypeChange(update.playerId, 'HR', true);
+          } else if (update.betType === 'B') {
+            handleHitterBetTypeChange(update.playerId, 'B', true);
+          }
+        });
+        
+        // Second approach (backup): Update state directly
+        setSelectedPlayers(prev => {
+          const updatedHitters = [...prev.hitters];
+          
+          pendingBetTypeUpdates.forEach(update => {
+            const playerIndex = updatedHitters.findIndex(p => p.id === update.playerId);
+            if (playerIndex !== -1) {
+              const player = updatedHitters[playerIndex];
+              
+              // Update betTypes
+              const updatedBetTypes = { ...player.betTypes };
+              if (update.betType === 'H') updatedBetTypes.H = true;
+              else if (update.betType === 'HR') updatedBetTypes.HR = true;
+              else if (update.betType === 'B') updatedBetTypes.B = true;
+              
+              // Update the player
+              updatedHitters[playerIndex] = {
+                ...player,
+                betTypes: updatedBetTypes
+              };
+              
+              console.log(`Directly updated bet types for ${player.name} to ${update.betType}`);
+            }
+          });
+          
+          return {
+            ...prev,
+            hitters: updatedHitters
+          };
+        });
+        
+        // Force another refresh after updating bet types
+        setHitterRefreshKey(Date.now());
+      }, 500); // 500ms delay to ensure players are fully added
+    }
     
     setScanResults(prevResults => ({ ...prevResults, matchStats: matchResults }));
   } else {
