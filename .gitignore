@@ -1,5 +1,6 @@
 node_modules
 
+public/data/logos/
 public/data/2025/
 public/data/predictions/
 public/data/predictions/hr_predictions_latest.json
