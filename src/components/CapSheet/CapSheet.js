@@ -175,165 +175,90 @@ function CapSheet({ playerData, gameData, currentDate }) {
   if (results.player_data && results.player_data.length > 0) {
     console.log(`Processing ${results.player_data.length} players from scan results`);
     
-    const newHitters = [];
     const matchResults = { matched: 0, added: 0, total: results.player_data.length };
     
-    const findBestPlayerMatch = (scannedName, scannedTeam) => {
-      // Your existing findBestPlayerMatch implementation
-      if (!scannedName) return null;
-      const cleanName = scannedName.replace(/[^a-zA-Z0-9\s\.]/g, '').trim();
-      let match = hitterSelectOptions.find(option => 
-        option.label.toLowerCase() === cleanName.toLowerCase()
-      );
-      if (match) return match;
-      const nameParts = cleanName.split(' ');
-      if (nameParts.length > 1) {
-        const abbreviatedName = `${nameParts[0][0]}. ${nameParts.slice(1).join(' ')}`;
-        match = hitterSelectOptions.find(option => 
-          option.label.toLowerCase().includes(abbreviatedName.toLowerCase())
-        );
-        if (match) return match;
-      }
-      if (nameParts.length > 1) {
-        const lastName = nameParts[nameParts.length - 1];
-        const possibleMatches = hitterSelectOptions.filter(option => 
-          option.label.toLowerCase().includes(lastName.toLowerCase())
-        );
-        if (scannedTeam && possibleMatches.length > 1) {
-          const teamMatches = possibleMatches.filter(option => {
-            const teamInfo = option.label.match(/\(([^)]+)\)/);
-            return teamInfo && teamInfo[1] && 
-                   teamInfo[1].toLowerCase() === scannedTeam.toLowerCase();
-          });
-          if (teamMatches.length > 0) return teamMatches[0];
-        }
-        if (possibleMatches.length > 0) {
-          return possibleMatches.sort((a, b) => a.label.length - b.label.length)[0];
-        }
-      }
-      return null;
-    };
-
-    // Helper function to find current game details for a player's team
-    // Adjust this based on your actual gameData structure
-    const findCurrentGameForPlayerTeam = (playerTeamAbbr, allGames, targetDate) => {
-      if (!playerTeamAbbr || !allGames || !targetDate) return null;
-      
-      // Ensure targetDate is compared in YYYY-MM-DD format
-      const targetDateString = targetDate.toISOString().split('T')[0];
-
-      for (const game of allGames) {
-        // Assuming game.game_datetime is a string like "YYYY-MM-DDTHH:mm:ssZ" or similar
-        // Or game.date is "YYYY-MM-DD"
-        const gameDateString = game.game_datetime 
-                               ? new Date(game.game_datetime).toISOString().split('T')[0]
-                               : (game.date || ''); // Fallback if game.date exists
-
-        if (gameDateString === targetDateString) {
-          // Check if the player's team is home or away in this game
-          // Adjust property names (home_team_abbr, away_team_abbr, stadium_name, over_under) as per your gameData
-          if (game.home_team_abbr === playerTeamAbbr || game.away_team_abbr === playerTeamAbbr) {
-            const isHomeTeam = game.home_team_abbr === playerTeamAbbr;
-            return {
-              opponentTeam: isHomeTeam ? game.away_team_abbr : game.home_team_abbr,
-              stadium: game.stadium_name || game.stadium || '', // Prefer more specific if available
-              gameOU: game.over_under || game.game_ou || '',    // Prefer more specific
-              // You might need other fields like game_id if your HitterRow uses them
-            };
-          }
-        }
-      }
-      return null; // No game found for this team on this date
-    };
-    
+    // Process each scanned player
     for (const scannedPlayer of results.player_data) {
       console.log(`Processing scanned player: ${scannedPlayer.name}, prop type: ${scannedPlayer.prop_type}`);
+      
+      // Use your existing player matching logic
+      const findBestPlayerMatch = (scannedName, scannedTeam) => {
+        if (!scannedName) return null;
+        const cleanName = scannedName.replace(/[^a-zA-Z0-9\s\.]/g, '').trim();
+        let match = hitterSelectOptions.find(option => 
+          option.label.toLowerCase() === cleanName.toLowerCase()
+        );
+        if (match) return match;
+        const nameParts = cleanName.split(' ');
+        if (nameParts.length > 1) {
+          const abbreviatedName = `${nameParts[0][0]}. ${nameParts.slice(1).join(' ')}`;
+          match = hitterSelectOptions.find(option => 
+            option.label.toLowerCase().includes(abbreviatedName.toLowerCase())
+          );
+          if (match) return match;
+        }
+        if (nameParts.length > 1) {
+          const lastName = nameParts[nameParts.length - 1];
+          const possibleMatches = hitterSelectOptions.filter(option => 
+            option.label.toLowerCase().includes(lastName.toLowerCase())
+          );
+          if (scannedTeam && possibleMatches.length > 1) {
+            const teamMatches = possibleMatches.filter(option => {
+              const teamInfo = option.label.match(/\(([^)]+)\)/);
+              return teamInfo && teamInfo[1] && 
+                    teamInfo[1].toLowerCase() === scannedTeam.toLowerCase();
+            });
+            if (teamMatches.length > 0) return teamMatches[0];
+          }
+          if (possibleMatches.length > 0) {
+            return possibleMatches.sort((a, b) => a.label.length - b.label.length)[0];
+          }
+        }
+        return null;
+      };
+      
       const match = findBestPlayerMatch(scannedPlayer.name, scannedPlayer.team);
       
-      if (match) { // Player found in hitterSelectOptions
+      // REPLACE THIS ENTIRE SECTION WHERE YOU PREVIOUSLY HANDLED MATCHED PLAYERS
+      if (match) {
         matchResults.matched++;
-        const existingPlayerInSheet = selectedPlayers.hitters.some(p => p.id === match.value);
+        const playerId = match.value;
+        
+        // Check if player already exists in the sheet
+        const existingPlayerInSheet = selectedPlayers.hitters.some(p => p.id === playerId);
         
         if (!existingPlayerInSheet) {
-          const fullPlayerData = await fetchHitterById(match.value); 
-
-          if (fullPlayerData) {
-            matchResults.added++;
+          console.log(`Adding player ${match.label} (ID: ${playerId}) using handleAddHitterById`);
+          
+          try {
+            // Step 1: Use your existing function to add the player
+            // This will handle all the setup for pitchers, opponents, etc.
+            const addedPlayer = await handleAddHitterById(playerId);
             
-            // Fetch current game context using the player's team from fullPlayerData
-            const gameContext = findCurrentGameForPlayerTeam(fullPlayerData.team, gameData, currentDate);
-            
-            if (gameContext) {
-              console.log(`Found game context for ${fullPlayerData.name} (Team: ${fullPlayerData.team}): Opponent - ${gameContext.opponentTeam}, Stadium - ${gameContext.stadium}`);
-            } else {
-              console.warn(`No current game context found for ${fullPlayerData.name} (Team: ${fullPlayerData.team}) on ${currentDate.toISOString().split('T')[0]}. Pitcher dropdown may not populate correctly.`);
+            if (addedPlayer) {
+              matchResults.added++;
+              
+              // Step 2: After player is added, set the bet types based on scan type
+              if (scannedPlayer.prop_type === 'H') {
+                handleHitterBetTypeChange(playerId, 'H', true);
+              } else if (scannedPlayer.prop_type === 'HR') {
+                handleHitterBetTypeChange(playerId, 'HR', true);
+              } else if (scannedPlayer.prop_type === 'B') {
+                handleHitterBetTypeChange(playerId, 'B', true);
+              }
             }
-
-            const newPlayerToAdd = {
-              ...fullPlayerData, // Base player data (id, name, fullName, bats, team, history stats)
-              
-              // Integrate game context if found, otherwise use defaults or existing from fullPlayerData
-              opponentTeam: gameContext ? gameContext.opponentTeam : (fullPlayerData.opponentTeam || ''),
-              stadium: gameContext ? gameContext.stadium : (fullPlayerData.stadium || ''),
-              gameOU: gameContext ? gameContext.gameOU : (fullPlayerData.gameOU || ''),
-              
-              // Ensure these are reset for a new entry, to be selected by user
-              pitcher: '',
-              pitcherId: '',
-              pitcherHand: '',
-              
-              // Set bet types from scan
-              betTypes: { 
-                H: scannedPlayer.prop_type === 'H',
-                HR: scannedPlayer.prop_type === 'HR',
-                B: scannedPlayer.prop_type === 'B'
-              },
-              handicapperPicks: {},
-            };
-            
-            hitterHandicappers.forEach(handicapper => {
-              newPlayerToAdd.handicapperPicks[handicapper.id] = {
-                public: false, private: false, straight: false,
-                H: scannedPlayer.prop_type === 'H',
-                HR: scannedPlayer.prop_type === 'HR', 
-                B: scannedPlayer.prop_type === 'B'
-              };
-            });
-            newHitters.push(newPlayerToAdd);
-
-          } else {
-            // Fallback if fetchHitterById fails (this part remains similar to your previous version)
-            console.warn(`Could not fetch full data for player ID: ${match.value}. Adding with limited info.`);
-            matchResults.added++;
-            let nameFromLabel = match.label;
-            let teamFromLabel = '';
-            const labelTeamRegex = /^(.*?)\s*\(([^)]+)\)\s*$/;
-            const labelParts = match.label.match(labelTeamRegex);
-            if (labelParts) { nameFromLabel = labelParts[1].trim(); teamFromLabel = labelParts[2].trim(); }
-            else { nameFromLabel = match.label.trim(); }
-
-            const gameContextFallback = findCurrentGameForPlayerTeam(teamFromLabel || scannedPlayer.team, gameData, currentDate);
-
-            const fallbackPlayer = {
-              id: match.value, name: nameFromLabel, team: teamFromLabel || scannedPlayer.team || '',
-              playerType: 'hitter', bats: '', fullName: nameFromLabel,
-              prevGameHR: '0', prevGameAB: '0', prevGameH: '0',
-              opponentTeam: gameContextFallback ? gameContextFallback.opponentTeam : '',
-              stadium: gameContextFallback ? gameContextFallback.stadium : '',
-              gameOU: gameContextFallback ? gameContextFallback.gameOU : '',
-              pitcher: '', pitcherId: '', pitcherHand: '', expectedSO: '',
-              betTypes: { H: scannedPlayer.prop_type === 'H', HR: scannedPlayer.prop_type === 'HR', B: scannedPlayer.prop_type === 'B' },
-              handicapperPicks: {}, // Initialize picks
-            };
-            hitterHandicappers.forEach(handicapper => { /* ... initialize picks ... */ });
-            newHitters.push(fallbackPlayer);
+          } catch (error) {
+            console.error(`Error adding player ${match.label}:`, error);
           }
         } else {
-          console.log(`Player ${match.label} (ID: ${match.value}) already exists in CapSheet, skipping.`);
+          console.log(`Player ${match.label} already exists in CapSheet, skipping.`);
         }
-      } else { // No match found in hitterSelectOptions, add based on scanned data only
+      } else {
+        // No match found in hitterSelectOptions, add based on scanned data only
+        // You can keep your existing code for this case, or simplify it
         matchResults.added++;
         console.log(`No match found, adding player with scanned data: ${scannedPlayer.name}`);
+        
         let nameForNewPlayer = scannedPlayer.name;
         let teamForNewPlayer = scannedPlayer.team || ''; 
         const scannedNameTeamRegex = /^(.*?)\s*\(([^)]+)\)\s*$/;
@@ -342,37 +267,58 @@ function CapSheet({ playerData, gameData, currentDate }) {
             nameForNewPlayer = scannedNameParts[1].trim();
             if (!teamForNewPlayer) teamForNewPlayer = scannedNameParts[2].trim();
         }
-        const newPlayerId = `scanned-${nameForNewPlayer.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}-${Date.now()}`;
-
-        // Try to find game context for this new, unmatched player if we have a team
-        const gameContextForNew = findCurrentGameForPlayerTeam(teamForNewPlayer, gameData, currentDate);
         
+        const newPlayerId = `scanned-${nameForNewPlayer.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}-${Date.now()}`;
+        
+        // Create a minimal player without all the complex lookups
         const newPlayerFromScan = {
-          id: newPlayerId, name: nameForNewPlayer, team: teamForNewPlayer, playerType: 'hitter',
-          bats: '', fullName: nameForNewPlayer,
+          id: newPlayerId, 
+          name: nameForNewPlayer, 
+          team: teamForNewPlayer, 
+          playerType: 'hitter',
+          bats: '', 
+          fullName: nameForNewPlayer,
           prevGameHR: '0', prevGameAB: '0', prevGameH: '0',
-          opponentTeam: gameContextForNew ? gameContextForNew.opponentTeam : '',
-          stadium: gameContextForNew ? gameContextForNew.stadium : '',
-          gameOU: gameContextForNew ? gameContextForNew.gameOU : '',
-          pitcher: '', pitcherId: '', pitcherHand: '', expectedSO: '',
-          betTypes: { H: scannedPlayer.prop_type === 'H', HR: scannedPlayer.prop_type === 'HR', B: scannedPlayer.prop_type === 'B' },
+          
+          // Let app handle this based on team
+          opponentTeam: '',
+          stadium: '',
+          gameOU: '',
+          
+          pitcher: '', 
+          pitcherId: '', 
+          pitcherHand: '', 
+          expectedSO: '',
+          betTypes: { 
+            H: scannedPlayer.prop_type === 'H', 
+            HR: scannedPlayer.prop_type === 'HR', 
+            B: scannedPlayer.prop_type === 'B' 
+          },
           handicapperPicks: {},
         };
-        hitterHandicappers.forEach(handicapper => { /* ... initialize picks ... */ });
-        newHitters.push(newPlayerFromScan);
+        
+        // Initialize handicapper picks
+        hitterHandicappers.forEach(handicapper => {
+          newPlayerFromScan.handicapperPicks[handicapper.id] = {
+            public: false, private: false, straight: false,
+            H: scannedPlayer.prop_type === 'H',
+            HR: scannedPlayer.prop_type === 'HR', 
+            B: scannedPlayer.prop_type === 'B'
+          };
+        });
+        
+        // Add player
+        setSelectedPlayers(prev => ({
+          ...prev,
+          hitters: [...prev.hitters, newPlayerFromScan]
+        }));
       }
     }
     
-    if (newHitters.length > 0) {
-      console.log(`Adding ${newHitters.length} new players to CapSheet:`, newHitters.map(p => ({id: p.id, name: p.name, team: p.team, opponent: p.opponentTeam, stadium: p.stadium})));
-      setSelectedPlayers(prev => ({
-        ...prev,
-        hitters: [...prev.hitters, ...newHitters]
-      }));
-      setHitterRefreshKey(Date.now());
-    }
+    // Force a re-render of the hitter table
+    setHitterRefreshKey(Date.now());
+    
     setScanResults(prevResults => ({ ...prevResults, matchStats: matchResults }));
-
   } else {
     console.log("Scan results contained no player data.");
     setScanResults(prevResults => ({ ...prevResults, matchStats: { matched: 0, added: 0, total: 0 } }));
