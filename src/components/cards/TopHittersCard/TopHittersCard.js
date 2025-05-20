@@ -7,7 +7,8 @@ import './TopHittersCard.css';
 const TopHittersCard = ({ 
   hitters,
   isLoading,
-  timePeriodText 
+  timePeriodText,
+  teams // Add teams prop
 }) => {
   return (
     <div className="card top-hitters-card">
@@ -17,19 +18,37 @@ const TopHittersCard = ({
       ) : hitters.length > 0 ? (
         <div className="scrollable-container">
           <ul className="player-list">
-            {hitters.map((player, index) => (
-              <li key={index} className="player-item">
-                <div className="player-rank">{index + 1}</div>
-                <div className="player-info">
-                  <span className="player-name">{player.name}</span>
-                  <span className="player-team">{player.team}</span>
-                </div>
-                <div className="player-stat">
-                  {player.H} hits
-                  {player.games > 1 && <span className="stat-note">({player.games} games)</span>}
-                </div>
-              </li>
-            ))}
+            {hitters.map((player, index) => {
+              // Get team logo URL if teams data is available
+              const teamAbbr = player.team;
+              const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
+              const logoUrl = teamData ? teamData.logoUrl : null;
+              
+              return (
+                <li key={index} className="player-item">
+                  <div className="player-rank">{index + 1}</div>
+                  <div className="player-info">
+                    <span className="player-name">{player.name}</span>
+                    <span className="player-team">{player.team}</span>
+                  </div>
+                  <div className="player-stat">
+                    {player.H} hits
+                    {player.games > 1 && <span className="stat-note">({player.games} games)</span>}
+                  </div>
+                  
+                  {/* Add team logo as background if available */}
+                  {logoUrl && (
+                    <img 
+                      src={logoUrl} 
+                      alt="" 
+                      className="team-logo-bg" 
+                      loading="lazy"
+                      aria-hidden="true"
+                    />
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
       ) : (

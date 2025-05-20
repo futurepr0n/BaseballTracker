@@ -8,7 +8,8 @@ import { createSafeId, positionTooltip, setupTooltipCloseHandler } from '../../u
 const DayOfWeekHitsCard = ({ 
   dayOfWeekHits,
   isLoading,
-  currentDate 
+  currentDate,
+  teams // Add teams prop
 }) => {
   const [activeTooltip, setActiveTooltip] = useState(null);
 
@@ -51,6 +52,11 @@ const DayOfWeekHitsCard = ({
               const safeId = createSafeId(player.name, player.team);
               const tooltipId = `day_hit_${safeId}`;
               
+              // Get team logo URL if teams data is available
+              const teamAbbr = player.team;
+              const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
+              const logoUrl = teamData ? teamData.logoUrl : null;
+              
               return (
                 <li key={index} className="player-item">
                   <div className="player-rank">{index + 1}</div>
@@ -70,6 +76,17 @@ const DayOfWeekHitsCard = ({
                     <small>in {player.games} {dayOfWeekHits.dayOfWeek}s</small>
                     <small>({(player.hitRate * 100).toFixed(1)}%)</small>
                   </div>
+                  
+                  {/* Add team logo as background if available */}
+                  {logoUrl && (
+                    <img 
+                      src={logoUrl} 
+                      alt="" 
+                      className="team-logo-bg" 
+                      loading="lazy"
+                      aria-hidden="true"
+                    />
+                  )}
                 </li>
               );
             })}
