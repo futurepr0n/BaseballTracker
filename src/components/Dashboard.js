@@ -729,6 +729,7 @@ useEffect(() => {
           hitStreakData={hitStreakData}
           isLoading={additionalStatsLoading}
           currentDate={currentDate}
+          teams={teamData} 
         />
 
         {/* Continue Streak Card */}
