@@ -660,7 +660,6 @@ body .streak-tooltip {
   overflow: hidden;
   z-index: 1;
 }
-
 .player-item .team-logo-bg {
   position: absolute;
   right: 25%;
@@ -696,4 +695,102 @@ body .streak-tooltip {
   opacity: 0.04;
   z-index: -1;
   pointer-events: none;
+}
+
+
+/* New stuff */ 
+/* Enhanced team logo background */
+.player-item {
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.2s ease;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.player-item:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.player-item .team-logo-bg {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 66%;
+  opacity: 0.05;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  transform: translate(20%, -10%) scale(2.2);
+  object-fit: cover;
+  object-position: center;
+}
+
+.player-item:hover .team-logo-bg {
+  opacity: 0.1;
+}
+
+/* Enhanced rank indicator with team logo */
+.player-rank {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* Team color would be set inline with style attribute */
+}
+.player-rank .rank-logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 6px; /* Padding to keep logo from touching edges */
+  object-fit: contain; /* Show entire logo */
+  opacity: 0.7;
+}
+
+.player-rank .rank-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0.3;
+}
+
+.player-rank .rank-number {
+  position: relative;
+  z-index: 10;
+  color: white;
+  font-size: 1.125rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+
+.player-rank .rank-logo-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.3;
+}
+
+.player-rank .rank-number {
+  position: relative;
+  z-index: 10;
+  color: white;
+  font-size: 1.125rem;
+}
+
+/* Make stats use team colors */
+.stat-highlight {
+  font-weight: 700;
+  font-size: 1.1rem;
+  /* Color will be set inline with style attribute using team colors */
 }

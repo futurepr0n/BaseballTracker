@@ -4,12 +4,13 @@ import { createSafeId, positionTooltip, setupTooltipCloseHandler } from '../../u
 
 /**
  * DayOfWeekHitsCard - Shows players who perform best on specific days of the week
+ * Enhanced with integrated team logos
  */
 const DayOfWeekHitsCard = ({ 
   dayOfWeekHits,
   isLoading,
   currentDate,
-  teams // Add teams prop
+  teams
 }) => {
   const [activeTooltip, setActiveTooltip] = useState(null);
 
@@ -59,7 +60,21 @@ const DayOfWeekHitsCard = ({
               
               return (
                 <li key={index} className="player-item">
-                  <div className="player-rank">{index + 1}</div>
+                  <div className="player-rank">
+                    {logoUrl && (
+                      <>
+                        <img 
+                          src={logoUrl} 
+                          alt="" 
+                          className="rank-logo" 
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
+                    <span className="rank-number">{index + 1}</span>
+                  </div>
                   <div className="player-info">
                     <span className="player-name">{player.name}</span>
                     <span className="player-team">{player.team}</span>
@@ -77,7 +92,7 @@ const DayOfWeekHitsCard = ({
                     <small>({(player.hitRate * 100).toFixed(1)}%)</small>
                   </div>
                   
-                  {/* Add team logo as background if available */}
+                  {/* Enhanced background logo */}
                   {logoUrl && (
                     <img 
                       src={logoUrl} 
@@ -96,7 +111,7 @@ const DayOfWeekHitsCard = ({
         <p className="no-data">No {dayOfWeekHits.dayOfWeek} hit data available</p>
       )}
 
-      {/* Tooltips rendered outside card to avoid clipping */}
+      {/* Tooltips rendered outside card to avoid clipping - keep as is */}
       {activeTooltip && activeTooltip.startsWith('day_hit_') && (
         <>
           {dayOfWeekHits.topHitsByTotal.slice(0, 10).map((player) => {

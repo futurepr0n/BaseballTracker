@@ -1,9 +1,9 @@
 import React from 'react';
-import './HomeRunLeadersCard.css';
+import './HomeRunLeadersCard.css'; // Keep your original CSS import
 
 /**
  * HomeRunLeadersCard - Shows home run leaders for the current time period
- * Modified to include team logo backgrounds
+ * Enhanced with better team logo visualization
  */
 const HomeRunLeadersCard = ({ 
   homers,
@@ -24,20 +24,40 @@ const HomeRunLeadersCard = ({
               const teamAbbr = player.team;
               const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
               const logoUrl = teamData ? teamData.logoUrl : null;
+              // Get team color - use a default if not available
+              const teamColor = teamData ? teamData.primaryColor : "#333333";
 
               return (
                 <li key={index} className="player-item">
-                  <div className="player-rank">{index + 1}</div>
+                  {/* Enhanced rank indicator with logo inside */}
+                  <div className="player-rank">
+                    {/* Only add the logo if available */}
+                    {logoUrl && (
+                      <>
+                        <img 
+                          src={logoUrl} 
+                          alt="" 
+                          className="rank-logo" 
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
+                    <span className="rank-number">{index + 1}</span>
+                  </div>
+                  
                   <div className="player-info">
                     <span className="player-name">{player.name}</span>
                     <span className="player-team">{player.team}</span>
                   </div>
+                  
                   <div className="player-stat">
                     {player.HR} HR
                     {player.games > 1 && <span className="stat-note">({player.games} games)</span>}
                   </div>
                   
-                  {/* Add team logo as background if available */}
+                  {/* Keep the larger background logo */}
                   {logoUrl && (
                     <img 
                       src={logoUrl} 

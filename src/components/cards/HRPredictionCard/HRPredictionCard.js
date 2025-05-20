@@ -3,11 +3,12 @@ import './HRPredictionCard.css';
 
 /**
  * HRPredictionCard - Displays players who are due for home runs based on predictions
+ * Enhanced with integrated team logos
  */
 const HRPredictionCard = ({ 
   playersWithHomeRunPrediction, 
   isLoading,
-  teams // Add teams prop 
+  teams
 }) => {
   return (
     <div className="card hr-prediction-card">
@@ -25,7 +26,21 @@ const HRPredictionCard = ({
               
               return (
                 <li key={index} className="player-item">
-                  <div className="player-rank">{index + 1}</div>
+                  <div className="player-rank">
+                    {logoUrl && (
+                      <>
+                        <img 
+                          src={logoUrl} 
+                          alt="" 
+                          className="rank-logo" 
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
+                    <span className="rank-number">{index + 1}</span>
+                  </div>
                   <div className="player-info">
                     <span className="player-name">{player.fullName || player.name}</span>
                     <span className="player-team">{player.team}</span>
@@ -42,7 +57,7 @@ const HRPredictionCard = ({
                     </div>
                   </div>
                   
-                  {/* Add team logo as background if available */}
+                  {/* Enhanced background logo */}
                   {logoUrl && (
                     <img 
                       src={logoUrl} 
