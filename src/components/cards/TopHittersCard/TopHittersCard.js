@@ -3,12 +3,13 @@ import './TopHittersCard.css';
 
 /**
  * TopHittersCard - Shows the top hitters for the current time period
+ * Enhanced with integrated team logos
  */
 const TopHittersCard = ({ 
   hitters,
   isLoading,
   timePeriodText,
-  teams // Add teams prop
+  teams
 }) => {
   return (
     <div className="card top-hitters-card">
@@ -26,7 +27,21 @@ const TopHittersCard = ({
               
               return (
                 <li key={index} className="player-item">
-                  <div className="player-rank">{index + 1}</div>
+                  <div className="player-rank">
+                    {logoUrl && (
+                      <>
+                        <img 
+                          src={logoUrl} 
+                          alt="" 
+                          className="rank-logo" 
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
+                    <span className="rank-number">{index + 1}</span>
+                  </div>
                   <div className="player-info">
                     <span className="player-name">{player.name}</span>
                     <span className="player-team">{player.team}</span>
@@ -36,7 +51,7 @@ const TopHittersCard = ({
                     {player.games > 1 && <span className="stat-note">({player.games} games)</span>}
                   </div>
                   
-                  {/* Add team logo as background if available */}
+                  {/* Enhanced background logo */}
                   {logoUrl && (
                     <img 
                       src={logoUrl} 

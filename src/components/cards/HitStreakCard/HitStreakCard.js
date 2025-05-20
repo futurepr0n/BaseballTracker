@@ -4,13 +4,13 @@ import { createSafeId, positionTooltip, setupTooltipCloseHandler } from '../../u
 
 /**
  * HitStreakCard - Shows players with active hit streaks
- * Fixed to properly handle tooltips and display complete streak stats
+ * Enhanced with integrated team logos
  */
 const HitStreakCard = ({ 
   hitStreakData,
   isLoading,
   currentDate,
-  teams // Add teams prop
+  teams
 }) => {
   const [activeTooltip, setActiveTooltip] = useState(null);
 
@@ -60,7 +60,21 @@ const HitStreakCard = ({
               
               return (
                 <li key={index} className="player-item streak-item">
-                  <div className="player-rank">{index + 1}</div>
+                  <div className="player-rank">
+                    {logoUrl && (
+                      <>
+                        <img 
+                          src={logoUrl} 
+                          alt="" 
+                          className="rank-logo" 
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
+                    <span className="rank-number">{index + 1}</span>
+                  </div>
                   <div className="player-info">
                     <span className="player-name">{player.name}</span>
                     <span className="player-team">{player.team}</span>
@@ -89,7 +103,7 @@ const HitStreakCard = ({
                     <small>Continue: {(player.continuationProbability * 100).toFixed(1)}%</small>
                   </div>
                   
-                  {/* Add team logo as background if available */}
+                  {/* Enhanced background logo */}
                   {logoUrl && (
                     <img 
                       src={logoUrl} 
@@ -108,7 +122,7 @@ const HitStreakCard = ({
         <p className="no-data">No active hitting streaks</p>
       )}
 
-      {/* Tooltips rendered outside card to avoid clipping */}
+      {/* Tooltips rendered outside card to avoid clipping - keep this unchanged */}
       {activeTooltip && activeTooltip.startsWith('streak_hit_') && (
         <>
           {hitStreakData.hitStreaks.slice(0, 10).map((player) => {

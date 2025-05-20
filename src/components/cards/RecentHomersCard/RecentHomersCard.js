@@ -3,13 +3,14 @@ import './RecentHomersCard.css';
 
 /**
  * RecentHomersCard - Shows players who hit home runs most recently
+ * Enhanced with integrated team logos
  */
 const RecentHomersCard = ({ 
   recentHRPlayers,
   isLoading,
-  teams // Add teams prop
+  teams
 }) => {
-  // Helper function to format date - define it FIRST
+  // Helper function to format date
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     
@@ -43,7 +44,21 @@ const RecentHomersCard = ({
               
               return (
                 <li key={index} className="player-item">
-                  <div className="player-rank">{index + 1}</div>
+                  <div className="player-rank">
+                    {logoUrl && (
+                      <>
+                        <img 
+                          src={logoUrl} 
+                          alt="" 
+                          className="rank-logo" 
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
+                    <span className="rank-number">{index + 1}</span>
+                  </div>
                   <div className="player-info">
                     <span className="player-name">{player.fullName || player.name}</span>
                     <span className="player-team">{player.team}</span>
@@ -55,7 +70,7 @@ const RecentHomersCard = ({
                     <small>{player.homeRunsThisSeason} HR this season</small>
                   </div>
                   
-                  {/* Add team logo as background if available */}
+                  {/* Enhanced background logo */}
                   {logoUrl && (
                     <img 
                       src={logoUrl} 

@@ -3,11 +3,12 @@ import './ImprovedRateCard.css';
 
 /**
  * ImprovedRateCard - Shows players with the most improved HR rate compared to historical
+ * Enhanced with integrated team logos
  */
 const ImprovedRateCard = ({ 
   improvedPlayers,
   isLoading,
-  teams // Add teams prop
+  teams
 }) => {
   return (
     <div className="card improved-rate-card">
@@ -25,7 +26,21 @@ const ImprovedRateCard = ({
               
               return (
                 <li key={index} className="player-item">
-                  <div className="player-rank">{index + 1}</div>
+                  <div className="player-rank">
+                    {logoUrl && (
+                      <>
+                        <img 
+                          src={logoUrl} 
+                          alt="" 
+                          className="rank-logo" 
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
+                    <span className="rank-number">{index + 1}</span>
+                  </div>
                   <div className="player-info">
                     <span className="player-name">{player.fullName || player.name}</span>
                     <span className="player-team">{player.team}</span>
@@ -38,7 +53,7 @@ const ImprovedRateCard = ({
                     <small>Historical: {(player.historicalHRRate * 100).toFixed(1)}%</small>
                   </div>
                   
-                  {/* Add team logo as background if available */}
+                  {/* Enhanced background logo */}
                   {logoUrl && (
                     <img 
                       src={logoUrl} 
