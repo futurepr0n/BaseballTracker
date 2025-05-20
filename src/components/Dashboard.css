@@ -663,7 +663,7 @@ body .streak-tooltip {
 
 .player-item .team-logo-bg {
   position: absolute;
-  right: 10px;
+  right: 25%;
   top: 50%;
   transform: translateY(-50%);
   height: 65%;

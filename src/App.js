@@ -69,7 +69,17 @@ function App() {
     <Router>
       <div className="app">
         <header className="app-header">
-          <h1>MLB Statistics Tracker</h1>
+          <h1>
+  <img
+    src='data/logos/Major_League_Baseball_logo.svg'
+    style={{
+      height: '1.2em',        // CSS properties are camelCased
+      verticalAlign: 'middle' // and values are strings
+    }}
+    alt="MLB Logo" // It's also good practice to add an alt attribute
+  />
+  MLB Statistics Tracker
+</h1>
           <Navigation />
           
           <div className="date-selector">

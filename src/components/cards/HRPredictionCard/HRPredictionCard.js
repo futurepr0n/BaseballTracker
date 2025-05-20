@@ -6,7 +6,8 @@ import './HRPredictionCard.css';
  */
 const HRPredictionCard = ({ 
   playersWithHomeRunPrediction, 
-  isLoading 
+  isLoading,
+  teams // Add teams prop 
 }) => {
   return (
     <div className="card hr-prediction-card">
@@ -16,26 +17,44 @@ const HRPredictionCard = ({
       ) : playersWithHomeRunPrediction.length > 0 ? (
         <div className="scrollable-container">
           <ul className="player-list">
-            {playersWithHomeRunPrediction.map((player, index) => (
-              <li key={index} className="player-item">
-                <div className="player-rank">{index + 1}</div>
-                <div className="player-info">
-                  <span className="player-name">{player.fullName || player.name}</span>
-                  <span className="player-team">{player.team}</span>
-                </div>
-                <div className="player-stat">
-                  <div className="hr-deficit">
-                    {player.gamesSinceLastHR} games without HR
+            {playersWithHomeRunPrediction.map((player, index) => {
+              // Get team logo URL if teams data is available
+              const teamAbbr = player.team;
+              const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
+              const logoUrl = teamData ? teamData.logoUrl : null;
+              
+              return (
+                <li key={index} className="player-item">
+                  <div className="player-rank">{index + 1}</div>
+                  <div className="player-info">
+                    <span className="player-name">{player.fullName || player.name}</span>
+                    <span className="player-team">{player.team}</span>
                   </div>
-                  <div className="hr-detail">
-                    Expected: {player.expectedHRs.toFixed(1)} / Actual: {player.actualHRs}
+                  <div className="player-stat">
+                    <div className="hr-deficit">
+                      {player.gamesSinceLastHR} games without HR
+                    </div>
+                    <div className="hr-detail">
+                      Expected: {player.expectedHRs.toFixed(1)} / Actual: {player.actualHRs}
+                    </div>
+                    <div className="hr-detail">
+                      Last HR: {player.daysSinceLastHR} days ago
+                    </div>
                   </div>
-                  <div className="hr-detail">
-                    Last HR: {player.daysSinceLastHR} days ago
-                  </div>
-                </div>
-              </li>
-            ))}
+                  
+                  {/* Add team logo as background if available */}
+                  {logoUrl && (
+                    <img 
+                      src={logoUrl} 
+                      alt="" 
+                      className="team-logo-bg" 
+                      loading="lazy"
+                      aria-hidden="true"
+                    />
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
       ) : (
