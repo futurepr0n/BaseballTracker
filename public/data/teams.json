@@ -6,7 +6,7 @@
       "division": "West",
       "primaryColor": "#A71930",
       "secondaryColor": "#E3D4AD",
-      "logoUrl": "/logos/arizona-diamondbacks.svg"
+      "logoUrl": "/data/logos/arizona-diamondbacks.svg"
     },
     "ATL": {
       "name": "Atlanta Braves",
@@ -15,7 +15,7 @@
       "division": "East",
       "primaryColor": "#CE1141",
       "secondaryColor": "#13274F",
-      "logoUrl": "/logos/atlanta-braves.svg"
+      "logoUrl": "/data/logos/atlanta-braves.svg"
     },
     "BAL": {
       "name": "Baltimore Orioles",
@@ -24,7 +24,7 @@
       "division": "East",
       "primaryColor": "#DF4601",
       "secondaryColor": "#000000",
-      "logoUrl": "/logos/baltimore-orioles.svg"
+      "logoUrl": "/data/logos/baltimore-orioles.svg"
     },
     "BOS": {
       "name": "Boston Red Sox",
@@ -33,7 +33,7 @@
       "division": "East",
       "primaryColor": "#BD3039",
       "secondaryColor": "#0C2340",
-      "logoUrl": "/logos/boston-red-sox.svg"
+      "logoUrl": "/data/logos/boston-red-sox.svg"
     },
     "CHC": {
       "name": "Chicago Cubs",
@@ -42,7 +42,7 @@
       "division": "Central",
       "primaryColor": "#0E3386",
       "secondaryColor": "#CC3433",
-      "logoUrl": "/logos/chicago-cubs.svg"
+      "logoUrl": "/data/logos/chicago-cubs.svg"
     },
     "CHW": {
       "name": "Chicago White Sox",
@@ -51,7 +51,7 @@
       "division": "Central",
       "primaryColor": "#27251F",
       "secondaryColor": "#C4CED4",
-      "logoUrl": "/logos/chicago-white-sox.svg"
+      "logoUrl": "/data/logos/chicago-white-sox.svg"
     },
     "CIN": {
       "name": "Cincinnati Reds",
@@ -60,7 +60,7 @@
       "division": "Central",
       "primaryColor": "#C6011F",
       "secondaryColor": "#000000",
-      "logoUrl": "/logos/cincinnati-reds.svg"
+      "logoUrl": "/data/logos/cincinnati-reds.svg"
     },
     "CLE": {
       "name": "Cleveland Guardians",
@@ -69,7 +69,7 @@
       "division": "Central",
       "primaryColor": "#00385D",
       "secondaryColor": "#E31937",
-      "logoUrl": "/logos/cleveland-guardians.svg"
+      "logoUrl": "/data/logos/cleveland-guardians.svg"
     },
     "COL": {
       "name": "Colorado Rockies",
@@ -78,7 +78,7 @@
       "division": "West",
       "primaryColor": "#33006F",
       "secondaryColor": "#C4CED4",
-      "logoUrl": "/logos/colorado-rockies.svg"
+      "logoUrl": "/data/logos/colorado-rockies.svg"
     },
     "DET": {
       "name": "Detroit Tigers",
@@ -87,7 +87,7 @@
       "division": "Central",
       "primaryColor": "#0C2340",
       "secondaryColor": "#FA4616",
-      "logoUrl": "/logos/detroit-tigers.svg"
+      "logoUrl": "/data/logos/detroit-tigers.svg"
     },
     "HOU": {
       "name": "Houston Astros",
@@ -96,7 +96,7 @@
       "division": "West",
       "primaryColor": "#002D62",
       "secondaryColor": "#EB6E1F",
-      "logoUrl": "/logos/houston-astros.svg"
+      "logoUrl": "/data/logos/houston-astros.svg"
     },
     "KC": {
       "name": "Kansas City Royals",
@@ -105,7 +105,7 @@
       "division": "Central",
       "primaryColor": "#004687",
       "secondaryColor": "#BD9B60",
-      "logoUrl": "/logos/kansas-city-royals.svg"
+      "logoUrl": "/data/logos/kansas-city-royals.svg"
     },
     "LAA": {
       "name": "Los Angeles Angels",
@@ -114,7 +114,7 @@
       "division": "West",
       "primaryColor": "#BA0021",
       "secondaryColor": "#003263",
-      "logoUrl": "/logos/los-angeles-angels.svg"
+      "logoUrl": "/data/logos/los-angeles-angels.svg"
     },
     "LAD": {
       "name": "Los Angeles Dodgers",
@@ -123,7 +123,7 @@
       "division": "West",
       "primaryColor": "#005A9C",
       "secondaryColor": "#A5ACAF",
-      "logoUrl": "/logos/los-angeles-dodgers.svg"
+      "logoUrl": "/data/logos/los-angeles-dodgers.svg"
     },
     "MIA": {
       "name": "Miami Marlins",
@@ -132,7 +132,7 @@
       "division": "East",
       "primaryColor": "#00A3E0",
       "secondaryColor": "#EF3340",
-      "logoUrl": "/logos/miami-marlins.svg"
+      "logoUrl": "/data/logos/miami-marlins.svg"
     },
     "MIL": {
       "name": "Milwaukee Brewers",
@@ -141,7 +141,7 @@
       "division": "Central",
       "primaryColor": "#0A2351",
       "secondaryColor": "#FFC52F",
-      "logoUrl": "/logos/milwaukee-brewers.svg"
+      "logoUrl": "/data/logos/milwaukee-brewers.svg"
     },
     "MIN": {
       "name": "Minnesota Twins",
@@ -150,7 +150,7 @@
       "division": "Central",
       "primaryColor": "#002B5C",
       "secondaryColor": "#D31145",
-      "logoUrl": "/logos/minnesota-twins.svg"
+      "logoUrl": "/data/logos/minnesota-twins.svg"
     },
     "NYM": {
       "name": "New York Mets",
@@ -159,7 +159,7 @@
       "division": "East",
       "primaryColor": "#002D72",
       "secondaryColor": "#FF5910",
-      "logoUrl": "/logos/new-york-mets.svg"
+      "logoUrl": "/data/logos/new-york-mets.svg"
     },
     "NYY": {
       "name": "New York Yankees",
@@ -168,7 +168,7 @@
       "division": "East",
       "primaryColor": "#003087",
       "secondaryColor": "#E4002C",
-      "logoUrl": "/logos/new-york-yankees.svg"
+      "logoUrl": "/data/logos/new-york-yankees.svg"
     },
     "OAK": {
       "name": "Oakland Athletics",
@@ -177,7 +177,7 @@
       "division": "West",
       "primaryColor": "#003831",
       "secondaryColor": "#EFB21E",
-      "logoUrl": "/logos/oakland-athletics.svg"
+      "logoUrl": "/data/logos/oakland-athletics.svg"
     },
     "PHI": {
       "name": "Philadelphia Phillies",
@@ -186,7 +186,7 @@
       "division": "East",
       "primaryColor": "#E81828",
       "secondaryColor": "#002D72",
-      "logoUrl": "/logos/philadelphia-phillies.svg"
+      "logoUrl": "/data/logos/philadelphia-phillies.svg"
     },
     "PIT": {
       "name": "Pittsburgh Pirates",
@@ -195,7 +195,7 @@
       "division": "Central",
       "primaryColor": "#27251F",
       "secondaryColor": "#FDB827",
-      "logoUrl": "/logos/pittsburgh-pirates.svg"
+      "logoUrl": "/data/logos/pittsburgh-pirates.svg"
     },
     "SD": {
       "name": "San Diego Padres",
@@ -204,7 +204,7 @@
       "division": "West",
       "primaryColor": "#2F241D",
       "secondaryColor": "#FFC425",
-      "logoUrl": "/logos/san-diego-padres.svg"
+      "logoUrl": "/data/logos/san-diego-padres.svg"
     },
     "SF": {
       "name": "San Francisco Giants",
@@ -213,7 +213,7 @@
       "division": "West",
       "primaryColor": "#FD5A1E",
       "secondaryColor": "#27251F",
-      "logoUrl": "/logos/san-francisco-giants.svg"
+      "logoUrl": "/data/logos/san-francisco-giants.svg"
     },
     "SEA": {
       "name": "Seattle Mariners",
@@ -222,7 +222,7 @@
       "division": "West",
       "primaryColor": "#0C2C56",
       "secondaryColor": "#005C5C",
-      "logoUrl": "/logos/seattle-mariners.svg"
+      "logoUrl": "/data/logos/seattle-mariners.svg"
     },
     "STL": {
       "name": "St. Louis Cardinals",
@@ -231,7 +231,7 @@
       "division": "Central",
       "primaryColor": "#C41E3A",
       "secondaryColor": "#0C2340",
-      "logoUrl": "/logos/st-louis-cardinals.svg"
+      "logoUrl": "/data/logos/st-louis-cardinals.svg"
     },
     "TB": {
       "name": "Tampa Bay Rays",
@@ -240,7 +240,7 @@
       "division": "East",
       "primaryColor": "#092C5C",
       "secondaryColor": "#8FBCE6",
-      "logoUrl": "/logos/tampa-bay-rays.svg"
+      "logoUrl": "/data/logos/tampa-bay-rays.svg"
     },
     "TEX": {
       "name": "Texas Rangers",
@@ -249,7 +249,7 @@
       "division": "West",
       "primaryColor": "#003278",
       "secondaryColor": "#C0111F",
-      "logoUrl": "/logos/texas-rangers.svg"
+      "logoUrl": "/data/logos/texas-rangers.svg"
     },
     "TOR": {
       "name": "Toronto Blue Jays",
@@ -258,7 +258,7 @@
       "division": "East",
       "primaryColor": "#134A8E",
       "secondaryColor": "#1D2D5C",
-      "logoUrl": "/logos/toronto-blue-jays.svg"
+      "logoUrl": "/data/logos/toronto-blue-jays.svg"
     },
     "WSH": {
       "name": "Washington Nationals",
@@ -267,6 +267,6 @@
       "division": "East",
       "primaryColor": "#AB0003",
       "secondaryColor": "#14225A",
-      "logoUrl": "/logos/washington-nationals.svg"
+      "logoUrl": "/data/logos/washington-nationals.svg"
     }
   }
