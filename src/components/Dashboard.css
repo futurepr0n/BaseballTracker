@@ -654,3 +654,46 @@ body .streak-tooltip {
   }
 }
 
+/* Generic player-item logo background for all cards */
+.player-list .player-item {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.player-item .team-logo-bg {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 65%;
+  max-height: 40px;
+  width: auto;
+  opacity: 0.08;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.player-item:hover .team-logo-bg {
+  opacity: 0.12;
+}
+
+/* For CapSheet table rows */
+.capsheet-table tr {
+  position: relative;
+  overflow: hidden;
+}
+
+.capsheet-table tr .team-logo-bg {
+  position: absolute;
+  right: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 60%;
+  width: auto;
+  max-height: 40px;
+  opacity: 0.04;
+  z-index: -1;
+  pointer-events: none;
+}

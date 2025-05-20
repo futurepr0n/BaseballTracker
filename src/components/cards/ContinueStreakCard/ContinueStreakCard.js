@@ -8,7 +8,8 @@ import { createSafeId, positionTooltip, setupTooltipCloseHandler } from '../../u
 const ContinueStreakCard = ({ 
   hitStreakData,
   isLoading,
-  currentDate 
+  currentDate,
+  teams
 }) => {
   const [activeTooltip, setActiveTooltip] = useState(null);
 
@@ -38,7 +39,8 @@ const ContinueStreakCard = ({
       );
     }
   };
-
+  
+  
   return (
     <div className="card continue-streak-card">
       <h3>Streaks Likely to Continue</h3>
@@ -50,6 +52,10 @@ const ContinueStreakCard = ({
             {hitStreakData.likelyToContinueStreak.slice(0, 10).map((player, index) => {
               const safeId = createSafeId(player.name, player.team);
               const tooltipId = `continue_streak_${safeId}`;
+               // Get team logo URL if teams data is available
+              const teamAbbr = player.team;
+              const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
+              const logoUrl = teamData ? teamData.logoUrl : null;
               
               return (
                 <li key={index} className="player-item">
@@ -83,6 +89,16 @@ const ContinueStreakCard = ({
                     <small>Continue: {(player.continuationProbability * 100).toFixed(1)}%</small>
                     <small>Best streak: {player.longestHitStreak} games</small>
                   </div>
+                  {/* Add team logo as background if available */}
+                  {logoUrl && (
+                    <img 
+                      src={logoUrl} 
+                      alt="" 
+                      className="team-logo-bg" 
+                      loading="lazy"
+                      aria-hidden="true"
+                    />
+                  )}
                 </li>
               );
             })}

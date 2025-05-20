@@ -661,6 +661,7 @@ useEffect(() => {
         <HRPredictionCard 
           playersWithHomeRunPrediction={playersWithHomeRunPrediction}
           isLoading={predictionLoading}
+          teams={teamData} 
         />
         
         {/* Top Hitters Card */}
@@ -668,6 +669,7 @@ useEffect(() => {
           hitters={rollingStats.hitters}
           isLoading={statsLoading}
           timePeriodText={getTimePeriodText()}
+          teams={teamData} 
         />
         
         {/* Home Run Leaders Card */}
@@ -675,24 +677,28 @@ useEffect(() => {
           homers={rollingStats.homers}
           isLoading={statsLoading}
           timePeriodText={getTimePeriodText()}
+          teams={teamData} 
         />
         
         {/* HR Rate Card */}
         <HRRateCard 
           topHRRatePlayers={topPerformers.hrRate}
           isLoading={!playerPerformance}
+          teams={teamData} 
         />
         
         {/* Improved Rate Card */}
         <ImprovedRateCard 
           improvedPlayers={topPerformers.improved}
           isLoading={!playerPerformance}
+          teams={teamData} 
         />
         
         {/* Recent Homers Card */}
         <RecentHomersCard 
           recentHRPlayers={topPerformers.recent}
           isLoading={!playerPerformance}
+          teams={teamData} 
         />
         
         {/* Over-Performing Players Card */}
@@ -700,6 +706,7 @@ useEffect(() => {
           performingPlayers={topPerformers.overPerforming}
           isLoading={!playerPerformance}
           type="over"
+          teams={teamData} 
         />
         
         {/* Under-Performing Players Card */}
@@ -707,6 +714,7 @@ useEffect(() => {
           performingPlayers={topPerformers.underPerforming}
           isLoading={!playerPerformance}
           type="under"
+          teams={teamData} 
         />
         
         {/* Pitcher Matchup Analysis Card */}
@@ -728,6 +736,7 @@ useEffect(() => {
           hitStreakData={hitStreakData}
           isLoading={additionalStatsLoading}
           currentDate={currentDate}
+          teams={teamData} 
         />
         
         {/* Likely to Hit Card */}
@@ -735,6 +744,7 @@ useEffect(() => {
           hitStreakData={hitStreakData}
           isLoading={additionalStatsLoading}
           currentDate={currentDate}
+          teams={teamData} 
         />
         
         {/* Day of Week Hits Card */}
@@ -742,6 +752,7 @@ useEffect(() => {
           dayOfWeekHits={dayOfWeekHits}
           isLoading={additionalStatsLoading}
           currentDate={currentDate}
+          teams={teamData} 
         />
         
         {/* Recent Updates Card */}
