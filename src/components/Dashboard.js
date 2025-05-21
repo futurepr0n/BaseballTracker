@@ -775,8 +775,43 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
         return "Today";
     }
   };
+
+  // Add this state for handling race conditions
+const [filteringComplete, setFilteringComplete] = useState(false);
+
+// Use this effect to delay the final check
+useEffect(() => {
+  if (isFiltering) {
+    setFilteringComplete(false);
+    // Give time for all filters to apply
+    const timer = setTimeout(() => {
+      setFilteringComplete(true);
+    }, 250); // 250ms should be enough for all filtering to complete
+    
+    return () => clearTimeout(timer);
+  }
+}, [isFiltering]);
+
+const isLoadingAnyData = statsLoading || 
+                         predictionLoading || 
+                         additionalStatsLoading || 
+                         matchupsLoading;
   
-  const noFilteredData = isFiltering && filteredPlayerData.length === 0;
+const noFilteredData = isFiltering && 
+                      !isLoadingAnyData && 
+                      filteredPlayerData.length === 0 && 
+                      filteredBatterData.length === 0 &&
+                      filteredPitcherData.length === 0 &&
+                      // Check if all arrays in topPerformers are empty
+                      Object.values(topPerformers).every(arr => !arr || arr.length === 0) &&
+                      // Check if hitStreakData arrays are empty
+                      hitStreakData.hitStreaks.length === 0 &&
+                      hitStreakData.likelyToGetHit.length === 0 &&
+                      hitStreakData.likelyToContinueStreak.length === 0 &&
+                      // Check if dayOfWeekHits arrays are empty
+                      (dayOfWeekHits.topHitsByTotal && dayOfWeekHits.topHitsByTotal.length === 0);
+
+  
   
   return (
     <div className="dashboard">
@@ -809,26 +844,21 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
       />
       
       {/* Add Filter Indicator when filtering is active */}
-      {isFiltering && (
-        <FilterIndicator 
-          selectedTeam={selectedTeam}
-          teamData={teamData}
-          includeMatchup={includeMatchup}
-          matchupTeam={matchupTeam}
-          onReset={resetFilters}
-        />
-      )}
-      
-      {noFilteredData ? (
-        <div className="filtered-empty-state">
-          <div className="empty-icon">🔍</div>
-          <h3>No Data Found</h3>
-          <p>No player data found for the selected team filter.</p>
-          <button className="reset-btn" onClick={resetFilters}>
-            Reset Filters
-          </button>
-        </div>
-      ) : (
+      {isFiltering && !filteringComplete ? (
+  <div className="filtering-in-progress">
+    <div className="loading-spinner"></div>
+    <p>Applying filters...</p>
+  </div>
+) : noFilteredData ? (
+  <div className="filtered-empty-state">
+    <div className="empty-icon">🔍</div>
+    <h3>No Data Found</h3>
+    <p>No player data found for the selected team filter.</p>
+    <button className="reset-btn" onClick={resetFilters}>
+      Reset Filters
+    </button>
+  </div>
+) : (
         <div className="dashboard-grid">
           {/* Statistics Summary Card */}
           <StatsSummaryCard 

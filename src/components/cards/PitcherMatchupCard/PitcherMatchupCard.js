@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './PitcherMatchupCard.css';
 import { createSafeId, positionTooltip, setupTooltipCloseHandler } from '../../utils/tooltipUtils';
+import { useTeamFilter } from '../../TeamFilterContext'; // Import the team filter context
 
 /**
  * PitcherMatchupCard - Displays pitcher matchup analysis
@@ -10,13 +11,45 @@ const PitcherMatchupCard = ({
   isLoading,
   currentDate 
 }) => {
+
+  // Get team filter context
+  const { 
+    selectedTeam, 
+    includeMatchup, 
+    matchupTeam,
+    isFiltering
+  } = useTeamFilter();
+
+
   // State variables for the pitcher matchup display
-  const [selectedTeam, setSelectedTeam] = useState('ALL');
+  const [selectedPitcherTeam, setSelectedPitcherTeam] = useState('ALL');
   const [allTeams, setAllTeams] = useState([]);
   const [filteredPitchers, setFilteredPitchers] = useState([]);
-  const [pitcherSortMethod, setPitcherSortMethod] = useState('sameHanded'); // 'sameHanded' or 'oppositeHanded'
-  const [hiddenPitchers, setHiddenPitchers] = useState(new Set()); // Track removed pitchers
-  const [activeTooltip, setActiveTooltip] = useState(null); // Track which tooltip is active
+  const [pitcherSortMethod, setPitcherSortMethod] = useState('sameHanded');
+  const [hiddenPitchers, setHiddenPitchers] = useState(new Set());
+  const [activeTooltip, setActiveTooltip] = useState(null);
+  const [previousFilterState, setPreviousFilterState] = useState({ isFiltering, selectedTeam });
+
+  // Handle team filter changes
+  useEffect(() => {
+    // Only run this effect if the filter state has changed
+    if (isFiltering !== previousFilterState.isFiltering || 
+        selectedTeam !== previousFilterState.selectedTeam) {
+      
+      // Store current filter state to compare in future renders
+      setPreviousFilterState({ isFiltering, selectedTeam });
+      
+      if (isFiltering) {
+        // If filtering is enabled, set the selected team in this component
+        setSelectedPitcherTeam(selectedTeam);
+        // Reset hidden pitchers when filter changes
+        setHiddenPitchers(new Set());
+      } else {
+        // If filtering is disabled, reset to ALL TEAMS
+        setSelectedPitcherTeam('ALL');
+      }
+    }
+  }, [isFiltering, selectedTeam, previousFilterState]);
 
   // Set up available teams when pitcher data changes
   useEffect(() => {
@@ -36,26 +69,52 @@ const PitcherMatchupCard = ({
     return setupTooltipCloseHandler(setActiveTooltip);
   }, []);
 
+    useEffect(() => {
+    // Only run this effect if the filter state has changed
+    if (isFiltering !== previousFilterState.isFiltering || 
+        selectedTeam !== previousFilterState.selectedTeam) {
+      
+      // Store current filter state to compare in future renders
+      setPreviousFilterState({ isFiltering, selectedTeam });
+      
+      if (isFiltering) {
+        // If filtering is enabled, set the selected team in this component
+        setSelectedPitcherTeam(selectedTeam);
+        // Reset hidden pitchers when filter changes
+        setHiddenPitchers(new Set());
+      } else {
+        // If filtering is disabled, reset to ALL TEAMS
+        setSelectedPitcherTeam('ALL');
+      }
+    }
+  }, [isFiltering, selectedTeam, previousFilterState]);
+
   // Filter pitchers based on selected team, sort method, and hidden pitchers
   useEffect(() => {
-    if (selectedTeam === 'ALL') {
+    if (selectedPitcherTeam === 'ALL') {
       // For "All Teams," combine pitchers from all teams but limit to top 3 from each
       const limitedPitchers = [];
       Object.keys(pitcherMatchups.allPitchersByTeam || {}).forEach(team => {
-        const teamPitchers = [...(pitcherMatchups.allPitchersByTeam[team] || [])];
-        
-        // Filter out hidden pitchers
-        const visiblePitchers = teamPitchers.filter(p => !hiddenPitchers.has(createSafeId(p.name, p.team)));
-        
-        // Sort based on selected method
-        if (pitcherSortMethod === 'sameHanded') {
-          visiblePitchers.sort((a, b) => b.sameHandednessPercentage - a.sameHandednessPercentage);
-        } else {
-          visiblePitchers.sort((a, b) => b.oppositeHandednessPercentage - a.oppositeHandednessPercentage);
+        // If filtering is active, only include the selected team and matchup team
+        if (!isFiltering || 
+            team === selectedTeam || 
+            (includeMatchup && team === matchupTeam)) {
+          
+          const teamPitchers = [...(pitcherMatchups.allPitchersByTeam[team] || [])];
+          
+          // Filter out hidden pitchers
+          const visiblePitchers = teamPitchers.filter(p => !hiddenPitchers.has(createSafeId(p.name, p.team)));
+          
+          // Sort based on selected method
+          if (pitcherSortMethod === 'sameHanded') {
+            visiblePitchers.sort((a, b) => b.sameHandednessPercentage - a.sameHandednessPercentage);
+          } else {
+            visiblePitchers.sort((a, b) => b.oppositeHandednessPercentage - a.oppositeHandednessPercentage);
+          }
+          
+          // Add top 3 pitchers from this team
+          limitedPitchers.push(...visiblePitchers.slice(0, 3));
         }
-        
-        // Add top 3 pitchers from this team
-        limitedPitchers.push(...visiblePitchers.slice(0, 3));
       });
       
       // Final sort for the combined list
@@ -68,7 +127,7 @@ const PitcherMatchupCard = ({
       setFilteredPitchers(limitedPitchers);
     } else {
       // For a specific team, show all pitchers from that team
-      const teamPitchers = [...(pitcherMatchups.allPitchersByTeam[selectedTeam] || [])];
+      const teamPitchers = [...(pitcherMatchups.allPitchersByTeam[selectedPitcherTeam] || [])];
       
       // Filter out hidden pitchers
       const visiblePitchers = teamPitchers.filter(p => !hiddenPitchers.has(createSafeId(p.name, p.team)));
@@ -82,11 +141,30 @@ const PitcherMatchupCard = ({
       
       setFilteredPitchers(visiblePitchers);
     }
-  }, [selectedTeam, pitcherMatchups, pitcherSortMethod, hiddenPitchers]);
+  }, [
+    selectedPitcherTeam, 
+    pitcherMatchups, 
+    pitcherSortMethod, 
+    hiddenPitchers, 
+    isFiltering, 
+    selectedTeam, 
+    includeMatchup, 
+    matchupTeam
+  ]);
+
+  // Helper to determine if a team button should be disabled
+  const isTeamDisabled = useCallback((team) => {
+    if (!isFiltering) return false;
+    if (team === 'ALL') return false;
+    return team !== selectedTeam && (!includeMatchup || team !== matchupTeam);
+  }, [isFiltering, selectedTeam, includeMatchup, matchupTeam]);
 
   const handleTeamChange = (team) => {
-    setSelectedTeam(team);
-    setActiveTooltip(null); // Close any open tooltips when changing teams
+    // Only allow changing to enabled teams
+    if (!isTeamDisabled(team)) {
+      setSelectedPitcherTeam(team);
+      setActiveTooltip(null); // Close any open tooltips when changing teams
+    }
   };
 
   // Helper function for toggling sort method
