@@ -1,0 +1,377 @@
+/* MatchupAnalyzer.css - Enhanced with tabbed interface */
+.matchup-analyzer {
+  padding: 20px;
+}
+
+.analyzer-header {
+  margin-bottom: 20px;
+}
+
+.analyzer-header h2 {
+  font-size: 1.8rem;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.analyzer-header .date {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Game selection section */
+.game-selection-section {
+  margin-bottom: 30px;
+}
+
+.game-selection-section h3 {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.game-card {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.game-card:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.game-card.selected {
+  border-color: #0056b3;
+  box-shadow: 0 3px 10px rgba(0, 86, 179, 0.15);
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eee;
+}
+
+.select-btn {
+  background-color: #0056b3;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background-color 0.2s ease;
+}
+
+.select-btn:hover {
+  background-color: #003d7a;
+}
+
+.game-pitchers {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.team-pitcher {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.team-pitcher label {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.team-pitcher select {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+}
+
+/* Analysis controls */
+.analyzer-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.analyze-btn {
+  background-color: #6c8ebd;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.analyze-btn:hover:not(:disabled) {
+  background-color: #5576a5;
+}
+
+.analyze-btn.analyzing {
+  background-color: #456a9c;
+}
+
+.analyze-btn:disabled {
+  background-color: #b3c5d9;
+  cursor: not-allowed;
+}
+
+.clear-btn {
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.clear-btn:hover {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+}
+
+/* Loading spinner */
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Results section */
+.results-section {
+  margin-top: 30px;
+}
+
+.results-section h3 {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* Tabs for filtering results */
+.results-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.tab-btn {
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+}
+
+.tab-btn.active {
+  background-color: #0056b3;
+  color: white;
+  border-color: #0056b3;
+}
+
+.results-tab-title {
+  font-size: 1.1rem;
+  margin: 15px 0;
+  padding-left: 5px;
+  border-left: 3px solid #0056b3;
+}
+
+.results-table-container {
+  overflow-x: auto;
+  margin-top: 15px;
+  border: 1px solid #eee;
+  border-radius: 6px;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.results-table th {
+  background-color: #f8f9fa;
+  padding: 10px 15px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #ddd;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.results-table td {
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.results-table tr:hover td {
+  background-color: #f5f8fa;
+}
+
+/* Player cell styling */
+.player-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-name {
+  font-weight: 500;
+}
+
+.player-team {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.player-hand {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* Advantage styling */
+.advantage-cell {
+  text-align: center;
+}
+
+.advantage-value {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.advantage-label {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.strong-advantage .advantage-value { color: #22c55e; }
+.medium-advantage .advantage-value { color: #16a34a; }
+.slight-advantage .advantage-value { color: #4ade80; }
+.neutral .advantage-value { color: #6b7280; }
+.slight-disadvantage .advantage-value { color: #fb923c; }
+.medium-disadvantage .advantage-value { color: #f97316; }
+.strong-disadvantage .advantage-value { color: #ef4444; }
+
+/* Potential cell styling */
+.potential-cell {
+  text-align: center;
+  font-weight: 500;
+}
+
+.potential-high { color: #22c55e; }
+.potential-medium { color: #f97316; }
+.potential-low { color: #6b7280; }
+
+/* Explanation cell */
+.explanation-cell {
+  font-size: 0.85rem;
+  max-width: 250px;
+  color: #555;
+}
+
+/* Details button */
+.details-btn {
+  background-color: #0056b3;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background-color 0.2s ease;
+}
+
+.details-btn:hover {
+  background-color: #003d7a;
+}
+
+/* Responsive styling */
+@media (max-width: 992px) {
+  .games-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+  
+  .results-tabs {
+    overflow-x: auto;
+    padding-bottom: 5px;
+    white-space: nowrap;
+    display: block;
+  }
+  
+  .tab-btn {
+    margin-bottom: 5px;
+  }
+}
+
+@media (max-width: 768px) {
+  .games-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .analyzer-controls {
+    flex-direction: column;
+  }
+  
+  .analyze-btn, .clear-btn {
+    width: 100%;
+  }
+  
+  .results-table td, 
+  .results-table th {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+  
+  .explanation-cell {
+    max-width: 150px;
+  }
+}
+
+/* Animation for loading */
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.loading-indicator {
+  animation: pulse 1.5s infinite;
+}
