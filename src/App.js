@@ -10,6 +10,7 @@ import TeamStats from './components/TeamStats';
 import GameResults from './components/GameResults';
 import Dashboard from './components/Dashboard';
 import CapSheet from './components/CapSheet';
+import MatchupAnalyzer from './components/MatchupAnalyzer'; // Add this import
 import Navigation from './components/Navigation';
 import { 
   fetchPlayerData, 
@@ -73,10 +74,10 @@ function App() {
   <img
     src='data/logos/Major_League_Baseball_logo.svg'
     style={{
-      height: '1.2em',        // CSS properties are camelCased
-      verticalAlign: 'middle' // and values are strings
+      height: '1.2em',
+      verticalAlign: 'middle'
     }}
-    alt="MLB Logo" // It's also good practice to add an alt attribute
+    alt="MLB Logo"
   />
   MLB Statistics Tracker
 </h1>
@@ -144,6 +145,14 @@ function App() {
             <Route path="/capsheet" element={<CapSheet 
               playerData={playerData} 
               gameData={gameData} 
+              currentDate={currentDate}
+            />} />
+            
+            {/* Add the new route for Matchup Analyzer */}
+            <Route path="/matchup-analyzer" element={<MatchupAnalyzer 
+              playerData={playerData} 
+              gameData={gameData} 
+              teamData={teamData}
               currentDate={currentDate}
             />} />
           </Routes>
