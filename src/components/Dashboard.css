@@ -5,7 +5,9 @@
 }
 
 .dashboard-header {
-  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
 }
 
 .dashboard-header h2 {
@@ -14,9 +16,106 @@
   color: #333;
 }
 
+
 .dashboard-header .date {
   color: #666;
   font-size: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Team filter note styling */
+.date-note.team-filter-note {
+  background-color: #e6f7ff;
+  border-left: 3px solid #1890ff;
+}
+
+/* Team filter section - add space between filter and grid */
+.team-filter {
+  margin-bottom: 25px;
+}
+
+.dashboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Filter info messaging */
+.filter-info {
+  background-color: #f0f9ff;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 15px;
+  color: #0c53b7;
+  font-size: 0.95rem;
+  border-left: 4px solid #1890ff;
+}
+
+.filter-info p {
+  margin: 0;
+}
+
+.filter-info .highlight {
+  font-weight: 600;
+}
+
+/* Empty state for filtered results */
+.filtered-empty-state {
+  background-color: white;
+  border-radius: 8px;
+  padding: 30px;
+  text-align: center;
+  grid-column: 1 / -1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filtered-empty-state .empty-icon {
+  font-size: 2rem;
+  color: #d9d9d9;
+  margin-bottom: 15px;
+}
+
+.filtered-empty-state h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.filtered-empty-state p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.filtered-empty-state .reset-btn {
+  background-color: #f5f5f5;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  padding: 8px 16px;
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filtered-empty-state .reset-btn:hover {
+  background-color: #e8e8e8;
+  border-color: #d9d9d9;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard-header .date {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .date-note {
+    width: 100%;
+  }
 }
 
 /* Add styling for the date note that shows when displaying previous day data */

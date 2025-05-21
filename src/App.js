@@ -10,8 +10,9 @@ import TeamStats from './components/TeamStats';
 import GameResults from './components/GameResults';
 import Dashboard from './components/Dashboard';
 import CapSheet from './components/CapSheet';
-import MatchupAnalyzer from './components/MatchupAnalyzer'; // Add this import
+import MatchupAnalyzer from './components/MatchupAnalyzer';
 import Navigation from './components/Navigation';
+import { TeamFilterProvider } from './components/TeamFilterContext';
 import { 
   fetchPlayerData, 
   fetchTeamData, 
@@ -34,7 +35,6 @@ function App() {
         
         // Format date as YYYY-MM-DD
         const dateStr = formatDateString(currentDate);
-
         
         // Load player data for the selected date
         const players = await fetchPlayerData(dateStr);
@@ -71,16 +71,16 @@ function App() {
       <div className="app">
         <header className="app-header">
           <h1>
-  <img
-    src='data/logos/Major_League_Baseball_logo.svg'
-    style={{
-      height: '1.2em',
-      verticalAlign: 'middle'
-    }}
-    alt="MLB Logo"
-  />
-  MLB Statistics Tracker
-</h1>
+            <img
+              src='data/logos/Major_League_Baseball_logo.svg'
+              style={{
+                height: '1.2em',
+                verticalAlign: 'middle'
+              }}
+              alt="MLB Logo"
+            />
+            MLB Statistics Tracker
+          </h1>
           <Navigation />
           
           <div className="date-selector">
@@ -116,46 +116,48 @@ function App() {
         </header>
         
         <main className="app-content">
-          <Routes>
-            <Route path="/" element={<Dashboard 
-              playerData={playerData} 
-              teamData={teamData} 
-              gameData={gameData} 
-              currentDate={currentDate}
-            />} />
-            
-            <Route path="/players" element={<PlayerStats 
-              playerData={playerData} 
-              currentDate={currentDate}
-            />} />
-            
-            <Route path="/teams" element={<TeamStats 
-              teamData={teamData} 
-              gameData={gameData} 
-              playerData={playerData} 
-              currentDate={currentDate}
-            />} />
-            
-            <Route path="/games" element={<GameResults 
-              gameData={gameData} 
-              teamData={teamData} 
-              currentDate={currentDate}
-            />} />
-            
-            <Route path="/capsheet" element={<CapSheet 
-              playerData={playerData} 
-              gameData={gameData} 
-              currentDate={currentDate}
-            />} />
-            
-            {/* Add the new route for Matchup Analyzer */}
-            <Route path="/matchup-analyzer" element={<MatchupAnalyzer 
-              playerData={playerData} 
-              gameData={gameData} 
-              teamData={teamData}
-              currentDate={currentDate}
-            />} />
-          </Routes>
+          {/* Wrap routes with TeamFilterProvider to enable filtering */}
+          <TeamFilterProvider teamData={teamData} gameData={gameData}>
+            <Routes>
+              <Route path="/" element={<Dashboard 
+                playerData={playerData} 
+                teamData={teamData} 
+                gameData={gameData} 
+                currentDate={currentDate}
+              />} />
+              
+              <Route path="/players" element={<PlayerStats 
+                playerData={playerData} 
+                currentDate={currentDate}
+              />} />
+              
+              <Route path="/teams" element={<TeamStats 
+                teamData={teamData} 
+                gameData={gameData} 
+                playerData={playerData} 
+                currentDate={currentDate}
+              />} />
+              
+              <Route path="/games" element={<GameResults 
+                gameData={gameData} 
+                teamData={teamData} 
+                currentDate={currentDate}
+              />} />
+              
+              <Route path="/capsheet" element={<CapSheet 
+                playerData={playerData} 
+                gameData={gameData} 
+                currentDate={currentDate}
+              />} />
+              
+              <Route path="/matchup-analyzer" element={<MatchupAnalyzer 
+                playerData={playerData} 
+                gameData={gameData} 
+                teamData={teamData}
+                currentDate={currentDate}
+              />} />
+            </Routes>
+          </TeamFilterProvider>
         </main>
         
         <footer className="app-footer">
