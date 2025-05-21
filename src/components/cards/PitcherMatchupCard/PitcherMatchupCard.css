@@ -435,3 +435,17 @@ body .batter-tooltip {
     transform: translateX(-50%) !important;
   }
 }
+
+.team-button.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+  background-color: #f0f0f0;
+  color: #999;
+}
+
+/* Special highlight for when filter is active */
+.team-button.filter-active {
+  border: 2px solid #0056b3;
+  font-weight: bold;
+}
