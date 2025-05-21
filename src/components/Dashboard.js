@@ -1,5 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import './Dashboard.css';
+
+// Import TeamFilter components
+import TeamFilter from './TeamFilter';
+import FilterIndicator from './FilterIndicator';
+import { useTeamFilter } from './TeamFilterContext';
 
 // Import reusable tooltip utilities
 import { createSafeId } from './utils/tooltipUtils';
@@ -22,9 +27,22 @@ import PerformanceCard from './cards/PerformanceCard/PerformanceCard';
 
 /**
  * Dashboard component - Home page displaying summary of MLB data
- * Refactored to use modular card components with fixed tooltips
+ * Enhanced with team filtering capability
  */
 function Dashboard({ playerData, teamData, gameData, currentDate }) {
+  // Get team filter context
+  const { 
+    selectedTeam, 
+    setSelectedTeam, 
+    includeMatchup, 
+    toggleMatchup, 
+    matchupTeam, 
+    resetFilters,
+    shouldIncludePlayer,
+    shouldIncludeGame,
+    isFiltering
+  } = useTeamFilter();
+  
   // State for core data
   const [playersWithHomeRunPrediction, setPlayersWithHomeRunPrediction] = useState([]);
   const [predictionLoading, setPredictionLoading] = useState(true);
@@ -70,21 +88,36 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
   const [dataDate, setDataDate] = useState(currentDate);
   const [dateStatus, setDateStatus] = useState('current'); // 'current', 'previous', or 'historical'
   
-  // Format date for display
-  const formattedDate = currentDate.toLocaleDateString('en-US', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  });
+  // Filter player data based on team selection
+  const filteredPlayerData = useMemo(() => {
+    if (!isFiltering) return playerData;
+    
+    return playerData.filter(player => 
+      shouldIncludePlayer(player.team)
+    );
+  }, [playerData, isFiltering, shouldIncludePlayer]);
   
-  // Format dataDate for display when showing previous day's data
-  const formattedDataDate = dataDate.toLocaleDateString('en-US', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  });
+  // Split filtered data into batters and pitchers
+  const filteredBatterData = useMemo(() => {
+    return filteredPlayerData.filter(player => 
+      player.playerType === 'hitter' || !player.playerType
+    );
+  }, [filteredPlayerData]);
+  
+  const filteredPitcherData = useMemo(() => {
+    return filteredPlayerData.filter(player => 
+      player.playerType === 'pitcher'
+    );
+  }, [filteredPlayerData]);
+  
+  // Filter game data based on team selection
+  const filteredGameData = useMemo(() => {
+    if (!isFiltering) return gameData;
+    
+    return gameData.filter(game => 
+      shouldIncludeGame(game)
+    );
+  }, [gameData, isFiltering, shouldIncludeGame]);
 
   // Close any open tooltips when clicking outside
   useEffect(() => {
@@ -106,7 +139,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     };
   }, []);
   
-  // Load HR predictions
+  // Load HR predictions with team filtering
   useEffect(() => {
     const loadHRPredictions = async () => {
       try {
@@ -131,7 +164,16 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
           setPlayersWithHomeRunPrediction([]);
         } else {
           const data = await response.json();
-          setPlayersWithHomeRunPrediction(data.predictions || []);
+          let predictions = data.predictions || [];
+          
+          // Apply team filtering if needed
+          if (isFiltering) {
+            predictions = predictions.filter(player => 
+              shouldIncludePlayer(player.team)
+            );
+          }
+          
+          setPlayersWithHomeRunPrediction(predictions);
         }
       } catch (error) {
         console.error('Error loading HR predictions:', error);
@@ -142,9 +184,9 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     };
     
     loadHRPredictions();
-  }, [currentDate]);
+  }, [currentDate, isFiltering, shouldIncludePlayer]);
   
-  // Load additional stats (day of week hits and hit streak data)
+  // Load additional stats (day of week hits and hit streak data) with filtering
   useEffect(() => {
     const loadAdditionalStats = async () => {
       try {
@@ -173,7 +215,22 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
           });
         } else {
           const data = await response.json();
-          setDayOfWeekHits(data);
+          
+          // Apply team filtering if needed
+          if (isFiltering) {
+            const filteredData = {
+              ...data,
+              topHitsByTotal: data.topHitsByTotal.filter(player => 
+                shouldIncludePlayer(player.team)
+              ),
+              topHitsByRate: data.topHitsByRate.filter(player => 
+                shouldIncludePlayer(player.team)
+              )
+            };
+            setDayOfWeekHits(filteredData);
+          } else {
+            setDayOfWeekHits(data);
+          }
         }
         
         // Load hit streak data
@@ -194,7 +251,27 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
           });
         } else {
           const data = await response.json();
-          setHitStreakData(data);
+          
+          // Apply team filtering if needed
+          if (isFiltering) {
+            const filteredData = {
+              hitStreaks: data.hitStreaks.filter(player => 
+                shouldIncludePlayer(player.team)
+              ),
+              noHitStreaks: data.noHitStreaks.filter(player => 
+                shouldIncludePlayer(player.team)
+              ),
+              likelyToGetHit: data.likelyToGetHit.filter(player => 
+                shouldIncludePlayer(player.team)
+              ),
+              likelyToContinueStreak: data.likelyToContinueStreak.filter(player => 
+                shouldIncludePlayer(player.team)
+              )
+            };
+            setHitStreakData(filteredData);
+          } else {
+            setHitStreakData(data);
+          }
         }
       } catch (error) {
         console.error('Error loading additional stats:', error);
@@ -204,9 +281,9 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     };
     
     loadAdditionalStats();
-  }, [currentDate]);
+  }, [currentDate, isFiltering, shouldIncludePlayer]);
 
-  // Load pitcher matchup data
+  // Load pitcher matchup data with filtering
   useEffect(() => {
     const loadPitcherMatchups = async () => {
       try {
@@ -236,7 +313,40 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
           });
         } else {
           const data = await response.json();
-          setPitcherMatchups(data);
+          
+          // Apply team filtering if needed
+          if (isFiltering) {
+            // Filter pitcher matchups
+            const filteredToughMatchups = data.toughPitcherMatchups.filter(pitcher => 
+              shouldIncludePlayer(pitcher.team)
+            );
+            
+            const filteredFavorableMatchups = data.favorablePitcherMatchups.filter(pitcher => 
+              shouldIncludePlayer(pitcher.team)
+            );
+            
+            const filteredTeamAdvantages = data.teamHandednessAdvantages.filter(team => 
+              shouldIncludePlayer(team.team)
+            );
+            
+            // Filter pitchers by team
+            const filteredPitchersByTeam = {};
+            
+            Object.keys(data.allPitchersByTeam || {}).forEach(teamCode => {
+              if (shouldIncludePlayer(teamCode)) {
+                filteredPitchersByTeam[teamCode] = data.allPitchersByTeam[teamCode];
+              }
+            });
+            
+            setPitcherMatchups({
+              toughPitcherMatchups: filteredToughMatchups,
+              favorablePitcherMatchups: filteredFavorableMatchups,
+              teamHandednessAdvantages: filteredTeamAdvantages,
+              allPitchersByTeam: filteredPitchersByTeam
+            });
+          } else {
+            setPitcherMatchups(data);
+          }
         }
       } catch (error) {
         console.error('Error loading pitcher matchup data:', error);
@@ -252,97 +362,111 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     };
     
     loadPitcherMatchups();
-  }, [currentDate]);
+  }, [currentDate, isFiltering, shouldIncludePlayer]);
   
-  // Load player performance data and calculate top performers
-  // Load player performance data and calculate top performers
-useEffect(() => {
-  const loadPlayerPerformance = async () => {
-    try {
-      console.log("Loading performance data for date:", currentDate.toISOString());
-      
-      // Force cache bypass with a random query parameter
-      const timestamp = new Date().getTime() + Math.random();
-      const response = await fetch(`/data/predictions/player_performance_latest.json?nocache=${timestamp}`);
-      
-      if (response.ok) {
-        const data = await response.json();
+  // Load player performance data and calculate top performers with filtering
+  useEffect(() => {
+    const loadPlayerPerformance = async () => {
+      try {
+        console.log("Loading performance data for date:", currentDate.toISOString());
         
-        // Debug the raw data
-        console.log("Raw data lastHRDates:", 
-          data.recentHRs?.slice(0, 5).map(p => ({ 
-            name: p.name, 
-            date: p.lastHRDate 
-          }))
-        );
+        // Force cache bypass with a random query parameter
+        const timestamp = new Date().getTime() + Math.random();
+        const response = await fetch(`/data/predictions/player_performance_latest.json?nocache=${timestamp}`);
         
-        setPlayerPerformance(data);
-        
-        // Process top performers if we have player data
-        if (data && data.players && data.players.length > 0) {
-          // Create a new array (don't modify the original) to ensure React detects the change
-          const recent = [...data.recentHRs || data.players
-            .filter(player => player.lastHRDate)
-            .sort((a, b) => {
-              // First sort by date (newest first)
-              const dateA = new Date(a.lastHRDate);
-              const dateB = new Date(b.lastHRDate);
-              if (dateB - dateA !== 0) return dateB - dateA;
-              
-              // If same date, sort by total home runs
-              return b.homeRunsThisSeason - a.homeRunsThisSeason;
-            })];
+        if (response.ok) {
+          const data = await response.json();
           
-          // Debug the processed data
-          console.log("Processed recent HRs:", 
-            recent.slice(0, 5).map(p => ({ 
+          // Debug the raw data
+          console.log("Raw data lastHRDates:", 
+            data.recentHRs?.slice(0, 5).map(p => ({ 
               name: p.name, 
               date: p.lastHRDate 
             }))
           );
           
-          // Rest of your code for other categories
-          const hrRate = [...data.players]
-            .filter(player => player.gamesPlayed > 0 && player.homeRunsThisSeason > 0)
-            .sort((a, b) => (b.homeRunsThisSeason / b.gamesPlayed) - (a.homeRunsThisSeason / a.gamesPlayed))
-            .slice(0, 25);
+          // Apply team filtering if needed
+          let filteredData = data;
           
-          const improved = [...data.players]
-            .filter(player => player.actualHRRate > player.historicalHRRate)
-            .sort((a, b) => (b.actualHRRate - b.historicalHRRate) - (a.actualHRRate - a.historicalHRRate))
-            .slice(0, 25);
+          if (isFiltering) {
+            filteredData = {
+              ...data,
+              players: data.players ? data.players.filter(player => 
+                shouldIncludePlayer(player.team)
+              ) : [],
+              recentHRs: data.recentHRs ? data.recentHRs.filter(player => 
+                shouldIncludePlayer(player.team)
+              ) : []
+            };
+          }
           
-          const overPerforming = [...data.players]
-            .filter(player => player.status === "over-performing")
-            .sort((a, b) => b.performanceIndicator - a.performanceIndicator)
-            .slice(0, 25);
+          setPlayerPerformance(filteredData);
           
-          const underPerforming = [...data.players]
-            .filter(player => player.status === "under-performing")
-            .sort((a, b) => a.performanceIndicator - b.performanceIndicator)
-            .slice(0, 25);
-          
-          // Set state with completely new object to force re-render
-          setTopPerformers({
-            hrRate,
-            improved,
-            recent,
-            overPerforming,
-            underPerforming
-          });
+          // Process top performers if we have player data
+          if (filteredData && filteredData.players && filteredData.players.length > 0) {
+            // Create a new array (don't modify the original) to ensure React detects the change
+            const recent = [...filteredData.recentHRs || filteredData.players
+              .filter(player => player.lastHRDate)
+              .sort((a, b) => {
+                // First sort by date (newest first)
+                const dateA = new Date(a.lastHRDate);
+                const dateB = new Date(b.lastHRDate);
+                if (dateB - dateA !== 0) return dateB - dateA;
+                
+                // If same date, sort by total home runs
+                return b.homeRunsThisSeason - a.homeRunsThisSeason;
+              })];
+            
+            // Debug the processed data
+            console.log("Processed recent HRs:", 
+              recent.slice(0, 5).map(p => ({ 
+                name: p.name, 
+                date: p.lastHRDate 
+              }))
+            );
+            
+            // Rest of your code for other categories
+            const hrRate = [...filteredData.players]
+              .filter(player => player.gamesPlayed > 0 && player.homeRunsThisSeason > 0)
+              .sort((a, b) => (b.homeRunsThisSeason / b.gamesPlayed) - (a.homeRunsThisSeason / a.gamesPlayed))
+              .slice(0, 25);
+            
+            const improved = [...filteredData.players]
+              .filter(player => player.actualHRRate > player.historicalHRRate)
+              .sort((a, b) => (b.actualHRRate - b.historicalHRRate) - (a.actualHRRate - a.historicalHRRate))
+              .slice(0, 25);
+            
+            const overPerforming = [...filteredData.players]
+              .filter(player => player.status === "over-performing")
+              .sort((a, b) => b.performanceIndicator - a.performanceIndicator)
+              .slice(0, 25);
+            
+            const underPerforming = [...filteredData.players]
+              .filter(player => player.status === "under-performing")
+              .sort((a, b) => a.performanceIndicator - b.performanceIndicator)
+              .slice(0, 25);
+            
+            // Set state with completely new object to force re-render
+            setTopPerformers({
+              hrRate,
+              improved,
+              recent,
+              overPerforming,
+              underPerforming
+            });
+          }
+        } else {
+          console.warn('No player performance data found');
+          setPlayerPerformance(null);
         }
-      } else {
-        console.warn('No player performance data found');
+      } catch (error) {
+        console.error('Error loading player performance data:', error);
         setPlayerPerformance(null);
       }
-    } catch (error) {
-      console.error('Error loading player performance data:', error);
-      setPlayerPerformance(null);
-    }
-  };
-  
-  loadPlayerPerformance();
-}, [currentDate]);
+    };
+    
+    loadPlayerPerformance();
+  }, [currentDate, isFiltering, shouldIncludePlayer]);
   
   // Load rolling stats (with priority: today > yesterday > 7-day rolling > season)
   useEffect(() => {
@@ -351,7 +475,7 @@ useEffect(() => {
         setStatsLoading(true);
         
         // Check if there's data for today
-        const hasDataForToday = playerData && playerData.length > 0;
+        const hasDataForToday = filteredPlayerData && filteredPlayerData.length > 0;
         
         if (hasDataForToday) {
           // Use the current day's data
@@ -373,11 +497,19 @@ useEffect(() => {
             if (response.ok) {
               const data = await response.json();
               if (data.players && data.players.length > 0) {
-                // Process previous day data
-                const batters = data.players.filter(player => 
+                // Process previous day data with filtering
+                let filteredPrevDayPlayers = data.players;
+                
+                if (isFiltering) {
+                  filteredPrevDayPlayers = filteredPrevDayPlayers.filter(player => 
+                    shouldIncludePlayer(player.team)
+                  );
+                }
+                
+                const batters = filteredPrevDayPlayers.filter(player => 
                   player.playerType === 'hitter' || !player.playerType);
                 
-                const pitchers = data.players.filter(player => 
+                const pitchers = filteredPrevDayPlayers.filter(player => 
                   player.playerType === 'pitcher');
                 
                 // Find top performers in previous day data
@@ -462,8 +594,15 @@ useEffect(() => {
         }
       }
       
-      // Process the combined data
+      // Process the combined data with filtering
       if (combinedData.length > 0) {
+        // Filter by team if needed
+        if (isFiltering) {
+          combinedData = combinedData.filter(player => 
+            shouldIncludePlayer(player.team)
+          );
+        }
+        
         // Group by player and combine stats
         const playerMap = new Map();
         
@@ -576,11 +715,8 @@ useEffect(() => {
     
     // Helper function to process current data
     const processCurrentData = () => {
-      const batters = playerData.filter(player => 
-        player.playerType === 'hitter' || !player.playerType);
-      
-      const pitchers = playerData.filter(player => 
-        player.playerType === 'pitcher');
+      const batters = filteredBatterData;
+      const pitchers = filteredPitcherData;
       
       // Find top performers in current data
       const topHitters = [...batters]
@@ -599,22 +735,31 @@ useEffect(() => {
         .slice(0, 25);
       
       setRollingStats({
-        hitters: topHitters,
-        homers: topHomers,
-        strikeouts: topStrikeoutPitchers
+        hitters: topHitters.map(player => ({...player, games: 1})),
+        homers: topHomers.map(player => ({...player, games: 1})),
+        strikeouts: topStrikeoutPitchers.map(player => ({...player, games: 1}))
       });
     };
     
     loadRollingStats();
-  }, [playerData, currentDate, playerPerformance]);
+  }, [filteredPlayerData, filteredBatterData, filteredPitcherData, currentDate, playerPerformance, isFiltering, shouldIncludePlayer]);
   
-  // Separate batting and pitching stats from current data
-  const batterData = playerData.filter(player => 
-    player.playerType === 'hitter' || !player.playerType);
+  // Format date for display
+  const formattedDate = currentDate.toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
   
-  const pitcherData = playerData.filter(player => 
-    player.playerType === 'pitcher');
-  
+  // Format dataDate for display when showing previous day's data
+  const formattedDataDate = dataDate.toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+
   // Helper function to display the time period
   const getTimePeriodText = () => {
     switch(dateStatus) {
@@ -630,6 +775,8 @@ useEffect(() => {
         return "Today";
     }
   };
+  
+  const noFilteredData = isFiltering && filteredPlayerData.length === 0;
   
   return (
     <div className="dashboard">
@@ -650,121 +797,154 @@ useEffect(() => {
         </p>
       </header>
       
-      <div className="dashboard-grid">
-        {/* Statistics Summary Card */}
-        <StatsSummaryCard 
-          batterData={batterData}
-          pitcherData={pitcherData}
+      {/* Add Team Filter Component */}
+      <TeamFilter 
+        teamData={teamData}
+        selectedTeam={selectedTeam}
+        includeMatchup={includeMatchup}
+        matchupTeam={matchupTeam}
+        onTeamSelect={setSelectedTeam}
+        onMatchupToggle={toggleMatchup}
+        onReset={resetFilters}
+      />
+      
+      {/* Add Filter Indicator when filtering is active */}
+      {isFiltering && (
+        <FilterIndicator 
+          selectedTeam={selectedTeam}
+          teamData={teamData}
+          includeMatchup={includeMatchup}
+          matchupTeam={matchupTeam}
+          onReset={resetFilters}
         />
-        
-        {/* HR Prediction Card */}
-        <HRPredictionCard 
-          playersWithHomeRunPrediction={playersWithHomeRunPrediction}
-          isLoading={predictionLoading}
-          teams={teamData} 
-        />
-        
-        {/* Top Hitters Card */}
-        <TopHittersCard 
-          hitters={rollingStats.hitters}
-          isLoading={statsLoading}
-          timePeriodText={getTimePeriodText()}
-          teams={teamData} 
-        />
-        
-        {/* Home Run Leaders Card */}
-        <HomeRunLeadersCard 
-          homers={rollingStats.homers}
-          isLoading={statsLoading}
-          timePeriodText={getTimePeriodText()}
-          teams={teamData} 
-        />
-        
-        {/* HR Rate Card */}
-        <HRRateCard 
-          topHRRatePlayers={topPerformers.hrRate}
-          isLoading={!playerPerformance}
-          teams={teamData} 
-        />
-        
-        {/* Improved Rate Card */}
-        <ImprovedRateCard 
-          improvedPlayers={topPerformers.improved}
-          isLoading={!playerPerformance}
-          teams={teamData} 
-        />
-        
-        {/* Recent Homers Card */}
-        <RecentHomersCard 
-          recentHRPlayers={topPerformers.recent}
-          isLoading={!playerPerformance}
-          teams={teamData} 
-        />
-        
-        {/* Over-Performing Players Card */}
-        <PerformanceCard 
-          performingPlayers={topPerformers.overPerforming}
-          isLoading={!playerPerformance}
-          type="over"
-          teams={teamData} 
-        />
-        
-        {/* Under-Performing Players Card */}
-        <PerformanceCard 
-          performingPlayers={topPerformers.underPerforming}
-          isLoading={!playerPerformance}
-          type="under"
-          teams={teamData} 
-        />
-        
-        {/* Pitcher Matchup Analysis Card */}
-        <PitcherMatchupCard 
-          pitcherMatchups={pitcherMatchups}
-          isLoading={matchupsLoading}
-          currentDate={currentDate}
-        />
-        
-        {/* Hit Streak Card */}
-        <HitStreakCard 
-          hitStreakData={hitStreakData}
-          isLoading={additionalStatsLoading}
-          currentDate={currentDate}
-          teams={teamData} 
-        />
+      )}
+      
+      {noFilteredData ? (
+        <div className="filtered-empty-state">
+          <div className="empty-icon">🔍</div>
+          <h3>No Data Found</h3>
+          <p>No player data found for the selected team filter.</p>
+          <button className="reset-btn" onClick={resetFilters}>
+            Reset Filters
+          </button>
+        </div>
+      ) : (
+        <div className="dashboard-grid">
+          {/* Statistics Summary Card */}
+          <StatsSummaryCard 
+            batterData={filteredBatterData}
+            pitcherData={filteredPitcherData}
+          />
+          
+          {/* HR Prediction Card */}
+          <HRPredictionCard 
+            playersWithHomeRunPrediction={playersWithHomeRunPrediction}
+            isLoading={predictionLoading}
+            teams={teamData} 
+          />
+          
+          {/* Top Hitters Card */}
+          <TopHittersCard 
+            hitters={rollingStats.hitters}
+            isLoading={statsLoading}
+            timePeriodText={getTimePeriodText()}
+            teams={teamData} 
+          />
+          
+          {/* Home Run Leaders Card */}
+          <HomeRunLeadersCard 
+            homers={rollingStats.homers}
+            isLoading={statsLoading}
+            timePeriodText={getTimePeriodText()}
+            teams={teamData} 
+          />
+          
+          {/* HR Rate Card */}
+          <HRRateCard 
+            topHRRatePlayers={topPerformers.hrRate}
+            isLoading={!playerPerformance}
+            teams={teamData} 
+          />
+          
+          {/* Improved Rate Card */}
+          <ImprovedRateCard 
+            improvedPlayers={topPerformers.improved}
+            isLoading={!playerPerformance}
+            teams={teamData} 
+          />
+          
+          {/* Recent Homers Card */}
+          <RecentHomersCard 
+            recentHRPlayers={topPerformers.recent}
+            isLoading={!playerPerformance}
+            teams={teamData} 
+          />
+          
+          {/* Over-Performing Players Card */}
+          <PerformanceCard 
+            performingPlayers={topPerformers.overPerforming}
+            isLoading={!playerPerformance}
+            type="over"
+            teams={teamData} 
+          />
+          
+          {/* Under-Performing Players Card */}
+          <PerformanceCard 
+            performingPlayers={topPerformers.underPerforming}
+            isLoading={!playerPerformance}
+            type="under"
+            teams={teamData} 
+          />
+          
+          {/* Pitcher Matchup Analysis Card */}
+          <PitcherMatchupCard 
+            pitcherMatchups={pitcherMatchups}
+            isLoading={matchupsLoading}
+            currentDate={currentDate}
+          />
+          
+          {/* Hit Streak Card */}
+          <HitStreakCard 
+            hitStreakData={hitStreakData}
+            isLoading={additionalStatsLoading}
+            currentDate={currentDate}
+            teams={teamData} 
+          />
 
-        {/* Continue Streak Card */}
-        <ContinueStreakCard
-          hitStreakData={hitStreakData}
-          isLoading={additionalStatsLoading}
-          currentDate={currentDate}
-          teams={teamData} 
-        />
-        
-        {/* Likely to Hit Card */}
-        <LikelyToHitCard 
-          hitStreakData={hitStreakData}
-          isLoading={additionalStatsLoading}
-          currentDate={currentDate}
-          teams={teamData} 
-        />
-        
-        {/* Day of Week Hits Card */}
-        <DayOfWeekHitsCard 
-          dayOfWeekHits={dayOfWeekHits}
-          isLoading={additionalStatsLoading}
-          currentDate={currentDate}
-          teams={teamData} 
-        />
-        
-        {/* Recent Updates Card */}
-        <RecentUpdatesCard 
-          currentDate={currentDate}
-          dataDate={dataDate}
-          dateStatus={dateStatus}
-          topPerformers={topPerformers}
-          rollingStats={rollingStats}
-        />
-      </div>
+          {/* Continue Streak Card */}
+          <ContinueStreakCard
+            hitStreakData={hitStreakData}
+            isLoading={additionalStatsLoading}
+            currentDate={currentDate}
+            teams={teamData} 
+          />
+          
+          {/* Likely to Hit Card */}
+          <LikelyToHitCard 
+            hitStreakData={hitStreakData}
+            isLoading={additionalStatsLoading}
+            currentDate={currentDate}
+            teams={teamData} 
+          />
+          
+          {/* Day of Week Hits Card */}
+          <DayOfWeekHitsCard 
+            dayOfWeekHits={dayOfWeekHits}
+            isLoading={additionalStatsLoading}
+            currentDate={currentDate}
+            teams={teamData} 
+          />
+          
+          {/* Recent Updates Card */}
+          <RecentUpdatesCard 
+            currentDate={currentDate}
+            dataDate={dataDate}
+            dateStatus={dateStatus}
+            topPerformers={topPerformers}
+            rollingStats={rollingStats}
+          />
+        </div>
+      )}
     </div>
   );
 }
