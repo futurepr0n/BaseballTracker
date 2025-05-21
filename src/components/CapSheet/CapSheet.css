@@ -1108,8 +1108,9 @@
 
 /* Table container with fixed height to enable scrolling */
 .section-container .table-container {
-  max-height: 70vh; /* Adjust height as needed */
+  max-height: none; /* Adjust height as needed */
   overflow-y: auto;
+  overflow-x: auto;
   position: relative;
 }
 
