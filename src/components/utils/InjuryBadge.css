@@ -1,0 +1,223 @@
+/* InjuryBadge.css - Enhanced visibility */
+
+.injury-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  position: relative;
+  transition: transform 0.2s ease;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  line-height: 1;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  vertical-align: middle;
+  padding: 2px;
+  border: 2px solid;
+  transform: translateY(-2px);
+}
+
+.injury-badge:hover {
+  transform: translateY(-2px) scale(1.2);
+}
+
+/* Badge Types with improved visibility */
+.injury-day-to-day {
+  color: #faad14; /* Yellow for day-to-day */
+  border-color: #faad14;
+  animation: pulse-yellow 2s infinite;
+}
+
+.injury-injured {
+  color: #f5222d; /* Red for IL */
+  border-color: #f5222d;
+  animation: pulse-red 2s infinite;
+}
+
+.injury-severe {
+  color: #722ed1; /* Purple for severe injuries */
+  border-color: #722ed1;
+  animation: pulse-purple 2s infinite;
+}
+
+/* Pulse animations for different injury types */
+@keyframes pulse-yellow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(250, 173, 20, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(250, 173, 20, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(250, 173, 20, 0);
+  }
+}
+
+@keyframes pulse-red {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 34, 45, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(245, 34, 45, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 34, 45, 0);
+  }
+}
+
+@keyframes pulse-purple {
+  0% {
+    box-shadow: 0 0 0 0 rgba(114, 46, 209, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(114, 46, 209, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(114, 46, 209, 0);
+  }
+}
+
+/* Position badge better in player list */
+.player-name .injury-badge {
+  position: relative;
+  top: -1px;
+}
+
+/* Improve contrast for the badge emoji */
+.injury-badge::before {
+  content: '🏥';
+  font-size: 0.9rem;
+  text-shadow: 0 0 2px white;
+}
+
+/* Rest of the existing CSS */
+.injury-tooltip {
+  position: fixed;
+  z-index: 1600; /* Higher than other tooltips */
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  max-height: 80vh;
+  overflow-y: auto;
+  width: 300px;
+  max-width: 90vw;
+  pointer-events: auto;
+}
+
+.injury-tooltip .tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #eee;
+  font-weight: 500;
+  font-size: 0.95rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.injury-tooltip .close-tooltip {
+  background: none;
+  border: none;
+  height: 28px;
+  width: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #666;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.injury-tooltip .close-tooltip:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #333;
+}
+
+/* Injury Details */
+.injury-tooltip .injury-details {
+  padding: 16px;
+}
+
+.injury-tooltip .injury-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.injury-tooltip .injury-summary-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+}
+
+.injury-tooltip .summary-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.injury-tooltip .summary-value {
+  font-weight: 500;
+}
+
+.injury-tooltip .summary-value.highlight {
+  color: #1890ff;
+  font-weight: 700;
+}
+
+/* Status Colors */
+.injury-tooltip .status-day-to-day {
+  color: #faad14;
+}
+
+.injury-tooltip .status-injured {
+  color: #f5222d;
+}
+
+.injury-tooltip .status-severe {
+  color: #722ed1;
+}
+
+/* Injury Comment */
+.injury-tooltip .injury-comment {
+  margin-top: 15px;
+}
+
+.injury-tooltip .injury-comment h4 {
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.injury-tooltip .injury-comment p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #555;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .injury-tooltip {
+    width: 90vw;
+    max-width: 350px;
+    max-height: 60vh;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+}

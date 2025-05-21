@@ -794,3 +794,45 @@ body .streak-tooltip {
   font-size: 1.1rem;
   /* Color will be set inline with style attribute using team colors */
 }
+
+.player-name-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  position: relative;
+}
+
+/* Improve player name styling to accommodate badge */
+.player-name {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  margin-right: 5px;
+  white-space: nowrap;
+  overflow: visible; /* Allow badge to be visible outside of container */
+  text-overflow: ellipsis;
+  max-width: calc(100% - 30px); /* Allow space for injury badge */
+}
+
+/* Add some space after the name */
+.player-name::after {
+  content: '';
+  display: inline-block;
+  width: 5px;
+}
+
+/* Make sure the badge doesn't disturb the layout */
+.injury-badge {
+  flex-shrink: 0;
+}
+
+/* Ensure player items have proper positioning context */
+.player-item {
+  position: relative;
+  overflow: visible !important; /* Allow badge to be visible if needed */
+}
+
+/* Add some space between player info and stats */
+.player-info {
+  margin-right: 10px;
+}

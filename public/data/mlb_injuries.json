@@ -1,0 +1,2674 @@
+[
+    {
+        "TEAM NAME": "Arizona Diamondbacks",
+        "NAME": "Ketel Marte",
+        "POS": "2B",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 15: Marte went 2-for-4 with two home runs and three RBI in Wednesday's 8-7 win over the Giants."
+    },
+    {
+        "TEAM NAME": "Arizona Diamondbacks",
+        "NAME": "A.J. Puk",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 12: Puk (elbow) is expected to begin a throwing program in the coming week, Alex Weiner of ArizonaSports.com reports."
+    },
+    {
+        "TEAM NAME": "Arizona Diamondbacks",
+        "NAME": "Justin Martinez",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 12: Martinez (shoulder) will throw to live hitters Wednesday, Alex Weiner of ArizonaSports.com reports."
+    },
+    {
+        "TEAM NAME": "Arizona Diamondbacks",
+        "NAME": "Jordan Montgomery",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Mar 26: The Diamondbacks placed Montgomery (elbow) on the 60-day injured list Wednesday, Alex Weiner of ArizonaSports.comreports."
+    },
+    {
+        "TEAM NAME": "Arizona Diamondbacks",
+        "NAME": "Blake Walston",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Mar 23: The Diamondbacks placed Walston (elbow) on the 60-day injured list Sunday."
+    },
+    {
+        "TEAM NAME": "Athletics",
+        "NAME": "J.T. Ginn",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 16: Ginn (elbow) threw 3.1 scoreless innings for Triple-A Las Vegas with five strikeouts and two walks during a rehab start Wednesday. He will travel with the A's for their upcoming road trip at San Francisco, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Athletics",
+        "NAME": "Luis Medina",
+        "POS": "SP",
+        "EST. RETURN DATE": "Sep 15",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 12: Medina (elbow) began a throwing program March 17, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Athletics",
+        "NAME": "Ken Waldichuk",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 12: Waldichuk (elbow) threw his most recent bullpen session Saturday and is targeting a return from the 60-day injured list before the All-Star break, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Athletics",
+        "NAME": "Brady Basso",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 8",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 12: Basso (shoulder) is scheduled to throw a 15-pitch bullpen session this week, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Athletics",
+        "NAME": "Zack Gelof",
+        "POS": "2B",
+        "EST. RETURN DATE": "May 27",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 5: Gelof (wrist) had his rehab assignment paused after being diagnosed with a stress reaction in his ribs, Martin Gallegos of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Atlanta Braves",
+        "NAME": "Ronald Acuna Jr.",
+        "POS": "RF",
+        "EST. RETURN DATE": "May 27",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 16: Acuna (knee) went 2-for-3 with a double for Triple-A Gwinnett on Thursday."
+    },
+    {
+        "TEAM NAME": "Atlanta Braves",
+        "NAME": "Spencer Strider",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 20",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 15: Manager Brian Snitker said Thursday that Strider (hamstring) will be activated off the injured list to start one of Atlanta's games in Washington next week, 680 The Fan Atlanta reports."
+    },
+    {
+        "TEAM NAME": "Atlanta Braves",
+        "NAME": "Charles Leblanc",
+        "POS": "3B",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 1: Atlanta reassigned Leblanc to minor-league camp Thursday."
+    },
+    {
+        "TEAM NAME": "Atlanta Braves",
+        "NAME": "Nacho Alvarez Jr.",
+        "POS": "SS",
+        "EST. RETURN DATE": "May 23",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 23: Atlanta transferred Alvarez (wrist) from the 10-day injured list to the 60-day IL on Wednesday."
+    },
+    {
+        "TEAM NAME": "Atlanta Braves",
+        "NAME": "Reynaldo Lopez",
+        "POS": "SP",
+        "EST. RETURN DATE": "Aug 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 8: Lopez underwent arthroscopic shoulder surgery Tuesday and will be shut down for 12 weeks, David O'Brien of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Atlanta Braves",
+        "NAME": "Joe Jimenez",
+        "POS": "RP",
+        "EST. RETURN DATE": "Aug 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Mar 31: Atlanta placed Jimenez on the 15-day injured list Tuesday with a left knee articular cartilage injury."
+    },
+    {
+        "TEAM NAME": "Atlanta Braves",
+        "NAME": "Royber Salinas",
+        "POS": "RP",
+        "EST. RETURN DATE": "Aug 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 27: Atlanta reassigned Salinas (shoulder) to minor-league camp Tuesday."
+    },
+    {
+        "TEAM NAME": "Baltimore Orioles",
+        "NAME": "Jordan Westburg",
+        "POS": "3B",
+        "EST. RETURN DATE": "May 30",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 14: Orioles manager Brandon Hyde said Wednesday that Westburg suffered a setback in his recovery from a left hamstring strain and has paused his running progression, Jacob Calvin Meyer of The Baltimore Sun reports."
+    },
+    {
+        "TEAM NAME": "Baltimore Orioles",
+        "NAME": "Andrew Kittredge",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 30",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 11: Kittredge (knee) tossed one scoreless inning, allowing two hits while striking out a batter in Triple-A Norfolk's loss against Nashville on Sunday, Roch Kubatko of MASNSports.com reports."
+    },
+    {
+        "TEAM NAME": "Baltimore Orioles",
+        "NAME": "Carlos Tavera",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 20",
+        "STATUS": "Day-To-Day",
+        "COMMENT": ""
+    },
+    {
+        "TEAM NAME": "Baltimore Orioles",
+        "NAME": "Colton Cowser",
+        "POS": "LF",
+        "EST. RETURN DATE": "May 30",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 9: Cowser (thumb) was seen playing catch Friday, Matt Weyrich of The Baltimore Sun reports."
+    },
+    {
+        "TEAM NAME": "Baltimore Orioles",
+        "NAME": "Brandon Young",
+        "POS": "P",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": ""
+    },
+    {
+        "TEAM NAME": "Baltimore Orioles",
+        "NAME": "Grayson Rodriguez",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jul 18",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 2: Orioles general manager Mike Elias said Friday that Rodriguez (lat/elbow) will get re-imaged in a few weeks and could be cleared to resume throwing at that time, Andy Kostka of TheBaltimoreBanner.com reports."
+    },
+    {
+        "TEAM NAME": "Baltimore Orioles",
+        "NAME": "Gary Sanchez",
+        "POS": "C",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "10-Day-IL",
+        "COMMENT": ""
+    },
+    {
+        "TEAM NAME": "Baltimore Orioles",
+        "NAME": "Kyle Bradish",
+        "POS": "SP",
+        "EST. RETURN DATE": "Aug 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 28: Orioles manager Brandon Hyde said that Bradish (elbow) completed another bullpen session Monday, Roch Kubatko of MASNSports.com reports."
+    },
+    {
+        "TEAM NAME": "Baltimore Orioles",
+        "NAME": "Tyler Wells",
+        "POS": "SP",
+        "EST. RETURN DATE": "Aug 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 28: Orioles manager Brandon Hyde said Monday that Wells (elbow) will throw a bullpen session Friday, Jake Rill of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Baltimore Orioles",
+        "NAME": "Justin Armbruester",
+        "POS": "SP",
+        "EST. RETURN DATE": "Sep 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 25: Armbruester underwent right lat surgery Friday, Andy Kostka of TheBaltimoreBanner.com reports."
+    },
+    {
+        "TEAM NAME": "Baltimore Orioles",
+        "NAME": "Cody Poteet",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "Apr 22: The Orioles placed Poteet on the 15-day injured list Tuesday with right shoulder inflammation."
+    },
+    {
+        "TEAM NAME": "Baltimore Orioles",
+        "NAME": "Albert Suarez",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 10",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 12: Suarez (shoulder) said Saturday that he will be shut down from throwing for about three weeks, Matt Weyrich of The Baltimore Sun reports."
+    },
+    {
+        "TEAM NAME": "Baltimore Orioles",
+        "NAME": "Robinson Martinez",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 30: Martinez signed a minor-league contract with the Orioles on Thursday, Matt Weyrich of The Baltimore Sun reports."
+    },
+    {
+        "TEAM NAME": "Baltimore Orioles",
+        "NAME": "Franklin Barreto",
+        "POS": "LF",
+        "EST. RETURN DATE": "Jul 18",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 30: The Orioles reassigned Barreto to minor-league camp Monday, Jake Rill of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Boston Red Sox",
+        "NAME": "Tanner Houck",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 28",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 14: Manager Alex Cora said Tuesday that \"as of now,\" Houck will make his next start Sunday against Atlanta, Chris Cotillo of MassLive.com reports."
+    },
+    {
+        "TEAM NAME": "Boston Red Sox",
+        "NAME": "Richard Fitts",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 14: Fitts (pectoral) has been throwing up-and-down bullpen sessions and is expected to be cleared to face hitter soon, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Boston Red Sox",
+        "NAME": "Romy Gonzalez",
+        "POS": "1B",
+        "EST. RETURN DATE": "May 18",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 14: Red Sox manager Alex Cora believes Gonzalez (back) will be ready to return from the 10-day injured list when first eligible May 18, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Boston Red Sox",
+        "NAME": "Walker Buehler",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 20",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 10: Manager Alex Cora said Saturday that Buehler (shoulder) will likely return during the Red Sox's home series against the Mets that begins May 19, Chris Cotillo of MassLive.com reports."
+    },
+    {
+        "TEAM NAME": "Boston Red Sox",
+        "NAME": "Kutter Crawford",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 15",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 9: Crawford (knee) threw a live bullpen session Tuesday and will do so again Friday, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Boston Red Sox",
+        "NAME": "Seby Zavala",
+        "POS": "C",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 8: Zavala, who is on Triple-A Worcester's 7-day injured list due to a left oblique strain, began a rehab assignment in the rookie-level Florida Complex League on Monday and went 1-for-3 with a double and a walk in his first game."
+    },
+    {
+        "TEAM NAME": "Boston Red Sox",
+        "NAME": "Masataka Yoshida",
+        "POS": "LF",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 6: Yoshida (shoulder) said Tuesday that he received a cortisone shot a few days ago and will remain shut down from throwing for three more days, Jen McCaffrey of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Boston Red Sox",
+        "NAME": "Triston Casas",
+        "POS": "1B",
+        "EST. RETURN DATE": "Mar 26",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 4: Casas underwent successful surgery Sunday to repair the ruptured patellar tendon in his left knee, Chris Cotillo of MassLive.com reports."
+    },
+    {
+        "TEAM NAME": "Boston Red Sox",
+        "NAME": "Zach Penrod",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 30",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Mar 27: The Red Sox placed Penrod on the 60-day injured list Thursday with a left elbow UCL sprain, Mac Cerullo of the Boston Herald reports."
+    },
+    {
+        "TEAM NAME": "Boston Red Sox",
+        "NAME": "Chris Murphy",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Mar 27: Murphy (elbow) was thrown two bullpen sessions early this spring, Christopher Smith of MassLive reports."
+    },
+    {
+        "TEAM NAME": "Boston Red Sox",
+        "NAME": "Jovani Moran",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Feb 26: The Twins traded Moran (elbow) to the Red Sox on Tuesday in exchange for Mickey Gasper, Chris Cotillo of MassLive.com reports."
+    },
+    {
+        "TEAM NAME": "Boston Red Sox",
+        "NAME": "Patrick Sandoval",
+        "POS": "SP",
+        "EST. RETURN DATE": "Aug 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Feb 17: The Red Sox placed Sandoval (elbow) on the 60-day injured list Saturday."
+    },
+    {
+        "TEAM NAME": "Chicago Cubs",
+        "NAME": "Tyson Miller",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 20",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 13: Miller (hip) struck out two over a scoreless inning during a rehab appearance with Triple-A Iowa on Tuesday."
+    },
+    {
+        "TEAM NAME": "Chicago Cubs",
+        "NAME": "Ian Happ",
+        "POS": "LF",
+        "EST. RETURN DATE": "May 21",
+        "STATUS": "10-Day-IL",
+        "COMMENT": ""
+    },
+    {
+        "TEAM NAME": "Chicago Cubs",
+        "NAME": "Eli Morgan",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 14",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 10: The Cubs transferred Morgan (elbow) to the 60-day injured list Saturday, Taylor McGregor of Marquee Sports Network reports."
+    },
+    {
+        "TEAM NAME": "Chicago Cubs",
+        "NAME": "Ryan Brasier",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 7: Brasier (groin) will begin a rehab assignment with Triple-A Iowa on Wednesday, Maddie Lee of the Chicago Sun-Times reports."
+    },
+    {
+        "TEAM NAME": "Chicago Cubs",
+        "NAME": "Shota Imanaga",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 27",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 5: Imanaga has been diagnosed with a mild left hamstring strain that is expected to hold him out for more than two weeks, Bruce Levine of 670TheScore.com reports."
+    },
+    {
+        "TEAM NAME": "Chicago Cubs",
+        "NAME": "Javier Assad",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 12",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 30: Cubs manager Craig Counsell said Friday that Assad has been shut down after being diagnosed with a Grade 2 left oblique strain, Jordan Bastian of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Chicago Cubs",
+        "NAME": "Justin Steele",
+        "POS": "SP",
+        "EST. RETURN DATE": "Apr 15",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 23: The Cubs transferred Steele (elbow) to the 60-day injured list Wednesday, Sahadev Sharma of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Chicago Cubs",
+        "NAME": "Ben Heller",
+        "POS": "RP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 27: The Cubs signed Heller to a minor-league contract Monday, Andrew Destin of the Pittsburgh Post-Gazette reports."
+    },
+    {
+        "TEAM NAME": "Chicago Cubs",
+        "NAME": "Brandon Birdsell",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Feb 26: Cubs manager Craig Counsell said Monday that Birdsell is dealing with an injury to his right shoulder/lat area, Meghan Montemurro of the Chicago Tribune reports."
+    },
+    {
+        "TEAM NAME": "Chicago White Sox",
+        "NAME": "Andrew Benintendi",
+        "POS": "LF",
+        "EST. RETURN DATE": "Jun 2",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 15: Benintendi (calf) will be reevaluated in one or two weeks, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Chicago White Sox",
+        "NAME": "Jesse Scholtens",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 5",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 13: The White Sox transferred Scholtens' (elbow) rehab assignment from High-A Winston-Salem to Triple-A Charlotte on Tuesday."
+    },
+    {
+        "TEAM NAME": "Chicago White Sox",
+        "NAME": "Austin Slater",
+        "POS": "RF",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 12: Slater (knee) will begin a rehab assignment with Triple-A Charlotte on Tuesday, Kyle Williams of the Chicago Sun-Times reports."
+    },
+    {
+        "TEAM NAME": "Chicago White Sox",
+        "NAME": "Brandon Drury",
+        "POS": "2B",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 8: The White Sox re-signed Drury (thumb) to a minor-league contract Tuesday."
+    },
+    {
+        "TEAM NAME": "Chicago White Sox",
+        "NAME": "Mike Tauchman",
+        "POS": "RF",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 8: Tauchman (hamstring) will begin a rehab assignment with Triple-A Charlotte on Saturday, Scott Merkin of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Chicago White Sox",
+        "NAME": "Korey Lee",
+        "POS": "C",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 8: Lee (ankle) will begin a rehab assignment with Triple-A Charlotte on Friday, Scott Merkin of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Chicago White Sox",
+        "NAME": "Fraser Ellard",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 4: The White Sox placed Ellard on the 15-day injured list Sunday due to a left lat strain."
+    },
+    {
+        "TEAM NAME": "Chicago White Sox",
+        "NAME": "Martin Perez",
+        "POS": "SP",
+        "EST. RETURN DATE": "Sep 15",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 28: White Sox manager Will Venable said last Tuesday that he anticipates Perez (elbow) returning from the 60-day injured list at some point in September, ESPN.com reports. \"He's continuing to get evaluated,\" Venable said of Perez, who was diagnosed last week with a flexor tendon strain in his left elbow. \"We're going to treat him and expect him to pitch later on in the summer.\""
+    },
+    {
+        "TEAM NAME": "Chicago White Sox",
+        "NAME": "Mason Adams",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 2: The White Sox announced that Adams underwent successful Tommy John surgery Wednesday, Scott Merkin of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Chicago White Sox",
+        "NAME": "Drew Thorpe",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Mar 27: The White Sox placed Thorpe (elbow) on the 60-day injured list Thursday."
+    },
+    {
+        "TEAM NAME": "Chicago White Sox",
+        "NAME": "Prelander Berroa",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Mar 23: Berroa (elbow) needs Tommy John surgery, James Fegan of SoxMachine.com reports."
+    },
+    {
+        "TEAM NAME": "Chicago White Sox",
+        "NAME": "Ky Bush",
+        "POS": "SP",
+        "EST. RETURN DATE": "Apr 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Feb 17: Bush will undergo Tommy John surgery on his left elbow Wednesday, Scott Merkin of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Chicago White Sox",
+        "NAME": "Edgar Navarro",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 5: Navarro will undergo Tommy John surgery in March, Scott Merkin of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "Jeimer Candelario",
+        "POS": "3B",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 15: Candelario (back) played catch on the field at Great American Ball Park on Thursday, Charlie Goldsmith of the Dayton Daily News reports."
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "TJ Friedl",
+        "POS": "CF",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 15: Friedl (wrist) is out of the lineup for Thursday's game against the White Sox."
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "Rhett Lowder",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 21",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 12: Lowder (forearm) gave up five runs (four earned) on five hits and one walk while striking out five over three innings in his rehab start Sunday with High-A Dayton."
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "Wade Miley",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 12: Miley (elbow) allowed three runs on three hits and struck out six over 2.2 innings in a rehab start at High-A Dayton on Saturday."
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "Ian Gibaut",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 12: Gibault (shoulder) struck out two over one inning for Triple-A Louisville on Sunday."
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "Sam Moll",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 11: Moll (shoulder) has allowed five runs on eight hits and three walks while striking out nine over seven innings across seven appearances while on a rehab assignment with Triple-A Louisville."
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "Jake Fraley",
+        "POS": "RF",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 10: Reds manager Terry Francona on Friday discussed the idea of placing Fraley (calf) on the 10-day injured list, Jeremy Rakes of MLB.com reports. \"We talked to Jake and we were like, 'We appreciate you trying to push this,' but what are the chances he plays tonight and he doesn't feel good tomorrow?\" Francona said. \"So if we IL him [Saturday], we can push it back three days.\""
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "Tyler Callihan",
+        "POS": "LF",
+        "EST. RETURN DATE": "Aug 11",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 9: The Reds placed Callihan on the 10-day injured list Tuesday with a fractured left forearm."
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "Hunter Greene",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 24",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 9: Greene suffered a Grade 1 right groin strain during his start Wednesday against Atlanta, Gordon Wittenmyer of The Cincinnati Enquirer reports."
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "Christian Encarnacion-Strand",
+        "POS": "1B",
+        "EST. RETURN DATE": "May 23",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 7: Reds manager Terry Francona said Wednesday that Encarnacion-Strand (back) is \"continuing to take steps\" forward in his recovery process and could begin ramping up his baseball activities next week, Charlie Goldsmith of the Dayton Daily News reports."
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "Noelvi Marte",
+        "POS": "3B",
+        "EST. RETURN DATE": "May 20",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 7: Reds manager Terry Francona said that Marte's placement on injured list Wednesday was due to a Grade 2 left oblique strain, Charlie Goldsmith of the Dayton Daily News reports."
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "Josh Staumont",
+        "POS": "RP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 23: The Reds reassigned Staumont to minor-league camp Saturday."
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "Alex Young",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 23: Young traveled back to Cincinnati to be examined by the Reds' orthopedist to determine whether he needs Tommy John surgery, Gordon Wittenmyer of The Cincinnati Enquirer reports."
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "Carson Spiers",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 30",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "Apr 20: The Reds placed Spiers on the 15-day injured list Sunday due to a right shoulder impingement, Charlie Goldsmith of the Dayton Daily News reports."
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "Cam Collier",
+        "POS": "3B",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 27: Reds manager Terry Francona announced that Collier is scheduled to have surgery Thursday on his injured left thumb, Pat Brennan of The Cincinnati Enquirer reports. Collier is expected to resume hitting in 4-to-6 weeks."
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "Brandon Williamson",
+        "POS": "SP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Mar 26: The Reds transferred Williamson (elbow) to the 60-day injured list Tuesday."
+    },
+    {
+        "TEAM NAME": "Cincinnati Reds",
+        "NAME": "Julian Aguiar",
+        "POS": "SP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Feb 13: Aguiar will miss the entire 2025 season after undergoing Tommy John surgery, Mark Sheldon of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Cleveland Guardians",
+        "NAME": "George Valera",
+        "POS": "RF",
+        "EST. RETURN DATE": "May 30",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 15: Valera (knee) began a rehab assignment in the Arizona Complex League on Thursday, SI.com reports."
+    },
+    {
+        "TEAM NAME": "Cleveland Guardians",
+        "NAME": "Micah Pries",
+        "POS": "1B",
+        "EST. RETURN DATE": "May 22",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 15: no"
+    },
+    {
+        "TEAM NAME": "Cleveland Guardians",
+        "NAME": "Erik Sabrowski",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 14: Sabrowski (elbow) resumed throwing bullpen sessions earlier this month, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Cleveland Guardians",
+        "NAME": "John Means",
+        "POS": "SP",
+        "EST. RETURN DATE": "Sep 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 14: Means (elbow) is expected to begin throwing bullpen sessions at some point this month, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Cleveland Guardians",
+        "NAME": "Lane Thomas",
+        "POS": "CF",
+        "EST. RETURN DATE": "May 22",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 14: Thomas (wrist) will require at least a week's worth of rehab games with Triple-A Columbus before being activated from the 10-day injured list, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Cleveland Guardians",
+        "NAME": "Ben Lively",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 13",
+        "STATUS": "15-Day-IL",
+        "COMMENT": ""
+    },
+    {
+        "TEAM NAME": "Cleveland Guardians",
+        "NAME": "David Fry",
+        "POS": "1B",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 12: Guardians manager Stephen Vogt said Monday that Fry (elbow) is set to begin playing in rehab games in the rookie-level Arizona Complex League this week, Tim Stebbins of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Cleveland Guardians",
+        "NAME": "Slade Cecconi",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 12: Cecconi (oblique) allowed two runs on six hits while striking out three over 5.2 innings for Triple-A Columbus on Sunday."
+    },
+    {
+        "TEAM NAME": "Cleveland Guardians",
+        "NAME": "Paul Sewald",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 6: Sewald (shoulder) will be rechecked at two-week intervals to determine progress and readiness to begin a throwing program, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Cleveland Guardians",
+        "NAME": "Chase DeLauter",
+        "POS": "RF",
+        "EST. RETURN DATE": "May 18",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 5: DeLauter (abdomen) was added to the Guardian's Arizona Complex League roster Monday for a rehab assignment."
+    },
+    {
+        "TEAM NAME": "Cleveland Guardians",
+        "NAME": "Shane Bieber",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 4: Bieber (elbow) threw a live batting practice session Friday, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Cleveland Guardians",
+        "NAME": "Trevor Stephan",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 28: Guardians manager Stephen Vogt said Sunday that Stephan (elbow) is \"progressing well\" and is expected to return to game activity at the organization's spring training complex in Arizona at some point in May, Michael Beaven of the Akron Beacon Journal reports."
+    },
+    {
+        "TEAM NAME": "Cleveland Guardians",
+        "NAME": "Jack Leftwich",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 5",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 7: no"
+    },
+    {
+        "TEAM NAME": "Cleveland Guardians",
+        "NAME": "Sam Hentges",
+        "POS": "RP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Feb 18: The Guardians placed Hentges (shoulder) on the 60-day injured list Sunday."
+    },
+    {
+        "TEAM NAME": "Colorado Rockies",
+        "NAME": "Kyle Karros",
+        "POS": "3B",
+        "EST. RETURN DATE": "May 20",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 14: Karros slashed .311/.390/.485 with 15 home runs and 12 steals in 123 games for High-A Spokane."
+    },
+    {
+        "TEAM NAME": "Colorado Rockies",
+        "NAME": "Aaron Schunk",
+        "POS": "SS",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 12: Schunk (groin) made starts at third base and second base during his rehab assignment with Triple-A Albuquerque over the weekend, going 2-for-7 with a home run and two RBI."
+    },
+    {
+        "TEAM NAME": "Colorado Rockies",
+        "NAME": "Ezequiel Tovar",
+        "POS": "SS",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 12: Tovar (hip) played nine innings at shortstop and went 1-for-3 with a walk and a run scored in his rehab appearance Sunday with Triple-A Albuquerque."
+    },
+    {
+        "TEAM NAME": "Colorado Rockies",
+        "NAME": "Kris Bryant",
+        "POS": "RF",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 11: The Rockies transferred Bryant (back) from the 10-day injured list to the 60-day IL on Sunday."
+    },
+    {
+        "TEAM NAME": "Colorado Rockies",
+        "NAME": "Austin Nola",
+        "POS": "C",
+        "EST. RETURN DATE": "May 20",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 11: Nola signed a minor-league deal Sunday that includes an invitation to spring training with the Rockies, Ari Alexander of KPRC 2 Houston reports."
+    },
+    {
+        "TEAM NAME": "Colorado Rockies",
+        "NAME": "Thairo Estrada",
+        "POS": "2B",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 9: Estrada (wrist) has resumed fielding drills and running the bases this week, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Colorado Rockies",
+        "NAME": "Victor Vodnik",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 30",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 9: Vodnik (shoulder) is throwing from 90 feet, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Colorado Rockies",
+        "NAME": "Tyler Freeman",
+        "POS": "2B",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 8: Freeman (oblique) will begin a rehab assignment with Triple-A Albuquerque this weekend, Patrick Lyons of JustBaseball.com reports."
+    },
+    {
+        "TEAM NAME": "Colorado Rockies",
+        "NAME": "Austin Gomber",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 16",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 5: Gomber (shoulder) has increased the volume and distance of his throws, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Colorado Rockies",
+        "NAME": "Ryan Feltner",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 21",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 2: The Rockies placed Feltner (back) on the 15-day injured list Friday, retroactive to April 29."
+    },
+    {
+        "TEAM NAME": "Colorado Rockies",
+        "NAME": "Jeff Criswell",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 14: The Rockies placed Criswell (elbow) on the 15-day injured list Thursday."
+    },
+    {
+        "TEAM NAME": "Colorado Rockies",
+        "NAME": "Case Williams",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Feb 26: Williams is currently slowed by a stress reaction in his right triceps, Thomas Harding of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Detroit Tigers",
+        "NAME": "Parker Meadows",
+        "POS": "CF",
+        "EST. RETURN DATE": "Jun 2",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 14: Meadows (arm) threw to bases from the outfield Wednesday and said afterward that he feels close to being ready for a rehab assignment, Chris McCosky of The Detroit News reports."
+    },
+    {
+        "TEAM NAME": "Detroit Tigers",
+        "NAME": "Jake Rogers",
+        "POS": "C",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 13: Rogers (oblique) will begin a rehab assignment with Triple-A Toledo on Tuesday, Chris McCosky of The Detroit News reports."
+    },
+    {
+        "TEAM NAME": "Detroit Tigers",
+        "NAME": "Sawyer Gipson-Long",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 7",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 13: Gipson-Long (elbow/hip) is scheduled to make the second start of his rehab assignment Tuesday with High-A West Michigan, Emily Waldon of Baseball America reports."
+    },
+    {
+        "TEAM NAME": "Detroit Tigers",
+        "NAME": "Wenceel Perez",
+        "POS": "RF",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 12: Perez (back) said Monday that he's scheduled to begin a rehab assignment with High-A West Michigan on Thursday, Evan Woodbery of MLive.com reports."
+    },
+    {
+        "TEAM NAME": "Detroit Tigers",
+        "NAME": "Matt Vierling",
+        "POS": "CF",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 12: Vierling (shoulder) played six innings in right field and went 0-for-3 in his rehab game with Triple-A Toledo on Sunday."
+    },
+    {
+        "TEAM NAME": "Detroit Tigers",
+        "NAME": "Casey Mize",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 24",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 10: Mize was placed on the injured list Saturday due to a left hamstring strain, Evan Woodbery of MLive.com reports."
+    },
+    {
+        "TEAM NAME": "Detroit Tigers",
+        "NAME": "Alex Cobb",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 4",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 9: Cobb (hip) looked uncomfortable covering first base during a live batting practice session Friday, Chris McCosky of The Detroit News reports."
+    },
+    {
+        "TEAM NAME": "Detroit Tigers",
+        "NAME": "Wilmer Flores",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 9: The Tigers announced Wednesday that Flores (shoulder) is playing catch daily but has yet to advance to completing bullpen sessions in his throwing program, Cody Stavenhagen of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Detroit Tigers",
+        "NAME": "Alex Lange",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 8: The Tigers announced Tuesday that Lange (lat) has been shut down from throwing temporarily and will complete a period of rest after he recently experienced increased upper-arm inflammation, Evan Woodbery of MLive.com reports."
+    },
+    {
+        "TEAM NAME": "Detroit Tigers",
+        "NAME": "Ty Madden",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 8: Madden (shoulder) is scheduled to throw a bullpen session Wednesday, Evan Woodbery of MLive.com reports."
+    },
+    {
+        "TEAM NAME": "Detroit Tigers",
+        "NAME": "Jose Urquidy",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jul 20",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 8: The Tigers announced Tuesday that Urquidy (elbow) has been playing catch out to 120 feet three times per week as he continues his rehab program from Tommy John surgery, Evan Woodbery of MLive.com reports."
+    },
+    {
+        "TEAM NAME": "Houston Astros",
+        "NAME": "Brice Matthews",
+        "POS": "SS",
+        "EST. RETURN DATE": "May 22",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 15: Matthews was placed on the minor-league seven-day injured list after suffering a concussion Thursday, Chandler Rome of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Houston Astros",
+        "NAME": "Yordan Alvarez",
+        "POS": "LF",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 15: Alvarez (hand) is still \"a few days away\" from returning to the lineup, Matt Kawahara reports."
+    },
+    {
+        "TEAM NAME": "Houston Astros",
+        "NAME": "Miguel Palma",
+        "POS": "C",
+        "EST. RETURN DATE": "Jul 18",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 11: no"
+    },
+    {
+        "TEAM NAME": "Houston Astros",
+        "NAME": "Hayden Wesneski",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 22",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 10: Wesneski underwent an MRI on Saturday that showed inflammation in his elbow, Matt Kawahara of the Houston Chronicle reports."
+    },
+    {
+        "TEAM NAME": "Houston Astros",
+        "NAME": "Cristian Javier",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jul 20",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 9: Javier (elbow) threw a 15-pitch bullpen session Friday, Chandler Rome of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Houston Astros",
+        "NAME": "Spencer Arrighetti",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 25",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "Apr 28: Arrighetti got imaging on his fractured right thumb Monday that showed the bone is healing properly, Will Kunkel of FOX 26 Houston reports."
+    },
+    {
+        "TEAM NAME": "Houston Astros",
+        "NAME": "Forrest Whitley",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 22",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "Apr 27: Whitley was placed on the 15-day injured list Sunday due to a left knee sprain, Julia Morales of AT&amp;T SportsNet Southwest reports."
+    },
+    {
+        "TEAM NAME": "Houston Astros",
+        "NAME": "Luis Garcia",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 6",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 22: Garcia (elbow) played catch at Daikin Park on Tuesday, Chandler Rome of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Houston Astros",
+        "NAME": "Pedro Leon",
+        "POS": "RF",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "Apr 14: Leon (knee) is expected to be ready to begin a rehab assignment with Triple-A Sugar Land in late April, Francys Romero of BeisbolFR.com reports."
+    },
+    {
+        "TEAM NAME": "Houston Astros",
+        "NAME": "Ray Gaither",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 30: no"
+    },
+    {
+        "TEAM NAME": "Houston Astros",
+        "NAME": "J.P. France",
+        "POS": "SP",
+        "EST. RETURN DATE": "Aug 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Mar 27: The Astros placed France (shoulder) on the 60-day injured list Thursday, Brian McTaggart of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Houston Astros",
+        "NAME": "Taylor Trammell",
+        "POS": "LF",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "Mar 27: The Astros placed Trammell (calf) on the 10-day injured list Thursday, Brian McTaggart of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Houston Astros",
+        "NAME": "Glenn Otto",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Feb 27: The Astros reassigned Otto (shoulder) and Ray Gaither (shoulder) to minor-league camp Tuesday, Chandler Rome of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Kansas City Royals",
+        "NAME": "Harold Castro",
+        "POS": "2B",
+        "EST. RETURN DATE": "May 23",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 16: The Royals reassigned Castro to minor-league camp Tuesday."
+    },
+    {
+        "TEAM NAME": "Kansas City Royals",
+        "NAME": "Sam Long",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 30",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 10: Long (elbow) threw a bullpen session on May 8 at 85 percent intensity and has another bullpen session scheduled for May 11, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Kansas City Royals",
+        "NAME": "Kyle Wright",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 9: Wright has been pulled off his rehab assignment due to right shoulder fatigue."
+    },
+    {
+        "TEAM NAME": "Kansas City Royals",
+        "NAME": "Anthony Simonelli",
+        "POS": "SP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": ""
+    },
+    {
+        "TEAM NAME": "Kansas City Royals",
+        "NAME": "Hunter Harvey",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 23",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 7: Harvey (shoulder) came away from his most recent live batting practice session Tuesday with a bit of soreness, Anne Rogers of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Kansas City Royals",
+        "NAME": "Alec Marsh",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 30",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 2: Marsh (shoulder) started a new throwing program on April 25, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Kansas City Royals",
+        "NAME": "James McArthur",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jul 18",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 1: McArthur (elbow) continues to rehab in Kansas City but hasn't progressed quickly and is not throwing yet, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Kansas City Royals",
+        "NAME": "Dairon Blanco",
+        "POS": "LF",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 1: Blanco (Achilles) went 1-for-3 in his first rehab game Tuesday for Triple-A Omaha."
+    },
+    {
+        "TEAM NAME": "Kansas City Royals",
+        "NAME": "Blake Mitchell",
+        "POS": "C",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 26: Mitchell (wrist) has started playing in extended spring training games, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Los Angeles Angels",
+        "NAME": "Victor Gonzalez",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 21",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 15: The Angels signed Gonzalez to a minor-league contract Jan. 14."
+    },
+    {
+        "TEAM NAME": "Los Angeles Angels",
+        "NAME": "Ben Joyce",
+        "POS": "RP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 14: Joyce underwent surgery to repair his right shoulder Wednesday and is expected to miss the rest of the season."
+    },
+    {
+        "TEAM NAME": "Los Angeles Angels",
+        "NAME": "Robert Stephenson",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 14: Stephenson (elbow) began a rehab assignment with Single-A Inland Empire on Tuesday, allowing one run over one inning."
+    },
+    {
+        "TEAM NAME": "Los Angeles Angels",
+        "NAME": "Sam Bachman",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 13: The Angels transferred Bachman's (shoulder) rehab assignment to Triple-A Salt Lake on Tuesday."
+    },
+    {
+        "TEAM NAME": "Los Angeles Angels",
+        "NAME": "George Klassen",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 12: Klassen is awake and alert after taking a line drive to the head while pitching at Double-A Rocket City on Sunday, Sam Blum of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Los Angeles Angels",
+        "NAME": "Mike Trout",
+        "POS": "RF",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 12: Trout (knee) will run on an anti-gravity treadmill Monday, Erica Weston of Bally Sports West reports."
+    },
+    {
+        "TEAM NAME": "Los Angeles Angels",
+        "NAME": "Gustavo Campero",
+        "POS": "RF",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 9: The Angles placed Campero on the 10-day injured list Friday, retroactive to May 7, due to left ankle inflammation."
+    },
+    {
+        "TEAM NAME": "Los Angeles Angels",
+        "NAME": "Garrett McDaniels",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 3: The Angels placed McDaniels on the 15-day injured list Saturday due to left biceps tendinitis, retroactive to May 2."
+    },
+    {
+        "TEAM NAME": "Los Angeles Angels",
+        "NAME": "Angel Felipe",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 30: Felipe signed a minor-league contract with the Angels on Wednesday, Taylor Blake Ward of TheSportingTribune.com reports."
+    },
+    {
+        "TEAM NAME": "Los Angeles Angels",
+        "NAME": "Anthony Rendon",
+        "POS": "3B",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Feb 15: The Angels placed Rendon (hip) on the 60-day injured list Saturday, Jeff Fletcher of The Orange County Register reports."
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "Blake Treinen",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 18",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 15: Treinen (forearm) will begin playing catch within the next few days, Matthew Moreno of DodgerBlue.com reports."
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "Tyler Glasnow",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 30",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 15: Glasnow (shoulder) threw from flat ground Thursday, Matthew Moreno of DodgerBlue.com reports."
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "Roki Sasaki",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 27",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 14: Manager Dave Roberts said Wednesday that Sasaki will be shut down from throwing for a while, Fabian Ardaya of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "Blake Snell",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 4",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 14: Snell (shoulder) played catch from 60 feet out Wednesday, Fabian Ardaya of The Athletic reports"
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "Clayton Kershaw",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 13: Kershaw (toe/knee) is expected to start Saturday's contest against the Angels, David Vassegh of AM 570 LA Sports reports."
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "Michael Kopech",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 18",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 12: Kopech (shoulder) struck out two batters and gave up one hit and no walks over a scoreless inning of relief in his second rehab appearance Sunday with Triple-A Oklahoma City."
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "Teoscar Hernandez",
+        "POS": "RF",
+        "EST. RETURN DATE": "May 21",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 11: Hernandez (adductor) has been hitting in the cage and is slated to take live at-bats during the Dodgers' next homestand, which begins Tuesday, per MLB.com."
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "River Ryan",
+        "POS": "SP",
+        "EST. RETURN DATE": "Sep 18",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 10: Ryan (elbow) has resumed throwing off a mound but hasn't yet progressed to full bullpen sessions, per MLB.com."
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "Kyle Hurt",
+        "POS": "RP",
+        "EST. RETURN DATE": "Sep 2",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 10: Hurt (elbow) has resumed throwing off a mound but hasn't yet progressed to full bullpen sessions, per MLB.com."
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "Tommy Edman",
+        "POS": "2B",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 9: Edman (ankle) has experienced discomfort when running in a straight line, but he is scheduled to participate in live at-bats next week, Fabian Ardaya of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "Evan Phillips",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 6",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 9: Manager Dave Roberts said Friday that Phillips will be shut down from throwing for two weeks after MRI results revealed inflammation in his right elbow, Fabian Ardaya of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "Emmet Sheehan",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 8: Sheehan (elbow) threw around 40 pitches in a simulated game Thursday, Sonja Chen of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "Edgardo Henriquez",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 24",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 18: The Dodgers transferred Henriquez (foot) to the 60-day injured list Friday, Bill Plunkett of The Orange County Register reports."
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "Giovanny Gallegos",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 31",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 30: Gallegos was reassigned to minor-league camp by the Dodgers on Tuesday."
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "Michael Grove",
+        "POS": "RP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Mar 17: Grove (shoulder) was placed on the 60-day injured list Monday, Sonja Chen of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "Brusdar Graterol",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jul 18",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Mar 17: Graterol (shoulder) was placed on the 60-day injured list Monday, Sonja Chen of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Los Angeles Dodgers",
+        "NAME": "Gavin Stone",
+        "POS": "SP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Feb 11: Stone (shoulder) was placed on the 60-day injured list by the Dodgers on Tuesday, Bill Plunkett of The Orange County Register reports."
+    },
+    {
+        "TEAM NAME": "Miami Marlins",
+        "NAME": "Dane Myers",
+        "POS": "CF",
+        "EST. RETURN DATE": "May 21",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 12: The Marlins placed Myers on the 10-day injured list Monday due to a right oblique strain."
+    },
+    {
+        "TEAM NAME": "Miami Marlins",
+        "NAME": "Otto Lopez",
+        "POS": "2B",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 4: Lopez (ankle) said after Sunday's 3-2 loss to the Athletics that he expects to miss around 2-to-3 weeks, Daniel Alvarez-Montes of ElExtraBase.com reports."
+    },
+    {
+        "TEAM NAME": "Miami Marlins",
+        "NAME": "Eury Perez",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 6",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 2: Perez (elbow) said the plan is to make a total of eight rehab starts in his continued recovery from Tommy John surgery, Christina De Nicola of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Miami Marlins",
+        "NAME": "Griffin Conine",
+        "POS": "LF",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 30: Conine is expected to miss the remainder of the 2025 season after undergoing surgery Tuesday to repair a dislocated left shoulder, Barry Jackson of the Miami Herald reports."
+    },
+    {
+        "TEAM NAME": "Miami Marlins",
+        "NAME": "Rob Brantly",
+        "POS": "C",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "Apr 21: Brantly went 3-for-3 with an RBI in Thursday's loss to the Diamondbacks."
+    },
+    {
+        "TEAM NAME": "Miami Marlins",
+        "NAME": "Woo-Suk Go",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 16: Go has been diagnosed with a fractured right index finger, Christina De Nicola of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Miami Marlins",
+        "NAME": "Declan Cronin",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "Apr 10: Cronin (hip) will begin a rehab assignment with Triple-A Jacksonville on Thursday, Christina De Nicola of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Miami Marlins",
+        "NAME": "Andrew Nardi",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Mar 31: Nardi (back) began a throwing program Monday, Kevin Barral of FishonFirst.com reports."
+    },
+    {
+        "TEAM NAME": "Miami Marlins",
+        "NAME": "Braxton Garrett",
+        "POS": "SP",
+        "EST. RETURN DATE": "Apr 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Feb 12: The Marlins and Garrett (elbow) avoided arbitration by agreeing to a one-year contract Thursday, Christina De Nicola of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Milwaukee Brewers",
+        "NAME": "Aaron Civale",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 14: Civale (hamstring) tossed five shutout innings in his second rehab start with Triple-A Nashville on Wednesday reports."
+    },
+    {
+        "TEAM NAME": "Milwaukee Brewers",
+        "NAME": "Jose Quintana",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 14: no"
+    },
+    {
+        "TEAM NAME": "Milwaukee Brewers",
+        "NAME": "Nestor Cortes",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 6",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 13: Cortes (elbow) resumed playing catch last week, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Milwaukee Brewers",
+        "NAME": "Brandon Woodruff",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 12: Woodruff (shoulder) won't be reinstated from the 15-day injured list this week as initially hoped after experiencing right ankle tendinitis during his rehab start Sunday with Triple-A Nashville, Adam McCalvy of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Milwaukee Brewers",
+        "NAME": "Aaron Ashby",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 9: Ashby (oblique) will move his rehab assignment to Triple-A Nashville on Sunday, Todd Rosiak of the Milwaukee Journal Sentinel reports."
+    },
+    {
+        "TEAM NAME": "Milwaukee Brewers",
+        "NAME": "DL Hall",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 9: Hall (lat) will continue his rehab assignment with Triple-A Nashville on Wednesday, Todd Rosiak of the Milwaukee Journal Sentinel reports."
+    },
+    {
+        "TEAM NAME": "Milwaukee Brewers",
+        "NAME": "Blake Perkins",
+        "POS": "CF",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 26: The Brewers transferred Perkins (shin) to the 60-day injured list Saturday."
+    },
+    {
+        "TEAM NAME": "Milwaukee Brewers",
+        "NAME": "Garrett Mitchell",
+        "POS": "CF",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "Apr 26: The Brewers placed Mitchell on the 10-day injured list Saturday with a left oblique strain."
+    },
+    {
+        "TEAM NAME": "Milwaukee Brewers",
+        "NAME": "Connor Thomas",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "Apr 24: Thomas received an anti-inflammatory injection April 16 in an effort to calm irritation in his left elbow, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Milwaukee Brewers",
+        "NAME": "J.B. Bukauskas",
+        "POS": "RP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 27: Bukauskas will undergo surgery on his injured right lat and be sidelined for 9-to-10 months, Todd Rosiak of the Milwaukee Journal Sentinel reports."
+    },
+    {
+        "TEAM NAME": "Milwaukee Brewers",
+        "NAME": "Thomas Pannone",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 2",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 27: Pannone was diagnosed with a torn flexor tendon in his left forearm Saturday, Adam McCalvy of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Milwaukee Brewers",
+        "NAME": "Robert Gasser",
+        "POS": "SP",
+        "EST. RETURN DATE": "Sep 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Mar 19: Gasser (elbow) has advanced his throwing program to flat-ground throws from 120 feet, Adam McCalvy of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Minnesota Twins",
+        "NAME": "Carlos Correa",
+        "POS": "SS",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": ""
+    },
+    {
+        "TEAM NAME": "Minnesota Twins",
+        "NAME": "Byron Buxton",
+        "POS": "CF",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 15: Buxton entered concussion protocol after exiting Thursday's game against Baltimore following a collision with Carlos Correa, Dan Hayes of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Minnesota Twins",
+        "NAME": "Harrison Bader",
+        "POS": "LF",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 15: Bader is out of the lineup for Thursday's game against the Orioles after exiting in the third inning of the Twins' 8-6 win in the second game of a doubleheader Wednesday due to left groin tightness, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Minnesota Twins",
+        "NAME": "Ty France",
+        "POS": "1B",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 15: France (foot) is out of the lineup for Thursday's game against the Orioles."
+    },
+    {
+        "TEAM NAME": "Minnesota Twins",
+        "NAME": "Michael Tonkin",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jul 18",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 11: Tonkin (shoulder) has developed biceps tendinitis during his rehab assignment and will receive an injection, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Minnesota Twins",
+        "NAME": "Matt Wallner",
+        "POS": "RF",
+        "EST. RETURN DATE": "Jun 10",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 11: Wallner (hamstring) has started up a running program that includes turns, and he's also taking batting practice, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Minnesota Twins",
+        "NAME": "Luke Keaschall",
+        "POS": "2B",
+        "EST. RETURN DATE": "Jul 4",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "Apr 28: Keaschall may not need surgery on his fractured right ulna bone, but is still expected to miss two months or more, the Minnesota Star Tribune reports. \"It's probably going to be a couple months before he's back into playing games,\" said Twins head athletic trainer Nick Paparesta."
+    },
+    {
+        "TEAM NAME": "Minnesota Twins",
+        "NAME": "Yunior Severino",
+        "POS": "1B",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 26: The Twins re-signed Severino to a minor-league contract Monday."
+    },
+    {
+        "TEAM NAME": "Minnesota Twins",
+        "NAME": "Erasmo Ramirez",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 27: The Twins reassigned Ramirez (shoulder) to minor-league camp Sunday, Phil Miller of The Minnesota Star Tribune reports."
+    },
+    {
+        "TEAM NAME": "Minnesota Twins",
+        "NAME": "Daniel Duarte",
+        "POS": "RP",
+        "EST. RETURN DATE": "Aug 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 27: The Twins re-signed Duarte (elbow) to a minor-league contract on Nov. 6."
+    },
+    {
+        "TEAM NAME": "New York Mets",
+        "NAME": "Paul Blackburn",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 15: Blackburn (knee) is expected to make two more rehab starts before being activated from the 15-day injured list, Joe Pantorno of AMNY.com reports."
+    },
+    {
+        "TEAM NAME": "New York Mets",
+        "NAME": "Drew Smith",
+        "POS": "RP",
+        "EST. RETURN DATE": "Sep 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 15: Smith (elbow) has been playing catch from 120 feet up to three times per week and threw 10 pitches from halfway up the mound earlier this week, Joe Pantorno of AMNY.com reports."
+    },
+    {
+        "TEAM NAME": "New York Mets",
+        "NAME": "Jose Siri",
+        "POS": "CF",
+        "EST. RETURN DATE": "Jun 7",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 13: Siri is progressing more quickly than expected in his recovery from a fractured tibia and has already resumed baseball activities, Tim Britton of the Athletic reports."
+    },
+    {
+        "TEAM NAME": "New York Mets",
+        "NAME": "Ronny Mauricio",
+        "POS": "SS",
+        "EST. RETURN DATE": "May 18",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 12: Mauricio (knee) had his rehab assignment moved to Double-A Binghamton on Saturday."
+    },
+    {
+        "TEAM NAME": "New York Mets",
+        "NAME": "Sean Manaea",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 17",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 9: Manaea (oblique) played catch from 120 feet Friday and is soon expected to start throwing off a mound, Andrew Tredinnick of The Bergen Record reports."
+    },
+    {
+        "TEAM NAME": "New York Mets",
+        "NAME": "Frankie Montas",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 6: Montas (lat) threw his third bullpen session Tuesday since resuming his throwing program in mid-April, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "New York Mets",
+        "NAME": "A.J. Minter",
+        "POS": "RP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 5: Minter will undergo surgery May 12 to repair a torn left lat, Mike Puma of the New York Post reports."
+    },
+    {
+        "TEAM NAME": "New York Mets",
+        "NAME": "Jesse Winker",
+        "POS": "LF",
+        "EST. RETURN DATE": "Jun 17",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 5: Winker has been diagnosed with a Grade 2 oblique strain and is expected to miss the next 6-to-8 weeks, Abbey Mastracco of the New York Daily News reports."
+    },
+    {
+        "TEAM NAME": "New York Mets",
+        "NAME": "Danny Young",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 4: The Mets transferred Young (elbow) from the 15-day injured list to the 60-day IL on Sunday."
+    },
+    {
+        "TEAM NAME": "New York Mets",
+        "NAME": "Brooks Raley",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 30: Raley (elbow) signed a one-year contract with the Mets on Friday, Joel Sherman of the New York Post reports."
+    },
+    {
+        "TEAM NAME": "New York Mets",
+        "NAME": "Yacksel Rios",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 30: The Mets reassigned Rios to minor-league camp Sunday."
+    },
+    {
+        "TEAM NAME": "New York Mets",
+        "NAME": "Bryce Montes de Oca",
+        "POS": "RP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 27: Montes de Oca underwent a second Tommy John surgery toward the end of last year's minor-league season, Michael Mayer of MetsmerizedOnline.com reports."
+    },
+    {
+        "TEAM NAME": "New York Mets",
+        "NAME": "Adbert Alzolay",
+        "POS": "RP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 27: The Mets signed Alzolay to a two-year minor-league contract Friday, Will Sammon of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "New York Mets",
+        "NAME": "Christian Scott",
+        "POS": "SP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Mar 5: Scott will throw from 45 feet Monday as he continues his recovery from hybrid elbow surgery performed last September, Will Sammon of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "New York Mets",
+        "NAME": "Oliver Ortega",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 2: Ortega (elbow) signed a minor-league contract with the Mets that includes an invitation to spring training Sunday, Jon Morosi of MLB Networkreports."
+    },
+    {
+        "TEAM NAME": "New York Mets",
+        "NAME": "Nick Madrigal",
+        "POS": "3B",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Feb 28: Madrigal will likely miss the entire season after surgery to repair a fractured left shoulder, Tim Healey of Newsday reports."
+    },
+    {
+        "TEAM NAME": "New York Yankees",
+        "NAME": "Oswaldo Cabrera",
+        "POS": "3B",
+        "EST. RETURN DATE": "Jul 18",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 14: Cabrera will undergo an MRI and seek multiple opinions before deciding whether to have surgery to repair his fractured left ankle, Greg Joyce of the New York Post reports."
+    },
+    {
+        "TEAM NAME": "New York Yankees",
+        "NAME": "Jake Cousins",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 3",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 14: Cousins (forearm) said May 6 that he's hopeful to return from the 60-day injured list in early-to-mid June, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "New York Yankees",
+        "NAME": "Spencer Jones",
+        "POS": "CF",
+        "EST. RETURN DATE": "May 18",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 14: Yankees manager Aaron Boone said that Jones was placed on Double-A Somerset's 7-day injured list May 6 due to an intercostal injury, Gary Phillips of the New York Daily News reports."
+    },
+    {
+        "TEAM NAME": "New York Yankees",
+        "NAME": "Giancarlo Stanton",
+        "POS": "DH",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 12: Stanton (elbows) could be sent to Tampa later in the week to take live at-bats, Brendan Kuty of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "New York Yankees",
+        "NAME": "Marcus Stroman",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 10",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 11: Manager Aaron Boone said Sunday that Stroman (knee) has been experiencing some discomfort after throwing a simulated game Friday, Erik Boland of Newsday reports."
+    },
+    {
+        "TEAM NAME": "New York Yankees",
+        "NAME": "Scott Effross",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 18",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 10: Effross (hamstring) had his rehab assignment transferred to Double-A Somerset on Saturday."
+    },
+    {
+        "TEAM NAME": "New York Yankees",
+        "NAME": "Jonathan Loaisiga",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 20",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 7: Yankees manager Aaron Boone said Wednesday that Loasiga (elbow) will likely remain on his rehab assignment through May 18, Max Goodman of NJ.com reports."
+    },
+    {
+        "TEAM NAME": "New York Yankees",
+        "NAME": "Gerrit Cole",
+        "POS": "SP",
+        "EST. RETURN DATE": "Apr 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 5: Cole (elbow) said that he plans to begin a throwing program in August, Pete Caldera of The Bergen Record reports."
+    },
+    {
+        "TEAM NAME": "New York Yankees",
+        "NAME": "Jazz Chisholm Jr.",
+        "POS": "2B",
+        "EST. RETURN DATE": "Jun 3",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 2: Manager Aaron Boone said Friday that Chisholm was diagnosed with a high-grade strain of his right oblique and is expected to be sidelined 4-to-6 weeks, Gary Phillips of the New York Daily News reports."
+    },
+    {
+        "TEAM NAME": "New York Yankees",
+        "NAME": "Luis Gil",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 3",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 28: Yankees manager Aaron Boone said Monday that Gil (lat) began a throwing program Sunday, Gary Phillips of the New York Daily News reports."
+    },
+    {
+        "TEAM NAME": "New York Yankees",
+        "NAME": "Clayton Beeter",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "Apr 21: Beeter (shoulder) struck out all four batters he faced in his first rehab appearance with Single-A Tampa on Sunday."
+    },
+    {
+        "TEAM NAME": "New York Yankees",
+        "NAME": "JT Brubaker",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 29",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 1: The Yankees transferred Brubaker (rib) from the 15-day injured list to the 60-day IL on Monday."
+    },
+    {
+        "TEAM NAME": "New York Yankees",
+        "NAME": "Brennen Davis",
+        "POS": "CF",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 30: The Yankees signed Davis to a minor-league contract Tuesday, Aram Leighton of Just Baseball reports."
+    },
+    {
+        "TEAM NAME": "New York Yankees",
+        "NAME": "Jayvien Sandridge",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 26: Sandridge signed a minor-league contract with the Yankees on Sunday that includes an invitation to big-league spring training."
+    },
+    {
+        "TEAM NAME": "Philadelphia Phillies",
+        "NAME": "Jose Ruiz",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 3: The Phillies placed Ruiz on the 15-day injured list Saturday due to neck spasms, retroactive to May 1, Lochlahn March of The Philadelphia Inquirer reports."
+    },
+    {
+        "TEAM NAME": "Philadelphia Phillies",
+        "NAME": "Carson Taylor",
+        "POS": "SS",
+        "EST. RETURN DATE": "Jun 15",
+        "STATUS": "Day-To-Day",
+        "COMMENT": ""
+    },
+    {
+        "TEAM NAME": "Philadelphia Phillies",
+        "NAME": "Matt Kroon",
+        "POS": "CF",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 9: no"
+    },
+    {
+        "TEAM NAME": "Philadelphia Phillies",
+        "NAME": "Christian McGowan",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 31: McGowan will miss the remainder of the season following Tommy John surgery, Jonathan Mayo of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Pittsburgh Pirates",
+        "NAME": "Hunter Barco",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 20",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 15: Barco was promoted to Triple-A Indianapolis on Saturday, Alex Stumpf of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Pittsburgh Pirates",
+        "NAME": "Malcom Nunez",
+        "POS": "1B",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 15: The Pirates re-signed Nunez to a minor-league contract with an invitation to spring training Friday, Francys Romero of BeisbolFR.com reports."
+    },
+    {
+        "TEAM NAME": "Pittsburgh Pirates",
+        "NAME": "Oneil Cruz",
+        "POS": "CF",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 14: Cruz (back) is not in the Pirates' starting lineup against the Mets on Wednesday."
+    },
+    {
+        "TEAM NAME": "Pittsburgh Pirates",
+        "NAME": "Enmanuel Valdez",
+        "POS": "1B",
+        "EST. RETURN DATE": "Jul 8",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 14: The Pirates transferred Valdez (shoulder) from the 10-day injured list to the 60-day IL on Wednesday."
+    },
+    {
+        "TEAM NAME": "Pittsburgh Pirates",
+        "NAME": "Endy Rodriguez",
+        "POS": "1B",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 14: Rodriguez (finger) will begin a rehab assignment with Triple-A Indianapolis on Wednesday."
+    },
+    {
+        "TEAM NAME": "Pittsburgh Pirates",
+        "NAME": "Anthony Solometo",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jul 18",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 14: Double-A Altoona placed Solometo on the 60-day injured list May 7 with a left shoulder injury."
+    },
+    {
+        "TEAM NAME": "Pittsburgh Pirates",
+        "NAME": "Spencer Horwitz",
+        "POS": "1B",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 10: Horwitz (wrist) has gone 4-for-28 with five strikeouts on his rehab assignment split between Double-A Altoona and Triple-A Indianapolis."
+    },
+    {
+        "TEAM NAME": "Pittsburgh Pirates",
+        "NAME": "Nick Gonzales",
+        "POS": "2B",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 7: Gonzales (ankle) ran on the field Monday and took batting practice Tuesday, Alex Stumpf of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Pittsburgh Pirates",
+        "NAME": "Justin Lawrence",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 23",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 3: The Pirates transferred Lawrence (elbow) from the 15-day injured list to the 60-day injured list Saturday."
+    },
+    {
+        "TEAM NAME": "Pittsburgh Pirates",
+        "NAME": "Jared Jones",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 30: Jones (elbow) began a throwing program Wednesday, Noah Hiles of the Pittsburgh Post-Gazette reports."
+    },
+    {
+        "TEAM NAME": "Pittsburgh Pirates",
+        "NAME": "Dauri Moreta",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 3",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 29: Moreta (elbow) will begin a rehab assignment with Single-A Bradenton on Tuesday."
+    },
+    {
+        "TEAM NAME": "Pittsburgh Pirates",
+        "NAME": "Burch Smith",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 26: Smith left Friday's appearance for Triple-A Indianapolis after facing just one batter with an undisclosed injury, the Minnesota Star Tribune reports."
+    },
+    {
+        "TEAM NAME": "Pittsburgh Pirates",
+        "NAME": "Tim Mayza",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 24: Mayza (shoulder) was transferred to the 60-day injured list Thursday, Colin Beazley of the Pittsburgh Post-Gazette reports."
+    },
+    {
+        "TEAM NAME": "Pittsburgh Pirates",
+        "NAME": "Johan Oviedo",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 30",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 17: Oviedo (lat/elbow) is throwing from 75 feet, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "San Diego Padres",
+        "NAME": "Matt Waldron",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 4",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 15: Waldron (oblique) began a rehab assignment in the Arizona Complex League on Thursday, Jeff Sanders of The San Diego Union-Tribune reports."
+    },
+    {
+        "TEAM NAME": "San Diego Padres",
+        "NAME": "Yu Darvish",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 13: Padres manager Mike Shildt said Monday that Darvish (elbow) will begin a rehab assignment with Triple-A El Paso on Wednesday, Kyle Glaser of Foul Territory TV reports."
+    },
+    {
+        "TEAM NAME": "San Diego Padres",
+        "NAME": "Ethan Salas",
+        "POS": "C",
+        "EST. RETURN DATE": "Jul 18",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 13: Padres general manager A.J. Preller said Monday that Salas has been diagnosed with a stress reaction in his lower back and is expected to remain out until July, AJ Cassavell of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "San Diego Padres",
+        "NAME": "Jhony Brito",
+        "POS": "RP",
+        "EST. RETURN DATE": "Mar 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 12: Brito underwent a UCL internal brace surgery and a repair of his flexor tendon last month and will miss the entire 2025 season, AJ Cassavell of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "San Diego Padres",
+        "NAME": "Bryan Hoeing",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 27",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 11: Hoeing (shoulder) began a rehab assignment Saturday with the Padres' rookie-level Arizona Complex League affiliate, retiring one batter while allowing three earned runs on three hits."
+    },
+    {
+        "TEAM NAME": "San Diego Padres",
+        "NAME": "Luis Patino",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 13",
+        "STATUS": "Out",
+        "COMMENT": "May 1: Patino (elbow) will make a rehab start with Single-A Lake Elsinore on Sunday."
+    },
+    {
+        "TEAM NAME": "San Diego Padres",
+        "NAME": "Mason McCoy",
+        "POS": "2B",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "Apr 29: The Padres placed McCoy on the 10-day injured list Tuesday with a sprained finger on his left hand."
+    },
+    {
+        "TEAM NAME": "San Diego Padres",
+        "NAME": "Logan Gillaspie",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 25",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "Apr 27: The Padres placed Gillaspie on the 15-day injured list Sunday due to a left oblique strain."
+    },
+    {
+        "TEAM NAME": "San Diego Padres",
+        "NAME": "Joe Musgrove",
+        "POS": "SP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 7: Musgrove (elbow) played catch Monday for the first time since undergoing Tommy John surgery, AJ Cassavell of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "San Francisco Giants",
+        "NAME": "Tyler Fitzgerald",
+        "POS": "2B",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 13: Fitzgerald (rib) started at second base and went 1-for-3 with a run scored in Triple-A Sacramento's 5-3 win over Salt Lake on Tuesday."
+    },
+    {
+        "TEAM NAME": "San Francisco Giants",
+        "NAME": "Casey Schmitt",
+        "POS": "1B",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 13: Schmitt (oblique) started at first base and went 1-for-3 with a run scored in Triple-A Sacramento's 5-3 win over Salt Lake on Tuesday."
+    },
+    {
+        "TEAM NAME": "San Francisco Giants",
+        "NAME": "Tom Murphy",
+        "POS": "C",
+        "EST. RETURN DATE": "Jul 7",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 12: Murphy (back) will be re-evaluated in six weeks, Alex Pavlovic of NBC Sports Bay Area reports."
+    },
+    {
+        "TEAM NAME": "San Francisco Giants",
+        "NAME": "Jerar Encarnacion",
+        "POS": "RF",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 11: Encarnacion (hand) went 2-for-3 with an RBI double and a run scored in Triple-A Sacramento's 7-5 win over Triple-A Tacoma on Saturday."
+    },
+    {
+        "TEAM NAME": "San Francisco Giants",
+        "NAME": "Enny Romero",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "Out",
+        "COMMENT": "Mar 30: Romero is away from the Giants due to personal reasons, Maria Guardado of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "San Francisco Giants",
+        "NAME": "Cole Waites",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 30: The Giants reassigned Waites to minor-league camp Wednesday, Justice delos Santos of The San Jose Mercury News reports."
+    },
+    {
+        "TEAM NAME": "San Francisco Giants",
+        "NAME": "Ethan Small",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 30: The Giants reassigned Small to minor-league camp Wednesday, Justice delos Santos of The San Jose Mercury News reports."
+    },
+    {
+        "TEAM NAME": "San Francisco Giants",
+        "NAME": "Ryan Murphy",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 27: no"
+    },
+    {
+        "TEAM NAME": "Seattle Mariners",
+        "NAME": "J.P. Crawford",
+        "POS": "SS",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 14: Crawford was scratched from the lineup before Wednesday's game against the Yankees due to shoulder tightness, Adam Jude of The Seattle Times reports."
+    },
+    {
+        "TEAM NAME": "Seattle Mariners",
+        "NAME": "Bryce Miller",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 27",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 14: Miller (2-4) allowed seven runs on eight hits and two walks while striking out three over five-plus innings to take the loss versus the Blue Jays on Sunday."
+    },
+    {
+        "TEAM NAME": "Seattle Mariners",
+        "NAME": "Logan Gilbert",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 23",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 13: Gilbert (elbow) threw roughly 25 pitches in Tuesday's bullpen session, Adam Jude of The Seattle Times reports."
+    },
+    {
+        "TEAM NAME": "Seattle Mariners",
+        "NAME": "George Kirby",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 21",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 12: Kirby (shoulder) is expected to make another minor-league rehab start with Triple-A Tacoma on Friday in Albuquerque, Daniel Kramer of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Seattle Mariners",
+        "NAME": "Trent Thornton",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 21",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 9: The Mariners and Thornton avoided arbitration by agreeing to a one-year, $2 million contract Thursday, Daniel Kramer of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Seattle Mariners",
+        "NAME": "Luke Raley",
+        "POS": "RF",
+        "EST. RETURN DATE": "Jun 13",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "Apr 30: The Mariners placed Raley on the 10-day injured list Wednesday with a right oblique strain."
+    },
+    {
+        "TEAM NAME": "Seattle Mariners",
+        "NAME": "Gregory Santos",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 23",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 29: The Mariners placed Santos on the 15-day injured list Friday with right knee inflammation."
+    },
+    {
+        "TEAM NAME": "Seattle Mariners",
+        "NAME": "Victor Robles",
+        "POS": "RF",
+        "EST. RETURN DATE": "Jul 18",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 25: Mariners general manager Justin Hollander said Friday that Robles' shoulder is healing as hoped and the 27-year-old outfielder could avoid surgery, Adam Jude of The Seattle Times reports."
+    },
+    {
+        "TEAM NAME": "Seattle Mariners",
+        "NAME": "Ryan Bliss",
+        "POS": "2B",
+        "EST. RETURN DATE": "Aug 10",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 13: The Mariners transferred Bliss (biceps) from the 10-day injured list to the 60-day IL on Sunday."
+    },
+    {
+        "TEAM NAME": "Seattle Mariners",
+        "NAME": "Cade Marlowe",
+        "POS": "LF",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 27: Marlowe was outrighted to Triple-A Tacoma on Friday after clearing waivers."
+    },
+    {
+        "TEAM NAME": "Seattle Mariners",
+        "NAME": "Jackson Kowar",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 3",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Mar 2: Kowar (elbow) was placed on the 60-day injured list Sunday, Daniel Kramer of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Seattle Mariners",
+        "NAME": "Taylor Dollard",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Feb 26: Dollard will have labrum surgery and is out for the rest of the season, Ryan Divish of The Seattle Times reports."
+    },
+    {
+        "TEAM NAME": "St. Louis Cardinals",
+        "NAME": "Quinn Mathews",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 19",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 13: Mathews (shoulder) will make a rehab start this week with the Cardinals' Florida Complex League affiliate, Derrick Goold of the St. Louis Post-Dispatch reports."
+    },
+    {
+        "TEAM NAME": "St. Louis Cardinals",
+        "NAME": "Cooper Hjerpe",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 15: Double-A Springfield transferred Hjerpe (elbow) from the 7-day injured list to the full season injured list Tuesday."
+    },
+    {
+        "TEAM NAME": "St. Louis Cardinals",
+        "NAME": "Zack Thompson",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 30",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 8: Thompson (lat) has progressed to throwing from 100 feet on flat ground, Daniel Guerrero of the St. Louis Post-Dispatch reports."
+    },
+    {
+        "TEAM NAME": "St. Louis Cardinals",
+        "NAME": "Packy Naughton",
+        "POS": "RP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 30: The Cardinals re-signed Naughton (elbow) to a two-year, minor-league contract Monday, Jeff Jones of the Belleville News-Democrat reports."
+    },
+    {
+        "TEAM NAME": "St. Louis Cardinals",
+        "NAME": "Drew Rom",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 30: Rom has been shut down from throwing after feeling soreness in his surgically repaired left shoulder during a recent bullpen session, Derrick Goold of the St. Louis Post-Dispatch reports."
+    },
+    {
+        "TEAM NAME": "St. Louis Cardinals",
+        "NAME": "Victor Santos",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 27: Santos (elbow) has compiled a 3.97 ERA, 1.38 WHIP and 26:7 K:BB across 34 innings over his first nine outings (seven starts) in the Dominican Winter League."
+    },
+    {
+        "TEAM NAME": "Tampa Bay Rays",
+        "NAME": "Travis Jankowski",
+        "POS": "RF",
+        "EST. RETURN DATE": "May 25",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 15: Jankowski is out of the lineup for Wednesday's game against the Phillies, Ryan Bass of FanDuel Sports Network Sun reports."
+    },
+    {
+        "TEAM NAME": "Tampa Bay Rays",
+        "NAME": "Xavier Isaac",
+        "POS": "1B",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 14: Isaac (elbow) is 4-for-10 with one home run, four RBI and two runs scored over his last three games at Double-A Montgomery."
+    },
+    {
+        "TEAM NAME": "Tampa Bay Rays",
+        "NAME": "Yandy Diaz",
+        "POS": "1B",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Out",
+        "COMMENT": "May 13: Diaz is on the restricted list because there was a delay in having his passport renewed as the team traveled to Toronto, Marc Topkin of the Tampa Bay Times reports."
+    },
+    {
+        "TEAM NAME": "Tampa Bay Rays",
+        "NAME": "Nate Lavender",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 13: Lavender (elbow) is scheduled to throw his first true bullpen session of the season Tuesday, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Tampa Bay Rays",
+        "NAME": "Kevin Kelly",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 13: Kelly (glute) could begin a minor-league rehab assignment next week, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Tampa Bay Rays",
+        "NAME": "Hunter Bigge",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 23",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 13: Bigge (lat) recently resumed a throwing program, Marc Topkin of the Tampa Bay Times reports."
+    },
+    {
+        "TEAM NAME": "Tampa Bay Rays",
+        "NAME": "Shane McClanahan",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 20",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 13: Rays manager Kevin Cash said Sunday that McClanahan still feels some discomfort in his left triceps when playing catch from 60 feet, Marc Topkin of the Tampa Bay Times reports."
+    },
+    {
+        "TEAM NAME": "Tampa Bay Rays",
+        "NAME": "Ha-Seong Kim",
+        "POS": "SS",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": ""
+    },
+    {
+        "TEAM NAME": "Tampa Bay Rays",
+        "NAME": "Jake Mangum",
+        "POS": "RF",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 7: Rays manager Kevin Cash said Wednesday that Mangum (groin) will be evaluated the week of May 19 and could head out on a rehab assignment soon thereafter, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Tampa Bay Rays",
+        "NAME": "Alex Faedo",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 13",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 7: Faedo (shoulder) has been shut down from throwing due to neck and shoulder tightness, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Tampa Bay Rays",
+        "NAME": "Jonny DeLuca",
+        "POS": "CF",
+        "EST. RETURN DATE": "Jun 3",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 7: DeLuca (shoulder) began hitting off a tee Monday, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Tampa Bay Rays",
+        "NAME": "Richie Palacios",
+        "POS": "LF",
+        "EST. RETURN DATE": "May 24",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 2: Palacios (knee) has begun jogging on a treadmill, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Tampa Bay Rays",
+        "NAME": "Alfredo Zarraga",
+        "POS": "RP",
+        "EST. RETURN DATE": "Feb 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": ""
+    },
+    {
+        "TEAM NAME": "Tampa Bay Rays",
+        "NAME": "Jonathan Hernandez",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 21",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 9: The Rays reassigned Hernandez to minor-league camp Monday."
+    },
+    {
+        "TEAM NAME": "Tampa Bay Rays",
+        "NAME": "Gregory Barrios",
+        "POS": "SS",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 3: Barrios is facing a lengthy absence for High-A Bowling Green due to an elbow injury, Sam Dykstra of MLB Pipeline reports."
+    },
+    {
+        "TEAM NAME": "Tampa Bay Rays",
+        "NAME": "Dominic Keegan",
+        "POS": "C",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "Day-To-Day",
+        "COMMENT": ""
+    },
+    {
+        "TEAM NAME": "Texas Rangers",
+        "NAME": "Chris Martin",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 14: Martin said Wednesday that an MRI on his right elbow came back negative, Jeff Wilson of AllDLLS.com reports."
+    },
+    {
+        "TEAM NAME": "Texas Rangers",
+        "NAME": "Corey Seager",
+        "POS": "SS",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 14: Rangers manager Bruce Bochy said it's possible Seager (hamstring) will require longer than a minimum stay on the 10-day injured list, MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Texas Rangers",
+        "NAME": "Kevin Pillar",
+        "POS": "CF",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 14: Pillar (back) will begin a rehab assignment with Double-A Frisco on Wednesday."
+    },
+    {
+        "TEAM NAME": "Texas Rangers",
+        "NAME": "Luke Jackson",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 13: Jackson's hand is still swollen Tuesday but he's optimistic he'll be able to avoid the injured list, Evan Grant of The Dallas Morning News reports."
+    },
+    {
+        "TEAM NAME": "Texas Rangers",
+        "NAME": "Cody Bradford",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 10",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 12: Bradford (elbow) will throw a bullpen session Thursday, Shawn McFarland of The Dallas Morning News reports."
+    },
+    {
+        "TEAM NAME": "Texas Rangers",
+        "NAME": "Trevor Hauver",
+        "POS": "RF",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "Day-To-Day",
+        "COMMENT": ""
+    },
+    {
+        "TEAM NAME": "Texas Rangers",
+        "NAME": "Dane Acker",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 20",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 8: Acker (undisclosed) was reinstated from High-A Hickory's 7-day injured list May 24 and has covered five innings while striking out seven and allowing two earned runs on four hits and three walks over his first two starts of the 2023 season."
+    },
+    {
+        "TEAM NAME": "Texas Rangers",
+        "NAME": "Jon Gray",
+        "POS": "SP",
+        "EST. RETURN DATE": "Aug 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 1: Gray (wrist) has been cleared to do some light throwing next week, Shawn McFarland of The Dallas Morning News reports."
+    },
+    {
+        "TEAM NAME": "Texas Rangers",
+        "NAME": "Kumar Rocker",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 31",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 1: Rocker (shoulder) said Thursday that he will likely throw a bullpen session next week, Shawn McFarland of The Dallas Morning News reports."
+    },
+    {
+        "TEAM NAME": "Texas Rangers",
+        "NAME": "Malcolm Moore",
+        "POS": "C",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 17: Moore was placed on the injured list at High-A Hub City on Thursday with a broken finger on his right hand, Kennedi Landry of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Texas Rangers",
+        "NAME": "Patrick Murphy",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 30: The Rangers signed Murphy to a minor-league contract Monday that includes an invitation to spring training camp."
+    },
+    {
+        "TEAM NAME": "Texas Rangers",
+        "NAME": "Jax Biggers",
+        "POS": "2B",
+        "EST. RETURN DATE": "May 18",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 30: The Rangers signed Biggers to a minor-league contract and gave him an invitation to spring training Thursday."
+    },
+    {
+        "TEAM NAME": "Texas Rangers",
+        "NAME": "Josh Sborz",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Feb 17: The Rangers placed Sborz (shoulder) on the 60-day injured list Monday."
+    },
+    {
+        "TEAM NAME": "Toronto Blue Jays",
+        "NAME": "Andres Gimenez",
+        "POS": "2B",
+        "EST. RETURN DATE": "May 18",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 14: Gimenez (quadricep) resumed baseball activities Tuesday, Mitch Bannon of the Athletic reports."
+    },
+    {
+        "TEAM NAME": "Toronto Blue Jays",
+        "NAME": "Ryan Burr",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 13: Burr (shoulder) will shift his rehab assignment to Triple-A Buffalo on Wednesday, Mitch Bannon of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Toronto Blue Jays",
+        "NAME": "Erik Swanson",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 13: Swanson (forearm) will pitch for Triple-A Buffalo on Wednesday, Mitch Bannon of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Toronto Blue Jays",
+        "NAME": "Max Scherzer",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jun 3",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 13: Scherzer (thumb) was unable to throw as scheduled Tuesday because of back tightness following his last bullpen session, Mitch Bannon of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Toronto Blue Jays",
+        "NAME": "Hayden Juenger",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "Day-To-Day",
+        "COMMENT": ""
+    },
+    {
+        "TEAM NAME": "Toronto Blue Jays",
+        "NAME": "Nick Sandlin",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 24",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 6: Sandlin (lat) has been playing catch up to 60 feet, Mitch Bannon of The Athletic reports."
+    },
+    {
+        "TEAM NAME": "Toronto Blue Jays",
+        "NAME": "Alek Manoah",
+        "POS": "SP",
+        "EST. RETURN DATE": "Aug 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "May 2: Manoah (elbow) is throwing regular bullpen sessions at the Blue Jays' spring training complex in Dunedin, Arden Zwelling of Sportsnet.ca reports."
+    },
+    {
+        "TEAM NAME": "Toronto Blue Jays",
+        "NAME": "Josh Kasevich",
+        "POS": "SS",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 27: Kasevich will be sidelined several weeks after aggravating a stress reaction in his lower back in a game last weekend, Arden Zwelling of Sportsnet.ca reports."
+    },
+    {
+        "TEAM NAME": "Toronto Blue Jays",
+        "NAME": "Angel Bastardo",
+        "POS": "RP",
+        "EST. RETURN DATE": "Sep 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Mar 12: The Rangers placed Bastardo (elbow) on the 60-day injured list Wednesday, Keegan Matheson of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Toronto Blue Jays",
+        "NAME": "Adam Kloffenstein",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Mar 2: Kloffenstein is dealing with right shoulder fatigue but recently underwent an MRI that came back negative, Keegan Matheson of MLB.com reports."
+    },
+    {
+        "TEAM NAME": "Washington Nationals",
+        "NAME": "Mitchell Parker",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 20",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 14: Parker was removed from his start Wednesday against Atlanta after getting hit on his left leg by a line drive, Bobby Blanco of MASNSports.com reports."
+    },
+    {
+        "TEAM NAME": "Washington Nationals",
+        "NAME": "Andres Chaparro",
+        "POS": "1B",
+        "EST. RETURN DATE": "May 28",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "May 14: Chaparro (oblique) has been sent to the rookie-level Florida Complex League Nationals to begin a rehab assignment."
+    },
+    {
+        "TEAM NAME": "Washington Nationals",
+        "NAME": "Joan Adon",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 18",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 13: Adon (biceps) pitched a scoreless inning during Saturday's Grapefruit League game against the Astros."
+    },
+    {
+        "TEAM NAME": "Washington Nationals",
+        "NAME": "Daison Acosta",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 20",
+        "STATUS": "Day-To-Day",
+        "COMMENT": ""
+    },
+    {
+        "TEAM NAME": "Washington Nationals",
+        "NAME": "Luis Garcia Jr.",
+        "POS": "2B",
+        "EST. RETURN DATE": "May 16",
+        "STATUS": "paternity",
+        "COMMENT": "May 13: Garcia went 1-for-3 with a solo home run and two RBI in Sunday's win over the Reds."
+    },
+    {
+        "TEAM NAME": "Washington Nationals",
+        "NAME": "Jarlin Susana",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 23",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "May 11: Double-A Harrisburg placed Susana on its 7-day injured list Saturday due to a Grade 1 UCL sprain in his right elbow, Mark Zuckerman of MASNSports.com reports."
+    },
+    {
+        "TEAM NAME": "Washington Nationals",
+        "NAME": "Derek Law",
+        "POS": "RP",
+        "EST. RETURN DATE": "Jun 1",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 9: Law (forearm) is slated to throw off a mound before the end of this week, Mark Zuckerman of MASNSports.com reports."
+    },
+    {
+        "TEAM NAME": "Washington Nationals",
+        "NAME": "Orlando Ribalta",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 22",
+        "STATUS": "15-Day-IL",
+        "COMMENT": "May 9: Ribalta (biceps) will throw a 20-to-25 pitch bullpen session Saturday, Mark Zuckerman of MASNSports.com reports."
+    },
+    {
+        "TEAM NAME": "Washington Nationals",
+        "NAME": "Paul DeJong",
+        "POS": "3B",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "10-Day-IL",
+        "COMMENT": "Apr 29: DeJong isn't expected to return from the 10-day injured list for at least two months after undergoing surgery Monday to repair his nose and sinuses, Bob Nightengale of USA Today reports. He also had a titanium orbital plate inserted as part of the procedure."
+    },
+    {
+        "TEAM NAME": "Washington Nationals",
+        "NAME": "DJ Herz",
+        "POS": "SP",
+        "EST. RETURN DATE": "Jul 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Apr 16: Nationals manager Dave Martinez confirmed that Herz (elbow) underwent Tommy John surgery Wednesday in Dallas, Andrew Golden of The Washington Post reports."
+    },
+    {
+        "TEAM NAME": "Washington Nationals",
+        "NAME": "Tyler Stuart",
+        "POS": "SP",
+        "EST. RETURN DATE": "May 17",
+        "STATUS": "Day-To-Day",
+        "COMMENT": "Apr 3: The Nationals promoted Stuart from Double-A Harrisburg to Triple-A Rochester on Tuesday."
+    },
+    {
+        "TEAM NAME": "Washington Nationals",
+        "NAME": "Mason Thompson",
+        "POS": "RP",
+        "EST. RETURN DATE": "May 26",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Feb 19: Nationals manager Dave Martinez said Friday that Thompson (elbow) has a chance to be ready in time for Opening Day, Spencer Nusbaum of The Washington Post reports."
+    },
+    {
+        "TEAM NAME": "Washington Nationals",
+        "NAME": "Josiah Gray",
+        "POS": "SP",
+        "EST. RETURN DATE": "Sep 1",
+        "STATUS": "60-Day-IL",
+        "COMMENT": "Feb 16: The Nationals placed Gray (elbow) on the 60-day injured list Sunday, Andrew Golden of The Washington Post reports."
+    }
+]

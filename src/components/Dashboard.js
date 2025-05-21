@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 
 // Import reusable tooltip utilities
-import { createSafeId } from './utils/tooltipUtils';
+import { createSafeId, setupTooltipCloseHandler } from './utils/tooltipUtils';
 
 // Import individual card components
 import StatsSummaryCard from './cards/StatsSummaryCard/StatsSummaryCard';
@@ -19,6 +19,7 @@ import HomeRunLeadersCard from './cards/HomeRunLeadersCard/HomeRunLeadersCard';
 import ImprovedRateCard from './cards/ImprovedRateCard/ImprovedRateCard';
 import RecentHomersCard from './cards/RecentHomersCard/RecentHomersCard';
 import PerformanceCard from './cards/PerformanceCard/PerformanceCard';
+import InjuryTooltips from './utils/InjuryTooltips';
 
 /**
  * Dashboard component - Home page displaying summary of MLB data
@@ -42,7 +43,34 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     overPerforming: [],
     underPerforming: []
   });
+
+
+
+// Add this to your useEffect that handles closing tooltips on outside clicks
+useEffect(() => {
+  const handleDocumentClick = (e) => {
+    // Only close tooltips if clicking outside tooltip-related elements
+    if (!e.target.closest('.tooltip-container') && 
+        !e.target.closest('.batter-tooltip') && 
+        !e.target.closest('.streak-tooltip') &&
+        !e.target.closest('.day-hit-tooltip') &&
+        !e.target.closest('.injury-tooltip') &&
+        !e.target.closest('.injury-badge')) {
+      // Dispatch a custom event that card components can listen for
+      document.dispatchEvent(new CustomEvent('dashboard-click-outside'));
+      // Also close any active injury tooltip
+      setActiveInjuryTooltip(null);
+    }
+  };
   
+  document.addEventListener('click', handleDocumentClick);
+  
+  return () => {
+    document.removeEventListener('click', handleDocumentClick);
+  };
+}, []);
+
+
   // State for streak and day-of-week data
   const [dayOfWeekHits, setDayOfWeekHits] = useState({
     dayOfWeek: '',
@@ -86,6 +114,60 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     day: 'numeric' 
   });
 
+  //Injury Status ////////
+  const [injuryData, setInjuryData] = useState({});
+  const [injuryLoading, setInjuryLoading] = useState(true);
+    // Add this state to your Dashboard component
+  const [activeInjuryTooltip, setActiveInjuryTooltip] = useState(null);
+
+  useEffect(() => {
+    // Close injury tooltips when date changes
+    setActiveInjuryTooltip(null);
+  }, [currentDate]);
+
+
+
+  useEffect(() => {
+    const loadInjuryData = async () => {
+      try {
+        setInjuryLoading(true);
+        const response = await fetch('/data/mlb_injuries.json');
+        
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Convert to a map with player name as key for easier lookup
+          const injuryMap = {};
+          data.forEach(injury => {
+            // Using name as key (could use name+team for more precision)
+            injuryMap[injury.NAME] = injury;
+          });
+          
+          setInjuryData(injuryMap);
+        } else {
+          console.warn('No injury data found');
+          setInjuryData({});
+        }
+      } catch (error) {
+        console.error('Error loading injury data:', error);
+        setInjuryData({});
+      } finally {
+        setInjuryLoading(false);
+      }
+    };
+    
+    loadInjuryData();
+  }, [currentDate]); // Reload when date changes to ensure latest data
+
+  useEffect(() => {
+  return setupTooltipCloseHandler((tooltipId) => {
+    setActiveTooltip(null);
+    setActiveInjuryTooltip(null);
+  });
+}, []);
+  //End Injury Status ////////
+
+
   // Close any open tooltips when clicking outside
   useEffect(() => {
     const handleDocumentClick = (e) => {
@@ -96,6 +178,9 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
           !e.target.closest('.day-hit-tooltip')) {
         // Dispatch a custom event that card components can listen for
         document.dispatchEvent(new CustomEvent('dashboard-click-outside'));
+      }
+      if (!e.target.closest('.injury-tooltip') && !e.target.closest('.injury-badge')) {
+        setActiveInjuryTooltip(null);
       }
     };
     
@@ -630,6 +715,8 @@ useEffect(() => {
         return "Today";
     }
   };
+
+  
   
   return (
     <div className="dashboard">
@@ -661,7 +748,11 @@ useEffect(() => {
         <HRPredictionCard 
           playersWithHomeRunPrediction={playersWithHomeRunPrediction}
           isLoading={predictionLoading}
+          injuryData={injuryData}
+          currentDate={currentDate}
           teams={teamData} 
+            activeTooltip={activeInjuryTooltip}
+  setActiveTooltip={setActiveInjuryTooltip}
         />
         
         {/* Top Hitters Card */}

@@ -1,14 +1,20 @@
 import React from 'react';
 import './HRPredictionCard.css';
+import InjuryBadge from '../../utils/InjuryBadge';
+import '../../utils/InjuryBadge.css';
 
 /**
  * HRPredictionCard - Displays players who are due for home runs based on predictions
- * Enhanced with integrated team logos
+ * Updated to use the document-level tooltip system
  */
 const HRPredictionCard = ({ 
   playersWithHomeRunPrediction, 
   isLoading,
-  teams
+  teams,
+  injuryData,
+  currentDate,
+  activeTooltip,
+  setActiveTooltip
 }) => {
   return (
     <div className="card hr-prediction-card">
@@ -42,7 +48,18 @@ const HRPredictionCard = ({
                     <span className="rank-number">{index + 1}</span>
                   </div>
                   <div className="player-info">
-                    <span className="player-name">{player.fullName || player.name}</span>
+                    <span className="player-name">
+                      {player.fullName || player.name}
+                      {injuryData && (
+                        <InjuryBadge 
+                          playerName={player.fullName || player.name}
+                          playerTeam={player.team}
+                          injuryData={injuryData}
+                          activeTooltip={activeTooltip}
+                          setActiveTooltip={setActiveTooltip}
+                        />
+                      )}
+                    </span>
                     <span className="player-team">{player.team}</span>
                   </div>
                   <div className="player-stat">
@@ -57,7 +74,7 @@ const HRPredictionCard = ({
                     </div>
                   </div>
                   
-                  {/* Enhanced background logo */}
+                  {/* Add team logo as background if available */}
                   {logoUrl && (
                     <img 
                       src={logoUrl} 
