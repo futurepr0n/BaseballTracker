@@ -1,44 +1,60 @@
-/* BetSlipScannerModal.css */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   z-index: 1000;
 }
 
 .scanner-modal {
-  background-color: white;
-  border-radius: 8px;
-  width: 90%;
+  background: white;
+  border-radius: 12px;
   max-width: 600px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 20px;
+  padding: 20px;
   border-bottom: 1px solid #eee;
+  background-color: #f8f9fa;
+  border-radius: 12px 12px 0 0;
 }
 
 .modal-header h2 {
   margin: 0;
-  font-size: 1.3rem;
+  color: #333;
+  font-size: 1.5rem;
 }
 
 .close-button {
   background: none;
   border: none;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-button:hover {
+  color: #333;
+  background-color: #f0f0f0;
+  border-radius: 50%;
 }
 
 .modal-content {
@@ -51,18 +67,30 @@
 
 .dropzone {
   border: 2px dashed #ccc;
-  padding: 30px;
+  border-radius: 8px;
+  padding: 40px 20px;
   text-align: center;
-  cursor: pointer;
-  border-radius: 6px;
+  background-color: #fafafa;
+  transition: border-color 0.3s ease;
 }
 
 .dropzone:hover {
-  border-color: #888;
+  border-color: #007bff;
+  background-color: #f0f8ff;
 }
 
-.dropzone input {
-  display: none;
+.dropzone p {
+  margin: 0 0 15px 0;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.dropzone input[type="file"] {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
 }
 
 .preview-container {
@@ -72,146 +100,170 @@
 .file-preview {
   max-width: 100%;
   max-height: 300px;
-  margin-bottom: 10px;
-  border-radius: 4px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
 }
 
 .remove-file {
-  background-color: #ff4d4f;
+  background-color: #dc3545;
   color: white;
   border: none;
-  padding: 5px 10px;
+  padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.remove-file:hover {
+  background-color: #c82333;
 }
 
 .error-message {
-  color: #ff4d4f;
-  margin: 10px 0;
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 4px;
+  margin: 15px 0;
+  border: 1px solid #f5c6cb;
 }
 
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
   margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
 }
 
 .cancel-button {
-  background-color: #f5f5f5;
-  border: 1px solid #d9d9d9;
-  padding: 8px 16px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 1rem;
+}
+
+.cancel-button:hover {
+  background-color: #5a6268;
 }
 
 .scan-button {
-  background-color: #1890ff;
+  background-color: #007bff;
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 1rem;
+}
+
+.scan-button:hover:not(:disabled) {
+  background-color: #0056b3;
 }
 
 .scan-button:disabled {
-  background-color: #bfbfbf;
+  background-color: #6c757d;
   cursor: not-allowed;
 }
 
-/* Notification styles for CapSheet */
-.scan-results-notification {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: #f6ffed;
-  border: 1px solid #b7eb8f;
-  border-radius: 4px;
-  padding: 10px 15px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  z-index: 100;
-  animation: slide-in 0.3s ease-out;
-}
-
-@keyframes slide-in {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.notification-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.notification-content button {
-  background: none;
+.confirm-button {
+  background-color: #28a745;
+  color: white;
   border: none;
-  color: #1890ff;
+  padding: 10px 20px;
+  border-radius: 4px;
   cursor: pointer;
-  margin-left: 10px;
-}
-
-.dropzone {
-  border: 2px dashed #ccc;
-  padding: 30px;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  background-color: #f9f9f9;
-  min-height: 150px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-
-.dropzone:hover {
-  border-color: #22c55e;
-  background-color: #f0fff0;
-}
-
-.dropzone p {
-  margin: 0;
   font-size: 1rem;
-  color: #666;
 }
 
-.dropzone svg {
-  width: 48px;
-  height: 48px;
-  color: #999;
-  margin-bottom: 15px;
+.confirm-button:hover:not(:disabled) {
+  background-color: #218838;
 }
 
-/* Scan button styling */
-.scan-btn {
-  background-color: #22c55e !important;
+.confirm-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Scan Results Styles */
+.scan-results {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.bet-summary {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid #007bff;
+}
+
+.bet-summary p {
+  margin: 5px 0;
+  font-size: 0.95rem;
+}
+
+.players-section {
+  margin-bottom: 20px;
+}
+
+.player-results {
+  margin-bottom: 20px;
+}
+
+.player-results h4 {
+  color: #333;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid #007bff;
+  font-size: 1.1rem;
+}
+
+.player-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.player-item {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 8px;
   transition: background-color 0.2s ease;
 }
 
-.scan-btn:hover {
-  background-color: #16a34a !important;
+.player-item:hover {
+  background-color: #e9ecef;
 }
 
-/* Notification animation */
-@keyframes slide-in {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+.player-item strong {
+  color: #333;
+  font-size: 1rem;
 }
 
-.scan-results-notification {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: #f0fff4;
-  border: 1px solid #16a34a;
-  border-left: 4px solid #16a34a;
-  border-radius: 4px;
-  padding: 12px 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 100;
-  animation: slide-in 0.3s ease-out;
-  max-width: 400px;
+.prop-details {
+  color: #666;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.no-players-warning {
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 6px;
+  padding: 15px;
+  margin: 15px 0;
+  text-align: center;
+}
+
+.no-players-warning p {
+  margin: 5px 0;
+  color: #856404;
 }
