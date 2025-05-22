@@ -816,7 +816,14 @@ const noFilteredData = isFiltering &&
   return (
     <div className="dashboard">
       <header className="dashboard-header">
-        <h2>MLB Statistics Dashboard</h2>
+        <h2> <img
+              src='data/logos/Major_League_Baseball_logo.svg'
+              style={{
+                height: '1.2em',
+                verticalAlign: 'middle'
+              }}
+              alt="MLB Logo"
+            />MLB Statistics Dashboard</h2>
         <p className="date">
           {formattedDate}
           {dateStatus === 'previous' && (
