@@ -20,6 +20,8 @@ import {
   formatDateString
 } from './services/dataService';
 
+import './App.css';
+
 function App() {
   const [playerData, setPlayerData] = useState([]);
   const [teamData, setTeamData] = useState({});
@@ -70,17 +72,19 @@ function App() {
     <Router>
       <div className="app">
         <header className="app-header">
-          <h1>
-            <img
-              src='data/logos/Major_League_Baseball_logo.svg'
-              style={{
-                height: '1.2em',
-                verticalAlign: 'middle'
-              }}
-              alt="MLB Logo"
-            />
-            MLB Statistics Tracker
-          </h1>
+         <div className="header-top-row">
+            <h1>
+              Capping.Pro
+            </h1>
+            <div className="social-icons">
+              <a href="https://x.com/capping_pro" target="_blank" rel="noopener noreferrer" aria-label="Capping.Pro on X">
+                <img src="/data/logos/x_logo_icon.svg" alt="X (formerly Twitter) Logo" />
+              </a>
+              <a href="https://discord.gg/K3djWdDU" target="_blank" rel="noopener noreferrer" aria-label="Capping.Pro Discord Server">
+                <img src="/data/logos/discord_icon.svg" alt="Discord Logo" />
+              </a>
+            </div>
+          </div>
           <Navigation />
           
           <div className="date-selector">
@@ -161,7 +165,7 @@ function App() {
         </main>
         
         <footer className="app-footer">
-          <p>© 2025 MLB Statistics Tracker - Data updated daily</p>
+          <p>© 2025 Capping.Pro - MLB Stat Tracker Dashboard - Data updated daily - Absolutely and totally unafiliated with MLB and or any Team or Organization.</p>
         </footer>
       </div>
     </Router>
