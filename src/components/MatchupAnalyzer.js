@@ -9,7 +9,7 @@ const DATA_YEARS = [2025, 2024, 2023, 2022];
 const CURRENT_YEAR = Math.max(...DATA_YEARS);
 
 /**
- * Matchup Analyzer Component - With Year Selection
+ * Enhanced Matchup Analyzer Component - With Sortable Table and Row Removal
  * Analyzes all batter-pitcher matchups for selected games with configurable years
  */
 function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
@@ -31,6 +31,11 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
   const [gamePitchers, setGamePitchers] = useState({});
   const [analysisResults, setAnalysisResults] = useState([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  
+  // New state for table functionality
+  const [sortConfig, setSortConfig] = useState({ key: 'advantage', direction: 'desc' });
+  const [filteredResults, setFilteredResults] = useState([]);
+  const [removedResultIds, setRemovedResultIds] = useState(new Set());
   
   // Format date for display
   const formattedDate = currentDate.toLocaleDateString('en-US', { 
@@ -198,6 +203,8 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
   const resetSelections = () => {
     setGamePitchers({});
     setAnalysisResults([]);
+    setFilteredResults([]);
+    setRemovedResultIds(new Set());
   };
 
   // Get pitcher by ID (name-team format)
@@ -360,11 +367,96 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     };
   };
 
+  // Sorting functionality
+  const handleSort = (column) => {
+    let direction = 'desc';
+    if (sortConfig.key === column && sortConfig.direction === 'desc') {
+      direction = 'asc';
+    }
+    setSortConfig({ key: column, direction });
+  };
+
+  // Sort the results based on current sort config
+  const getSortedResults = () => {
+    const resultsToSort = analysisResults.filter(result => !removedResultIds.has(result.id));
+    
+    if (!sortConfig.key) return resultsToSort;
+
+    return [...resultsToSort].sort((a, b) => {
+      let aValue, bValue;
+      
+      switch (sortConfig.key) {
+        case 'advantage':
+          aValue = a.result.advantage;
+          bValue = b.result.advantage;
+          break;
+        case 'hit':
+          aValue = getPotentialValue(a.result.hitPotential);
+          bValue = getPotentialValue(b.result.hitPotential);
+          break;
+        case 'hr':
+          aValue = getPotentialValue(a.result.hrPotential);
+          bValue = getPotentialValue(b.result.hrPotential);
+          break;
+        case 'tb':
+          aValue = getPotentialValue(a.result.tbPotential);
+          bValue = getPotentialValue(b.result.tbPotential);
+          break;
+        case 'k':
+          aValue = getPotentialValue(a.result.kPotential);
+          bValue = getPotentialValue(b.result.kPotential);
+          break;
+        case 'batter':
+          aValue = a.batter.name;
+          bValue = b.batter.name;
+          break;
+        case 'pitcher':
+          aValue = a.pitcher.name;
+          bValue = b.pitcher.name;
+          break;
+        default:
+          return 0;
+      }
+
+      if (typeof aValue === 'string') {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
+
+      if (sortConfig.direction === 'asc') {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      } else {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      }
+    });
+  };
+
+  // Helper function to convert potential ratings to numeric values for sorting
+  const getPotentialValue = (potential) => {
+    switch (potential) {
+      case 'High': return 3;
+      case 'Medium': return 2;
+      case 'Low': return 1;
+      default: return 0;
+    }
+  };
+
+  // Remove a result row
+  const removeResult = (resultId) => {
+    setRemovedResultIds(prev => new Set([...prev, resultId]));
+  };
+
+  // Clear all removed results
+  const clearRemovedResults = () => {
+    setRemovedResultIds(new Set());
+  };
+
   // Run the analysis for selected games and pitchers
   const runAnalysis = async () => {
     console.log("Starting analysis...");
     setIsAnalyzing(true);
     setAnalysisResults([]);
+    setRemovedResultIds(new Set());
     
     // Get selected game indices
     const selectedGameIndices = Object.entries(selectedGames)
@@ -394,8 +486,9 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
           const awayBatters = getBattersForTeam(game.awayTeam);
           console.log(`Found ${awayBatters.length} away batters`);
           
-          awayBatters.forEach(batter => {
+          awayBatters.forEach((batter, index) => {
             matchups.push({
+              id: `${gameIndex}-home-${index}`, // Add unique ID
               gameIndex,
               game: `${game.awayTeam} @ ${game.homeTeam}`,
               batter,
@@ -414,8 +507,9 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
           const homeBatters = getBattersForTeam(game.homeTeam);
           console.log(`Found ${homeBatters.length} home batters`);
           
-          homeBatters.forEach(batter => {
+          homeBatters.forEach((batter, index) => {
             matchups.push({
+              id: `${gameIndex}-away-${index}`, // Add unique ID
               gameIndex,
               game: `${game.awayTeam} @ ${game.homeTeam}`,
               batter,
@@ -445,9 +539,6 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
           explanation: mockGetExplanation(analysis)
         };
       });
-      
-      // Sort by strongest batter advantage
-      results.sort((a, b) => b.result.advantage - a.result.advantage);
       
       setAnalysisResults(results);
     } catch (error) {
@@ -518,6 +609,16 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     return hasSelectedGames && hasPitcherConfigured && !isAnalyzing && !isLoadingRoster && !isLoadingCSV && activeYears.length > 0;
   };
 
+  // Get the current sorted results
+  const sortedResults = getSortedResults();
+  const removedCount = removedResultIds.size;
+
+  // Get sort direction indicator
+  const getSortIcon = (column) => {
+    if (sortConfig.key !== column) return '↕️';
+    return sortConfig.direction === 'asc' ? '↑' : '↓';
+  };
+
   return (
     <div className="matchup-analyzer">
       <header className="analyzer-header">
@@ -525,8 +626,6 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
         <p className="date">{formattedDate}</p>
       </header>
 
-
-      
       <section className="game-selection-section">
         <h3>Select Games & Configure Pitchers</h3>
         <div className="games-grid">
@@ -605,7 +704,23 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
       
       {analysisResults.length > 0 && (
         <section className="results-section">
-          <h3>Matchup Analysis Results ({analysisResults.length} matchups)</h3>
+          <div className="results-header">
+            <h3>Matchup Analysis Results</h3>
+            <div className="results-stats">
+              <span className="total-results">
+                {sortedResults.length} of {analysisResults.length} matchups shown
+              </span>
+              {removedCount > 0 && (
+                <button 
+                  className="restore-btn"
+                  onClick={clearRemovedResults}
+                  title="Restore all removed results"
+                >
+                  Restore {removedCount} removed
+                </button>
+              )}
+            </div>
+          </div>
           
           {/* Year Selection - Now positioned correctly under results heading */}
           <div className="analysis-years-control">
@@ -655,67 +770,169 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
             </div>
           </div>
           
-          <div className="results-table-container">
-            <table className="results-table">
+          <div className="enhanced-results-table-container">
+            <table className="enhanced-results-table">
               <thead>
                 <tr>
-                  <th>Game</th>
-                  <th>Batter</th>
-                  <th>Pitcher</th>
-                  <th>Advantage</th>
-                  <th>Hit</th>
-                  <th>HR</th>
-                  <th>TB</th>
-                  <th>K</th>
-                  <th>Details</th>
+                  <th className="remove-column">Remove</th>
+                  <th className="game-column">Game</th>
+                  <th 
+                    className="sortable-column player-column" 
+                    onClick={() => handleSort('batter')}
+                  >
+                    Batter {getSortIcon('batter')}
+                  </th>
+                  <th 
+                    className="sortable-column player-column" 
+                    onClick={() => handleSort('pitcher')}
+                  >
+                    Pitcher {getSortIcon('pitcher')}
+                  </th>
+                  <th 
+                    className="sortable-column advantage-column" 
+                    onClick={() => handleSort('advantage')}
+                  >
+                    Advantage {getSortIcon('advantage')}
+                  </th>
+                  <th 
+                    className="sortable-column potential-column" 
+                    onClick={() => handleSort('hit')}
+                  >
+                    Hit {getSortIcon('hit')}
+                  </th>
+                  <th 
+                    className="sortable-column potential-column" 
+                    onClick={() => handleSort('hr')}
+                  >
+                    HR {getSortIcon('hr')}
+                  </th>
+                  <th 
+                    className="sortable-column potential-column" 
+                    onClick={() => handleSort('tb')}
+                  >
+                    TB {getSortIcon('tb')}
+                  </th>
+                  <th 
+                    className="sortable-column potential-column" 
+                    onClick={() => handleSort('k')}
+                  >
+                    K {getSortIcon('k')}
+                  </th>
+                  <th className="stats-column">Stats</th>
+                  <th className="details-column">Details</th>
                 </tr>
               </thead>
               <tbody>
-                {analysisResults.map((result, index) => (
-                  <tr key={index}>
-                    <td>{result.game}</td>
+                {sortedResults.map((result) => (
+                  <tr key={result.id} className="result-row">
+                    <td className="remove-cell">
+                      <button 
+                        className="remove-result-btn"
+                        onClick={() => removeResult(result.id)}
+                        title="Remove this result"
+                      >
+                        ×
+                      </button>
+                    </td>
+                    <td className="game-cell">
+                      <span className="game-text">{result.game}</span>
+                    </td>
                     <td className="player-cell">
-                      <div className="player-info">
-                        <span className="player-name">{result.batter.name}</span>
-                        <span className="player-team">{result.batter.team}</span>
-                        {result.batter.bats && (
-                          <span className="player-hand">Bats: {result.batter.bats}</span>
-                        )}
+                      <div className="player-info-compact">
+                        <span className="player-name-compact">{result.batter.name}</span>
+                        <div className="player-details-compact">
+                          <span className="player-team-compact">{result.batter.team}</span>
+                          {result.batter.bats && (
+                            <span className="player-hand-compact">B: {result.batter.bats}</span>
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td className="player-cell">
-                      <div className="player-info">
-                        <span className="player-name">{result.pitcher.name}</span>
-                        <span className="player-team">{result.pitcher.team}</span>
-                        {(result.pitcher.throwingArm || result.pitcher.ph) && (
-                          <span className="player-hand">
-                            Throws: {result.pitcher.throwingArm || result.pitcher.ph}
-                          </span>
-                        )}
+                      <div className="player-info-compact">
+                        <span className="player-name-compact">{result.pitcher.name}</span>
+                        <div className="player-details-compact">
+                          <span className="player-team-compact">{result.pitcher.team}</span>
+                          {(result.pitcher.throwingArm || result.pitcher.ph) && (
+                            <span className="player-hand-compact">
+                              T: {result.pitcher.throwingArm || result.pitcher.ph}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </td>
-                    <td className={`advantage-cell ${getAdvantageClass(result.result.advantage)}`}>
-                      <div className="advantage-value">
+                    <td className={`advantage-cell-compact ${getAdvantageClass(result.result.advantage)}`}>
+                      <div className="advantage-value-compact">
                         {result.result.advantage.toFixed(1)}
                       </div>
-                      <div className="advantage-label">{result.result.advantageLabel}</div>
+                      <div className="advantage-label-compact">{result.result.advantageLabel}</div>
                     </td>
-                    <td className={`potential-cell potential-${result.result.hitPotential.toLowerCase()}`}>
+                    <td className={`potential-cell-compact potential-${result.result.hitPotential.toLowerCase()}`}>
                       {result.result.hitPotential}
                     </td>
-                    <td className={`potential-cell potential-${result.result.hrPotential.toLowerCase()}`}>
+                    <td className={`potential-cell-compact potential-${result.result.hrPotential.toLowerCase()}`}>
                       {result.result.hrPotential}
                     </td>
-                    <td className={`potential-cell potential-${result.result.tbPotential.toLowerCase()}`}>
+                    <td className={`potential-cell-compact potential-${result.result.tbPotential.toLowerCase()}`}>
                       {result.result.tbPotential}
                     </td>
-                    <td className={`potential-cell potential-${result.result.kPotential.toLowerCase()}`}>
+                    <td className={`potential-cell-compact potential-${result.result.kPotential.toLowerCase()}`}>
                       {result.result.kPotential}
                     </td>
-                    <td>
-                      <pre className="betting-insights">
-                        {result.explanation}
-                      </pre>
+                    <td className="stats-cell-compact">
+                      <div className="betting-insights-compact">
+                        <div className="insight-row">
+                          <span className="insight-label">BA:</span>
+                          <span className="insight-value">{result.result.details.predictedBA}</span>
+                        </div>
+                        <div className="insight-row">
+                          <span className="insight-label">HR:</span>
+                          <span className="insight-value">{(parseFloat(result.result.details.predictedHR) * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="insight-row">
+                          <span className="insight-label">SLG:</span>
+                          <span className="insight-value">{result.result.details.predictedSLG}</span>
+                        </div>
+                        <div className="insight-row">
+                          <span className="insight-label">K:</span>
+                          <span className="insight-value">{(parseFloat(result.result.details.strikeoutRate) * 100).toFixed(1)}%</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="details-cell-full">
+                      <div className="betting-insights-full">
+                        <div className="insight-section">
+                          <span className="insight-icon">🎯</span>
+                          <span className="insight-text">
+                            <strong>Hit Potential: {result.result.hitPotential}</strong><br/>
+                            Predicted Hit Rate: {(parseFloat(result.result.details.predictedBA) * 100).toFixed(1)}%.
+                          </span>
+                        </div>
+                        
+                        <div className="insight-section">
+                          <span className="insight-icon">💣</span>
+                          <span className="insight-text">
+                            <strong>Home Run Potential: {result.result.hrPotential}</strong><br/>
+                            Predicted HR Rate: {(parseFloat(result.result.details.predictedHR) * 100).toFixed(1)}%. Expects 1 HR every {Math.round(1 / parseFloat(result.result.details.predictedHR))} AB.
+                          </span>
+                        </div>
+                        
+                        <div className="insight-section">
+                          <span className="insight-icon">📊</span>
+                          <span className="insight-text">
+                            <strong>Total Bases Potential: {result.result.tbPotential}</strong><br/>
+                            Driven by Predicted SLG of {result.result.details.predictedSLG} and wOBA of {result.result.details.predictedWOBA}.
+                          </span>
+                        </div>
+                        
+                        <div className="insight-section">
+                          <span className="insight-icon">⚾</span>
+                          <span className="insight-text">
+                            <strong>Batter K Potential: {result.result.kPotential}</strong><br/>
+                            Batter's Strikeout Rate: {(parseFloat(result.result.details.strikeoutRate) * 100).toFixed(1)}%.
+                          </span>
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 ))}
