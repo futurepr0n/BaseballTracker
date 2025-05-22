@@ -277,19 +277,41 @@
 /* Results section */
 .results-section {
   margin-top: 30px;
+  margin-bottom: 40px; /* Add bottom margin for scroll indicator */
 }
 
 /* Enhanced results table */
 .enhanced-results-table-container {
   overflow-x: auto;
+  overflow-y: visible;
   margin-top: 15px;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  max-width: 100vw; /* Ensure it doesn't exceed viewport */
+  position: relative;
+}
+
+/* Add scroll indicator for mobile */
+.enhanced-results-table-container::after {
+  content: '← Scroll for more data →';
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: #6c757d;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid #e9ecef;
+  display: none;
+  white-space: nowrap;
 }
 
 .enhanced-results-table {
   width: 100%;
+  min-width: 1200px; /* Force horizontal scroll when needed */
   border-collapse: collapse;
   font-size: 0.9rem;
   background-color: white;
@@ -642,7 +664,7 @@
 
 @media (max-width: 768px) {
   .matchup-analyzer {
-    padding: 15px;
+    padding: 15px 10px; /* Reduce side padding */
   }
   
   .games-grid {
@@ -657,11 +679,52 @@
     width: 100%;
   }
   
+  /* Show scroll indicator on mobile */
+  .enhanced-results-table-container::after {
+    display: block;
+  }
+  
+  /* Make table container stable and fixed on mobile */
+  .enhanced-results-table-container {
+    margin-left: -10px;
+    margin-right: -10px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    max-width: calc(100vw - 0px); /* Full viewport width */
+    position: relative;
+    /* Remove momentum scrolling and make it more stable */
+    -webkit-overflow-scrolling: auto;
+    overflow-scrolling: auto;
+    /* Prevent elastic scrolling bounce */
+    overscroll-behavior-x: contain;
+    /* Make container more stable */
+    transform: translateZ(0); /* Force hardware acceleration */
+    backface-visibility: hidden;
+    /* Prevent wobbling */
+    touch-action: pan-x; /* Only allow horizontal scrolling */
+  }
+  
+  .enhanced-results-table {
+    min-width: 900px; /* Smaller min-width for mobile */
+    /* Stabilize table */
+    position: relative;
+    transform: translateZ(0);
+  }
+  
   .enhanced-results-table th,
   .enhanced-results-table td {
     padding: 6px 4px;
     font-size: 0.75rem;
   }
+  
+  /* Compress columns on mobile */
+  .game-column { width: 100px; }
+  .player-column { width: 120px; }
+  .advantage-column { width: 100px; }
+  .potential-column { width: 50px; }
+  .stats-column { width: 120px; }
+  .details-column { width: 200px; }
   
   .player-info-compact {
     min-width: 100px;
@@ -704,32 +767,50 @@
     padding: 1px 3px;
   }
 }
+  
+
 
 @media (max-width: 576px) {
   .enhanced-results-table-container {
-    margin: 0 -15px;
+    margin-left: -10px;
+    margin-right: -10px;
     border-radius: 0;
     border-left: none;
     border-right: none;
+    /* Additional stability for very small screens */
+    -webkit-overflow-scrolling: auto;
+    overflow-scrolling: auto;
+    overscroll-behavior-x: contain;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    touch-action: pan-x;
+  }
+  
+  .enhanced-results-table {
+    min-width: 800px; /* Even smaller for very small screens */
+    /* Stabilize table on small screens */
+    position: relative;
+    transform: translateZ(0);
   }
   
   .enhanced-results-table th,
   .enhanced-results-table td {
-    padding: 4px 2px;
+    padding: 4px 3px;
+    font-size: 0.7rem;
   }
   
   .remove-result-btn {
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
   }
   
   .game-text {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
   }
   
   .potential-cell-compact {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     padding: 4px 2px;
   }
   
@@ -746,11 +827,13 @@
     font-size: 0.8rem;
   }
   
-  /* Hide details column on very small screens to save space */
-  .details-column,
-  .details-cell-full {
-    display: none;
-  }
+  /* Compress columns further on very small screens */
+  .game-column { width: 90px; }
+  .player-column { width: 100px; }
+  .advantage-column { width: 80px; }
+  .potential-column { width: 40px; }
+  .stats-column { width: 100px; }
+  .details-column { width: 180px; }
 }
 
 /* Animation for loading */
