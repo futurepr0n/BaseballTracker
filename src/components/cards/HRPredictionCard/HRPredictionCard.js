@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { useTeamFilter } from '../../TeamFilterContext'; // Import to check filtering status
+import './HRPredictionCard.css'; // Import your styles
 
 const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) => {
   // Get filtering context to determine if we should limit display
