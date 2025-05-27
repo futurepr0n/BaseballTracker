@@ -1,0 +1,181 @@
+/* src/components/cards/LiveScoresCard/LiveScoresCard.css */
+.live-scores-card {
+  grid-column: span 2;
+  background-color: white;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.last-updated {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.refresh-btn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.refresh-btn:hover {
+  background-color: #f5f5f5;
+}
+
+.refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.scores-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.game-score {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  background-color: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.game-score.live {
+  border-color: #dc3545;
+  background-color: #fff5f5;
+}
+
+.game-score.final {
+  background-color: #f8f9fa;
+}
+
+.game-teams {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+
+.team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 80px;
+}
+
+.team-logo {
+  width: 24px;
+  height: 24px;
+}
+
+.team-name {
+  font-weight: 500;
+  min-width: 35px;
+}
+
+.team-score {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #333;
+  min-width: 25px;
+  text-align: right;
+}
+
+.game-divider {
+  color: #666;
+  font-weight: 500;
+}
+
+.game-status {
+  min-width: 80px;
+  text-align: right;
+}
+
+.status {
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.status.live {
+  color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.status.final {
+  color: #6c757d;
+}
+
+.status.scheduled {
+  color: #0056b3;
+}
+
+.error-message {
+  color: #dc3545;
+  text-align: center;
+  padding: 20px;
+}
+
+.error-message button {
+  display: block;
+  margin: 10px auto 0;
+  padding: 5px 15px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.no-games {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .live-scores-card {
+    grid-column: 1 / -1;
+  }
+  
+  .game-teams {
+    gap: 10px;
+  }
+  
+  .team {
+    gap: 4px;
+    min-width: 60px;
+  }
+  
+  .team-logo {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .team-name {
+    font-size: 0.9rem;
+  }
+}

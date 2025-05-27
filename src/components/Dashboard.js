@@ -25,6 +25,10 @@ import ImprovedRateCard from './cards/ImprovedRateCard/ImprovedRateCard';
 import RecentHomersCard from './cards/RecentHomersCard/RecentHomersCard';
 import PerformanceCard from './cards/PerformanceCard/PerformanceCard';
 
+
+import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
+
+
 /**
  * Dashboard component - Home page displaying summary of MLB data
  * Enhanced with team filtering capability
@@ -872,6 +876,8 @@ const noFilteredData = isFiltering &&
             batterData={filteredBatterData}
             pitcherData={filteredPitcherData}
           />
+
+          <LiveScoresCard teams={teamData} />
           
           {/* HR Prediction Card */}
           <HRPredictionCard 
