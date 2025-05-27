@@ -17,6 +17,24 @@ const SEASON_DATA_DIR = path.join(__dirname, '../../public/data/2025');
 const OUTPUT_DIR = path.join(__dirname, '../../public/data/predictions');
 
 /**
+ * Check if a player is currently injured
+ */
+function isPlayerInjured(player) {
+  if (!player.injuries || !Array.isArray(player.injuries)) {
+    return false;
+  }
+  
+  return player.injuries.some(injury => injury.active === true);
+}
+
+/**
+ * Filter out injured players from a roster array
+ */
+function filterHealthyPlayers(players) {
+  return players.filter(player => !isPlayerInjured(player));
+}
+
+/**
  * Read JSON file
  */
 function readJsonFile(filePath) {
@@ -119,6 +137,10 @@ async function generatePlayerPerformance(targetDate = new Date()) {
     return false;
   }
   
+  // Filter out injured players
+  const healthyRosterData = filterHealthyPlayers(rosterData);
+  console.log(`[generatePlayerPerformance] Filtered out ${rosterData.length - healthyRosterData.length} injured players from roster`);
+  
   // Load all season data
   console.log('[generatePlayerPerformance] Loading all season data...');
   const seasonData = loadAllSeasonData();
@@ -204,9 +226,17 @@ async function generatePlayerPerformance(targetDate = new Date()) {
     }
   });
   
-  // Convert map to array and sort as needed
+  // Convert map to array and filter only healthy players
   const players = Array.from(playerMap.values())
-    .filter(player => player.gamesPlayed > 0);
+    .filter(player => {
+      // Check if this player is in our healthy roster
+      const rosterPlayer = healthyRosterData.find(r => 
+        r.name === player.name && 
+        r.team === player.team && 
+        (r.type === 'hitter' || !r.type)
+      );
+      return rosterPlayer && player.gamesPlayed > 0;
+    });
   
   // Sort players with most recent home runs first
   const recentHRs = [...players]
@@ -255,6 +285,10 @@ async function generateDayOfWeekHitLeaders(targetDate = new Date()) {
     console.error('[generateDayOfWeekHitLeaders] Failed to load roster data');
     return false;
   }
+  
+  // Filter out injured players
+  const healthyRosterData = filterHealthyPlayers(rosterData);
+  console.log(`[generateDayOfWeekHitLeaders] Filtered out ${rosterData.length - healthyRosterData.length} injured players from roster`);
   
   // Load all season data
   console.log('[generateDayOfWeekHitLeaders] Loading all season data...');
@@ -308,9 +342,17 @@ async function generateDayOfWeekHitLeaders(targetDate = new Date()) {
     }
   });
   
-  // Convert map to array and sort by hits
+  // Convert map to array and filter only healthy players
   let playerHits = Array.from(playerHitsMap.values())
-    .filter(player => player.games > 0) // Only include players who have played on this day
+    .filter(player => {
+      // Check if this player is in our healthy roster and has played on this day
+      const rosterPlayer = healthyRosterData.find(r => 
+        r.name === player.name && 
+        r.team === player.team && 
+        (r.type === 'hitter' || !r.type)
+      );
+      return rosterPlayer && player.games > 0;
+    })
     .sort((a, b) => b.hits - a.hits);
   
   // Add hit rate (hits per game)
@@ -373,6 +415,10 @@ async function generateHitStreakAnalysis(targetDate = new Date()) {
     return false;
   }
   
+  // Filter out injured players
+  const healthyRosterData = filterHealthyPlayers(rosterData);
+  console.log(`[generateHitStreakAnalysis] Filtered out ${rosterData.length - healthyRosterData.length} injured players from roster`);
+  
   // Load all season data
   console.log('[generateHitStreakAnalysis] Loading all season data...');
   const seasonData = loadAllSeasonData();
@@ -419,14 +465,21 @@ async function generateHitStreakAnalysis(targetDate = new Date()) {
     }
   });
   
-  // Calculate streak statistics for each player
+  // Calculate streak statistics for each player (only healthy players)
   const playerStreakStats = [];
   
   playerGameHistoryMap.forEach((playerHistory, playerKey) => {
     const { name, team, games } = playerHistory;
     
-    // Skip players with few games
-    if (games.length < 5) {
+    // Check if this player is in our healthy roster
+    const rosterPlayer = healthyRosterData.find(r => 
+      r.name === name && 
+      r.team === team && 
+      (r.type === 'hitter' || !r.type)
+    );
+    
+    // Skip if player is injured or doesn't have enough games
+    if (!rosterPlayer || games.length < 5) {
       return;
     }
     

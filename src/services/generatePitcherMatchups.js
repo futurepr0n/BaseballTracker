@@ -14,6 +14,24 @@ const SEASON_DATA_DIR = path.join(__dirname, '../../public/data/2025');
 const OUTPUT_DIR = path.join(__dirname, '../../public/data/predictions');
 
 /**
+ * Check if a player is currently injured
+ */
+function isPlayerInjured(player) {
+  if (!player.injuries || !Array.isArray(player.injuries)) {
+    return false;
+  }
+  
+  return player.injuries.some(injury => injury.active === true);
+}
+
+/**
+ * Filter out injured players from a roster array
+ */
+function filterHealthyPlayers(players) {
+  return players.filter(player => !isPlayerInjured(player));
+}
+
+/**
  * Read JSON file
  */
 function readJsonFile(filePath) {
@@ -180,7 +198,7 @@ function findMostRecentDataFile(targetDate) {
 }
 
 /**
- * Analyze matchups between one team's pitchers and another team's batters
+ * Analyzes matchups between one team's pitchers and another team's batters
  */
 function analyzeTeamMatchup(pitchingTeam, battingTeam, pitchersByTeam, battersByTeam, matchupsByPitcher, matchupsByTeam) {
   const pitchers = pitchersByTeam.get(pitchingTeam) || [];
@@ -332,11 +350,15 @@ async function generatePitcherMatchups(targetDate = new Date()) {
     return false;
   }
   
-  // Create lookup maps for pitchers and batters by team
+  // Filter out injured players
+  const healthyRosterData = filterHealthyPlayers(rosterData);
+  console.log(`[generatePitcherMatchups] Filtered out ${rosterData.length - healthyRosterData.length} injured players from roster`);
+  
+  // Create lookup maps for pitchers and batters by team (only healthy players)
   const pitchersByTeam = new Map();
   const battersByTeam = new Map();
   
-  rosterData.forEach(player => {
+  healthyRosterData.forEach(player => {
     if (!player.team) return;
     
     if (player.type === 'pitcher' || (!player.type && player.ph)) {
@@ -351,6 +373,8 @@ async function generatePitcherMatchups(targetDate = new Date()) {
       battersByTeam.get(player.team).push(player);
     }
   });
+  
+  console.log(`[generatePitcherMatchups] Created maps with ${pitchersByTeam.size} teams with pitchers and ${battersByTeam.size} teams with batters`);
   
   // 2. Find today's game data to determine matchups
   console.log('[generatePitcherMatchups] Finding most recent game data file...');
@@ -419,7 +443,7 @@ matchupsByTeam.sort((a, b) => a.favorableMatchupPercentage - b.favorableMatchupP
   matchupsByPitcher.sort((a, b) => b.sameHandednessPercentage - a.sameHandednessPercentage);
   matchupsByTeam.sort((a, b) => a.favorableMatchupPercentage - b.favorableMatchupPercentage);
   
-  // Group all pitchers by team for the team-based view
+  // Group all pitchers by team for the team-based view (only healthy players)
   const allPitchersByTeam = {};
   matchupsByPitcher.forEach(pitcher => {
     if (!allPitchersByTeam[pitcher.team]) {
