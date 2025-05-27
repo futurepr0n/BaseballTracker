@@ -17,6 +17,24 @@ const OUTPUT_DIR = path.join(__dirname, '../../public/data/predictions');
 const HR_DEFICIT_THRESHOLD = 2; // Threshold for considering a player "due"
 
 /**
+ * Check if a player is currently injured
+ */
+function isPlayerInjured(player) {
+  if (!player.injuries || !Array.isArray(player.injuries)) {
+    return false;
+  }
+  
+  return player.injuries.some(injury => injury.active === true);
+}
+
+/**
+ * Filter out injured players from a roster array
+ */
+function filterHealthyPlayers(players) {
+  return players.filter(player => !isPlayerInjured(player));
+}
+
+/**
  * Read JSON file
  */
 function readJsonFile(filePath) {
@@ -348,11 +366,15 @@ async function generateHRPredictions(targetDate = new Date()) {
   }
   console.log(`[generateHRPredictions] Loaded ${rosterData.length} players from roster.`);
   
+  // Filter out injured players
+  const healthyRosterData = filterHealthyPlayers(rosterData);
+  console.log(`[generateHRPredictions] Filtered out ${rosterData.length - healthyRosterData.length} injured players from roster`);
+  
   // Extract hitters from roster
-  const hitters = rosterData.filter(player => 
+  const hitters = healthyRosterData.filter(player => 
     player.type === 'hitter' || !player.type
   );
-  console.log(`[generateHRPredictions] Found ${hitters.length} hitters in roster.`);
+  console.log(`[generateHRPredictions] Found ${hitters.length} healthy hitters in roster.`);
   
   // 2. Find today's game data to determine which teams are playing
   console.log('[generateHRPredictions] 2. Finding most recent game data file...');
@@ -386,7 +408,7 @@ async function generateHRPredictions(targetDate = new Date()) {
   } else {
     console.warn('[generateHRPredictions] No games found in today\'s data. Including all teams.');
     // If no games found, include all teams to avoid empty predictions
-    rosterData.forEach(player => {
+    healthyRosterData.forEach(player => {
       if (player.team) {
         teamsPlayingToday.add(player.team);
       }
@@ -500,7 +522,7 @@ async function generateHRPredictions(targetDate = new Date()) {
     .filter(Boolean) // Remove null entries
     .sort((a, b) => b.dueScore - a.dueScore); // Sort by most due first
   
-  console.log(`[generateHRPredictions] Processed ${processedCount} hitters from roster. Found ${teamFilteredCount} on today's teams, ${sufficientDataCount} with game data, and ${dueCount} considered "due" for a HR.`);
+  console.log(`[generateHRPredictions] Processed ${processedCount} healthy hitters from roster. Found ${teamFilteredCount} on today's teams, ${sufficientDataCount} with game data, and ${dueCount} considered "due" for a HR.`);
   
   // Take top 15 players based on due score
   const predictions = playerPredictions.slice(0, 25);
@@ -567,6 +589,10 @@ async function generatePlayerPerformance(targetDate = new Date()) {
     return false;
   }
   
+  // Filter out injured players
+  const healthyRosterData = filterHealthyPlayers(rosterData);
+  console.log(`[generatePlayerPerformance] Filtered out ${rosterData.length - healthyRosterData.length} injured players from roster`);
+  
   console.log('[generatePlayerPerformance] 2. Loading all season data...');
   const seasonData = loadAllSeasonData();
   if (Object.keys(seasonData).length === 0) {
@@ -595,7 +621,8 @@ async function generatePlayerPerformance(targetDate = new Date()) {
   for (const playerData of allPlayersMap.values()) {
     const { name, team } = playerData;
     
-    const rosterPlayer = rosterData.find(r => 
+    // Check if this player is in our healthy roster
+    const rosterPlayer = healthyRosterData.find(r => 
       r.name === name && r.team === team && 
       (r.type === 'hitter' || !r.type));
     
