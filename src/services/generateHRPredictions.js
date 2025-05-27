@@ -425,6 +425,7 @@ async function generateHRPredictions(targetDate = new Date()) {
   let dueCount = 0;
   
   // Process each hitter from the roster
+// Process each hitter from the roster
   const playerPredictions = hitters
     .map(player => {
       processedCount++;
@@ -500,8 +501,7 @@ async function generateHRPredictions(targetDate = new Date()) {
       }
       
       // Create prediction object with all possible fields initialized
-      // This ensures no undefined values that could cause errors
-      return {
+      const predictionData = {
         name: player.name || "",
         fullName: fullName || player.name || "",
         team: player.team || "",
@@ -518,14 +518,19 @@ async function generateHRPredictions(targetDate = new Date()) {
         isDue: isDue || false,
         dueScore: dueScore || 0
       };
+      
+      // MODIFIED: Only return players who are actually "due"
+      return isDue ? predictionData : null;
     })
     .filter(Boolean) // Remove null entries
     .sort((a, b) => b.dueScore - a.dueScore); // Sort by most due first
   
   console.log(`[generateHRPredictions] Processed ${processedCount} healthy hitters from roster. Found ${teamFilteredCount} on today's teams, ${sufficientDataCount} with game data, and ${dueCount} considered "due" for a HR.`);
   
-  // Take top 15 players based on due score
-  const predictions = playerPredictions.slice(0, 25);
+  // Take all players based on due score
+  const predictions = playerPredictions;
+
+  console.log(`[generateHRPredictions] Including ${predictions.length} players who are due for HRs in the output file.`);
   
   // If no predictions were generated, provide default data to prevent errors
   if (predictions.length === 0) {
@@ -553,7 +558,10 @@ async function generateHRPredictions(targetDate = new Date()) {
   const outputData = {
     date: targetDate.toISOString().split('T')[0],
     updatedAt: new Date().toISOString(),
-    predictions: predictions
+    predictions: predictions,
+    totalDuePlayers: predictions.length,
+    teamsRepresented: [...new Set(predictions.map(p => p.team))].length,
+    generationNote: "Includes all players meeting 'due' criteria, not limited to top 25"
   };
   
   // Format output filename based on date

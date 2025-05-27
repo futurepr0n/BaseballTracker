@@ -21,7 +21,7 @@
   background-color: rgba(230, 57, 70, 0.02);
 }
 
-/* Player Rank Styling */
+/* Player Rank Styling 
 .hr-prediction-card .player-rank {
   width: 30px;
   height: 30px;
@@ -29,11 +29,11 @@
   align-items: center;
   justify-content: center;
   background-color: #e63946; /* Red background for HR prediction ranks */
-  color: white;
+ /* color: white;
   border-radius: 50%;
   font-weight: bold;
   margin-right: 15px;
-}
+}*/
 
 /* Player Info Styling */
 .hr-prediction-card .player-info {
@@ -103,4 +103,20 @@
   color: #888;
   text-align: center;
   padding: 20px 0;
+}
+
+.hr-prediction .player-rank {
+  /* Let inline styles (team colors) take precedence */
+  background-color: var(--team-color, #e63946); /* Fallback to red only if no team color */
+  width: 30px;
+  height: 30px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 15px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
