@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Fragment } from 'react';
 import './MatchupAnalyzer.css';
 import { fetchRosterData } from '../services/dataService';
 import Papa from 'papaparse';
@@ -819,122 +819,138 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                     K {getSortIcon('k')}
                   </th>
                   <th className="stats-column">Stats</th>
-                  <th className="details-column">Details</th>
                 </tr>
               </thead>
               <tbody>
                 {sortedResults.map((result) => (
-                  <tr key={result.id} className="result-row">
-                    <td className="remove-cell">
-                      <button 
-                        className="remove-result-btn"
-                        onClick={() => removeResult(result.id)}
-                        title="Remove this result"
-                      >
-                        ×
-                      </button>
-                    </td>
-                    <td className="game-cell">
-                      <span className="game-text">{result.game}</span>
-                    </td>
-                    <td className="player-cell">
-                      <div className="player-info-compact">
-                        <span className="player-name-compact">{result.batter.name}</span>
-                        <div className="player-details-compact">
-                          <span className="player-team-compact">{result.batter.team}</span>
-                          {result.batter.bats && (
-                            <span className="player-hand-compact">B: {result.batter.bats}</span>
-                          )}
+                  <React.Fragment key={result.id}>
+                    {/* Main data row */}
+                    <tr className="result-row main-row">
+                      <td className="remove-cell">
+                        <button 
+                          className="remove-result-btn"
+                          onClick={() => removeResult(result.id)}
+                          title="Remove this result"
+                        >
+                          ×
+                        </button>
+                      </td>
+                      <td className="game-cell">
+                        <span className="game-text">{result.game}</span>
+                      </td>
+                      <td className="player-cell">
+                        <div className="player-info-compact">
+                          <span className="player-name-compact">{result.batter.name}</span>
+                          <div className="player-details-compact">
+                            <span className="player-team-compact">{result.batter.team}</span>
+                            {result.batter.bats && (
+                              <span className="player-hand-compact">B: {result.batter.bats}</span>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="player-cell">
-                      <div className="player-info-compact">
-                        <span className="player-name-compact">{result.pitcher.name}</span>
-                        <div className="player-details-compact">
-                          <span className="player-team-compact">{result.pitcher.team}</span>
-                          {(result.pitcher.throwingArm || result.pitcher.ph) && (
-                            <span className="player-hand-compact">
-                              T: {result.pitcher.throwingArm || result.pitcher.ph}
-                            </span>
-                          )}
+                      </td>
+                      <td className="player-cell">
+                        <div className="player-info-compact">
+                          <span className="player-name-compact">{result.pitcher.name}</span>
+                          <div className="player-details-compact">
+                            <span className="player-team-compact">{result.pitcher.team}</span>
+                            {(result.pitcher.throwingArm || result.pitcher.ph) && (
+                              <span className="player-hand-compact">
+                                T: {result.pitcher.throwingArm || result.pitcher.ph}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className={`advantage-cell-compact ${getAdvantageClass(result.result.advantage)}`}>
-                      <div className="advantage-value-compact">
-                        {result.result.advantage.toFixed(1)}
-                      </div>
-                      <div className="advantage-label-compact">{result.result.advantageLabel}</div>
-                    </td>
-                    <td className={`potential-cell-compact potential-${result.result.hitPotential.toLowerCase()}`}>
-                      {result.result.hitPotential}
-                    </td>
-                    <td className={`potential-cell-compact potential-${result.result.hrPotential.toLowerCase()}`}>
-                      {result.result.hrPotential}
-                    </td>
-                    <td className={`potential-cell-compact potential-${result.result.tbPotential.toLowerCase()}`}>
-                      {result.result.tbPotential}
-                    </td>
-                    <td className={`potential-cell-compact potential-${result.result.kPotential.toLowerCase()}`}>
-                      {result.result.kPotential}
-                    </td>
-                    <td className="stats-cell-compact">
-                      <div className="betting-insights-compact">
-                        <div className="insight-row">
-                          <span className="insight-label">BA:</span>
-                          <span className="insight-value">{result.result.details.predictedBA}</span>
+                      </td>
+                      <td className={`advantage-cell-compact ${getAdvantageClass(result.result.advantage)}`}>
+                        <div className="advantage-value-compact">
+                          {result.result.advantage.toFixed(1)}
                         </div>
-                        <div className="insight-row">
-                          <span className="insight-label">HR:</span>
-                          <span className="insight-value">{(parseFloat(result.result.details.predictedHR) * 100).toFixed(1)}%</span>
+                        <div className="advantage-label-compact">{result.result.advantageLabel}</div>
+                      </td>
+                      <td className={`potential-cell-compact potential-${result.result.hitPotential.toLowerCase()}`}>
+                        {result.result.hitPotential}
+                      </td>
+                      <td className={`potential-cell-compact potential-${result.result.hrPotential.toLowerCase()}`}>
+                        {result.result.hrPotential}
+                      </td>
+                      <td className={`potential-cell-compact potential-${result.result.tbPotential.toLowerCase()}`}>
+                        {result.result.tbPotential}
+                      </td>
+                      <td className={`potential-cell-compact potential-${result.result.kPotential.toLowerCase()}`}>
+                        {result.result.kPotential}
+                      </td>
+                      <td className="stats-cell-compact">
+                        <div className="betting-insights-compact">
+                          <div className="insight-row">
+                            <span className="insight-label">BA:</span>
+                            <span className="insight-value">{result.result.details.predictedBA}</span>
+                          </div>
+                          <div className="insight-row">
+                            <span className="insight-label">HR:</span>
+                            <span className="insight-value">{(parseFloat(result.result.details.predictedHR) * 100).toFixed(1)}%</span>
+                          </div>
+                          <div className="insight-row">
+                            <span className="insight-label">SLG:</span>
+                            <span className="insight-value">{result.result.details.predictedSLG}</span>
+                          </div>
+                          <div className="insight-row">
+                            <span className="insight-label">K:</span>
+                            <span className="insight-value">{(parseFloat(result.result.details.strikeoutRate) * 100).toFixed(1)}%</span>
+                          </div>
                         </div>
-                        <div className="insight-row">
-                          <span className="insight-label">SLG:</span>
-                          <span className="insight-value">{result.result.details.predictedSLG}</span>
+                      </td>
+                    </tr>
+                    
+                    {/* Details row - spans the entire width */}
+                    <tr className="result-row details-row">
+                      <td className="details-full-span" colSpan="10">
+                        <div className="betting-insights-expanded">
+                          <div className="insight-grid">
+                            <div className="insight-card hit-potential">
+                              <div className="insight-header">
+                                <span className="insight-icon">🎯</span>
+                                <span className="insight-title">Hit Potential: {result.result.hitPotential}</span>
+                              </div>
+                              <div className="insight-body">
+                                Predicted Hit Rate: {(parseFloat(result.result.details.predictedBA) * 100).toFixed(1)}%
+                              </div>
+                            </div>
+                            
+                            <div className="insight-card hr-potential">
+                              <div className="insight-header">
+                                <span className="insight-icon">💣</span>
+                                <span className="insight-title">Home Run Potential: {result.result.hrPotential}</span>
+                              </div>
+                              <div className="insight-body">
+                                Predicted HR Rate: {(parseFloat(result.result.details.predictedHR) * 100).toFixed(1)}%. Expects 1 HR every {Math.round(1 / parseFloat(result.result.details.predictedHR))} AB
+                              </div>
+                            </div>
+                            
+                            <div className="insight-card tb-potential">
+                              <div className="insight-header">
+                                <span className="insight-icon">📊</span>
+                                <span className="insight-title">Total Bases Potential: {result.result.tbPotential}</span>
+                              </div>
+                              <div className="insight-body">
+                                Driven by Predicted SLG of {result.result.details.predictedSLG} and wOBA of {result.result.details.predictedWOBA}
+                              </div>
+                            </div>
+                            
+                            <div className="insight-card k-potential">
+                              <div className="insight-header">
+                                <span className="insight-icon">⚾</span>
+                                <span className="insight-title">Batter K Potential: {result.result.kPotential}</span>
+                              </div>
+                              <div className="insight-body">
+                                Batter's Strikeout Rate: {(parseFloat(result.result.details.strikeoutRate) * 100).toFixed(1)}%
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div className="insight-row">
-                          <span className="insight-label">K:</span>
-                          <span className="insight-value">{(parseFloat(result.result.details.strikeoutRate) * 100).toFixed(1)}%</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="details-cell-full">
-                      <div className="betting-insights-full">
-                        <div className="insight-section">
-                          <span className="insight-icon">🎯</span>
-                          <span className="insight-text">
-                            <strong>Hit Potential: {result.result.hitPotential}</strong><br/>
-                            Predicted Hit Rate: {(parseFloat(result.result.details.predictedBA) * 100).toFixed(1)}%.
-                          </span>
-                        </div>
-                        
-                        <div className="insight-section">
-                          <span className="insight-icon">💣</span>
-                          <span className="insight-text">
-                            <strong>Home Run Potential: {result.result.hrPotential}</strong><br/>
-                            Predicted HR Rate: {(parseFloat(result.result.details.predictedHR) * 100).toFixed(1)}%. Expects 1 HR every {Math.round(1 / parseFloat(result.result.details.predictedHR))} AB.
-                          </span>
-                        </div>
-                        
-                        <div className="insight-section">
-                          <span className="insight-icon">📊</span>
-                          <span className="insight-text">
-                            <strong>Total Bases Potential: {result.result.tbPotential}</strong><br/>
-                            Driven by Predicted SLG of {result.result.details.predictedSLG} and wOBA of {result.result.details.predictedWOBA}.
-                          </span>
-                        </div>
-                        
-                        <div className="insight-section">
-                          <span className="insight-icon">⚾</span>
-                          <span className="insight-text">
-                            <strong>Batter K Potential: {result.result.kPotential}</strong><br/>
-                            Batter's Strikeout Rate: {(parseFloat(result.result.details.strikeoutRate) * 100).toFixed(1)}%.
-                          </span>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
+                      </td>
+                    </tr>
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
