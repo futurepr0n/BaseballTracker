@@ -1,9 +1,136 @@
-// src/components/cards/CurrentSeriesHitsCard/CurrentSeriesHitsCard.js
+// src/components/cards/CurrentSeriesCards/CurrentSeriesCard.js
 import React, { useState, useEffect } from 'react';
 import { 
   fetchPlayerDataForDateRange, 
   fetchRosterData 
 } from '../../../services/dataService';
+
+/**
+ * Find current series statistics for a team vs opponent
+ */
+const findCurrentSeriesStats = async (playerTeam, opponentTeam, dateRangeData, currentDate) => {
+  console.log(`[findCurrentSeriesStats] Analyzing ${playerTeam} vs ${opponentTeam}`);
+  
+  const playerSeriesStats = new Map();
+  const sortedDates = Object.keys(dateRangeData).sort().reverse(); // Start from most recent
+  
+  console.log(`[findCurrentSeriesStats] Available dates: ${sortedDates.slice(0, 5).join(', ')}...`);
+  
+  let seriesGames = [];
+  
+  // Go backwards in time to find the current series
+  for (const dateStr of sortedDates) {
+    const playersForDate = dateRangeData[dateStr];
+    
+    if (!playersForDate || playersForDate.length === 0) {
+      console.log(`[findCurrentSeriesStats] No players data for ${dateStr}`);
+      continue;
+    }
+    
+    // Check if these two teams played on this date
+    const playerTeamPlayers = playersForDate.filter(p => p.team === playerTeam);
+    const opponentTeamPlayers = playersForDate.filter(p => p.team === opponentTeam);
+    
+    console.log(`[findCurrentSeriesStats] ${dateStr}: ${playerTeam} players: ${playerTeamPlayers.length}, ${opponentTeam} players: ${opponentTeamPlayers.length}`);
+    
+    if (playerTeamPlayers.length > 0 && opponentTeamPlayers.length > 0) {
+      // This is part of the current series
+      console.log(`[findCurrentSeriesStats] Found series game on ${dateStr}`);
+      seriesGames.unshift({ date: dateStr, players: playersForDate });
+    } else if (playerTeamPlayers.length > 0) {
+      // Player team played but we need to check if against different opponent
+      const allOpponentTeams = playersForDate
+        .filter(p => p.team !== playerTeam)
+        .map(p => p.team);
+      
+      const uniqueOpponents = [...new Set(allOpponentTeams)];
+      console.log(`[findCurrentSeriesStats] ${dateStr}: ${playerTeam} played against: ${uniqueOpponents.join(', ')}`);
+      
+      if (uniqueOpponents.length > 0 && !uniqueOpponents.includes(opponentTeam)) {
+        // Found a game against a different opponent, series boundary found
+        console.log(`[findCurrentSeriesStats] Series boundary found at ${dateStr} - different opponent: ${uniqueOpponents.join(', ')}`);
+        break;
+      }
+    }
+    
+    // Limit search to prevent going too far back
+    if (seriesGames.length >= 6) {
+      console.log(`[findCurrentSeriesStats] Reached max series length (6 games)`);
+      break;
+    }
+  }
+  
+  console.log(`[findCurrentSeriesStats] Found ${seriesGames.length} games in series between ${playerTeam} and ${opponentTeam}`);
+  
+  if (seriesGames.length === 0) return [];
+  
+  // Calculate stats for each player in the series
+  seriesGames.forEach((gameData, gameIndex) => {
+    console.log(`[findCurrentSeriesStats] Processing game ${gameIndex + 1}: ${gameData.date}`);
+    const playersInGame = gameData.players.filter(p => p.team === playerTeam);
+    
+    playersInGame.forEach(player => {
+      if (player.playerType === 'hitter' || !player.playerType) {
+        const playerKey = `${player.name}_${player.team}`;
+        
+        if (!playerSeriesStats.has(playerKey)) {
+          playerSeriesStats.set(playerKey, {
+            name: player.name,
+            team: player.team,
+            opponent: opponentTeam,
+            gamesInSeries: 0,
+            totalHitsInSeries: 0,
+            totalHRsInSeries: 0,
+            totalABInSeries: 0,
+            gameResults: [],
+            seriesDateRange: ''
+          });
+        }
+        
+        const stats = playerSeriesStats.get(playerKey);
+        
+        if (player.H !== 'DNP') {
+          const hits = Number(player.H) || 0;
+          const hrs = Number(player.HR) || 0;
+          const ab = Number(player.AB) || 0;
+          
+          stats.gamesInSeries++;
+          stats.totalHitsInSeries += hits;
+          stats.totalHRsInSeries += hrs;
+          stats.totalABInSeries += ab;
+          stats.gameResults.push({
+            date: gameData.date,
+            hits,
+            hrs,
+            ab
+          });
+        }
+      }
+    });
+  });
+  
+  // Convert to array and add calculated stats
+  const seriesStartDate = seriesGames[0]?.date;
+  const seriesEndDate = seriesGames[seriesGames.length - 1]?.date;
+  const dateRange = seriesStartDate === seriesEndDate ? 
+    new Date(seriesStartDate).toLocaleDateString() :
+    `${new Date(seriesStartDate).toLocaleDateString()} - ${new Date(seriesEndDate).toLocaleDateString()}`;
+  
+  const result = Array.from(playerSeriesStats.values())
+    .map(player => ({
+      ...player,
+      hitsPerGameInSeries: player.gamesInSeries > 0 ? 
+        (player.totalHitsInSeries / player.gamesInSeries).toFixed(2) : '0.00',
+      hrsPerGameInSeries: player.gamesInSeries > 0 ? 
+        (player.totalHRsInSeries / player.gamesInSeries).toFixed(2) : '0.00',
+      avgInSeries: player.totalABInSeries > 0 ? 
+        (player.totalHitsInSeries / player.totalABInSeries).toFixed(3) : '.000',
+      seriesDateRange: dateRange
+    }));
+  
+  console.log(`[findCurrentSeriesStats] Returning stats for ${result.length} players`);
+  return result;
+};
 
 const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
   const [seriesData, setSeriesData] = useState([]);
@@ -18,21 +145,29 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
         setError(null);
         
         if (!gameData || gameData.length === 0) {
+          console.log('[CurrentSeriesHitsCard] No game data available');
           setSeriesData([]);
           return;
         }
         
+        console.log(`[CurrentSeriesHitsCard] Analyzing ${gameData.length} games:`, gameData.map(g => `${g.awayTeam} @ ${g.homeTeam}`));
+        
         // Load recent historical data (last 2 weeks to catch current series)
+        // FIXED: Changed from (currentDate, 0, 14) to (currentDate, 14, 14) to actually load data
         const dateRangeData = await fetchPlayerDataForDateRange(
           currentDate, 
-          0,   // Start from today
-          14   // Look back 2 weeks max
+          14,  // Look back 14 days initially
+          14   // Max 14 days back
         );
+        
+        console.log(`[CurrentSeriesHitsCard] Loaded data for ${Object.keys(dateRangeData).length} dates:`, Object.keys(dateRangeData).sort().reverse().slice(0, 5));
         
         // Analyze each matchup for current series
         const allSeriesStats = [];
         
         for (const game of gameData) {
+          console.log(`[CurrentSeriesHitsCard] Processing game: ${game.awayTeam} @ ${game.homeTeam}`);
+          
           const homeSeriesStats = await findCurrentSeriesStats(
             game.homeTeam, 
             game.awayTeam, 
@@ -47,8 +182,12 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
             currentDate
           );
           
+          console.log(`[CurrentSeriesHitsCard] Home team stats: ${homeSeriesStats.length}, Away team stats: ${awaySeriesStats.length}`);
+          
           allSeriesStats.push(...homeSeriesStats, ...awaySeriesStats);
         }
+        
+        console.log(`[CurrentSeriesHitsCard] Total series stats collected: ${allSeriesStats.length}`);
         
         // Sort by hits in current series
         const sortedStats = allSeriesStats
@@ -62,6 +201,8 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
             return parseFloat(b.hitsPerGameInSeries) - parseFloat(a.hitsPerGameInSeries);
           })
           .slice(0, 25);
+        
+        console.log(`[CurrentSeriesHitsCard] Final sorted stats: ${sortedStats.length} players`);
         
         setSeriesData(sortedStats);
         
@@ -77,7 +218,7 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
         
       } catch (err) {
         console.error('Error analyzing current series:', err);
-        setError('Failed to load series data');
+        setError('Failed to load series data: ' + err.message);
         setSeriesData([]);
       } finally {
         setLoading(false);
@@ -86,116 +227,10 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
     
     if (gameData.length > 0) {
       analyzeCurrentSeries();
+    } else {
+      setLoading(false);
     }
   }, [gameData, currentDate]);
-
-  /**
-   * Find current series statistics for a team vs opponent
-   */
-  const findCurrentSeriesStats = async (playerTeam, opponentTeam, dateRangeData, currentDate) => {
-    const playerSeriesStats = new Map();
-    const sortedDates = Object.keys(dateRangeData).sort().reverse(); // Start from most recent
-    
-    let seriesGames = [];
-    let foundDifferentOpponent = false;
-    
-    // Go backwards in time to find the current series
-    for (const dateStr of sortedDates) {
-      const gameDate = new Date(dateStr);
-      const playersForDate = dateRangeData[dateStr];
-      
-      // Check if these two teams played on this date
-      const hasPlayerTeam = playersForDate.some(p => p.team === playerTeam);
-      const hasOpponentTeam = playersForDate.some(p => p.team === opponentTeam);
-      
-      if (hasPlayerTeam && hasOpponentTeam) {
-        // This is part of the current series
-        seriesGames.unshift({ date: dateStr, players: playersForDate });
-      } else if (hasPlayerTeam) {
-        // Player team played but against different opponent
-        const otherOpponents = playersForDate
-          .filter(p => p.team !== playerTeam)
-          .map(p => p.team);
-        
-        if (otherOpponents.length > 0 && !otherOpponents.includes(opponentTeam)) {
-          // Found a game against a different opponent, series boundary found
-          foundDifferentOpponent = true;
-          break;
-        }
-      }
-      
-      // Limit search to prevent going too far back
-      if (seriesGames.length >= 6) break; // Most series are 3-4 games
-    }
-    
-    // If no different opponent found and we have games, this might be the start of season
-    // In that case, use all games found
-    
-    if (seriesGames.length === 0) return [];
-    
-    // Calculate stats for each player in the series
-    seriesGames.forEach(gameData => {
-      const playersInGame = gameData.players.filter(p => p.team === playerTeam);
-      
-      playersInGame.forEach(player => {
-        if (player.playerType === 'hitter' || !player.playerType) {
-          const playerKey = `${player.name}_${player.team}`;
-          
-          if (!playerSeriesStats.has(playerKey)) {
-            playerSeriesStats.set(playerKey, {
-              name: player.name,
-              team: player.team,
-              opponent: opponentTeam,
-              gamesInSeries: 0,
-              totalHitsInSeries: 0,
-              totalHRsInSeries: 0,
-              totalABInSeries: 0,
-              gameResults: [],
-              seriesDateRange: ''
-            });
-          }
-          
-          const stats = playerSeriesStats.get(playerKey);
-          
-          if (player.H !== 'DNP') {
-            const hits = Number(player.H) || 0;
-            const hrs = Number(player.HR) || 0;
-            const ab = Number(player.AB) || 0;
-            
-            stats.gamesInSeries++;
-            stats.totalHitsInSeries += hits;
-            stats.totalHRsInSeries += hrs;
-            stats.totalABInSeries += ab;
-            stats.gameResults.push({
-              date: gameData.date,
-              hits,
-              hrs,
-              ab
-            });
-          }
-        }
-      });
-    });
-    
-    // Convert to array and add calculated stats
-    const seriesStartDate = seriesGames[0]?.date;
-    const seriesEndDate = seriesGames[seriesGames.length - 1]?.date;
-    const dateRange = seriesStartDate === seriesEndDate ? 
-      new Date(seriesStartDate).toLocaleDateString() :
-      `${new Date(seriesStartDate).toLocaleDateString()} - ${new Date(seriesEndDate).toLocaleDateString()}`;
-    
-    return Array.from(playerSeriesStats.values())
-      .map(player => ({
-        ...player,
-        hitsPerGameInSeries: player.gamesInSeries > 0 ? 
-          (player.totalHitsInSeries / player.gamesInSeries).toFixed(2) : '0.00',
-        hrsPerGameInSeries: player.gamesInSeries > 0 ? 
-          (player.totalHRsInSeries / player.gamesInSeries).toFixed(2) : '0.00',
-        avgInSeries: player.totalABInSeries > 0 ? 
-          (player.totalHitsInSeries / player.totalABInSeries).toFixed(3) : '.000',
-        seriesDateRange: dateRange
-      }));
-  };
 
   const getTeamInfo = (teamAbbr) => {
     return teams[teamAbbr] || { 
@@ -236,6 +271,10 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
       {seriesData.length === 0 ? (
         <div className="no-data">
           No current series data available
+          <br />
+          <small style={{ fontSize: '0.8em', color: '#999' }}>
+            Debug: Check browser console for detailed logs
+          </small>
         </div>
       ) : (
         <div className="scrollable-container">
@@ -303,13 +342,14 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
         }
         
         // Load recent historical data
+        // FIXED: Changed from (currentDate, 0, 14) to (currentDate, 14, 14)
         const dateRangeData = await fetchPlayerDataForDateRange(
           currentDate, 
-          0,   // Start from today
-          14   // Look back 2 weeks max
+          14,  // Look back 14 days initially  
+          14   // Max 14 days back
         );
         
-        // Analyze each matchup for current series (reuse logic from hits card)
+        // Analyze each matchup for current series
         const allSeriesStats = [];
         
         for (const game of gameData) {
@@ -356,7 +396,7 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
         
       } catch (err) {
         console.error('Error analyzing current series HRs:', err);
-        setError('Failed to load series HR data');
+        setError('Failed to load series HR data: ' + err.message);
         setSeriesData([]);
       } finally {
         setLoading(false);
@@ -365,14 +405,10 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
     
     if (gameData.length > 0) {
       analyzeCurrentSeriesHRs();
+    } else {
+      setLoading(false);
     }
   }, [gameData, currentDate]);
-
-  // Use the same findCurrentSeriesStats function as the hits card
-  const findCurrentSeriesStats = async (playerTeam, opponentTeam, dateRangeData, currentDate) => {
-    // ... (same implementation as in CurrentSeriesHitsCard)
-    // This would be moved to a shared utility function in practice
-  };
 
   const getTeamInfo = (teamAbbr) => {
     return teams[teamAbbr] || { 
@@ -391,6 +427,15 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="card">
+        <h3>🚀 Current Series HRs</h3>
+        <div className="no-data">Error: {error}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="card">
       <h3>🚀 Current Series HRs</h3>
@@ -404,6 +449,10 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
       {seriesData.length === 0 ? (
         <div className="no-data">
           No home runs hit in current series yet
+          <br />
+          <small style={{ fontSize: '0.8em', color: '#999' }}>
+            Debug: Check browser console for detailed logs
+          </small>
         </div>
       ) : (
         <div className="scrollable-container">
