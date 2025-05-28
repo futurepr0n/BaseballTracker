@@ -280,6 +280,27 @@
   margin-bottom: 40px; /* Add bottom margin for scroll indicator */
 }
 
+/* Add padding back to results content that isn't the table */
+@media (max-width: 768px) {
+  .analyzer-header,
+  .game-selection-section,
+  .results-header,
+  .analysis-years-control {
+    margin-left: 15px;
+    margin-right: 15px;
+  }
+  
+  .games-grid {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  .analyzer-controls {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
 /* Enhanced results table */
 .enhanced-results-table-container {
   overflow-x: auto;
@@ -288,6 +309,7 @@
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   max-width: 100vw; /* Ensure it doesn't exceed viewport */
   position: relative;
 }
@@ -311,7 +333,7 @@
 
 .enhanced-results-table {
   width: 100%;
-  min-width: 1200px; /* Force horizontal scroll when needed */
+  min-width: 800px; /* Reduced since we have full-width details */
   border-collapse: collapse;
   font-size: 0.9rem;
   background-color: white;
@@ -384,10 +406,6 @@
 
 .stats-column {
   width: 140px;
-}
-
-.details-column {
-  width: 280px;
 }
 
 /* Remove button styling */
@@ -570,62 +588,104 @@
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
 
-/* Full details styling */
-.details-cell-full {
-  vertical-align: top;
-  max-width: 280px;
-}
-
-.betting-insights-full {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 0.8rem;
-  line-height: 1.3;
-}
-
-.insight-section {
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  padding: 6px 8px;
-  background-color: #f8f9fa;
-  border-radius: 6px;
-  border-left: 3px solid #e9ecef;
-}
-
-.insight-icon {
-  font-size: 1rem;
-  line-height: 1;
-  margin-top: 1px;
-  flex-shrink: 0;
-}
-
-.insight-text {
-  flex: 1;
-  color: #495057;
-}
-
-.insight-text strong {
-  color: #212529;
-  display: block;
-  margin-bottom: 2px;
-}
-
-/* Color coding for different insight types */
-.insight-section:nth-child(1) { border-left-color: #20c997; } /* Hit - teal */
-.insight-section:nth-child(2) { border-left-color: #fd7e14; } /* HR - orange */
-.insight-section:nth-child(3) { border-left-color: #6f42c1; } /* TB - purple */
-.insight-section:nth-child(4) { border-left-color: #dc3545; } /* K - red */
-
-/* Row animations */
+/* Row animations and styling */
 .result-row {
   transition: all 0.2s ease;
 }
 
-.result-row:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.main-row:hover {
+  background-color: #f8f9fa;
+}
+
+.main-row:hover + .details-row {
+  background-color: #f8f9fa;
+}
+
+/* Details row styling - New full-width approach */
+.details-row {
+  border-top: none;
+  background-color: #fafbfc;
+}
+
+.details-full-span {
+  padding: 0 !important;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.betting-insights-expanded {
+  width: 100%;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #fafbfc 0%, #f8f9fa 100%);
+}
+
+.insight-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  width: 100%;
+}
+
+.insight-card {
+  background: white;
+  border-radius: 8px;
+  padding: 12px 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid transparent;
+  transition: all 0.2s ease;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.insight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.insight-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.insight-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.insight-title {
+  font-weight: 600;
+  color: #212529;
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+
+.insight-body {
+  color: #495057;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  margin-top: auto;
+}
+
+/* Color coding for different insight types */
+.insight-card.hit-potential { 
+  border-left-color: #20c997; 
+}
+
+.insight-card.hr-potential { 
+  border-left-color: #fd7e14; 
+}
+
+.insight-card.tb-potential { 
+  border-left-color: #6f42c1; 
+}
+
+.insight-card.k-potential { 
+  border-left-color: #dc3545; 
 }
 
 /* Responsive styling */
@@ -640,10 +700,26 @@
   }
   
   .player-column,
-  .stats-column,
-  .details-column {
+  .stats-column {
     width: auto;
     min-width: 120px;
+  }
+  
+  .insight-grid {
+    gap: 12px;
+  }
+  
+  .insight-card {
+    padding: 10px 12px;
+    min-height: 70px;
+  }
+  
+  .insight-title {
+    font-size: 0.85rem;
+  }
+  
+  .insight-body {
+    font-size: 0.75rem;
   }
 }
 
@@ -664,15 +740,17 @@
 
 @media (max-width: 768px) {
   .matchup-analyzer {
-    padding: 15px 10px; /* Reduce side padding */
+    padding: 15px 0; /* Remove side padding to allow full width table */
   }
   
   .games-grid {
     grid-template-columns: 1fr;
+    margin: 0 15px; /* Add margin back for other content */
   }
   
   .analyzer-controls {
     flex-direction: column;
+    margin: 0 15px; /* Add margin back for controls */
   }
   
   .analyze-btn, .clear-btn {
@@ -684,32 +762,21 @@
     display: block;
   }
   
-  /* Make table container stable and fixed on mobile */
+  /* Make table container fixed to screen width and stable */
   .enhanced-results-table-container {
-    margin-left: -10px;
-    margin-right: -10px;
+    margin: 15px 0 0 0; /* Remove side margins completely */
     border-radius: 0;
     border-left: none;
     border-right: none;
-    max-width: calc(100vw - 0px); /* Full viewport width */
+    width: 100vw; /* Fixed to full viewport width */
+    max-width: 100vw;
     position: relative;
-    /* Remove momentum scrolling and make it more stable */
-    -webkit-overflow-scrolling: auto;
-    overflow-scrolling: auto;
-    /* Prevent elastic scrolling bounce */
-    overscroll-behavior-x: contain;
-    /* Make container more stable */
-    transform: translateZ(0); /* Force hardware acceleration */
-    backface-visibility: hidden;
-    /* Prevent wobbling */
-    touch-action: pan-x; /* Only allow horizontal scrolling */
+    /* Keep smooth scrolling but make container stable */
+    -webkit-overflow-scrolling: touch;
   }
   
   .enhanced-results-table {
-    min-width: 900px; /* Smaller min-width for mobile */
-    /* Stabilize table */
-    position: relative;
-    transform: translateZ(0);
+    min-width: 600px; /* Reduced for mobile */
   }
   
   .enhanced-results-table th,
@@ -724,7 +791,33 @@
   .advantage-column { width: 100px; }
   .potential-column { width: 50px; }
   .stats-column { width: 120px; }
-  .details-column { width: 200px; }
+  
+  /* Mobile insight grid - stack in 2 columns */
+  .betting-insights-expanded {
+    padding: 12px 15px;
+  }
+  
+  .insight-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .insight-card {
+    padding: 8px 10px;
+    min-height: 60px;
+  }
+  
+  .insight-title {
+    font-size: 0.8rem;
+  }
+  
+  .insight-body {
+    font-size: 0.7rem;
+  }
+  
+  .insight-icon {
+    font-size: 1rem;
+  }
   
   .player-info-compact {
     min-width: 100px;
@@ -750,19 +843,6 @@
     font-size: 0.7rem;
   }
   
-  .betting-insights-full {
-    font-size: 0.7rem;
-  }
-  
-  .insight-section {
-    padding: 4px 6px;
-    gap: 4px;
-  }
-  
-  .insight-icon {
-    font-size: 0.9rem;
-  }
-  
   .insight-row {
     padding: 1px 3px;
   }
@@ -770,27 +850,31 @@
   
 
 
+
 @media (max-width: 576px) {
+  .matchup-analyzer {
+    padding: 15px 0;
+  }
+  
+  .analyzer-header,
+  .game-selection-section,
+  .results-header,
+  .analysis-years-control {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  
   .enhanced-results-table-container {
-    margin-left: -10px;
-    margin-right: -10px;
+    margin: 15px 0 0 0;
     border-radius: 0;
     border-left: none;
     border-right: none;
-    /* Additional stability for very small screens */
-    -webkit-overflow-scrolling: auto;
-    overflow-scrolling: auto;
-    overscroll-behavior-x: contain;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    touch-action: pan-x;
+    width: 100vw;
+    max-width: 100vw;
   }
   
   .enhanced-results-table {
-    min-width: 800px; /* Even smaller for very small screens */
-    /* Stabilize table on small screens */
-    position: relative;
-    transform: translateZ(0);
+    min-width: 500px; /* Further reduced for small screens */
   }
   
   .enhanced-results-table th,
@@ -814,17 +898,31 @@
     padding: 4px 2px;
   }
   
-  .betting-insights-full {
+  /* Mobile insight grid - single column on very small screens */
+  .betting-insights-expanded {
+    padding: 10px;
+  }
+  
+  .insight-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .insight-card {
+    padding: 6px 8px;
+    min-height: 50px;
+  }
+  
+  .insight-title {
+    font-size: 0.75rem;
+  }
+  
+  .insight-body {
     font-size: 0.65rem;
   }
   
-  .insight-section {
-    padding: 3px 4px;
-    gap: 3px;
-  }
-  
   .insight-icon {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
   }
   
   /* Compress columns further on very small screens */
@@ -833,7 +931,6 @@
   .advantage-column { width: 80px; }
   .potential-column { width: 40px; }
   .stats-column { width: 100px; }
-  .details-column { width: 180px; }
 }
 
 /* Animation for loading */
