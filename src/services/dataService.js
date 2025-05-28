@@ -751,3 +751,206 @@ export const generateMatchupAnalysis = async (gameData, dateRangeData, rosterDat
     totalPlayersAnalyzed: activePlayers.length
   };
 };
+
+/**
+ * Classify time slot based on specific day of week and time
+ * @param {Date} gameDate - Date of the game
+ * @param {string} gameTime - Game time (if available, format: "1:05 PM" or "13:05")
+ * @returns {Object} Time slot classification with day and time
+ */
+export const classifySpecificTimeSlot = (gameDate, gameTime = null) => {
+  const dayOfWeek = gameDate.getDay();
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const dayName = dayNames[dayOfWeek];
+  
+  let timeBlock = 'Unknown Time';
+  let hour = null;
+  
+  // Try to extract hour from game time if provided
+  if (gameTime) {
+    const timeMatch = gameTime.match(/(\d{1,2}):?\d{0,2}\s*(AM|PM)?/i);
+    if (timeMatch) {
+      hour = parseInt(timeMatch[1]);
+      const isPM = timeMatch[2] && timeMatch[2].toUpperCase() === 'PM';
+      
+      // Convert to 24-hour format
+      if (isPM && hour !== 12) {
+        hour += 12;
+      } else if (!isPM && hour === 12) {
+        hour = 0;
+      }
+    }
+  }
+  
+  // If no specific time, use historical patterns to estimate
+  if (hour === null) {
+    hour = estimateGameTime(gameDate, dayOfWeek);
+  }
+  
+  // Classify into time blocks
+  if (hour >= 10 && hour <= 11) {
+    timeBlock = '10-11 AM';
+  } else if (hour >= 12 && hour <= 12) {
+    timeBlock = '12-1 PM';
+  } else if (hour >= 13 && hour <= 13) {
+    timeBlock = '1-2 PM';
+  } else if (hour >= 14 && hour <= 14) {
+    timeBlock = '2-3 PM';
+  } else if (hour >= 15 && hour <= 15) {
+    timeBlock = '3-4 PM';
+  } else if (hour >= 16 && hour <= 16) {
+    timeBlock = '4-5 PM';
+  } else if (hour >= 17 && hour <= 17) {
+    timeBlock = '5-6 PM';
+  } else if (hour >= 18 && hour <= 18) {
+    timeBlock = '6-7 PM';
+  } else if (hour >= 19 && hour <= 19) {
+    timeBlock = '7-8 PM';
+  } else if (hour >= 20 && hour <= 20) {
+    timeBlock = '8-9 PM';
+  } else if (hour >= 21 && hour <= 21) {
+    timeBlock = '9-10 PM';
+  } else {
+    timeBlock = 'Other Time';
+  }
+  
+  return {
+    dayOfWeek: dayName,
+    timeBlock: timeBlock,
+    fullSlot: `${dayName} ${timeBlock}`,
+    hour: hour,
+    dayIndex: dayOfWeek
+  };
+};
+
+/**
+ * Estimate game time based on historical patterns
+ * @param {Date} gameDate - Date of the game
+ * @param {number} dayOfWeek - Day of week (0-6)
+ * @returns {number} Estimated hour in 24-hour format
+ */
+const estimateGameTime = (gameDate, dayOfWeek) => {
+  const month = gameDate.getMonth();
+  
+  // Sunday games are typically afternoon
+  if (dayOfWeek === 0) {
+    return 13; // 1 PM
+  }
+  
+  // Saturday games can vary but often afternoon
+  if (dayOfWeek === 6) {
+    return 15; // 3 PM
+  }
+  
+  // Weekday games
+  if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+    // Wednesday often has day games
+    if (dayOfWeek === 3) {
+      return 13; // 1 PM
+    }
+    
+    // Other weekdays typically evening
+    return 19; // 7 PM
+  }
+  
+  return 19; // Default to 7 PM
+};
+
+/**
+ * Find players with matching time slot patterns
+ * @param {string} targetDayOfWeek - Target day (e.g., "Wednesday")
+ * @param {string} targetTimeBlock - Target time block (e.g., "1-2 PM")
+ * @param {Object} dateRangeData - Historical player data
+ * @returns {Array} Players with stats in matching time slots
+ */
+export const findPlayersInTimeSlot = (targetDayOfWeek, targetTimeBlock, dateRangeData) => {
+  const playerStats = new Map();
+  
+  Object.keys(dateRangeData).forEach(dateStr => {
+    const gameDate = new Date(dateStr);
+    const timeSlot = classifySpecificTimeSlot(gameDate);
+    
+    // Match both day and time (or just day if time is unknown)
+    const isMatchingSlot = (
+      timeSlot.dayOfWeek === targetDayOfWeek &&
+      (timeSlot.timeBlock === targetTimeBlock || 
+       targetTimeBlock === 'Any Time' ||
+       timeSlot.timeBlock === 'Unknown Time')
+    );
+    
+    if (isMatchingSlot) {
+      const playersForDate = dateRangeData[dateStr];
+      
+      playersForDate.forEach(player => {
+        if (player.playerType === 'hitter' || !player.playerType) {
+          const playerKey = `${player.name}_${player.team}`;
+          
+          if (!playerStats.has(playerKey)) {
+            playerStats.set(playerKey, {
+              name: player.name,
+              team: player.team,
+              gamesInSlot: 0,
+              totalHits: 0,
+              totalHRs: 0,
+              totalAB: 0,
+              gameResults: []
+            });
+          }
+          
+          const stats = playerStats.get(playerKey);
+          
+          if (player.H !== 'DNP') {
+            const hits = Number(player.H) || 0;
+            const hrs = Number(player.HR) || 0;
+            const ab = Number(player.AB) || 0;
+            
+            stats.gamesInSlot++;
+            stats.totalHits += hits;
+            stats.totalHRs += hrs;
+            stats.totalAB += ab;
+            stats.gameResults.push({
+              date: dateStr,
+              hits,
+              hrs,
+              ab,
+              timeSlot: timeSlot.fullSlot
+            });
+          }
+        }
+      });
+    }
+  });
+  
+  // Convert to array and calculate per-game stats
+  return Array.from(playerStats.values())
+    .filter(player => player.gamesInSlot >= 3)
+    .map(player => ({
+      ...player,
+      hitsPerGame: (player.totalHits / player.gamesInSlot).toFixed(2),
+      hrsPerGame: (player.totalHRs / player.gamesInSlot).toFixed(2),
+      battingAvg: player.totalAB > 0 ? (player.totalHits / player.totalAB).toFixed(3) : '.000'
+    }));
+};
+
+/**
+ * Get current game time slot for today's games
+ * @param {Array} gameData - Today's games
+ * @param {Date} currentDate - Current date
+ * @returns {Object} Current time slot information
+ */
+export const getCurrentTimeSlot = (gameData, currentDate) => {
+  // Try to get time from game data if available
+  let gameTime = null;
+  if (gameData.length > 0 && gameData[0].time) {
+    gameTime = gameData[0].time;
+  }
+  
+  const timeSlot = classifySpecificTimeSlot(currentDate, gameTime);
+  
+  return {
+    dayOfWeek: timeSlot.dayOfWeek,
+    timeBlock: timeSlot.timeBlock,
+    fullSlot: timeSlot.fullSlot,
+    displayText: `${timeSlot.dayOfWeek} games at ${timeSlot.timeBlock}`
+  };
+};

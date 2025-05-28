@@ -28,13 +28,17 @@ import PerformanceCard from './cards/PerformanceCard/PerformanceCard';
 
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
 
+import { CurrentSeriesHitsCard, CurrentSeriesHRCard } from './cards/CurrentSeriesCards/CurrentSeriesCards';
+import { TimeSlotHitsCard, TimeSlotHRCard } from './cards/TimeSlotHitsCard/TimeSlotHitsCard';
 
 import { 
   OpponentMatchupHitsCard,
-  OpponentMatchupHRCard,
-  TimeSlotHitsCard,
-  TimeSlotHRCard
+  OpponentMatchupHRCard
 } from './cards/OpponentMatchupHitsCard/OpponentMatchupHitsCard';
+
+import HitDroughtBounceBackCard from './cards/HitDroughtBounceBackCard/HitDroughtBounceBackCard';
+
+
 
 
 /**
@@ -1000,6 +1004,17 @@ const noFilteredData = isFiltering &&
   currentDate={currentDate}
   teams={teamData}
 />
+
+<CurrentSeriesHitsCard 
+  gameData={filteredGameData}
+  currentDate={currentDate}
+  teams={teamData}
+/>
+<CurrentSeriesHRCard 
+  gameData={filteredGameData}
+  currentDate={currentDate}
+  teams={teamData}
+/>
 <TimeSlotHitsCard 
   gameData={filteredGameData}
   currentDate={currentDate}
@@ -1011,6 +1026,11 @@ const noFilteredData = isFiltering &&
   teams={teamData}
 />
 
+<HitDroughtBounceBackCard 
+  gameData={filteredGameData}
+  currentDate={currentDate}
+  teams={teamData}
+/>
           {/* Recent Updates Card */}
           <RecentUpdatesCard 
             currentDate={currentDate}
@@ -1019,6 +1039,7 @@ const noFilteredData = isFiltering &&
             topPerformers={topPerformers}
             rollingStats={rollingStats}
           />
+
         </div>
       )}
     </div>
