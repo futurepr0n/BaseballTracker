@@ -38,6 +38,7 @@ import {
 
 import HitDroughtBounceBackCard from './cards/HitDroughtBounceBackCard/HitDroughtBounceBackCard';
 
+//import SlotMachineCard from './cards/SlotMachineCard/SlotMachineCard';
 
 
 
@@ -1040,6 +1041,16 @@ const noFilteredData = isFiltering &&
             rollingStats={rollingStats}
           />
 
+<div />
+      {/* 
+< SlotMachineCard 
+  playerData={filteredPlayerData}
+  teamData={teamData}
+  rollingStats={rollingStats}
+  topPerformers={topPerformers}
+  hitStreakData={hitStreakData}
+  playersWithHomeRunPrediction={playersWithHomeRunPrediction}
+/> */}
         </div>
       )}
     </div>
