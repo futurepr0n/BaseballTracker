@@ -1,313 +1,3 @@
-/* HRPredictionCard.css */
-
-.hr-prediction-card {
-  grid-column: span 1;
-  background-color: white;
-}
-
-/* Player Item Styling */
-.hr-prediction-card .player-item {
-  padding: 12px 0;
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.hr-prediction-card .player-item:last-child {
-  border-bottom: none;
-}
-
-.hr-prediction-card .player-item:hover {
-  background-color: rgba(230, 57, 70, 0.02);
-}
-
-/* Player Rank Styling 
-.hr-prediction-card .player-rank {
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #e63946; /* Red background for HR prediction ranks */
- /* color: white;
-  border-radius: 50%;
-  font-weight: bold;
-  margin-right: 15px;
-}*/
-
-/* Player Info Styling */
-.hr-prediction-card .player-info {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.hr-prediction-card .player-name {
-  font-weight: 500;
-  color: #333;
-}
-
-.hr-prediction-card .player-team {
-  font-size: 0.85rem;
-  color: #666;
-}
-
-/* Player Stats Styling */
-.hr-prediction-card .player-stat {
-  display: flex;
-  flex-direction: column;
-  min-width: 180px;
-  align-items: flex-end;
-  line-height: 1.2;
-}
-
-.hr-prediction-card .hr-deficit {
-  font-weight: 700;
-  color: #e63946; /* Red for deficit */
-  font-size: 0.95rem;
-}
-
-.hr-prediction-card .hr-detail {
-  font-size: 0.8rem;
-  font-weight: normal;
-  color: #666;
-  margin-top: 3px;
-}
-
-
-
-/* Odds loading and status indicators */
-.odds-loading {
-  font-size: 0.8rem;
-  color: #666;
-  font-style: italic;
-}
-
-.odds-error {
-  font-size: 0.8rem;
-  color: #d32f2f;
-  font-weight: 500;
-}
-
-.odds-info {
-  font-size: 0.8rem;
-  color: #2e7d32;
-  font-weight: 500;
-}
-
-/* Enhanced player team and odds container */
-.player-team-odds {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.player-team {
-  font-size: 0.85rem;
-  color: #666;
-  font-weight: 500;
-}
-
-.odds-separator {
-  color: #ccc;
-  font-size: 0.7rem;
-}
-
-.player-odds {
-  font-size: 0.85rem;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background-color: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-  cursor: help;
-}
-
-.player-odds:hover {
-  background-color: rgba(0, 0, 0, 0.1);
-  transform: scale(1.05);
-}
-
-/* Enhanced player stat styling for HR predictions */
-.hr-prediction .player-stat {
-  display: flex;
-  flex-direction: column;
-  min-width: 200px;
-  align-items: flex-end;
-  line-height: 1.3;
-  text-align: right;
-}
-
-.hr-deficit {
-  font-weight: 700;
-  color: #e63946;
-  font-size: 0.95rem;
-}
-
-.hr-detail {
-  font-size: 0.8rem;
-  font-weight: normal;
-  color: #666;
-  margin-top: 3px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.days-since {
-  font-size: 0.75rem;
-  color: #888;
-  font-style: italic;
-}
-
-
-/* Highlight players with long HR droughts */
-.hr-prediction-card .player-item:nth-child(1) .hr-deficit {
-  background-color: rgba(230, 57, 70, 0.1);
-  padding: 2px 6px;
-  border-radius: 4px;
-  border-left: 3px solid #e63946;
-}
-
-.hr-prediction-card .player-item:nth-child(2) .hr-deficit,
-.hr-prediction-card .player-item:nth-child(3) .hr-deficit {
-  padding: 2px 6px;
-  border-radius: 4px;
-  border-left: 3px solid #e63946;
-}
-
-/* Loading & No Data States */
-.hr-prediction-card .loading-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  color: #666;
-  font-style: italic;
-}
-
-.hr-prediction-card .no-data {
-  color: #888;
-  text-align: center;
-  padding: 20px 0;
-}
-
-.hr-prediction .player-rank {
-  /* Let inline styles (team colors) take precedence */
-  background-color: var(--team-color, #e63946); /* Fallback to red only if no team color */
-  width: 30px;
-  height: 30px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  font-weight: bold;
-  margin-right: 15px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-
-
-/* Odds footer */
-.odds-footer {
-  margin-top: 15px;
-  padding-top: 10px;
-  border-top: 1px solid #eee;
-  text-align: center;
-}
-
-.odds-footer small {
-  color: #666;
-  font-size: 0.75rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .player-team-odds {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 3px;
-  }
-  
-  .odds-separator {
-    display: none;
-  }
-  
-  .player-odds {
-    font-size: 0.8rem;
-    padding: 1px 4px;
-  }
-  
-  .hr-prediction .player-stat {
-    min-width: 150px;
-  }
-  
-  .hr-prediction .card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
-  }
-  
-  .odds-loading,
-  .odds-error,
-  .odds-info {
-    font-size: 0.75rem;
-  }
-}
-
-/* Accessibility improvements */
-.player-odds:focus {
-  outline: 2px solid #0056b3;
-  outline-offset: 2px;
-}
-
-/* Animation for odds loading */
-@keyframes oddsShimmer {
-  0% { opacity: 0.5; }
-  50% { opacity: 1; }
-  100% { opacity: 0.5; }
-}
-
-.odds-loading {
-  animation: oddsShimmer 1.5s ease-in-out infinite;
-}
-
-/* Odds value color coding styles */
-.player-odds[style*="color: #d4282d"] {
-  /* Favorites/Low odds - Red background accent */
-  background-color: rgba(212, 40, 45, 0.1);
-  border-color: rgba(212, 40, 45, 0.2);
-}
-
-.player-odds[style*="color: #f57c00"] {
-  /* Moderate odds - Orange background accent */
-  background-color: rgba(245, 124, 0, 0.1);
-  border-color: rgba(245, 124, 0, 0.2);
-}
-
-.player-odds[style*="color: #2e7d32"] {
-  /* Long shots - Green background accent */
-  background-color: rgba(46, 125, 50, 0.1);
-  border-color: rgba(46, 125, 50, 0.2);
-}
-
-/* Enhanced hover effects for odds */
-.player-item:hover .player-odds {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Special styling for players who hit HR last game */
-.hr-prediction .player-item .hr-deficit:contains("Hit HR last game") {
-  color: #2e7d32;
-  background-color: rgba(46, 125, 50, 0.1);
-  border-left-color: #2e7d32;
-}
-
-
 /* HRPredictionCard.css - Enhanced with odds display */
 
 .hr-prediction {
@@ -449,38 +139,140 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  /* Much more compact rows on mobile */
+  .hr-prediction .player-item {
+    padding: 6px 12px; /* Even tighter padding */
+    margin-bottom: 4px; /* Minimal separation between rows */
+    min-height: auto; /* Remove any min-height constraints */
+    display: flex !important; /* Ensure flex layout */
+    align-items: center !important; /* Center items vertically */
+    width: 100%; /* Full width */
+  }
+  
+  /* Smaller rank circle on mobile */
+  .hr-prediction .player-rank {
+    width: 32px;  /* Much smaller */
+    height: 32px; 
+    margin-right: 10px; /* Tighter margin */
+  }
+  
+  .hr-prediction .rank-number {
+    font-size: 0.9rem; /* Smaller rank number */
+  }
+  
+  /* Compact player info section */
+  .player-info {
+    flex-grow: 1;
+    min-width: 0; /* Allow shrinking */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px; /* Minimal gap between name and team/odds */
+    width: 100%; /* Ensure full width */
+  }
+  
+  /* Smaller player name on mobile */
+  .player-name {
+    font-size: 0.85rem; /* Smaller font */
+    line-height: 1.1; /* Tighter line height */
+    margin: 0; /* Remove any default margins */
+  }
+  
+  /* Force team and odds to stay inline - CRITICAL FIX */
   .player-team-odds {
-    gap: 4px; /* Smaller gap on mobile but keep inline */
+    display: flex !important; /* Force flex display */
+    align-items: center !important;
+    gap: 4px !important;
+    flex-wrap: nowrap !important; /* Never wrap */
+    white-space: nowrap !important; /* Prevent any wrapping */
+    flex-direction: row !important; /* Explicitly set to row */
   }
   
   .player-team {
-    font-size: 0.8rem;
+    font-size: 0.7rem; /* Smaller team name */
+    font-weight: 600;
+    color: #888; /* Lighter color to de-emphasize */
+    flex-shrink: 0 !important; /* Don't let it shrink */
+    display: inline !important; /* Ensure inline */
   }
   
   .odds-separator {
-    display: inline; /* Keep separator visible on mobile */
     font-size: 0.6rem;
+    color: #ccc;
+    flex-shrink: 0 !important; /* Don't let separator shrink */
+    display: inline !important;
   }
   
   .player-odds {
-    font-size: 0.8rem;
-    padding: 1px 4px;
+    font-size: 0.7rem; /* Smaller odds font */
+    padding: 1px 3px; /* Very tight padding */
+    font-weight: 700;
+    border-radius: 3px; /* Smaller border radius */
+    flex-shrink: 0 !important; /* Don't let odds shrink */
+    display: inline !important; /* Ensure inline */
   }
   
+  /* Much more compact stats section */
   .hr-prediction .player-stat {
-    min-width: 140px; /* Reduced to make room for inline odds */
-  }
-  
-  .hr-prediction .card-header {
+    min-width: 120px; /* Even smaller width */
+    text-align: right;
+    display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
+    justify-content: center;
+    gap: 1px; /* Minimal gap */
   }
   
+  .hr-deficit {
+    font-size: 0.8rem; /* Smaller main stat */
+    line-height: 1.1;
+  }
+  
+  .hr-detail {
+    font-size: 0.65rem; /* Much smaller detail text */
+    line-height: 1.1;
+    margin-top: 1px; /* Minimal margin */
+  }
+  
+  .days-since {
+    font-size: 0.6rem; /* Even smaller for days since */
+  }
+  
+  /* Tighter card spacing */
+  .hr-prediction .card-header {
+    margin-bottom: 12px; /* Less margin */
+  }
+  
+  .hr-prediction h3 {
+    font-size: 1.1rem; /* Smaller title */
+    margin-bottom: 0;
+  }
+  
+  /* Compact scrollable container */
+  .hr-prediction .scrollable-container {
+    max-height: 280px; /* Shorter container */
+  }
+  
+  /* Remove any extra spacing from player list */
+  .hr-prediction .player-list {
+    gap: 0; /* No gap between list items */
+  }
+  
+  /* Smaller status indicators */
   .odds-loading,
   .odds-error,
   .odds-info {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+  
+  /* Compact footer */
+  .odds-footer {
+    margin-top: 8px;
+    padding-top: 6px;
+  }
+  
+  .odds-footer small {
+    font-size: 0.6rem;
   }
 }
 
