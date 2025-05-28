@@ -295,7 +295,7 @@ const TimeSlotHRCard = ({ gameData, currentDate, teams }) => {
       
       // Sort by performance and take top 25
       const sortedPlayers = allTimeSlotPlayers
-        .sort((a, b) => parseFloat(b.hitsPerGame) - parseFloat(a.hitsPerGame))
+        .sort((a, b) => parseFloat(b.hrsPerGame) - parseFloat(a.hrsPerGame))
         .slice(0, 25);
       
       setTimeSlotData(sortedPlayers);
