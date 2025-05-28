@@ -465,3 +465,289 @@ export const clearCache = () => {
   dataCache.dateRangeData = {};
   dataCache.multiGameData = {};
 };
+
+
+// Enhanced dataService.js functions for matchup analysis
+
+/**
+ * Analyze player performance vs specific opponents
+ * @param {string} playerName - Player name
+ * @param {string} playerTeam - Player's team
+ * @param {string} opponentTeam - Opponent team
+ * @param {Object} dateRangeData - Historical data
+ * @returns {Object} Performance stats vs opponent
+ */
+export const analyzePlayerVsOpponent = (playerName, playerTeam, opponentTeam, dateRangeData) => {
+  const gamesVsOpponent = [];
+  const sortedDates = Object.keys(dateRangeData).sort();
+  
+  // Look through each date to find games where these teams played
+  sortedDates.forEach(dateStr => {
+    const playersForDate = dateRangeData[dateStr];
+    
+    // Check if both teams have players in this date's data (indicating they played)
+    const hasPlayerTeam = playersForDate.some(p => p.team === playerTeam);
+    const hasOpponentTeam = playersForDate.some(p => p.team === opponentTeam);
+    
+    if (hasPlayerTeam && hasOpponentTeam) {
+      // Find our specific player's performance in this game
+      const playerData = playersForDate.find(p => 
+        p.name === playerName && p.team === playerTeam
+      );
+      
+      if (playerData && playerData.H !== 'DNP') {
+        gamesVsOpponent.push({
+          date: dateStr,
+          hits: Number(playerData.H) || 0,
+          homeRuns: Number(playerData.HR) || 0,
+          atBats: Number(playerData.AB) || 0,
+          rbi: Number(playerData.RBI) || 0,
+          runs: Number(playerData.R) || 0
+        });
+      }
+    }
+  });
+  
+  if (gamesVsOpponent.length === 0) {
+    return null;
+  }
+  
+  // Calculate aggregate stats
+  const totalGames = gamesVsOpponent.length;
+  const totalHits = gamesVsOpponent.reduce((sum, game) => sum + game.hits, 0);
+  const totalHRs = gamesVsOpponent.reduce((sum, game) => sum + game.homeRuns, 0);
+  const totalAB = gamesVsOpponent.reduce((sum, game) => sum + game.atBats, 0);
+  const totalRBI = gamesVsOpponent.reduce((sum, game) => sum + game.rbi, 0);
+  const totalRuns = gamesVsOpponent.reduce((sum, game) => sum + game.runs, 0);
+  
+  return {
+    playerName,
+    playerTeam,
+    opponentTeam,
+    gamesVsOpponent: totalGames,
+    totalHits,
+    totalHRs,
+    totalRBI,
+    totalRuns,
+    hitsPerGame: (totalHits / totalGames).toFixed(2),
+    hrsPerGame: (totalHRs / totalGames).toFixed(2),
+    battingAvg: totalAB > 0 ? (totalHits / totalAB).toFixed(3) : '.000',
+    gameLog: gamesVsOpponent,
+    // Recent form (last 5 games vs this opponent)
+    recentForm: gamesVsOpponent.slice(-5).map(g => g.hits > 0 ? '✓' : '✗').join('')
+  };
+};
+
+/**
+ * Get all matchups for today's games
+ * @param {Array} gameData - Today's game data
+ * @returns {Array} Array of matchup objects
+ */
+export const getTodaysMatchups = (gameData) => {
+  return gameData.map(game => ({
+    gameId: game.id || game.originalId,
+    homeTeam: game.homeTeam,
+    awayTeam: game.awayTeam,
+    gameTime: game.time || null,
+    status: game.status || 'Scheduled'
+  }));
+};
+
+/**
+ * Get players scheduled to play today from roster and game data
+ * @param {Array} gameData - Today's games
+ * @param {Array} rosterData - Current roster
+ * @returns {Array} Players playing today
+ */
+export const getTodaysActivePlayers = (gameData, rosterData) => {
+  const teamsPlayingToday = new Set();
+  
+  gameData.forEach(game => {
+    teamsPlayingToday.add(game.homeTeam);
+    teamsPlayingToday.add(game.awayTeam);
+  });
+  
+  return rosterData.filter(player => 
+    teamsPlayingToday.has(player.team) && 
+    (player.type === 'hitter' || !player.type)
+  );
+};
+
+/**
+ * Analyze time slot performance patterns
+ * @param {string} playerName - Player name  
+ * @param {string} playerTeam - Player's team
+ * @param {string} timeSlotType - Type of time slot
+ * @param {Object} dateRangeData - Historical data
+ * @returns {Object} Time slot performance stats
+ */
+export const analyzePlayerTimeSlotPerformance = (playerName, playerTeam, timeSlotType, dateRangeData) => {
+  const timeSlotGames = [];
+  
+  Object.keys(dateRangeData).forEach(dateStr => {
+    const gameDate = new Date(dateStr);
+    const gameTimeSlot = classifyTimeSlot(gameDate);
+    
+    if (gameTimeSlot === timeSlotType) {
+      const playersForDate = dateRangeData[dateStr];
+      const playerData = playersForDate.find(p => 
+        p.name === playerName && p.team === playerTeam
+      );
+      
+      if (playerData && playerData.H !== 'DNP') {
+        timeSlotGames.push({
+          date: dateStr,
+          dayOfWeek: gameDate.getDay(),
+          hits: Number(playerData.H) || 0,
+          homeRuns: Number(playerData.HR) || 0,
+          atBats: Number(playerData.AB) || 0
+        });
+      }
+    }
+  });
+  
+  if (timeSlotGames.length === 0) {
+    return null;
+  }
+  
+  const totalGames = timeSlotGames.length;
+  const totalHits = timeSlotGames.reduce((sum, game) => sum + game.hits, 0);
+  const totalHRs = timeSlotGames.reduce((sum, game) => sum + game.homeRuns, 0);
+  const totalAB = timeSlotGames.reduce((sum, game) => sum + game.atBats, 0);
+  
+  return {
+    playerName,
+    playerTeam,
+    timeSlotType,
+    gamesInTimeSlot: totalGames,
+    totalHits,
+    totalHRs,
+    hitsPerGame: (totalHits / totalGames).toFixed(2),
+    hrsPerGame: (totalHRs / totalGames).toFixed(2),
+    battingAvgInSlot: totalAB > 0 ? (totalHits / totalAB).toFixed(3) : '.000',
+    gameLog: timeSlotGames
+  };
+};
+
+/**
+ * Classify time slot based on date/time
+ * @param {Date} gameDate - Date of the game
+ * @returns {string} Time slot classification
+ */
+export const classifyTimeSlot = (gameDate) => {
+  const dayOfWeek = gameDate.getDay();
+  const month = gameDate.getMonth();
+  const date = gameDate.getDate();
+  
+  // Sunday games
+  if (dayOfWeek === 0) {
+    return 'Sunday Games';
+  }
+  
+  // Saturday games  
+  if (dayOfWeek === 6) {
+    return 'Saturday Games';
+  }
+  
+  // Friday games
+  if (dayOfWeek === 5) {
+    return 'Friday Games';
+  }
+  
+  // Weekday games (Mon-Thu)
+  if (dayOfWeek >= 1 && dayOfWeek <= 4) {
+    // Further classify by likely game time
+    // Day games are more common on certain days/holidays
+    const isLikelyDayGame = (
+      month === 3 ||  // April (season start, more day games)
+      month === 8 ||  // September (school back, more day games)
+      (dayOfWeek === 3 && month >= 4 && month <= 8) // Wednesday day games common
+    );
+    
+    return isLikelyDayGame ? 'Weekday Day Games' : 'Weekday Night Games';
+  }
+  
+  return 'Other Games';
+};
+
+/**
+ * Generate comprehensive matchup analysis for dashboard
+ * @param {Array} gameData - Today's games
+ * @param {Object} dateRangeData - Historical player data
+ * @param {Array} rosterData - Current roster
+ * @returns {Object} Complete matchup analysis
+ */
+export const generateMatchupAnalysis = async (gameData, dateRangeData, rosterData) => {
+  const todaysMatchups = getTodaysMatchups(gameData);
+  const activePlayers = getTodaysActivePlayers(gameData, rosterData);
+  
+  const opponentMatchupHits = [];
+  const opponentMatchupHRs = [];
+  const timeSlotHits = [];  
+  const timeSlotHRs = [];
+  
+  // Current date for time slot classification
+  const currentDate = new Date();
+  const currentTimeSlot = classifyTimeSlot(currentDate);
+  
+  // Analyze each active player
+  for (const player of activePlayers) {
+    // Find which opponent this player is facing today
+    const playerMatchup = todaysMatchups.find(matchup => 
+      matchup.homeTeam === player.team || matchup.awayTeam === player.team
+    );
+    
+    if (playerMatchup) {
+      const opponent = playerMatchup.homeTeam === player.team ? 
+        playerMatchup.awayTeam : playerMatchup.homeTeam;
+      
+      // Analyze vs opponent
+      const vsOpponentStats = analyzePlayerVsOpponent(
+        player.name, 
+        player.team, 
+        opponent, 
+        dateRangeData
+      );
+      
+      if (vsOpponentStats && vsOpponentStats.gamesVsOpponent >= 3) {
+        opponentMatchupHits.push(vsOpponentStats);
+        if (vsOpponentStats.totalHRs > 0) {
+          opponentMatchupHRs.push(vsOpponentStats);
+        }
+      }
+      
+      // Analyze time slot performance
+      const timeSlotStats = analyzePlayerTimeSlotPerformance(
+        player.name,
+        player.team,
+        currentTimeSlot,
+        dateRangeData
+      );
+      
+      if (timeSlotStats && timeSlotStats.gamesInTimeSlot >= 3) {
+        timeSlotHits.push(timeSlotStats);
+        if (timeSlotStats.totalHRs > 0) {
+          timeSlotHRs.push(timeSlotStats);
+        }
+      }
+    }
+  }
+  
+  return {
+    opponentMatchupHits: opponentMatchupHits
+      .sort((a, b) => parseFloat(b.hitsPerGame) - parseFloat(a.hitsPerGame))
+      .slice(0, 25),
+    opponentMatchupHRs: opponentMatchupHRs  
+      .sort((a, b) => parseFloat(b.hrsPerGame) - parseFloat(a.hrsPerGame))
+      .slice(0, 25),
+    timeSlotHits: timeSlotHits
+      .sort((a, b) => parseFloat(b.hitsPerGame) - parseFloat(a.hitsPerGame))
+      .slice(0, 25),
+    timeSlotHRs: timeSlotHRs
+      .sort((a, b) => parseFloat(b.hrsPerGame) - parseFloat(a.hrsPerGame))
+      .slice(0, 25),
+    currentTimeSlot,
+    totalMatchupsAnalyzed: todaysMatchups.length,
+    totalPlayersAnalyzed: activePlayers.length
+  };
+};
