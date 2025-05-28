@@ -29,6 +29,14 @@ import PerformanceCard from './cards/PerformanceCard/PerformanceCard';
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
 
 
+import { 
+  OpponentMatchupHitsCard,
+  OpponentMatchupHRCard,
+  TimeSlotHitsCard,
+  TimeSlotHRCard
+} from './cards/OpponentMatchupHitsCard/OpponentMatchupHitsCard';
+
+
 /**
  * Dashboard component - Home page displaying summary of MLB data
  * Enhanced with team filtering capability
@@ -978,6 +986,31 @@ const noFilteredData = isFiltering &&
             teams={teamData} 
           />
           
+
+
+          <OpponentMatchupHitsCard 
+            gameData={filteredGameData}
+             currentDate={currentDate}
+            teams={teamData}
+          />
+
+
+          <OpponentMatchupHRCard 
+  gameData={filteredGameData}
+  currentDate={currentDate}
+  teams={teamData}
+/>
+<TimeSlotHitsCard 
+  gameData={filteredGameData}
+  currentDate={currentDate}
+  teams={teamData}
+/>
+<TimeSlotHRCard 
+  gameData={filteredGameData}
+  currentDate={currentDate}
+  teams={teamData}
+/>
+
           {/* Recent Updates Card */}
           <RecentUpdatesCard 
             currentDate={currentDate}
