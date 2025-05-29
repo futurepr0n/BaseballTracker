@@ -1,0 +1,473 @@
+/* HRAnalysisCard.css */
+
+.hr-analysis-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.hr-analysis-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.hr-analysis-card.expanded {
+  border-color: #3b82f6;
+}
+
+/* Header */
+.hr-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #f8fafc;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease;
+}
+
+.hr-card-header:hover {
+  background: #f1f5f9;
+}
+
+.hr-header-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hr-icon {
+  font-size: 1.2rem;
+}
+
+.hr-title {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.hr-potential {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.low-confidence-badge {
+  background: #fef3c7;
+  color: #d97706;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  margin-left: 8px;
+}
+
+.expand-btn {
+  background: none;
+  border: none;
+  font-size: 0.8rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: all 0.2s ease;
+}
+
+.expand-btn:hover {
+  color: #1f2937;
+  background: #e5e7eb;
+  border-radius: 4px;
+}
+
+/* Body */
+.hr-card-body {
+  padding: 16px;
+}
+
+/* Core Metrics */
+.hr-core-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 6px;
+}
+
+.metric-label {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.metric-value {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Warnings */
+.hr-warnings {
+  margin-bottom: 16px;
+}
+
+.warning-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.warning-item.high {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.warning-item.medium {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #d97706;
+}
+
+.warning-icon {
+  font-size: 1rem;
+}
+
+.warning-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Insights */
+.hr-insights {
+  margin-bottom: 16px;
+}
+
+.hr-insights h5 {
+  margin: 0 0 12px 0;
+  color: #1f2937;
+  font-size: 1rem;
+}
+
+.insight-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.insight-item.high {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.insight-item.medium {
+  background: #fefce8;
+  border-color: #fef08a;
+}
+
+.insight-icon {
+  font-size: 1.1rem;
+}
+
+.insight-text {
+  font-size: 0.9rem;
+  color: #1f2937;
+  flex: 1;
+}
+
+/* Expanded Details */
+.hr-expanded-details {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid #e5e7eb;
+}
+
+.detail-section {
+  margin-bottom: 24px;
+}
+
+.detail-section h5 {
+  margin: 0 0 12px 0;
+  color: #1f2937;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.detail-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.detail-label {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.detail-value {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.9rem;
+}
+
+.detail-value.positive {
+  color: #16a34a;
+}
+
+.detail-value.negative {
+  color: #dc2626;
+}
+
+.trend-icon {
+  margin-left: 6px;
+}
+
+/* Arsenal Matchups */
+.arsenal-matchups {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.arsenal-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+
+.pitch-type {
+  font-weight: 600;
+  color: #1f2937;
+  min-width: 60px;
+}
+
+.pitch-usage {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.pitch-performance {
+  margin-left: auto;
+  font-weight: 500;
+  color: #3b82f6;
+}
+
+/* Recommendations */
+.recommendations {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recommendation-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.recommendation-item.positive {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.recommendation-item.caution {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.recommendation-item.negative {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.rec-icon {
+  font-size: 1rem;
+}
+
+.rec-text {
+  font-size: 0.9rem;
+  color: #1f2937;
+}
+
+/* Adjustment Comparison */
+.adjustment-comparison {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.comparison-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.comp-label {
+  font-size: 0.85rem;
+  color: #6b7280;
+  min-width: 80px;
+}
+
+.comp-value {
+  font-weight: 600;
+  color: #1f2937;
+  min-width: 60px;
+}
+
+.comp-arrow {
+  color: #9ca3af;
+}
+
+.adjustment-note {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin: 12px 0 0 0;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hr-core-metrics {
+    grid-template-columns: 1fr;
+  }
+  
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .comparison-row {
+    flex-wrap: wrap;
+  }
+  
+  .arsenal-item {
+    flex-wrap: wrap;
+  }
+  
+  .pitch-performance {
+    margin-left: 0;
+    width: 100%;
+    margin-top: 4px;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .hr-analysis-card {
+    background: #1f2937;
+    border-color: #374151;
+  }
+  
+  .hr-card-header {
+    background: #111827;
+  }
+  
+  .hr-card-header:hover {
+    background: #1f2937;
+  }
+  
+  .hr-title {
+    color: #f3f4f6;
+  }
+  
+  .metric-row {
+    background: #111827;
+  }
+  
+  .metric-label {
+    color: #9ca3af;
+  }
+  
+  .metric-value {
+    color: #f3f4f6;
+  }
+  
+  .detail-section h5 {
+    color: #f3f4f6;
+  }
+  
+  .detail-item {
+    background: #111827;
+    border-color: #374151;
+  }
+  
+  .detail-label {
+    color: #9ca3af;
+  }
+  
+  .detail-value {
+    color: #f3f4f6;
+  }
+  
+  .arsenal-item {
+    background: #111827;
+    border-color: #374151;
+  }
+  
+  .pitch-type {
+    color: #f3f4f6;
+  }
+  
+  .adjustment-comparison {
+    background: #111827;
+  }
+  
+  .comp-label {
+    color: #9ca3af;
+  }
+  
+  .comp-value {
+    color: #f3f4f6;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .hr-analysis-card {
+    break-inside: avoid;
+    border: 1px solid #000;
+  }
+  
+  .expand-btn {
+    display: none;
+  }
+  
+  .hr-expanded-details {
+    display: block !important;
+  }
+}
