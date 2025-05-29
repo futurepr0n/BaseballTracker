@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useCallback, Fragment } from 'react';
 import './MatchupAnalyzer.css';
 import { fetchRosterData } from '../services/dataService';
+import { createEnhancedMatchupAnalyzer, analyzeEnhancedMatchup } from '../services/EnhancedMatchupAnalysis';
 import Papa from 'papaparse';
 import _ from 'lodash';
 
-// Define the years of data you want to load (same as BatterPitcherMatchup)
+// Define the years of data you want to load
 const DATA_YEARS = [2025, 2024, 2023, 2022];
 const CURRENT_YEAR = Math.max(...DATA_YEARS);
 
 /**
- * Enhanced Matchup Analyzer Component - With Sortable Table and Row Removal
- * Analyzes all batter-pitcher matchups for selected games with configurable years
+ * FIXED Enhanced Matchup Analyzer Component
+ * - Properly filters for active, non-injured players only
+ * - Year checkboxes now trigger re-analysis
+ * - Shows only players with 2025 season data + their historical context
  */
 function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
   // State for data
@@ -23,7 +26,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
   const [isLoadingCSV, setIsLoadingCSV] = useState(true);
   const [dataLoadError, setDataLoadError] = useState(null);
   
-  // State for year selection (similar to BatterPitcherMatchup)
+  // State for year selection
   const [activeYears, setActiveYears] = useState([...DATA_YEARS].sort((a, b) => b - a));
   
   // State for selected games and configured pitchers
@@ -32,10 +35,13 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
   const [analysisResults, setAnalysisResults] = useState([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   
-  // New state for table functionality
+  // State for table functionality
   const [sortConfig, setSortConfig] = useState({ key: 'advantage', direction: 'desc' });
   const [filteredResults, setFilteredResults] = useState([]);
   const [removedResultIds, setRemovedResultIds] = useState(new Set());
+  
+  // Enhanced analyzer instance
+  const [matchupAnalyzer, setMatchupAnalyzer] = useState(null);
   
   // Format date for display
   const formattedDate = currentDate.toLocaleDateString('en-US', { 
@@ -154,7 +160,27 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
 
     loadAllCSVData();
   }, []);
-  
+
+  // FIXED: Create enhanced analyzer when data is loaded AND when activeYears change
+  useEffect(() => {
+    if (hitterData.length > 0 && pitcherData.length > 0 && rosterData.length > 0 && activeYears.length > 0) {
+      console.log('Creating enhanced matchup analyzer with years:', activeYears);
+      const analyzer = createEnhancedMatchupAnalyzer(hitterData, pitcherData, rosterData, activeYears);
+      setMatchupAnalyzer(analyzer);
+    }
+  }, [hitterData, pitcherData, rosterData, activeYears]); // FIXED: Added activeYears dependency
+
+  // FIXED: Auto re-run analysis when analyzer updates (due to year changes)
+  useEffect(() => {
+    if (matchupAnalyzer && analysisResults.length > 0) {
+      console.log('Analyzer updated, re-running analysis...');
+      // Small delay to ensure analyzer is fully updated
+      setTimeout(() => {
+        runAnalysis();
+      }, 100);
+    }
+  }, [matchupAnalyzer]); // This will trigger when analyzer is recreated with new years
+
   // Get all available pitchers for a team
   const getPitchersForTeam = useCallback((teamCode) => {
     if (!rosterData || !teamCode) return [];
@@ -219,7 +245,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     );
   };
 
-  // Enhanced name matching function (similar to BatterPitcherMatchup)
+  // Enhanced name matching function
   const convertPlayerName = (name, format = 'lastFirst') => {
     if (!name) return null;
     if (typeof name === 'object' && name !== null) {
@@ -257,7 +283,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     return name;
   };
 
-  // Find best match function (similar to BatterPitcherMatchup)
+  // Find best match function
   const findBestMatch = (targetPlayer, playerList) => {
     if (!targetPlayer || !playerList || !playerList.length) return null;
     const targetName = typeof targetPlayer === 'object' ? targetPlayer.name : targetPlayer;
@@ -306,65 +332,6 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     }
     
     return null;
-  };
-
-  // Analyze matchup using CSV data (simplified version of BatterPitcherMatchup logic)
-  const analyzeMatchupWithCSV = (batter, pitcher) => {
-    // Filter data by active years
-    const currentHitterDataForPlayer = hitterData.filter(row => 
-      activeYears.includes(row.year) && 
-      findBestMatch(batter, [row])
-    );
-    
-    const currentPitcherDataForPlayer = pitcherData.filter(row => 
-      activeYears.includes(row.year) && 
-      findBestMatch(pitcher, [row])
-    );
-
-    // Basic handedness advantage
-    let handednessAdvantage = 0;
-    if (batter.bats && (pitcher.throwingArm || pitcher.ph)) {
-      const pitcherHand = pitcher.throwingArm || pitcher.ph;
-      
-      if (batter.bats === 'B') {
-        handednessAdvantage = 1.5;
-      } else if (batter.bats === pitcherHand) {
-        handednessAdvantage = -1.2;
-      } else {
-        handednessAdvantage = 1.2;
-      }
-    }
-
-    // Add some analysis based on CSV data if available
-    let csvAdvantage = 0;
-    if (currentHitterDataForPlayer.length > 0 && currentPitcherDataForPlayer.length > 0) {
-      // Example: Use average wOBA from hitter data vs average wOBA allowed by pitcher
-      const avgHitterWOBA = _.meanBy(currentHitterDataForPlayer, 'woba') || 0.320;
-      const avgPitcherWOBA = _.meanBy(currentPitcherDataForPlayer, 'woba') || 0.320;
-      
-      csvAdvantage = (avgHitterWOBA - avgPitcherWOBA) * 3; // Scale the difference
-    }
-
-    const totalAdvantage = handednessAdvantage + csvAdvantage;
-    
-    return {
-      advantage: totalAdvantage,
-      advantageLabel: getAdvantageLabel(totalAdvantage),
-      hitPotential: getPotentialRating(totalAdvantage, 0),
-      hrPotential: getPotentialRating(totalAdvantage, -0.8),
-      tbPotential: getPotentialRating(totalAdvantage, -0.3),
-      kPotential: getPotentialRating(-totalAdvantage, -0.2),
-      details: {
-        predictedBA: Math.min(0.350, Math.max(0.180, 0.250 + totalAdvantage * 0.04)).toFixed(3),
-        predictedHR: Math.min(0.080, Math.max(0.010, 0.030 + totalAdvantage * 0.01)).toFixed(3),
-        predictedSLG: Math.min(0.600, Math.max(0.300, 0.420 + totalAdvantage * 0.06)).toFixed(3),
-        predictedWOBA: Math.min(0.450, Math.max(0.280, 0.340 + totalAdvantage * 0.05)).toFixed(3),
-        strikeoutRate: Math.min(0.40, Math.max(0.10, 0.22 - totalAdvantage * 0.03)).toFixed(3),
-        yearsUsed: activeYears.join(', '),
-        hitterDataPoints: currentHitterDataForPlayer.length,
-        pitcherDataPoints: currentPitcherDataForPlayer.length
-      }
-    };
   };
 
   // Sorting functionality
@@ -451,12 +418,18 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     setRemovedResultIds(new Set());
   };
 
-  // Run the analysis for selected games and pitchers
-  const runAnalysis = async () => {
-    console.log("Starting analysis...");
+  // FIXED: Enhanced analysis using the new system
+  const runAnalysis = useCallback(async () => {
+    console.log("Starting enhanced analysis...");
     setIsAnalyzing(true);
     setAnalysisResults([]);
     setRemovedResultIds(new Set());
+    
+    if (!matchupAnalyzer) {
+      console.error("Enhanced analyzer not ready");
+      setIsAnalyzing(false);
+      return;
+    }
     
     // Get selected game indices
     const selectedGameIndices = Object.entries(selectedGames)
@@ -488,7 +461,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
           
           awayBatters.forEach((batter, index) => {
             matchups.push({
-              id: `${gameIndex}-home-${index}`, // Add unique ID
+              id: `${gameIndex}-home-${index}`,
               gameIndex,
               game: `${game.awayTeam} @ ${game.homeTeam}`,
               batter,
@@ -509,7 +482,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
           
           homeBatters.forEach((batter, index) => {
             matchups.push({
-              id: `${gameIndex}-away-${index}`, // Add unique ID
+              id: `${gameIndex}-away-${index}`,
               gameIndex,
               game: `${game.awayTeam} @ ${game.homeTeam}`,
               batter,
@@ -529,14 +502,14 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     }
     
     try {
-      // Process each matchup using CSV data
+      // Process each matchup using enhanced analysis
       const results = matchups.map(matchup => {
-        const analysis = analyzeMatchupWithCSV(matchup.batter, matchup.pitcher);
+        const analysis = matchupAnalyzer.analyzeComprehensiveMatchup(matchup.batter, matchup.pitcher);
         
         return {
           ...matchup,
           result: analysis,
-          explanation: mockGetExplanation(analysis)
+          explanation: generateEnhancedExplanation(analysis, matchup.batter, matchup.pitcher)
         };
       });
       
@@ -546,67 +519,71 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     } finally {
       setIsAnalyzing(false);
     }
-  };
+  }, [matchupAnalyzer, selectedGames, gamePitchers, gameData, getBattersForTeam, getPitcherById, activeYears]); // Added dependencies
 
-  // Helper functions
-  const getAdvantageLabel = (advantage) => {
-    if (advantage > 2) return 'Strong Batter Advantage';
-    if (advantage > 1) return 'Batter Advantage';
-    if (advantage > 0.3) return 'Slight Batter Advantage';
-    if (advantage > -0.3) return 'Neutral Matchup';
-    if (advantage > -1) return 'Slight Pitcher Advantage';
-    if (advantage > -2) return 'Pitcher Advantage';
-    return 'Strong Pitcher Advantage';
-  };
-  
-  const getPotentialRating = (advantage, adjustment = 0) => {
-    const adjustedAdvantage = advantage + adjustment;
-    
-    if (adjustedAdvantage > 1.5) return 'High';
-    if (adjustedAdvantage > 0) return 'Medium';
-    return 'Low';
-  };
-  
-  const mockGetExplanation = (analysis) => {
+  // Enhanced explanation generator
+  const generateEnhancedExplanation = (analysis, batter, pitcher) => {
     const { advantageLabel, hitPotential, hrPotential, tbPotential, kPotential, details } = analysis;
     
-    return `
-    Betting Prop Insights:
-    🎯
-    Hit Potential: ${hitPotential}
-    Predicted Hit Rate: ${(parseFloat(details.predictedBA) * 100).toFixed(1)}%. Expected BA of ${details.predictedBA}.
-
-    💣
-    Home Run Potential: ${hrPotential}
-    Predicted HR Rate: ${(parseFloat(details.predictedHR) * 100).toFixed(1)}%. This suggests about 1 HR every ${Math.round(1 / parseFloat(details.predictedHR))} Plate Appearances.
-
-    📊
-    Total Bases Potential: ${tbPotential}
-    Driven by Predicted SLG of ${details.predictedSLG} and wOBA of ${details.predictedWOBA}.
-
-    ⚾
-    Batter K Potential: ${kPotential}
-    Batter's Strikeout Rate: ${(parseFloat(details.strikeoutRate) * 100).toFixed(1)}%. This is a ${kPotential} indicator for pitcher strikeout props.
+    let explanation = `🎯 **${advantageLabel}**\n\n`;
     
-    📈 Analysis based on ${details.yearsUsed} data (${details.hitterDataPoints} hitter records, ${details.pitcherDataPoints} pitcher records)
-    `;
-  };
-
-  const getAdvantageClass = (advantage) => {
-    if (advantage > 2) return 'strong-advantage';
-    if (advantage > 1) return 'medium-advantage';
-    if (advantage > 0.3) return 'slight-advantage';
-    if (advantage > -0.3) return 'neutral';
-    if (advantage > -1) return 'slight-disadvantage';
-    if (advantage > -2) return 'medium-disadvantage';
-    return 'strong-disadvantage';
+    // Hit Analysis
+    explanation += `**Hit Potential: ${hitPotential}**\n`;
+    explanation += `• Predicted Batting Average: ${details.predictedBA}\n`;
+    explanation += `• Expected hit rate: ${(parseFloat(details.predictedBA) * 100).toFixed(1)}%\n`;
+    
+    if (details.analysisBreakdown) {
+      if (details.analysisBreakdown.handedness) {
+        const handAdvantage = details.analysisBreakdown.handedness;
+        if (handAdvantage > 0.3) {
+          explanation += `• Handedness favors batter (${batter.bats || 'R'} vs ${pitcher.throwingArm || pitcher.ph || 'R'})\n`;
+        } else if (handAdvantage < -0.3) {
+          explanation += `• Handedness favors pitcher (${batter.bats || 'R'} vs ${pitcher.throwingArm || pitcher.ph || 'R'})\n`;
+        }
+      }
+    }
+    
+    explanation += `\n💣 **Home Run Potential: ${hrPotential}**\n`;
+    explanation += `• Predicted HR Rate: ${(parseFloat(details.predictedHR) * 100).toFixed(1)}%\n`;
+    explanation += `• Expects 1 HR every ~${Math.round(1 / parseFloat(details.predictedHR))} at-bats\n`;
+    
+    explanation += `\n📊 **Total Bases Potential: ${tbPotential}**\n`;
+    explanation += `• Predicted Slugging: ${details.predictedSLG}\n`;
+    explanation += `• Predicted wOBA: ${details.predictedWOBA}\n`;
+    
+    explanation += `\n⚾ **Strikeout Risk: ${kPotential}**\n`;
+    explanation += `• Predicted K Rate: ${(parseFloat(details.strikeoutRate) * 100).toFixed(1)}%\n`;
+    
+    // Arsenal information if available
+    if (details.pitcherArsenal && details.pitcherArsenal.length > 0) {
+      explanation += `\n🎨 **Pitcher Arsenal:**\n`;
+      details.pitcherArsenal.slice(0, 3).forEach(pitch => {
+        explanation += `• ${pitch.type}: ${pitch.avgSpeed.toFixed(1)} mph (${(pitch.usage * 100).toFixed(1)}% usage)\n`;
+      });
+    }
+    
+    explanation += `\n📈 **Analysis Quality:**\n`;
+    explanation += `• Confidence Level: ${(details.confidence * 100).toFixed(0)}%\n`;
+    explanation += `• Years Used: ${details.yearsUsed}\n`;
+    
+    if (details.analysisBreakdown) {
+      const breakdown = details.analysisBreakdown;
+      explanation += `• Analysis Components:\n`;
+      if (breakdown.direct) explanation += `  - Direct matchup data\n`;
+      if (breakdown.sameHanded) explanation += `  - Same-handed pitcher context\n`;
+      if (breakdown.oppositeHanded) explanation += `  - Opposite-handed pitcher context\n`;
+      if (breakdown.overall) explanation += `  - Overall league context\n`;
+      if (breakdown.arsenal) explanation += `  - Pitcher arsenal analysis\n`;
+    }
+    
+    return explanation;
   };
 
   const canRunAnalysis = () => {
     const hasSelectedGames = Object.values(selectedGames).some(isSelected => isSelected);
     const hasPitcherConfigured = Object.keys(gamePitchers).length > 0;
     
-    return hasSelectedGames && hasPitcherConfigured && !isAnalyzing && !isLoadingRoster && !isLoadingCSV && activeYears.length > 0;
+    return hasSelectedGames && hasPitcherConfigured && !isAnalyzing && !isLoadingRoster && !isLoadingCSV && activeYears.length > 0 && matchupAnalyzer;
   };
 
   // Get the current sorted results
@@ -619,11 +596,100 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     return sortConfig.direction === 'asc' ? '↑' : '↓';
   };
 
+  const getAdvantageClass = (advantage) => {
+    if (advantage > 2) return 'strong-advantage';
+    if (advantage > 1) return 'medium-advantage';
+    if (advantage > 0.3) return 'slight-advantage';
+    if (advantage > -0.3) return 'neutral';
+    if (advantage > -1) return 'slight-disadvantage';
+    if (advantage > -2) return 'medium-disadvantage';
+    return 'strong-disadvantage';
+  };
+
+  // Export results functionality
+  const exportAnalysisResults = () => {
+    const exportData = analysisResults.map(result => ({
+      Game: result.game,
+      Batter: result.batter.name,
+      BatterTeam: result.batter.team,
+      BatterHand: result.batter.bats,
+      Pitcher: result.pitcher.name,
+      PitcherTeam: result.pitcher.team,
+      PitcherHand: result.pitcher.throwingArm || result.pitcher.ph,
+      Advantage: result.result.advantage.toFixed(2),
+      AdvantageLabel: result.result.advantageLabel,
+      HitPotential: result.result.hitPotential,
+      HRPotential: result.result.hrPotential,
+      TBPotential: result.result.tbPotential,
+      KPotential: result.result.kPotential,
+      PredictedBA: result.result.details.predictedBA,
+      PredictedHR: result.result.details.predictedHR,
+      PredictedSLG: result.result.details.predictedSLG,
+      PredictedWOBA: result.result.details.predictedWOBA,
+      StrikeoutRate: result.result.details.strikeoutRate,
+      Confidence: (result.result.details.confidence * 100).toFixed(0) + '%',
+      YearsUsed: result.result.details.yearsUsed
+    }));
+    
+    // Convert to CSV and download
+    const csv = Papa.unparse(exportData);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `enhanced-matchup-analysis-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  // FIXED: Year change handler with proper re-analysis
+  const handleYearChange = (yearVal, isChecked) => {
+    console.log(`Year change: ${yearVal}, checked: ${isChecked}`);
+    
+    if (isChecked) {
+      setActiveYears(prev => {
+        const newYears = _.uniq([...prev, yearVal]).sort((a,b) => b-a);
+        console.log('Adding year:', yearVal, 'New years:', newYears);
+        return newYears;
+      });
+    } else {
+      if (activeYears.length > 1) { // Prevent unchecking all years
+        setActiveYears(prev => {
+          const newYears = prev.filter(y => y !== yearVal);
+          console.log('Removing year:', yearVal, 'New years:', newYears);
+          return newYears;
+        });
+      } else {
+        console.log('Cannot remove last year - at least one year must be selected');
+      }
+    }
+  };
+
+  // FIXED: Calculate filtered data counts for display
+  const getFilteredDataCounts = () => {
+    const filteredHitters = hitterData.filter(h => activeYears.includes(h.year));
+    const filteredPitchers = pitcherData.filter(p => activeYears.includes(p.year));
+    
+    return {
+      hitters: filteredHitters.length,
+      pitchers: filteredPitchers.length
+    };
+  };
+
+  const filteredCounts = getFilteredDataCounts();
+
   return (
     <div className="matchup-analyzer">
       <header className="analyzer-header">
-        <h2>Matchup Analyzer</h2>
+        <h2>Enhanced Matchup Analyzer</h2>
         <p className="date">{formattedDate}</p>
+        <div className="analyzer-status">
+          {matchupAnalyzer ? (
+            <span className="status-ready">✅ Enhanced Analysis Ready (Active Players Only)</span>
+          ) : (
+            <span className="status-loading">⏳ Loading Enhanced Analysis...</span>
+          )}
+        </div>
       </header>
 
       <section className="game-selection-section">
@@ -683,32 +749,38 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
         
         <div className="analyzer-controls">
           <button 
-            className="analyze-btn"
+            className="analyze-btn enhanced"
             onClick={runAnalysis}
             disabled={!canRunAnalysis()}
+            title={!matchupAnalyzer ? "Enhanced analyzer loading..." : "Run comprehensive multi-dimensional analysis"}
           >
             {isAnalyzing ? (
               <>
                 <div className="spinner"></div>
-                Analyzing...
+                Analyzing Enhanced Matchups...
               </>
             ) : (
-              'Run Analysis'
+              '🚀 Run Enhanced Analysis'
             )}
           </button>
           <button className="clear-btn" onClick={resetSelections}>
             Clear All
           </button>
+          {analysisResults.length > 0 && (
+            <button className="export-btn" onClick={exportAnalysisResults}>
+              📊 Export Results
+            </button>
+          )}
         </div>
       </section>
       
       {analysisResults.length > 0 && (
         <section className="results-section">
           <div className="results-header">
-            <h3>Matchup Analysis Results</h3>
+            <h3>Enhanced Matchup Analysis Results</h3>
             <div className="results-stats">
               <span className="total-results">
-                {sortedResults.length} of {analysisResults.length} matchups shown
+                {sortedResults.length} of {analysisResults.length} matchups shown (Active Players Only)
               </span>
               {removedCount > 0 && (
                 <button 
@@ -722,10 +794,13 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
             </div>
           </div>
           
-          {/* Year Selection - Now positioned correctly under results heading */}
-          <div className="analysis-years-control">
+          {/* FIXED: Year Selection with proper change handling */}
+          <div className="analysis-years-control enhanced">
             <div className="years-header">
-              <span className="years-label">Analysis Years (Successfully Loaded: {activeYears.join(', ')}):</span>
+              <span className="years-label">📊 Analysis Years (Successfully Loaded: {activeYears.join(', ')}):</span>
+              <span className="data-summary">
+                ({filteredCounts.hitters} hitter records, {filteredCounts.pitchers} pitcher records for selected years)
+              </span>
             </div>
             <div className="year-checkboxes-inline">
               {DATA_YEARS.sort((a,b) => b-a).map(year => (
@@ -735,22 +810,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                     className="form-checkbox"
                     value={year}
                     checked={activeYears.includes(year)}
-                    onChange={(e) => {
-                      const yearVal = parseInt(e.target.value);
-                      if (e.target.checked) {
-                        setActiveYears(prev => _.uniq([...prev, yearVal]).sort((a,b) => b-a));
-                        // Re-run analysis with new year selection
-                        if (analysisResults.length > 0) {
-                          setTimeout(() => runAnalysis(), 100);
-                        }
-                      } else {
-                        if (activeYears.length > 1) { // Prevent unchecking all years
-                          setActiveYears(prev => prev.filter(y => y !== yearVal));
-                          // Re-run analysis with new year selection
-                          setTimeout(() => runAnalysis(), 100);
-                        }
-                      }
-                    }}
+                    onChange={(e) => handleYearChange(parseInt(e.target.value), e.target.checked)}
                     disabled={isLoadingCSV || isAnalyzing}
                   />
                   <span className="year-label-inline">{year}</span>
@@ -764,7 +824,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                 <span className="error-text">{dataLoadError}</span>
               ) : (
                 <span className="success-text">
-                  ({hitterData.length} hitter records, {pitcherData.length} pitcher records)
+                  ✅ Enhanced analysis ready - Only active, non-injured players
                 </span>
               )}
             </div>
@@ -818,7 +878,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                   >
                     K {getSortIcon('k')}
                   </th>
-                  <th className="stats-column">Stats</th>
+                  <th className="stats-column">Enhanced Stats</th>
                 </tr>
               </thead>
               <tbody>
@@ -880,70 +940,125 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                       <td className={`potential-cell-compact potential-${result.result.kPotential.toLowerCase()}`}>
                         {result.result.kPotential}
                       </td>
-                      <td className="stats-cell-compact">
-                        <div className="betting-insights-compact">
-                          <div className="insight-row">
-                            <span className="insight-label">BA:</span>
-                            <span className="insight-value">{result.result.details.predictedBA}</span>
+                      <td className="stats-cell-compact enhanced">
+                        <div className="enhanced-stats-compact">
+                          <div className="stat-row">
+                            <span className="stat-label">BA:</span>
+                            <span className="stat-value">{result.result.details.predictedBA}</span>
                           </div>
-                          <div className="insight-row">
-                            <span className="insight-label">HR:</span>
-                            <span className="insight-value">{(parseFloat(result.result.details.predictedHR) * 100).toFixed(1)}%</span>
+                          <div className="stat-row">
+                            <span className="stat-label">HR:</span>
+                            <span className="stat-value">{(parseFloat(result.result.details.predictedHR) * 100).toFixed(1)}%</span>
                           </div>
-                          <div className="insight-row">
-                            <span className="insight-label">SLG:</span>
-                            <span className="insight-value">{result.result.details.predictedSLG}</span>
+                          <div className="stat-row">
+                            <span className="stat-label">SLG:</span>
+                            <span className="stat-value">{result.result.details.predictedSLG}</span>
                           </div>
-                          <div className="insight-row">
-                            <span className="insight-label">K:</span>
-                            <span className="insight-value">{(parseFloat(result.result.details.strikeoutRate) * 100).toFixed(1)}%</span>
+                          <div className="stat-row">
+                            <span className="stat-label">wOBA:</span>
+                            <span className="stat-value">{result.result.details.predictedWOBA}</span>
+                          </div>
+                          <div className="stat-row">
+                            <span className="stat-label">K:</span>
+                            <span className="stat-value">{(parseFloat(result.result.details.strikeoutRate) * 100).toFixed(1)}%</span>
+                          </div>
+                          <div className="stat-row confidence">
+                            <span className="stat-label">Conf:</span>
+                            <span className="stat-value">{(result.result.details.confidence * 100).toFixed(0)}%</span>
                           </div>
                         </div>
                       </td>
                     </tr>
                     
-                    {/* Details row - spans the entire width */}
-                    <tr className="result-row details-row">
+                    {/* Enhanced Details row - spans the entire width */}
+                    <tr className="result-row details-row enhanced">
                       <td className="details-full-span" colSpan="10">
-                        <div className="betting-insights-expanded">
-                          <div className="insight-grid">
-                            <div className="insight-card hit-potential">
-                              <div className="insight-header">
-                                <span className="insight-icon">🎯</span>
-                                <span className="insight-title">Hit Potential: {result.result.hitPotential}</span>
+                        <div className="enhanced-analysis-breakdown">
+                          <div className="breakdown-grid">
+                            <div className="breakdown-card hit-analysis">
+                              <div className="breakdown-header">
+                                <span className="breakdown-icon">🎯</span>
+                                <span className="breakdown-title">Hit Analysis: {result.result.hitPotential}</span>
                               </div>
-                              <div className="insight-body">
-                                Predicted Hit Rate: {(parseFloat(result.result.details.predictedBA) * 100).toFixed(1)}%
-                              </div>
-                            </div>
-                            
-                            <div className="insight-card hr-potential">
-                              <div className="insight-header">
-                                <span className="insight-icon">💣</span>
-                                <span className="insight-title">Home Run Potential: {result.result.hrPotential}</span>
-                              </div>
-                              <div className="insight-body">
-                                Predicted HR Rate: {(parseFloat(result.result.details.predictedHR) * 100).toFixed(1)}%. Expects 1 HR every {Math.round(1 / parseFloat(result.result.details.predictedHR))} AB
+                              <div className="breakdown-body">
+                                <p>Predicted BA: <strong>{result.result.details.predictedBA}</strong></p>
+                                <p>Hit Rate: <strong>{(parseFloat(result.result.details.predictedBA) * 100).toFixed(1)}%</strong></p>
+                                {result.result.details.analysisBreakdown?.handedness && (
+                                  <p className="handedness-note">
+                                    Handedness: {result.result.details.analysisBreakdown.handedness > 0 ? '✅ Favors Batter' : '❌ Favors Pitcher'}
+                                  </p>
+                                )}
                               </div>
                             </div>
                             
-                            <div className="insight-card tb-potential">
-                              <div className="insight-header">
-                                <span className="insight-icon">📊</span>
-                                <span className="insight-title">Total Bases Potential: {result.result.tbPotential}</span>
+                            <div className="breakdown-card hr-analysis">
+                              <div className="breakdown-header">
+                                <span className="breakdown-icon">💣</span>
+                                <span className="breakdown-title">HR Analysis: {result.result.hrPotential}</span>
                               </div>
-                              <div className="insight-body">
-                                Driven by Predicted SLG of {result.result.details.predictedSLG} and wOBA of {result.result.details.predictedWOBA}
+                              <div className="breakdown-body">
+                                <p>HR Rate: <strong>{(parseFloat(result.result.details.predictedHR) * 100).toFixed(1)}%</strong></p>
+                                <p>Expected: <strong>1 HR per {Math.round(1 / parseFloat(result.result.details.predictedHR))} AB</strong></p>
                               </div>
                             </div>
                             
-                            <div className="insight-card k-potential">
-                              <div className="insight-header">
-                                <span className="insight-icon">⚾</span>
-                                <span className="insight-title">Batter K Potential: {result.result.kPotential}</span>
+                            <div className="breakdown-card power-analysis">
+                              <div className="breakdown-header">
+                                <span className="breakdown-icon">📊</span>
+                                <span className="breakdown-title">Power: {result.result.tbPotential}</span>
                               </div>
-                              <div className="insight-body">
-                                Batter's Strikeout Rate: {(parseFloat(result.result.details.strikeoutRate) * 100).toFixed(1)}%
+                              <div className="breakdown-body">
+                                <p>SLG: <strong>{result.result.details.predictedSLG}</strong></p>
+                                <p>wOBA: <strong>{result.result.details.predictedWOBA}</strong></p>
+                              </div>
+                            </div>
+                            
+                            <div className="breakdown-card strikeout-analysis">
+                              <div className="breakdown-header">
+                                <span className="breakdown-icon">⚾</span>
+                                <span className="breakdown-title">K Risk: {result.result.kPotential}</span>
+                              </div>
+                              <div className="breakdown-body">
+                                <p>K Rate: <strong>{(parseFloat(result.result.details.strikeoutRate) * 100).toFixed(1)}%</strong></p>
+                              </div>
+                            </div>
+                            
+                            {result.result.details.pitcherArsenal && result.result.details.pitcherArsenal.length > 0 && (
+                              <div className="breakdown-card arsenal-analysis">
+                                <div className="breakdown-header">
+                                  <span className="breakdown-icon">🎨</span>
+                                  <span className="breakdown-title">Pitcher Arsenal</span>
+                                </div>
+                                <div className="breakdown-body">
+                                  {result.result.details.pitcherArsenal.slice(0, 3).map((pitch, index) => (
+                                    <p key={index}>
+                                      <strong>{pitch.type}:</strong> {pitch.avgSpeed.toFixed(1)} mph ({(pitch.usage * 100).toFixed(1)}%)
+                                    </p>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            
+                            <div className="breakdown-card confidence-analysis">
+                              <div className="breakdown-header">
+                                <span className="breakdown-icon">📈</span>
+                                <span className="breakdown-title">Analysis Quality</span>
+                              </div>
+                              <div className="breakdown-body">
+                                <p>Confidence: <strong>{(result.result.details.confidence * 100).toFixed(0)}%</strong></p>
+                                <p>Years: <strong>{result.result.details.yearsUsed}</strong></p>
+                                {result.result.details.analysisBreakdown && (
+                                  <div className="analysis-components">
+                                    <p><strong>Components Used:</strong></p>
+                                    <ul>
+                                      {result.result.details.analysisBreakdown.direct && <li>✅ Direct matchup</li>}
+                                      {result.result.details.analysisBreakdown.sameHanded && <li>✅ Same-handed context</li>}
+                                      {result.result.details.analysisBreakdown.oppositeHanded && <li>✅ Opposite-handed context</li>}
+                                      {result.result.details.analysisBreakdown.overall && <li>✅ League context</li>}
+                                      {result.result.details.analysisBreakdown.arsenal && <li>✅ Arsenal analysis</li>}
+                                    </ul>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -957,6 +1072,49 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
           </div>
         </section>
       )}
+      
+      {/* Enhanced Analysis Info Panel */}
+      <section className="analysis-info-panel">
+        <h3>🚀 FIXED Enhanced Analysis Features</h3>
+        <div className="info-grid">
+          <div className="info-card">
+            <h4>🎯 Active Players Only</h4>
+            <ul>
+              <li>Only analyzes current roster players</li>
+              <li>Excludes injured players automatically</li>
+              <li>Requires 2025 season activity</li>
+              <li>Uses historical data for context</li>
+            </ul>
+          </div>
+          <div className="info-card">
+            <h4>📊 Multi-Dimensional Analysis</h4>
+            <ul>
+              <li>Direct batter vs pitcher matchups</li>
+              <li>Same-handed pitcher context</li>
+              <li>Opposite-handed pitcher context</li>
+              <li>Overall league baseline</li>
+            </ul>
+          </div>
+          <div className="info-card">
+            <h4>⚖️ Weighted Historical Data</h4>
+            <ul>
+              <li>2025 data: 4x weight</li>
+              <li>2024 data: 2x weight</li>
+              <li>2023 data: 1x weight</li>
+              <li>2022 data: 0.5x weight</li>
+            </ul>
+          </div>
+          <div className="info-card">
+            <h4>🎨 Live Year Selection</h4>
+            <ul>
+              <li>Year checkboxes update immediately</li>
+              <li>Automatically re-runs analysis</li>
+              <li>Shows filtered data counts</li>
+              <li>Arsenal integration with usage rates</li>
+            </ul>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
