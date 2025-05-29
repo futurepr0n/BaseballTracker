@@ -1,705 +1,531 @@
 /**
- * Arsenal Analysis Module
- * src/services/arsenalAnalysis.js
- * 
- * Analyzes pitcher arsenals and hitter performance against specific pitch types
- * Includes year-over-year trend analysis for both pitchers and hitters
+ * Arsenal Analysis Service
+ * Provides comprehensive pitcher arsenal analysis and hitter matchup evaluations
  */
 
 import _ from 'lodash';
 
 /**
- * Main Arsenal Analyzer Class
+ * Arsenal Analyzer Class
  */
 export class ArsenalAnalyzer {
   constructor(hitterData, pitcherData, activeYears = [2025, 2024, 2023, 2022]) {
     this.hitterData = hitterData;
     this.pitcherData = pitcherData;
-    this.activeYears = activeYears.sort((a, b) => b - a); // Most recent first
+    this.activeYears = activeYears.sort((a, b) => b - a);
     this.currentYear = Math.max(...activeYears);
     
-    console.log('[ArsenalAnalyzer] Initialized with years:', activeYears);
+    console.log(`[ArsenalAnalyzer] Initialized with ${hitterData.length} hitter records and ${pitcherData.length} pitcher records`);
   }
 
   /**
-   * Find pitcher by name and team in CSV data
+   * Enhanced name matching that handles roster format (G. Perdomo) to CSV format (Perdomo, Geraldo)
    */
-  findPitcherInData(pitcher) {
-    const searchName = this.convertToCSVName(pitcher.name);
-    const matches = this.pitcherData.filter(p => 
-      p['last_name, first_name'] === searchName && 
-      p.team_name_alt === pitcher.team
-    );
+  findPlayerInCSV(rosterPlayer, csvData) {
+    if (!rosterPlayer || !csvData || csvData.length === 0) return [];
     
-    console.log(`[ArsenalAnalyzer] Found ${matches.length} records for pitcher ${pitcher.name}`);
-    return matches;
-  }
-
-  /**
-   * Find hitter by name and team in CSV data
-   */
-  findHitterInData(hitter) {
-    const searchName = this.convertToCSVName(hitter.name);
-    const matches = this.hitterData.filter(h => 
-      h['last_name, first_name'] === searchName && 
-      h.team_name_alt === hitter.team
-    );
+    const matches = [];
     
-    console.log(`[ArsenalAnalyzer] Found ${matches.length} records for hitter ${hitter.name}`);
-    return matches;
-  }
-
-  /**
-   * Convert roster name format to CSV format (LastName, FirstName)
-   */
-  convertToCSVName(name) {
-    if (!name) return null;
-    
-    // If already in CSV format, return as-is
-    if (name.includes(',')) return name;
-    
-    // Convert "FirstName LastName" to "LastName, FirstName"
-    const parts = name.trim().split(' ');
-    if (parts.length >= 2) {
-      const firstName = parts[0];
-      const lastName = parts.slice(1).join(' ');
-      return `${lastName}, ${firstName}`;
+    // Strategy 1: Use fullName if available for exact matching
+    if (rosterPlayer.fullName) {
+      const parts = rosterPlayer.fullName.split(' ');
+      if (parts.length >= 2) {
+        const firstName = parts[0];
+        const lastName = parts.slice(1).join(' ');
+        const csvFormat = `${lastName}, ${firstName}`;
+        
+        const exactMatches = csvData.filter(row => 
+          row['last_name, first_name'] === csvFormat && 
+          row.team_name_alt === rosterPlayer.team &&
+          this.activeYears.includes(row.year)
+        );
+        
+        if (exactMatches.length > 0) {
+          console.log(`[ArsenalAnalyzer] Found ${exactMatches.length} exact matches for ${rosterPlayer.fullName} using fullName`);
+          return exactMatches;
+        }
+      }
     }
     
-    return name;
+    // Strategy 2: Extract last name from short name (G. Perdomo -> Perdomo)
+    if (rosterPlayer.name) {
+      const nameParts = rosterPlayer.name.split(' ');
+      const lastName = nameParts[nameParts.length - 1];
+      
+      // Find all players with matching last name and team
+      const lastNameMatches = csvData.filter(row => {
+        const csvName = row['last_name, first_name'];
+        return csvName && 
+               csvName.toLowerCase().startsWith(lastName.toLowerCase() + ',') &&
+               row.team_name_alt === rosterPlayer.team &&
+               this.activeYears.includes(row.year);
+      });
+      
+      if (lastNameMatches.length > 0) {
+        console.log(`[ArsenalAnalyzer] Found ${lastNameMatches.length} last name matches for ${rosterPlayer.name}`);
+        return lastNameMatches;
+      }
+    }
+    
+    console.log(`[ArsenalAnalyzer] No matches found for ${rosterPlayer.name} (${rosterPlayer.fullName})`);
+    return [];
   }
 
   /**
-   * Build comprehensive pitcher arsenal analysis
+   * Analyze a pitcher's arsenal
    */
   analyzePitcherArsenal(pitcher) {
-    console.log(`[ArsenalAnalyzer] Analyzing arsenal for ${pitcher.name}`);
+    console.log(`[ArsenalAnalyzer] Analyzing arsenal for pitcher: ${pitcher.name} (${pitcher.fullName})`);
     
-    const pitcherRecords = this.findPitcherInData(pitcher);
-    if (pitcherRecords.length === 0) {
-      return {
-        pitcher: pitcher.name,
-        team: pitcher.team,
-        arsenal: [],
-        yearOverYearTrends: {},
-        totalPitchTypes: 0,
-        primaryPitches: [],
-        confidence: 0
-      };
+    const pitcherStats = this.findPlayerInCSV(pitcher, this.pitcherData);
+    
+    if (pitcherStats.length === 0) {
+      console.log(`[ArsenalAnalyzer] No pitcher data found for ${pitcher.name}`);
+      return null;
     }
-
-    // Group by year and pitch type
-    const recordsByYear = _.groupBy(pitcherRecords, 'year');
-    const recordsByPitchType = _.groupBy(pitcherRecords, 'pitch_type');
-
-    console.log(`[ArsenalAnalyzer] ${pitcher.name} data by year:`, Object.keys(recordsByYear));
-    console.log(`[ArsenalAnalyzer] ${pitcher.name} pitch types:`, Object.keys(recordsByPitchType));
-
-    // Build arsenal for current year (most recent available)
-    const currentYearRecords = recordsByYear[this.currentYear] || [];
-    const arsenal = this.buildArsenal(currentYearRecords);
-
-    // Analyze year-over-year trends
-    const yearOverYearTrends = this.analyzePitcherTrends(recordsByYear, recordsByPitchType);
-
+    
+    // Group by pitch type across years
+    const pitchGroups = _.groupBy(pitcherStats, 'pitch_type');
+    const arsenal = [];
+    
+    Object.entries(pitchGroups).forEach(([pitchType, pitchData]) => {
+      if (!pitchType || pitchType === 'null' || pitchType === 'undefined') return;
+      
+      // Calculate weighted averages based on pitches thrown
+      const totalPitches = _.sumBy(pitchData, 'pitches') || 0;
+      if (totalPitches === 0) return;
+      
+      const weightedStats = this.calculateWeightedPitchStats(pitchData);
+      
+      arsenal.push({
+        pitchType,
+        pitchName: pitchData[0].pitch_name || pitchType,
+        usage: weightedStats.usage,
+        totalPitches,
+        runValuePer100: weightedStats.runValuePer100,
+        battingAverageAgainst: weightedStats.ba,
+        wobaAgainst: weightedStats.woba,
+        whiffPercent: weightedStats.whiffPercent,
+        strikeoutPercent: weightedStats.kPercent,
+        hardHitPercent: weightedStats.hardHitPercent || 0,
+        yearlyBreakdown: this.getYearlyBreakdown(pitchData)
+      });
+    });
+    
+    // Sort by usage
+    arsenal.sort((a, b) => b.usage - a.usage);
+    
+    console.log(`[ArsenalAnalyzer] Found ${arsenal.length} pitch types for ${pitcher.name}`);
+    
     return {
       pitcher: pitcher.name,
       team: pitcher.team,
-      arsenal,
-      yearOverYearTrends,
       totalPitchTypes: arsenal.length,
-      primaryPitches: arsenal.filter(pitch => pitch.usage > 0.15), // Used more than 15%
-      confidence: this.calculateArsenalConfidence(pitcherRecords),
-      dataYears: Object.keys(recordsByYear).map(y => parseInt(y)).sort((a,b) => b-a)
+      arsenal,
+      primaryPitches: arsenal.filter(p => p.usage > 0.15),
+      confidence: this.calculatePitcherConfidence(pitcherStats),
+      dataYears: [...new Set(pitcherStats.map(s => s.year))].sort((a, b) => b - a)
     };
   }
 
   /**
-   * Build arsenal from pitcher records
+   * Calculate weighted pitch statistics
    */
-  buildArsenal(pitcherRecords) {
-    if (pitcherRecords.length === 0) return [];
-
-    const arsenal = pitcherRecords.map(record => ({
-      pitchType: record.pitch_type,
-      pitchName: record.pitch_name,
-      usage: parseFloat(record.pitch_usage) || 0,
-      runValuePer100: parseFloat(record.run_value_per_100) || 0,
-      totalPitches: parseInt(record.pitches) || 0,
-      
-      // Effectiveness metrics
-      battingAverageAgainst: parseFloat(record.ba) || 0,
-      sluggingAgainst: parseFloat(record.slg) || 0,
-      wobaAgainst: parseFloat(record.woba) || 0,
-      whiffPercent: parseFloat(record.whiff_percent) || 0,
-      strikeoutPercent: parseFloat(record.k_percent) || 0,
-      putAwayRate: parseFloat(record.put_away) || 0,
-      
-      // Quality metrics
-      hardHitPercent: parseFloat(record.hard_hit_percent) || 0,
-      
-      // Estimated stats
-      estimatedBA: parseFloat(record.est_ba) || 0,
-      estimatedSLG: parseFloat(record.est_slg) || 0,
-      estimatedWOBA: parseFloat(record.est_woba) || 0,
-      
-      year: record.year
-    }));
-
-    // Sort by usage (most used first)
-    return arsenal.sort((a, b) => b.usage - a.usage);
-  }
-
-  /**
-   * Analyze pitcher trends year-over-year
-   */
-  analyzePitcherTrends(recordsByYear, recordsByPitchType) {
-    const trends = {};
-    const years = Object.keys(recordsByYear).map(y => parseInt(y)).sort();
-
-    // Overall trends
-    trends.overall = this.calculateOverallPitcherTrends(recordsByYear, years);
-
-    // Pitch-specific trends
-    trends.byPitch = {};
-    Object.entries(recordsByPitchType).forEach(([pitchType, records]) => {
-      if (records.length > 1) {
-        trends.byPitch[pitchType] = this.calculatePitchSpecificTrends(records);
-      }
-    });
-
-    return trends;
-  }
-
-  /**
-   * Calculate overall pitcher trends
-   */
-  calculateOverallPitcherTrends(recordsByYear, years) {
-    if (years.length < 2) return { trend: 'insufficient_data' };
-
-    const yearlyStats = years.map(year => {
-      const yearRecords = recordsByYear[year] || [];
-      return {
-        year,
-        totalPitches: _.sumBy(yearRecords, r => parseInt(r.pitches) || 0),
-        avgRunValuePer100: _.meanBy(yearRecords, r => parseFloat(r.run_value_per_100) || 0),
-        avgWOBAAgainst: _.meanBy(yearRecords, r => parseFloat(r.woba) || 0),
-        avgWhiffPercent: _.meanBy(yearRecords, r => parseFloat(r.whiff_percent) || 0),
-        avgStrikeoutPercent: _.meanBy(yearRecords, r => parseFloat(r.k_percent) || 0),
-        pitchTypeCount: yearRecords.length
-      };
-    });
-
-    // Calculate trends
-    const firstYear = yearlyStats[0];
-    const lastYear = yearlyStats[yearlyStats.length - 1];
-
-    return {
-      trend: 'multi_year_data',
-      years: years,
-      yearlyStats,
-      improvements: {
-        runValue: lastYear.avgRunValuePer100 - firstYear.avgRunValuePer100, // Negative is better for pitcher
-        wobaAgainst: lastYear.avgWOBAAgainst - firstYear.avgWOBAAgainst, // Negative is better for pitcher
-        whiffRate: lastYear.avgWhiffPercent - firstYear.avgWhiffPercent, // Positive is better for pitcher
-        strikeoutRate: lastYear.avgStrikeoutPercent - firstYear.avgStrikeoutPercent // Positive is better for pitcher
-      },
-      summary: this.generatePitcherTrendSummary(firstYear, lastYear)
-    };
-  }
-
-  /**
-   * Calculate pitch-specific trends
-   */
-  calculatePitchSpecificTrends(pitchRecords) {
-    const recordsByYear = _.groupBy(pitchRecords, 'year');
-    const years = Object.keys(recordsByYear).map(y => parseInt(y)).sort();
-
-    if (years.length < 2) return { trend: 'insufficient_data' };
-
-    const yearlyStats = years.map(year => {
-      const record = recordsByYear[year][0]; // Should be one record per year per pitch type
-      return {
-        year,
-        usage: parseFloat(record.pitch_usage) || 0,
-        runValuePer100: parseFloat(record.run_value_per_100) || 0,
-        wobaAgainst: parseFloat(record.woba) || 0,
-        whiffPercent: parseFloat(record.whiff_percent) || 0,
-        strikeoutPercent: parseFloat(record.k_percent) || 0,
-        totalPitches: parseInt(record.pitches) || 0
-      };
-    });
-
-    const firstYear = yearlyStats[0];
-    const lastYear = yearlyStats[yearlyStats.length - 1];
-
-    return {
-      pitchType: pitchRecords[0].pitch_type,
-      pitchName: pitchRecords[0].pitch_name,
-      years,
-      yearlyStats,
-      changes: {
-        usage: lastYear.usage - firstYear.usage,
-        effectiveness: lastYear.runValuePer100 - firstYear.runValuePer100, // Negative is better
-        whiffRate: lastYear.whiffPercent - firstYear.whiffPercent,
-        strikeoutRate: lastYear.strikeoutPercent - firstYear.strikeoutPercent
-      },
-      summary: this.generatePitchTrendSummary(pitchRecords[0], firstYear, lastYear)
-    };
-  }
-
-  /**
-   * Analyze how opposing hitters perform against pitcher's arsenal
-   */
-  analyzeHittersVsArsenal(hitters, pitcherArsenal) {
-    console.log(`[ArsenalAnalyzer] Analyzing ${hitters.length} hitters vs arsenal`);
+  calculateWeightedPitchStats(pitchData) {
+    const totalPitches = _.sumBy(pitchData, 'pitches') || 1;
     
-    const hitterAnalyses = hitters.map(hitter => {
-      const hitterRecords = this.findHitterInData(hitter);
-      
-      if (hitterRecords.length === 0) {
-        return {
-          hitter: hitter.name,
-          team: hitter.team,
-          pitchMatchups: [],
-          overallAssessment: this.getDefaultHitterAssessment(),
-          confidence: 0
-        };
-      }
-
-      // Analyze against each pitch in arsenal
-      const pitchMatchups = pitcherArsenal.arsenal.map(pitch => 
-        this.analyzeHitterVsPitch(hitter, hitterRecords, pitch)
-      );
-
-      // Calculate overall assessment
-      const overallAssessment = this.calculateOverallHitterAssessment(pitchMatchups, pitcherArsenal.arsenal);
-
-      // Analyze hitter trends
-      const hitterTrends = this.analyzeHitterTrends(hitterRecords);
-
-      return {
-        hitter: hitter.name,
-        team: hitter.team,
-        pitchMatchups,
-        overallAssessment,
-        hitterTrends,
-        confidence: this.calculateHitterConfidence(hitterRecords),
-        dataYears: [...new Set(hitterRecords.map(r => r.year))].sort((a,b) => b-a)
-      };
-    });
-
-    return hitterAnalyses;
-  }
-
-  /**
-   * Analyze individual hitter vs specific pitch type
-   */
-  analyzeHitterVsPitch(hitter, hitterRecords, pitch) {
-    // Find records for this specific pitch type
-    const pitchRecords = hitterRecords.filter(record => record.pitch_type === pitch.pitchType);
-
-    if (pitchRecords.length === 0) {
-      return {
-        pitchType: pitch.pitchType,
-        pitchName: pitch.pitchName,
-        pitcherUsage: pitch.usage,
-        hitterPerformance: null,
-        matchupAdvantage: 0,
-        confidence: 0,
-        recommendation: 'insufficient_data'
-      };
-    }
-
-    // Calculate weighted performance (more recent years weighted higher)
-    const weightedStats = this.calculateWeightedHitterStats(pitchRecords);
-
-    // Calculate matchup advantage
-    const matchupAdvantage = this.calculateMatchupAdvantage(weightedStats, pitch);
-
-    // Analyze trends for this pitch type
-    const pitchTrends = this.analyzeHitterPitchTrends(pitchRecords, pitch.pitchType);
-
-    return {
-      pitchType: pitch.pitchType,
-      pitchName: pitch.pitchName,
-      pitcherUsage: pitch.usage,
-      pitcherStats: {
-        runValuePer100: pitch.runValuePer100,
-        battingAverageAgainst: pitch.battingAverageAgainst,
-        wobaAgainst: pitch.wobaAgainst,
-        whiffPercent: pitch.whiffPercent
-      },
-      hitterPerformance: weightedStats,
-      hitterTrends: pitchTrends,
-      matchupAdvantage,
-      confidence: this.calculatePitchMatchupConfidence(pitchRecords),
-      recommendation: this.generateMatchupRecommendation(matchupAdvantage, weightedStats, pitch)
-    };
-  }
-
-  /**
-   * Calculate weighted hitter stats (recent years weighted more)
-   */
-  calculateWeightedHitterStats(records) {
-    const yearWeights = {
-      2025: 4.0,
-      2024: 2.0,
-      2023: 1.0,
-      2022: 0.5
-    };
-
-    let totalWeight = 0;
-    let weightedSums = {
-      ba: 0, slg: 0, woba: 0, whiff_percent: 0, k_percent: 0,
-      run_value_per_100: 0, hard_hit_percent: 0, pitches: 0
-    };
-
-    records.forEach(record => {
-      const weight = yearWeights[record.year] || 0.25;
-      totalWeight += weight;
-
-      Object.keys(weightedSums).forEach(stat => {
-        const value = parseFloat(record[stat]) || 0;
-        weightedSums[stat] += value * weight;
+    const weightedSum = (field) => {
+      return _.sumBy(pitchData, row => {
+        const value = parseFloat(row[field]) || 0;
+        const weight = (row.pitches || 0) / totalPitches;
+        return value * weight;
       });
-    });
-
-    const weightedStats = {};
-    Object.keys(weightedSums).forEach(stat => {
-      weightedStats[stat] = totalWeight > 0 ? weightedSums[stat] / totalWeight : 0;
-    });
-
+    };
+    
     return {
-      ...weightedStats,
-      totalPitches: weightedSums.pitches,
-      dataPoints: records.length,
-      years: [...new Set(records.map(r => r.year))].sort((a,b) => b-a)
+      usage: weightedSum('pitch_usage') / 100, // Convert to decimal
+      runValuePer100: weightedSum('run_value_per_100'),
+      ba: weightedSum('ba'),
+      woba: weightedSum('woba'),
+      whiffPercent: weightedSum('whiff_percent'),
+      kPercent: weightedSum('k_percent'),
+      hardHitPercent: weightedSum('hard_hit_percent')
     };
   }
 
   /**
-   * Calculate matchup advantage score
+   * Get yearly breakdown for a pitch
    */
-  calculateMatchupAdvantage(hitterStats, pitcherStats) {
-    // Compare hitter performance vs pitcher effectiveness
-    // Positive = advantage to hitter, Negative = advantage to pitcher
-    
-    let advantage = 0;
-    let factors = 0;
-
-    // wOBA comparison (most important)
-    if (hitterStats.woba && pitcherStats.wobaAgainst) {
-      const wobaAdvantage = hitterStats.woba - pitcherStats.wobaAgainst;
-      advantage += wobaAdvantage * 10; // Scale up for visibility
-      factors++;
-    }
-
-    // Whiff rate comparison
-    if (hitterStats.whiff_percent && pitcherStats.whiffPercent) {
-      const whiffAdvantage = pitcherStats.whiffPercent - hitterStats.whiff_percent; // Lower hitter whiff is better
-      advantage += whiffAdvantage * 0.05;
-      factors++;
-    }
-
-    // Run value comparison
-    if (hitterStats.run_value_per_100 && pitcherStats.runValuePer100) {
-      const runValueAdvantage = hitterStats.run_value_per_100 - pitcherStats.runValuePer100;
-      advantage += runValueAdvantage * 0.1;
-      factors++;
-    }
-
-    return factors > 0 ? advantage / factors : 0;
+  getYearlyBreakdown(pitchData) {
+    return pitchData.map(row => ({
+      year: row.year,
+      usage: row.pitch_usage,
+      runValuePer100: row.run_value_per_100,
+      ba: row.ba,
+      woba: row.woba,
+      pitches: row.pitches
+    })).sort((a, b) => b.year - a.year);
   }
 
   /**
-   * Analyze hitter trends for specific pitch type
+   * Analyze hitter performance against specific pitch types
    */
-  analyzeHitterPitchTrends(records, pitchType) {
-    const recordsByYear = _.groupBy(records, 'year');
-    const years = Object.keys(recordsByYear).map(y => parseInt(y)).sort();
-
-    if (years.length < 2) return { trend: 'insufficient_data' };
-
-    const yearlyStats = years.map(year => {
-      const record = recordsByYear[year][0];
-      return {
-        year,
-        ba: parseFloat(record.ba) || 0,
-        woba: parseFloat(record.woba) || 0,
-        runValue: parseFloat(record.run_value_per_100) || 0,
-        whiffPercent: parseFloat(record.whiff_percent) || 0,
-        pitches: parseInt(record.pitches) || 0
-      };
-    });
-
-    const firstYear = yearlyStats[0];
-    const lastYear = yearlyStats[yearlyStats.length - 1];
-
-    return {
-      pitchType,
-      years,
-      yearlyStats,
-      improvements: {
-        battingAverage: lastYear.ba - firstYear.ba,
-        woba: lastYear.woba - firstYear.woba,
-        runValue: lastYear.runValue - firstYear.runValue,
-        whiffRate: lastYear.whiffPercent - firstYear.whiffPercent // Negative is better for hitter
-      },
-      summary: this.generateHitterPitchTrendSummary(pitchType, firstYear, lastYear)
-    };
-  }
-
-  /**
-   * Analyze overall hitter trends across all pitch types
-   */
-  analyzeHitterTrends(hitterRecords) {
-    const recordsByYear = _.groupBy(hitterRecords, 'year');
-    const years = Object.keys(recordsByYear).map(y => parseInt(y)).sort();
-
-    if (years.length < 2) return { trend: 'insufficient_data' };
-
-    const yearlyStats = years.map(year => {
-      const yearRecords = recordsByYear[year] || [];
-      return {
-        year,
-        avgBA: _.meanBy(yearRecords, r => parseFloat(r.ba) || 0),
-        avgWOBA: _.meanBy(yearRecords, r => parseFloat(r.woba) || 0),
-        avgRunValue: _.meanBy(yearRecords, r => parseFloat(r.run_value_per_100) || 0),
-        avgWhiffPercent: _.meanBy(yearRecords, r => parseFloat(r.whiff_percent) || 0),
-        totalPitches: _.sumBy(yearRecords, r => parseInt(r.pitches) || 0),
-        pitchTypeCount: yearRecords.length
-      };
-    });
-
-    const firstYear = yearlyStats[0];
-    const lastYear = yearlyStats[yearlyStats.length - 1];
-
-    return {
-      years,
-      yearlyStats,
-      overallTrend: {
-        battingAverage: lastYear.avgBA - firstYear.avgBA,
-        woba: lastYear.avgWOBA - firstYear.avgWOBA,
-        runValue: lastYear.avgRunValue - firstYear.avgRunValue,
-        whiffRate: lastYear.avgWhiffPercent - firstYear.avgWhiffPercent
-      },
-      summary: this.generateHitterOverallTrendSummary(firstYear, lastYear)
-    };
-  }
-
-  /**
-   * Helper methods for confidence calculations and summaries
-   */
-  calculateArsenalConfidence(pitcherRecords) {
-    if (pitcherRecords.length === 0) return 0;
+  analyzeHitterVsPitches(hitter, pitcherArsenal) {
+    console.log(`[ArsenalAnalyzer] Analyzing ${hitter.name} vs pitcher arsenal`);
     
-    const totalPitches = _.sumBy(pitcherRecords, r => parseInt(r.pitches) || 0);
-    const yearSpread = Math.max(...pitcherRecords.map(r => r.year)) - Math.min(...pitcherRecords.map(r => r.year)) + 1;
+    const hitterStats = this.findPlayerInCSV(hitter, this.hitterData);
     
-    // Higher confidence for more pitches and more years of data
-    return Math.min(1.0, (totalPitches / 1000) * (yearSpread / 4));
-  }
-
-  calculateHitterConfidence(hitterRecords) {
-    if (hitterRecords.length === 0) return 0;
+    if (hitterStats.length === 0) {
+      console.log(`[ArsenalAnalyzer] No hitter data found for ${hitter.name}`);
+      return null;
+    }
     
-    const totalPitches = _.sumBy(hitterRecords, r => parseInt(r.pitches) || 0);
-    const pitchTypeCount = [...new Set(hitterRecords.map(r => r.pitch_type))].length;
+    const pitchMatchups = [];
     
-    return Math.min(1.0, (totalPitches / 500) * (pitchTypeCount / 8));
-  }
-
-  calculatePitchMatchupConfidence(pitchRecords) {
-    if (pitchRecords.length === 0) return 0;
-    
-    const totalPitches = _.sumBy(pitchRecords, r => parseInt(r.pitches) || 0);
-    const yearCount = [...new Set(pitchRecords.map(r => r.year))].length;
-    
-    return Math.min(1.0, (totalPitches / 100) * (yearCount / 4));
-  }
-
-  calculateOverallHitterAssessment(pitchMatchups, arsenal) {
-    if (pitchMatchups.length === 0) return this.getDefaultHitterAssessment();
-
-    const totalUsage = _.sumBy(arsenal, 'usage');
-    let weightedAdvantage = 0;
-    let totalWeight = 0;
-
-    pitchMatchups.forEach(matchup => {
-      if (matchup.hitterPerformance) {
-        const pitchWeight = matchup.pitcherUsage / totalUsage;
-        weightedAdvantage += matchup.matchupAdvantage * pitchWeight;
-        totalWeight += pitchWeight;
+    // Analyze hitter performance against each pitch type in the arsenal
+    pitcherArsenal.forEach(pitch => {
+      const hitterVsPitch = hitterStats.filter(row => row.pitch_type === pitch.pitchType);
+      
+      if (hitterVsPitch.length > 0) {
+        const hitterPitchStats = this.calculateWeightedPitchStats(hitterVsPitch);
+        
+        // Calculate matchup advantage (positive = hitter advantage)
+        const matchupAdvantage = this.calculateMatchupAdvantage(
+          hitterPitchStats,
+          pitch
+        );
+        
+        pitchMatchups.push({
+          pitchType: pitch.pitchType,
+          pitchName: pitch.pitchName,
+          pitcherUsage: pitch.usage,
+          matchupAdvantage,
+          hitterPerformance: {
+            ba: hitterPitchStats.ba,
+            woba: hitterPitchStats.woba,
+            whiffPercent: hitterPitchStats.whiffPercent,
+            dataPoints: hitterVsPitch.length
+          },
+          recommendation: this.getRecommendation(matchupAdvantage)
+        });
+      } else {
+        // No specific data - use league average estimate
+        pitchMatchups.push({
+          pitchType: pitch.pitchType,
+          pitchName: pitch.pitchName,
+          pitcherUsage: pitch.usage,
+          matchupAdvantage: 0,
+          hitterPerformance: null,
+          recommendation: 'neutral'
+        });
       }
     });
-
-    const overallAdvantage = totalWeight > 0 ? weightedAdvantage / totalWeight : 0;
-
+    
+    // Calculate overall assessment
+    const overallAssessment = this.calculateOverallAssessment(pitchMatchups);
+    
     return {
-      overallAdvantage,
-      strengthCount: pitchMatchups.filter(m => m.matchupAdvantage > 0.5).length,
-      weaknessCount: pitchMatchups.filter(m => m.matchupAdvantage < -0.5).length,
-      neutralCount: pitchMatchups.filter(m => Math.abs(m.matchupAdvantage) <= 0.5).length,
-      recommendation: this.getOverallRecommendation(overallAdvantage),
-      keyStrengths: pitchMatchups
-        .filter(m => m.matchupAdvantage > 0.5)
-        .sort((a, b) => b.matchupAdvantage - a.matchupAdvantage)
-        .slice(0, 3)
-        .map(m => ({ pitch: m.pitchName, advantage: m.matchupAdvantage })),
-      keyWeaknesses: pitchMatchups
-        .filter(m => m.matchupAdvantage < -0.5)
-        .sort((a, b) => a.matchupAdvantage - b.matchupAdvantage)
-        .slice(0, 3)
-        .map(m => ({ pitch: m.pitchName, disadvantage: Math.abs(m.matchupAdvantage) }))
-    };
-  }
-
-  getDefaultHitterAssessment() {
-    return {
-      overallAdvantage: 0,
-      strengthCount: 0,
-      weaknessCount: 0,
-      neutralCount: 0,
-      recommendation: 'insufficient_data',
-      keyStrengths: [],
-      keyWeaknesses: []
+      hitter: hitter.name,
+      team: hitter.team,
+      pitchMatchups,
+      overallAssessment,
+      confidence: this.calculateHitterConfidence(hitterStats, pitchMatchups),
+      hitterTrends: this.analyzeHitterTrends(hitterStats)
     };
   }
 
   /**
-   * Summary generation methods
+   * Calculate matchup advantage between hitter and pitch
    */
-  generatePitcherTrendSummary(firstYear, lastYear) {
-    const improvements = [];
-    const regressions = [];
-
-    if (lastYear.avgWOBAAgainst < firstYear.avgWOBAAgainst) {
-      improvements.push(`Better run prevention (wOBA against: ${firstYear.avgWOBAAgainst.toFixed(3)} → ${lastYear.avgWOBAAgainst.toFixed(3)})`);
-    } else if (lastYear.avgWOBAAgainst > firstYear.avgWOBAAgainst) {
-      regressions.push(`Worse run prevention (wOBA against: ${firstYear.avgWOBAAgainst.toFixed(3)} → ${lastYear.avgWOBAAgainst.toFixed(3)})`);
-    }
-
-    if (lastYear.avgWhiffPercent > firstYear.avgWhiffPercent) {
-      improvements.push(`Higher whiff rate (${firstYear.avgWhiffPercent.toFixed(1)}% → ${lastYear.avgWhiffPercent.toFixed(1)}%)`);
-    }
-
-    return {
-      improvements,
-      regressions,
-      overall: improvements.length > regressions.length ? 'improving' : 
-               improvements.length < regressions.length ? 'declining' : 'stable'
-    };
+  calculateMatchupAdvantage(hitterStats, pitchStats) {
+    // Compare hitter's performance vs pitch to pitcher's average
+    const wobaAdvantage = (hitterStats.woba || 0.320) - (pitchStats.wobaAgainst || 0.320);
+    const baAdvantage = (hitterStats.ba || 0.250) - (pitchStats.battingAverageAgainst || 0.250);
+    const whiffDisadvantage = (hitterStats.whiffPercent || 20) - (pitchStats.whiffPercent || 20);
+    
+    // Weighted combination (wOBA is most important)
+    const advantage = (wobaAdvantage * 10) + (baAdvantage * 5) - (whiffDisadvantage * 0.1);
+    
+    return advantage;
   }
 
-  generatePitchTrendSummary(pitch, firstYear, lastYear) {
-    const changes = [];
-    
-    if (Math.abs(lastYear.usage - firstYear.usage) > 0.05) {
-      changes.push(`Usage ${lastYear.usage > firstYear.usage ? 'increased' : 'decreased'} by ${Math.abs(lastYear.usage - firstYear.usage).toFixed(1)}%`);
-    }
-    
-    if (lastYear.runValuePer100 < firstYear.runValuePer100) {
-      changes.push(`More effective (better run value)`);
-    } else if (lastYear.runValuePer100 > firstYear.runValuePer100) {
-      changes.push(`Less effective (worse run value)`);
-    }
-
-    return {
-      changes,
-      overall: changes.length > 0 ? 'changed' : 'stable'
-    };
-  }
-
-  generateHitterPitchTrendSummary(pitchType, firstYear, lastYear) {
-    const improvements = [];
-    
-    if (lastYear.woba > firstYear.woba) {
-      improvements.push(`Better wOBA vs ${pitchType} (${firstYear.woba.toFixed(3)} → ${lastYear.woba.toFixed(3)})`);
-    }
-    
-    if (lastYear.whiffPercent < firstYear.whiffPercent) {
-      improvements.push(`Lower whiff rate vs ${pitchType}`);
-    }
-
-    return {
-      improvements,
-      overall: improvements.length > 0 ? 'improving' : 'declining'
-    };
-  }
-
-  generateHitterOverallTrendSummary(firstYear, lastYear) {
-    return {
-      battingImprovement: lastYear.avgBA - firstYear.avgBA,
-      powerImprovement: lastYear.avgWOBA - firstYear.avgWOBA,
-      contactImprovement: firstYear.avgWhiffPercent - lastYear.avgWhiffPercent,
-      overall: lastYear.avgWOBA > firstYear.avgWOBA ? 'improving' : 'declining'
-    };
-  }
-
-  generateMatchupRecommendation(advantage, hitterStats, pitcherStats) {
-    if (advantage > 1.0) return 'strong_hitter_advantage';
-    if (advantage > 0.3) return 'hitter_advantage';
-    if (advantage < -1.0) return 'strong_pitcher_advantage';
-    if (advantage < -0.3) return 'pitcher_advantage';
+  /**
+   * Get recommendation based on matchup advantage
+   */
+  getRecommendation(advantage) {
+    if (advantage > 2) return 'strong_hitter_advantage';
+    if (advantage > 0.5) return 'hitter_advantage';
+    if (advantage < -2) return 'strong_pitcher_advantage';
+    if (advantage < -0.5) return 'pitcher_advantage';
     return 'neutral';
   }
 
-  getOverallRecommendation(overallAdvantage) {
-    if (overallAdvantage > 0.5) return 'favorable_matchup';
-    if (overallAdvantage < -0.5) return 'difficult_matchup';
-    return 'neutral_matchup';
+  /**
+   * Calculate overall assessment for hitter
+   */
+  calculateOverallAssessment(pitchMatchups) {
+    // Weight matchups by pitcher's usage
+    let totalWeight = 0;
+    let weightedAdvantage = 0;
+    const strengths = [];
+    const weaknesses = [];
+    
+    pitchMatchups.forEach(matchup => {
+      const weight = matchup.pitcherUsage;
+      totalWeight += weight;
+      weightedAdvantage += matchup.matchupAdvantage * weight;
+      
+      if (matchup.matchupAdvantage > 1) {
+        strengths.push({
+          pitch: matchup.pitchName,
+          advantage: matchup.matchupAdvantage
+        });
+      } else if (matchup.matchupAdvantage < -1) {
+        weaknesses.push({
+          pitch: matchup.pitchName,
+          disadvantage: Math.abs(matchup.matchupAdvantage)
+        });
+      }
+    });
+    
+    return {
+      overallAdvantage: totalWeight > 0 ? weightedAdvantage / totalWeight : 0,
+      strengthCount: strengths.length,
+      weaknessCount: weaknesses.length,
+      keyStrengths: strengths.sort((a, b) => b.advantage - a.advantage).slice(0, 3),
+      keyWeaknesses: weaknesses.sort((a, b) => b.disadvantage - a.disadvantage).slice(0, 3)
+    };
+  }
+
+  /**
+   * Calculate confidence scores
+   */
+  calculatePitcherConfidence(pitcherStats) {
+    const totalPitches = _.sumBy(pitcherStats, 'pitches') || 0;
+    const yearsOfData = [...new Set(pitcherStats.map(s => s.year))].length;
+    
+    // Base confidence on data volume and recency
+    let confidence = Math.min(1, totalPitches / 5000) * 0.5;
+    confidence += Math.min(1, yearsOfData / 3) * 0.3;
+    
+    // Bonus for recent data
+    if (pitcherStats.some(s => s.year === this.currentYear)) {
+      confidence += 0.2;
+    }
+    
+    return Math.min(1, confidence);
+  }
+
+  calculateHitterConfidence(hitterStats, pitchMatchups) {
+    const totalPA = _.sumBy(hitterStats, 'pa') || 0;
+    const matchupsWithData = pitchMatchups.filter(m => m.hitterPerformance !== null).length;
+    const matchupCoverage = pitchMatchups.length > 0 ? matchupsWithData / pitchMatchups.length : 0;
+    
+    let confidence = Math.min(1, totalPA / 1000) * 0.4;
+    confidence += matchupCoverage * 0.4;
+    
+    // Bonus for recent data
+    if (hitterStats.some(s => s.year === this.currentYear)) {
+      confidence += 0.2;
+    }
+    
+    return Math.min(1, confidence);
+  }
+
+  /**
+   * Analyze hitter trends
+   */
+  analyzeHitterTrends(hitterStats) {
+    const yearlyStats = _.groupBy(hitterStats, 'year');
+    const years = Object.keys(yearlyStats).sort((a, b) => b - a);
+    
+    if (years.length < 2) {
+      return { trend: 'insufficient_data' };
+    }
+    
+    // Calculate year-over-year changes
+    const recentYear = years[0];
+    const previousYear = years[1];
+    
+    const recentWOBA = _.meanBy(yearlyStats[recentYear], 'woba') || 0;
+    const previousWOBA = _.meanBy(yearlyStats[previousYear], 'woba') || 0;
+    
+    return {
+      trend: recentWOBA > previousWOBA ? 'improving' : 'declining',
+      wobaChange: recentWOBA - previousWOBA,
+      years: years
+    };
+  }
+
+  /**
+   * Analyze pitcher year-over-year trends
+   */
+  analyzePitcherTrends(pitcherStats) {
+    const yearlyStats = _.groupBy(pitcherStats, 'year');
+    const years = Object.keys(yearlyStats).sort((a, b) => b - a);
+    
+    if (years.length < 2) {
+      return {
+        overall: { trend: 'insufficient_data' },
+        byPitch: {}
+      };
+    }
+    
+    // Overall trends
+    const yearlyAverages = years.map(year => {
+      const yearData = yearlyStats[year];
+      return {
+        year: parseInt(year),
+        avgWOBAAgainst: _.meanBy(yearData, 'woba') || 0,
+        avgWhiffPercent: _.meanBy(yearData, 'whiff_percent') || 0,
+        avgUsage: _.meanBy(yearData, 'pitch_usage') || 0
+      };
+    });
+    
+    // Pitch-specific trends
+    const pitchTypes = [...new Set(pitcherStats.map(s => s.pitch_type))].filter(Boolean);
+    const byPitch = {};
+    
+    pitchTypes.forEach(pitchType => {
+      const pitchYearlyData = pitcherStats.filter(s => s.pitch_type === pitchType);
+      const pitchByYear = _.groupBy(pitchYearlyData, 'year');
+      
+      if (Object.keys(pitchByYear).length >= 2) {
+        const recentYear = Math.max(...Object.keys(pitchByYear).map(Number));
+        const previousYear = recentYear - 1;
+        
+        if (pitchByYear[recentYear] && pitchByYear[previousYear]) {
+          const recentUsage = _.meanBy(pitchByYear[recentYear], 'pitch_usage') || 0;
+          const previousUsage = _.meanBy(pitchByYear[previousYear], 'pitch_usage') || 0;
+          const recentWOBA = _.meanBy(pitchByYear[recentYear], 'woba') || 0;
+          const previousWOBA = _.meanBy(pitchByYear[previousYear], 'woba') || 0;
+          
+          byPitch[pitchType] = {
+            changes: {
+              usage: (recentUsage - previousUsage) / 100,
+              effectiveness: recentWOBA - previousWOBA
+            }
+          };
+        }
+      }
+    });
+    
+    // Determine overall trend
+    const recentData = yearlyAverages[0];
+    const previousData = yearlyAverages[1];
+    const wobaImproved = recentData.avgWOBAAgainst < previousData.avgWOBAAgainst;
+    const whiffImproved = recentData.avgWhiffPercent > previousData.avgWhiffPercent;
+    
+    const improvements = [];
+    const regressions = [];
+    
+    if (wobaImproved) improvements.push('Reduced wOBA against');
+    else regressions.push('Increased wOBA against');
+    
+    if (whiffImproved) improvements.push('Improved whiff rate');
+    else regressions.push('Decreased whiff rate');
+    
+    return {
+      overall: {
+        trend: improvements.length > regressions.length ? 'improving' : 'declining',
+        yearlyStats: yearlyAverages,
+        summary: { improvements, regressions }
+      },
+      byPitch
+    };
   }
 }
 
 /**
- * Factory function to create analyzer
+ * Factory function to create arsenal analyzer
  */
 export function createArsenalAnalyzer(hitterData, pitcherData, activeYears) {
   return new ArsenalAnalyzer(hitterData, pitcherData, activeYears);
 }
 
 /**
- * Main analysis function for pitcher arsenal vs team of hitters
+ * Main analysis function for a pitcher vs lineup
  */
-export function analyzeArsenalMatchup(pitcher, hitters, hitterData, pitcherData, activeYears = [2025, 2024, 2023, 2022]) {
-  console.log(`[analyzeArsenalMatchup] Starting analysis: ${pitcher.name} vs ${hitters.length} hitters`);
+export function analyzeArsenalMatchup(pitcher, opposingHitters, hitterData, pitcherData, activeYears) {
+  console.log(`[analyzeArsenalMatchup] Starting analysis for ${pitcher.name} vs ${opposingHitters.length} hitters`);
   
   const analyzer = new ArsenalAnalyzer(hitterData, pitcherData, activeYears);
   
-  // Build pitcher arsenal
+  // Analyze pitcher's arsenal
   const pitcherArsenal = analyzer.analyzePitcherArsenal(pitcher);
   
-  // Analyze all hitters vs the arsenal
-  const hitterAnalyses = analyzer.analyzeHittersVsArsenal(hitters, pitcherArsenal);
+  if (!pitcherArsenal) {
+    console.log(`[analyzeArsenalMatchup] No arsenal data found for pitcher ${pitcher.name}`);
+    return null;
+  }
   
-  // Generate summary statistics
-  const summary = {
-    pitcher: pitcherArsenal,
-    hitters: hitterAnalyses,
-    teamSummary: {
-      totalHitters: hitters.length,
-      favorableMatchups: hitterAnalyses.filter(h => h.overallAssessment.overallAdvantage > 0.3).length,
-      difficultMatchups: hitterAnalyses.filter(h => h.overallAssessment.overallAdvantage < -0.3).length,
-      averageAdvantage: _.meanBy(hitterAnalyses, h => h.overallAssessment.overallAdvantage),
-      topTargets: hitterAnalyses
-        .sort((a, b) => a.overallAssessment.overallAdvantage - b.overallAssessment.overallAdvantage)
-        .slice(0, 3)
-        .map(h => ({ name: h.hitter, advantage: h.overallAssessment.overallAdvantage })),
-      toughestMatchups: hitterAnalyses
-        .sort((a, b) => b.overallAssessment.overallAdvantage - a.overallAssessment.overallAdvantage)
-        .slice(0, 3)
-        .map(h => ({ name: h.hitter, disadvantage: Math.abs(h.overallAssessment.overallAdvantage) }))
-    },
-    analysisMetadata: {
-      activeYears,
-      pitcherDataPoints: pitcherArsenal.arsenal.reduce((sum, pitch) => sum + (pitch.totalPitches || 0), 0),
-      averageHitterConfidence: _.meanBy(hitterAnalyses, h => h.confidence),
-      pitcherConfidence: pitcherArsenal.confidence
+  // Analyze each hitter vs the arsenal
+  const hitterAnalyses = [];
+  let totalAdvantage = 0;
+  let favorableMatchups = 0;
+  let difficultMatchups = 0;
+  
+  opposingHitters.forEach(hitter => {
+    const analysis = analyzer.analyzeHitterVsPitches(hitter, pitcherArsenal.arsenal);
+    
+    if (analysis) {
+      hitterAnalyses.push(analysis);
+      totalAdvantage += analysis.overallAssessment.overallAdvantage;
+      
+      if (analysis.overallAssessment.overallAdvantage > 0.5) {
+        favorableMatchups++;
+      } else if (analysis.overallAssessment.overallAdvantage < -0.5) {
+        difficultMatchups++;
+      }
     }
+  });
+  
+  console.log(`[analyzeArsenalMatchup] Completed analysis for ${hitterAnalyses.length} hitters`);
+  
+  // Calculate team summary
+  const teamSummary = {
+    totalHitters: opposingHitters.length,
+    analyzedHitters: hitterAnalyses.length,
+    favorableMatchups,
+    difficultMatchups,
+    averageAdvantage: hitterAnalyses.length > 0 ? totalAdvantage / hitterAnalyses.length : 0,
+    topTargets: hitterAnalyses
+      .filter(h => h.overallAssessment.overallAdvantage < -0.5)
+      .sort((a, b) => a.overallAssessment.overallAdvantage - b.overallAssessment.overallAdvantage)
+      .slice(0, 3)
+      .map(h => ({
+        name: h.hitter,
+        advantage: Math.abs(h.overallAssessment.overallAdvantage)
+      })),
+    toughestMatchups: hitterAnalyses
+      .filter(h => h.overallAssessment.overallAdvantage > 0.5)
+      .sort((a, b) => b.overallAssessment.overallAdvantage - a.overallAssessment.overallAdvantage)
+      .slice(0, 3)
+      .map(h => ({
+        name: h.hitter,
+        disadvantage: h.overallAssessment.overallAdvantage
+      }))
   };
   
-  console.log(`[analyzeArsenalMatchup] Analysis complete. Arsenal: ${pitcherArsenal.arsenal.length} pitches, Hitters: ${hitterAnalyses.length}`);
+  // Add year-over-year trends
+  const pitcherStats = analyzer.findPlayerInCSV(pitcher, pitcherData);
+  const pitcherTrends = analyzer.analyzePitcherTrends(pitcherStats);
   
-  return summary;
+  return {
+    pitcher: {
+      ...pitcherArsenal,
+      yearOverYearTrends: pitcherTrends
+    },
+    hitters: hitterAnalyses,
+    teamSummary,
+    analysisMetadata: {
+      activeYears,
+      pitcherConfidence: pitcherArsenal.confidence,
+      averageHitterConfidence: hitterAnalyses.length > 0 
+        ? _.meanBy(hitterAnalyses, 'confidence') 
+        : 0,
+      pitcherDataPoints: pitcherStats.length,
+      analyzedOn: new Date().toISOString()
+    }
+  };
 }
