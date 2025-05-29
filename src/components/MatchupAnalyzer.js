@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, Fragment } from 'react';
 import './MatchupAnalyzer.css';
 import { fetchRosterData } from '../services/dataService';
 import { createEnhancedMatchupAnalyzer, analyzeEnhancedMatchup } from '../services/EnhancedMatchupAnalysis';
+import { createArsenalAnalyzer, analyzeArsenalMatchup } from '../services/arsenalAnalysis'; // NEW IMPORT
 import Papa from 'papaparse';
 import _ from 'lodash';
 
@@ -10,10 +11,8 @@ const DATA_YEARS = [2025, 2024, 2023, 2022];
 const CURRENT_YEAR = Math.max(...DATA_YEARS);
 
 /**
- * FIXED Enhanced Matchup Analyzer Component
- * - Properly filters for active, non-injured players only
- * - Year checkboxes now trigger re-analysis
- * - Shows only players with 2025 season data + their historical context
+ * ENHANCED MatchupAnalyzer with Arsenal Analysis Integration
+ * Now includes detailed pitcher arsenal analysis and pitch-by-pitch hitter breakdowns
  */
 function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
   // State for data
@@ -35,6 +34,10 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
   const [analysisResults, setAnalysisResults] = useState([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   
+  // NEW: State for arsenal analysis
+  const [arsenalAnalyses, setArsenalAnalyses] = useState(new Map());
+  const [expandedArsenal, setExpandedArsenal] = useState(new Set());
+  
   // State for table functionality
   const [sortConfig, setSortConfig] = useState({ key: 'advantage', direction: 'desc' });
   const [filteredResults, setFilteredResults] = useState([]);
@@ -42,6 +45,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
   
   // Enhanced analyzer instance
   const [matchupAnalyzer, setMatchupAnalyzer] = useState(null);
+  const [arsenalAnalyzer, setArsenalAnalyzer] = useState(null); // NEW
   
   // Format date for display
   const formattedDate = currentDate.toLocaleDateString('en-US', { 
@@ -161,25 +165,29 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     loadAllCSVData();
   }, []);
 
-  // FIXED: Create enhanced analyzer when data is loaded AND when activeYears change
+  // Create enhanced analyzer when data is loaded AND when activeYears change
   useEffect(() => {
     if (hitterData.length > 0 && pitcherData.length > 0 && rosterData.length > 0 && activeYears.length > 0) {
       console.log('Creating enhanced matchup analyzer with years:', activeYears);
       const analyzer = createEnhancedMatchupAnalyzer(hitterData, pitcherData, rosterData, activeYears);
       setMatchupAnalyzer(analyzer);
+      
+      // NEW: Create arsenal analyzer
+      console.log('Creating arsenal analyzer with years:', activeYears);
+      const arsenalAnalyzer = createArsenalAnalyzer(hitterData, pitcherData, activeYears);
+      setArsenalAnalyzer(arsenalAnalyzer);
     }
-  }, [hitterData, pitcherData, rosterData, activeYears]); // FIXED: Added activeYears dependency
+  }, [hitterData, pitcherData, rosterData, activeYears]);
 
-  // FIXED: Auto re-run analysis when analyzer updates (due to year changes)
+  // Auto re-run analysis when analyzer updates (due to year changes)
   useEffect(() => {
-    if (matchupAnalyzer && analysisResults.length > 0) {
-      console.log('Analyzer updated, re-running analysis...');
-      // Small delay to ensure analyzer is fully updated
+    if (matchupAnalyzer && arsenalAnalyzer && analysisResults.length > 0) {
+      console.log('Analyzers updated, re-running analysis...');
       setTimeout(() => {
         runAnalysis();
       }, 100);
     }
-  }, [matchupAnalyzer]); // This will trigger when analyzer is recreated with new years
+  }, [matchupAnalyzer, arsenalAnalyzer]);
 
   // Get all available pitchers for a team
   const getPitchersForTeam = useCallback((teamCode) => {
@@ -231,6 +239,8 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     setAnalysisResults([]);
     setFilteredResults([]);
     setRemovedResultIds(new Set());
+    setArsenalAnalyses(new Map()); // NEW: Clear arsenal analyses
+    setExpandedArsenal(new Set());
   };
 
   // Get pitcher by ID (name-team format)
@@ -243,95 +253,6 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
       p.team === pitcherTeam && 
       p.type === 'pitcher'
     );
-  };
-
-  // Enhanced name matching function
-  const convertPlayerName = (name, format = 'lastFirst') => {
-    if (!name) return null;
-    if (typeof name === 'object' && name !== null) {
-      if (format === 'lastFirst' && name.fullName) {
-        const parts = name.fullName.split(' ');
-        if (parts.length >= 2) {
-          const firstName = parts[0];
-          const lastName = parts.slice(1).join(' ');
-          return `${lastName}, ${firstName}`;
-        }
-      }
-      name = name.name;
-    }
-    if (typeof name !== 'string') return null;
-    if (name.includes('.') && format === 'lastFirst') {
-      const parts = name.split(' ');
-      if (parts.length === 2) {
-        return `${parts[1]}, ${parts[0]}`;
-      }
-    }
-    if (name.includes(' ') && !name.includes(',') && format === 'lastFirst') {
-      const parts = name.split(' ');
-      if (parts.length >= 2) {
-        const firstName = parts[0];
-        const lastName = parts.slice(1).join(' ');
-        return `${lastName}, ${firstName}`;
-      }
-    }
-    if (name.includes(',') && format === 'firstLast') {
-      const parts = name.split(', ');
-      if (parts.length === 2) {
-        return `${parts[1]} ${parts[0]}`;
-      }
-    }
-    return name;
-  };
-
-  // Find best match function
-  const findBestMatch = (targetPlayer, playerList) => {
-    if (!targetPlayer || !playerList || !playerList.length) return null;
-    const targetName = typeof targetPlayer === 'object' ? targetPlayer.name : targetPlayer;
-    
-    let match = playerList.find(p => p['last_name, first_name'] === targetName);
-    if (match) return match;
-    
-    if (typeof targetPlayer === 'object' && targetPlayer.fullName) {
-      const convertedFullName = convertPlayerName({ fullName: targetPlayer.fullName }, 'lastFirst');
-      match = playerList.find(p => p['last_name, first_name'] === convertedFullName);
-      if (match) return match;
-    }
-    
-    const convertedName = convertPlayerName(targetName, 'lastFirst');
-    if (convertedName && convertedName !== targetName) {
-      match = playerList.find(p => p['last_name, first_name'] === convertedName);
-      if (match) return match;
-    }
-    
-    if (targetName.includes(' ')) {
-      let lastName;
-      if (targetName.includes('.')) {
-        lastName = targetName.split(' ')[1];
-      } else if (typeof targetPlayer === 'object' && targetPlayer.fullName) {
-        const parts = targetPlayer.fullName.split(' ');
-        if (parts.length >= 2) lastName = parts[parts.length - 1];
-      }
-      
-      if (lastName) {
-        const lastNameMatches = playerList.filter(p => 
-          p['last_name, first_name'] && (
-            p['last_name, first_name'].startsWith(lastName + ',') || 
-            p['last_name, first_name'].includes(`, ${lastName}`)
-          )
-        );
-        
-        if (lastNameMatches.length === 1) return lastNameMatches[0];
-        else if (lastNameMatches.length > 1) {
-          if (typeof targetPlayer === 'object' && targetPlayer.team) {
-            const teamMatch = lastNameMatches.find(p => p.team_name_alt === targetPlayer.team);
-            if (teamMatch) return teamMatch;
-          }
-          return lastNameMatches[0]; 
-        }
-      }
-    }
-    
-    return null;
   };
 
   // Sorting functionality
@@ -418,15 +339,29 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     setRemovedResultIds(new Set());
   };
 
-  // FIXED: Enhanced analysis using the new system
+  // NEW: Toggle arsenal expansion for a specific pitcher-team combination
+  const toggleArsenalExpansion = (pitcherKey) => {
+    setExpandedArsenal(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(pitcherKey)) {
+        newSet.delete(pitcherKey);
+      } else {
+        newSet.add(pitcherKey);
+      }
+      return newSet;
+    });
+  };
+
+  // ENHANCED: Analysis with Arsenal Integration
   const runAnalysis = useCallback(async () => {
-    console.log("Starting enhanced analysis...");
+    console.log("Starting enhanced analysis with arsenal integration...");
     setIsAnalyzing(true);
     setAnalysisResults([]);
     setRemovedResultIds(new Set());
+    setArsenalAnalyses(new Map()); // Clear previous arsenal analyses
     
-    if (!matchupAnalyzer) {
-      console.error("Enhanced analyzer not ready");
+    if (!matchupAnalyzer || !arsenalAnalyzer) {
+      console.error("Analyzers not ready");
       setIsAnalyzing(false);
       return;
     }
@@ -438,7 +373,11 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     
     console.log(`Selected games: ${selectedGameIndices.length}, Active years: ${activeYears.join(', ')}`);
     
-    // Collect all configured matchups
+    // NEW: Track pitchers for arsenal analysis
+    const uniquePitchers = new Map();
+    const pitcherToOpposingHitters = new Map();
+    
+    // Collect all configured matchups AND track pitcher-hitter relationships
     const matchups = [];
     
     for (const gameIndex of selectedGameIndices) {
@@ -459,13 +398,19 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
           const awayBatters = getBattersForTeam(game.awayTeam);
           console.log(`Found ${awayBatters.length} away batters`);
           
+          // NEW: Track pitcher and opposing hitters for arsenal analysis
+          const pitcherKey = `${homePitcher.name}-${homePitcher.team}`;
+          uniquePitchers.set(pitcherKey, homePitcher);
+          pitcherToOpposingHitters.set(pitcherKey, awayBatters);
+          
           awayBatters.forEach((batter, index) => {
             matchups.push({
               id: `${gameIndex}-home-${index}`,
               gameIndex,
               game: `${game.awayTeam} @ ${game.homeTeam}`,
               batter,
-              pitcher: homePitcher
+              pitcher: homePitcher,
+              pitcherKey // NEW: Add pitcher key for arsenal lookup
             });
           });
         }
@@ -480,13 +425,19 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
           const homeBatters = getBattersForTeam(game.homeTeam);
           console.log(`Found ${homeBatters.length} home batters`);
           
+          // NEW: Track pitcher and opposing hitters for arsenal analysis
+          const pitcherKey = `${awayPitcher.name}-${awayPitcher.team}`;
+          uniquePitchers.set(pitcherKey, awayPitcher);
+          pitcherToOpposingHitters.set(pitcherKey, homeBatters);
+          
           homeBatters.forEach((batter, index) => {
             matchups.push({
               id: `${gameIndex}-away-${index}`,
               gameIndex,
               game: `${game.awayTeam} @ ${game.homeTeam}`,
               batter,
-              pitcher: awayPitcher
+              pitcher: awayPitcher,
+              pitcherKey // NEW: Add pitcher key for arsenal lookup
             });
           });
         }
@@ -494,6 +445,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     }
     
     console.log(`Total matchups to analyze: ${matchups.length}`);
+    console.log(`Unique pitchers for arsenal analysis: ${uniquePitchers.size}`);
     
     if (matchups.length === 0) {
       console.log("No matchups to analyze. Make sure pitchers are selected.");
@@ -502,14 +454,53 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     }
     
     try {
+      // NEW: First, run arsenal analysis for each unique pitcher
+      console.log("Running arsenal analyses...");
+      const newArsenalAnalyses = new Map();
+      
+      for (const [pitcherKey, pitcher] of uniquePitchers) {
+        const opposingHitters = pitcherToOpposingHitters.get(pitcherKey) || [];
+        console.log(`Analyzing arsenal for ${pitcher.name} vs ${opposingHitters.length} hitters`);
+        
+        const arsenalAnalysis = analyzeArsenalMatchup(
+          pitcher, 
+          opposingHitters, 
+          hitterData, 
+          pitcherData, 
+          activeYears
+        );
+        
+        newArsenalAnalyses.set(pitcherKey, arsenalAnalysis);
+        console.log(`Arsenal analysis complete for ${pitcher.name}: ${arsenalAnalysis.pitcher.arsenal.length} pitch types`);
+      }
+      
+      setArsenalAnalyses(newArsenalAnalyses);
+      console.log("All arsenal analyses complete");
+      
       // Process each matchup using enhanced analysis
       const results = matchups.map(matchup => {
         const analysis = matchupAnalyzer.analyzeComprehensiveMatchup(matchup.batter, matchup.pitcher);
         
+        // NEW: Add arsenal-specific insights to the result
+        const arsenalAnalysis = newArsenalAnalyses.get(matchup.pitcherKey);
+        let arsenalInsights = null;
+        
+        if (arsenalAnalysis) {
+          const hitterArsenalAnalysis = arsenalAnalysis.hitters.find(h => h.hitter === matchup.batter.name);
+          arsenalInsights = hitterArsenalAnalysis ? {
+            overallAdvantage: hitterArsenalAnalysis.overallAssessment.overallAdvantage,
+            keyStrengths: hitterArsenalAnalysis.overallAssessment.keyStrengths,
+            keyWeaknesses: hitterArsenalAnalysis.overallAssessment.keyWeaknesses,
+            pitchMatchups: hitterArsenalAnalysis.pitchMatchups,
+            confidence: hitterArsenalAnalysis.confidence
+          } : null;
+        }
+        
         return {
           ...matchup,
           result: analysis,
-          explanation: generateEnhancedExplanation(analysis, matchup.batter, matchup.pitcher)
+          arsenalInsights, // NEW: Add arsenal insights
+          explanation: generateEnhancedExplanation(analysis, matchup.batter, matchup.pitcher, arsenalInsights)
         };
       });
       
@@ -519,10 +510,10 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [matchupAnalyzer, selectedGames, gamePitchers, gameData, getBattersForTeam, getPitcherById, activeYears]); // Added dependencies
+  }, [matchupAnalyzer, arsenalAnalyzer, selectedGames, gamePitchers, gameData, getBattersForTeam, getPitcherById, activeYears, hitterData, pitcherData]);
 
-  // Enhanced explanation generator
-  const generateEnhancedExplanation = (analysis, batter, pitcher) => {
+  // ENHANCED: Explanation generator with arsenal insights
+  const generateEnhancedExplanation = (analysis, batter, pitcher, arsenalInsights) => {
     const { advantageLabel, hitPotential, hrPotential, tbPotential, kPotential, details } = analysis;
     
     let explanation = `🎯 **${advantageLabel}**\n\n`;
@@ -541,6 +532,22 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
           explanation += `• Handedness favors pitcher (${batter.bats || 'R'} vs ${pitcher.throwingArm || pitcher.ph || 'R'})\n`;
         }
       }
+    }
+    
+    // NEW: Arsenal-specific insights
+    if (arsenalInsights) {
+      explanation += `\n🎨 **Arsenal Matchup Analysis:**\n`;
+      explanation += `• Overall Arsenal Advantage: ${arsenalInsights.overallAdvantage > 0 ? 'Hitter' : 'Pitcher'} (+${arsenalInsights.overallAdvantage.toFixed(2)})\n`;
+      
+      if (arsenalInsights.keyStrengths.length > 0) {
+        explanation += `• Strong vs: ${arsenalInsights.keyStrengths.map(s => s.pitch).join(', ')}\n`;
+      }
+      
+      if (arsenalInsights.keyWeaknesses.length > 0) {
+        explanation += `• Vulnerable to: ${arsenalInsights.keyWeaknesses.map(w => w.pitch).join(', ')}\n`;
+      }
+      
+      explanation += `• Arsenal Analysis Confidence: ${(arsenalInsights.confidence * 100).toFixed(0)}%\n`;
     }
     
     explanation += `\n💣 **Home Run Potential: ${hrPotential}**\n`;
@@ -583,7 +590,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     const hasSelectedGames = Object.values(selectedGames).some(isSelected => isSelected);
     const hasPitcherConfigured = Object.keys(gamePitchers).length > 0;
     
-    return hasSelectedGames && hasPitcherConfigured && !isAnalyzing && !isLoadingRoster && !isLoadingCSV && activeYears.length > 0 && matchupAnalyzer;
+    return hasSelectedGames && hasPitcherConfigured && !isAnalyzing && !isLoadingRoster && !isLoadingCSV && activeYears.length > 0 && matchupAnalyzer && arsenalAnalyzer;
   };
 
   // Get the current sorted results
@@ -628,7 +635,12 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
       PredictedWOBA: result.result.details.predictedWOBA,
       StrikeoutRate: result.result.details.strikeoutRate,
       Confidence: (result.result.details.confidence * 100).toFixed(0) + '%',
-      YearsUsed: result.result.details.yearsUsed
+      YearsUsed: result.result.details.yearsUsed,
+      // NEW: Arsenal analysis fields
+      ArsenalAdvantage: result.arsenalInsights ? result.arsenalInsights.overallAdvantage.toFixed(3) : 'N/A',
+      ArsenalConfidence: result.arsenalInsights ? (result.arsenalInsights.confidence * 100).toFixed(0) + '%' : 'N/A',
+      KeyStrengths: result.arsenalInsights ? result.arsenalInsights.keyStrengths.map(s => s.pitch).join('; ') : 'N/A',
+      KeyWeaknesses: result.arsenalInsights ? result.arsenalInsights.keyWeaknesses.map(w => w.pitch).join('; ') : 'N/A'
     }));
     
     // Convert to CSV and download
@@ -637,12 +649,12 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `enhanced-matchup-analysis-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `enhanced-matchup-analysis-with-arsenal-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
 
-  // FIXED: Year change handler with proper re-analysis
+  // Year change handler with proper re-analysis
   const handleYearChange = (yearVal, isChecked) => {
     console.log(`Year change: ${yearVal}, checked: ${isChecked}`);
     
@@ -665,7 +677,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     }
   };
 
-  // FIXED: Calculate filtered data counts for display
+  // Calculate filtered data counts for display
   const getFilteredDataCounts = () => {
     const filteredHitters = hitterData.filter(h => activeYears.includes(h.year));
     const filteredPitchers = pitcherData.filter(p => activeYears.includes(p.year));
@@ -678,14 +690,37 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
 
   const filteredCounts = getFilteredDataCounts();
 
+  // NEW: Helper function to get arsenal analysis for a pitcher
+  const getArsenalAnalysis = (pitcherKey) => {
+    return arsenalAnalyses.get(pitcherKey);
+  };
+
+  // NEW: Helper function to get pitch effectiveness color
+  const getPitchEffectivenessColor = (runValue) => {
+    if (runValue < -2) return '#22c55e'; // Very effective (green)
+    if (runValue < 0) return '#84cc16'; // Effective (light green)
+    if (runValue < 2) return '#eab308'; // Neutral (yellow)
+    if (runValue < 4) return '#f97316'; // Poor (orange)
+    return '#ef4444'; // Very poor (red)
+  };
+
+  // NEW: Helper function to get advantage color for arsenal
+  const getArsenalAdvantageColor = (advantage) => {
+    if (advantage > 0.5) return '#22c55e'; // Strong hitter advantage
+    if (advantage > 0.1) return '#84cc16'; // Hitter advantage
+    if (advantage > -0.1) return '#eab308'; // Neutral
+    if (advantage > -0.5) return '#f97316'; // Pitcher advantage
+    return '#ef4444'; // Strong pitcher advantage
+  };
+
   return (
     <div className="matchup-analyzer">
       <header className="analyzer-header">
-        <h2>Enhanced Matchup Analyzer</h2>
+        <h2>Enhanced Matchup Analyzer with Arsenal Analysis</h2>
         <p className="date">{formattedDate}</p>
         <div className="analyzer-status">
-          {matchupAnalyzer ? (
-            <span className="status-ready">✅ Enhanced Analysis Ready (Active Players Only)</span>
+          {matchupAnalyzer && arsenalAnalyzer ? (
+            <span className="status-ready">✅ Enhanced Analysis Ready (Active Players + Arsenal Analysis)</span>
           ) : (
             <span className="status-loading">⏳ Loading Enhanced Analysis...</span>
           )}
@@ -752,15 +787,15 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
             className="analyze-btn enhanced"
             onClick={runAnalysis}
             disabled={!canRunAnalysis()}
-            title={!matchupAnalyzer ? "Enhanced analyzer loading..." : "Run comprehensive multi-dimensional analysis"}
+            title={!matchupAnalyzer || !arsenalAnalyzer ? "Enhanced analyzer loading..." : "Run comprehensive multi-dimensional analysis with arsenal breakdown"}
           >
             {isAnalyzing ? (
               <>
                 <div className="spinner"></div>
-                Analyzing Enhanced Matchups...
+                Analyzing Enhanced Matchups + Arsenal...
               </>
             ) : (
-              '🚀 Run Enhanced Analysis'
+              '🚀 Run Enhanced Analysis + Arsenal'
             )}
           </button>
           <button className="clear-btn" onClick={resetSelections}>
@@ -768,7 +803,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
           </button>
           {analysisResults.length > 0 && (
             <button className="export-btn" onClick={exportAnalysisResults}>
-              📊 Export Results
+              📊 Export Results (with Arsenal)
             </button>
           )}
         </div>
@@ -777,10 +812,10 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
       {analysisResults.length > 0 && (
         <section className="results-section">
           <div className="results-header">
-            <h3>Enhanced Matchup Analysis Results</h3>
+            <h3>Enhanced Matchup Analysis Results with Arsenal Breakdown</h3>
             <div className="results-stats">
               <span className="total-results">
-                {sortedResults.length} of {analysisResults.length} matchups shown (Active Players Only)
+                {sortedResults.length} of {analysisResults.length} matchups shown (Active Players + Arsenal Analysis)
               </span>
               {removedCount > 0 && (
                 <button 
@@ -794,7 +829,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
             </div>
           </div>
           
-          {/* FIXED: Year Selection with proper change handling */}
+          {/* Year Selection with proper change handling */}
           <div className="analysis-years-control enhanced">
             <div className="years-header">
               <span className="years-label">📊 Analysis Years (Successfully Loaded: {activeYears.join(', ')}):</span>
@@ -824,7 +859,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                 <span className="error-text">{dataLoadError}</span>
               ) : (
                 <span className="success-text">
-                  ✅ Enhanced analysis ready - Only active, non-injured players
+                  ✅ Enhanced analysis ready - Arsenal Analysis Integrated
                 </span>
               )}
             </div>
@@ -879,6 +914,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                     K {getSortIcon('k')}
                   </th>
                   <th className="stats-column">Enhanced Stats</th>
+                  <th className="arsenal-column">Arsenal Analysis</th>
                 </tr>
               </thead>
               <tbody>
@@ -968,11 +1004,35 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                           </div>
                         </div>
                       </td>
+                      {/* NEW: Arsenal Analysis Column */}
+                      <td className="arsenal-cell-compact">
+                        {result.arsenalInsights ? (
+                          <div className="arsenal-insights-compact">
+                            <div className="arsenal-advantage" 
+                                 style={{ color: getArsenalAdvantageColor(result.arsenalInsights.overallAdvantage) }}>
+                              {result.arsenalInsights.overallAdvantage > 0 ? '+' : ''}{result.arsenalInsights.overallAdvantage.toFixed(2)}
+                            </div>
+                            <div className="arsenal-details">
+                              {result.arsenalInsights.keyStrengths.length > 0 && (
+                                <div className="strengths">⚡ {result.arsenalInsights.keyStrengths.length}</div>
+                              )}
+                              {result.arsenalInsights.keyWeaknesses.length > 0 && (
+                                <div className="weaknesses">🎯 {result.arsenalInsights.keyWeaknesses.length}</div>
+                              )}
+                            </div>
+                            <div className="arsenal-confidence">
+                              📊 {(result.arsenalInsights.confidence * 100).toFixed(0)}%
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="no-arsenal">No arsenal data</div>
+                        )}
+                      </td>
                     </tr>
                     
-                    {/* Enhanced Details row - spans the entire width */}
+                    {/* Enhanced Details row with Arsenal Breakdown */}
                     <tr className="result-row details-row enhanced">
-                      <td className="details-full-span" colSpan="10">
+                      <td className="details-full-span" colSpan="11">
                         <div className="enhanced-analysis-breakdown">
                           <div className="breakdown-grid">
                             <div className="breakdown-card hit-analysis">
@@ -1022,6 +1082,58 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                                 <p>K Rate: <strong>{(parseFloat(result.result.details.strikeoutRate) * 100).toFixed(1)}%</strong></p>
                               </div>
                             </div>
+
+                            {/* NEW: Arsenal Analysis Breakdown */}
+                            {result.arsenalInsights && (
+                              <>
+                                <div className="breakdown-card arsenal-overall">
+                                  <div className="breakdown-header">
+                                    <span className="breakdown-icon">🎨</span>
+                                    <span className="breakdown-title">Arsenal Matchup</span>
+                                  </div>
+                                  <div className="breakdown-body">
+                                    <p>Overall Advantage: <strong 
+                                       style={{ color: getArsenalAdvantageColor(result.arsenalInsights.overallAdvantage) }}>
+                                      {result.arsenalInsights.overallAdvantage > 0 ? 'Hitter +' : 'Pitcher +'}
+                                      {Math.abs(result.arsenalInsights.overallAdvantage).toFixed(2)}
+                                    </strong></p>
+                                    <p>Confidence: <strong>{(result.arsenalInsights.confidence * 100).toFixed(0)}%</strong></p>
+                                  </div>
+                                </div>
+
+                                {result.arsenalInsights.keyStrengths.length > 0 && (
+                                  <div className="breakdown-card arsenal-strengths">
+                                    <div className="breakdown-header">
+                                      <span className="breakdown-icon">⚡</span>
+                                      <span className="breakdown-title">Key Strengths</span>
+                                    </div>
+                                    <div className="breakdown-body">
+                                      {result.arsenalInsights.keyStrengths.map((strength, idx) => (
+                                        <p key={idx}>
+                                          <strong>{strength.pitch}:</strong> +{strength.advantage.toFixed(2)} advantage
+                                        </p>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {result.arsenalInsights.keyWeaknesses.length > 0 && (
+                                  <div className="breakdown-card arsenal-weaknesses">
+                                    <div className="breakdown-header">
+                                      <span className="breakdown-icon">🎯</span>
+                                      <span className="breakdown-title">Key Weaknesses</span>
+                                    </div>
+                                    <div className="breakdown-body">
+                                      {result.arsenalInsights.keyWeaknesses.map((weakness, idx) => (
+                                        <p key={idx}>
+                                          <strong>{weakness.pitch}:</strong> -{weakness.disadvantage.toFixed(2)} disadvantage
+                                        </p>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </>
+                            )}
                             
                             {result.result.details.pitcherArsenal && result.result.details.pitcherArsenal.length > 0 && (
                               <div className="breakdown-card arsenal-analysis">
@@ -1045,7 +1157,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                                 <span className="breakdown-title">Analysis Quality</span>
                               </div>
                               <div className="breakdown-body">
-                                <p>Confidence: <strong>{(result.result.details.confidence * 100).toFixed(0)}%</strong></p>
+                                <p>Overall Confidence: <strong>{(result.result.details.confidence * 100).toFixed(0)}%</strong></p>
                                 <p>Years: <strong>{result.result.details.yearsUsed}</strong></p>
                                 {result.result.details.analysisBreakdown && (
                                   <div className="analysis-components">
@@ -1062,6 +1174,53 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                               </div>
                             </div>
                           </div>
+
+                          {/* NEW: Detailed Pitch-by-Pitch Arsenal Breakdown */}
+                          {result.arsenalInsights && result.arsenalInsights.pitchMatchups && (
+                            <div className="pitch-by-pitch-breakdown">
+                              <div className="pitch-breakdown-header">
+                                <h4>🎯 Pitch-by-Pitch Arsenal Analysis</h4>
+                                <button 
+                                  className="toggle-arsenal-btn"
+                                  onClick={() => toggleArsenalExpansion(`${result.pitcher.name}-${result.pitcher.team}-${result.batter.name}`)}
+                                >
+                                  {expandedArsenal.has(`${result.pitcher.name}-${result.pitcher.team}-${result.batter.name}`) ? '▼ Hide Details' : '▶ Show Details'}
+                                </button>
+                              </div>
+                              
+                              {expandedArsenal.has(`${result.pitcher.name}-${result.pitcher.team}-${result.batter.name}`) && (
+                                <div className="pitch-matchups-grid">
+                                  {result.arsenalInsights.pitchMatchups.map((pitchMatchup, idx) => (
+                                    <div key={idx} className="pitch-matchup-card">
+                                      <div className="pitch-matchup-header">
+                                        <span className="pitch-name">{pitchMatchup.pitchName}</span>
+                                        <span className="pitch-usage">{(pitchMatchup.pitcherUsage * 100).toFixed(1)}%</span>
+                                      </div>
+                                      <div className="pitch-matchup-stats">
+                                        <div className="matchup-advantage" 
+                                             style={{ color: getArsenalAdvantageColor(pitchMatchup.matchupAdvantage) }}>
+                                          {pitchMatchup.matchupAdvantage > 0 ? '+' : ''}{pitchMatchup.matchupAdvantage.toFixed(2)}
+                                        </div>
+                                        {pitchMatchup.hitterPerformance && (
+                                          <div className="performance-details">
+                                            <div>BA: {pitchMatchup.hitterPerformance.ba.toFixed(3)}</div>
+                                            <div>wOBA: {pitchMatchup.hitterPerformance.woba.toFixed(3)}</div>
+                                          </div>
+                                        )}
+                                        <div className="recommendation">
+                                          {pitchMatchup.recommendation === 'strong_hitter_advantage' && '🔥 Strong Target'}
+                                          {pitchMatchup.recommendation === 'hitter_advantage' && '⚡ Good Matchup'}
+                                          {pitchMatchup.recommendation === 'neutral' && '➡️ Neutral'}
+                                          {pitchMatchup.recommendation === 'pitcher_advantage' && '🎯 Tough Pitch'}
+                                          {pitchMatchup.recommendation === 'strong_pitcher_advantage' && '⚠️ Avoid'}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -1075,15 +1234,24 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
       
       {/* Enhanced Analysis Info Panel */}
       <section className="analysis-info-panel">
-        <h3>🚀 FIXED Enhanced Analysis Features</h3>
+        <h3>🚀 ENHANCED Arsenal Analysis Features</h3>
         <div className="info-grid">
           <div className="info-card">
-            <h4>🎯 Active Players Only</h4>
+            <h4>🎯 Pitcher Arsenal Analysis</h4>
             <ul>
-              <li>Only analyzes current roster players</li>
-              <li>Excludes injured players automatically</li>
-              <li>Requires 2025 season activity</li>
-              <li>Uses historical data for context</li>
+              <li>Complete pitch repertoire breakdown</li>
+              <li>Usage rates and effectiveness metrics</li>
+              <li>Year-over-year pitch development trends</li>
+              <li>Pitch-specific wOBA, whiff%, and K rates</li>
+            </ul>
+          </div>
+          <div className="info-card">
+            <h4>🎨 Hitter vs Arsenal Matchups</h4>
+            <ul>
+              <li>Performance vs each pitch type</li>
+              <li>Key strengths and weaknesses identification</li>
+              <li>Weighted matchup advantage calculations</li>
+              <li>Confidence scoring based on data volume</li>
             </ul>
           </div>
           <div className="info-card">
@@ -1092,25 +1260,16 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
               <li>Direct batter vs pitcher matchups</li>
               <li>Same-handed pitcher context</li>
               <li>Opposite-handed pitcher context</li>
-              <li>Overall league baseline</li>
+              <li>Overall league baseline + Arsenal integration</li>
             </ul>
           </div>
           <div className="info-card">
-            <h4>⚖️ Weighted Historical Data</h4>
+            <h4>⚖️ Enhanced Data Integration</h4>
             <ul>
-              <li>2025 data: 4x weight</li>
-              <li>2024 data: 2x weight</li>
-              <li>2023 data: 1x weight</li>
-              <li>2022 data: 0.5x weight</li>
-            </ul>
-          </div>
-          <div className="info-card">
-            <h4>🎨 Live Year Selection</h4>
-            <ul>
-              <li>Year checkboxes update immediately</li>
-              <li>Automatically re-runs analysis</li>
-              <li>Shows filtered data counts</li>
-              <li>Arsenal integration with usage rates</li>
+              <li>Arsenal analysis for each pitcher</li>
+              <li>Pitch-by-pitch hitter breakdowns</li>
+              <li>Year-over-year trend analysis</li>
+              <li>Comprehensive export with arsenal data</li>
             </ul>
           </div>
         </div>

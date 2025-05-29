@@ -1062,3 +1062,626 @@
   border-style: solid;
   border-color: #333 transparent transparent transparent;
 }
+
+
+/* Enhanced MatchupAnalyzer.css with Arsenal Analysis Integration */
+
+/* Import existing styles */
+@import url('./MatchupAnalyzer.css');
+
+/* NEW: Arsenal Analysis Column Styles */
+.arsenal-column {
+  min-width: 140px;
+  text-align: center;
+}
+
+.arsenal-cell-compact {
+  min-width: 140px;
+  padding: 8px;
+  text-align: center;
+}
+
+.arsenal-insights-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.arsenal-advantage {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.arsenal-details {
+  display: flex;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.strengths {
+  color: #22c55e;
+}
+
+.weaknesses {
+  color: #ef4444;
+}
+
+.arsenal-confidence {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.no-arsenal {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* NEW: Enhanced Breakdown Cards for Arsenal */
+.breakdown-card.arsenal-overall {
+  border-left-color: #8b5cf6;
+}
+
+.breakdown-card.arsenal-strengths {
+  border-left-color: #22c55e;
+}
+
+.breakdown-card.arsenal-weaknesses {
+  border-left-color: #ef4444;
+}
+
+/* NEW: Pitch-by-Pitch Arsenal Breakdown */
+.pitch-by-pitch-breakdown {
+  margin-top: 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 8px;
+  padding: 20px;
+  border: 2px solid #8b5cf6;
+}
+
+.pitch-breakdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.pitch-breakdown-header h4 {
+  margin: 0;
+  color: #1f2937;
+  font-size: 1.1rem;
+}
+
+.toggle-arsenal-btn {
+  background: #8b5cf6;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.toggle-arsenal-btn:hover {
+  background: #7c3aed;
+  transform: translateY(-1px);
+}
+
+.pitch-matchups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.pitch-matchup-card {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+.pitch-matchup-card:hover {
+  border-color: #8b5cf6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+}
+
+.pitch-matchup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.pitch-name {
+  font-weight: 700;
+  color: #1f2937;
+  font-size: 1rem;
+}
+
+.pitch-usage {
+  background: #f3f4f6;
+  color: #6b7280;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.pitch-matchup-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.matchup-advantage {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.performance-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: #6b7280;
+  background: #f9fafb;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.recommendation {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #f3f4f6;
+}
+
+/* NEW: Enhanced Button Styles */
+.analyze-btn.enhanced {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.analyze-btn.enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.analyze-btn.enhanced:hover::before {
+  left: 100%;
+}
+
+.analyze-btn.enhanced:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+}
+
+/* NEW: Enhanced Status Indicators */
+.status-ready {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  border: 2px solid #15803d;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+
+.status-loading {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  border: 2px solid #b45309;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+/* NEW: Enhanced Year Control */
+.analysis-years-control.enhanced {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 2px solid #8b5cf6;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
+}
+
+.data-summary {
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  color: #4338ca;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid #a5b4fc;
+}
+
+.success-text {
+  color: #059669;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.success-text::before {
+  content: '🎨';
+  font-size: 1.2rem;
+}
+
+/* NEW: Enhanced Table Styles */
+.enhanced-results-table {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.enhanced-results-table thead {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+  color: white;
+}
+
+.enhanced-results-table th {
+  padding: 16px 12px;
+  text-align: left;
+  font-weight: 700;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 3px solid #6d28d9;
+}
+
+.enhanced-results-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+.result-row.main-row:hover {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  transform: translateX(2px);
+  transition: all 0.2s ease;
+}
+
+.result-row.details-row.enhanced {
+  background: linear-gradient(135deg, #fafbff 0%, #f4f6ff 100%);
+  border-top: 2px solid #8b5cf6;
+}
+
+/* NEW: Enhanced Info Panel */
+.analysis-info-panel {
+  margin-top: 40px;
+  padding: 32px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+  border-radius: 16px;
+  color: white;
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+}
+
+.analysis-info-panel h3 {
+  margin: 0 0 24px 0;
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 800;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.info-card {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 24px;
+  backdrop-filter: blur(12px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.info-card:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.info-card h4 {
+  margin: 0 0 16px 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.info-card ul {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.info-card li {
+  margin: 10px 0;
+  font-size: 15px;
+  line-height: 1.5;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* NEW: Arsenal Animation Effects */
+@keyframes arsenalPulse {
+  0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+}
+
+.arsenal-cell-compact:hover {
+  animation: arsenalPulse 1.5s infinite;
+}
+
+.pitch-matchup-card:hover .matchup-advantage {
+  animation: arsenalPulse 1s infinite;
+}
+
+/* NEW: Responsive Enhancements for Arsenal */
+@media (max-width: 1200px) {
+  .pitch-matchups-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  
+  .arsenal-cell-compact {
+    min-width: 120px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pitch-by-pitch-breakdown {
+    padding: 16px;
+  }
+  
+  .pitch-breakdown-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .pitch-matchups-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .arsenal-insights-compact {
+    font-size: 0.8rem;
+  }
+  
+  .enhanced-results-table th,
+  .enhanced-results-table td {
+    padding: 10px 8px;
+  }
+  
+  .arsenal-cell-compact {
+    min-width: 100px;
+  }
+  
+  .analysis-info-panel {
+    padding: 24px;
+  }
+  
+  .analysis-info-panel h3 {
+    font-size: 1.5rem;
+  }
+  
+  .info-card {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .enhanced-results-table-container {
+    font-size: 11px;
+  }
+  
+  .enhanced-results-table th,
+  .enhanced-results-table td {
+    padding: 8px 6px;
+  }
+  
+  .arsenal-cell-compact {
+    min-width: 90px;
+  }
+  
+  .arsenal-insights-compact {
+    gap: 2px;
+  }
+  
+  .arsenal-advantage {
+    font-size: 1rem;
+  }
+  
+  .pitch-matchup-card {
+    padding: 12px;
+  }
+  
+  .breakdown-card {
+    padding: 12px;
+  }
+  
+  .breakdown-body p {
+    font-size: 12px;
+  }
+  
+  .analysis-info-panel {
+    padding: 20px;
+  }
+  
+  .info-card {
+    padding: 16px;
+  }
+  
+  .info-card h4 {
+    font-size: 1.1rem;
+  }
+  
+  .info-card li {
+    font-size: 14px;
+  }
+}
+
+/* NEW: Dark Mode Enhancements */
+@media (prefers-color-scheme: dark) {
+  .pitch-by-pitch-breakdown {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    border-color: #8b5cf6;
+  }
+  
+  .pitch-matchup-card {
+    background: #1e293b;
+    border-color: #475569;
+    color: #f1f5f9;
+  }
+  
+  .pitch-matchup-card:hover {
+    border-color: #8b5cf6;
+  }
+  
+  .pitch-name {
+    color: #f1f5f9;
+  }
+  
+  .performance-details {
+    background: #334155;
+    color: #cbd5e1;
+  }
+  
+  .recommendation {
+    background: #475569;
+    color: #f1f5f9;
+  }
+  
+  .breakdown-card {
+    background: #1e293b;
+    color: #f1f5f9;
+  }
+  
+  .breakdown-header .breakdown-title {
+    color: #f1f5f9;
+  }
+  
+  .breakdown-body p {
+    color: #cbd5e1;
+  }
+  
+  .breakdown-body strong {
+    color: #f1f5f9;
+  }
+}
+
+/* NEW: Print Styles for Arsenal Analysis */
+@media print {
+  .arsenal-cell-compact {
+    background: white !important;
+    color: black !important;
+    border: 1px solid #000 !important;
+  }
+  
+  .pitch-by-pitch-breakdown {
+    background: white !important;
+    border: 2px solid #000 !important;
+    page-break-inside: avoid;
+  }
+  
+  .pitch-matchup-card {
+    background: white !important;
+    border: 1px solid #000 !important;
+    break-inside: avoid;
+  }
+  
+  .breakdown-card {
+    background: white !important;
+    border: 1px solid #000 !important;
+    break-inside: avoid;
+  }
+  
+  .analysis-info-panel {
+    background: white !important;
+    color: black !important;
+    border: 2px solid #000 !important;
+  }
+  
+  .toggle-arsenal-btn {
+    display: none !important;
+  }
+  
+  .pitch-matchups-grid {
+    display: block !important;
+  }
+}
+
+/* NEW: Accessibility Enhancements */
+.toggle-arsenal-btn:focus {
+  outline: 3px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+.pitch-matchup-card:focus-within {
+  border-color: #fbbf24;
+  outline: 2px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+.arsenal-cell-compact:focus-within {
+  outline: 2px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .arsenalPulse,
+  .pitch-matchup-card:hover,
+  .result-row.main-row:hover,
+  .info-card:hover,
+  .analyze-btn.enhanced:hover,
+  .toggle-arsenal-btn:hover {
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* NEW: High contrast mode support */
+@media (prefers-contrast: high) {
+  .arsenal-advantage {
+    font-weight: 900;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  .pitch-matchup-card {
+    border-width: 3px;
+  }
+  
+  .breakdown-card {
+    border-width: 3px;
+  }
+  
+  .toggle-arsenal-btn {
+    border: 3px solid #000;
+    font-weight: 900;
+  }
+}
