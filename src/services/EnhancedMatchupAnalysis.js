@@ -1,8 +1,9 @@
 /**
- * Enhanced Matchup Analysis System
+ * Enhanced Matchup Analysis System - FIXED VERSION
  * src/services/EnhancedMatchupAnalysis.js
  * 
  * Provides comprehensive batter vs pitcher analysis using multiple data points
+ * FIXED: Only analyzes currently active, non-injured players from roster
  */
 
 import _ from 'lodash';
@@ -18,68 +19,116 @@ export class EnhancedMatchupAnalyzer {
     this.activeYears = activeYears.sort((a, b) => b - a); // Most recent first
     this.currentYear = Math.max(...activeYears);
     
-    // Pre-process and filter data
+    // Pre-process and filter data - FIXED to start with active roster
     this.processedData = this.preprocessData();
   }
 
   /**
-   * Filter data to only include players active in current year
+   * FIXED: Filter data to only include currently active, non-injured players from roster
    */
   preprocessData() {
-    // Get players active in current year
-    const currentYearPlayers = new Set();
+    console.log(`[EnhancedMatchupAnalyzer] Starting data preprocessing for ${this.currentYear}`);
     
-    // From roster data (current active players)
-    this.rosterData.forEach(player => {
-      const key = `${player.name}_${player.team}`;
-      currentYearPlayers.add(key);
+    // Step 1: Get ONLY currently active, non-injured players from roster
+    const activeHealthyPlayers = this.rosterData.filter(player => {
+      // Check if player is injured
+      const isInjured = player.injuries && Array.isArray(player.injuries) && 
+                        player.injuries.some(injury => injury.active === true);
       
-      // Also add fullName variant if exists
-      if (player.fullName) {
-        const fullNameKey = `${player.fullName}_${player.team}`;
-        currentYearPlayers.add(fullNameKey);
+      return !isInjured; // Only include non-injured players
+    });
+    
+    console.log(`[EnhancedMatchupAnalyzer] Found ${activeHealthyPlayers.length} active, healthy players in roster`);
+    
+    // Step 2: Create lookup sets for active players (multiple name formats)
+    const activePlayerKeys = new Set();
+    const activePlayersByNameTeam = new Map();
+    
+    activeHealthyPlayers.forEach(player => {
+      // Store multiple name format variations
+      const nameVariations = [
+        player.name,
+        player.fullName,
+        this.convertPlayerName(player.name, 'lastFirst'),
+        this.convertPlayerName(player.fullName, 'lastFirst')
+      ].filter(Boolean); // Remove null/undefined values
+      
+      nameVariations.forEach(nameVar => {
+        const key = `${nameVar}_${player.team}`;
+        activePlayerKeys.add(key);
+        activePlayersByNameTeam.set(key, player);
+      });
+    });
+    
+    console.log(`[EnhancedMatchupAnalyzer] Created ${activePlayerKeys.size} name-team combinations for active players`);
+    
+    // Step 3: Filter CSV data to only include active players, prioritizing current year
+    const filteredHitterData = [];
+    const filteredPitcherData = [];
+    
+    // First, find players who have 2025 data (current season activity)
+    const playersWithCurrentSeasonData = new Set();
+    
+    // Check hitters for current season activity
+    this.hitterData.filter(row => row.year === this.currentYear).forEach(row => {
+      if (row['last_name, first_name'] && row.team_name_alt) {
+        const csvKey = `${row['last_name, first_name']}_${row.team_name_alt}`;
+        if (activePlayerKeys.has(csvKey)) {
+          playersWithCurrentSeasonData.add(csvKey);
+        }
       }
     });
     
-    // From current year game data
-    const currentYearHitters = this.hitterData.filter(row => row.year === this.currentYear);
-    const currentYearPitchers = this.pitcherData.filter(row => row.year === this.currentYear);
-    
-    currentYearHitters.forEach(hitter => {
-      if (hitter['last_name, first_name']) {
-        const key = `${hitter['last_name, first_name']}_${hitter.team_name_alt}`;
-        currentYearPlayers.add(key);
+    // Check pitchers for current season activity
+    this.pitcherData.filter(row => row.year === this.currentYear).forEach(row => {
+      if (row['last_name, first_name'] && row.team_name_alt) {
+        const csvKey = `${row['last_name, first_name']}_${row.team_name_alt}`;
+        if (activePlayerKeys.has(csvKey)) {
+          playersWithCurrentSeasonData.add(csvKey);
+        }
       }
     });
     
-    currentYearPitchers.forEach(pitcher => {
-      if (pitcher['last_name, first_name']) {
-        const key = `${pitcher['last_name, first_name']}_${pitcher.team_name_alt}`;
-        currentYearPlayers.add(key);
+    console.log(`[EnhancedMatchupAnalyzer] Found ${playersWithCurrentSeasonData.size} active players with ${this.currentYear} season data`);
+    
+    // Step 4: Filter historical data for active players with current season activity
+    this.hitterData.forEach(row => {
+      if (row['last_name, first_name'] && row.team_name_alt && this.activeYears.includes(row.year)) {
+        const csvKey = `${row['last_name, first_name']}_${row.team_name_alt}`;
+        
+        // Only include if player is active AND has current season data
+        if (activePlayerKeys.has(csvKey) && playersWithCurrentSeasonData.has(csvKey)) {
+          filteredHitterData.push(row);
+        }
       }
     });
     
-    console.log(`Found ${currentYearPlayers.size} active players for ${this.currentYear}`);
-    
-    // Filter historical data to only include active players
-    const filteredHitterData = this.hitterData.filter(row => {
-      if (!row['last_name, first_name'] || !row.team_name_alt) return false;
-      const key = `${row['last_name, first_name']}_${row.team_name_alt}`;
-      return currentYearPlayers.has(key);
+    this.pitcherData.forEach(row => {
+      if (row['last_name, first_name'] && row.team_name_alt && this.activeYears.includes(row.year)) {
+        const csvKey = `${row['last_name, first_name']}_${row.team_name_alt}`;
+        
+        // Only include if player is active AND has current season data
+        if (activePlayerKeys.has(csvKey) && playersWithCurrentSeasonData.has(csvKey)) {
+          filteredPitcherData.push(row);
+        }
+      }
     });
     
-    const filteredPitcherData = this.pitcherData.filter(row => {
-      if (!row['last_name, first_name'] || !row.team_name_alt) return false;
-      const key = `${row['last_name, first_name']}_${row.team_name_alt}`;
-      return currentYearPlayers.has(key);
-    });
+    console.log(`[EnhancedMatchupAnalyzer] Filtered to ${filteredHitterData.length} hitter records and ${filteredPitcherData.length} pitcher records for active players with current season data`);
     
-    console.log(`Filtered to ${filteredHitterData.length} hitter records and ${filteredPitcherData.length} pitcher records for active players`);
+    // Step 5: Group by year for debugging
+    const hittersByYear = _.groupBy(filteredHitterData, 'year');
+    const pitchersByYear = _.groupBy(filteredPitcherData, 'year');
+    
+    console.log(`[EnhancedMatchupAnalyzer] Hitter data by year:`, Object.keys(hittersByYear).map(year => `${year}: ${hittersByYear[year].length}`).join(', '));
+    console.log(`[EnhancedMatchupAnalyzer] Pitcher data by year:`, Object.keys(pitchersByYear).map(year => `${year}: ${pitchersByYear[year].length}`).join(', '));
     
     return {
       hitters: filteredHitterData,
       pitchers: filteredPitcherData,
-      activePlayerKeys: currentYearPlayers
+      activePlayerKeys,
+      activeHealthyPlayers,
+      playersWithCurrentSeasonData
     };
   }
 
@@ -180,7 +229,7 @@ export class EnhancedMatchupAnalyzer {
   }
 
   /**
-   * Get pitcher's arsenal from CSV data
+   * Get pitcher's arsenal from CSV data (only for active players)
    */
   getPitcherArsenal(pitcher) {
     const pitcherMatches = this.processedData.pitchers.filter(p => 
@@ -215,6 +264,24 @@ export class EnhancedMatchupAnalyzer {
     
     return pitchTypes.sort((a, b) => b.usage - a.usage);
   }
+
+  /**
+   * UPDATED: Method to refresh data when years change
+   */
+  updateActiveYears(newActiveYears) {
+    console.log(`[EnhancedMatchupAnalyzer] Updating active years from [${this.activeYears.join(', ')}] to [${newActiveYears.join(', ')}]`);
+    this.activeYears = newActiveYears.sort((a, b) => b - a);
+    this.currentYear = Math.max(...newActiveYears);
+    
+    // Reprocess data with new years
+    this.processedData = this.preprocessData();
+    
+    console.log(`[EnhancedMatchupAnalyzer] Data reprocessed with new years`);
+  }
+
+  // ... (Continue with all the analysis methods from the previous version)
+  // The rest of the methods remain the same: analyzeHitterVsPitcher, analyzeHitterVsSameHanded, etc.
+  
   /**
    * Analyze hitter vs specific pitcher
    */

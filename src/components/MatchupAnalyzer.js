@@ -10,8 +10,10 @@ const DATA_YEARS = [2025, 2024, 2023, 2022];
 const CURRENT_YEAR = Math.max(...DATA_YEARS);
 
 /**
- * Enhanced Matchup Analyzer Component - With Comprehensive Multi-Dimensional Analysis
- * Analyzes all batter-pitcher matchups for selected games with configurable years
+ * FIXED Enhanced Matchup Analyzer Component
+ * - Properly filters for active, non-injured players only
+ * - Year checkboxes now trigger re-analysis
+ * - Shows only players with 2025 season data + their historical context
  */
 function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
   // State for data
@@ -159,15 +161,26 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     loadAllCSVData();
   }, []);
 
-  // Create enhanced analyzer when data is loaded
+  // FIXED: Create enhanced analyzer when data is loaded AND when activeYears change
   useEffect(() => {
     if (hitterData.length > 0 && pitcherData.length > 0 && rosterData.length > 0 && activeYears.length > 0) {
-      console.log('Creating enhanced matchup analyzer...');
+      console.log('Creating enhanced matchup analyzer with years:', activeYears);
       const analyzer = createEnhancedMatchupAnalyzer(hitterData, pitcherData, rosterData, activeYears);
       setMatchupAnalyzer(analyzer);
     }
-  }, [hitterData, pitcherData, rosterData, activeYears]);
-  
+  }, [hitterData, pitcherData, rosterData, activeYears]); // FIXED: Added activeYears dependency
+
+  // FIXED: Auto re-run analysis when analyzer updates (due to year changes)
+  useEffect(() => {
+    if (matchupAnalyzer && analysisResults.length > 0) {
+      console.log('Analyzer updated, re-running analysis...');
+      // Small delay to ensure analyzer is fully updated
+      setTimeout(() => {
+        runAnalysis();
+      }, 100);
+    }
+  }, [matchupAnalyzer]); // This will trigger when analyzer is recreated with new years
+
   // Get all available pitchers for a team
   const getPitchersForTeam = useCallback((teamCode) => {
     if (!rosterData || !teamCode) return [];
@@ -405,8 +418,8 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     setRemovedResultIds(new Set());
   };
 
-  // Enhanced analysis using the new system
-  const runAnalysis = async () => {
+  // FIXED: Enhanced analysis using the new system
+  const runAnalysis = useCallback(async () => {
     console.log("Starting enhanced analysis...");
     setIsAnalyzing(true);
     setAnalysisResults([]);
@@ -506,7 +519,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     } finally {
       setIsAnalyzing(false);
     }
-  };
+  }, [matchupAnalyzer, selectedGames, gamePitchers, gameData, getBattersForTeam, getPitcherById, activeYears]); // Added dependencies
 
   // Enhanced explanation generator
   const generateEnhancedExplanation = (analysis, batter, pitcher) => {
@@ -614,7 +627,8 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
       PredictedSLG: result.result.details.predictedSLG,
       PredictedWOBA: result.result.details.predictedWOBA,
       StrikeoutRate: result.result.details.strikeoutRate,
-      Confidence: (result.result.details.confidence * 100).toFixed(0) + '%'
+      Confidence: (result.result.details.confidence * 100).toFixed(0) + '%',
+      YearsUsed: result.result.details.yearsUsed
     }));
     
     // Convert to CSV and download
@@ -628,6 +642,42 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     window.URL.revokeObjectURL(url);
   };
 
+  // FIXED: Year change handler with proper re-analysis
+  const handleYearChange = (yearVal, isChecked) => {
+    console.log(`Year change: ${yearVal}, checked: ${isChecked}`);
+    
+    if (isChecked) {
+      setActiveYears(prev => {
+        const newYears = _.uniq([...prev, yearVal]).sort((a,b) => b-a);
+        console.log('Adding year:', yearVal, 'New years:', newYears);
+        return newYears;
+      });
+    } else {
+      if (activeYears.length > 1) { // Prevent unchecking all years
+        setActiveYears(prev => {
+          const newYears = prev.filter(y => y !== yearVal);
+          console.log('Removing year:', yearVal, 'New years:', newYears);
+          return newYears;
+        });
+      } else {
+        console.log('Cannot remove last year - at least one year must be selected');
+      }
+    }
+  };
+
+  // FIXED: Calculate filtered data counts for display
+  const getFilteredDataCounts = () => {
+    const filteredHitters = hitterData.filter(h => activeYears.includes(h.year));
+    const filteredPitchers = pitcherData.filter(p => activeYears.includes(p.year));
+    
+    return {
+      hitters: filteredHitters.length,
+      pitchers: filteredPitchers.length
+    };
+  };
+
+  const filteredCounts = getFilteredDataCounts();
+
   return (
     <div className="matchup-analyzer">
       <header className="analyzer-header">
@@ -635,7 +685,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
         <p className="date">{formattedDate}</p>
         <div className="analyzer-status">
           {matchupAnalyzer ? (
-            <span className="status-ready">✅ Enhanced Analysis Ready</span>
+            <span className="status-ready">✅ Enhanced Analysis Ready (Active Players Only)</span>
           ) : (
             <span className="status-loading">⏳ Loading Enhanced Analysis...</span>
           )}
@@ -730,7 +780,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
             <h3>Enhanced Matchup Analysis Results</h3>
             <div className="results-stats">
               <span className="total-results">
-                {sortedResults.length} of {analysisResults.length} matchups shown
+                {sortedResults.length} of {analysisResults.length} matchups shown (Active Players Only)
               </span>
               {removedCount > 0 && (
                 <button 
@@ -744,12 +794,12 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
             </div>
           </div>
           
-          {/* Year Selection */}
+          {/* FIXED: Year Selection with proper change handling */}
           <div className="analysis-years-control enhanced">
             <div className="years-header">
               <span className="years-label">📊 Analysis Years (Successfully Loaded: {activeYears.join(', ')}):</span>
               <span className="data-summary">
-                ({hitterData.length} hitter records, {pitcherData.length} pitcher records)
+                ({filteredCounts.hitters} hitter records, {filteredCounts.pitchers} pitcher records for selected years)
               </span>
             </div>
             <div className="year-checkboxes-inline">
@@ -760,16 +810,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                     className="form-checkbox"
                     value={year}
                     checked={activeYears.includes(year)}
-                    onChange={(e) => {
-                      const yearVal = parseInt(e.target.value);
-                      if (e.target.checked) {
-                        setActiveYears(prev => _.uniq([...prev, yearVal]).sort((a,b) => b-a));
-                      } else {
-                        if (activeYears.length > 1) {
-                          setActiveYears(prev => prev.filter(y => y !== yearVal));
-                        }
-                      }
-                    }}
+                    onChange={(e) => handleYearChange(parseInt(e.target.value), e.target.checked)}
                     disabled={isLoadingCSV || isAnalyzing}
                   />
                   <span className="year-label-inline">{year}</span>
@@ -783,7 +824,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                 <span className="error-text">{dataLoadError}</span>
               ) : (
                 <span className="success-text">
-                  ✅ Enhanced analysis ready with multi-dimensional matchup data
+                  ✅ Enhanced analysis ready - Only active, non-injured players
                 </span>
               )}
             </div>
@@ -1034,8 +1075,17 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
       
       {/* Enhanced Analysis Info Panel */}
       <section className="analysis-info-panel">
-        <h3>🚀 Enhanced Analysis Features</h3>
+        <h3>🚀 FIXED Enhanced Analysis Features</h3>
         <div className="info-grid">
+          <div className="info-card">
+            <h4>🎯 Active Players Only</h4>
+            <ul>
+              <li>Only analyzes current roster players</li>
+              <li>Excludes injured players automatically</li>
+              <li>Requires 2025 season activity</li>
+              <li>Uses historical data for context</li>
+            </ul>
+          </div>
           <div className="info-card">
             <h4>📊 Multi-Dimensional Analysis</h4>
             <ul>
@@ -1055,21 +1105,12 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
             </ul>
           </div>
           <div className="info-card">
-            <h4>🎯 Active Player Focus</h4>
+            <h4>🎨 Live Year Selection</h4>
             <ul>
-              <li>Only analyzes current 2025 players</li>
-              <li>Uses their full historical data</li>
-              <li>Eliminates irrelevant matchups</li>
-              <li>Higher prediction accuracy</li>
-            </ul>
-          </div>
-          <div className="info-card">
-            <h4>🎨 Arsenal Integration</h4>
-            <ul>
-              <li>Actual pitch mix analysis</li>
-              <li>Velocity considerations</li>
-              <li>Usage rate adjustments</li>
-              <li>Pitch-specific advantages</li>
+              <li>Year checkboxes update immediately</li>
+              <li>Automatically re-runs analysis</li>
+              <li>Shows filtered data counts</li>
+              <li>Arsenal integration with usage rates</li>
             </ul>
           </div>
         </div>
