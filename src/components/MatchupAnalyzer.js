@@ -236,6 +236,69 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     }
   }, [matchupAnalyzer, arsenalAnalyzer]);
 
+  // Calculate overall confidence score
+  const calculateOverallConfidence = (result) => {
+    const confidenceScores = [];
+    let weights = [];
+    
+    // HR Confidence
+    if (result.hrAnalysis && result.hrAnalysis.confidence !== undefined) {
+      confidenceScores.push(result.hrAnalysis.confidence);
+      weights.push(0.25); // 25% weight
+    }
+    
+    // Arsenal Confidence
+    if (result.arsenalInsights && result.arsenalInsights.confidence !== undefined) {
+      confidenceScores.push(result.arsenalInsights.confidence);
+      weights.push(0.25); // 25% weight
+    }
+    
+    // Analysis Quality (from main analysis)
+    if (result.result.details.confidence !== undefined) {
+      confidenceScores.push(result.result.details.confidence);
+      weights.push(0.30); // 30% weight - higher because it's the core analysis
+    }
+    
+    // Future: Hit Confidence (placeholder - will be implemented)
+    // For now, use a proxy based on PA data if available
+    if (result.result.details.totalPA !== undefined && result.result.details.totalPA > 0) {
+      const hitConfidence = Math.min(1, result.result.details.totalPA / 200);
+      confidenceScores.push(hitConfidence);
+      weights.push(0.10); // 10% weight
+    }
+    
+    // Future: K Confidence (placeholder - will be implemented)
+    // For now, use analysis quality as a proxy
+    if (result.result.details.confidence !== undefined) {
+      const kConfidence = result.result.details.confidence * 0.9; // Slightly lower than overall
+      confidenceScores.push(kConfidence);
+      weights.push(0.10); // 10% weight
+    }
+    
+    // If we have no scores, return 0
+    if (confidenceScores.length === 0) return 0;
+    
+    // Normalize weights to sum to 1
+    const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+    const normalizedWeights = weights.map(w => w / totalWeight);
+    
+    // Calculate weighted average
+    let overallConfidence = 0;
+    confidenceScores.forEach((score, index) => {
+      overallConfidence += score * normalizedWeights[index];
+    });
+    
+    return overallConfidence;
+  };
+
+  // Get confidence level label
+  const getConfidenceLevel = (confidence) => {
+    if (confidence >= 0.8) return { label: 'High', color: '#22c55e' };
+    if (confidence >= 0.6) return { label: 'Med', color: '#f59e0b' };
+    if (confidence >= 0.4) return { label: 'Low', color: '#ef4444' };
+    return { label: 'V.Low', color: '#991b1b' };
+  };
+
   // Get all available pitchers for a team
   const getPitchersForTeam = useCallback((teamCode) => {
     if (!rosterData || !teamCode) return [];
@@ -330,8 +393,8 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
           bValue = getPotentialValue(b.result.hitPotential);
           break;
         case 'hr':
-          aValue = getPotentialValue(a.result.hrPotential);
-          bValue = getPotentialValue(b.result.hrPotential);
+          aValue = getPotentialValue(a.hrAnalysis?.potential || a.result.hrPotential);
+          bValue = getPotentialValue(b.hrAnalysis?.potential || b.result.hrPotential);
           break;
         case 'tb':
           aValue = getPotentialValue(a.result.tbPotential);
@@ -1001,7 +1064,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                   >
                     K {getSortIcon('k')}
                   </th>
-                  <th className="stats-column">Enhanced Stats</th>
+                  <th className="confidence-column">Confidence</th>
                   <th className="arsenal-column">Arsenal Analysis</th>
                 </tr>
               </thead>
@@ -1055,8 +1118,8 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                       <td className={`potential-cell-compact potential-${result.result.hitPotential.toLowerCase()}`}>
                         {result.result.hitPotential}
                       </td>
-                      <td className={`potential-cell-compact potential-${result.result.hrPotential.toLowerCase()}`}>
-                        {result.result.hrPotential}
+                      <td className={`potential-cell-compact potential-${(result.hrAnalysis?.potential || result.result.hrPotential).toLowerCase()}`}>
+                        {result.hrAnalysis?.potential || result.result.hrPotential}
                         {result.hrAnalysis && result.hrAnalysis.confidence < 0.3 && (
                           <span className="low-data-indicator" title={`Based on ${result.hrAnalysis.metrics.totalPA} PA`}>
                             ⚠️
@@ -1069,33 +1132,42 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                       <td className={`potential-cell-compact potential-${result.result.kPotential.toLowerCase()}`}>
                         {result.result.kPotential}
                       </td>
-                      <td className="stats-cell-compact enhanced">
-                        <div className="enhanced-stats-compact">
-                          <div className="stat-row">
-                            <span className="stat-label">BA:</span>
-                            <span className="stat-value">{result.result.details.predictedBA}</span>
-                          </div>
-                          <div className="stat-row">
-                            <span className="stat-label">HR:</span>
-                            <span className="stat-value">{(parseFloat(result.result.details.predictedHR) * 100).toFixed(1)}%</span>
-                          </div>
-                          <div className="stat-row">
-                            <span className="stat-label">SLG:</span>
-                            <span className="stat-value">{result.result.details.predictedSLG}</span>
-                          </div>
-                          <div className="stat-row">
-                            <span className="stat-label">wOBA:</span>
-                            <span className="stat-value">{result.result.details.predictedWOBA}</span>
-                          </div>
-                          <div className="stat-row">
-                            <span className="stat-label">K:</span>
-                            <span className="stat-value">{(parseFloat(result.result.details.strikeoutRate) * 100).toFixed(1)}%</span>
-                          </div>
-                          <div className="stat-row confidence">
-                            <span className="stat-label">Conf:</span>
-                            <span className="stat-value">{(result.result.details.confidence * 100).toFixed(0)}%</span>
-                          </div>
-                        </div>
+                      <td className="confidence-cell-compact">
+                        {(() => {
+                          const overallConfidence = calculateOverallConfidence(result);
+                          const confidenceLevel = getConfidenceLevel(overallConfidence);
+                          return (
+                            <div className="confidence-display">
+                              <div 
+                                className="confidence-value"
+                                style={{ color: confidenceLevel.color }}
+                              >
+                                {(overallConfidence * 100).toFixed(0)}%
+                              </div>
+                              <div className="confidence-label">{confidenceLevel.label}</div>
+                              <div className="confidence-breakdown">
+                                {result.result.details.confidence && (
+                                  <div className="confidence-component" title="Analysis Quality">
+                                    <span className="component-icon">📊</span>
+                                    <span className="component-value">{(result.result.details.confidence * 100).toFixed(0)}%</span>
+                                  </div>
+                                )}
+                                {result.hrAnalysis && (
+                                  <div className="confidence-component" title="HR Confidence">
+                                    <span className="component-icon">💣</span>
+                                    <span className="component-value">{(result.hrAnalysis.confidence * 100).toFixed(0)}%</span>
+                                  </div>
+                                )}
+                                {result.arsenalInsights && (
+                                  <div className="confidence-component" title="Arsenal Confidence">
+                                    <span className="component-icon">🎨</span>
+                                    <span className="component-value">{(result.arsenalInsights.confidence * 100).toFixed(0)}%</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </td>
                       {/* Arsenal Analysis Column */}
                       <td className="arsenal-cell-compact">
@@ -1347,7 +1419,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
             <h4>📊 Data Quality Indicators</h4>
             <ul>
               <li>PA-based confidence scores</li>
-              <li>Low data warnings ( Greater than 50 PA)</li>
+              <li>Low data warnings (less than 50 PA)</li>
               <li>Raw vs adjusted stat comparisons</li>
               <li>Multi-year trend analysis</li>
             </ul>

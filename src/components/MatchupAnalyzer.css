@@ -1685,3 +1685,190 @@
     font-weight: 900;
   }
 }
+
+
+/* Confidence Column Styles - Add to MatchupAnalyzer.css */
+
+.confidence-column {
+  min-width: 120px;
+  text-align: center;
+}
+
+.sortable-column.confidence-column {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sortable-column.confidence-column:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.confidence-cell-compact {
+  min-width: 120px;
+  text-align: center;
+  padding: 8px;
+}
+
+.confidence-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.confidence-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.confidence-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.confidence-breakdown {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.confidence-component {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.7rem;
+  color: #6b7280;
+  cursor: help;
+  transition: color 0.2s ease;
+}
+
+.confidence-component:hover {
+  color: #1f2937;
+}
+
+.component-icon {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.component-value {
+  font-weight: 600;
+}
+
+/* Confidence level colors */
+.confidence-high {
+  color: #22c55e;
+}
+
+.confidence-medium {
+  color: #f59e0b;
+}
+
+.confidence-low {
+  color: #ef4444;
+}
+
+.confidence-very-low {
+  color: #991b1b;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .confidence-label {
+    color: #9ca3af;
+  }
+  
+  .confidence-component {
+    color: #9ca3af;
+  }
+  
+  .confidence-component:hover {
+    color: #f3f4f6;
+  }
+  
+  .confidence-breakdown {
+    border-top-color: #374151;
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .confidence-column {
+    min-width: 100px;
+  }
+  
+  .confidence-cell-compact {
+    min-width: 100px;
+  }
+  
+  .confidence-value {
+    font-size: 1rem;
+  }
+  
+  .confidence-breakdown {
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+  }
+  
+  .confidence-component {
+    font-size: 0.65rem;
+  }
+}
+
+/* Add low data indicator for HR column */
+.low-data-indicator {
+  font-size: 0.75rem;
+  margin-left: 4px;
+  cursor: help;
+  opacity: 0.8;
+}
+
+.low-data-indicator:hover {
+  opacity: 1;
+}
+
+/* Ensure proper alignment with new column */
+.enhanced-results-table th,
+.enhanced-results-table td {
+  vertical-align: middle;
+}
+
+/* Tooltip styles for confidence components */
+.confidence-component[title] {
+  position: relative;
+}
+
+.confidence-component[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1f2937;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  margin-bottom: 4px;
+  z-index: 10;
+}
+
+.confidence-component[title]:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: #1f2937;
+  margin-bottom: 0;
+  z-index: 10;
+}
