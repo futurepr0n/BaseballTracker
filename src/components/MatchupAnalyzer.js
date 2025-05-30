@@ -389,20 +389,79 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
           bValue = b.result.advantage;
           break;
         case 'hit':
-          aValue = getPotentialValue(a.result.hitPotential);
-          bValue = getPotentialValue(b.result.hitPotential);
+          // Sort by both rating and actual batting average
+          const aHitRating = a.result.hitPotential;
+          const bHitRating = b.result.hitPotential;
+          
+          // Get the actual batting averages
+          const aBA = parseFloat(a.result.details.predictedBA) || 0;
+          const bBA = parseFloat(b.result.details.predictedBA) || 0;
+          
+          // First sort by rating level
+          aValue = getPotentialValue(aHitRating) * 1000; // Multiply by 1000 to ensure rating takes precedence
+          bValue = getPotentialValue(bHitRating) * 1000;
+          
+          // Then add the batting average as a secondary sort within the same rating
+          aValue += aBA * 1000; // Scale up BA to make differences meaningful
+          bValue += bBA * 1000;
           break;
         case 'hr':
-          aValue = getPotentialValue(a.hrAnalysis?.potential || a.result.hrPotential);
-          bValue = getPotentialValue(b.hrAnalysis?.potential || b.result.hrPotential);
+          // Sort by both rating and actual HR percentage
+          const aRating = a.hrAnalysis?.potential || a.result.hrPotential;
+          const bRating = b.hrAnalysis?.potential || b.result.hrPotential;
+          
+          // Get the actual HR rates
+          const aHRRate = a.hrAnalysis?.metrics?.adjustedHRRate || 
+                         (parseFloat(a.result.details.predictedHR) || 0);
+          const bHRRate = b.hrAnalysis?.metrics?.adjustedHRRate || 
+                         (parseFloat(b.result.details.predictedHR) || 0);
+          
+          // First sort by rating level
+          aValue = getPotentialValue(aRating) * 1000; // Multiply by 1000 to ensure rating takes precedence
+          bValue = getPotentialValue(bRating) * 1000;
+          
+          // Then add the HR rate as a secondary sort within the same rating
+          aValue += aHRRate * 100; // Scale up HR rate to make differences meaningful
+          bValue += bHRRate * 100;
           break;
         case 'tb':
-          aValue = getPotentialValue(a.result.tbPotential);
-          bValue = getPotentialValue(b.result.tbPotential);
+          // Sort by both rating and actual slugging percentage
+          const aTBRating = a.result.tbPotential;
+          const bTBRating = b.result.tbPotential;
+          
+          // Get the actual slugging percentages
+          const aSLG = parseFloat(a.result.details.predictedSLG) || 0;
+          const bSLG = parseFloat(b.result.details.predictedSLG) || 0;
+          
+          // First sort by rating level
+          aValue = getPotentialValue(aTBRating) * 1000;
+          bValue = getPotentialValue(bTBRating) * 1000;
+          
+          // Then add the slugging percentage as secondary sort
+          aValue += aSLG * 1000;
+          bValue += bSLG * 1000;
           break;
         case 'k':
-          aValue = getPotentialValue(a.result.kPotential);
-          bValue = getPotentialValue(b.result.kPotential);
+          // Sort by both rating and actual strikeout rate
+          const aKRating = a.result.kPotential;
+          const bKRating = b.result.kPotential;
+          
+          // Get the actual strikeout rates
+          const aKRate = parseFloat(a.result.details.strikeoutRate) || 0;
+          const bKRate = parseFloat(b.result.details.strikeoutRate) || 0;
+          
+          // First sort by rating level (note: for K, Low is better, so we invert)
+          aValue = getPotentialValue(aKRating) * 1000;
+          bValue = getPotentialValue(bKRating) * 1000;
+          
+          // Then add the K rate as secondary sort
+          // For K rate, lower is better for batters, so we subtract instead of add
+          aValue += (1 - aKRate) * 100;
+          bValue += (1 - bKRate) * 100;
+          break;
+        case 'confidence':
+          aValue = calculateOverallConfidence(a);
+          bValue = calculateOverallConfidence(b);
           break;
         case 'batter':
           aValue = a.batter.name;
@@ -1064,7 +1123,12 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                   >
                     K {getSortIcon('k')}
                   </th>
-                  <th className="confidence-column">Confidence</th>
+                  <th 
+                    className="sortable-column confidence-column" 
+                    onClick={() => handleSort('confidence')}
+                  >
+                    Confidence {getSortIcon('confidence')}
+                  </th>
                   <th className="arsenal-column">Arsenal Analysis</th>
                 </tr>
               </thead>
@@ -1116,10 +1180,24 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                         <div className="advantage-label-compact">{result.result.advantageLabel}</div>
                       </td>
                       <td className={`potential-cell-compact potential-${result.result.hitPotential.toLowerCase()}`}>
-                        {result.result.hitPotential}
+                        <div className="hit-potential-display">
+                          <span className="hit-rating">{result.result.hitPotential}</span>
+                          <span className="hit-percentage">
+                            {result.result.details.predictedBA}
+                          </span>
+                        </div>
                       </td>
                       <td className={`potential-cell-compact potential-${(result.hrAnalysis?.potential || result.result.hrPotential).toLowerCase()}`}>
-                        {result.hrAnalysis?.potential || result.result.hrPotential}
+                        <div className="hr-potential-display">
+                          <span className="hr-rating">{result.hrAnalysis?.potential || result.result.hrPotential}</span>
+                          <span className="hr-percentage">
+                            {(() => {
+                              const hrRate = result.hrAnalysis?.metrics?.adjustedHRRate || 
+                                           parseFloat(result.result.details.predictedHR);
+                              return hrRate ? `${(hrRate * 100).toFixed(1)}%` : '';
+                            })()}
+                          </span>
+                        </div>
                         {result.hrAnalysis && result.hrAnalysis.confidence < 0.3 && (
                           <span className="low-data-indicator" title={`Based on ${result.hrAnalysis.metrics.totalPA} PA`}>
                             ⚠️
@@ -1127,10 +1205,20 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
                         )}
                       </td>
                       <td className={`potential-cell-compact potential-${result.result.tbPotential.toLowerCase()}`}>
-                        {result.result.tbPotential}
+                        <div className="tb-potential-display">
+                          <span className="tb-rating">{result.result.tbPotential}</span>
+                          <span className="tb-percentage">
+                            {result.result.details.predictedSLG}
+                          </span>
+                        </div>
                       </td>
                       <td className={`potential-cell-compact potential-${result.result.kPotential.toLowerCase()}`}>
-                        {result.result.kPotential}
+                        <div className="k-potential-display">
+                          <span className="k-rating">{result.result.kPotential}</span>
+                          <span className="k-percentage">
+                            {(parseFloat(result.result.details.strikeoutRate) * 100).toFixed(1)}%
+                          </span>
+                        </div>
                       </td>
                       <td className="confidence-cell-compact">
                         {(() => {

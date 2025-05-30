@@ -1834,6 +1834,43 @@
   opacity: 1;
 }
 
+/* Generic potential display styling */
+[class$="-potential-display"] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  line-height: 1.2;
+}
+
+[class$="-rating"] {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+[class$="-percentage"] {
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Specific overrides if needed */
+.hr-potential-display {
+  /* Inherits from generic */
+}
+
+.hit-potential-display {
+  /* Inherits from generic */
+}
+
+.tb-potential-display {
+  /* Inherits from generic */
+}
+
+.k-potential-display {
+  /* Inherits from generic */
+}
+
 /* Ensure proper alignment with new column */
 .enhanced-results-table th,
 .enhanced-results-table td {
