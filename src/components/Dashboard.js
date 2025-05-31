@@ -104,6 +104,10 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
   // Track which date's data we're showing
   const [dataDate, setDataDate] = useState(currentDate);
   const [dateStatus, setDateStatus] = useState('current'); // 'current', 'previous', or 'historical'
+
+  // Visit tracking state
+  const [visitCount, setVisitCount] = useState(0);
+  const [visitLoading, setVisitLoading] = useState(true);
   
   // Filter player data based on team selection
   const filteredPlayerData = useMemo(() => {
@@ -135,6 +139,19 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
       shouldIncludeGame(game)
     );
   }, [gameData, isFiltering, shouldIncludeGame]);
+
+
+  //Visitor Counter
+  useEffect(() => {
+    fetch('http://localhost:3001/visits', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).catch((error) => {
+      console.error('Visit counter failed:', error);
+    });
+  }, []);
 
   // Close any open tooltips when clicking outside
   useEffect(() => {
