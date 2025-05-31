@@ -70,36 +70,6 @@ const RecentUpdatesCard = ({
             ) : (
               <span>
                 <strong>{Number(visitCount || 0).toLocaleString()}</strong> total page loads
-                {/* Temporary test button - remove after debugging */}
-                <button 
-                  onClick={async () => {
-                    console.log('🧪 Manual test button clicked');
-                    try {
-                      const response = await fetch('https://visits.capping.pro/visits', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' }
-                      });
-                      const data = await response.json();
-                      console.log('🧪 Test response:', data);
-                      alert(`Test successful! Count: ${data.totalPageLoads}`);
-                    } catch (error) {
-                      console.error('🧪 Test failed:', error);
-                      alert(`Test failed: ${error.message}`);
-                    }
-                  }}
-                  style={{ 
-                    marginLeft: '10px', 
-                    padding: '2px 6px', 
-                    fontSize: '0.7rem',
-                    background: '#007bff',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '3px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Test
-                </button>
               </span>
             )}
           </div>
