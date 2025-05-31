@@ -75,7 +75,7 @@ const RecentUpdatesCard = ({
                   onClick={async () => {
                     console.log('🧪 Manual test button clicked');
                     try {
-                      const response = await fetch('http://localhost:3001/visits', {
+                      const response = await fetch('https://visits.capping.pro/visits', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' }
                       });

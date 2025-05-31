@@ -143,7 +143,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
 
   //Visitor Counter
   useEffect(() => {
-    fetch('http://localhost:3001/visits', {
+    fetch('https://visits.capping.pro/visits', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
