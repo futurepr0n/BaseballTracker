@@ -25,7 +25,6 @@ import ImprovedRateCard from './cards/ImprovedRateCard/ImprovedRateCard';
 import RecentHomersCard from './cards/RecentHomersCard/RecentHomersCard';
 import PerformanceCard from './cards/PerformanceCard/PerformanceCard';
 
-
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
 
 import { CurrentSeriesHitsCard, CurrentSeriesHRCard } from './cards/CurrentSeriesCards/CurrentSeriesCards';
@@ -38,13 +37,9 @@ import {
 
 import HitDroughtBounceBackCard from './cards/HitDroughtBounceBackCard/HitDroughtBounceBackCard';
 
-//import SlotMachineCard from './cards/SlotMachineCard/SlotMachineCard';
-
-
-
 /**
  * Dashboard component - Home page displaying summary of MLB data
- * Enhanced with team filtering capability
+ * Enhanced with team filtering capability and visit tracking
  */
 function Dashboard({ playerData, teamData, gameData, currentDate }) {
   // Get team filter context
@@ -105,6 +100,10 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
   const [dataDate, setDataDate] = useState(currentDate);
   const [dateStatus, setDateStatus] = useState('current'); // 'current', 'previous', or 'historical'
   
+  // Visit tracking state
+  const [visitCount, setVisitCount] = useState(0);
+  const [visitLoading, setVisitLoading] = useState(true);
+  
   // Filter player data based on team selection
   const filteredPlayerData = useMemo(() => {
     if (!isFiltering) return playerData;
@@ -155,6 +154,92 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
       document.removeEventListener('click', handleDocumentClick);
     };
   }, []);
+  
+  // Track visit on component mount
+  useEffect(() => {
+    const trackVisit = async () => {
+      console.log('🔄 Starting visit tracking...');
+      try {
+        setVisitLoading(true);
+        
+        console.log('📤 Making POST request to https://visits.capping.pro/visits');
+        // Record visit
+        const response = await fetch('https://visits.capping.pro/visits', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        console.log('📥 Response status:', response.status);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('📊 Response data:', data);
+          if (data.success) {
+            console.log('🔄 Setting visitCount to', data.totalPageLoads);
+            setVisitCount(data.totalPageLoads);
+            console.log(`📈 Page load tracked! Total loads: ${data.totalPageLoads}`);
+          } else {
+            console.warn('❌ API response success was false:', data);
+          }
+        } else {
+          console.warn('❌ Page load tracking server not responding, status:', response.status);
+          // Get current count even if increment failed
+          console.log('🔄 Trying to get current count...');
+          try {
+            const getResponse = await fetch('https://visits.capping.pro/visits');
+            console.log('📥 GET Response status:', getResponse.status);
+            if (getResponse.ok) {
+              const getData = await getResponse.json();
+              console.log('📊 Current count data:', getData);
+              if (getData.success) {
+                console.log('🔄 Setting visitCount from GET request:', getData.totalPageLoads);
+                setVisitCount(getData.totalPageLoads);
+              }
+            }
+          } catch (getError) {
+            console.error('❌ Failed to get current count:', getError);
+          }
+        }
+      } catch (error) {
+        console.error('❌ Page load tracking error:', error);
+        console.error('Error details - message:', error.message);
+        
+        // If POST fails, try to at least get the current count
+        console.log('🔄 POST failed, attempting to get current count...');
+        try {
+          const getResponse = await fetch('https://visits.capping.pro/visits');
+          if (getResponse.ok) {
+            const getData = await getResponse.json();
+            console.log('📊 Fallback count data:', getData);
+            if (getData.success) {
+              setVisitCount(getData.totalPageLoads);
+              console.log(`📊 Retrieved current count: ${getData.totalPageLoads}`);
+            }
+          }
+        } catch (fallbackError) {
+          console.error('❌ Fallback GET also failed:', fallbackError);
+        }
+      } finally {
+        console.log('🔚 Setting visitLoading to false');
+        setVisitLoading(false);
+        console.log('✅ Visit tracking completed');
+      }
+    };
+    
+    console.log('⏰ Setting up visit tracking timer...');
+    // Track page load after a small delay to ensure page is fully loaded
+    const timer = setTimeout(() => {
+      console.log('⏰ Timer fired, executing trackVisit...');
+      trackVisit();
+    }, 1000);
+    
+    return () => {
+      console.log('🧹 Cleaning up visit tracking timer');
+      clearTimeout(timer);
+    };
+  }, []); // Only run once on mount
   
   // Load HR predictions with team filtering
   useEffect(() => {
@@ -991,47 +1076,45 @@ const noFilteredData = isFiltering &&
             teams={teamData} 
           />
           
-
-
           <OpponentMatchupHitsCard 
             gameData={filteredGameData}
              currentDate={currentDate}
             teams={teamData}
           />
 
-
           <OpponentMatchupHRCard 
-  gameData={filteredGameData}
-  currentDate={currentDate}
-  teams={teamData}
-/>
+            gameData={filteredGameData}
+            currentDate={currentDate}
+            teams={teamData}
+          />
 
-<CurrentSeriesHitsCard 
-  gameData={filteredGameData}
-  currentDate={currentDate}
-  teams={teamData}
-/>
-<CurrentSeriesHRCard 
-  gameData={filteredGameData}
-  currentDate={currentDate}
-  teams={teamData}
-/>
-<TimeSlotHitsCard 
-  gameData={filteredGameData}
-  currentDate={currentDate}
-  teams={teamData}
-/>
-<TimeSlotHRCard 
-  gameData={filteredGameData}
-  currentDate={currentDate}
-  teams={teamData}
-/>
+          <CurrentSeriesHitsCard 
+            gameData={filteredGameData}
+            currentDate={currentDate}
+            teams={teamData}
+          />
+          <CurrentSeriesHRCard 
+            gameData={filteredGameData}
+            currentDate={currentDate}
+            teams={teamData}
+          />
+          <TimeSlotHitsCard 
+            gameData={filteredGameData}
+            currentDate={currentDate}
+            teams={teamData}
+          />
+          <TimeSlotHRCard 
+            gameData={filteredGameData}
+            currentDate={currentDate}
+            teams={teamData}
+          />
 
-<HitDroughtBounceBackCard 
-  gameData={filteredGameData}
-  currentDate={currentDate}
-  teams={teamData}
-/>
+          <HitDroughtBounceBackCard 
+            gameData={filteredGameData}
+            currentDate={currentDate}
+            teams={teamData}
+          />
+          
           {/* Recent Updates Card */}
           <RecentUpdatesCard 
             currentDate={currentDate}
@@ -1039,18 +1122,11 @@ const noFilteredData = isFiltering &&
             dateStatus={dateStatus}
             topPerformers={topPerformers}
             rollingStats={rollingStats}
+            visitCount={visitCount}
+            visitLoading={visitLoading}
           />
 
-<div />
-      {/* 
-< SlotMachineCard 
-  playerData={filteredPlayerData}
-  teamData={teamData}
-  rollingStats={rollingStats}
-  topPerformers={topPerformers}
-  hitStreakData={hitStreakData}
-  playersWithHomeRunPrediction={playersWithHomeRunPrediction}
-/> */}
+          <div />
         </div>
       )}
     </div>

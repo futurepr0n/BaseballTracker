@@ -366,7 +366,6 @@ export const fetchGameData = async (dateStr) => {
 
   try {
     const [year, month, day] = dateStr.split('-');
-// Create date with explicit year, month (0-based), day
     const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
     const monthName = date.toLocaleString('default', { month: 'long' }).toLowerCase();
     const filePath = `/data/${year}/${monthName}/${monthName}_${day}_${year}.json`;
@@ -375,10 +374,8 @@ export const fetchGameData = async (dateStr) => {
     const response = await fetch(filePath);
 
     if (!response.ok) {
-      // If the specific date's file is not found, return default empty games.
-      // Do NOT fall back to a different date for game schedule.
       console.warn(`Failed to load game data file for ${dateStr}. Returning empty game list.`);
-      dataCache.games[dateStr] = DEFAULT_GAME_DATA; // Cache the empty result for this date
+      dataCache.games[dateStr] = DEFAULT_GAME_DATA;
       return DEFAULT_GAME_DATA;
     }
 
@@ -466,49 +463,85 @@ export const clearCache = () => {
   dataCache.multiGameData = {};
 };
 
-
 // Enhanced dataService.js functions for matchup analysis
 
 /**
- * Analyze player performance vs specific opponents
+ * ENHANCED: Analyze player performance vs specific opponents
+ * Now properly identifies actual games between teams by loading game data
  * @param {string} playerName - Player name
  * @param {string} playerTeam - Player's team
  * @param {string} opponentTeam - Opponent team
  * @param {Object} dateRangeData - Historical data
  * @returns {Object} Performance stats vs opponent
  */
-export const analyzePlayerVsOpponent = (playerName, playerTeam, opponentTeam, dateRangeData) => {
+export const analyzePlayerVsOpponent = async (playerName, playerTeam, opponentTeam, dateRangeData) => {
   const gamesVsOpponent = [];
   const sortedDates = Object.keys(dateRangeData).sort();
   
-  // Look through each date to find games where these teams played
-  sortedDates.forEach(dateStr => {
+  console.log(`[analyzePlayerVsOpponent] Looking for ${playerName} (${playerTeam}) vs ${opponentTeam}`);
+  
+  // For each date, we need to check if these teams actually played each other
+  for (const dateStr of sortedDates) {
     const playersForDate = dateRangeData[dateStr];
     
-    // Check if both teams have players in this date's data (indicating they played)
-    const hasPlayerTeam = playersForDate.some(p => p.team === playerTeam);
-    const hasOpponentTeam = playersForDate.some(p => p.team === opponentTeam);
+    // First, verify both teams have players in the data
+    const playerTeamPlayers = playersForDate.filter(p => p.team === playerTeam);
+    const opponentTeamPlayers = playersForDate.filter(p => p.team === opponentTeam);
     
-    if (hasPlayerTeam && hasOpponentTeam) {
-      // Find our specific player's performance in this game
-      const playerData = playersForDate.find(p => 
-        p.name === playerName && p.team === playerTeam
+    if (playerTeamPlayers.length === 0 || opponentTeamPlayers.length === 0) {
+      continue; // One or both teams didn't play on this date
+    }
+    
+    // Load the actual game data for this date to verify matchup
+    let actuallyPlayed = false;
+    try {
+      const gameDataForDate = await fetchGameData(dateStr);
+      
+      // Check if there's a game between these two teams
+      actuallyPlayed = gameDataForDate.some(game => 
+        (game.homeTeam === playerTeam && game.awayTeam === opponentTeam) ||
+        (game.homeTeam === opponentTeam && game.awayTeam === playerTeam)
       );
       
-      if (playerData && playerData.H !== 'DNP') {
-        gamesVsOpponent.push({
-          date: dateStr,
-          hits: Number(playerData.H) || 0,
-          homeRuns: Number(playerData.HR) || 0,
-          atBats: Number(playerData.AB) || 0,
-          rbi: Number(playerData.RBI) || 0,
-          runs: Number(playerData.R) || 0
+      if (!actuallyPlayed) {
+        // Also check for completed games that might have different status
+        actuallyPlayed = gameDataForDate.some(game => {
+          const hasTeams = (game.homeTeam === playerTeam && game.awayTeam === opponentTeam) ||
+                          (game.homeTeam === opponentTeam && game.awayTeam === playerTeam);
+          const isCompleted = game.status && (game.status.includes('Final') || game.status.includes('Completed'));
+          return hasTeams && isCompleted;
         });
       }
+    } catch (error) {
+      console.log(`[analyzePlayerVsOpponent] Could not load game data for ${dateStr}, using player count heuristic`);
+      // Fallback: if we can't load game data, use a very strict heuristic
+      // Both teams must have at least 8 players with stats (stronger indicator of actual game)
+      actuallyPlayed = playerTeamPlayers.length >= 8 && opponentTeamPlayers.length >= 8;
     }
-  });
+    
+    if (!actuallyPlayed) {
+      console.log(`[analyzePlayerVsOpponent] ${dateStr}: Teams did not play each other`);
+      continue;
+    }
+    
+    // Now check if our specific player participated in this game
+    const playerData = playerTeamPlayers.find(p => p.name === playerName);
+    
+    if (playerData && playerData.H !== 'DNP') {
+      console.log(`[analyzePlayerVsOpponent] Found game on ${dateStr}: ${playerName} played vs ${opponentTeam}`);
+      gamesVsOpponent.push({
+        date: dateStr,
+        hits: Number(playerData.H) || 0,
+        homeRuns: Number(playerData.HR) || 0,
+        atBats: Number(playerData.AB) || 0,
+        rbi: Number(playerData.RBI) || 0,
+        runs: Number(playerData.R) || 0
+      });
+    }
+  }
   
   if (gamesVsOpponent.length === 0) {
+    console.log(`[analyzePlayerVsOpponent] No games found for ${playerName} vs ${opponentTeam}`);
     return null;
   }
   
@@ -519,6 +552,8 @@ export const analyzePlayerVsOpponent = (playerName, playerTeam, opponentTeam, da
   const totalAB = gamesVsOpponent.reduce((sum, game) => sum + game.atBats, 0);
   const totalRBI = gamesVsOpponent.reduce((sum, game) => sum + game.rbi, 0);
   const totalRuns = gamesVsOpponent.reduce((sum, game) => sum + game.runs, 0);
+  
+  console.log(`[analyzePlayerVsOpponent] Found ${totalGames} games for ${playerName} vs ${opponentTeam}: ${totalHits}H, ${totalHRs}HR in ${totalAB}AB`);
   
   return {
     playerName,
@@ -671,7 +706,8 @@ export const classifyTimeSlot = (gameDate) => {
 };
 
 /**
- * Generate comprehensive matchup analysis for dashboard
+ * ENHANCED: Generate comprehensive matchup analysis for dashboard
+ * Now uses improved opponent detection logic with actual game verification
  * @param {Array} gameData - Today's games
  * @param {Object} dateRangeData - Historical player data
  * @param {Array} rosterData - Current roster
@@ -690,6 +726,8 @@ export const generateMatchupAnalysis = async (gameData, dateRangeData, rosterDat
   const currentDate = new Date();
   const currentTimeSlot = classifyTimeSlot(currentDate);
   
+  console.log(`[generateMatchupAnalysis] Analyzing ${activePlayers.length} active players for ${todaysMatchups.length} matchups`);
+  
   // Analyze each active player
   for (const player of activePlayers) {
     // Find which opponent this player is facing today
@@ -701,8 +739,10 @@ export const generateMatchupAnalysis = async (gameData, dateRangeData, rosterDat
       const opponent = playerMatchup.homeTeam === player.team ? 
         playerMatchup.awayTeam : playerMatchup.homeTeam;
       
-      // Analyze vs opponent
-      const vsOpponentStats = analyzePlayerVsOpponent(
+      console.log(`[generateMatchupAnalysis] Analyzing ${player.name} (${player.team}) vs ${opponent}`);
+      
+      // Analyze vs opponent with improved logic (now async)
+      const vsOpponentStats = await analyzePlayerVsOpponent(
         player.name, 
         player.team, 
         opponent, 
@@ -710,6 +750,7 @@ export const generateMatchupAnalysis = async (gameData, dateRangeData, rosterDat
       );
       
       if (vsOpponentStats && vsOpponentStats.gamesVsOpponent >= 3) {
+        console.log(`[generateMatchupAnalysis] Found valid matchup data: ${vsOpponentStats.gamesVsOpponent} games`);
         opponentMatchupHits.push(vsOpponentStats);
         if (vsOpponentStats.totalHRs > 0) {
           opponentMatchupHRs.push(vsOpponentStats);
@@ -732,6 +773,8 @@ export const generateMatchupAnalysis = async (gameData, dateRangeData, rosterDat
       }
     }
   }
+  
+  console.log(`[generateMatchupAnalysis] Found ${opponentMatchupHits.length} hit matchups and ${opponentMatchupHRs.length} HR matchups`);
   
   return {
     opponentMatchupHits: opponentMatchupHits
@@ -860,7 +903,6 @@ const estimateGameTime = (gameDate, dayOfWeek) => {
  * @param {Object} dateRangeData - Historical player data
  * @returns {Array} Players with stats in matching time slots
  */
-// Updated findPlayersInTimeSlot to handle missing time data
 export const findPlayersInTimeSlot = (targetDayOfWeek, targetTimeBlock, dateRangeData) => {
   const playerStats = new Map();
   
@@ -970,4 +1012,3 @@ export const getCurrentTimeSlot = (gameData, currentDate) => {
     displayText: `${timeSlot.dayOfWeek} games at ${timeSlot.timeBlock}`
   };
 };
-

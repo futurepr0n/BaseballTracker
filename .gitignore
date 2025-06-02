@@ -1,6 +1,5 @@
 node_modules
 
-public/data/
 public/data/logos/
 public/data/2025/
 public/data/predictions/
@@ -30,19 +29,3 @@ public/data/stats/pitcher_exit_velocity_2022.csv
 public/data/stats/pitcher_exit_velocity_2023.csv
 public/data/stats/pitcher_exit_velocity_2024.csv
 public/data/stats/pitcher_exit_velocity_2025.csv
-public/data/injuries/mlb_injuries_2025-05-25.json
-public/data/injuries/mlb_injuries_2025-05-27.json
-public/data/injuries/mlb_injuries_2025-05-28.json
-public/data/injuries/mlb_injuries_2025-05-29.json
-public/data/injuries/mlb_injuries_2025-05-30.json
-public/data/injuries/mlb_injuries_2025-05-31.json
-public/data/injuries/rosters_backup_2025-05-25_23-28.json
-public/data/injuries/rosters_backup_2025-05-25_23-46.json
-public/data/injuries/rosters_backup_2025-05-27_00-06.json
-public/data/injuries/rosters_backup_2025-05-27_23-41.json
-public/data/injuries/rosters_backup_2025-05-28_08-46.json
-public/data/injuries/rosters_backup_2025-05-29_08-24.json
-public/data/injuries/rosters_backup_2025-05-30_08-12.json
-public/data/injuries/rosters_backup_2025-05-31_08-59.json
-public/data/odds/mlb-hr-odds-only.csv
-public/data/odds/mlb-hr-odds.csv

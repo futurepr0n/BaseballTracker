@@ -17,7 +17,7 @@ echo "====================================="
 
 # 1. Generate all data (HR predictions and player performance)
 echo "Generating data files..."
-node src/services/generateHRPredictions.js $DATE
+node src/services/generateHRPredictions3.js $DATE
 
 # Check if generation was successful
 if [ $? -ne 0 ]; then
