@@ -30,12 +30,15 @@ import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
 import { CurrentSeriesHitsCard, CurrentSeriesHRCard } from './cards/CurrentSeriesCards/CurrentSeriesCards';
 import { TimeSlotHitsCard, TimeSlotHRCard } from './cards/TimeSlotHitsCard/TimeSlotHitsCard';
 
+
+import MostHomeRunsAtHomeCard from './cards/MostHomeRunsAtHomeCard/MostHomeRunsAtHomeCard'; // ADD THIS LINE
 import { 
   OpponentMatchupHitsCard,
   OpponentMatchupHRCard
 } from './cards/OpponentMatchupHitsCard/OpponentMatchupHitsCard';
 
 import HitDroughtBounceBackCard from './cards/HitDroughtBounceBackCard/HitDroughtBounceBackCard';
+
 
 /**
  * Dashboard component - Home page displaying summary of MLB data
@@ -103,6 +106,38 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
   // Visit tracking state
   const [visitCount, setVisitCount] = useState(0);
   const [visitLoading, setVisitLoading] = useState(true);
+
+  const [stadiumData, setStadiumData] = useState(null);
+  const [stadiumLoading, setStadiumLoading] = useState(true);
+
+    useEffect(() => {
+    const loadStadiumData = async () => {
+      try {
+        setStadiumLoading(true);
+        
+        console.log('Loading stadium HR analysis data...');
+        
+        // Load the stadium analysis file
+        const response = await fetch('/data/stadium/stadium_hr_analysis.json');
+        
+        if (!response.ok) {
+          console.warn('No stadium HR analysis data found');
+          setStadiumData(null);
+        } else {
+          const data = await response.json();
+          console.log('Stadium data loaded:', data);
+          setStadiumData(data);
+        }
+      } catch (error) {
+        console.error('Error loading stadium data:', error);
+        setStadiumData(null);
+      } finally {
+        setStadiumLoading(false);
+      }
+    };
+    
+    loadStadiumData();
+  }, [currentDate]);
   
   // Filter player data based on team selection
   const filteredPlayerData = useMemo(() => {
@@ -134,6 +169,9 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
       shouldIncludeGame(game)
     );
   }, [gameData, isFiltering, shouldIncludeGame]);
+
+
+  
 
   // Close any open tooltips when clicking outside
   useEffect(() => {
@@ -897,7 +935,8 @@ useEffect(() => {
 const isLoadingAnyData = statsLoading || 
                          predictionLoading || 
                          additionalStatsLoading || 
-                         matchupsLoading;
+                         matchupsLoading||
+                         stadiumLoading;
   
 const noFilteredData = isFiltering && 
                       !isLoadingAnyData && 
@@ -1075,6 +1114,12 @@ const noFilteredData = isFiltering &&
             currentDate={currentDate}
             teams={teamData} 
           />
+
+        <MostHomeRunsAtHomeCard 
+          stadiumData={stadiumData}
+          isLoading={stadiumLoading}
+          teams={teamData} 
+        />
           
           <OpponentMatchupHitsCard 
             gameData={filteredGameData}
@@ -1108,6 +1153,8 @@ const noFilteredData = isFiltering &&
             currentDate={currentDate}
             teams={teamData}
           />
+
+
 
           <HitDroughtBounceBackCard 
             gameData={filteredGameData}
