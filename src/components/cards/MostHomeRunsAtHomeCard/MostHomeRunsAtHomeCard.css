@@ -1,0 +1,286 @@
+/* src/components/cards/MostHomeRunsAtHome/MostHomeRunsAtHome.css */
+
+.most-home-runs-at-home-card {
+  grid-column: span 1;
+  background-color: white;
+}
+
+/* Stadium Summary Stats */
+.stadium-summary {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  text-align: center;
+}
+
+.summary-stats .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.summary-stats .stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0056b3;
+}
+
+.summary-stats .stat-label {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* Stadium List Styling */
+.stadium-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.stadium-item {
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.2s ease;
+}
+
+.stadium-item:last-child {
+  border-bottom: none;
+}
+
+.stadium-item:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Stadium Rank Styling */
+.stadium-rank {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.stadium-rank .rank-logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  object-fit: cover;
+  opacity: 0.7;
+}
+
+.stadium-rank .rank-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0.3;
+}
+
+.stadium-rank .rank-number {
+  position: relative;
+  z-index: 10;
+  color: white;
+  font-size: 1.125rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  line-height: 1;
+}
+
+/* Stadium Info Styling */
+.stadium-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  margin-right: 10px;
+}
+
+.stadium-name {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.stadium-team {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+}
+
+/* Stadium Stats Styling */
+.stadium-stats {
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+  align-items: flex-end;
+  line-height: 1.2;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.stadium-stats .stat-highlight {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #0056b3;
+  margin-bottom: 2px;
+}
+
+.stadium-stats small {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Enhanced background logo */
+.stadium-item .team-logo-bg {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 66%;
+  opacity: 0.05;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  transform: translate(20%, -10%) scale(2.2);
+  object-fit: cover;
+  object-position: center;
+}
+
+.stadium-item:hover .team-logo-bg {
+  opacity: 0.1;
+}
+
+/* Home vs Away Analysis */
+.home-away-analysis {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+}
+
+.home-away-analysis h4 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.analysis-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.analysis-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.analysis-label {
+  color: #666;
+}
+
+.analysis-value {
+  font-weight: 600;
+  color: #333;
+}
+
+.analysis-value.positive {
+  color: #22c55e;
+}
+
+.analysis-value.negative {
+  color: #ef4444;
+}
+
+/* Highlight top performers */
+.stadium-item:nth-child(1) .stat-highlight {
+  color: #dc2626;
+  font-size: 1.15rem;
+}
+
+.stadium-item:nth-child(2) .stat-highlight {
+  color: #ea580c;
+  font-size: 1.15rem;
+}
+
+.stadium-item:nth-child(3) .stat-highlight {
+  color: #d97706;
+  font-size: 1.15rem;
+}
+
+/* Loading & No Data States */
+.most-home-runs-at-home-card .loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.most-home-runs-at-home-card .no-data {
+  color: #888;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .summary-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .summary-stats .stat-value {
+    font-size: 1.3rem;
+  }
+  
+  .stadium-item {
+    padding: 10px 5px;
+  }
+  
+  .stadium-rank {
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
+  }
+  
+  .stadium-rank .rank-number {
+    font-size: 1rem;
+  }
+  
+  .stadium-name {
+    font-size: 0.9rem;
+  }
+  
+  .stadium-stats {
+    min-width: 100px;
+  }
+  
+  .analysis-stats {
+    font-size: 0.85rem;
+  }
+}
