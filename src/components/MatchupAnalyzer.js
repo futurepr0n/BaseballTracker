@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, Fragment } from 'react';
+import React, { useState, useEffect, useCallback, Fragment, useMemo } from 'react';
 import './MatchupAnalyzer.css';
 import { fetchRosterData, fetchPlayerDataForDateRange } from '../services/dataService';
 import { createEnhancedMatchupAnalyzer, analyzeEnhancedMatchup } from '../services/EnhancedMatchupAnalysis';
@@ -67,6 +67,42 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     fetchPlayerDataForDateRange,
     rosterData
   };
+
+  // Team mapping helper function to handle abbreviation mismatches
+  const mapTeamAbbreviation = useCallback((team) => {
+    const teamMappings = {
+      'ATH': 'OAK',  // Athletics
+      'CWS': 'CHW',  // White Sox  
+      'LAD': 'LA',   // Dodgers
+      'NYM': 'NYN',  // Mets
+      'NYY': 'NY',   // Yankees
+      'SD': 'SDN',   // Padres
+      'SF': 'SFN',   // Giants
+      'TB': 'TBR',   // Rays
+      'WSH': 'WAS',  // Nationals
+      // Reverse mappings
+      'OAK': 'ATH',
+      'CHW': 'CWS', 
+      'LA': 'LAD',
+      'NYN': 'NYM',
+      'NY': 'NYY',
+      'SDN': 'SD',
+      'SFN': 'SF',
+      'TBR': 'TB',
+      'WAS': 'WSH'
+    };
+    
+    return teamMappings[team] || team;
+  }, []);
+
+  // Normalize roster data with team mappings
+  const normalizedRosterData = useMemo(() => {
+    return rosterData.map(player => ({
+      ...player,
+      originalTeam: player.team,
+      team: mapTeamAbbreviation(player.team)
+    }));
+  }, [rosterData, mapTeamAbbreviation]);
   
   // Load roster data when component mounts
   useEffect(() => {
@@ -215,16 +251,16 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
 
   // Create enhanced analyzer when data is loaded AND when activeYears change
   useEffect(() => {
-    if (hitterData.length > 0 && pitcherData.length > 0 && rosterData.length > 0 && activeYears.length > 0) {
+    if (hitterData.length > 0 && pitcherData.length > 0 && normalizedRosterData.length > 0 && activeYears.length > 0) {
       console.log('Creating enhanced matchup analyzer with years:', activeYears);
-      const analyzer = createEnhancedMatchupAnalyzer(hitterData, pitcherData, rosterData, activeYears);
+      const analyzer = createEnhancedMatchupAnalyzer(hitterData, pitcherData, normalizedRosterData, activeYears);
       setMatchupAnalyzer(analyzer);
       
       console.log('Creating arsenal analyzer with years:', activeYears);
       const arsenalAnalyzer = createArsenalAnalyzer(hitterData, pitcherData, activeYears);
       setArsenalAnalyzer(arsenalAnalyzer);
     }
-  }, [hitterData, pitcherData, rosterData, activeYears]);
+  }, [hitterData, pitcherData, normalizedRosterData, activeYears]);
 
   // Auto re-run analysis when analyzer updates (due to year changes)
   useEffect(() => {
@@ -301,30 +337,36 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
 
   // Get all available pitchers for a team
   const getPitchersForTeam = useCallback((teamCode) => {
-    if (!rosterData || !teamCode) return [];
+    if (!normalizedRosterData || !teamCode) return [];
     
-    return rosterData
-      .filter(player => 
-        player.team === teamCode && 
-        player.type === 'pitcher'
-      )
-      .map(pitcher => ({
-        value: `${pitcher.name}-${pitcher.team}`,
-        label: `${pitcher.name}${pitcher.throwingArm || pitcher.ph ? ` (${pitcher.throwingArm || pitcher.ph})` : ''}`,
-        data: pitcher
-      }));
-  }, [rosterData]);
+    console.log(`[getPitchersForTeam] Looking for pitchers for team: ${teamCode}`);
+    console.log(`[getPitchersForTeam] Mapped team code: ${mapTeamAbbreviation(teamCode)}`);
+    
+    // Try both original and mapped team codes
+    const originalTeamPitchers = normalizedRosterData.filter(player => 
+      (player.originalTeam === teamCode || player.team === teamCode) && 
+      player.type === 'pitcher'
+    );
+    
+    console.log(`[getPitchersForTeam] Found ${originalTeamPitchers.length} pitchers`);
+    
+    return originalTeamPitchers.map(pitcher => ({
+      value: `${pitcher.name}-${pitcher.originalTeam || pitcher.team}`, // Use original team for the key
+      label: `${pitcher.name}${pitcher.throwingArm || pitcher.ph ? ` (${pitcher.throwingArm || pitcher.ph})` : ''}`,
+      data: pitcher
+    }));
+  }, [normalizedRosterData, mapTeamAbbreviation]);
   
   // Get all batters for a team
   const getBattersForTeam = useCallback((teamCode) => {
-    if (!rosterData || !teamCode) return [];
+    if (!normalizedRosterData || !teamCode) return [];
     
-    return rosterData
+    return normalizedRosterData
       .filter(player => 
-        player.team === teamCode && 
+        (player.originalTeam === teamCode || player.team === teamCode) && 
         player.type === 'hitter'
       );
-  }, [rosterData]);
+  }, [normalizedRosterData]);
 
   // Toggle game selection
   const handleGameSelect = (gameIndex) => {
@@ -353,16 +395,46 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
     setExpandedArsenal(new Set());
   };
 
-  // Get pitcher by ID (name-team format)
+  // Get pitcher by ID (name-team format) with enhanced debugging
   const getPitcherById = (pitcherId) => {
-    if (!pitcherId || !rosterData.length) return null;
+    console.log('getPitcherById called with:', pitcherId);
+    console.log('normalizedRosterData length:', normalizedRosterData?.length || 0);
+    
+    if (!pitcherId || !normalizedRosterData.length) {
+      console.log('Early return: missing pitcherId or normalizedRosterData');
+      return null;
+    }
     
     const [pitcherName, pitcherTeam] = pitcherId.split('-');
-    return rosterData.find(p => 
-      p.name === pitcherName && 
-      p.team === pitcherTeam && 
-      p.type === 'pitcher'
-    );
+    console.log('Looking for pitcher:', { pitcherName, pitcherTeam });
+    
+    const found = normalizedRosterData.find(p => {
+      const nameMatch = p.name === pitcherName;
+      const teamMatch = p.originalTeam === pitcherTeam || p.team === pitcherTeam;
+      const typeMatch = p.type === 'pitcher' || p.type === 'Pitcher';
+      
+      if (nameMatch && (p.originalTeam === pitcherTeam || p.team === pitcherTeam)) {
+        console.log('Found player but checking type:', {
+          name: p.name,
+          originalTeam: p.originalTeam,
+          team: p.team,
+          type: p.type,
+          typeMatch
+        });
+      }
+      
+      return nameMatch && teamMatch && typeMatch;
+    });
+    
+    if (!found) {
+      console.log('Pitcher not found. Available pitchers for team:', 
+        normalizedRosterData.filter(p => (p.originalTeam === pitcherTeam || p.team === pitcherTeam) && 
+                                    (p.type === 'pitcher' || p.type === 'Pitcher'))
+                          .map(p => ({ name: p.name, type: p.type, originalTeam: p.originalTeam, team: p.team }))
+      );
+    }
+    
+    return found || null;
   };
 
   // Sorting functionality
@@ -567,7 +639,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
           const awayBatters = getBattersForTeam(game.awayTeam);
           console.log(`Found ${awayBatters.length} away batters`);
           
-          const pitcherKey = `${homePitcher.name}-${homePitcher.team}`;
+          const pitcherKey = `${homePitcher.name}-${homePitcher.originalTeam || homePitcher.team}`;
           uniquePitchers.set(pitcherKey, homePitcher);
           pitcherToOpposingHitters.set(pitcherKey, awayBatters);
           
@@ -581,6 +653,8 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
               pitcherKey
             });
           });
+        } else {
+          console.error(`Could not find pitcher with ID: ${homePitcherId}`);
         }
       }
       
@@ -593,7 +667,7 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
           const homeBatters = getBattersForTeam(game.homeTeam);
           console.log(`Found ${homeBatters.length} home batters`);
           
-          const pitcherKey = `${awayPitcher.name}-${awayPitcher.team}`;
+          const pitcherKey = `${awayPitcher.name}-${awayPitcher.originalTeam || awayPitcher.team}`;
           uniquePitchers.set(pitcherKey, awayPitcher);
           pitcherToOpposingHitters.set(pitcherKey, homeBatters);
           
@@ -607,6 +681,8 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
               pitcherKey
             });
           });
+        } else {
+          console.error(`Could not find pitcher with ID: ${awayPitcherId}`);
         }
       }
     }
@@ -638,7 +714,11 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
         );
         
         newArsenalAnalyses.set(pitcherKey, arsenalAnalysis);
-        console.log(`Arsenal analysis complete for ${pitcher.name}: ${arsenalAnalysis.pitcher.arsenal.length} pitch types`);
+        if (arsenalAnalysis) {
+          console.log(`Arsenal analysis complete for ${pitcher.name}: ${arsenalAnalysis.pitcher.arsenal.length} pitch types`);
+        } else {
+          console.log(`Arsenal analysis failed for ${pitcher.name}`);
+        }
       }
       
       setArsenalAnalyses(newArsenalAnalyses);
@@ -646,60 +726,85 @@ function MatchupAnalyzer({ gameData, playerData, teamData, currentDate }) {
       
       // Process each matchup using enhanced analysis with HR analysis
       const results = await Promise.all(matchups.map(async matchup => {
-        const analysis = matchupAnalyzer.analyzeComprehensiveMatchup(matchup.batter, matchup.pitcher);
-        
-        // Add arsenal-specific insights to the result
-        const arsenalAnalysis = newArsenalAnalyses.get(matchup.pitcherKey);
-        let arsenalInsights = null;
-        
-        if (arsenalAnalysis) {
-          const hitterArsenalAnalysis = arsenalAnalysis.hitters.find(h => h.hitter === matchup.batter.name);
-          arsenalInsights = hitterArsenalAnalysis ? {
-            overallAdvantage: hitterArsenalAnalysis.overallAssessment.overallAdvantage,
-            keyStrengths: hitterArsenalAnalysis.overallAssessment.keyStrengths,
-            keyWeaknesses: hitterArsenalAnalysis.overallAssessment.keyWeaknesses,
-            pitchMatchups: hitterArsenalAnalysis.pitchMatchups,
-            confidence: hitterArsenalAnalysis.confidence
-          } : null;
-        }
-        
-        // NEW: Run enhanced HR analysis
-        let hrAnalysis = null;
         try {
-          console.log(`Running HR analysis for ${matchup.batter.name} vs ${matchup.pitcher.name}`);
-          hrAnalysis = await analyzeHRMatchup(
-            matchup.batter,
-            matchup.pitcher,
-            dataService,
-            {
-              hitterCSV: hitterData,
-              pitcherCSV: pitcherData,
-              hitterExitVelo: exitVelocityData?.hitter || [],
-              pitcherExitVelo: exitVelocityData?.pitcher || [],
-              rosterData: rosterData,
-              confidenceK: 100 // Adjust based on your needs
-            }
-          );
+          // Add null check here
+          if (!matchup.pitcher || !matchup.batter) {
+            console.error('Invalid matchup:', {
+              pitcher: matchup.pitcher,
+              batter: matchup.batter,
+              pitcherKey: matchup.pitcherKey
+            });
+            return null;
+          }
+          
+          const analysis = matchupAnalyzer.analyzeComprehensiveMatchup(matchup.batter, matchup.pitcher);
+          
+          // Add arsenal-specific insights to the result
+          const arsenalAnalysis = newArsenalAnalyses.get(matchup.pitcherKey);
+          let arsenalInsights = null;
+          
+          if (arsenalAnalysis) {
+            const hitterArsenalAnalysis = arsenalAnalysis.hitters.find(h => h.hitter === matchup.batter.name);
+            arsenalInsights = hitterArsenalAnalysis ? {
+              overallAdvantage: hitterArsenalAnalysis.overallAssessment.overallAdvantage,
+              keyStrengths: hitterArsenalAnalysis.overallAssessment.keyStrengths,
+              keyWeaknesses: hitterArsenalAnalysis.overallAssessment.keyWeaknesses,
+              pitchMatchups: hitterArsenalAnalysis.pitchMatchups,
+              confidence: hitterArsenalAnalysis.confidence
+            } : null;
+          }
+          
+          // NEW: Run enhanced HR analysis
+          let hrAnalysis = null;
+          try {
+            console.log(`Running HR analysis for ${matchup.batter.name} vs ${matchup.pitcher.name}`);
+            hrAnalysis = await analyzeHRMatchup(
+              matchup.batter,
+              matchup.pitcher,
+              dataService,
+              {
+                hitterCSV: hitterData,
+                pitcherCSV: pitcherData,
+                hitterExitVelo: exitVelocityData?.hitter || [],
+                pitcherExitVelo: exitVelocityData?.pitcher || [],
+                rosterData: normalizedRosterData,
+                confidenceK: 100 // Adjust based on your needs
+              }
+            );
+          } catch (error) {
+            console.warn(`HR analysis failed for ${matchup.batter.name}:`, error);
+          }
+          
+          return {
+            ...matchup,
+            result: analysis,
+            arsenalInsights,
+            hrAnalysis, // Add HR analysis to result
+            explanation: generateEnhancedExplanation(analysis, matchup.batter, matchup.pitcher, arsenalInsights, hrAnalysis)
+          };
         } catch (error) {
-          console.warn(`HR analysis failed for ${matchup.batter.name}:`, error);
+          console.error(`Error processing individual matchup:`, error);
+          console.error('Matchup details:', matchup);
+          return null;
         }
-        
-        return {
-          ...matchup,
-          result: analysis,
-          arsenalInsights,
-          hrAnalysis, // Add HR analysis to result
-          explanation: generateEnhancedExplanation(analysis, matchup.batter, matchup.pitcher, arsenalInsights, hrAnalysis)
-        };
       }));
       
-      setAnalysisResults(results);
+      // Filter out null results
+      const validResults = results.filter(result => result !== null);
+      setAnalysisResults(validResults);
+      
     } catch (error) {
       console.error("Error analyzing matchups:", error);
+      console.error("Analysis state:", {
+        matchupsCount: matchups.length,
+        normalizedRosterDataLength: normalizedRosterData.length,
+        selectedGames: Object.keys(selectedGames).filter(k => selectedGames[k]),
+        gamePitchers: Object.keys(gamePitchers)
+      });
     } finally {
       setIsAnalyzing(false);
     }
-  }, [matchupAnalyzer, arsenalAnalyzer, selectedGames, gamePitchers, gameData, getBattersForTeam, getPitcherById, activeYears, hitterData, pitcherData, exitVelocityData, rosterData, dataService]);
+  }, [matchupAnalyzer, arsenalAnalyzer, selectedGames, gamePitchers, gameData, getBattersForTeam, getPitcherById, activeYears, hitterData, pitcherData, exitVelocityData, normalizedRosterData, dataService]);
 
   // ENHANCED: Explanation generator with arsenal and HR insights
   const generateEnhancedExplanation = (analysis, batter, pitcher, arsenalInsights, hrAnalysis) => {
