@@ -225,7 +225,7 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
   if (isLoading) {
     return (
       <div className="card hr-prediction">
-        <h3>🎯 Home Run Predictions</h3>
+        <h3>⏳Players Due for A Home Run</h3>
         <div className="loading-indicator">Loading predictions...</div>
       </div>
     );
@@ -234,7 +234,7 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
   if (!playersWithHomeRunPrediction || playersWithHomeRunPrediction.length === 0) {
     return (
       <div className="card hr-prediction">
-        <h3>🎯 Home Run Predictions</h3>
+        <h3>⏳Players Due for A Home Run</h3>
         <div className="no-data">No HR prediction data available</div>
       </div>
     );
@@ -243,7 +243,7 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
   return (
     <div className="card hr-prediction">
       <div className="card-header">
-        <h3>🎯 Home Run Predictions</h3>
+        <h3>⏳Players Due for A Home Run</h3>
         {oddsLoading && (
           <div className="odds-loading">Loading odds...</div>
         )}
