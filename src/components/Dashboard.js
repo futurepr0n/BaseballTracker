@@ -24,6 +24,9 @@ import HomeRunLeadersCard from './cards/HomeRunLeadersCard/HomeRunLeadersCard';
 import ImprovedRateCard from './cards/ImprovedRateCard/ImprovedRateCard';
 import RecentHomersCard from './cards/RecentHomersCard/RecentHomersCard';
 import PerformanceCard from './cards/PerformanceCard/PerformanceCard';
+import PitcherHRsAllowedCard from './cards/PitcherHRsAllowedCard/PitcherHRsAllowedCard';
+import PitcherHitsAllowedCard from './cards/PitcherHitsAllowedCard/PitcherHitsAllowedCard';
+
 
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
 
@@ -1154,7 +1157,17 @@ const noFilteredData = isFiltering &&
             teams={teamData}
           />
 
-
+            <PitcherHRsAllowedCard 
+              currentDate={currentDate}
+              teams={teamData}
+              maxItems={15}
+            />
+      
+            <PitcherHitsAllowedCard 
+              currentDate={currentDate}
+              teams={teamData}
+              maxItems={15}
+            />
 
           <HitDroughtBounceBackCard 
             gameData={filteredGameData}
