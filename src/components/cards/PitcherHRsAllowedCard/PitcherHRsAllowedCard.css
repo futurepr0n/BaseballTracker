@@ -1,0 +1,450 @@
+/* PitcherHRsAllowedCard.css */
+
+.pitcher-hrs-allowed-card {
+  /* Inherits base card styles from Dashboard.css */
+}
+
+.pitcher-hrs-allowed-card .card-subtitle {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 15px;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Pitcher HR Item Specific Styles */
+.pitcher-hr-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 12px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.pitcher-hr-item:hover {
+  background-color: rgba(239, 68, 68, 0.05); /* Light red background for HR context */
+  transform: translateX(2px);
+}
+
+.pitcher-hr-item:last-child {
+  border-bottom: none;
+}
+
+/* Pitcher HR Stats */
+.pitcher-hr-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 100px;
+  margin-right: 30px; /* Space for expand button */
+}
+
+.total-hrs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.total-hrs .stat-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ef4444; /* Red for HRs allowed */
+  line-height: 1;
+}
+
+.total-hrs .stat-label {
+  font-size: 0.7rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.hr-rate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hr-rate .stat-detail {
+  font-size: 0.8rem;
+  color: #999;
+  font-weight: 500;
+}
+
+/* Expand Toggle Button */
+.expand-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  color: #666;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.expand-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #333;
+}
+
+/* Expanded Details Section */
+.pitcher-hr-details {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  padding: 16px;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.hr-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.breakdown-section {
+  background: white;
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 3px solid #ef4444;
+}
+
+.breakdown-section h4 {
+  margin: 0 0 12px 0;
+  font-size: 0.95rem;
+  color: #333;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.breakdown-section h5 {
+  margin: 8px 0 6px 0;
+  font-size: 0.85rem;
+  color: #555;
+  font-weight: 600;
+}
+
+/* Home vs Away Stats */
+.home-away-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.venue-label {
+  font-weight: 600;
+  color: #555;
+  font-size: 0.85rem;
+}
+
+.venue-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.venue-rate {
+  font-size: 0.75rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Vulnerable Team Section */
+.vulnerable-team {
+  background: #fff5f5;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #fed7d7;
+}
+
+.top-opponent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.opponent-team {
+  font-weight: 700;
+  color: #c53030;
+  font-size: 0.9rem;
+}
+
+.opponent-hrs {
+  font-weight: 600;
+  color: #ef4444;
+  background: #fed7d7;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+/* All Opponents Grid */
+.all-opponents {
+  margin-top: 12px;
+}
+
+.opponents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.opponent-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 4px;
+  background: #f7fafc;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.75rem;
+}
+
+.opponent-name {
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 2px;
+}
+
+.opponent-count {
+  color: #e53e3e;
+  font-weight: 700;
+}
+
+/* Recent Games Log */
+.recent-games {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.game-entry {
+  display: grid;
+  grid-template-columns: 50px 25px 50px 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 10px;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.8rem;
+}
+
+.game-date {
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.game-venue {
+  text-align: center;
+  color: #718096;
+  font-weight: 500;
+}
+
+.game-opponent {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.game-hrs {
+  text-align: right;
+  font-weight: 700;
+  color: #e53e3e;
+}
+
+/* Loading and Empty States */
+.pitcher-hrs-allowed-card .loading-indicator {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.pitcher-hrs-allowed-card .no-data {
+  text-align: center;
+  padding: 40px 20px;
+  color: #888;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pitcher-hr-item {
+    padding: 10px 6px;
+  }
+  
+  .pitcher-hr-stats {
+    min-width: 80px;
+    margin-right: 25px;
+  }
+  
+  .total-hrs .stat-value {
+    font-size: 1.2rem;
+  }
+  
+  .breakdown-section {
+    padding: 10px;
+  }
+  
+  .home-away-stats {
+    gap: 6px;
+  }
+  
+  .stat-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .venue-stats {
+    align-items: flex-start;
+  }
+  
+  .opponents-grid {
+    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  }
+  
+  .game-entry {
+    grid-template-columns: 45px 20px 45px 1fr;
+    gap: 6px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+  }
+  
+  .pitcher-hr-details {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .total-hrs .stat-value {
+    font-size: 1.1rem;
+  }
+  
+  .hr-rate .stat-detail {
+    font-size: 0.75rem;
+  }
+  
+  .breakdown-section h4 {
+    font-size: 0.9rem;
+  }
+  
+  .game-entry {
+    grid-template-columns: 40px 15px 40px 1fr;
+    gap: 4px;
+  }
+  
+  .opponents-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Animation for expand/collapse */
+.pitcher-hr-details {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .pitcher-hr-details {
+    background: #2d3748;
+    border-color: #4a5568;
+  }
+  
+  .breakdown-section {
+    background: #1a202c;
+    color: #e2e8f0;
+  }
+  
+  .breakdown-section h4,
+  .breakdown-section h5 {
+    color: #f7fafc;
+  }
+  
+  .stat-group {
+    background: #2d3748;
+  }
+  
+  .venue-label {
+    color: #cbd5e0;
+  }
+  
+  .venue-stats {
+    color: #e2e8f0;
+  }
+  
+  .venue-rate {
+    color: #a0aec0;
+  }
+  
+  .vulnerable-team {
+    background: #742a2a;
+    border-color: #c53030;
+  }
+  
+  .opponent-stat {
+    background: #2d3748;
+    border-color: #4a5568;
+  }
+  
+  .opponent-name {
+    color: #cbd5e0;
+  }
+  
+  .game-entry {
+    background: #1a202c;
+    border-color: #4a5568;
+  }
+  
+  .game-date,
+  .game-opponent {
+    color: #e2e8f0;
+  }
+  
+  .game-venue {
+    color: #a0aec0;
+  }
+}
