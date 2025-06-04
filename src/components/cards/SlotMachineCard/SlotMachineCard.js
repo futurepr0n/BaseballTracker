@@ -15,18 +15,44 @@ const PlayerReel = ({ players, isSpinning, finalPlayer, reelIndex, onSpinComplet
   const [displayPlayer, setDisplayPlayer] = useState(players[0] || null);
   const intervalRef = useRef(null);
   const timeoutRef = useRef(null);
+  const hasCompletedRef = useRef(false);
+
+  // Reset internal state when spinning starts
+  useEffect(() => {
+    if (isSpinning) {
+      hasCompletedRef.current = false;
+      setCurrentIndex(0);
+      if (players.length > 0) {
+        setDisplayPlayer(players[0]);
+      }
+    }
+  }, [isSpinning, players]);
 
   useEffect(() => {
-    if (isSpinning && players.length > 0) {
+    // Cleanup function
+    const cleanup = () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+
+    if (isSpinning && players.length > 0 && finalPlayer && !hasCompletedRef.current) {
+      // Start spinning animation
       intervalRef.current = setInterval(() => {
         setCurrentIndex(prev => (prev + 1) % players.length);
       }, 80);
 
-      // Each reel stops at different times: reel 1, then reel 2, then reel 3
-      const spinDuration = 2000 + (reelIndex * 800); // More staggered timing
+      // Set timeout to stop spinning
+      const spinDuration = 2000 + (reelIndex * 800);
       timeoutRef.current = setTimeout(() => {
-        clearInterval(intervalRef.current);
+        cleanup();
         
+        // Find final player index
         const finalIndex = players.findIndex(p => 
           p.name === finalPlayer.name && p.team === finalPlayer.team
         );
@@ -36,21 +62,35 @@ const PlayerReel = ({ players, isSpinning, finalPlayer, reelIndex, onSpinComplet
           setDisplayPlayer(finalPlayer);
         }
         
-        setTimeout(() => onSpinComplete('player', reelIndex), 200);
+        // Mark as completed and notify parent
+        hasCompletedRef.current = true;
+        setTimeout(() => {
+          if (onSpinComplete && !hasCompletedRef.current === false) {
+            onSpinComplete('player', reelIndex);
+          }
+        }, 200);
       }, spinDuration);
     }
 
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [isSpinning, finalPlayer, players, reelIndex, onSpinComplete]);
+    // Cleanup on unmount or dependency change
+    return cleanup;
+  }, [isSpinning, finalPlayer, players, reelIndex]); // Removed onSpinComplete from dependencies
 
+  // Update display player when current index changes
   useEffect(() => {
-    if (players.length > 0) {
+    if (players.length > 0 && players[currentIndex]) {
       setDisplayPlayer(players[currentIndex]);
     }
   }, [currentIndex, players]);
+
+  // Call completion callback when component unmounts or conditions change
+  useEffect(() => {
+    return () => {
+      if (hasCompletedRef.current && onSpinComplete) {
+        // This ensures completion is called if component unmounts while spinning
+      }
+    };
+  }, [onSpinComplete]);
 
   if (!displayPlayer) return null;
 
@@ -85,10 +125,6 @@ const PlayerReel = ({ players, isSpinning, finalPlayer, reelIndex, onSpinComplet
               <span className="stat-value">{displayPlayer.HR || 0}</span>
               <span className="stat-label">HR</span>
             </div>
-{/*             <div className="stat-item">
-              <span className="stat-value">{displayPlayer.H || 0}</span>
-              <span className="stat-label">H</span>
-            </div> */}
           </div>
         </div>
       </div>
@@ -102,17 +138,37 @@ const PropReel = ({ isSpinning, finalProp, reelIndex, onSpinComplete }) => {
   const [displayProp, setDisplayProp] = useState(PROP_TYPES[0]);
   const intervalRef = useRef(null);
   const timeoutRef = useRef(null);
+  const hasCompletedRef = useRef(false);
 
+  // Reset internal state when spinning starts
   useEffect(() => {
     if (isSpinning) {
+      hasCompletedRef.current = false;
+      setCurrentIndex(0);
+      setDisplayProp(PROP_TYPES[0]);
+    }
+  }, [isSpinning]);
+
+  useEffect(() => {
+    const cleanup = () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+
+    if (isSpinning && finalProp && !hasCompletedRef.current) {
       intervalRef.current = setInterval(() => {
         setCurrentIndex(prev => (prev + 1) % PROP_TYPES.length);
       }, 120);
 
-      // Stop 300ms after the player reel for this column
       const spinDuration = 2300 + (reelIndex * 800);
       timeoutRef.current = setTimeout(() => {
-        clearInterval(intervalRef.current);
+        cleanup();
         
         const finalIndex = PROP_TYPES.findIndex(p => p.key === finalProp.key);
         if (finalIndex !== -1) {
@@ -120,15 +176,17 @@ const PropReel = ({ isSpinning, finalProp, reelIndex, onSpinComplete }) => {
           setDisplayProp(finalProp);
         }
         
-        setTimeout(() => onSpinComplete('prop', reelIndex), 200);
+        hasCompletedRef.current = true;
+        setTimeout(() => {
+          if (onSpinComplete) {
+            onSpinComplete('prop', reelIndex);
+          }
+        }, 200);
       }, spinDuration);
     }
 
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [isSpinning, finalProp, reelIndex, onSpinComplete]);
+    return cleanup;
+  }, [isSpinning, finalProp, reelIndex]);
 
   useEffect(() => {
     setDisplayProp(PROP_TYPES[currentIndex]);
@@ -152,17 +210,39 @@ const NumberReel = ({ isSpinning, finalNumber, availableNumbers, reelIndex, onSp
   const [displayNumber, setDisplayNumber] = useState(availableNumbers[0] || 1);
   const intervalRef = useRef(null);
   const timeoutRef = useRef(null);
+  const hasCompletedRef = useRef(false);
+
+  // Reset internal state when spinning starts
+  useEffect(() => {
+    if (isSpinning) {
+      hasCompletedRef.current = false;
+      setCurrentIndex(0);
+      if (availableNumbers.length > 0) {
+        setDisplayNumber(availableNumbers[0]);
+      }
+    }
+  }, [isSpinning, availableNumbers]);
 
   useEffect(() => {
-    if (isSpinning && availableNumbers.length > 0) {
+    const cleanup = () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+
+    if (isSpinning && availableNumbers.length > 0 && finalNumber !== null && !hasCompletedRef.current) {
       intervalRef.current = setInterval(() => {
         setCurrentIndex(prev => (prev + 1) % availableNumbers.length);
       }, 90);
 
-      // Stop 300ms after the prop reel for this column
       const spinDuration = 2600 + (reelIndex * 800);
       timeoutRef.current = setTimeout(() => {
-        clearInterval(intervalRef.current);
+        cleanup();
         
         const finalIndex = availableNumbers.findIndex(n => n === finalNumber);
         if (finalIndex !== -1) {
@@ -170,15 +250,17 @@ const NumberReel = ({ isSpinning, finalNumber, availableNumbers, reelIndex, onSp
           setDisplayNumber(finalNumber);
         }
         
-        setTimeout(() => onSpinComplete('number', reelIndex), 200);
+        hasCompletedRef.current = true;
+        setTimeout(() => {
+          if (onSpinComplete) {
+            onSpinComplete('number', reelIndex);
+          }
+        }, 200);
       }, spinDuration);
     }
 
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [isSpinning, finalNumber, availableNumbers, reelIndex, onSpinComplete]);
+    return cleanup;
+  }, [isSpinning, finalNumber, availableNumbers, reelIndex]);
 
   useEffect(() => {
     if (availableNumbers.length > 0) {
@@ -201,15 +283,13 @@ const NumberReel = ({ isSpinning, finalNumber, availableNumbers, reelIndex, onSp
 // Player picker component
 const PlayerPicker = ({ availablePlayers, selectedPlayers, onTogglePlayer, teams }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [filter, setFilter] = useState('hitters'); // Default to hitters only
+  const [filter, setFilter] = useState('hitters');
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredPlayers = availablePlayers.filter(player => {
-    // Apply type filter - only allow hitters
     const isHitter = player.playerType === 'hitter' || !player.playerType;
     if (!isHitter) return false;
     
-    // Apply search filter
     const passesSearchFilter = !searchTerm || 
       player.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       player.team.toLowerCase().includes(searchTerm.toLowerCase());
@@ -336,13 +416,13 @@ const SlotMachineCard = ({
     props: [null, null, null],
     numbers: [null, null, null]
   });
-  // Track completion by component type AND reel index
   const [completedReels, setCompletedReels] = useState({
     player: [false, false, false],
     prop: [false, false, false],
     number: [false, false, false]
   });
   const [hasSpun, setHasSpun] = useState(false);
+  const [spinKey, setSpinKey] = useState(0); // Add a key to force re-render of reel components
 
   // Process player data to include team info and filter to hitters only
   const processedPlayerData = playerData
@@ -359,7 +439,6 @@ const SlotMachineCard = ({
 
   // Check if a player is in top 5 of any category
   const isTopPerformer = (player) => {
-    // Check if player appears in top 5 of any card category
     const inHRLeaders = (rollingStats.homers || []).slice(0, 5).some(p => 
       p.name === player.name && p.team === player.team);
     const inHitLeaders = (rollingStats.hitters || []).slice(0, 5).some(p => 
@@ -376,24 +455,21 @@ const SlotMachineCard = ({
 
   // Generate numbers based on prop type and player performance
   const generateNumbersForProp = (propType, player) => {
-  if (propType.key === 'homeruns') {
-    const numbers = [1];
-    
-    // Only add 2 if player is top performer
-    if (isTopPerformer(player)) {
-      // Low probability for 2 HRs - add multiple 1s to weight against 2
-      numbers.push(1, 1, 1, 2); // 20% chance for 2, 80% for 1
+    if (propType.key === 'homeruns') {
+      const numbers = [1];
+      
+      if (isTopPerformer(player)) {
+        numbers.push(1, 1, 1, 2);
+      }
+      
+      return numbers;
+    } else if (propType.key === 'hits' || propType.key === 'bases') {
+      const numbers = [1];
+      numbers.push(1, 1, 1, 2, 2, 3);
     }
     
-    return numbers;
-  } else if (propType.key === 'hits' || propType.key === 'bases') {
-    const numbers = [1];
-    numbers.push(1, 1, 1, 2, 2, 3); // Weighted: 1: 50%, 2: 33.3%, 3: 16.7%
-  }
-  
-  // Fallback for other prop types
-  return propType.numbers;
-};
+    return propType.numbers;
+  };
 
   // Select final number with weighted probability
   const selectFinalNumber = (availableNumbers) => {
@@ -402,7 +478,6 @@ const SlotMachineCard = ({
   };
 
   const handleTogglePlayer = (player) => {
-    // Only allow hitters
     if (player.playerType === 'pitcher') return;
     
     setSelectedPlayers(prev => {
@@ -422,20 +497,12 @@ const SlotMachineCard = ({
     let playersToAdd = [];
     
     console.log(`[SlotMachine] Quick-adding ${type}`);
-    console.log('[SlotMachine] Available data:', {
-      hrLeaders: rollingStats.homers?.length || 0,
-      hitStreaks: hitStreakData.hitStreaks?.length || 0,
-      hotHitters: topPerformers.recent?.length || 0,
-      hitStreakDataStructure: Object.keys(hitStreakData)
-    });
     
     switch (type) {
       case 'hr-leaders':
         playersToAdd = (rollingStats.homers || []).slice(0, 8);
-        console.log('[SlotMachine] HR Leaders added:', playersToAdd.length);
         break;
       case 'hit-streaks':
-        // Try different possible data structures for hit streaks
         let hitStreakPlayers = [];
         if (hitStreakData.hitStreaks && Array.isArray(hitStreakData.hitStreaks)) {
           hitStreakPlayers = hitStreakData.hitStreaks;
@@ -446,15 +513,11 @@ const SlotMachineCard = ({
         }
         
         playersToAdd = hitStreakPlayers.slice(0, 6);
-        console.log('[SlotMachine] Hit Streaks found:', hitStreakPlayers.length, 'adding:', playersToAdd.length);
-        console.log('[SlotMachine] Hit Streak sample data:', playersToAdd.slice(0, 2));
         break;
       case 'hot-hitters':
         playersToAdd = (topPerformers.recent || []).slice(0, 8);
-        console.log('[SlotMachine] Hot Hitters added:', playersToAdd.length);
         break;
       default:
-        console.log('[SlotMachine] Unknown quick-add type:', type);
         return;
     }
 
@@ -463,13 +526,12 @@ const SlotMachineCard = ({
       return;
     }
 
-    // Process and add players that aren't already selected
     const processedPlayersToAdd = playersToAdd
       .map(player => {
         const team = teamData[player.team] || {};
         return {
           ...player,
-          name: player.fullName || player.name, // Use fullName if available
+          name: player.fullName || player.name,
           teamColor: team.primaryColor,
           teamLogo: team.logoUrl,
           teamName: team.name
@@ -479,7 +541,6 @@ const SlotMachineCard = ({
         p.name === player.name && p.team === player.team
       ));
 
-    console.log('[SlotMachine] Processed players to add:', processedPlayersToAdd.length);
     setSelectedPlayers(prev => [...prev, ...processedPlayersToAdd]);
   };
 
@@ -489,26 +550,30 @@ const SlotMachineCard = ({
       return;
     }
 
+    console.log('[SlotMachine] Starting new spin');
+    
+    // Increment spin key to force reel component re-render
+    setSpinKey(prev => prev + 1);
+    
     setIsSpinning(true);
     setHasSpun(true);
-    // Reset completion tracking for all components
+    
+    // Reset completion tracking
     setCompletedReels({
       player: [false, false, false],
       prop: [false, false, false],
       number: [false, false, false]
     });
 
-    // Randomly select 3 unique players
+    // Generate new results
     const shuffledPlayers = [...selectedPlayers].sort(() => Math.random() - 0.5);
     const selectedPlayersForSpin = shuffledPlayers.slice(0, 3);
 
-    // Randomly select props for each reel
     const selectedProps = Array(3).fill().map(() => {
       const randomIndex = Math.floor(Math.random() * PROP_TYPES.length);
       return PROP_TYPES[randomIndex];
     });
 
-    // Generate numbers based on props and players
     const selectedNumbers = selectedPlayersForSpin.map((player, index) => {
       const prop = selectedProps[index];
       const availableNumbers = generateNumbersForProp(prop, player);
@@ -522,7 +587,7 @@ const SlotMachineCard = ({
     });
   };
 
-  // Updated completion handler - tracks by component type AND reel index
+  // Memoize the completion handler to prevent unnecessary re-renders
   const handleReelComplete = useCallback((componentType, reelIndex) => {
     console.log(`[SlotMachine] ${componentType} reel ${reelIndex} completed`);
     
@@ -534,10 +599,9 @@ const SlotMachineCard = ({
         )
       };
       
-      // Check if this entire reel (column) is now complete
       const reelComplete = updated.player[reelIndex] && updated.prop[reelIndex] && updated.number[reelIndex];
       
-      console.log(`[SlotMachine] ${componentType} reel ${reelIndex} completed. Reel status:`, {
+      console.log(`[SlotMachine] Reel ${reelIndex} completion status:`, {
         player: updated.player[reelIndex],
         prop: updated.prop[reelIndex], 
         number: updated.number[reelIndex],
@@ -549,18 +613,25 @@ const SlotMachineCard = ({
   }, []);
 
   const handleReset = () => {
+    console.log('[SlotMachine] Resetting machine');
+    
     setIsSpinning(false);
+    setHasSpun(false);
+    
+    // Increment spin key to force reel component re-render
+    setSpinKey(prev => prev + 1);
+    
     setResults({
       players: [null, null, null],
       props: [null, null, null],
       numbers: [null, null, null]
     });
+    
     setCompletedReels({
       player: [false, false, false],
       prop: [false, false, false],
       number: [false, false, false]
     });
-    setHasSpun(false);
   };
 
   const handleClearAll = () => {
@@ -568,7 +639,7 @@ const SlotMachineCard = ({
     handleReset();
   };
 
-  // Check if all reels (columns) are complete - each reel needs all 3 components complete
+  // Check if all reels are complete
   const allReelsComplete = [0, 1, 2].every(reelIndex => 
     completedReels.player[reelIndex] && 
     completedReels.prop[reelIndex] && 
@@ -582,28 +653,13 @@ const SlotMachineCard = ({
   ).length;
 
   useEffect(() => {
-    console.log(`[SlotMachine] Completion check: ${completedReelCount}/3 reels complete, allComplete: ${allReelsComplete}, isSpinning: ${isSpinning}`);
-    console.log('[SlotMachine] Completion details:', completedReels);
-    
     if (allReelsComplete && isSpinning) {
-      console.log('[SlotMachine] All reels complete, stopping spin in 500ms');
+      console.log('[SlotMachine] All reels complete, stopping spin');
       setTimeout(() => {
-        console.log('[SlotMachine] Setting isSpinning to false');
         setIsSpinning(false);
       }, 500);
     }
-  }, [allReelsComplete, isSpinning, completedReelCount, completedReels]);
-
-  // Debug logging
-  useEffect(() => {
-    console.log('[SlotMachine] Component mounted with data:', {
-      playerDataCount: playerData.length,
-      hitStreakDataKeys: Object.keys(hitStreakData),
-      hitStreaksCount: hitStreakData.hitStreaks?.length || 0,
-      rollingStatsKeys: Object.keys(rollingStats),
-      topPerformersKeys: Object.keys(topPerformers)
-    });
-  }, []);
+  }, [allReelsComplete, isSpinning]);
 
   return (
     <div className="card slot-machine-card">
@@ -641,7 +697,7 @@ const SlotMachineCard = ({
                 <div className="reels-container">
                   {[0, 1, 2].map(reelIndex => (
                     <PlayerReel
-                      key={`player-${reelIndex}`}
+                      key={`player-${reelIndex}-${spinKey}`} // Add spinKey to force re-render
                       players={selectedPlayers}
                       isSpinning={isSpinning}
                       finalPlayer={results.players[reelIndex]}
@@ -658,7 +714,7 @@ const SlotMachineCard = ({
                 <div className="reels-container">
                   {[0, 1, 2].map(reelIndex => (
                     <PropReel
-                      key={`prop-${reelIndex}`}
+                      key={`prop-${reelIndex}-${spinKey}`} // Add spinKey to force re-render
                       isSpinning={isSpinning}
                       finalProp={results.props[reelIndex]}
                       reelIndex={reelIndex}
@@ -675,13 +731,12 @@ const SlotMachineCard = ({
                   {[0, 1, 2].map(reelIndex => {
                     const player = results.players[reelIndex];
                     const prop = results.props[reelIndex];
-                    // Use default numbers when not spinning or no results yet
                     const availableNumbers = (player && prop && isSpinning) ? 
                       generateNumbersForProp(prop, player) : [1, 2, 3];
                     
                     return (
                       <NumberReel
-                        key={`number-${reelIndex}`}
+                        key={`number-${reelIndex}-${spinKey}`} // Add spinKey to force re-render
                         isSpinning={isSpinning}
                         finalNumber={results.numbers[reelIndex]}
                         availableNumbers={availableNumbers}
