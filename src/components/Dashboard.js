@@ -26,6 +26,7 @@ import RecentHomersCard from './cards/RecentHomersCard/RecentHomersCard';
 import PerformanceCard from './cards/PerformanceCard/PerformanceCard';
 import PitcherHRsAllowedCard from './cards/PitcherHRsAllowedCard/PitcherHRsAllowedCard';
 import PitcherHitsAllowedCard from './cards/PitcherHitsAllowedCard/PitcherHitsAllowedCard';
+import SlotMachineCard from './cards/SlotMachineCard/SlotMachineCard';
 
 
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
@@ -1155,6 +1156,20 @@ const noFilteredData = isFiltering &&
             gameData={filteredGameData}
             currentDate={currentDate}
             teams={teamData}
+          />
+
+          {/* 
+            SLOT MACHINE CARD - FULL WIDTH
+            This will now span the entire width of the dashboard grid
+            and be properly responsive across all screen sizes
+          */}
+          <SlotMachineCard 
+            playerData={filteredPlayerData}
+            teamData={teamData}
+            rollingStats={rollingStats}
+            topPerformers={topPerformers}
+            hitStreakData={hitStreakData}
+            playersWithHomeRunPrediction={playersWithHomeRunPrediction}
           />
 
             <PitcherHRsAllowedCard 

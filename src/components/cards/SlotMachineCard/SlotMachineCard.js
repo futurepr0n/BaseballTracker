@@ -1,27 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
+// src/components/cards/SlotMachineCard/SlotMachineCard.js
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import './SlotMachineCard.css';
 
-// Sample data for demonstration
-const sampleTeams = {
-  "LAD": { name: "Los Angeles Dodgers", primaryColor: "#005A9C", logoUrl: "/data/logos/los-angeles-dodgers.svg" },
-  "NYY": { name: "New York Yankees", primaryColor: "#003087", logoUrl: "/data/logos/new-york-yankees.svg" },
-  "HOU": { name: "Houston Astros", primaryColor: "#002D62", logoUrl: "/data/logos/houston-astros.svg" },
-  "ATL": { name: "Atlanta Braves", primaryColor: "#CE1141", logoUrl: "/data/logos/atlanta-braves.svg" },
-  "SD": { name: "San Diego Padres", primaryColor: "#2F241D", logoUrl: "/data/logos/san-diego-padres.svg" }
-};
-
-const samplePlayers = [
-  { name: "Mookie Betts", team: "LAD", playerType: "hitter", HR: 15, AVG: ".285" },
-  { name: "Aaron Judge", team: "NYY", playerType: "hitter", HR: 22, AVG: ".312" },
-  { name: "Jose Altuve", team: "HOU", playerType: "hitter", HR: 8, AVG: ".298" },
-  { name: "Ronald Acuña Jr.", team: "ATL", playerType: "hitter", HR: 18, AVG: ".276" },
-  { name: "Manny Machado", team: "SD", playerType: "hitter", HR: 12, AVG: ".267" },
-  { name: "Shohei Ohtani", team: "LAD", playerType: "hitter", HR: 25, AVG: ".305" },
-  { name: "Gerrit Cole", team: "NYY", playerType: "pitcher", K: 45, ERA: "3.21" },
-  { name: "Spencer Strider", team: "ATL", playerType: "pitcher", K: 52, ERA: "2.95" }
+// Available prop types
+const PROP_TYPES = [
+  { key: 'hits', label: 'Hits', emoji: '💥', numbers: [1, 2, 3] },
+  { key: 'homeruns', label: 'Home Runs', emoji: '⚾', numbers: [1, 2] },
+  { key: 'bases', label: 'Total Bases', emoji: '🏃', numbers: [1, 2, 3] }
 ];
 
-// Individual slot reel component
-const SlotReel = ({ players, isSpinning, finalPlayer, reelIndex, onSpinComplete }) => {
+// Individual slot reel component for players
+const PlayerReel = ({ players, isSpinning, finalPlayer, reelIndex, onSpinComplete }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [displayPlayer, setDisplayPlayer] = useState(players[0] || null);
   const intervalRef = useRef(null);
@@ -29,17 +18,15 @@ const SlotReel = ({ players, isSpinning, finalPlayer, reelIndex, onSpinComplete 
 
   useEffect(() => {
     if (isSpinning && players.length > 0) {
-      // Start spinning animation
       intervalRef.current = setInterval(() => {
         setCurrentIndex(prev => (prev + 1) % players.length);
-      }, 100); // Fast spinning
+      }, 80);
 
-      // Stop spinning after a delay (staggered for each reel)
-      const spinDuration = 2000 + (reelIndex * 500); // Each reel stops 500ms after the previous
+      // Each reel stops at different times: reel 1, then reel 2, then reel 3
+      const spinDuration = 2000 + (reelIndex * 800); // More staggered timing
       timeoutRef.current = setTimeout(() => {
         clearInterval(intervalRef.current);
         
-        // Find the final player in our list
         const finalIndex = players.findIndex(p => 
           p.name === finalPlayer.name && p.team === finalPlayer.team
         );
@@ -49,8 +36,7 @@ const SlotReel = ({ players, isSpinning, finalPlayer, reelIndex, onSpinComplete 
           setDisplayPlayer(finalPlayer);
         }
         
-        // Notify parent that this reel has finished
-        setTimeout(() => onSpinComplete(reelIndex), 200);
+        setTimeout(() => onSpinComplete('player', reelIndex), 200);
       }, spinDuration);
     }
 
@@ -68,56 +54,41 @@ const SlotReel = ({ players, isSpinning, finalPlayer, reelIndex, onSpinComplete 
 
   if (!displayPlayer) return null;
 
-  const team = sampleTeams[displayPlayer.team] || {};
-
   return (
-    <div className={`slot-reel ${isSpinning ? 'spinning' : ''}`}>
+    <div className={`slot-reel player-reel ${isSpinning ? 'spinning' : ''}`}>
       <div className="reel-container">
         <div className="player-slot">
           <div 
             className="player-rank"
-            style={{ backgroundColor: team.primaryColor || '#0056b3' }}
+            style={{ backgroundColor: displayPlayer.teamColor || '#0056b3' }}
           >
-            <img 
-              src={team.logoUrl} 
-              alt={team.name}
-              className="rank-logo"
-            />
+            {displayPlayer.teamLogo && (
+              <img 
+                src={displayPlayer.teamLogo} 
+                alt={displayPlayer.teamName}
+                className="rank-logo"
+              />
+            )}
             <div className="rank-overlay"></div>
             <span className="rank-number">{reelIndex + 1}</span>
           </div>
           
           <div className="player-info">
             <div className="player-name">{displayPlayer.name}</div>
-            <div className="player-team" style={{ color: team.primaryColor || '#666' }}>
+            <div className="player-team" style={{ color: displayPlayer.teamColor || '#666' }}>
               {displayPlayer.team}
             </div>
           </div>
           
           <div className="player-stats">
-            {displayPlayer.playerType === 'hitter' ? (
-              <>
-                <div className="stat-item">
-                  <span className="stat-value">{displayPlayer.HR}</span>
-                  <span className="stat-label">HR</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-value">{displayPlayer.AVG}</span>
-                  <span className="stat-label">AVG</span>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="stat-item">
-                  <span className="stat-value">{displayPlayer.K}</span>
-                  <span className="stat-label">K</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-value">{displayPlayer.ERA}</span>
-                  <span className="stat-label">ERA</span>
-                </div>
-              </>
-            )}
+            <div className="stat-item">
+              <span className="stat-value">{displayPlayer.HR || 0}</span>
+              <span className="stat-label">HR</span>
+            </div>
+{/*             <div className="stat-item">
+              <span className="stat-value">{displayPlayer.H || 0}</span>
+              <span className="stat-label">H</span>
+            </div> */}
           </div>
         </div>
       </div>
@@ -125,50 +96,148 @@ const SlotReel = ({ players, isSpinning, finalPlayer, reelIndex, onSpinComplete 
   );
 };
 
+// Prop type reel component
+const PropReel = ({ isSpinning, finalProp, reelIndex, onSpinComplete }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [displayProp, setDisplayProp] = useState(PROP_TYPES[0]);
+  const intervalRef = useRef(null);
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    if (isSpinning) {
+      intervalRef.current = setInterval(() => {
+        setCurrentIndex(prev => (prev + 1) % PROP_TYPES.length);
+      }, 120);
+
+      // Stop 300ms after the player reel for this column
+      const spinDuration = 2300 + (reelIndex * 800);
+      timeoutRef.current = setTimeout(() => {
+        clearInterval(intervalRef.current);
+        
+        const finalIndex = PROP_TYPES.findIndex(p => p.key === finalProp.key);
+        if (finalIndex !== -1) {
+          setCurrentIndex(finalIndex);
+          setDisplayProp(finalProp);
+        }
+        
+        setTimeout(() => onSpinComplete('prop', reelIndex), 200);
+      }, spinDuration);
+    }
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [isSpinning, finalProp, reelIndex, onSpinComplete]);
+
+  useEffect(() => {
+    setDisplayProp(PROP_TYPES[currentIndex]);
+  }, [currentIndex]);
+
+  return (
+    <div className={`slot-reel prop-reel ${isSpinning ? 'spinning' : ''}`}>
+      <div className="reel-container">
+        <div className="prop-slot">
+          <div className="prop-emoji">{displayProp.emoji}</div>
+          <div className="prop-label">{displayProp.label}</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Number reel component
+const NumberReel = ({ isSpinning, finalNumber, availableNumbers, reelIndex, onSpinComplete }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [displayNumber, setDisplayNumber] = useState(availableNumbers[0] || 1);
+  const intervalRef = useRef(null);
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    if (isSpinning && availableNumbers.length > 0) {
+      intervalRef.current = setInterval(() => {
+        setCurrentIndex(prev => (prev + 1) % availableNumbers.length);
+      }, 90);
+
+      // Stop 300ms after the prop reel for this column
+      const spinDuration = 2600 + (reelIndex * 800);
+      timeoutRef.current = setTimeout(() => {
+        clearInterval(intervalRef.current);
+        
+        const finalIndex = availableNumbers.findIndex(n => n === finalNumber);
+        if (finalIndex !== -1) {
+          setCurrentIndex(finalIndex);
+          setDisplayNumber(finalNumber);
+        }
+        
+        setTimeout(() => onSpinComplete('number', reelIndex), 200);
+      }, spinDuration);
+    }
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [isSpinning, finalNumber, availableNumbers, reelIndex, onSpinComplete]);
+
+  useEffect(() => {
+    if (availableNumbers.length > 0) {
+      setDisplayNumber(availableNumbers[currentIndex]);
+    }
+  }, [currentIndex, availableNumbers]);
+
+  return (
+    <div className={`slot-reel number-reel ${isSpinning ? 'spinning' : ''}`}>
+      <div className="reel-container">
+        <div className="number-slot">
+          <div className="number-display">{displayNumber}</div>
+          <div className="number-label">Count</div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Player picker component
-const PlayerPicker = ({ availablePlayers, selectedPlayers, onTogglePlayer }) => {
+const PlayerPicker = ({ availablePlayers, selectedPlayers, onTogglePlayer, teams }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState('hitters'); // Default to hitters only
+  const [searchTerm, setSearchTerm] = useState('');
 
   const filteredPlayers = availablePlayers.filter(player => {
-    if (filter === 'hitters') return player.playerType === 'hitter' || !player.playerType;
-    if (filter === 'pitchers') return player.playerType === 'pitcher';
-    return true;
+    // Apply type filter - only allow hitters
+    const isHitter = player.playerType === 'hitter' || !player.playerType;
+    if (!isHitter) return false;
+    
+    // Apply search filter
+    const passesSearchFilter = !searchTerm || 
+      player.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      player.team.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return passesSearchFilter;
   });
 
   return (
     <div className="player-picker">
-      <div className="picker-header">
-        <h4>Select Players ({selectedPlayers.length} selected)</h4>
-        <button 
-          className="expand-btn"
-          onClick={() => setIsExpanded(!isExpanded)}
-        >
+      <div className="picker-header" onClick={() => setIsExpanded(!isExpanded)}>
+        <h4>Select Hitters ({selectedPlayers.length} selected)</h4>
+        <button className="expand-btn">
           {isExpanded ? '▲' : '▼'}
         </button>
       </div>
       
       {isExpanded && (
         <div className="picker-content">
-          <div className="filter-tabs">
-            <button 
-              className={`filter-tab ${filter === 'all' ? 'active' : ''}`}
-              onClick={() => setFilter('all')}
-            >
-              All
-            </button>
-            <button 
-              className={`filter-tab ${filter === 'hitters' ? 'active' : ''}`}
-              onClick={() => setFilter('hitters')}
-            >
-              Hitters
-            </button>
-            <button 
-              className={`filter-tab ${filter === 'pitchers' ? 'active' : ''}`}
-              onClick={() => setFilter('pitchers')}
-            >
-              Pitchers
-            </button>
+          <div className="picker-controls">
+            <div className="search-container">
+              <input
+                type="text"
+                placeholder="Search players..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+            </div>
           </div>
           
           <div className="players-grid">
@@ -176,7 +245,6 @@ const PlayerPicker = ({ availablePlayers, selectedPlayers, onTogglePlayer }) => 
               const isSelected = selectedPlayers.some(p => 
                 p.name === player.name && p.team === player.team
               );
-              const team = sampleTeams[player.team] || {};
               
               return (
                 <div 
@@ -186,9 +254,12 @@ const PlayerPicker = ({ availablePlayers, selectedPlayers, onTogglePlayer }) => 
                 >
                   <div className="option-info">
                     <span className="option-name">{player.name}</span>
-                    <span className="option-team" style={{ color: team.primaryColor }}>
+                    <span className="option-team" style={{ color: player.teamColor }}>
                       {player.team}
                     </span>
+                  </div>
+                  <div className="option-stats">
+                    <span className="option-stat">{player.HR || 0} HR</span>
                   </div>
                   <div className="selection-indicator">
                     {isSelected ? '✓' : '+'}
@@ -196,6 +267,12 @@ const PlayerPicker = ({ availablePlayers, selectedPlayers, onTogglePlayer }) => 
                 </div>
               );
             })}
+            
+            {filteredPlayers.length === 0 && (
+              <div className="no-players-found">
+                <p>No players found matching your criteria.</p>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -203,15 +280,131 @@ const PlayerPicker = ({ availablePlayers, selectedPlayers, onTogglePlayer }) => 
   );
 };
 
+// Quick add buttons for popular card data
+const QuickAddButtons = ({ onQuickAdd, isLoading }) => {
+  const quickAddOptions = [
+    { 
+      label: 'HR Leaders', 
+      key: 'hr-leaders',
+      description: 'Add top home run hitters'
+    },
+    { 
+      label: 'Hit Streaks', 
+      key: 'hit-streaks',
+      description: 'Add players with active hit streaks'
+    },
+    { 
+      label: 'Hot Hitters', 
+      key: 'hot-hitters',
+      description: 'Add recently performing hitters'
+    }
+  ];
+
+  return (
+    <div className="quick-add-section">
+      <h4>Quick Add From Dashboard Cards</h4>
+      <div className="quick-add-buttons">
+        {quickAddOptions.map(option => (
+          <button
+            key={option.key}
+            className="quick-add-btn"
+            onClick={() => onQuickAdd(option.key)}
+            disabled={isLoading}
+          >
+            <span className="quick-add-label">{option.label}</span>
+            <span className="quick-add-desc">{option.description}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // Main slot machine component
-const SlotMachineCard = () => {
+const SlotMachineCard = ({ 
+  playerData = [], 
+  teamData = {}, 
+  rollingStats = {}, 
+  topPerformers = {}, 
+  hitStreakData = {},
+  playersWithHomeRunPrediction = []
+}) => {
   const [selectedPlayers, setSelectedPlayers] = useState([]);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [results, setResults] = useState([null, null, null]);
-  const [completedReels, setCompletedReels] = useState([false, false, false]);
+  const [results, setResults] = useState({
+    players: [null, null, null],
+    props: [null, null, null],
+    numbers: [null, null, null]
+  });
+  // Track completion by component type AND reel index
+  const [completedReels, setCompletedReels] = useState({
+    player: [false, false, false],
+    prop: [false, false, false],
+    number: [false, false, false]
+  });
   const [hasSpun, setHasSpun] = useState(false);
 
+  // Process player data to include team info and filter to hitters only
+  const processedPlayerData = playerData
+    .filter(player => player.playerType === 'hitter' || !player.playerType)
+    .map(player => {
+      const team = teamData[player.team] || {};
+      return {
+        ...player,
+        teamColor: team.primaryColor,
+        teamLogo: team.logoUrl,
+        teamName: team.name
+      };
+    });
+
+  // Check if a player is in top 5 of any category
+  const isTopPerformer = (player) => {
+    // Check if player appears in top 5 of any card category
+    const inHRLeaders = (rollingStats.homers || []).slice(0, 5).some(p => 
+      p.name === player.name && p.team === player.team);
+    const inHitLeaders = (rollingStats.hitters || []).slice(0, 5).some(p => 
+      p.name === player.name && p.team === player.team);
+    const inHRRate = (topPerformers.hrRate || []).slice(0, 5).some(p => 
+      (p.fullName || p.name) === player.name && p.team === player.team);
+    const inHitStreaks = (hitStreakData.hitStreaks || []).slice(0, 5).some(p => 
+      p.name === player.name && p.team === player.team);
+    const inRecent = (topPerformers.recent || []).slice(0, 5).some(p => 
+      (p.fullName || p.name) === player.name && p.team === player.team);
+    
+    return inHRLeaders || inHitLeaders || inHRRate || inHitStreaks || inRecent;
+  };
+
+  // Generate numbers based on prop type and player performance
+  const generateNumbersForProp = (propType, player) => {
+  if (propType.key === 'homeruns') {
+    const numbers = [1];
+    
+    // Only add 2 if player is top performer
+    if (isTopPerformer(player)) {
+      // Low probability for 2 HRs - add multiple 1s to weight against 2
+      numbers.push(1, 1, 1, 2); // 20% chance for 2, 80% for 1
+    }
+    
+    return numbers;
+  } else if (propType.key === 'hits' || propType.key === 'bases') {
+    const numbers = [1];
+    numbers.push(1, 1, 1, 2, 2, 3); // Weighted: 1: 50%, 2: 33.3%, 3: 16.7%
+  }
+  
+  // Fallback for other prop types
+  return propType.numbers;
+};
+
+  // Select final number with weighted probability
+  const selectFinalNumber = (availableNumbers) => {
+    const randomIndex = Math.floor(Math.random() * availableNumbers.length);
+    return availableNumbers[randomIndex];
+  };
+
   const handleTogglePlayer = (player) => {
+    // Only allow hitters
+    if (player.playerType === 'pitcher') return;
+    
     setSelectedPlayers(prev => {
       const isAlreadySelected = prev.some(p => 
         p.name === player.name && p.team === player.team
@@ -225,81 +418,280 @@ const SlotMachineCard = () => {
     });
   };
 
+  const handleQuickAdd = (type) => {
+    let playersToAdd = [];
+    
+    console.log(`[SlotMachine] Quick-adding ${type}`);
+    console.log('[SlotMachine] Available data:', {
+      hrLeaders: rollingStats.homers?.length || 0,
+      hitStreaks: hitStreakData.hitStreaks?.length || 0,
+      hotHitters: topPerformers.recent?.length || 0,
+      hitStreakDataStructure: Object.keys(hitStreakData)
+    });
+    
+    switch (type) {
+      case 'hr-leaders':
+        playersToAdd = (rollingStats.homers || []).slice(0, 8);
+        console.log('[SlotMachine] HR Leaders added:', playersToAdd.length);
+        break;
+      case 'hit-streaks':
+        // Try different possible data structures for hit streaks
+        let hitStreakPlayers = [];
+        if (hitStreakData.hitStreaks && Array.isArray(hitStreakData.hitStreaks)) {
+          hitStreakPlayers = hitStreakData.hitStreaks;
+        } else if (hitStreakData.likelyToContinueStreak && Array.isArray(hitStreakData.likelyToContinueStreak)) {
+          hitStreakPlayers = hitStreakData.likelyToContinueStreak;
+        } else if (Array.isArray(hitStreakData)) {
+          hitStreakPlayers = hitStreakData;
+        }
+        
+        playersToAdd = hitStreakPlayers.slice(0, 6);
+        console.log('[SlotMachine] Hit Streaks found:', hitStreakPlayers.length, 'adding:', playersToAdd.length);
+        console.log('[SlotMachine] Hit Streak sample data:', playersToAdd.slice(0, 2));
+        break;
+      case 'hot-hitters':
+        playersToAdd = (topPerformers.recent || []).slice(0, 8);
+        console.log('[SlotMachine] Hot Hitters added:', playersToAdd.length);
+        break;
+      default:
+        console.log('[SlotMachine] Unknown quick-add type:', type);
+        return;
+    }
+
+    if (playersToAdd.length === 0) {
+      console.warn(`[SlotMachine] No players found for ${type}`);
+      return;
+    }
+
+    // Process and add players that aren't already selected
+    const processedPlayersToAdd = playersToAdd
+      .map(player => {
+        const team = teamData[player.team] || {};
+        return {
+          ...player,
+          name: player.fullName || player.name, // Use fullName if available
+          teamColor: team.primaryColor,
+          teamLogo: team.logoUrl,
+          teamName: team.name
+        };
+      })
+      .filter(player => !selectedPlayers.some(p => 
+        p.name === player.name && p.team === player.team
+      ));
+
+    console.log('[SlotMachine] Processed players to add:', processedPlayersToAdd.length);
+    setSelectedPlayers(prev => [...prev, ...processedPlayersToAdd]);
+  };
+
   const handleSpin = () => {
     if (selectedPlayers.length < 3) {
-      alert('Please select at least 3 players to spin!');
+      alert('Please select at least 3 hitters to spin!');
       return;
     }
 
     setIsSpinning(true);
     setHasSpun(true);
-    setCompletedReels([false, false, false]);
+    // Reset completion tracking for all components
+    setCompletedReels({
+      player: [false, false, false],
+      prop: [false, false, false],
+      number: [false, false, false]
+    });
 
     // Randomly select 3 unique players
-    const shuffled = [...selectedPlayers].sort(() => Math.random() - 0.5);
-    const newResults = shuffled.slice(0, 3);
-    setResults(newResults);
-  };
+    const shuffledPlayers = [...selectedPlayers].sort(() => Math.random() - 0.5);
+    const selectedPlayersForSpin = shuffledPlayers.slice(0, 3);
 
-  const handleReelComplete = (reelIndex) => {
-    setCompletedReels(prev => {
-      const updated = [...prev];
-      updated[reelIndex] = true;
-      return updated;
+    // Randomly select props for each reel
+    const selectedProps = Array(3).fill().map(() => {
+      const randomIndex = Math.floor(Math.random() * PROP_TYPES.length);
+      return PROP_TYPES[randomIndex];
+    });
+
+    // Generate numbers based on props and players
+    const selectedNumbers = selectedPlayersForSpin.map((player, index) => {
+      const prop = selectedProps[index];
+      const availableNumbers = generateNumbersForProp(prop, player);
+      return selectFinalNumber(availableNumbers);
+    });
+
+    setResults({
+      players: selectedPlayersForSpin,
+      props: selectedProps,
+      numbers: selectedNumbers
     });
   };
 
+  // Updated completion handler - tracks by component type AND reel index
+  const handleReelComplete = useCallback((componentType, reelIndex) => {
+    console.log(`[SlotMachine] ${componentType} reel ${reelIndex} completed`);
+    
+    setCompletedReels(prev => {
+      const updated = {
+        ...prev,
+        [componentType]: prev[componentType].map((completed, index) => 
+          index === reelIndex ? true : completed
+        )
+      };
+      
+      // Check if this entire reel (column) is now complete
+      const reelComplete = updated.player[reelIndex] && updated.prop[reelIndex] && updated.number[reelIndex];
+      
+      console.log(`[SlotMachine] ${componentType} reel ${reelIndex} completed. Reel status:`, {
+        player: updated.player[reelIndex],
+        prop: updated.prop[reelIndex], 
+        number: updated.number[reelIndex],
+        reelComplete
+      });
+      
+      return updated;
+    });
+  }, []);
+
   const handleReset = () => {
     setIsSpinning(false);
-    setResults([null, null, null]);
-    setCompletedReels([false, false, false]);
+    setResults({
+      players: [null, null, null],
+      props: [null, null, null],
+      numbers: [null, null, null]
+    });
+    setCompletedReels({
+      player: [false, false, false],
+      prop: [false, false, false],
+      number: [false, false, false]
+    });
     setHasSpun(false);
   };
 
-  const allReelsComplete = completedReels.every(completed => completed);
+  const handleClearAll = () => {
+    setSelectedPlayers([]);
+    handleReset();
+  };
+
+  // Check if all reels (columns) are complete - each reel needs all 3 components complete
+  const allReelsComplete = [0, 1, 2].every(reelIndex => 
+    completedReels.player[reelIndex] && 
+    completedReels.prop[reelIndex] && 
+    completedReels.number[reelIndex]
+  );
+
+  const completedReelCount = [0, 1, 2].filter(reelIndex => 
+    completedReels.player[reelIndex] && 
+    completedReels.prop[reelIndex] && 
+    completedReels.number[reelIndex]
+  ).length;
 
   useEffect(() => {
+    console.log(`[SlotMachine] Completion check: ${completedReelCount}/3 reels complete, allComplete: ${allReelsComplete}, isSpinning: ${isSpinning}`);
+    console.log('[SlotMachine] Completion details:', completedReels);
+    
     if (allReelsComplete && isSpinning) {
+      console.log('[SlotMachine] All reels complete, stopping spin in 500ms');
       setTimeout(() => {
+        console.log('[SlotMachine] Setting isSpinning to false');
         setIsSpinning(false);
       }, 500);
     }
-  }, [allReelsComplete, isSpinning]);
+  }, [allReelsComplete, isSpinning, completedReelCount, completedReels]);
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[SlotMachine] Component mounted with data:', {
+      playerDataCount: playerData.length,
+      hitStreakDataKeys: Object.keys(hitStreakData),
+      hitStreaksCount: hitStreakData.hitStreaks?.length || 0,
+      rollingStatsKeys: Object.keys(rollingStats),
+      topPerformersKeys: Object.keys(topPerformers)
+    });
+  }, []);
 
   return (
     <div className="card slot-machine-card">
       <div className="card-header">
-        <h3>🎰 Pick 'Em Opt Machine</h3>
+        <h3>🎰 Pick 'Em Prop Machine</h3>
         <div className="header-subtitle">
-          Select your players and spin for 3 random picks!
+          Build your player pool and spin for 3 random prop betting options!
         </div>
       </div>
 
+      <QuickAddButtons 
+        onQuickAdd={handleQuickAdd}
+        isLoading={isSpinning}
+      />
+
       <PlayerPicker 
-        availablePlayers={samplePlayers}
+        availablePlayers={processedPlayerData}
         selectedPlayers={selectedPlayers}
         onTogglePlayer={handleTogglePlayer}
+        teams={teamData}
       />
 
       <div className="slot-machine">
         <div className="machine-display">
-          <div className="reels-container">
-            {[0, 1, 2].map(reelIndex => (
-              <SlotReel
-                key={reelIndex}
-                players={selectedPlayers}
-                isSpinning={isSpinning}
-                finalPlayer={results[reelIndex]}
-                reelIndex={reelIndex}
-                onSpinComplete={handleReelComplete}
-              />
-            ))}
-          </div>
-          
-          {selectedPlayers.length === 0 && (
+          {selectedPlayers.length === 0 ? (
             <div className="empty-state">
               <div className="empty-icon">🎯</div>
-              <p>Select players above to get started!</p>
+              <p>Select hitters above or use quick add buttons to get started!</p>
+            </div>
+          ) : (
+            <div className="reels-section">
+              {/* Player Row */}
+              <div className="reel-row player-row">
+                <div className="row-label">Player</div>
+                <div className="reels-container">
+                  {[0, 1, 2].map(reelIndex => (
+                    <PlayerReel
+                      key={`player-${reelIndex}`}
+                      players={selectedPlayers}
+                      isSpinning={isSpinning}
+                      finalPlayer={results.players[reelIndex]}
+                      reelIndex={reelIndex}
+                      onSpinComplete={handleReelComplete}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Prop Type Row */}
+              <div className="reel-row prop-row">
+                <div className="row-label">Prop</div>
+                <div className="reels-container">
+                  {[0, 1, 2].map(reelIndex => (
+                    <PropReel
+                      key={`prop-${reelIndex}`}
+                      isSpinning={isSpinning}
+                      finalProp={results.props[reelIndex]}
+                      reelIndex={reelIndex}
+                      onSpinComplete={handleReelComplete}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Number Row */}
+              <div className="reel-row number-row">
+                <div className="row-label">Count</div>
+                <div className="reels-container">
+                  {[0, 1, 2].map(reelIndex => {
+                    const player = results.players[reelIndex];
+                    const prop = results.props[reelIndex];
+                    // Use default numbers when not spinning or no results yet
+                    const availableNumbers = (player && prop && isSpinning) ? 
+                      generateNumbersForProp(prop, player) : [1, 2, 3];
+                    
+                    return (
+                      <NumberReel
+                        key={`number-${reelIndex}`}
+                        isSpinning={isSpinning}
+                        finalNumber={results.numbers[reelIndex]}
+                        availableNumbers={availableNumbers}
+                        reelIndex={reelIndex}
+                        onSpinComplete={handleReelComplete}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -318,477 +710,56 @@ const SlotMachineCard = () => {
             ) : (
               <>
                 <span className="lever">🎰</span>
-                SPIN IT!
+                SPIN FOR PROPS!
               </>
             )}
           </button>
           
-          {hasSpun && !isSpinning && (
-            <button className="reset-btn" onClick={handleReset}>
-              Reset Machine
-            </button>
-          )}
+          <div className="control-buttons">
+            {hasSpun && !isSpinning && (
+              <button className="reset-btn" onClick={handleReset}>
+                🔄 New Spin
+              </button>
+            )}
+            
+            {selectedPlayers.length > 0 && (
+              <button className="clear-btn" onClick={handleClearAll}>
+                🗑️ Clear All
+              </button>
+            )}
+          </div>
         </div>
 
         {allReelsComplete && !isSpinning && (
           <div className="results-banner">
             <div className="banner-content">
-              <h4>🎉 Your Picks Are In! 🎉</h4>
-              <p>Here are your 3 random selections for today's bets!</p>
+              <h4>🎉 Your Prop Bets Are Ready! 🎉</h4>
+              <p>Here are your 3 random prop bet selections:</p>
+              <div className="results-summary">
+                {results.players.map((player, index) => {
+                  const prop = results.props[index];
+                  const number = results.numbers[index];
+                  const isTopPlayer = isTopPerformer(player);
+                  
+                  return (
+                    <div key={index} className="result-item">
+                      <div className="result-main">
+                        <strong>{player.name}</strong> - {number}+ {prop.label}
+                        {isTopPlayer && prop.key === 'homeruns' && number === 2 && (
+                          <span className="rare-indicator">⭐ RARE BET!</span>
+                        )}
+                      </div>
+                      <div className="result-detail">
+                        {player.team} • {prop.emoji} {prop.label} • Count: {number}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
       </div>
-
-      <style jsx>{`
-        .slot-machine-card {
-          background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-          color: white;
-          min-height: 500px;
-          border: 2px solid #ffd700;
-          box-shadow: 0 8px 32px rgba(255, 215, 0, 0.3);
-          position: relative;
-          overflow: hidden;
-        }
-
-        .slot-machine-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: 
-            radial-gradient(circle at 10% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 20%),
-            radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 20%),
-            radial-gradient(circle at 40% 40%, rgba(255, 215, 0, 0.05) 0%, transparent 20%);
-          pointer-events: none;
-        }
-
-        .card-header {
-          position: relative;
-          z-index: 2;
-          border-bottom: 2px solid #ffd700;
-          margin-bottom: 20px;
-          padding-bottom: 15px;
-        }
-
-        .card-header h3 {
-          color: #ffd700;
-          font-size: 1.5rem;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-          margin-bottom: 5px;
-          font-weight: 700;
-        }
-
-        .header-subtitle {
-          color: #e0e0e0;
-          font-size: 0.9rem;
-          font-style: italic;
-        }
-
-        .player-picker {
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 8px;
-          margin-bottom: 20px;
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-
-        .picker-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 12px 16px;
-          cursor: pointer;
-        }
-
-        .picker-header h4 {
-          color: #ffd700;
-          margin: 0;
-          font-size: 1rem;
-        }
-
-        .expand-btn {
-          background: none;
-          border: none;
-          color: #ffd700;
-          font-size: 1.2rem;
-          cursor: pointer;
-          transition: transform 0.2s ease;
-        }
-
-        .expand-btn:hover {
-          transform: scale(1.1);
-        }
-
-        .picker-content {
-          border-top: 1px solid rgba(255, 215, 0, 0.3);
-          padding: 16px;
-        }
-
-        .filter-tabs {
-          display: flex;
-          gap: 8px;
-          margin-bottom: 16px;
-        }
-
-        .filter-tab {
-          background: rgba(255, 255, 255, 0.1);
-          border: 1px solid rgba(255, 215, 0, 0.3);
-          color: white;
-          padding: 6px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 0.85rem;
-          transition: all 0.2s ease;
-        }
-
-        .filter-tab:hover {
-          background: rgba(255, 215, 0, 0.2);
-        }
-
-        .filter-tab.active {
-          background: #ffd700;
-          color: #1a1a2e;
-          font-weight: 600;
-        }
-
-        .players-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 8px;
-          max-height: 200px;
-          overflow-y: auto;
-        }
-
-        .player-option {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 8px 12px;
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 4px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          border: 1px solid transparent;
-        }
-
-        .player-option:hover {
-          background: rgba(255, 215, 0, 0.1);
-          border-color: rgba(255, 215, 0, 0.3);
-        }
-
-        .player-option.selected {
-          background: rgba(255, 215, 0, 0.2);
-          border-color: #ffd700;
-        }
-
-        .option-info {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .option-name {
-          font-size: 0.85rem;
-          font-weight: 500;
-          color: white;
-        }
-
-        .option-team {
-          font-size: 0.75rem;
-          font-weight: 600;
-        }
-
-        .selection-indicator {
-          font-size: 1.2rem;
-          font-weight: bold;
-          color: #ffd700;
-        }
-
-        .slot-machine {
-          position: relative;
-          z-index: 2;
-        }
-
-        .machine-display {
-          background: rgba(0, 0, 0, 0.4);
-          border-radius: 12px;
-          padding: 20px;
-          border: 2px solid #ffd700;
-          margin-bottom: 20px;
-          min-height: 200px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .reels-container {
-          display: flex;
-          gap: 20px;
-          width: 100%;
-          justify-content: center;
-        }
-
-        .slot-reel {
-          flex: 1;
-          max-width: 200px;
-        }
-
-        .reel-container {
-          background: white;
-          border-radius: 8px;
-          overflow: hidden;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-          transition: transform 0.3s ease;
-        }
-
-        .slot-reel.spinning .reel-container {
-          animation: shake 0.1s infinite;
-        }
-
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-2px); }
-          75% { transform: translateX(2px); }
-        }
-
-        .player-slot {
-          display: flex;
-          align-items: center;
-          padding: 12px;
-          background: white;
-          color: #333;
-          gap: 12px;
-        }
-
-        .player-rank {
-          width: 40px;
-          height: 40px;
-          position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 50%;
-          font-weight: bold;
-          overflow: hidden;
-          flex-shrink: 0;
-        }
-
-        .rank-logo {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-          padding: 4px;
-          opacity: 0.7;
-        }
-
-        .rank-overlay {
-          position: absolute;
-          inset: 0;
-          background-color: currentColor;
-          opacity: 0.3;
-        }
-
-        .rank-number {
-          position: relative;
-          z-index: 10;
-          color: white;
-          font-size: 0.9rem;
-          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-        }
-
-        .player-info {
-          flex: 1;
-          min-width: 0;
-        }
-
-        .player-name {
-          font-weight: 600;
-          font-size: 0.9rem;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .player-team {
-          font-size: 0.75rem;
-          font-weight: 600;
-          margin-top: 2px;
-        }
-
-        .player-stats {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-          align-items: center;
-          flex-shrink: 0;
-        }
-
-        .stat-item {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          min-width: 40px;
-        }
-
-        .stat-value {
-          font-weight: bold;
-          font-size: 0.85rem;
-          color: #0056b3;
-        }
-
-        .stat-label {
-          font-size: 0.65rem;
-          color: #666;
-          text-transform: uppercase;
-        }
-
-        .empty-state {
-          text-align: center;
-          color: #ccc;
-          padding: 40px 20px;
-        }
-
-        .empty-icon {
-          font-size: 3rem;
-          margin-bottom: 16px;
-          opacity: 0.7;
-        }
-
-        .machine-controls {
-          display: flex;
-          gap: 16px;
-          justify-content: center;
-          align-items: center;
-        }
-
-        .spin-btn {
-          background: linear-gradient(45deg, #ff6b6b, #ffd700);
-          border: none;
-          padding: 16px 32px;
-          border-radius: 8px;
-          color: #1a1a2e;
-          font-weight: bold;
-          font-size: 1.1rem;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-        }
-
-        .spin-btn:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
-        }
-
-        .spin-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-          transform: none;
-        }
-
-        .spin-btn.spinning {
-          background: linear-gradient(45deg, #ffd700, #ff6b6b);
-          animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.05); }
-        }
-
-        .spinner {
-          animation: spin 0.5s linear infinite;
-        }
-
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-
-        .reset-btn {
-          background: rgba(255, 255, 255, 0.1);
-          border: 1px solid rgba(255, 215, 0, 0.5);
-          color: #ffd700;
-          padding: 12px 24px;
-          border-radius: 6px;
-          cursor: pointer;
-          font-weight: 500;
-          transition: all 0.2s ease;
-        }
-
-        .reset-btn:hover {
-          background: rgba(255, 215, 0, 0.1);
-          border-color: #ffd700;
-        }
-
-        .results-banner {
-          background: linear-gradient(45deg, #28a745, #20c997);
-          margin-top: 20px;
-          padding: 16px;
-          border-radius: 8px;
-          text-align: center;
-          animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .banner-content h4 {
-          margin: 0 0 8px 0;
-          font-size: 1.2rem;
-          color: white;
-        }
-
-        .banner-content p {
-          margin: 0;
-          color: rgba(255, 255, 255, 0.9);
-          font-size: 0.9rem;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-          .reels-container {
-            flex-direction: column;
-            gap: 12px;
-            align-items: center;
-          }
-
-          .slot-reel {
-            width: 100%;
-            max-width: 280px;
-          }
-
-          .players-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .machine-controls {
-            flex-direction: column;
-            gap: 12px;
-          }
-
-          .spin-btn {
-            width: 100%;
-            justify-content: center;
-          }
-        }
-      `}</style>
     </div>
   );
 };
