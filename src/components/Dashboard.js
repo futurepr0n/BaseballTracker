@@ -29,6 +29,7 @@ import PitcherHitsAllowedCard from './cards/PitcherHitsAllowedCard/PitcherHitsAl
 import SlotMachineCard from './cards/SlotMachineCard/SlotMachineCard';
 
 
+
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
 
 import { CurrentSeriesHitsCard, CurrentSeriesHRCard } from './cards/CurrentSeriesCards/CurrentSeriesCards';
@@ -113,6 +114,10 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
 
   const [stadiumData, setStadiumData] = useState(null);
   const [stadiumLoading, setStadiumLoading] = useState(true);
+
+
+  const [rollingStatsType, setRollingStatsType] = useState('season'); // 'season', 'last_30', 'last_7', 'current'
+
 
     useEffect(() => {
     const loadStadiumData = async () => {
@@ -614,280 +619,239 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
   
   // Load rolling stats (with priority: today > yesterday > 7-day rolling > season)
   useEffect(() => {
-    const loadRollingStats = async () => {
-      try {
-        setStatsLoading(true);
+  const loadEnhancedRollingStats = async () => {
+    try {
+      setStatsLoading(true);
+      
+      console.log(`[Dashboard] Loading rolling stats for type: ${rollingStatsType}`);
+      
+      // Format date for file name
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+      
+      // Try to load rolling stats file
+      let rollingStatsResponse = await fetch(`/data/rolling_stats/rolling_stats_${rollingStatsType}_${dateStr}.json`);
+      
+      // If specific date not found, try latest
+      if (!rollingStatsResponse.ok) {
+        console.log(`[Dashboard] Specific date rolling stats not found, trying latest for ${rollingStatsType}`);
+        rollingStatsResponse = await fetch(`/data/rolling_stats/rolling_stats_${rollingStatsType}_latest.json`);
+      }
+      
+      if (rollingStatsResponse.ok) {
+        console.log(`[Dashboard] Successfully loaded rolling stats from file`);
+        const rollingStatsData = await rollingStatsResponse.json();
         
-        // Check if there's data for today
-        const hasDataForToday = filteredPlayerData && filteredPlayerData.length > 0;
+        // Apply team filtering if needed
+        let filteredHitters = rollingStatsData.topHitters || [];
+        let filteredHomers = rollingStatsData.topHRLeaders || [];
+        let filteredStrikeouts = rollingStatsData.topStrikeoutPitchers || [];
         
-        if (hasDataForToday) {
-          // Use the current day's data
-          processCurrentData();
-          setDataDate(currentDate);
-          setDateStatus('current');
-        } else {
-          // Try to load previous day's data specifically
-          const yesterday = new Date(currentDate);
-          yesterday.setDate(yesterday.getDate() - 1);
-          const yesterdayYear = yesterday.getFullYear();
-          const yesterdayMonth = String(yesterday.getMonth() + 1).padStart(2, '0');
-          const yesterdayDay = String(yesterday.getDate()).padStart(2, '0');
-          const yesterdayDateStr = `${yesterdayYear}-${yesterdayMonth}-${yesterdayDay}`;
-          
-          try {
-            const response = await fetch(`/data/${yesterdayYear}/${yesterdayMonth}/${yesterdayDay}/daily_stats.json`);
-            
-            if (response.ok) {
-              const data = await response.json();
-              if (data.players && data.players.length > 0) {
-                // Process previous day data with filtering
-                let filteredPrevDayPlayers = data.players;
-                
-                if (isFiltering) {
-                  filteredPrevDayPlayers = filteredPrevDayPlayers.filter(player => 
-                    shouldIncludePlayer(player.team)
-                  );
-                }
-                
-                const batters = filteredPrevDayPlayers.filter(player => 
-                  player.playerType === 'hitter' || !player.playerType);
-                
-                const pitchers = filteredPrevDayPlayers.filter(player => 
-                  player.playerType === 'pitcher');
-                
-                // Find top performers in previous day data
-                const topHitters = [...batters]
-                  .filter(player => player.H !== 'DNP' && player.H !== null)
-                  .sort((a, b) => (Number(b.H) || 0) - (Number(a.H) || 0))
-                  .slice(0, 25);
-                
-                const topHomers = [...batters]
-                  .filter(player => player.HR !== 'DNP' && player.HR !== null && Number(player.HR) > 0)
-                  .sort((a, b) => (Number(b.HR) || 0) - (Number(a.HR) || 0))
-                  .slice(0, 25);
-                
-                const topStrikeoutPitchers = [...pitchers]
-                  .filter(player => player.K !== 'DNP' && player.K !== null)
-                  .sort((a, b) => (Number(b.K) || 0) - (Number(a.K) || 0))
-                  .slice(0, 25);
-                
-                setRollingStats({
-                  hitters: topHitters.map(player => ({...player, games: 1})),
-                  homers: topHomers.map(player => ({...player, games: 1})),
-                  strikeouts: topStrikeoutPitchers.map(player => ({...player, games: 1}))
-                });
-                
-                // Set data date and status
-                setDataDate(yesterday);
-                setDateStatus('previous');
-                
-                // Exit early since we found yesterday's data
-                setStatsLoading(false);
-                return;
-              }
-            }
-          } catch (e) {
-            console.warn(`Could not load previous day data: ${e.message}`);
-          }
-          
-          // If we get here, we couldn't load yesterday's data, so fall back to more historical data
-          loadHistoricalStats();
-        }
-      } catch (error) {
-        console.error('Error loading rolling stats:', error);
-        processCurrentData(); // Fallback to current data
-        setDateStatus('current');
-      } finally {
-        setStatsLoading(false);
-      }
-    };
-    
-    // Helper function to load 7-day rolling data or season data
-    const loadHistoricalStats = async () => {
-      console.log('No previous day data found, falling back to 7-day rolling data');
-      
-      // Calculate dates for the last 7 days
-      const dates = [];
-      for (let i = 1; i <= 7; i++) {
-        const date = new Date(currentDate);
-        date.setDate(date.getDate() - i);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        dates.push(`${year}-${month}-${day}`);
-      }
-      
-      // Try to load data for each date
-      let combinedData = [];
-      for (const dateStr of dates) {
-        try {
-          const response = await fetch(`/data/${dateStr.substring(0, 4)}/${dateStr.substring(5, 7)}/${dateStr.substring(8, 10)}/daily_stats.json`);
-          if (response.ok) {
-            const data = await response.json();
-            if (data.players && data.players.length > 0) {
-              combinedData = combinedData.concat(data.players.map(player => ({
-                ...player,
-                dateStr
-              })));
-            }
-          }
-        } catch (e) {
-          // Silently fail for individual dates
-          console.warn(`Could not load data for ${dateStr}`);
-        }
-      }
-      
-      // Process the combined data with filtering
-      if (combinedData.length > 0) {
-        // Filter by team if needed
         if (isFiltering) {
-          combinedData = combinedData.filter(player => 
+          filteredHitters = filteredHitters.filter(player => 
+            shouldIncludePlayer(player.team)
+          );
+          filteredHomers = filteredHomers.filter(player => 
+            shouldIncludePlayer(player.team)
+          );
+          filteredStrikeouts = filteredStrikeouts.filter(player => 
             shouldIncludePlayer(player.team)
           );
         }
         
-        // Group by player and combine stats
-        const playerMap = new Map();
-        
-        combinedData.forEach(player => {
-          const key = `${player.name}_${player.team}`;
-          if (!playerMap.has(key)) {
-            playerMap.set(key, {
-              ...player,
-              games: 1,
-              dates: [player.dateStr]
-            });
-          } else {
-            const existing = playerMap.get(key);
-            existing.games += 1;
-            existing.dates.push(player.dateStr);
-            
-            // Combine stats (summing numeric values)
-            ['H', 'R', 'HR', 'RBI', 'K'].forEach(stat => {
-              if (player[stat] !== 'DNP' && player[stat] !== null) {
-                existing[stat] = (existing[stat] === 'DNP' || existing[stat] === null) 
-                  ? Number(player[stat]) 
-                  : Number(existing[stat]) + Number(player[stat]);
-              }
-            });
-          }
-        });
-        
-        // Convert back to array
-        const processedPlayers = Array.from(playerMap.values());
-        
-        // Create separate lists for batters and pitchers
-        const batters = processedPlayers.filter(player => 
-          player.playerType === 'hitter' || !player.playerType);
-        
-        const pitchers = processedPlayers.filter(player => 
-          player.playerType === 'pitcher');
-        
-        // Find top performers
-        const topHitters = [...batters]
-          .filter(player => player.H !== 'DNP' && player.H !== null)
-          .sort((a, b) => Number(b.H) - Number(a.H))
-          .slice(0, 25);
-        
-        const topHomers = [...batters]
-          .filter(player => player.HR !== 'DNP' && player.HR !== null && Number(player.HR) > 0)
-          .sort((a, b) => Number(b.HR) - Number(a.HR))
-          .slice(0, 25);
-        
-        const topStrikeoutPitchers = [...pitchers]
-          .filter(player => player.K !== 'DNP' && player.K !== null)
-          .sort((a, b) => Number(b.K) - Number(a.K))
-          .slice(0, 25);
-        
         setRollingStats({
-          hitters: topHitters,
-          homers: topHomers,
-          strikeouts: topStrikeoutPitchers
+          hitters: filteredHitters.slice(0, 25),
+          homers: filteredHomers.slice(0, 25),
+          strikeouts: filteredStrikeouts.slice(0, 25)
         });
         
-        // Set data date and status
-        setDateStatus('historical');
+        setDataDate(new Date(rollingStatsData.date));
+        setDateStatus(rollingStatsData.period || 'Season Stats');
+        
+        console.log(`[Dashboard] Loaded ${filteredHitters.length} hitters, ${filteredHomers.length} HR leaders, ${filteredStrikeouts.length} strikeout leaders`);
+        
       } else {
-        // No historical data available, check if we have player performance data
-        if (playerPerformance && playerPerformance.players) {
-          // Transform player performance data for use in dashboard
-          const players = playerPerformance.players;
-          
-          // Create homers list based on homeRunsThisSeason
-          const homers = [...players]
-            .filter(player => player.homeRunsThisSeason)
-            .sort((a, b) => b.homeRunsThisSeason - a.homeRunsThisSeason)
-            .slice(0, 25)
-            .map(player => ({
-              name: player.fullName || player.name,
-              team: player.team,
-              HR: player.homeRunsThisSeason,
-              games: player.gamesPlayed || 1
-            }));
-          
-          // Create hitters list based on performance indicators
-          const hitters = [...players]
-            .filter(player => player.performanceIndicator)
-            .map(player => ({
-              name: player.fullName || player.name,
-              team: player.team,
-              H: Math.round(player.expectedHRs * 2), // Estimated hits based on HR rate
-              games: player.gamesPlayed || 1
-            }))
-            .sort((a, b) => b.H - a.H)
-            .slice(0, 25);
-          
-          // We don't have pitcher data, so leave strikeouts empty
-          const strikeouts = [];
-          
-          setRollingStats({
-            hitters,
-            homers,
-            strikeouts
-          });
-          
-          // Set data date and status
-          setDateStatus('season');
-        } else {
-          // Fallback to the current playerData
-          processCurrentData();
-          setDateStatus('current');
-        }
+        console.log(`[Dashboard] No rolling stats file found, falling back to legacy method`);
+        await loadLegacyRollingStats();
       }
-    };
-    
-    // Helper function to process current data
-    const processCurrentData = () => {
-      const batters = filteredBatterData;
-      const pitchers = filteredPitcherData;
       
-      // Find top performers in current data
-      const topHitters = [...batters]
-        .filter(player => player.H !== 'DNP' && player.H !== null)
-        .sort((a, b) => (Number(b.H) || 0) - (Number(a.H) || 0))
-        .slice(0, 25);
-      
-      const topHomers = [...batters]
-        .filter(player => player.HR !== 'DNP' && player.HR !== null && Number(player.HR) > 0)
-        .sort((a, b) => (Number(b.HR) || 0) - (Number(a.HR) || 0))
-        .slice(0, 25);
-      
-      const topStrikeoutPitchers = [...pitchers]
-        .filter(player => player.K !== 'DNP' && player.K !== null)
-        .sort((a, b) => (Number(b.K) || 0) - (Number(a.K) || 0))
-        .slice(0, 25);
-      
-      setRollingStats({
-        hitters: topHitters.map(player => ({...player, games: 1})),
-        homers: topHomers.map(player => ({...player, games: 1})),
-        strikeouts: topStrikeoutPitchers.map(player => ({...player, games: 1}))
-      });
-    };
-    
-    loadRollingStats();
-  }, [filteredPlayerData, filteredBatterData, filteredPitcherData, currentDate, playerPerformance, isFiltering, shouldIncludePlayer]);
+    } catch (error) {
+      console.error('[Dashboard] Error loading enhanced rolling stats:', error);
+      await loadLegacyRollingStats();
+    } finally {
+      setStatsLoading(false);
+    }
+  };
   
+  // Legacy fallback method (your original logic)
+  const loadLegacyRollingStats = async () => {
+    console.log(`[Dashboard] Using legacy rolling stats method`);
+    
+    // Check if there's data for today
+    const hasDataForToday = filteredPlayerData && filteredPlayerData.length > 0;
+    
+    if (hasDataForToday) {
+      // Use the current day's data
+      processCurrentData();
+      setDataDate(currentDate);
+      setDateStatus('current');
+    } else {
+      // Try to load previous day's data specifically
+      const yesterday = new Date(currentDate);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayYear = yesterday.getFullYear();
+      const yesterdayMonth = String(yesterday.getMonth() + 1).padStart(2, '0');
+      const yesterdayDay = String(yesterday.getDate()).padStart(2, '0');
+      
+      try {
+        const monthName = yesterday.toLocaleString('default', { month: 'long' }).toLowerCase();
+        const filePath = `/data/${yesterdayYear}/${monthName}/${monthName}_${yesterdayDay}_${yesterdayYear}.json`;
+        const response = await fetch(filePath);
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.players && data.players.length > 0) {
+            // Process previous day data with filtering
+            let filteredPrevDayPlayers = data.players;
+            
+            if (isFiltering) {
+              filteredPrevDayPlayers = filteredPrevDayPlayers.filter(player => 
+                shouldIncludePlayer(player.team)
+              );
+            }
+            
+            const batters = filteredPrevDayPlayers.filter(player => 
+              player.playerType === 'hitter' || !player.playerType);
+            
+            const pitchers = filteredPrevDayPlayers.filter(player => 
+              player.playerType === 'pitcher');
+            
+            // Find top performers in previous day data
+            const topHitters = [...batters]
+              .filter(player => player.H !== 'DNP' && player.H !== null)
+              .sort((a, b) => (Number(b.H) || 0) - (Number(a.H) || 0))
+              .slice(0, 25);
+            
+            const topHomers = [...batters]
+              .filter(player => player.HR !== 'DNP' && player.HR !== null && Number(player.HR) > 0)
+              .sort((a, b) => (Number(b.HR) || 0) - (Number(a.HR) || 0))
+              .slice(0, 25);
+            
+            const topStrikeoutPitchers = [...pitchers]
+              .filter(player => player.K !== 'DNP' && player.K !== null)
+              .sort((a, b) => (Number(b.K) || 0) - (Number(a.K) || 0))
+              .slice(0, 25);
+            
+            setRollingStats({
+              hitters: topHitters.map(player => ({...player, games: 1})),
+              homers: topHomers.map(player => ({...player, games: 1})),
+              strikeouts: topStrikeoutPitchers.map(player => ({...player, games: 1}))
+            });
+            
+            // Set data date and status
+            setDataDate(yesterday);
+            setDateStatus('previous');
+            
+            return; // Exit early since we found yesterday's data
+          }
+        }
+      } catch (e) {
+        console.warn(`Could not load previous day data: ${e.message}`);
+      }
+      
+      // If we get here, fall back to current data processing
+      processCurrentData();
+      setDateStatus('current');
+    }
+  };
+  
+  // Helper function to process current data (unchanged from your original)
+  const processCurrentData = () => {
+    const batters = filteredBatterData;
+    const pitchers = filteredPitcherData;
+    
+    // Find top performers in current data
+    const topHitters = [...batters]
+      .filter(player => player.H !== 'DNP' && player.H !== null)
+      .sort((a, b) => (Number(b.H) || 0) - (Number(a.H) || 0))
+      .slice(0, 25);
+    
+    const topHomers = [...batters]
+      .filter(player => player.HR !== 'DNP' && player.HR !== null && Number(player.HR) > 0)
+      .sort((a, b) => (Number(b.HR) || 0) - (Number(a.HR) || 0))
+      .slice(0, 25);
+    
+    const topStrikeoutPitchers = [...pitchers]
+      .filter(player => player.K !== 'DNP' && player.K !== null)
+      .sort((a, b) => (Number(b.K) || 0) - (Number(a.K) || 0))
+      .slice(0, 25);
+    
+    setRollingStats({
+      hitters: topHitters.map(player => ({...player, games: 1})),
+      homers: topHomers.map(player => ({...player, games: 1})),
+      strikeouts: topStrikeoutPitchers.map(player => ({...player, games: 1}))
+    });
+  };
+  
+  loadEnhancedRollingStats();
+}, [filteredPlayerData, filteredBatterData, filteredPitcherData, currentDate, isFiltering, shouldIncludePlayer, rollingStatsType]);
+  
+
+const getTimePeriodText = () => {
+  switch(rollingStatsType) {
+    case 'season':
+      return "Season Leaders";
+    case 'last_30':
+      return "Last 30 Days";
+    case 'last_7':
+      return "Last 7 Days";
+    case 'current':
+      return dateStatus === 'current' ? "Today" : 
+             dateStatus === 'previous' ? dataDate.toLocaleDateString('en-US', { weekday: 'long' }) :
+             "Current";
+    default:
+      return dateStatus === 'current' ? "Today" : 
+             dateStatus === 'previous' ? dataDate.toLocaleDateString('en-US', { weekday: 'long' }) :
+             dateStatus === 'historical' ? "Last 7 Days" :
+             dateStatus === 'season' ? "Season Performance" : "Today";
+  }
+};
+
+const StatsTimePeriodSelector = () => (
+  <div className="stats-time-selector" style={{
+    display: 'flex',
+    gap: '8px',
+    marginBottom: '15px',
+    flexWrap: 'wrap'
+  }}>
+    <span style={{ fontSize: '0.9rem', color: '#666', alignSelf: 'center' }}>Show:</span>
+    {[
+      { key: 'season', label: 'Season' },
+      { key: 'last_30', label: 'Last 30 Days' },
+      { key: 'last_7', label: 'Last 7 Days' },
+      { key: 'current', label: 'Current' }
+    ].map(option => (
+      <button
+        key={option.key}
+        onClick={() => setRollingStatsType(option.key)}
+        style={{
+          padding: '4px 12px',
+          border: '1px solid #ddd',
+          borderRadius: '4px',
+          backgroundColor: rollingStatsType === option.key ? '#0056b3' : 'white',
+          color: rollingStatsType === option.key ? 'white' : '#333',
+          fontSize: '0.85rem',
+          cursor: 'pointer',
+          transition: 'all 0.2s ease'
+        }}
+      >
+        {option.label}
+      </button>
+    ))}
+  </div>
+);
   // Format date for display
   const formattedDate = currentDate.toLocaleDateString('en-US', { 
     weekday: 'long', 
@@ -905,7 +869,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
   });
 
   // Helper function to display the time period
-  const getTimePeriodText = () => {
+/*   const getTimePeriodText = () => {
     switch(dateStatus) {
       case 'current':
         return "Today";
@@ -919,7 +883,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
         return "Today";
     }
   };
-
+ */
   // Add this state for handling race conditions
 const [filteringComplete, setFilteringComplete] = useState(false);
 
@@ -1012,6 +976,10 @@ const noFilteredData = isFiltering &&
   </div>
 ) : (
         <div className="dashboard-grid">
+
+                <div className="stats-controls" style={{ gridColumn: '1 / -1' }}>
+        <StatsTimePeriodSelector />
+      </div>
           {/* Statistics Summary Card */}
           <StatsSummaryCard 
             batterData={filteredBatterData}
