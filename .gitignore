@@ -57,3 +57,11 @@ public/data/odds/mlb-hr-odds.csv
 public/data/predictions/hr_predictions_latest.json
 public/data/predictions/player_performance_latest.json
 public/data/stadium/stadium_hr_analysis.json
+public/data/rolling_stats/rolling_stats_current_2025-06-04.json
+public/data/rolling_stats/rolling_stats_current_latest.json
+public/data/rolling_stats/rolling_stats_last_7_2025-06-04.json
+public/data/rolling_stats/rolling_stats_last_7_latest.json
+public/data/rolling_stats/rolling_stats_last_30_2025-06-04.json
+public/data/rolling_stats/rolling_stats_last_30_latest.json
+public/data/rolling_stats/rolling_stats_season_2025-06-04.json
+public/data/rolling_stats/rolling_stats_season_latest.json
