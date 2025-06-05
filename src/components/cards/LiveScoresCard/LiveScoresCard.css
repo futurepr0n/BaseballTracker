@@ -1,7 +1,8 @@
-/* Enhanced LiveScoresCard.css with date grouping */
+/* Enhanced LiveScoresCard.css with comprehensive player information styling */
 .live-scores-card {
   grid-column: span 2;
   background-color: white;
+  position: relative;
 }
 
 .card-header {
@@ -9,12 +10,59 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.card-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.live-indicator {
+  font-size: 0.8rem;
+  color: #dc3545;
+  font-weight: 500;
+  animation: pulse 2s infinite;
 }
 
 .header-controls {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 5px;
+}
+
+.filter-btn {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover:not(:disabled) {
+  background-color: #e9ecef;
+}
+
+.filter-btn.active {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: white;
+}
+
+.filter-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .last-updated {
@@ -45,7 +93,7 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
-  max-height: 500px;
+  max-height: 600px;
   overflow-y: auto;
 }
 
@@ -67,15 +115,27 @@
   margin-bottom: 5px;
 }
 
+/* Game container for expansion */
+.game-container {
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.game-container:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
 .game-score {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px;
+  padding: 14px;
   border: 1px solid #eee;
-  border-radius: 6px;
   background-color: #fafafa;
   transition: all 0.2s ease;
+  position: relative;
 }
 
 .game-score:hover {
@@ -96,6 +156,16 @@
   background-color: #f8f9fa;
 }
 
+.game-score.delayed {
+  border-color: #ffc107;
+  background-color: #fffbf0;
+}
+
+.game-score.postponed {
+  border-color: #6c757d;
+  background-color: #f8f9fa;
+}
+
 .game-teams {
   display: flex;
   align-items: center;
@@ -107,46 +177,62 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 80px;
+  min-width: 100px;
 }
 
 .team-logo {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
+  flex-shrink: 0;
+}
+
+.team-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 45px;
 }
 
 .team-name {
   font-weight: 500;
-  min-width: 35px;
+  font-size: 0.95rem;
+}
+
+.team-record {
+  font-size: 0.75rem;
+  color: #666;
+  font-weight: 400;
 }
 
 .team-score {
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: #333;
-  min-width: 25px;
+  min-width: 30px;
   text-align: right;
+  margin-left: auto;
 }
 
 .game-divider {
   color: #666;
   font-weight: 500;
+  font-size: 0.9rem;
 }
 
 .game-status-detailed {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 4px;
-  min-width: 120px;
+  gap: 6px;
+  min-width: 140px;
 }
 
 .game-status {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 2px;
+  gap: 3px;
 }
 
 .status {
@@ -171,15 +257,49 @@
   color: #0556b3;
 }
 
-.outs-count {
+.status.delayed {
+  color: #ffc107;
+  background-color: rgba(255, 193, 7, 0.1);
+}
+
+.status.postponed {
+  color: #6c757d;
+  background-color: rgba(108, 117, 125, 0.1);
+}
+
+.count-info {
   font-size: 0.75rem;
   color: #666;
   font-weight: 400;
 }
 
+.status-detail {
+  font-size: 0.7rem;
+  color: #888;
+  font-style: italic;
+}
+
+.game-extras {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* Base Runner Indicator */
 .base-runners {
-  margin-top: 4px;
+  margin-top: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.base-runners.empty {
+  opacity: 0.6;
+}
+
+.base-runners.occupied {
+  opacity: 1;
 }
 
 .diamond {
@@ -226,6 +346,264 @@
   bottom: 9px;
 }
 
+.runners-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.65rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+.runners-label {
+  font-weight: 500;
+}
+
+.runners-list {
+  color: #007bff;
+  font-weight: 500;
+}
+
+.no-runners {
+  font-size: 0.65rem;
+  color: #999;
+  font-style: italic;
+}
+
+/* Weather Indicator */
+.weather-info {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.weather-icon {
+  font-size: 0.9rem;
+}
+
+.weather-temp {
+  font-weight: 500;
+}
+
+.expand-indicator {
+  font-size: 0.8rem;
+  color: #999;
+  margin-top: 5px;
+}
+
+/* Live Game Details - NEW */
+.live-game-details {
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffebee 100%);
+  border-top: 1px solid #ffcdd2;
+  animation: slideDown 0.3s ease;
+}
+
+.live-situation {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.count-and-bases {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  border: 1px solid #e3f2fd;
+}
+
+.count-display {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.count-info-detailed {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.count-label {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.count-value {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #333;
+  background-color: #f8f9fa;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+}
+
+/* Current Players Information - NEW */
+.current-players {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  border: 1px solid #e8f5e8;
+}
+
+.batting-team {
+  margin-bottom: 4px;
+}
+
+.team-batting {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.batting-label {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.current-batter,
+.current-pitcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.player-role {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #555;
+  min-width: 70px;
+}
+
+.player-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+}
+
+.jersey-number {
+  font-size: 0.75rem;
+  color: #666;
+  background-color: #f8f9fa;
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid #dee2e6;
+  min-width: 24px;
+  text-align: center;
+}
+
+.last-play {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border-left: 3px solid #007bff;
+  margin-top: 4px;
+}
+
+.play-label {
+  font-size: 0.75rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.play-text {
+  font-size: 0.8rem;
+  color: #333;
+  font-style: italic;
+}
+
+/* Expanded Game Details */
+.game-details-expanded {
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    padding: 0 16px;
+  }
+  to {
+    opacity: 1;
+    max-height: 300px;
+    padding: 16px;
+  }
+}
+
+.game-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.venue-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.weather-detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.broadcast-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.odds-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #007bff;
+  font-weight: 500;
+}
+
+.game-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.note {
+  font-size: 0.8rem;
+  color: #666;
+  font-style: italic;
+  padding: 4px 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+}
+
 @keyframes pulse {
   0% { opacity: 1; }
   50% { opacity: 0.7; }
@@ -263,81 +641,124 @@
   opacity: 0.8;
 }
 
-/* Responsive */
+/* Loading indicator enhancements */
+.loading-indicator {
+  text-align: center;
+  padding: 30px;
+  color: #666;
+}
+
+.loading-indicator::after {
+  content: "...";
+  animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+  0%, 20% {
+    content: ".";
+  }
+  40% {
+    content: "..";
+  }
+  60% {
+    content: "...";
+  }
+  80%, 100% {
+    content: "";
+  }
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
   .live-scores-card {
     grid-column: 1 / -1;
-    margin: 0 -5px; /* Allow card to use more screen width */
+    margin: 0 -5px;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .card-header h3 {
+    justify-content: center;
+  }
+  
+  .header-controls {
+    justify-content: space-between;
   }
   
   .game-score {
-    padding: 8px;
+    padding: 10px;
     margin: 0;
   }
   
   .game-teams {
-    gap: 6px;
+    gap: 8px;
     flex: 1;
-    min-width: 0; /* Allow shrinking */
+    min-width: 0;
   }
   
   .team {
-    gap: 3px;
-    min-width: 45px;
+    gap: 4px;
+    min-width: 50px;
     flex-shrink: 1;
   }
   
   .team-logo {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+  }
+  
+  .team-info {
+    min-width: 35px;
   }
   
   .team-name {
     font-size: 0.85rem;
-    font-weight: 500;
-    min-width: 30px;
+  }
+  
+  .team-record {
+    font-size: 0.65rem;
   }
   
   .team-score {
-    font-size: 1rem;
-    font-weight: bold;
-    min-width: 20px;
-    text-align: right;
+    font-size: 1.1rem;
+    min-width: 25px;
   }
   
   .game-divider {
     font-size: 0.8rem;
-    margin: 0 2px;
+    margin: 0 3px;
     flex-shrink: 0;
   }
   
   .game-status-detailed {
-    min-width: 60px;
+    min-width: 80px;
     flex-shrink: 0;
   }
   
   .status {
     font-size: 0.75rem;
-    padding: 2px 5px;
-    white-space: nowrap;
+    padding: 2px 6px;
+    max-width: 80px;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 60px;
   }
   
-  .outs-count {
+  .count-info {
     font-size: 0.65rem;
   }
   
   .diamond {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
   }
   
   .base {
-    width: 4px;
-    height: 4px;
+    width: 5px;
+    height: 5px;
   }
   
   .base.home {
@@ -360,50 +781,82 @@
     bottom: 7px;
   }
   
-  /* Make the card header more compact on mobile */
-  .card-header {
-    margin-bottom: 15px;
-  }
-  
-  .card-header h3 {
-    font-size: 1.1rem;
-  }
-  
-  .header-controls {
-    gap: 8px;
-  }
-  
-  .last-updated {
-    font-size: 0.7rem;
-  }
-  
-  .refresh-btn {
-    padding: 3px 6px;
-    font-size: 0.9rem;
-  }
-  
-  /* Ensure the scores container doesn't overflow */
   .scores-container {
-    gap: 10px;
-    max-height: 400px;
-    width: 100%;
-    overflow-x: hidden; /* Prevent horizontal scroll */
+    gap: 12px;
+    max-height: 500px;
   }
   
   .date-header {
     font-size: 0.8rem;
     padding: 6px 10px;
   }
+  
+  /* Mobile Live Game Details */
+  .live-game-details {
+    padding: 10px;
+  }
+  
+  .count-and-bases {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+    padding: 8px;
+  }
+  
+  .current-players {
+    gap: 6px;
+    padding: 8px;
+  }
+  
+  .current-batter,
+  .current-pitcher {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .player-role {
+    font-size: 0.75rem;
+    min-width: auto;
+  }
+  
+  .player-name {
+    font-size: 0.8rem;
+  }
+  
+  .jersey-number {
+    font-size: 0.7rem;
+    align-self: flex-end;
+  }
+  
+  .runners-text {
+    font-size: 0.6rem;
+  }
+  
+  .game-details-expanded {
+    padding: 12px;
+  }
+  
+  .venue-info,
+  .weather-detail,
+  .broadcast-info,
+  .odds-info {
+    font-size: 0.75rem;
+  }
+  
+  .weather-info {
+    font-size: 0.7rem;
+  }
 }
 
 /* Extra small screens */
 @media (max-width: 480px) {
   .game-score {
-    padding: 6px;
+    padding: 8px;
   }
   
   .team {
-    min-width: 40px;
+    min-width: 45px;
   }
   
   .team-name {
@@ -411,22 +864,22 @@
   }
   
   .team-score {
-    font-size: 0.95rem;
+    font-size: 1rem;
   }
   
   .game-status-detailed {
-    min-width: 55px;
+    min-width: 70px;
   }
   
   .status {
     font-size: 0.7rem;
-    max-width: 55px;
+    max-width: 70px;
     padding: 1px 4px;
   }
   
   .diamond {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
   }
   
   .base.home {
@@ -447,5 +900,30 @@
   .base.third {
     left: -2px;
     bottom: 6px;
+  }
+  
+  .live-game-details {
+    padding: 8px;
+  }
+  
+  .count-and-bases {
+    padding: 6px;
+  }
+  
+  .current-players {
+    padding: 6px;
+    gap: 4px;
+  }
+  
+  .player-name {
+    font-size: 0.75rem;
+  }
+  
+  .play-text {
+    font-size: 0.75rem;
+  }
+  
+  .game-details {
+    gap: 8px;
   }
 }
