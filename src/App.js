@@ -20,7 +20,7 @@ import {
   formatDateString
 } from './services/dataService';
 
-import PinheadsPlayhouse from './components/PinheadsPlayhouse';
+import PinheadsPlayhouse from './components/PinheadsPlayhouse/PinheadsPlayhouse';
 
 import './App.css';
 
