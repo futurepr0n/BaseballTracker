@@ -93,7 +93,7 @@ const PinheadsPlayhouse = ({ currentDate }) => {
   // Load data functions
   const loadCSVData = async (filename) => {
     try {
-      const response = await fetch(`/data/${filename}`);
+      const response = await fetch(`/data/stats/${filename}`);
       if (!response.ok) return [];
       
       const csvText = await response.text();
