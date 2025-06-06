@@ -20,6 +20,8 @@ import {
   formatDateString
 } from './services/dataService';
 
+import PinheadsPlayhouse from './components/PinheadsPlayhouse';
+
 import './App.css';
 
 function App() {
@@ -160,6 +162,15 @@ function App() {
                 teamData={teamData}
                 currentDate={currentDate}
               />} />
+
+              <Route path="/pinheads-playhouse" element={<PinheadsPlayhouse 
+                  playerData={playerData} 
+                  teamData={teamData} 
+                  gameData={gameData} 
+                  currentDate={currentDate}
+                />} />
+
+
             </Routes>
           </TeamFilterProvider>
         </main>

@@ -16,7 +16,8 @@ function Navigation() {
     { path: '/teams', label: 'Teams' },
     { path: '/games', label: 'Games' },
     { path: '/capsheet', label: 'CapSheet' },
-    { path: '/matchup-analyzer', label: 'Matchup Analyzer' } // Add the new link
+    { path: '/matchup-analyzer', label: 'Matchup Analyzer' }, // Add the new link
+    { path: '/pinheads-playhouse', label: 'Pinheads Playhouse' } // Add the new link
   ];
   
   // Toggle mobile menu
