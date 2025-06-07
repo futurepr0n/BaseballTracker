@@ -1,91 +1,56 @@
-.picker-content {
-  border-top: 1px solid rgba(255, 215, 0, 0.3);
-  padding: 16px;
-}
-
-/* Picker Controls */
-.picker-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.search-container {
-  position: relative;
-}
-
-.search-input {
-  width: 100%;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 215, 0, 0.3);
-  border-radius: 4px;
-  color: white;
-  font-size: 0.85rem;
-  transition: all 0.2s ease;
-  box-sizing: border-box;
-}
-
-.search-input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: #ffd700;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-/* Picker Controls */
-.picker-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.search-container {
-  position: relative;
-}
-
-.search-input {
-  width: 100%;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 215, 0, 0.3);
-  border-radius: 4px;
-  color: white;
-  font-size: 0.85rem;
-  transition: all 0.2s ease;
-}
-
-.search-input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: #ffd700;
-  background: rgba(255, 255, 255, 0.15);
-}/* SlotMachineCard.css */
+/* ==========================================================================
+   Slot Machine Card - Main Component Styles
+   ========================================================================== */
 
 .slot-machine-card {
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  color: white;
+  color: white; /* Default text color for the entire card */
   min-height: 500px;
   border: 2px solid #ffd700;
   box-shadow: 0 8px 32px rgba(255, 215, 0, 0.3);
   position: relative;
   overflow: hidden;
-  /* Full width spanning all grid columns */
   grid-column: 1 / -1;
-  /* Ensure proper box sizing */
   box-sizing: border-box;
   width: 100%;
 }
 
-/* Quick Add Section */
+.slot-machine-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 10% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 20%),
+    radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 20%),
+    radial-gradient(circle at 40% 40%, rgba(255, 215, 0, 0.05) 0%, transparent 20%);
+  pointer-events: none;
+}
+
+.slot-machine-card .card-header {
+  position: relative;
+  z-index: 2;
+  border-bottom: 2px solid #ffd700;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+}
+
+.slot-machine-card .card-header h3 {
+  color: #ffd700;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  margin-bottom: 5px;
+}
+
+.slot-machine-card .header-subtitle {
+  color: #e0e0e0;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+/* ==========================================================================
+   Quick Add Section
+   ========================================================================== */
+
 .quick-add-section {
   margin-bottom: 20px;
   position: relative;
@@ -143,43 +108,10 @@
   line-height: 1.2;
 }
 
-.slot-machine-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at 10% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 20%),
-    radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 20%),
-    radial-gradient(circle at 40% 40%, rgba(255, 215, 0, 0.05) 0%, transparent 20%);
-  pointer-events: none;
-}
+/* ==========================================================================
+   Player Picker Section
+   ========================================================================== */
 
-.slot-machine-card .card-header {
-  position: relative;
-  z-index: 2;
-  border-bottom: 2px solid #ffd700;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-}
-
-.slot-machine-card .card-header h3 {
-  color: #ffd700;
-  font-size: 1.5rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  margin-bottom: 5px;
-  font-weight: 700;
-}
-
-.slot-machine-card .header-subtitle {
-  color: #e0e0e0;
-  font-size: 0.9rem;
-  font-style: italic;
-}
-
-/* Player Picker Styles */
 .player-picker {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
@@ -215,7 +147,11 @@
   transform: scale(1.1);
 }
 
-/* Picker Controls */
+.picker-content {
+  border-top: 1px solid rgba(255, 215, 0, 0.3);
+  padding: 16px;
+}
+
 .picker-controls {
   display: flex;
   flex-direction: column;
@@ -236,6 +172,7 @@
   color: white;
   font-size: 0.85rem;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .search-input::placeholder {
@@ -246,81 +183,6 @@
   outline: none;
   border-color: #ffd700;
   background: rgba(255, 255, 255, 0.15);
-}
-
-/* Enhanced Player Options */
-.player-option {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
-  gap: 8px;
-}
-
-.option-stats {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
-  min-width: 50px;
-  text-align: center;
-}
-
-.no-players-found {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 20px;
-  color: rgba(255, 255, 255, 0.6);
-  font-style: italic;
-}
-
-.no-players-found p {
-  margin: 0;
-  font-size: 0.9rem;
-}
-
-/* Enhanced Machine Controls */
-.control-buttons {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.clear-btn {
-  background: rgba(255, 99, 99, 0.2);
-  border: 1px solid rgba(255, 99, 99, 0.5);
-  color: #ff6363;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  font-size: 0.9rem;
-}
-
-.clear-btn:hover {
-  background: rgba(255, 99, 99, 0.3);
-  border-color: #ff6363;
-}
-
-/* Enhanced Results Banner */
-.results-summary {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.result-item {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  border-left: 3px solid #ffd700;
 }
 
 .filter-tabs {
@@ -376,31 +238,14 @@
 
 .player-option {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
+  justify-content: space-between;
+  padding: 8px 12px;
   cursor: pointer;
   transition: all 0.2s ease;
   border: 1px solid transparent;
+  border-radius: 4px;
   gap: 8px;
-}
-
-.option-stats {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
-  min-width: 50px;
-  text-align: center;
-}
-
-.no-players-found {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 20px;
-  color: rgba(255, 255, 255, 0.6);
-  font-style: italic;
 }
 
 .player-option:hover {
@@ -416,26 +261,47 @@
 .option-info {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-width: 0;
 }
 
+/* --- THEME FIX: Use inherit to adapt to light/dark mode --- */
 .option-name {
+  color: inherit; /* This allows the text to be white on dark backgrounds */
   font-size: 0.85rem;
   font-weight: 500;
-  color: white;
 }
 
 .option-team {
   font-size: 0.75rem;
   font-weight: 600;
+  /* Team color is often set inline, otherwise it will inherit */
 }
 
 .selection-indicator {
   font-size: 1.2rem;
   font-weight: bold;
   color: #ffd700;
+  flex-shrink: 0;
 }
 
-/* Slot Machine Display */
+.no-players-found {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 20px;
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+}
+
+.no-players-found p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   Machine Display (Reels) Section
+   ========================================================================== */
+
 .machine-display {
   background: rgba(0, 0, 0, 0.4);
   border-radius: 12px;
@@ -452,7 +318,7 @@
 
 .reels-section {
   width: 100%;
-  max-width: 1200px; /* Limit max width on very large screens */
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -480,7 +346,7 @@
   gap: 24px;
   flex: 1;
   justify-content: center;
-  max-width: calc(100% - 124px); /* Account for row label width */
+  max-width: calc(100% - 124px);
 }
 
 .slot-reel {
@@ -489,7 +355,6 @@
   min-width: 200px;
 }
 
-/* Different reel container styles for each row */
 .reel-container {
   border-radius: 8px;
   overflow: hidden;
@@ -497,29 +362,17 @@
   transition: transform 0.3s ease;
 }
 
-.slot-reel.spinning .reel-container {
-  animation: reelShake 0.1s infinite;
-}
+/* ==========================================================================
+   Slot Content Styles (Player, Prop, Number)
+   ========================================================================== */
 
-@keyframes reelShake {
-  0%, 100% { 
-    transform: translateX(0) scale(1); 
-  }
-  25% { 
-    transform: translateX(-2px) scale(1.02); 
-  }
-  75% { 
-    transform: translateX(2px) scale(1.02); 
-  }
-}
-
-/* Player Slot Styles */
+/* Player Slot - Light Background */
 .player-slot {
   display: flex;
   align-items: center;
   padding: 12px;
-  background: white;
-  color: #333;
+  background: white; /* This slot has a light background */
+  color: #333; /* So its default text color should be dark */
   gap: 12px;
   min-height: 70px;
 }
@@ -557,7 +410,7 @@
 .player-slot .rank-number {
   position: relative;
   z-index: 10;
-  color: white;
+  color: white; /* Number is on a colored background, so white is fine */
   font-size: 0.9rem;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
@@ -567,47 +420,26 @@
   min-width: 0;
 }
 
+/* --- THEME FIX: Use inherit to ensure text is visible on light background --- */
 .player-slot .player-name {
+  color: inherit; /* This will make it #333 from the .player-slot parent */
   font-weight: 600;
   font-size: 0.9rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: 2px;
 }
 
 .player-slot .player-team {
+  color: inherit;
+  opacity: 0.8;
   font-size: 0.75rem;
   font-weight: 600;
   margin-top: 2px;
 }
 
-.player-slot .player-stats {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.player-slot .stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 30px;
-}
-
-.player-slot .stat-value {
-  font-weight: bold;
-  font-size: 0.8rem;
-  color: #0056b3;
-}
-
-.player-slot .stat-label {
-  font-size: 0.6rem;
-  color: #666;
-  text-transform: uppercase;
-}
-
-/* Prop Slot Styles */
+/* Prop & Number Slots - Dark Backgrounds */
 .prop-slot {
   display: flex;
   flex-direction: column;
@@ -630,7 +462,6 @@
   text-align: center;
 }
 
-/* Number Slot Styles */
 .number-slot {
   display: flex;
   flex-direction: column;
@@ -654,137 +485,24 @@
   margin-top: 4px;
 }
 
-.reel-container {
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  transition: transform 0.3s ease;
-}
-
+/* Spinning State */
 .slot-reel.spinning .reel-container {
   animation: reelShake 0.1s infinite;
 }
 
-@keyframes reelShake {
-  0%, 100% { 
-    transform: translateX(0) scale(1); 
-  }
-  25% { 
-    transform: translateX(-2px) scale(1.02); 
-  }
-  75% { 
-    transform: translateX(2px) scale(1.02); 
-  }
+.slot-reel.spinning .player-slot {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
 
-.player-slot {
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  background: white;
-  color: #333;
-  gap: 12px;
+.slot-reel.spinning .player-name {
+  color: #000 !important; /* Make it extra bold during spin */
+  font-weight: 700;
 }
 
-.player-slot .player-rank {
-  width: 40px;
-  height: 40px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  font-weight: bold;
-  overflow: hidden;
-  flex-shrink: 0;
-}
+/* ==========================================================================
+   Machine Controls & Buttons
+   ========================================================================== */
 
-.player-slot .rank-logo {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  padding: 4px;
-  opacity: 0.7;
-}
-
-.player-slot .rank-overlay {
-  position: absolute;
-  inset: 0;
-  background-color: currentColor;
-  opacity: 0.3;
-}
-
-.player-slot .rank-number {
-  position: relative;
-  z-index: 10;
-  color: white;
-  font-size: 0.9rem;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.player-slot .player-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.player-slot .player-name {
-  font-weight: 600;
-  font-size: 0.9rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.player-slot .player-team {
-  font-size: 0.75rem;
-  font-weight: 600;
-  margin-top: 2px;
-}
-
-.player-slot .player-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.player-slot .stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 40px;
-}
-
-.player-slot .stat-value {
-  font-weight: bold;
-  font-size: 0.85rem;
-  color: #0056b3;
-}
-
-.player-slot .stat-label {
-  font-size: 0.65rem;
-  color: #666;
-  text-transform: uppercase;
-}
-
-/* Empty State */
-.empty-state {
-  text-align: center;
-  color: #ccc;
-  padding: 40px 20px;
-}
-
-.empty-icon {
-  font-size: 3rem;
-  margin-bottom: 16px;
-  opacity: 0.7;
-}
-
-/* Machine Controls */
 .machine-controls {
   display: flex;
   flex-direction: column;
@@ -797,23 +515,6 @@
   display: flex;
   gap: 12px;
   align-items: center;
-}
-
-.clear-btn {
-  background: rgba(255, 99, 99, 0.2);
-  border: 1px solid rgba(255, 99, 99, 0.5);
-  color: #ff6363;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  font-size: 0.9rem;
-}
-
-.clear-btn:hover {
-  background: rgba(255, 99, 99, 0.3);
-  border-color: #ff6363;
 }
 
 .spin-btn {
@@ -850,24 +551,25 @@
   animation: spinButtonPulse 1s infinite;
 }
 
-@keyframes spinButtonPulse {
-  0%, 100% { 
-    transform: scale(1); 
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-  }
-  50% { 
-    transform: scale(1.05); 
-    box-shadow: 0 6px 25px rgba(255, 215, 0, 0.8);
-  }
-}
-
 .spinner {
   animation: spinIcon 0.5s linear infinite;
 }
 
-@keyframes spinIcon {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.clear-btn {
+  background: rgba(255, 99, 99, 0.2);
+  border: 1px solid rgba(255, 99, 99, 0.5);
+  color: #ff6363;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.clear-btn:hover {
+  background: rgba(255, 99, 99, 0.3);
+  border-color: #ff6363;
 }
 
 .reset-btn {
@@ -886,391 +588,10 @@
   border-color: #ffd700;
 }
 
-/* Results Banner */
-.results-banner {
-  background: linear-gradient(45deg, #28a745, #20c997);
-  margin-top: 20px;
-  padding: 16px;
-  border-radius: 8px;
-  text-align: center;
-  animation: slideInResults 0.5s ease-out;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
+/* ==========================================================================
+   Results Section
+   ========================================================================== */
 
-.results-summary {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.result-item {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  border-left: 3px solid #ffd700;
-  text-align: left;
-}
-
-@keyframes slideInResults {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes spinButtonPulse {
-  0%, 100% { 
-    transform: scale(1); 
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-  }
-  50% { 
-    transform: scale(1.05); 
-    box-shadow: 0 6px 25px rgba(255, 215, 0, 0.8);
-  }
-}
-
-@keyframes spinIcon {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.banner-content h4 {
-  margin: 0 0 8px 0;
-  font-size: 1.2rem;
-  color: white;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.banner-content p {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.9rem;
-}
-
-/* Responsive Design */
-@media (max-width: 968px) {
-  .slot-machine-card {
-    grid-column: 1 / -1; /* Full width on smaller screens */
-  }
-}
-
-/* Responsive Design */
-
-/* Large Desktop (1400px+) */
-@media (min-width: 1400px) {
-  .reels-container {
-    gap: 32px;
-  }
-  
-  .slot-reel {
-    max-width: 320px;
-  }
-  
-  .row-label {
-    min-width: 120px;
-    font-size: 1.2rem;
-  }
-}
-
-/* Standard Desktop (1024px - 1399px) */
-@media (min-width: 1024px) and (max-width: 1399px) {
-  .reels-container {
-    gap: 20px;
-  }
-  
-  .slot-reel {
-    max-width: 260px;
-  }
-}
-
-/* Tablet Landscape (768px - 1023px) */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .machine-display {
-    padding: 16px;
-    min-height: 350px;
-  }
-  
-  .reels-section {
-    gap: 20px;
-  }
-  
-  .reel-row {
-    gap: 16px;
-  }
-  
-  .row-label {
-    min-width: 80px;
-    font-size: 1rem;
-  }
-  
-  .reels-container {
-    gap: 16px;
-    max-width: calc(100% - 96px);
-  }
-  
-  .slot-reel {
-    max-width: 220px;
-    min-width: 160px;
-  }
-  
-  .players-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-}
-
-@media (max-width: 768px) {
-  .slot-machine-card {
-    min-height: auto;
-    padding: 16px;
-    /* Compensate for dashboard padding on mobile */
-    margin: 0 -10px;
-  }
-  
-  .quick-add-buttons {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-  
-  .quick-add-btn {
-    padding: 10px 8px;
-    font-size: 0.8rem;
-  }
-  
-  .quick-add-label {
-    font-size: 0.8rem;
-  }
-  
-  .quick-add-desc {
-    font-size: 0.65rem;
-  }
-  
-  .machine-display {
-    padding: 12px;
-    min-height: 350px;
-    border-radius: 8px;
-  }
-  
-  .reels-section {
-    gap: 20px;
-  }
-  
-  .reel-row {
-    flex-direction: column;
-    gap: 12px;
-    align-items: stretch;
-  }
-
-  .row-label {
-    text-align: center;
-    min-width: auto;
-    font-size: 1rem;
-    padding: 8px 0;
-    background: rgba(255, 215, 0, 0.15);
-    border-radius: 6px;
-    margin: 0 10px;
-    border: 1px solid rgba(255, 215, 0, 0.3);
-  }
-
-  .reels-container {
-    gap: 12px;
-    max-width: 100%;
-    padding: 0 10px;
-  }
-
-  .slot-reel {
-    max-width: none;
-    min-width: auto;
-    flex: 1;
-  }
-
-  .reel-container {
-    min-height: 70px;
-  }
-
-  .player-slot {
-    padding: 10px;
-    gap: 10px;
-    min-height: 70px;
-  }
-
-  .prop-slot,
-  .number-slot {
-    padding: 14px 10px;
-    min-height: 70px;
-  }
-
-  .player-slot .player-rank {
-    width: 36px;
-    height: 36px;
-  }
-
-  .player-slot .rank-number {
-    font-size: 0.85rem;
-  }
-
-  .player-slot .player-name {
-    font-size: 0.85rem;
-  }
-
-  .player-slot .player-team {
-    font-size: 0.7rem;
-  }
-
-  .prop-emoji {
-    font-size: 1.5rem;
-  }
-
-  .prop-label {
-    font-size: 0.8rem;
-  }
-
-  .number-display {
-    font-size: 1.8rem;
-  }
-
-  .number-label {
-    font-size: 0.7rem;
-  }
-
-  .player-slot .stat-item {
-    min-width: 28px;
-  }
-
-  .player-slot .stat-value {
-    font-size: 0.75rem;
-  }
-
-  .player-slot .stat-label {
-    font-size: 0.55rem;
-  }
-
-  .players-grid {
-    grid-template-columns: 1fr;
-    max-height: 150px;
-  }
-
-  .machine-controls {
-    gap: 12px;
-  }
-  
-  .control-buttons {
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-  }
-
-  .spin-btn {
-    width: 100%;
-    justify-content: center;
-    padding: 14px 24px;
-    font-size: 1rem;
-  }
-  
-  .reset-btn,
-  .clear-btn {
-    width: 100%;
-    text-align: center;
-  }
-
-  .picker-content {
-    padding: 12px;
-  }
-  
-  .picker-controls {
-    gap: 10px;
-  }
-
-  .filter-tabs {
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .filter-tab {
-    padding: 5px 10px;
-    font-size: 0.8rem;
-    flex: 1;
-    text-align: center;
-  }
-  
-  .results-summary {
-    gap: 6px;
-  }
-  
-  .result-item {
-    padding: 10px;
-  }
-
-  .result-main {
-    font-size: 0.9rem;
-    flex-wrap: wrap;
-  }
-
-  .result-detail {
-    font-size: 0.8rem;
-  }
-
-  .rare-indicator {
-    font-size: 0.65rem;
-    padding: 1px 4px;
-  }
-}
-
-@media (max-width: 480px) {
-  .slot-machine-card .card-header h3 {
-    font-size: 1.3rem;
-  }
-  
-  .picker-header {
-    padding: 10px 12px;
-  }
-  
-  .picker-header h4 {
-    font-size: 0.9rem;
-  }
-  
-  .player-slot {
-    padding: 10px;
-    gap: 10px;
-  }
-  
-  .player-slot .player-rank {
-    width: 36px;
-    height: 36px;
-  }
-  
-  .player-slot .player-name {
-    font-size: 0.85rem;
-  }
-  
-  .player-slot .player-team {
-    font-size: 0.7rem;
-  }
-  
-  .results-banner {
-    padding: 12px;
-  }
-  
-  .banner-content h4 {
-    font-size: 1.1rem;
-  }
-  
-  .banner-content p {
-    font-size: 0.85rem;
-  }
-}
-
-
-
-/* Add these styles to your SlotMachineCard.css file */
-
-/* Results Section */
 .results-section {
   margin-top: 20px;
   padding: 20px;
@@ -1286,6 +607,7 @@
   border-radius: 8px;
   margin-bottom: 20px;
   box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+  animation: slideInResults 0.5s ease-out;
 }
 
 .banner-content h4 {
@@ -1301,17 +623,16 @@
   font-size: 0.9rem;
 }
 
-/* Results Summary */
 .results-summary {
   background: white;
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  color: #333; /* Set base text color for children */
 }
 
 .results-summary h4 {
   margin: 0 0 16px 0;
-  color: #333;
   font-size: 1.1rem;
   text-align: center;
 }
@@ -1369,54 +690,10 @@
   font-size: 1.5rem;
 }
 
-.prop-bet-card .player-info {
-  margin-bottom: 12px;
-}
-
 .prop-bet-card .player-name {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 2px;
+  color: #333; /* Explicitly dark for this light card */
 }
 
-.prop-bet-card .player-team {
-  font-size: 0.85rem;
-  font-weight: 600;
-  opacity: 0.8;
-}
-
-.prop-details {
-  margin-bottom: 12px;
-  padding: 8px;
-  background: rgba(255, 215, 0, 0.1);
-  border-radius: 4px;
-  border-left: 3px solid #ffd700;
-}
-
-.prop-type {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #0056b3;
-  margin-bottom: 4px;
-}
-
-.prop-target {
-  font-size: 0.85rem;
-  color: #666;
-}
-
-.bet-summary {
-  font-size: 0.9rem;
-  color: #333;
-  background: rgba(0, 86, 179, 0.1);
-  padding: 8px;
-  border-radius: 4px;
-  text-align: center;
-  border: 1px solid rgba(0, 86, 179, 0.2);
-}
-
-/* Results Actions */
 .results-actions {
   display: flex;
   gap: 12px;
@@ -1443,50 +720,15 @@
   color: white;
 }
 
-.copy-results-btn:hover {
-  background: linear-gradient(135deg, #5a6268 0%, #343a40 100%);
-  transform: translateY(-1px);
-}
-
 .share-results-btn {
   background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
   color: white;
 }
 
-.share-results-btn:hover {
-  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
-  transform: translateY(-1px);
-}
+/* ==========================================================================
+   Empty / Placeholder States
+   ========================================================================== */
 
-/* Responsive Design for Results */
-@media (max-width: 768px) {
-  .prop-bet-cards {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  
-  .prop-bet-card {
-    padding: 12px;
-  }
-  
-  .results-actions {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .copy-results-btn,
-  .share-results-btn {
-    width: 100%;
-    max-width: 200px;
-    justify-content: center;
-  }
-  
-  .results-summary {
-    padding: 16px;
-  }
-}
-
-/* Enhanced empty state */
 .empty-state {
   text-align: center;
   padding: 60px 20px;
@@ -1506,392 +748,158 @@
   margin: 0 auto;
 }
 
+/* ==========================================================================
+   Keyframe Animations
+   ========================================================================== */
 
-/* Mobile Portrait Mode - Optimized for 3x3 grid visibility */
+@keyframes reelShake {
+  0%, 100% { transform: translateX(0) scale(1); }
+  25% { transform: translateX(-2px) scale(1.02); }
+  75% { transform: translateX(2px) scale(1.02); }
+}
+
+@keyframes spinButtonPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 6px 25px rgba(255, 215, 0, 0.8);
+  }
+}
+
+@keyframes spinIcon {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes slideInResults {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+
+/* Tablet & Smaller Desktops */
+@media (max-width: 1023px) {
+  .machine-display {
+    padding: 16px;
+    min-height: 350px;
+  }
+  .reels-section { gap: 20px; }
+  .reel-row { gap: 16px; }
+  .row-label { min-width: 80px; font-size: 1rem; }
+  .reels-container { gap: 16px; max-width: calc(100% - 96px); }
+  .slot-reel { max-width: 220px; min-width: 160px; }
+  .players-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Mobile Devices (Portrait) */
 @media (max-width: 768px) {
   .slot-machine-card {
     min-height: auto;
     padding: 12px;
-    margin: 0 -8px; /* Slight negative margin to use more screen space */
-    font-size: 0.9rem; /* Slightly smaller base font */
+    margin: 0 -8px;
+    font-size: 0.9rem;
   }
-  
-  /* Compact header */
+
   .slot-machine-card .card-header {
     margin-bottom: 12px;
     padding-bottom: 10px;
   }
-  
-  .slot-machine-card .card-header h3 {
-    font-size: 1.2rem;
-    margin-bottom: 4px;
-  }
-  
-  .header-subtitle {
-    font-size: 0.8rem;
-  }
-  
-  /* Compact quick-add buttons */
-  .quick-add-section {
-    margin-bottom: 12px;
-  }
-  
-  .quick-add-section h4 {
-    font-size: 0.9rem;
-    margin-bottom: 8px;
-  }
-  
-  .quick-add-buttons {
-    grid-template-columns: repeat(4, 1fr); /* 4 columns for better fit */
-    gap: 6px;
-  }
-  
-  .quick-add-btn {
-    padding: 6px 4px;
-    font-size: 0.7rem;
-    min-height: 50px; /* Ensure buttons are tappable */
-  }
-  
-  .quick-add-label {
-    font-size: 0.7rem;
-    line-height: 1.1;
-  }
-  
-  .quick-add-desc {
-    font-size: 0.6rem;
-    line-height: 1.1;
-  }
-  
-  /* Compact player picker */
-  .player-picker {
-    margin-bottom: 12px;
-  }
-  
-  .picker-header {
-    padding: 8px 12px;
-  }
-  
-  .picker-header h4 {
-    font-size: 0.9rem;
-  }
-  
-  /* CRITICAL: Compact machine display for 3x3 grid visibility */
+
   .machine-display {
     padding: 8px;
-    min-height: 280px; /* Reduced height */
+    min-height: 280px;
     border-radius: 6px;
   }
   
-  .reels-section {
-    gap: 8px; /* Tighter spacing */
-    width: 100%;
-  }
+  .reels-section { gap: 8px; }
   
-  /* KEEP HORIZONTAL LAYOUT - Don't change to column! */
   .reel-row {
-    display: flex;
-    flex-direction: row; /* Keep horizontal */
+    flex-direction: row; /* Keep horizontal on mobile for 3x3 grid */
     align-items: center;
     gap: 6px;
-    width: 100%;
-    min-height: 70px; /* Consistent row height */
+    min-height: 70px;
   }
 
   .row-label {
-    min-width: 50px; /* Smaller label width */
+    min-width: 50px;
     font-size: 0.8rem;
     padding: 4px 2px;
-    text-align: center;
     background: rgba(255, 215, 0, 0.15);
     border-radius: 4px;
     border: 1px solid rgba(255, 215, 0, 0.3);
-    flex-shrink: 0;
-    writing-mode: horizontal-tb; /* Ensure horizontal text */
   }
 
   .reels-container {
-    display: flex;
     gap: 6px;
-    flex: 1;
-    justify-content: space-between;
-    max-width: calc(100% - 60px); /* Account for label */
+    max-width: calc(100% - 60px);
   }
 
   .slot-reel {
     flex: 1;
-    min-width: 70px; /* Minimum readable width */
-    max-width: 90px; /* Maximum width to fit 3 columns */
+    min-width: 70px;
+    max-width: 90px;
   }
 
-  /* Compact reel content */
-  .reel-container {
-    border-radius: 4px;
-  }
-
-  /* Compact player slots */
+  /* Compact Player Slot for Mobile */
   .player-slot {
-    padding: 6px;
-    gap: 4px;
-    min-height: 50px;
-  }
-
-  .player-slot .player-rank {
-    width: 24px;
-    height: 24px;
-  }
-
-  .player-slot .rank-number {
-    font-size: 0.7rem;
-  }
-
-  .player-slot .player-name {
-    font-size: 0.7rem;
-    line-height: 1.1;
-  }
-
-  .player-slot .player-team {
-    font-size: 0.6rem;
-  }
-
-  .player-slot .stat-value {
-    font-size: 0.6rem;
-  }
-
-  .player-slot .stat-label {
-    font-size: 0.5rem;
-  }
-
-  /* Compact prop slots */
-  .prop-slot {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     padding: 6px 4px;
-    min-height: 50px;
+    gap: 3px;
+    min-height: 55px;
+    text-align: center;
   }
-
-  .prop-emoji {
-    font-size: 1.2rem;
-    margin-bottom: 2px;
-  }
-
-  .prop-label {
-    font-size: 0.65rem;
-    line-height: 1.1;
-  }
-
-  /* Compact number slots */
-  .number-slot {
-    padding: 6px 4px;
-    min-height: 50px;
-  }
-
-  .number-display {
-    font-size: 1.4rem;
-  }
-
-  .number-label {
-    font-size: 0.6rem;
-    margin-top: 2px;
-  }
-
-  /* Compact machine controls */
-  .machine-controls {
-    margin-top: 12px;
-  }
-
-  .spin-btn {
-    padding: 12px 20px;
-    font-size: 0.9rem;
-    min-height: 48px; /* Ensure tappable */
-  }
-
+  
+  .player-slot .player-rank { width: 28px; height: 28px; margin-bottom: 2px; }
+  .player-slot .rank-number { font-size: 0.6rem; }
+  .player-slot .player-name { font-size: 0.65rem; line-height: 1.1; margin-bottom: 1px; }
+  .player-slot .player-team { font-size: 0.55rem; line-height: 1; margin-top: 0; }
+  
   .control-buttons {
-    gap: 8px;
-    margin-top: 8px;
-  }
-
-  .reset-btn,
-  .clear-btn {
-    padding: 8px 12px;
-    font-size: 0.8rem;
-    min-height: 40px;
-  }
-
-  /* Compact results section */
-  .results-section {
-    margin-top: 12px;
-    padding: 12px;
-  }
-
-  .results-banner {
-    padding: 10px;
-    margin-bottom: 12px;
-  }
-
-  .banner-content h4 {
-    font-size: 1rem;
-    margin-bottom: 4px;
-  }
-
-  .banner-content p {
-    font-size: 0.8rem;
-  }
-
-  .results-summary {
-    padding: 12px;
-  }
-
-  .results-summary h4 {
-    font-size: 0.9rem;
-    margin-bottom: 12px;
-  }
-
-  .prop-bet-cards {
-    grid-template-columns: 1fr; /* Single column on mobile */
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-
-  .prop-bet-card {
-    padding: 10px;
-  }
-
-  .bet-header {
-    margin-bottom: 8px;
-  }
-
-  .bet-number {
-    font-size: 0.7rem;
-    padding: 2px 6px;
-  }
-
-  .bet-emoji {
-    font-size: 1.2rem;
-  }
-
-  .prop-bet-card .player-name {
-    font-size: 0.9rem;
-  }
-
-  .prop-bet-card .player-team {
-    font-size: 0.75rem;
-  }
-
-  .prop-type {
-    font-size: 0.8rem;
-  }
-
-  .prop-target {
-    font-size: 0.75rem;
-  }
-
-  .bet-summary {
-    font-size: 0.8rem;
-    padding: 6px;
-  }
-
-  .results-actions {
     flex-direction: column;
     gap: 8px;
-    align-items: center;
+    width: 100%;
   }
 
-  .copy-results-btn,
-  .share-results-btn {
+  .spin-btn, .reset-btn, .clear-btn {
     width: 100%;
-    max-width: 200px;
-    padding: 8px 16px;
-    font-size: 0.8rem;
     justify-content: center;
   }
 
-  /* Empty state mobile */
-  .empty-state {
-    padding: 40px 12px;
-  }
-
-  .empty-state h4 {
-    font-size: 1.1rem;
-    margin-bottom: 8px;
-  }
-
-  .empty-state p {
-    font-size: 0.9rem;
-  }
+  .players-grid { grid-template-columns: 1fr; max-height: 150px; }
+  
+  .results-actions { flex-direction: column; }
+  .prop-bet-cards { grid-template-columns: 1fr; }
 }
 
-/* Extra small mobile devices (portrait phones, less than 576px) */
+/* Extra Small Mobile Devices */
 @media (max-width: 576px) {
   .slot-machine-card {
     padding: 8px;
     margin: 0 -6px;
   }
+  .machine-display { padding: 6px; min-height: 260px; }
+  .row-label { min-width: 45px; font-size: 0.7rem; }
+  .reels-container { gap: 4px; max-width: calc(100% - 50px); }
+  .reel-row { gap: 4px; min-height: 65px; }
+  .reels-section { gap: 6px; }
+  .slot-reel { min-width: 65px; max-width: 80px; }
   
-  .machine-display {
-    padding: 6px;
-    min-height: 260px;
-  }
-  
-  .row-label {
-    min-width: 45px;
-    font-size: 0.7rem;
-    padding: 2px 1px;
-  }
-  
-  .slot-reel {
-    min-width: 65px;
-    max-width: 80px;
-  }
-  
-  .reels-container {
-    gap: 4px;
-    max-width: calc(100% - 50px);
-  }
-  
-  .reel-row {
-    gap: 4px;
-    min-height: 65px;
-  }
-  
-  .reels-section {
-    gap: 6px;
-  }
-  
-  .player-slot,
-  .prop-slot,
-  .number-slot {
-    min-height: 45px;
-    padding: 4px;
-  }
-  
-  .prop-label {
-    font-size: 0.6rem;
-  }
-  
-  .quick-add-buttons {
-    grid-template-columns: repeat(3, 1fr); /* 3 columns on very small screens */
-  }
-}
-
-/* Landscape mobile optimization */
-@media (max-width: 768px) and (orientation: landscape) {
-  .machine-display {
-    min-height: 200px; /* Shorter height for landscape */
-  }
-  
-  .slot-machine-card {
-    padding: 8px;
-  }
-  
-  .reels-section {
-    gap: 6px;
-  }
-  
-  .reel-row {
-    min-height: 55px;
-  }
-  
-  .player-slot,
-  .prop-slot, 
-  .number-slot {
-    min-height: 40px;
-  }
+  .player-slot, .prop-slot, .number-slot { min-height: 45px; padding: 4px; }
+  .player-slot .player-rank { width: 24px; height: 24px; }
+  .player-slot .player-name { font-size: 0.6rem; }
+  .player-slot .player-team { font-size: 0.5rem; }
 }

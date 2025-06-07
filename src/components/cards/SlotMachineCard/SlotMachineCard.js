@@ -2,88 +2,48 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './SlotMachineCard.css';
 
-// Enhanced prop types with rarity system
-const PROP_TYPES = [
-  // Bases: 2+, 3+, 4+ (rarity: 2,2,2,2,2,3,3,4)
-  { key: 'bases-2+', label: 'Total Bases 2+', emoji: '🏃', numbers: [2], rarity: 2 },
-  { key: 'bases-2+', label: 'Total Bases 2+', emoji: '🏃', numbers: [2], rarity: 2 },
-  { key: 'bases-2+', label: 'Total Bases 2+', emoji: '🏃', numbers: [2], rarity: 2 },
-  { key: 'bases-2+', label: 'Total Bases 2+', emoji: '🏃', numbers: [2], rarity: 2 },
-  { key: 'bases-2+', label: 'Total Bases 2+', emoji: '🏃', numbers: [2], rarity: 2 },
-  { key: 'bases-2+', label: 'Total Bases 2+', emoji: '🏃', numbers: [2], rarity: 2 },
-  { key: 'bases-2+', label: 'Total Bases 2+', emoji: '🏃', numbers: [2], rarity: 2 },
-  { key: 'bases-2+', label: 'Total Bases 2+', emoji: '🏃', numbers: [2], rarity: 2 },
-  { key: 'bases-2+', label: 'Total Bases 2+', emoji: '🏃', numbers: [2], rarity: 2 },
-  { key: 'bases-2+', label: 'Total Bases 2+', emoji: '🏃', numbers: [2], rarity: 2 },
-  { key: 'bases-3+', label: 'Total Bases 3+', emoji: '🏃‍♂️', numbers: [3], rarity: 3 },
-  { key: 'bases-3+', label: 'Total Bases 3+', emoji: '🏃‍♂️', numbers: [3], rarity: 3 },
-  { key: 'bases-4+', label: 'Total Bases 4+', emoji: '💨', numbers: [4], rarity: 4 },
+// Enhanced prop types with weighted probability distribution
+const PROP_DEFINITIONS = [
+  // Most Common Props (High probability events)
+  { key: 'hits-1+', label: 'Hits 1+', emoji: '💥', numbers: [1], weight: 100 }, // Very common
+  { key: 'rbi-1+', label: 'RBI 1+', emoji: '🎯', numbers: [1], weight: 80 }, // Common
+  { key: 'bases-2+', label: 'Total Bases 2+', emoji: '🏃', numbers: [2], weight: 75 }, // Common
+  { key: 'homeruns-1+', label: 'Home Runs 1+', emoji: '⚾', numbers: [1], weight: 60 }, // Moderate
+  { key: 'hrs-rbi-1+', label: 'H+R+RBI 1+', emoji: '📊', numbers: [1], weight: 70 }, // Common
   
-  // Hits: 1+, 2+, 3+ (rarity: 1,1,1,1,1,1,2,2,3)
-  { key: 'hits-1+', label: 'Hits 1+', emoji: '💥', numbers: [1], rarity: 1 },
-  { key: 'hits-1+', label: 'Hits 1+', emoji: '💥', numbers: [1], rarity: 1 },
-  { key: 'hits-1+', label: 'Hits 1+', emoji: '💥', numbers: [1], rarity: 1 },
-  { key: 'hits-1+', label: 'Hits 1+', emoji: '💥', numbers: [1], rarity: 1 },
-  { key: 'hits-1+', label: 'Hits 1+', emoji: '💥', numbers: [1], rarity: 1 },
-  { key: 'hits-1+', label: 'Hits 1+', emoji: '💥', numbers: [1], rarity: 1 },
-  { key: 'hits-1+', label: 'Hits 1+', emoji: '💥', numbers: [1], rarity: 1 },
-  { key: 'hits-1+', label: 'Hits 1+', emoji: '💥', numbers: [1], rarity: 1 },
-  { key: 'hits-1+', label: 'Hits 1+', emoji: '💥', numbers: [1], rarity: 1 },
-  { key: 'hits-1+', label: 'Hits 1+', emoji: '💥', numbers: [1], rarity: 1 },
-  { key: 'hits-1+', label: 'Hits 1+', emoji: '💥', numbers: [1], rarity: 1 },
-  { key: 'hits-1+', label: 'Hits 1+', emoji: '💥', numbers: [1], rarity: 1 },
-  { key: 'hits-2+', label: 'Hits 2+', emoji: '💥💥', numbers: [2], rarity: 2 },
-  { key: 'hits-2+', label: 'Hits 2+', emoji: '💥💥', numbers: [2], rarity: 2 },
-  { key: 'hits-3+', label: 'Hits 3+', emoji: '🔥', numbers: [3], rarity: 3 },
+  // Moderately Common Props
+  { key: 'hits-2+', label: 'Hits 2+', emoji: '💥💥', numbers: [2], weight: 45 }, // Moderate
+  { key: 'rbi-2+', label: 'RBI 2+', emoji: '🎯🎯', numbers: [2], weight: 40 }, // Moderate
+  { key: 'bases-3+', label: 'Total Bases 3+', emoji: '🏃‍♂️', numbers: [3], weight: 35 }, // Moderate
+  { key: 'hrs-rbi-2+', label: 'H+R+RBI 2+', emoji: '📈', numbers: [2], weight: 40 }, // Moderate
   
-  // Home Runs: 1+, 2+ (rarity: 1,1,1,1,1,1,2)
-  { key: 'homeruns-1+', label: 'Home Runs 1+', emoji: '⚾', numbers: [1], rarity: 1 },
-  { key: 'homeruns-1+', label: 'Home Runs 1+', emoji: '⚾', numbers: [1], rarity: 1 },
-  { key: 'homeruns-1+', label: 'Home Runs 1+', emoji: '⚾', numbers: [1], rarity: 1 },
-  { key: 'homeruns-1+', label: 'Home Runs 1+', emoji: '⚾', numbers: [1], rarity: 1 },
-  { key: 'homeruns-1+', label: 'Home Runs 1+', emoji: '⚾', numbers: [1], rarity: 1 },
-  { key: 'homeruns-1+', label: 'Home Runs 1+', emoji: '⚾', numbers: [1], rarity: 1 },
-  { key: 'homeruns-1+', label: 'Home Runs 1+', emoji: '⚾', numbers: [1], rarity: 1 },
-  { key: 'homeruns-1+', label: 'Home Runs 1+', emoji: '⚾', numbers: [1], rarity: 1 },
-  { key: 'homeruns-1+', label: 'Home Runs 1+', emoji: '⚾', numbers: [1], rarity: 1 },
-  { key: 'homeruns-1+', label: 'Home Runs 1+', emoji: '⚾', numbers: [1], rarity: 1 },
-  { key: 'homeruns-1+', label: 'Home Runs 1+', emoji: '⚾', numbers: [1], rarity: 1 },
-  { key: 'homeruns-1+', label: 'Home Runs 1+', emoji: '⚾', numbers: [1], rarity: 1 },
-  { key: 'homeruns-2+', label: 'Home Runs 2+', emoji: '🚀', numbers: [2], rarity: 2 },
+  // Less Common Props
+  { key: 'single', label: 'To Hit a Single', emoji: '1️⃣', numbers: [1], weight: 50 }, // Moderate (specific hit type)
+  { key: 'double', label: 'To Hit a Double', emoji: '2️⃣', numbers: [1], weight: 25 }, // Less common
+  { key: 'homeruns-2+', label: 'Home Runs 2+', emoji: '🚀', numbers: [2], weight: 15 }, // Rare
   
-  // Hits Runs RBI: 1+, 2+, 3+ (rarity: 1,1,1,1,1,1,2,2,3)
-  { key: 'hrs-rbi-1+', label: 'H+R+RBI 1+', emoji: '📊', numbers: [1], rarity: 1 },
-  { key: 'hrs-rbi-1+', label: 'H+R+RBI 1+', emoji: '📊', numbers: [1], rarity: 1 },
-  { key: 'hrs-rbi-1+', label: 'H+R+RBI 1+', emoji: '📊', numbers: [1], rarity: 1 },
-  { key: 'hrs-rbi-1+', label: 'H+R+RBI 1+', emoji: '📊', numbers: [1], rarity: 1 },
-  { key: 'hrs-rbi-1+', label: 'H+R+RBI 1+', emoji: '📊', numbers: [1], rarity: 1 },
-  { key: 'hrs-rbi-1+', label: 'H+R+RBI 1+', emoji: '📊', numbers: [1], rarity: 1 },
-  { key: 'hrs-rbi-1+', label: 'H+R+RBI 1+', emoji: '📊', numbers: [1], rarity: 1 },
-  { key: 'hrs-rbi-1+', label: 'H+R+RBI 1+', emoji: '📊', numbers: [1], rarity: 1 },
-  { key: 'hrs-rbi-1+', label: 'H+R+RBI 1+', emoji: '📊', numbers: [1], rarity: 1 },
-  { key: 'hrs-rbi-1+', label: 'H+R+RBI 1+', emoji: '📊', numbers: [1], rarity: 1 },
-  { key: 'hrs-rbi-1+', label: 'H+R+RBI 1+', emoji: '📊', numbers: [1], rarity: 1 },
-  { key: 'hrs-rbi-1+', label: 'H+R+RBI 1+', emoji: '📊', numbers: [1], rarity: 1 },
-  { key: 'hrs-rbi-2+', label: 'H+R+RBI 2+', emoji: '📈', numbers: [2], rarity: 2 },
-  { key: 'hrs-rbi-2+', label: 'H+R+RBI 2+', emoji: '📈', numbers: [2], rarity: 2 },
-  { key: 'hrs-rbi-3+', label: 'H+R+RBI 3+', emoji: '🎯', numbers: [3], rarity: 3 },
-  
-  // Single hit types (rarity: 1 each)
-  { key: 'single', label: 'To Hit a Single', emoji: '1️⃣', numbers: [1], rarity: 1 },
-  { key: 'double', label: 'To Hit a Double', emoji: '2️⃣', numbers: [1], rarity: 1 },
-  { key: 'triple', label: 'To Hit a Triple', emoji: '3️⃣', numbers: [1], rarity: 1 },
-  
-  // RBI: 1+, 2+, 3+ (rarity: 1,1,1,1,1,1,2,2,3)
-  { key: 'rbi-1+', label: 'RBI 1+', emoji: '🎯', numbers: [1], rarity: 1 },
-  { key: 'rbi-1+', label: 'RBI 1+', emoji: '🎯', numbers: [1], rarity: 1 },
-  { key: 'rbi-1+', label: 'RBI 1+', emoji: '🎯', numbers: [1], rarity: 1 },
-  { key: 'rbi-1+', label: 'RBI 1+', emoji: '🎯', numbers: [1], rarity: 1 },
-  { key: 'rbi-1+', label: 'RBI 1+', emoji: '🎯', numbers: [1], rarity: 1 },
-  { key: 'rbi-1+', label: 'RBI 1+', emoji: '🎯', numbers: [1], rarity: 1 },
-  { key: 'rbi-2+', label: 'RBI 2+', emoji: '🎯🎯', numbers: [2], rarity: 2 },
-  { key: 'rbi-2+', label: 'RBI 2+', emoji: '🎯🎯', numbers: [2], rarity: 2 },
-  { key: 'rbi-3+', label: 'RBI 3+', emoji: '🔥🎯', numbers: [3], rarity: 3 }
+  // Rare Props (Low probability events)
+  { key: 'hits-3+', label: 'Hits 3+', emoji: '🔥', numbers: [3], weight: 20 }, // Rare
+  { key: 'rbi-3+', label: 'RBI 3+', emoji: '🔥🎯', numbers: [3], weight: 15 }, // Rare
+  { key: 'bases-4+', label: 'Total Bases 4+', emoji: '💨', numbers: [4], weight: 10 }, // Very rare
+  { key: 'hrs-rbi-3+', label: 'H+R+RBI 3+', emoji: '🎯', numbers: [3], weight: 12 }, // Very rare
+  { key: 'triple', label: 'To Hit a Triple', emoji: '3️⃣', numbers: [1], weight: 5 }, // Very rare
 ];
+
+// Create weighted prop types array for selection
+const PROP_TYPES = [];
+PROP_DEFINITIONS.forEach(prop => {
+  // Add each prop multiple times based on its weight
+  const frequency = Math.ceil(prop.weight / 5); // Normalize weights to reasonable frequencies
+  for (let i = 0; i < frequency; i++) {
+    PROP_TYPES.push(prop);
+  }
+});
+
+// Function to select a random prop with weighted distribution
+const selectRandomProp = () => {
+  return PROP_TYPES[Math.floor(Math.random() * PROP_TYPES.length)];
+};
 
 // Individual slot reel component for players
 const PlayerReel = ({ players, isSpinning, finalPlayer, reelIndex, onSpinComplete }) => {
@@ -176,16 +136,11 @@ const PlayerReel = ({ players, isSpinning, finalPlayer, reelIndex, onSpinComplet
           </div>
           
           <div className="player-info">
-            <div className="player-name">{displayPlayer?.name || 'Loading...'}</div>
+            <div className="player-name">
+              {displayPlayer?.fullName || displayPlayer?.name || 'Loading...'}
+            </div>
             <div className="player-team" style={{ color: displayPlayer?.teamColor || '#666' }}>
               {displayPlayer?.team || '---'}
-            </div>
-          </div>
-          
-          <div className="player-stats">
-            <div className="stat-item">
-              <span className="stat-value">{displayPlayer?.HR || 0}</span>
-              <span className="stat-label">HR</span>
             </div>
           </div>
         </div>
@@ -361,11 +316,11 @@ const PlayerPicker = ({ availablePlayers, selectedPlayers, onTogglePlayer, teams
               const team = teams[player.team] || {};
               return {
                 ...player,
-                name: player.fullName || player.name,
+                name: player.name, // Keep original name for compatibility
+                fullName: player.fullName || player.name, // Ensure fullName is available
                 teamColor: team.primaryColor,
                 teamLogo: team.logoUrl,
-                teamName: team.name,
-                HR: 0 // Default HR count
+                teamName: team.name
               };
             });
           
@@ -396,8 +351,12 @@ const PlayerPicker = ({ availablePlayers, selectedPlayers, onTogglePlayer, teams
     const isHitter = player.playerType === 'hitter' || player.type === 'hitter' || !player.playerType;
     if (!isHitter) return false;
     
+    const playerFullName = player.fullName || player.name || '';
+    const playerName = player.name || '';
+    
     const passesSearchFilter = !searchTerm || 
-      player.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      playerFullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      playerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       player.team.toLowerCase().includes(searchTerm.toLowerCase());
     
     return passesSearchFilter;
@@ -440,13 +399,12 @@ const PlayerPicker = ({ availablePlayers, selectedPlayers, onTogglePlayer, teams
                   onClick={() => onTogglePlayer(player)}
                 >
                   <div className="option-info">
-                    <span className="option-name">{player.name}</span>
+                    <span className="option-name">
+                      {player.fullName || player.name}
+                    </span>
                     <span className="option-team" style={{ color: player.teamColor }}>
                       {player.team}
                     </span>
-                  </div>
-                  <div className="option-stats">
-                    <span className="option-stat">{player.HR || 0} HR</span>
                   </div>
                   <div className="selection-indicator">
                     {isSelected ? '✓' : '+'}
@@ -625,7 +583,8 @@ const SlotMachineCard = ({
     const team = teamData[player.team] || {};
     return {
       ...player,
-      name: player.fullName || player.name,
+      name: player.name, // Keep original name for compatibility
+      fullName: player.fullName || player.name, // Ensure fullName is available
       teamColor: team.primaryColor,
       teamLogo: team.logoUrl,
       teamName: team.name
@@ -655,7 +614,10 @@ const SlotMachineCard = ({
     
     switch (type) {
       case 'hr-leaders':
-        playersToAdd = (rollingStats.homers || []).slice(0, 8);
+        // Add only the TOP home run leaders visible in the HR Leaders card (typically 25)
+        const hrLeadersCardLimit = 25; // Match what's shown in the actual card
+        playersToAdd = (rollingStats.homers || []).slice(0, hrLeadersCardLimit);
+        console.log(`[SlotMachine] Adding ${playersToAdd.length} HR leaders (card limit: ${hrLeadersCardLimit})`);
         break;
       case 'hit-streaks':
         let hitStreakPlayers = [];
@@ -666,47 +628,76 @@ const SlotMachineCard = ({
         } else if (Array.isArray(hitStreakData)) {
           hitStreakPlayers = hitStreakData;
         }
-        playersToAdd = hitStreakPlayers.slice(0, 6);
+        // Add hit streak players (these are typically already limited by the card)
+        playersToAdd = hitStreakPlayers;
+        console.log(`[SlotMachine] Adding ${playersToAdd.length} hit streak players`);
         break;
       case 'hot-hitters':
-        playersToAdd = (topPerformers.recent || []).slice(0, 8);
+        // Add only the TOP recent performers visible in the card (typically 25)  
+        const hotHittersCardLimit = 25; // Match what's shown in the actual card
+        playersToAdd = (topPerformers.recent || []).slice(0, hotHittersCardLimit);
+        console.log(`[SlotMachine] Adding ${playersToAdd.length} hot hitters (card limit: ${hotHittersCardLimit})`);
         break;
       case 'current-series-hits':
-        playersToAdd = (currentSeriesHits || []).slice(0, 6);
+        // Add ALL current series hits leaders
+        playersToAdd = currentSeriesHits || [];
+        console.log(`[SlotMachine] Adding ${playersToAdd.length} current series hits leaders`);
         break;
       case 'current-series-hrs':
-        playersToAdd = (currentSeriesHRs || []).slice(0, 6);
+        // Add ALL current series HR leaders
+        playersToAdd = currentSeriesHRs || [];
+        console.log(`[SlotMachine] Adding ${playersToAdd.length} current series HR leaders`);
         break;
       case 'time-slot-hits':
-        playersToAdd = (timeSlotHits || []).slice(0, 6);
+        // Add ALL time slot hits leaders
+        playersToAdd = timeSlotHits || [];
+        console.log(`[SlotMachine] Adding ${playersToAdd.length} time slot hits leaders`);
         break;
       case 'opponent-hits':
-        playersToAdd = (opponentHits || []).slice(0, 6);
+        // Add ALL opponent hits leaders
+        playersToAdd = opponentHits || [];
+        console.log(`[SlotMachine] Adding ${playersToAdd.length} opponent hits leaders`);
         break;
       case 'opponent-hrs':
-        playersToAdd = (opponentHRs || []).slice(0, 6);
+        // Add ALL opponent HR leaders
+        playersToAdd = opponentHRs || [];
+        console.log(`[SlotMachine] Adding ${playersToAdd.length} opponent HR leaders`);
         break;
       case 'continue-streaks':
-        playersToAdd = (hitStreakData.likelyToContinueStreak || []).slice(0, 6);
+        // Add ALL players likely to continue streaks
+        playersToAdd = hitStreakData.likelyToContinueStreak || [];
+        console.log(`[SlotMachine] Adding ${playersToAdd.length} continue streak players`);
         break;
       case 'friday-leaders':
-        playersToAdd = (fridayHitLeaders || []).slice(0, 6);
+        // Add ALL Friday hit leaders
+        playersToAdd = fridayHitLeaders || [];
+        console.log(`[SlotMachine] Adding ${playersToAdd.length} Friday hit leaders`);
         break;
       case 'current-hit-streaks':
-        playersToAdd = (hitStreakData.hitStreaks || []).slice(0, 6);
+        // Add ALL current hit streaks
+        playersToAdd = hitStreakData.hitStreaks || [];
+        console.log(`[SlotMachine] Adding ${playersToAdd.length} current hit streak players`);
         break;
       case 'recent-homers':
-        playersToAdd = (topPerformers.recent || []).slice(0, 8);
+        // Add only the TOP players visible in the Recent HRs card (typically 25)
+        const recentHRsCardLimit = 25; // Match what's shown in the actual card
+        playersToAdd = (topPerformers.recent || []).slice(0, recentHRsCardLimit);
+        console.log(`[SlotMachine] Adding ${playersToAdd.length} recent homer players (card limit: ${recentHRsCardLimit})`);
         break;
       case 'due-for-hr':
-        playersToAdd = (playersWithHomeRunPrediction || []).slice(0, 8);
+        // Add only the TOP players due for home runs visible in the HR Prediction card (typically 10-25)
+        const hrPredictionCardLimit = 10; // Match what's shown in the actual HR Prediction card
+        playersToAdd = (playersWithHomeRunPrediction || []).slice(0, hrPredictionCardLimit);
+        console.log(`[SlotMachine] Adding ${playersToAdd.length} players due for HR (card limit: ${hrPredictionCardLimit})`);
         break;
       default:
+        console.warn(`[SlotMachine] Unknown quick add type: ${type}`);
         return;
     }
 
     if (playersToAdd.length === 0) {
       console.warn(`[SlotMachine] No players found for ${type}`);
+      alert(`No players available for ${type}. This data may not be loaded yet.`);
       return;
     }
 
@@ -715,17 +706,48 @@ const SlotMachineCard = ({
         const team = teamData[player.team] || {};
         return {
           ...player,
-          name: player.fullName || player.name,
+          name: player.name, // Keep original name for compatibility  
+          fullName: player.fullName || player.name, // Ensure fullName is available
           teamColor: team.primaryColor,
           teamLogo: team.logoUrl,
           teamName: team.name
         };
       })
-      .filter(player => !selectedPlayers.some(p => 
-        p.name === player.name && p.team === player.team
-      ));
+      .filter(player => {
+        // Only add players that aren't already selected
+        const alreadySelected = selectedPlayers.some(p => 
+          p.name === player.name && p.team === player.team
+        );
+        return !alreadySelected;
+      });
 
+    if (processedPlayersToAdd.length === 0) {
+      alert(`All available players from ${type} are already selected.`);
+      return;
+    }
+
+    console.log(`[SlotMachine] Successfully processed ${processedPlayersToAdd.length} new players from ${type}`);
     setSelectedPlayers(prev => [...prev, ...processedPlayersToAdd]);
+    
+    // Show success message with more specific information
+    const cardDisplayName = {
+      'hr-leaders': 'HR Leaders',
+      'hot-hitters': 'Hot Hitters', 
+      'recent-homers': 'Recent HRs',
+      'due-for-hr': 'Players Due for HR',
+      'hit-streaks': 'Hit Streaks',
+      'current-series-hits': 'Current Series Hits',
+      'current-series-hrs': 'Current Series HRs',
+      'time-slot-hits': 'Time Slot Hits',
+      'opponent-hits': 'Opponent Hits',
+      'opponent-hrs': 'Opponent HRs',
+      'continue-streaks': 'Continue Streaks',
+      'friday-leaders': 'Friday Leaders',
+      'current-hit-streaks': 'Current Hit Streaks'
+    };
+    
+    const displayName = cardDisplayName[type] || type;
+    alert(`Added ${processedPlayersToAdd.length} players from ${displayName} card! Total selected: ${selectedPlayers.length + processedPlayersToAdd.length}`);
   };
 
   const handleSpin = () => {
@@ -754,8 +776,7 @@ const SlotMachineCard = ({
     const selectedPlayersForSpin = shuffledPlayers.slice(0, 3);
 
     const selectedProps = Array(3).fill().map(() => {
-      const randomIndex = Math.floor(Math.random() * PROP_TYPES.length);
-      return PROP_TYPES[randomIndex];
+      return selectRandomProp(); // Use weighted selection
     });
 
     const selectedNumbers = selectedPlayersForSpin.map((player, index) => {
@@ -835,7 +856,8 @@ const SlotMachineCard = ({
       const number = results.numbers[index];
       
       if (player && prop) {
-        resultsText += `Bet #${index + 1}: ${player.name} (${player.team}) - ${prop.label} ${number}+\n`;
+        const playerName = player.fullName || player.name;
+        resultsText += `Bet #${index + 1}: ${playerName} (${player.team}) - ${prop.label} ${number}+\n`;
       }
     });
     
@@ -860,17 +882,26 @@ const SlotMachineCard = ({
       const number = results.numbers[index];
       
       if (player && prop) {
-        shareText += `${prop.emoji} ${player.name} (${player.team}) - ${prop.label} ${number}+\n`;
+        const playerName = player.fullName || player.name;
+        shareText += `${prop.emoji} ${playerName} (${player.team}) - ${prop.label} ${number}+\n`;
       }
     });
     
+    // Enhanced error handling for share functionality
     if (navigator.share) {
       navigator.share({
         title: 'MLB Prop Bets',
         text: shareText
+      }).catch((error) => {
+        // Handle user cancellation or other share errors gracefully
+        if (error.name !== 'AbortError') {
+          console.log('Share failed, falling back to copy:', error);
+          copyResultsToClipboard();
+        }
+        // If it's an AbortError (user cancelled), do nothing
       });
     } else {
-      // Fallback to copying
+      // Fallback to copying if share not supported
       copyResultsToClipboard();
     }
   };
@@ -1056,7 +1087,9 @@ const SlotMachineCard = ({
                       </div>
                       
                       <div className="player-info">
-                        <div className="player-name">{player.name}</div>
+                        <div className="player-name">
+                          {player.fullName || player.name}
+                        </div>
                         <div className="player-team" style={{ color: player.teamColor }}>
                           {player.team}
                         </div>
@@ -1070,7 +1103,7 @@ const SlotMachineCard = ({
                       </div>
                       
                       <div className="bet-summary">
-                        <strong>{player.name}</strong> to record <strong>{prop.label.toLowerCase()}</strong> of <strong>{number}+</strong>
+                        <strong>{player.fullName || player.name}</strong> to record <strong>{prop.label.toLowerCase()}</strong> of <strong>{number}+</strong>
                       </div>
                     </div>
                   );

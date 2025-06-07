@@ -1571,7 +1571,7 @@ body .streak-tooltip {
   }
   
   .player-name {
-    color: #f1f5f9 !important;
+    color: inherit;
   }
   
   .player-team {
