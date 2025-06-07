@@ -1,90 +1,196 @@
 /* RecentHomersCard.css */
 
-.recent-hr-card {
+.recent-homers-card {
   grid-column: span 1;
   background-color: white;
 }
 
-/* Player Item Styling */
-.recent-hr-card .player-item {
-  padding: 12px 0;
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid #f0f0f0;
+/* Player list styling */
+.recent-homers-card .player-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.recent-hr-card .player-item:last-child {
+.recent-homers-card .player-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.recent-homers-card .player-item:hover {
+  background-color: rgba(230, 57, 70, 0.05);
+  transform: translateX(2px);
+}
+
+.recent-homers-card .player-item:last-child {
   border-bottom: none;
 }
 
-.recent-hr-card .player-item:hover {
-  background-color: rgba(255, 153, 0, 0.05);
-}
-
-/* Player Rank Styling */
-.recent-hr-card .player-rank {
-  width: 30px;
-  height: 30px;
+/* Player rank styling */
+.recent-homers-card .player-rank {
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #FF9900; /* Orange background for recent HRs */
+  background-color: #e63946; /* Red for recent HRs */
   color: white;
   border-radius: 50%;
   font-weight: bold;
-  margin-right: 15px;
+  margin-right: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
-/* Player Info Styling */
-.recent-hr-card .player-info {
+.recent-homers-card .player-rank .rank-logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.7;
+}
+
+.recent-homers-card .player-rank .rank-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0.3;
+}
+
+.recent-homers-card .player-rank .rank-number {
+  position: relative;
+  z-index: 10;
+  color: white;
+  font-size: 1.125rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Player info styling */
+.recent-homers-card .player-info {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  margin-right: 10px;
 }
 
-.recent-hr-card .player-name {
+.recent-homers-card .player-name {
   font-weight: 500;
   color: #333;
+  font-size: 0.95rem;
 }
 
-.recent-hr-card .player-team {
+.recent-homers-card .player-team {
   font-size: 0.85rem;
   color: #666;
+  font-weight: 600;
 }
 
-/* Player Stats Styling */
-.recent-hr-card .player-stat {
+/* Recent HR stats styling */
+.recent-homers-card .recent-hr-stats {
   display: flex;
   flex-direction: column;
-  min-width: 120px;
   align-items: flex-end;
-  line-height: 1.2;
-}
-
-.recent-hr-card .stat-highlight {
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: #FF9900;
-}
-
-.recent-hr-card small {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: normal;
-  color: #666;
-  line-height: 1.4;
+  gap: 6px;
+  min-width: 120px;
   text-align: right;
 }
 
-/* Highlight most recent */
-.recent-hr-card .player-item:nth-child(1) .stat-highlight,
-.recent-hr-card .player-item:nth-child(2) .stat-highlight {
-  color: #FF6D00; /* Deeper orange for the very recent */
-  font-size: 1.15rem;
+.recent-homers-card .hr-date {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-bottom: 4px;
 }
 
-/* Loading & No Data States */
-.recent-hr-card .loading-indicator {
+.recent-homers-card .date-primary {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e63946;
+  line-height: 1;
+}
+
+.recent-homers-card .date-secondary {
+  font-size: 0.75rem;
+  color: #666;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.recent-homers-card .hr-totals {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.recent-homers-card .season-hrs {
+  font-size: 0.85rem;
+  color: #0056b3;
+  font-weight: 600;
+}
+
+.recent-homers-card .games-since {
+  font-size: 0.75rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Enhanced background logo */
+.recent-homers-card .player-item .team-logo-bg {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 66%;
+  opacity: 0.05;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  transform: translate(20%, -10%) scale(2.2);
+  object-fit: cover;
+  object-position: center;
+}
+
+.recent-homers-card .player-item:hover .team-logo-bg {
+  opacity: 0.1;
+}
+
+/* Team context subtitle */
+.recent-homers-card .card-subtitle.team-context {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 15px;
+  color: #991b1b;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* Team filter summary */
+.recent-homers-card .team-filter-summary {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-top: 15px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #991b1b;
+  font-style: italic;
+}
+
+/* Loading indicator */
+.recent-homers-card .loading-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,8 +199,179 @@
   font-style: italic;
 }
 
-.recent-hr-card .no-data {
+/* No data message */
+.recent-homers-card .no-data {
   color: #888;
   text-align: center;
   padding: 20px 0;
+  font-style: italic;
+}
+
+/* Scrollable container for player lists */
+.recent-homers-card .scrollable-container {
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.recent-homers-card .scrollable-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.recent-homers-card .scrollable-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.recent-homers-card .scrollable-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.recent-homers-card .scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Special highlighting for top performers */
+.recent-homers-card .player-item:first-child .date-primary {
+  font-size: 1.3rem;
+  text-shadow: 0 1px 2px rgba(230, 57, 70, 0.3);
+}
+
+.recent-homers-card .player-item:nth-child(2) .date-primary {
+  font-size: 1.2rem;
+}
+
+.recent-homers-card .player-item:nth-child(3) .date-primary {
+  font-size: 1.15rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .recent-homers-card {
+    grid-column: 1 / -1;
+  }
+  
+  .recent-homers-card .player-item {
+    padding: 10px 6px;
+  }
+  
+  .recent-homers-card .player-rank {
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
+  }
+  
+  .recent-homers-card .player-rank .rank-number {
+    font-size: 1rem;
+  }
+  
+  .recent-homers-card .recent-hr-stats {
+    min-width: 100px;
+  }
+  
+  .recent-homers-card .date-primary {
+    font-size: 1rem !important;
+  }
+  
+  .recent-homers-card .season-hrs {
+    font-size: 0.8rem;
+  }
+  
+  .recent-homers-card .games-since {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .recent-homers-card .player-item {
+    padding: 8px 4px;
+  }
+  
+  .recent-homers-card .player-rank {
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+  }
+  
+  .recent-homers-card .player-rank .rank-number {
+    font-size: 0.9rem;
+  }
+  
+  .recent-homers-card .recent-hr-stats {
+    min-width: 90px;
+  }
+  
+  .recent-homers-card .date-primary {
+    font-size: 0.95rem !important;
+  }
+  
+  .recent-homers-card .date-secondary {
+    font-size: 0.7rem;
+  }
+  
+  .recent-homers-card .player-name {
+    font-size: 0.9rem;
+  }
+  
+  .recent-homers-card .player-team {
+    font-size: 0.8rem;
+  }
+}
+
+/* Animation for team context elements */
+.recent-homers-card .team-context,
+.recent-homers-card .team-filter-summary {
+  animation: slideInTeamContext 0.3s ease-out;
+}
+
+@keyframes slideInTeamContext {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .recent-homers-card {
+    background-color: #1f2937;
+  }
+  
+  .recent-homers-card .player-name {
+    color: #f9fafb;
+  }
+  
+  .recent-homers-card .player-team {
+    color: #9ca3af;
+  }
+  
+  .recent-homers-card .date-secondary,
+  .recent-homers-card .games-since {
+    color: #9ca3af;
+  }
+  
+  .recent-homers-card .season-hrs {
+    color: #60a5fa;
+  }
+  
+  .recent-homers-card .card-subtitle.team-context {
+    background-color: #7f1d1d;
+    border-color: #dc2626;
+    color: #fecaca;
+  }
+  
+  .recent-homers-card .team-filter-summary {
+    background-color: #7f1d1d;
+    border-color: #dc2626;
+    color: #fecaca;
+  }
+  
+  .recent-homers-card .player-item:hover {
+    background-color: rgba(230, 57, 70, 0.1);
+  }
 }

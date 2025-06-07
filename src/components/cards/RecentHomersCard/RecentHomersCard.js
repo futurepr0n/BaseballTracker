@@ -1,50 +1,86 @@
 import React from 'react';
+import { useTeamFilter } from '../../TeamFilterContext';
 import './RecentHomersCard.css';
 
 /**
- * RecentHomersCard - Shows players who hit home runs most recently
- * Enhanced with integrated team logos
+ * RecentHomersCard - Shows players with most recent home runs
+ * Enhanced to show comprehensive team data when filtering
  */
 const RecentHomersCard = ({ 
-  recentHRPlayers,
-  isLoading,
-  teams
+  recentHRPlayers, 
+  isLoading, 
+  teams 
 }) => {
-  // Helper function to format date
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    
-    // Split the date string to get year, month, day
-    const [year, month, day] = dateString.split('-').map(Number);
-    
-    // Create date object with local timezone (not UTC)
-    // Month is 0-indexed in JavaScript Date, so subtract 1
-    const date = new Date(year, month - 1, day);
-    
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+  const { isFiltering, selectedTeam, getTeamName } = useTeamFilter();
+
+  // Get appropriate display limit based on filtering
+  const getDisplayLimit = () => {
+    if (isFiltering) {
+      // When filtering by team, show more comprehensive results
+      return Math.min(recentHRPlayers.length, 50);
+    }
+    return 25; // Default global limit
   };
 
+  const displayPlayers = recentHRPlayers.slice(0, getDisplayLimit());
+
+  // Get team context information
+  const getTeamContext = () => {
+    if (!isFiltering || !selectedTeam) return null;
+    
+    const teamName = getTeamName(selectedTeam);
+    const teamPlayerCount = recentHRPlayers.length;
+    
+    return {
+      teamName,
+      playerCount: teamPlayerCount,
+      showing: displayPlayers.length
+    };
+  };
+
+  const teamContext = getTeamContext();
+
   return (
-    <div className="card recent-hr-card">
-      <h3>Most Recent Home Runs</h3>
+    <div className="card recent-homers-card">
+      <h3>⚾ Most Recent Home Runs</h3>
+      
+      {/* Enhanced subtitle with team context */}
+      {teamContext && (
+        <div className="card-subtitle team-context">
+          Showing {teamContext.showing} of {teamContext.playerCount} {teamContext.teamName} players with home runs
+        </div>
+      )}
+      
       {isLoading ? (
-        <div className="loading-indicator">Loading stats...</div>
-      ) : recentHRPlayers && recentHRPlayers.length > 0 ? (
+        <div className="loading-indicator">Loading recent home run data...</div>
+      ) : displayPlayers.length > 0 ? (
         <div className="scrollable-container">
           <ul className="player-list">
-            {recentHRPlayers.map((player, index) => {
+            {displayPlayers.map((player, index) => {
               // Get team logo URL if teams data is available
               const teamAbbr = player.team;
               const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
               const logoUrl = teamData ? teamData.logoUrl : null;
+              const teamColor = teamData ? teamData.primaryColor : "#333333";
+
+              // Format the date
+              const hrDate = new Date(player.lastHRDate);
+              const formattedDate = hrDate.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric' 
+              });
               
+              // Calculate days ago
+              const today = new Date();
+              const daysDiff = Math.floor((today - hrDate) / (1000 * 60 * 60 * 24));
+              const daysAgoText = daysDiff === 0 ? 'Today' : 
+                                 daysDiff === 1 ? 'Yesterday' : 
+                                 `${daysDiff} days ago`;
+
               return (
-                <li key={index} className="player-item">
-                  <div className="player-rank">
+                <li key={index} className="player-item recent-homer-item">
+                  {/* Enhanced rank indicator with logo inside */}
+                  <div className="player-rank" style={{ backgroundColor: teamColor }}>
                     {logoUrl && (
                       <>
                         <img 
@@ -59,18 +95,26 @@ const RecentHomersCard = ({
                     )}
                     <span className="rank-number">{index + 1}</span>
                   </div>
+                  
                   <div className="player-info">
-                    <span className="player-name">{player.fullName || player.name}</span>
+                    <span className="player-name">{player.name}</span>
                     <span className="player-team">{player.team}</span>
                   </div>
-                  <div className="player-stat">
-                    <div className="stat-highlight">
-                      {formatDate(player.lastHRDate)}
+                  
+                  <div className="player-stat recent-hr-stats">
+                    <div className="hr-date">
+                      <span className="date-primary">{formattedDate}</span>
+                      <span className="date-secondary">({daysAgoText})</span>
                     </div>
-                    <small>{player.homeRunsThisSeason} HR this season</small>
+                    <div className="hr-totals">
+                      <span className="season-hrs">{player.homeRunsThisSeason} HRs this season</span>
+                      {player.gamesSinceLastHR && (
+                        <span className="games-since">{player.gamesSinceLastHR} games since</span>
+                      )}
+                    </div>
                   </div>
                   
-                  {/* Enhanced background logo */}
+                  {/* Keep the larger background logo */}
                   {logoUrl && (
                     <img 
                       src={logoUrl} 
@@ -84,9 +128,21 @@ const RecentHomersCard = ({
               );
             })}
           </ul>
+          
+          {/* Show summary when team filtering */}
+          {teamContext && teamContext.playerCount > teamContext.showing && (
+            <div className="team-filter-summary">
+              Showing top {teamContext.showing} of {teamContext.playerCount} {teamContext.teamName} players with home runs
+            </div>
+          )}
         </div>
       ) : (
-        <p className="no-data">No recent HR data available</p>
+        <p className="no-data">
+          {isFiltering 
+            ? `No home run data available for ${teamContext?.teamName || 'selected team'}`
+            : 'No recent home run data available'
+          }
+        </p>
       )}
     </div>
   );

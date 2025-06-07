@@ -28,22 +28,18 @@ import PitcherHRsAllowedCard from './cards/PitcherHRsAllowedCard/PitcherHRsAllow
 import PitcherHitsAllowedCard from './cards/PitcherHitsAllowedCard/PitcherHitsAllowedCard';
 import SlotMachineCard from './cards/SlotMachineCard/SlotMachineCard';
 
-
-
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
 
 import { CurrentSeriesHitsCard, CurrentSeriesHRCard } from './cards/CurrentSeriesCards/CurrentSeriesCards';
 import { TimeSlotHitsCard, TimeSlotHRCard } from './cards/TimeSlotHitsCard/TimeSlotHitsCard';
 
-
-import MostHomeRunsAtHomeCard from './cards/MostHomeRunsAtHomeCard/MostHomeRunsAtHomeCard'; // ADD THIS LINE
+import MostHomeRunsAtHomeCard from './cards/MostHomeRunsAtHomeCard/MostHomeRunsAtHomeCard';
 import { 
   OpponentMatchupHitsCard,
   OpponentMatchupHRCard
 } from './cards/OpponentMatchupHitsCard/OpponentMatchupHitsCard';
 
 import HitDroughtBounceBackCard from './cards/HitDroughtBounceBackCard/HitDroughtBounceBackCard';
-
 
 /**
  * Dashboard component - Home page displaying summary of MLB data
@@ -60,7 +56,8 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     resetFilters,
     shouldIncludePlayer,
     shouldIncludeGame,
-    isFiltering
+    isFiltering,
+    getTeamName
   } = useTeamFilter();
   
   // State for core data
@@ -115,11 +112,40 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
   const [stadiumData, setStadiumData] = useState(null);
   const [stadiumLoading, setStadiumLoading] = useState(true);
 
-
   const [rollingStatsType, setRollingStatsType] = useState('season'); // 'season', 'last_30', 'last_7', 'current'
 
+  // Simplified slot machine data - no complex loading required
+  const [slotMachineCardData, setSlotMachineCardData] = useState({
+    currentSeriesHits: [],
+    currentSeriesHRs: [],
+    timeSlotHits: [],
+    opponentHits: [],
+    opponentHRs: [],
+    fridayHitLeaders: []
+  });
 
-    useEffect(() => {
+  // Simple effect to populate slot machine data from existing sources
+  useEffect(() => {
+    const populateSlotMachineData = () => {
+      // Use existing data sources where possible
+      setSlotMachineCardData({
+        currentSeriesHits: [], // Can be populated later with more complex logic
+        currentSeriesHRs: [],
+        timeSlotHits: dayOfWeekHits.topHitsByTotal || [], // Use day of week data as proxy
+        opponentHits: [],
+        opponentHRs: [],
+        fridayHitLeaders: dayOfWeekHits?.dayOfWeek === 'Friday' ? (dayOfWeekHits.topHitsByTotal || []) : []
+      });
+    };
+
+    // Only populate if we have the required data
+    if (dayOfWeekHits) {
+      populateSlotMachineData();
+    }
+  }, [dayOfWeekHits]);
+
+  // Helper function to generate comprehensive team-specific stats
+  useEffect(() => {
     const loadStadiumData = async () => {
       try {
         setStadiumLoading(true);
@@ -178,9 +204,6 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
       shouldIncludeGame(game)
     );
   }, [gameData, isFiltering, shouldIncludeGame]);
-
-
-  
 
   // Close any open tooltips when clicking outside
   useEffect(() => {
@@ -538,14 +561,30 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
           let filteredData = data;
           
           if (isFiltering) {
+            // FOR TEAM FILTERING, GET COMPREHENSIVE RECENT HR DATA
+            console.log("[Dashboard] Team filtering active for performance data - generating comprehensive recent HR list");
+            
+            // Get all players from the filtered teams with HR data
+            const allTeamPlayersWithHRs = data.players ? data.players.filter(player => 
+              shouldIncludePlayer(player.team) && player.lastHRDate
+            ) : [];
+            
+            // Sort by most recent HR date, then by total HRs
+            const comprehensiveRecentHRs = allTeamPlayersWithHRs.sort((a, b) => {
+              const dateA = new Date(a.lastHRDate);
+              const dateB = new Date(b.lastHRDate);
+              if (dateB - dateA !== 0) return dateB - dateA;
+              return b.homeRunsThisSeason - a.homeRunsThisSeason;
+            });
+            
+            console.log(`[Dashboard] Found ${comprehensiveRecentHRs.length} players with HRs from filtered team(s)`);
+            
             filteredData = {
               ...data,
               players: data.players ? data.players.filter(player => 
                 shouldIncludePlayer(player.team)
               ) : [],
-              recentHRs: data.recentHRs ? data.recentHRs.filter(player => 
-                shouldIncludePlayer(player.team)
-              ) : []
+              recentHRs: comprehensiveRecentHRs // Use comprehensive list for team filtering
             };
           }
           
@@ -574,32 +613,32 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
               }))
             );
             
-            // Rest of your code for other categories
+            // Rest of your code for other categories - enhanced for team filtering
             const hrRate = [...filteredData.players]
               .filter(player => player.gamesPlayed > 0 && player.homeRunsThisSeason > 0)
               .sort((a, b) => (b.homeRunsThisSeason / b.gamesPlayed) - (a.homeRunsThisSeason / a.gamesPlayed))
-              .slice(0, 25);
+              .slice(0, isFiltering ? 50 : 25); // More results when team filtering
             
             const improved = [...filteredData.players]
               .filter(player => player.actualHRRate > player.historicalHRRate)
               .sort((a, b) => (b.actualHRRate - b.historicalHRRate) - (a.actualHRRate - a.historicalHRRate))
-              .slice(0, 25);
+              .slice(0, isFiltering ? 50 : 25); // More results when team filtering
             
             const overPerforming = [...filteredData.players]
               .filter(player => player.status === "over-performing")
               .sort((a, b) => b.performanceIndicator - a.performanceIndicator)
-              .slice(0, 25);
+              .slice(0, isFiltering ? 50 : 25); // More results when team filtering
             
             const underPerforming = [...filteredData.players]
               .filter(player => player.status === "under-performing")
               .sort((a, b) => a.performanceIndicator - b.performanceIndicator)
-              .slice(0, 25);
+              .slice(0, isFiltering ? 50 : 25); // More results when team filtering
             
             // Set state with completely new object to force re-render
             setTopPerformers({
               hrRate,
               improved,
-              recent,
+              recent, // This will now be comprehensive for team filtering
               overPerforming,
               underPerforming
             });
@@ -623,9 +662,9 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     try {
       setStatsLoading(true);
       
-      console.log(`[Dashboard] Loading rolling stats for type: ${rollingStatsType}`);
+      console.log(`[Dashboard] Loading rolling stats for type: ${rollingStatsType}, team filtering: ${isFiltering}`);
       
-      // Format date for file name
+      // FORMAT DATE FOR FILE NAME
       const year = currentDate.getFullYear();
       const month = String(currentDate.getMonth() + 1).padStart(2, '0');
       const day = String(currentDate.getDate()).padStart(2, '0');
@@ -641,37 +680,67 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
       }
       
       if (rollingStatsResponse.ok) {
-        console.log(`[Dashboard] Successfully loaded rolling stats from file`);
-        const rollingStatsData = await rollingStatsResponse.json();
+        const text = await rollingStatsResponse.text();
         
-        // Apply team filtering if needed
-        let filteredHitters = rollingStatsData.topHitters || [];
-        let filteredHomers = rollingStatsData.topHRLeaders || [];
-        let filteredStrikeouts = rollingStatsData.topStrikeoutPitchers || [];
-        
-        if (isFiltering) {
-          filteredHitters = filteredHitters.filter(player => 
-            shouldIncludePlayer(player.team)
-          );
-          filteredHomers = filteredHomers.filter(player => 
-            shouldIncludePlayer(player.team)
-          );
-          filteredStrikeouts = filteredStrikeouts.filter(player => 
-            shouldIncludePlayer(player.team)
-          );
+        // Check if it's actually JSON
+        if (text.trim().startsWith('{') || text.trim().startsWith('[')) {
+          const rollingStatsData = JSON.parse(text);
+          console.log(`[Dashboard] Successfully loaded rolling stats from file`);
+          
+          // ENHANCED: Use comprehensive data for team filtering
+          if (isFiltering && selectedTeam) {
+            console.log(`[Dashboard] Team filtering active - using comprehensive data`);
+            
+            // Use comprehensive data (allHitters, allHRLeaders) for team filtering
+            const allHitters = rollingStatsData.allHitters || rollingStatsData.topHitters || [];
+            const allHRLeaders = rollingStatsData.allHRLeaders || rollingStatsData.topHRLeaders || [];
+            const allStrikeouts = rollingStatsData.allStrikeoutPitchers || rollingStatsData.topStrikeoutPitchers || [];
+            
+            console.log(`[Dashboard] Available comprehensive data: ${allHitters.length} hitters, ${allHRLeaders.length} HR leaders, ${allStrikeouts.length} strikeout pitchers`);
+            
+            // Filter by team using comprehensive data
+            const filteredHitters = allHitters.filter(player => 
+              shouldIncludePlayer(player.team)
+            );
+            
+            const filteredHomers = allHRLeaders.filter(player => 
+              shouldIncludePlayer(player.team)
+            );
+            
+            const filteredStrikeouts = allStrikeouts.filter(player => 
+              shouldIncludePlayer(player.team)
+            );
+            
+            console.log(`[Dashboard] After team filtering: ${filteredHitters.length} hitters, ${filteredHomers.length} HR leaders, ${filteredStrikeouts.length} strikeout pitchers`);
+            
+            setRollingStats({
+              hitters: filteredHitters.slice(0, 50), // Show up to 50 for team filtering
+              homers: filteredHomers.slice(0, 50),
+              strikeouts: filteredStrikeouts.slice(0, 50)
+            });
+            
+          } else {
+            // NOT filtering by team - use regular top performers for global display
+            console.log(`[Dashboard] No team filtering - using top performers for global display`);
+            
+            let filteredHitters = rollingStatsData.topHitters || [];
+            let filteredHomers = rollingStatsData.topHRLeaders || [];
+            let filteredStrikeouts = rollingStatsData.topStrikeoutPitchers || [];
+            
+            setRollingStats({
+              hitters: filteredHitters.slice(0, 25), // Limit to 25 for global display
+              homers: filteredHomers.slice(0, 25),
+              strikeouts: filteredStrikeouts.slice(0, 25)
+            });
+          }
+          
+          setDataDate(new Date(rollingStatsData.date || currentDate));
+          setDateStatus(rollingStatsData.period || 'Season Stats');
+          
+        } else {
+          console.warn(`[Dashboard] Rolling stats file returned HTML, not JSON`);
+          await loadLegacyRollingStats();
         }
-        
-        setRollingStats({
-          hitters: filteredHitters.slice(0, 25),
-          homers: filteredHomers.slice(0, 25),
-          strikeouts: filteredStrikeouts.slice(0, 25)
-        });
-        
-        setDataDate(new Date(rollingStatsData.date));
-        setDateStatus(rollingStatsData.period || 'Season Stats');
-        
-        console.log(`[Dashboard] Loaded ${filteredHitters.length} hitters, ${filteredHomers.length} HR leaders, ${filteredStrikeouts.length} strikeout leaders`);
-        
       } else {
         console.log(`[Dashboard] No rolling stats file found, falling back to legacy method`);
         await loadLegacyRollingStats();
@@ -685,7 +754,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     }
   };
   
-  // Legacy fallback method (your original logic)
+  // LEGACY FALLBACK METHOD - ENHANCED FOR COMPREHENSIVE TEAM FILTERING
   const loadLegacyRollingStats = async () => {
     console.log(`[Dashboard] Using legacy rolling stats method`);
     
@@ -713,36 +782,39 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
         if (response.ok) {
           const data = await response.json();
           if (data.players && data.players.length > 0) {
-            // Process previous day data with filtering
-            let filteredPrevDayPlayers = data.players;
+            // Process previous day data with comprehensive team filtering
+            let allBatters = data.players.filter(player => 
+              player.playerType === 'hitter' || !player.playerType);
+            let allPitchers = data.players.filter(player => 
+              player.playerType === 'pitcher');
             
             if (isFiltering) {
-              filteredPrevDayPlayers = filteredPrevDayPlayers.filter(player => 
+              console.log(`[Dashboard] Legacy method with team filtering - processing ALL team players`);
+              
+              // Filter all players by team (not just top performers)
+              allBatters = allBatters.filter(player => 
+                shouldIncludePlayer(player.team)
+              );
+              allPitchers = allPitchers.filter(player => 
                 shouldIncludePlayer(player.team)
               );
             }
             
-            const batters = filteredPrevDayPlayers.filter(player => 
-              player.playerType === 'hitter' || !player.playerType);
-            
-            const pitchers = filteredPrevDayPlayers.filter(player => 
-              player.playerType === 'pitcher');
-            
-            // Find top performers in previous day data
-            const topHitters = [...batters]
-              .filter(player => player.H !== 'DNP' && player.H !== null)
+            // Find ALL performers (not limited) for team filtering
+            const topHitters = [...allBatters]
+              .filter(player => player.H !== 'DNP' && player.H !== null && Number(player.H) > 0)
               .sort((a, b) => (Number(b.H) || 0) - (Number(a.H) || 0))
-              .slice(0, 25);
+              .slice(0, isFiltering ? 50 : 25); // More results when filtering
             
-            const topHomers = [...batters]
+            const topHomers = [...allBatters]
               .filter(player => player.HR !== 'DNP' && player.HR !== null && Number(player.HR) > 0)
               .sort((a, b) => (Number(b.HR) || 0) - (Number(a.HR) || 0))
-              .slice(0, 25);
+              .slice(0, isFiltering ? 50 : 25); // More results when filtering
             
-            const topStrikeoutPitchers = [...pitchers]
-              .filter(player => player.K !== 'DNP' && player.K !== null)
+            const topStrikeoutPitchers = [...allPitchers]
+              .filter(player => player.K !== 'DNP' && player.K !== null && Number(player.K) > 0)
               .sort((a, b) => (Number(b.K) || 0) - (Number(a.K) || 0))
-              .slice(0, 25);
+              .slice(0, isFiltering ? 50 : 25); // More results when filtering
             
             setRollingStats({
               hitters: topHitters.map(player => ({...player, games: 1})),
@@ -753,6 +825,8 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
             // Set data date and status
             setDataDate(yesterday);
             setDateStatus('previous');
+            
+            console.log(`[Dashboard] Legacy previous day with team filtering: ${topHitters.length} hitters, ${topHomers.length} homers, ${topStrikeoutPitchers.length} strikeout pitchers`);
             
             return; // Exit early since we found yesterday's data
           }
@@ -766,38 +840,103 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
       setDateStatus('current');
     }
   };
-  
-  // Helper function to process current data (unchanged from your original)
+
+  // Helper function to process current data (enhanced for comprehensive team filtering)
   const processCurrentData = () => {
-    const batters = filteredBatterData;
-    const pitchers = filteredPitcherData;
+    console.log(`[Dashboard] Processing current data, team filtering: ${isFiltering}`);
+    
+    let batters = filteredBatterData;
+    let pitchers = filteredPitcherData;
+    
+    // If team filtering and we have comprehensive data, use ALL team players
+    if (isFiltering && playerData && playerData.length > 0) {
+      console.log(`[Dashboard] Team filtering active - processing ALL team players from current data`);
+      
+      // Get ALL team players (not pre-filtered)
+      const allTeamBatters = playerData
+        .filter(player => (player.playerType === 'hitter' || !player.playerType) && shouldIncludePlayer(player.team));
+      const allTeamPitchers = playerData
+        .filter(player => player.playerType === 'pitcher' && shouldIncludePlayer(player.team));
+      
+      batters = allTeamBatters;
+      pitchers = allTeamPitchers;
+      
+      console.log(`[Dashboard] Found ${batters.length} team batters and ${pitchers.length} team pitchers in current data`);
+    }
     
     // Find top performers in current data
     const topHitters = [...batters]
-      .filter(player => player.H !== 'DNP' && player.H !== null)
+      .filter(player => player.H !== 'DNP' && player.H !== null && Number(player.H) > 0)
       .sort((a, b) => (Number(b.H) || 0) - (Number(a.H) || 0))
-      .slice(0, 25);
+      .slice(0, isFiltering ? 50 : 25); // More results when filtering
     
     const topHomers = [...batters]
       .filter(player => player.HR !== 'DNP' && player.HR !== null && Number(player.HR) > 0)
       .sort((a, b) => (Number(b.HR) || 0) - (Number(a.HR) || 0))
-      .slice(0, 25);
+      .slice(0, isFiltering ? 50 : 25); // More results when filtering
     
     const topStrikeoutPitchers = [...pitchers]
-      .filter(player => player.K !== 'DNP' && player.K !== null)
+      .filter(player => player.K !== 'DNP' && player.K !== null && Number(player.K) > 0)
       .sort((a, b) => (Number(b.K) || 0) - (Number(a.K) || 0))
-      .slice(0, 25);
+      .slice(0, isFiltering ? 50 : 25); // More results when filtering
     
     setRollingStats({
       hitters: topHitters.map(player => ({...player, games: 1})),
       homers: topHomers.map(player => ({...player, games: 1})),
       strikeouts: topStrikeoutPitchers.map(player => ({...player, games: 1}))
     });
+    
+    console.log(`[Dashboard] Current data processing complete: ${topHitters.length} hitters, ${topHomers.length} homers, ${topStrikeoutPitchers.length} strikeout pitchers`);
   };
   
   loadEnhancedRollingStats();
-}, [filteredPlayerData, filteredBatterData, filteredPitcherData, currentDate, isFiltering, shouldIncludePlayer, rollingStatsType]);
+}, [filteredPlayerData, filteredBatterData, filteredPitcherData, currentDate, isFiltering, shouldIncludePlayer, rollingStatsType, selectedTeam, includeMatchup, matchupTeam, playerData]);
+
+// Also update the generateTeamSpecificStats function to be more comprehensive
+const generateTeamSpecificStats = (playerData, selectedTeam, includeMatchup, matchupTeam, shouldIncludePlayer) => {
+  console.log(`[generateTeamSpecificStats] Generating comprehensive stats for team filter`);
   
+  // Filter ALL players for the selected team(s) - this ensures we get everyone
+  const teamFilteredPlayers = playerData.filter(player => shouldIncludePlayer(player.team));
+  
+  console.log(`[generateTeamSpecificStats] Found ${teamFilteredPlayers.length} total team players`);
+  
+  // Separate batters and pitchers
+  const teamBatters = teamFilteredPlayers.filter(player => 
+    player.playerType === 'hitter' || !player.playerType
+  );
+  const teamPitchers = teamFilteredPlayers.filter(player => 
+    player.playerType === 'pitcher'
+  );
+  
+  console.log(`[generateTeamSpecificStats] Team breakdown: ${teamBatters.length} batters, ${teamPitchers.length} pitchers`);
+  
+  // Generate comprehensive hitters list (ALL team players with hits)
+  const comprehensiveHitters = [...teamBatters]
+    .filter(player => player.H !== 'DNP' && player.H !== null && Number(player.H) > 0)
+    .sort((a, b) => (Number(b.H) || 0) - (Number(a.H) || 0))
+    .map(player => ({...player, games: 1})); // Add games field for compatibility
+  
+  // Generate comprehensive home run leaders (ALL team players with HRs)
+  const comprehensiveHomers = [...teamBatters]
+    .filter(player => player.HR !== 'DNP' && player.HR !== null && Number(player.HR) > 0)
+    .sort((a, b) => (Number(b.HR) || 0) - (Number(a.HR) || 0))
+    .map(player => ({...player, games: 1}));
+  
+  // Generate comprehensive strikeout pitchers (ALL team pitchers with Ks)
+  const comprehensiveStrikeouts = [...teamPitchers]
+    .filter(player => player.K !== 'DNP' && player.K !== null && Number(player.K) > 0)
+    .sort((a, b) => (Number(b.K) || 0) - (Number(a.K) || 0))
+    .map(player => ({...player, games: 1}));
+  
+  console.log(`[generateTeamSpecificStats] Generated comprehensive team stats: ${comprehensiveHitters.length} hitters with hits, ${comprehensiveHomers.length} players with HRs, ${comprehensiveStrikeouts.length} pitchers with Ks`);
+  
+  return {
+    hitters: comprehensiveHitters,
+    homers: comprehensiveHomers,
+    strikeouts: comprehensiveStrikeouts
+  };
+};
 
 const getTimePeriodText = () => {
   switch(rollingStatsType) {
@@ -868,22 +1007,6 @@ const StatsTimePeriodSelector = () => (
     day: 'numeric' 
   });
 
-  // Helper function to display the time period
-/*   const getTimePeriodText = () => {
-    switch(dateStatus) {
-      case 'current':
-        return "Today";
-      case 'previous':
-        return dataDate.toLocaleDateString('en-US', { weekday: 'long' });
-      case 'historical':
-        return "Last 7 Days";
-      case 'season':
-        return "Season Performance";
-      default:
-        return "Today";
-    }
-  };
- */
   // Add this state for handling race conditions
 const [filteringComplete, setFilteringComplete] = useState(false);
 
@@ -1128,8 +1251,7 @@ const noFilteredData = isFiltering &&
 
           {/* 
             SLOT MACHINE CARD - FULL WIDTH
-            This will now span the entire width of the dashboard grid
-            and be properly responsive across all screen sizes
+            Enhanced with all the new quick add options
           */}
           <SlotMachineCard 
             playerData={filteredPlayerData}
@@ -1138,6 +1260,13 @@ const noFilteredData = isFiltering &&
             topPerformers={topPerformers}
             hitStreakData={hitStreakData}
             playersWithHomeRunPrediction={playersWithHomeRunPrediction}
+            // Use the simplified slot machine data
+            currentSeriesHits={slotMachineCardData.currentSeriesHits}
+            currentSeriesHRs={slotMachineCardData.currentSeriesHRs}
+            timeSlotHits={slotMachineCardData.timeSlotHits}
+            opponentHits={slotMachineCardData.opponentHits}
+            opponentHRs={slotMachineCardData.opponentHRs}
+            fridayHitLeaders={slotMachineCardData.fridayHitLeaders}
           />
 
             <PitcherHRsAllowedCard 

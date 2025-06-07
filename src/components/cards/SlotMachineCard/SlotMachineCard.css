@@ -1265,3 +1265,633 @@
     font-size: 0.85rem;
   }
 }
+
+
+
+/* Add these styles to your SlotMachineCard.css file */
+
+/* Results Section */
+.results-section {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(255, 215, 0, 0.1);
+  border-radius: 12px;
+  border: 2px solid #ffd700;
+}
+
+.results-banner {
+  text-align: center;
+  padding: 15px;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.banner-content h4 {
+  margin: 0 0 8px 0;
+  font-size: 1.2rem;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.banner-content p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+}
+
+/* Results Summary */
+.results-summary {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.results-summary h4 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.prop-bet-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.prop-bet-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.prop-bet-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #ffd700, #ffed4e);
+}
+
+.prop-bet-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #ffd700;
+}
+
+.bet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.bet-number {
+  background: #0056b3;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.bet-emoji {
+  font-size: 1.5rem;
+}
+
+.prop-bet-card .player-info {
+  margin-bottom: 12px;
+}
+
+.prop-bet-card .player-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.prop-bet-card .player-team {
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.prop-details {
+  margin-bottom: 12px;
+  padding: 8px;
+  background: rgba(255, 215, 0, 0.1);
+  border-radius: 4px;
+  border-left: 3px solid #ffd700;
+}
+
+.prop-type {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0056b3;
+  margin-bottom: 4px;
+}
+
+.prop-target {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.bet-summary {
+  font-size: 0.9rem;
+  color: #333;
+  background: rgba(0, 86, 179, 0.1);
+  padding: 8px;
+  border-radius: 4px;
+  text-align: center;
+  border: 1px solid rgba(0, 86, 179, 0.2);
+}
+
+/* Results Actions */
+.results-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.copy-results-btn,
+.share-results-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.copy-results-btn {
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  color: white;
+}
+
+.copy-results-btn:hover {
+  background: linear-gradient(135deg, #5a6268 0%, #343a40 100%);
+  transform: translateY(-1px);
+}
+
+.share-results-btn {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+}
+
+.share-results-btn:hover {
+  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+  transform: translateY(-1px);
+}
+
+/* Responsive Design for Results */
+@media (max-width: 768px) {
+  .prop-bet-cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .prop-bet-card {
+    padding: 12px;
+  }
+  
+  .results-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .copy-results-btn,
+  .share-results-btn {
+    width: 100%;
+    max-width: 200px;
+    justify-content: center;
+  }
+  
+  .results-summary {
+    padding: 16px;
+  }
+}
+
+/* Enhanced empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.empty-state h4 {
+  color: #ffd700;
+  margin-bottom: 12px;
+  font-size: 1.3rem;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  line-height: 1.5;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+
+/* Mobile Portrait Mode - Optimized for 3x3 grid visibility */
+@media (max-width: 768px) {
+  .slot-machine-card {
+    min-height: auto;
+    padding: 12px;
+    margin: 0 -8px; /* Slight negative margin to use more screen space */
+    font-size: 0.9rem; /* Slightly smaller base font */
+  }
+  
+  /* Compact header */
+  .slot-machine-card .card-header {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+  }
+  
+  .slot-machine-card .card-header h3 {
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+  }
+  
+  .header-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  /* Compact quick-add buttons */
+  .quick-add-section {
+    margin-bottom: 12px;
+  }
+  
+  .quick-add-section h4 {
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+  }
+  
+  .quick-add-buttons {
+    grid-template-columns: repeat(4, 1fr); /* 4 columns for better fit */
+    gap: 6px;
+  }
+  
+  .quick-add-btn {
+    padding: 6px 4px;
+    font-size: 0.7rem;
+    min-height: 50px; /* Ensure buttons are tappable */
+  }
+  
+  .quick-add-label {
+    font-size: 0.7rem;
+    line-height: 1.1;
+  }
+  
+  .quick-add-desc {
+    font-size: 0.6rem;
+    line-height: 1.1;
+  }
+  
+  /* Compact player picker */
+  .player-picker {
+    margin-bottom: 12px;
+  }
+  
+  .picker-header {
+    padding: 8px 12px;
+  }
+  
+  .picker-header h4 {
+    font-size: 0.9rem;
+  }
+  
+  /* CRITICAL: Compact machine display for 3x3 grid visibility */
+  .machine-display {
+    padding: 8px;
+    min-height: 280px; /* Reduced height */
+    border-radius: 6px;
+  }
+  
+  .reels-section {
+    gap: 8px; /* Tighter spacing */
+    width: 100%;
+  }
+  
+  /* KEEP HORIZONTAL LAYOUT - Don't change to column! */
+  .reel-row {
+    display: flex;
+    flex-direction: row; /* Keep horizontal */
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    min-height: 70px; /* Consistent row height */
+  }
+
+  .row-label {
+    min-width: 50px; /* Smaller label width */
+    font-size: 0.8rem;
+    padding: 4px 2px;
+    text-align: center;
+    background: rgba(255, 215, 0, 0.15);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    flex-shrink: 0;
+    writing-mode: horizontal-tb; /* Ensure horizontal text */
+  }
+
+  .reels-container {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+    justify-content: space-between;
+    max-width: calc(100% - 60px); /* Account for label */
+  }
+
+  .slot-reel {
+    flex: 1;
+    min-width: 70px; /* Minimum readable width */
+    max-width: 90px; /* Maximum width to fit 3 columns */
+  }
+
+  /* Compact reel content */
+  .reel-container {
+    border-radius: 4px;
+  }
+
+  /* Compact player slots */
+  .player-slot {
+    padding: 6px;
+    gap: 4px;
+    min-height: 50px;
+  }
+
+  .player-slot .player-rank {
+    width: 24px;
+    height: 24px;
+  }
+
+  .player-slot .rank-number {
+    font-size: 0.7rem;
+  }
+
+  .player-slot .player-name {
+    font-size: 0.7rem;
+    line-height: 1.1;
+  }
+
+  .player-slot .player-team {
+    font-size: 0.6rem;
+  }
+
+  .player-slot .stat-value {
+    font-size: 0.6rem;
+  }
+
+  .player-slot .stat-label {
+    font-size: 0.5rem;
+  }
+
+  /* Compact prop slots */
+  .prop-slot {
+    padding: 6px 4px;
+    min-height: 50px;
+  }
+
+  .prop-emoji {
+    font-size: 1.2rem;
+    margin-bottom: 2px;
+  }
+
+  .prop-label {
+    font-size: 0.65rem;
+    line-height: 1.1;
+  }
+
+  /* Compact number slots */
+  .number-slot {
+    padding: 6px 4px;
+    min-height: 50px;
+  }
+
+  .number-display {
+    font-size: 1.4rem;
+  }
+
+  .number-label {
+    font-size: 0.6rem;
+    margin-top: 2px;
+  }
+
+  /* Compact machine controls */
+  .machine-controls {
+    margin-top: 12px;
+  }
+
+  .spin-btn {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    min-height: 48px; /* Ensure tappable */
+  }
+
+  .control-buttons {
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .reset-btn,
+  .clear-btn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    min-height: 40px;
+  }
+
+  /* Compact results section */
+  .results-section {
+    margin-top: 12px;
+    padding: 12px;
+  }
+
+  .results-banner {
+    padding: 10px;
+    margin-bottom: 12px;
+  }
+
+  .banner-content h4 {
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+
+  .banner-content p {
+    font-size: 0.8rem;
+  }
+
+  .results-summary {
+    padding: 12px;
+  }
+
+  .results-summary h4 {
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+  }
+
+  .prop-bet-cards {
+    grid-template-columns: 1fr; /* Single column on mobile */
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .prop-bet-card {
+    padding: 10px;
+  }
+
+  .bet-header {
+    margin-bottom: 8px;
+  }
+
+  .bet-number {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+  }
+
+  .bet-emoji {
+    font-size: 1.2rem;
+  }
+
+  .prop-bet-card .player-name {
+    font-size: 0.9rem;
+  }
+
+  .prop-bet-card .player-team {
+    font-size: 0.75rem;
+  }
+
+  .prop-type {
+    font-size: 0.8rem;
+  }
+
+  .prop-target {
+    font-size: 0.75rem;
+  }
+
+  .bet-summary {
+    font-size: 0.8rem;
+    padding: 6px;
+  }
+
+  .results-actions {
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .copy-results-btn,
+  .share-results-btn {
+    width: 100%;
+    max-width: 200px;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    justify-content: center;
+  }
+
+  /* Empty state mobile */
+  .empty-state {
+    padding: 40px 12px;
+  }
+
+  .empty-state h4 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+
+  .empty-state p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Extra small mobile devices (portrait phones, less than 576px) */
+@media (max-width: 576px) {
+  .slot-machine-card {
+    padding: 8px;
+    margin: 0 -6px;
+  }
+  
+  .machine-display {
+    padding: 6px;
+    min-height: 260px;
+  }
+  
+  .row-label {
+    min-width: 45px;
+    font-size: 0.7rem;
+    padding: 2px 1px;
+  }
+  
+  .slot-reel {
+    min-width: 65px;
+    max-width: 80px;
+  }
+  
+  .reels-container {
+    gap: 4px;
+    max-width: calc(100% - 50px);
+  }
+  
+  .reel-row {
+    gap: 4px;
+    min-height: 65px;
+  }
+  
+  .reels-section {
+    gap: 6px;
+  }
+  
+  .player-slot,
+  .prop-slot,
+  .number-slot {
+    min-height: 45px;
+    padding: 4px;
+  }
+  
+  .prop-label {
+    font-size: 0.6rem;
+  }
+  
+  .quick-add-buttons {
+    grid-template-columns: repeat(3, 1fr); /* 3 columns on very small screens */
+  }
+}
+
+/* Landscape mobile optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+  .machine-display {
+    min-height: 200px; /* Shorter height for landscape */
+  }
+  
+  .slot-machine-card {
+    padding: 8px;
+  }
+  
+  .reels-section {
+    gap: 6px;
+  }
+  
+  .reel-row {
+    min-height: 55px;
+  }
+  
+  .player-slot,
+  .prop-slot, 
+  .number-slot {
+    min-height: 40px;
+  }
+}
