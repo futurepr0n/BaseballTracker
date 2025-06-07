@@ -15,13 +15,16 @@
 .top-hitters-card .player-item {
   display: flex;
   align-items: center;
-  padding: 10px 0;
+  padding: 12px 8px;
   border-bottom: 1px solid #f0f0f0;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .top-hitters-card .player-item:hover {
-  background-color: #f9f9f9;
+  background-color: rgba(79, 70, 229, 0.05);
+  transform: translateX(2px);
 }
 
 .top-hitters-card .player-item:last-child {
@@ -30,16 +33,44 @@
 
 /* Player rank styling */
 .top-hitters-card .player-rank {
-  width: 30px;
-  height: 30px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #0056b3;
+  background-color: #4f46e5; /* Blue for hits */
   color: white;
   border-radius: 50%;
   font-weight: bold;
-  margin-right: 15px;
+  margin-right: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.top-hitters-card .player-rank .rank-logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.7;
+}
+
+.top-hitters-card .player-rank .rank-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0.3;
+}
+
+.top-hitters-card .player-rank .rank-number {
+  position: relative;
+  z-index: 10;
+  color: white;
+  font-size: 1.125rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 /* Player info styling */
@@ -47,30 +78,153 @@
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  margin-right: 10px;
 }
 
 .top-hitters-card .player-name {
   font-weight: 500;
   color: #333;
+  font-size: 0.95rem;
 }
 
 .top-hitters-card .player-team {
   font-size: 0.85rem;
   color: #666;
+  font-weight: 600;
 }
 
-/* Player stats styling */
-.top-hitters-card .player-stat {
+/* Hitting stats styling */
+.top-hitters-card .hitting-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  min-width: 120px;
+}
+
+.top-hitters-card .primary-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.top-hitters-card .primary-stat .stat-value {
+  font-size: 1.4rem;
   font-weight: 700;
-  color: #0056b3;
+  color: #4f46e5;
+  line-height: 1;
 }
 
-.top-hitters-card .stat-note {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: normal;
+.top-hitters-card .primary-stat .stat-label {
+  font-size: 0.7rem;
   color: #666;
-  margin-top: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.top-hitters-card .secondary-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.8rem;
+}
+
+.top-hitters-card .batting-avg {
+  color: #0056b3;
+  font-weight: 600;
+}
+
+.top-hitters-card .games-played {
+  color: #666;
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+/* Enhanced background logo */
+.top-hitters-card .player-item .team-logo-bg {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 66%;
+  opacity: 0.05;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  transform: translate(20%, -10%) scale(2.2);
+  object-fit: cover;
+  object-position: center;
+}
+
+.top-hitters-card .player-item:hover .team-logo-bg {
+  opacity: 0.1;
+}
+
+/* Team context subtitle */
+.top-hitters-card .card-subtitle.team-context {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 15px;
+  color: #1e40af;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* Team hitting summary */
+.top-hitters-card .team-hitting-summary {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-left: 4px solid #4f46e5;
+}
+
+.top-hitters-card .summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  text-align: center;
+}
+
+.top-hitters-card .summary-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.top-hitters-card .summary-stat .stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #4f46e5;
+  line-height: 1;
+}
+
+.top-hitters-card .summary-stat .stat-label {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Team filter summary */
+.top-hitters-card .team-filter-summary {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-top: 15px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #1e40af;
+  font-style: italic;
 }
 
 /* Loading indicator */
@@ -88,11 +242,217 @@
   color: #888;
   text-align: center;
   padding: 20px 0;
+  font-style: italic;
+}
+
+/* Scrollable container for player lists */
+.top-hitters-card .scrollable-container {
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.top-hitters-card .scrollable-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.top-hitters-card .scrollable-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.top-hitters-card .scrollable-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.top-hitters-card .scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Special highlighting for top performers */
+.top-hitters-card .player-item:first-child .primary-stat .stat-value {
+  font-size: 1.6rem;
+  text-shadow: 0 1px 2px rgba(79, 70, 229, 0.3);
+}
+
+.top-hitters-card .player-item:nth-child(2) .primary-stat .stat-value {
+  font-size: 1.5rem;
+}
+
+.top-hitters-card .player-item:nth-child(3) .primary-stat .stat-value {
+  font-size: 1.45rem;
+}
+
+/* Context details styling */
+.top-hitters-card .context-details {
+  font-size: 0.85rem;
+  color: #3b82f6;
+  font-weight: 500;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .top-hitters-card {
     grid-column: 1 / -1;
+  }
+  
+  .top-hitters-card .player-item {
+    padding: 10px 6px;
+  }
+  
+  .top-hitters-card .player-rank {
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
+  }
+  
+  .top-hitters-card .player-rank .rank-number {
+    font-size: 1rem;
+  }
+  
+  .top-hitters-card .hitting-stats {
+    min-width: 100px;
+  }
+  
+  .top-hitters-card .primary-stat .stat-value {
+    font-size: 1.2rem !important;
+  }
+  
+  .top-hitters-card .summary-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .top-hitters-card .summary-stat .stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .top-hitters-card .team-hitting-summary {
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-hitters-card .player-item {
+    padding: 8px 4px;
+  }
+  
+  .top-hitters-card .player-rank {
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+  }
+  
+  .top-hitters-card .player-rank .rank-number {
+    font-size: 0.9rem;
+  }
+  
+  .top-hitters-card .hitting-stats {
+    min-width: 90px;
+  }
+  
+  .top-hitters-card .primary-stat .stat-value {
+    font-size: 1.1rem !important;
+  }
+  
+  .top-hitters-card .secondary-stats {
+    font-size: 0.75rem;
+  }
+  
+  .top-hitters-card .player-name {
+    font-size: 0.9rem;
+  }
+  
+  .top-hitters-card .player-team {
+    font-size: 0.8rem;
+  }
+  
+  .top-hitters-card .summary-stats {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .top-hitters-card .summary-stat .stat-value {
+    font-size: 1.3rem;
+  }
+  
+  .top-hitters-card .context-details {
+    font-size: 0.8rem;
+  }
+}
+
+/* Animation for team context elements */
+.top-hitters-card .team-context,
+.top-hitters-card .team-hitting-summary,
+.top-hitters-card .team-filter-summary {
+  animation: slideInTeamContext 0.3s ease-out;
+}
+
+@keyframes slideInTeamContext {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .top-hitters-card {
+    background-color: #1f2937;
+  }
+  
+  .top-hitters-card .player-name {
+    color: #f9fafb;
+  }
+  
+  .top-hitters-card .player-team {
+    color: #9ca3af;
+  }
+  
+  .top-hitters-card .games-played {
+    color: #9ca3af;
+  }
+  
+  .top-hitters-card .batting-avg {
+    color: #60a5fa;
+  }
+  
+  .top-hitters-card .card-subtitle.team-context {
+    background-color: #1e3a8a;
+    border-color: #3730a3;
+    color: #bfdbfe;
+  }
+  
+  .top-hitters-card .team-hitting-summary {
+    background-color: #1e293b;
+    border-left-color: #6366f1;
+  }
+  
+  .top-hitters-card .summary-stat .stat-value {
+    color: #818cf8;
+  }
+  
+  .top-hitters-card .summary-stat .stat-label {
+    color: #cbd5e1;
+  }
+  
+  .top-hitters-card .team-filter-summary {
+    background-color: #1e3a8a;
+    border-color: #3730a3;
+    color: #bfdbfe;
+  }
+  
+  .top-hitters-card .player-item:hover {
+    background-color: rgba(79, 70, 229, 0.1);
+  }
+  
+  .top-hitters-card .context-details {
+    color: #93c5fd;
   }
 }

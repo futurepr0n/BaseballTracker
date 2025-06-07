@@ -1060,3 +1060,531 @@ body .streak-tooltip {
   border-radius: 50% !important;
   flex-shrink: 0 !important;
 }
+
+
+
+
+/* //////////////////////////////*/
+
+/* Enhanced Card Styles for Team Context Features */
+/* Add this to your Dashboard.css or create a new file and import it */
+
+/* Team Context Subtitle */
+.card-subtitle.team-context {
+  background-color: #e6f7ff;
+  border: 1px solid #91d5ff;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 15px;
+  color: #0c53b7;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.context-details {
+  font-size: 0.85rem;
+  color: #1890ff;
+  font-weight: 500;
+}
+
+/* Team Summary Stats */
+.team-hitting-summary,
+.team-hr-summary {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-left: 4px solid #1890ff;
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  text-align: center;
+}
+
+.summary-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.summary-stat .stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #0056b3;
+  line-height: 1;
+}
+
+.summary-stat .stat-label {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.summary-stat.highlight .stat-value {
+  color: #e63946;
+  font-size: 2rem;
+}
+
+.summary-stat.highlight .stat-label {
+  color: #333;
+  font-weight: 600;
+}
+
+/* Enhanced Player Stats Layout */
+.hitting-stats,
+.hr-stats,
+.recent-hr-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  min-width: 120px;
+}
+
+.primary-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.primary-stat .stat-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.primary-stat .stat-label {
+  font-size: 0.7rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.secondary-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.8rem;
+}
+
+.batting-avg,
+.hr-rate {
+  color: #0056b3;
+  font-weight: 600;
+}
+
+.games-played {
+  color: #666;
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+/* Recent Home Run Stats */
+.recent-hr-stats {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.hr-date {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-bottom: 4px;
+}
+
+.date-primary {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e63946;
+  line-height: 1;
+}
+
+.date-secondary {
+  font-size: 0.75rem;
+  color: #666;
+  font-style: italic;
+}
+
+.hr-totals {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.season-hrs {
+  font-size: 0.85rem;
+  color: #0056b3;
+  font-weight: 600;
+}
+
+.games-since {
+  font-size: 0.75rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Team Filter Summary */
+.team-filter-summary {
+  background-color: #f0f9ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-top: 15px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #1e40af;
+  font-style: italic;
+}
+
+/* Enhanced Item Hover States */
+.hitter-item:hover,
+.hr-leader-item:hover,
+.recent-homer-item:hover {
+  background-color: rgba(0, 86, 179, 0.05);
+  transform: translateX(2px);
+}
+
+/* Color Coding for Different Stats */
+.hitting-stats .stat-value {
+  color: #4f46e5; /* Blue for hits */
+}
+
+.hr-stats .stat-value {
+  color: #e63946; /* Red for home runs */
+}
+
+.recent-hr-stats .date-primary {
+  color: #e63946; /* Red for recent HRs */
+}
+
+/* Enhanced Rank Circle with Team Logos */
+.player-rank {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: relative !important;
+  margin-right: 16px !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  flex-shrink: 0 !important;
+}
+
+.player-rank .rank-logo {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  object-fit: cover !important;
+  opacity: 0.7 !important;
+}
+
+.player-rank .rank-overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  background-color: currentColor !important;
+  opacity: 0.3 !important;
+}
+
+.player-rank .rank-number {
+  position: relative !important;
+  z-index: 10 !important;
+  color: white !important;
+  font-size: 1.125rem !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+  line-height: 1 !important;
+  font-weight: bold !important;
+}
+
+/* Enhanced background team logos */
+.player-item {
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.2s ease;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.player-item:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.player-item .team-logo-bg {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 66%;
+  opacity: 0.05;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  transform: translate(20%, -10%) scale(2.2);
+  object-fit: cover;
+  object-position: center;
+}
+
+.player-item:hover .team-logo-bg {
+  opacity: 0.1;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .summary-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .summary-stat .stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .team-hitting-summary,
+  .team-hr-summary {
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+  
+  .hitting-stats,
+  .hr-stats,
+  .recent-hr-stats {
+    min-width: 100px;
+  }
+  
+  .primary-stat .stat-value {
+    font-size: 1.2rem;
+  }
+  
+  .card-subtitle.team-context {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+  
+  .player-item {
+    padding: 10px 8px;
+  }
+  
+  .player-rank {
+    width: 40px !important;
+    height: 40px !important;
+    margin-right: 12px !important;
+  }
+  
+  .player-rank .rank-number {
+    font-size: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-stats {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .summary-stat .stat-value {
+    font-size: 1.3rem;
+  }
+  
+  .secondary-stats {
+    font-size: 0.75rem;
+  }
+  
+  .context-details {
+    font-size: 0.8rem;
+  }
+  
+  .player-item {
+    padding: 8px 6px;
+  }
+}
+
+/* Animation for team context appearance */
+.team-context,
+.team-hitting-summary,
+.team-hr-summary,
+.team-filter-summary {
+  animation: slideInTeamContext 0.3s ease-out;
+}
+
+@keyframes slideInTeamContext {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Special highlighting for top team performers */
+.hitter-item:first-child .primary-stat .stat-value,
+.hr-leader-item:first-child .primary-stat .stat-value,
+.recent-homer-item:first-child .date-primary {
+  font-size: 1.6rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.hitter-item:nth-child(2) .primary-stat .stat-value,
+.hr-leader-item:nth-child(2) .primary-stat .stat-value,
+.recent-homer-item:nth-child(2) .date-primary {
+  font-size: 1.5rem;
+}
+
+.hitter-item:nth-child(3) .primary-stat .stat-value,
+.hr-leader-item:nth-child(3) .primary-stat .stat-value,
+.recent-homer-item:nth-child(3) .date-primary {
+  font-size: 1.45rem;
+}
+
+/* Card-specific styles */
+.top-hitters-card .player-item {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.hr-leaders-card .player-item {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.recent-homers-card .player-item {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.top-hitters-card .player-item:last-child,
+.hr-leaders-card .player-item:last-child,
+.recent-homers-card .player-item:last-child {
+  border-bottom: none;
+}
+
+/* Loading states */
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.no-data {
+  color: #888;
+  text-align: center;
+  padding: 20px 0;
+  font-style: italic;
+}
+
+/* Scrollable container enhancements */
+.scrollable-container {
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.scrollable-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.scrollable-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Force override for any stubborn styles */
+.player-list {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.player-info {
+  flex-grow: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  margin-right: 10px !important;
+}
+
+.player-name {
+  font-weight: 500 !important;
+  color: #333 !important;
+  font-size: 0.95rem !important;
+}
+
+.player-team {
+  font-size: 0.85rem !important;
+  color: #666 !important;
+  font-weight: 600 !important;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .card-subtitle.team-context {
+    background-color: #1e3a8a;
+    border-color: #3730a3;
+    color: #bfdbfe;
+  }
+  
+  .team-hitting-summary,
+  .team-hr-summary {
+    background-color: #1e293b;
+    border-left-color: #3b82f6;
+  }
+  
+  .summary-stat .stat-value {
+    color: #60a5fa;
+  }
+  
+  .summary-stat .stat-label {
+    color: #cbd5e1;
+  }
+  
+  .team-filter-summary {
+    background-color: #1e3a8a;
+    border-color: #3730a3;
+    color: #bfdbfe;
+  }
+  
+  .player-name {
+    color: inherit;
+  }
+  
+  .player-team {
+    color: #94a3b8 !important;
+  }
+  
+  .batting-avg,
+  .hr-rate,
+  .season-hrs {
+    color: #60a5fa;
+  }
+  
+  .player-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+}

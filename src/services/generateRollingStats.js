@@ -1,9 +1,9 @@
 /**
- * generateRollingStats.js
+ * Enhanced generateRollingStats.js
  * 
  * This script crawls through all season data files and generates comprehensive
- * rolling statistics for players, handling multiple games per day and providing
- * cumulative stats that can be used by the dashboard cards.
+ * rolling statistics for players, including ALL players with stats (not just top 50)
+ * to support comprehensive team filtering in the dashboard.
  */
 
 const fs = require('fs');
@@ -263,6 +263,7 @@ function processPlayerGameData(playerEntries, playerName, playerTeam) {
 
 /**
  * Generate comprehensive rolling stats for all players
+ * ENHANCED: Now includes many more players to support team filtering
  */
 function generateRollingStats(seasonData, targetDate = new Date()) {
   console.log(`[generateRollingStats] Generating rolling stats up to ${targetDate.toDateString()}`);
@@ -348,31 +349,62 @@ function generateRollingStats(seasonData, targetDate = new Date()) {
     player.totalIP > 0 || player.totalPitcherKs > 0
   );
   
-  // Create top performer lists
-  const topHitters = [...hitters]
-    .filter(player => player.gamesPlayed >= 1)
-    .sort((a, b) => b.totalHits - a.totalHits)
-    .slice(0, 50);
+  // ENHANCED: Create more comprehensive lists for team filtering support
   
-  const topHRLeaders = [...hitters]
+  // All hitters with hits (for comprehensive team filtering)
+  const allHittersWithHits = [...hitters]
+    .filter(player => player.gamesPlayed >= 1 && player.totalHits > 0)
+    .sort((a, b) => b.totalHits - a.totalHits);
+  
+  // All hitters with HRs (for comprehensive team filtering)
+  const allHittersWithHRs = [...hitters]
     .filter(player => player.totalHRs > 0)
-    .sort((a, b) => b.totalHRs - a.totalHRs)
-    .slice(0, 50);
+    .sort((a, b) => b.totalHRs - a.totalHRs);
   
-  const topHRRate = [...hitters]
-    .filter(player => player.gamesPlayed >= 10 && player.totalHRs > 0)
-    .sort((a, b) => parseFloat(b.hrRate) - parseFloat(a.hrRate))
-    .slice(0, 50);
+  // All pitchers with strikeouts (for comprehensive team filtering)  
+  const allPitchersWithKs = [...pitchers]
+    .filter(player => player.gamesPlayed >= 1 && player.totalPitcherKs > 0)
+    .sort((a, b) => b.totalPitcherKs - a.totalPitcherKs);
   
-  const topStrikeoutPitchers = [...pitchers]
-    .filter(player => player.gamesPlayed >= 1)
-    .sort((a, b) => b.totalPitcherKs - a.totalPitcherKs)
-    .slice(0, 50);
+  // Create top lists for global display (limited)
+  const topHitters = allHittersWithHits.slice(0, 50);
+  const topHRLeaders = allHittersWithHRs.slice(0, 50);
+  const topStrikeoutPitchers = allPitchersWithKs.slice(0, 50);
   
-  const topBattingAvg = [...hitters]
-    .filter(player => player.totalABs >= 50)
-    .sort((a, b) => parseFloat(b.battingAvg) - parseFloat(a.battingAvg))
-    .slice(0, 50);
+  // Create additional comprehensive lists by team for filtering
+  const hittersByTeam = {};
+  const hrLeadersByTeam = {};
+  const strikeoutPitchersByTeam = {};
+  
+  // Group by team for comprehensive filtering
+  allHittersWithHits.forEach(player => {
+    if (!hittersByTeam[player.team]) {
+      hittersByTeam[player.team] = [];
+    }
+    hittersByTeam[player.team].push(player);
+  });
+  
+  allHittersWithHRs.forEach(player => {
+    if (!hrLeadersByTeam[player.team]) {
+      hrLeadersByTeam[player.team] = [];
+    }
+    hrLeadersByTeam[player.team].push(player);
+  });
+  
+  allPitchersWithKs.forEach(player => {
+    if (!strikeoutPitchersByTeam[player.team]) {
+      strikeoutPitchersByTeam[player.team] = [];
+    }
+    strikeoutPitchersByTeam[player.team].push(player);
+  });
+  
+  console.log(`[generateRollingStats] Created comprehensive data:
+    - All Hitters: ${allHittersWithHits.length}
+    - All HR Leaders: ${allHittersWithHRs.length}  
+    - All Strikeout Pitchers: ${allPitchersWithKs.length}
+    - Teams with Hitters: ${Object.keys(hittersByTeam).length}
+    - Teams with HR Leaders: ${Object.keys(hrLeadersByTeam).length}
+    - Teams with Strikeout Pitchers: ${Object.keys(strikeoutPitchersByTeam).length}`);
   
   return {
     date: targetDateStr,
@@ -381,7 +413,7 @@ function generateRollingStats(seasonData, targetDate = new Date()) {
     totalHitters: hitters.length,
     totalPitchers: pitchers.length,
     
-    // Top performer lists (formatted for dashboard compatibility)
+    // Top performer lists (formatted for dashboard compatibility) - LIMITED FOR GLOBAL VIEW
     topHitters: topHitters.map(player => ({
       name: player.name,
       team: player.team,
@@ -398,15 +430,6 @@ function generateRollingStats(seasonData, targetDate = new Date()) {
       rate: player.hrRate
     })),
     
-    topHRRate: topHRRate.map(player => ({
-      name: player.name,
-      team: player.team,
-      HR: player.totalHRs,
-      games: player.gamesPlayed,
-      rate: player.hrRate,
-      hrsPerGame: player.hrsPerGame
-    })),
-    
     topStrikeoutPitchers: topStrikeoutPitchers.map(player => ({
       name: player.name,
       team: player.team,
@@ -415,14 +438,41 @@ function generateRollingStats(seasonData, targetDate = new Date()) {
       IP: player.totalIP.toFixed(1)
     })),
     
-    topBattingAvg: topBattingAvg.map(player => ({
+    // COMPREHENSIVE DATA FOR TEAM FILTERING - ALL PLAYERS WITH STATS
+    allHitters: allHittersWithHits.map(player => ({
       name: player.name,
       team: player.team,
+      H: player.totalHits,
+      games: player.gamesPlayed,
       avg: player.battingAvg,
-      hits: player.totalHits,
-      abs: player.totalABs,
-      games: player.gamesPlayed
+      AB: player.totalABs,
+      R: player.totalRuns,
+      RBI: player.totalRBIs
     })),
+    
+    allHRLeaders: allHittersWithHRs.map(player => ({
+      name: player.name,
+      team: player.team,
+      HR: player.totalHRs,
+      games: player.gamesPlayed,
+      rate: player.hrRate,
+      hrsPerGame: player.hrsPerGame
+    })),
+    
+    allStrikeoutPitchers: allPitchersWithKs.map(player => ({
+      name: player.name,
+      team: player.team,
+      K: player.totalPitcherKs,
+      games: player.gamesPlayed,
+      IP: player.totalIP.toFixed(1),
+      ERA: player.era,
+      WHIP: player.whip
+    })),
+    
+    // TEAM-ORGANIZED DATA FOR EFFICIENT FILTERING
+    hittersByTeam,
+    hrLeadersByTeam,
+    strikeoutPitchersByTeam,
     
     // Complete player stats for further analysis
     allPlayerStats
@@ -482,6 +532,8 @@ async function generateAllRollingStats(targetDate = new Date()) {
         period: period.label,
         periodDays: period.days
       });
+      
+      console.log(`✅ Generated ${period.label} with ${rollingStats.allHitters.length} total hitters, ${rollingStats.allHRLeaders.length} total HR leaders`);
     }
   }
   
@@ -507,7 +559,7 @@ if (require.main === module) {
   generateAllRollingStats(targetDate)
     .then(success => {
       if (success) {
-        console.log('✅ Successfully generated all rolling statistics!');
+        console.log('✅ Successfully generated all comprehensive rolling statistics!');
       } else {
         console.error('❌ Rolling statistics generation failed.');
       }

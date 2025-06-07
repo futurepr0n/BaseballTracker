@@ -66,3 +66,11 @@ public/data/rolling_stats/rolling_stats_last_30_2025-06-04.json
 public/data/rolling_stats/rolling_stats_last_30_latest.json
 public/data/rolling_stats/rolling_stats_season_2025-06-04.json
 public/data/rolling_stats/rolling_stats_season_latest.json
+public/data/predictions/player_performance_latest.json
+public/data/rosters.json
+public/data/injuries/mlb_injuries_2025-06-05.json
+public/data/injuries/mlb_injuries_2025-06-06.json
+public/data/injuries/rosters_backup_2025-06-05_01-26.json
+public/data/injuries/rosters_backup_2025-06-06_08-16.json
+public/data/predictions/hr_predictions_latest.json
+public/data/predictions/player_performance_latest.json
