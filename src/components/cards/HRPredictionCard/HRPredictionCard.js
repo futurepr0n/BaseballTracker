@@ -255,80 +255,83 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
         )}
       </div>
 
-      <div className="scrollable-container">
-        <ul className="player-list">
-          {playersWithHomeRunPrediction.slice(0, 25).map((player, index) => {
-            const team = teams[player.team];
-            const playerOdds = getPlayerOdds(player.name);
-            const formattedOdds = formatOdds(playerOdds?.odds);
-            const oddsColor = getOddsColor(playerOdds?.odds);
+<div className="scrollable-container">
+  <ul className="player-list">
+    {playersWithHomeRunPrediction
+      .filter(player => getPlayerOdds(player.name) !== null) // Filter out players without odds
+      .slice(0, 25)
+      .map((player, index) => {
+        const team = teams[player.team];
+        const playerOdds = getPlayerOdds(player.name);
+        const formattedOdds = formatOdds(playerOdds?.odds);
+        const oddsColor = getOddsColor(playerOdds?.odds);
 
-            return (
-              <li key={`${player.name}_${player.team}_${index}`} className="player-item">
-                {/* Team logo background */}
-                {team?.logoUrl && (
-                  <img 
-                    src={team.logoUrl} 
-                    alt={team.name} 
-                    className="team-logo-bg"
-                  />
+        return (
+          <li key={`${player.name}_${player.team}_${index}`} className="player-item">
+            {/* Team logo background */}
+            {team?.logoUrl && (
+              <img 
+                src={team.logoUrl} 
+                alt={team.name} 
+                className="team-logo-bg"
+              />
+            )}
+            
+            {/* Rank circle with team colors */}
+            <div 
+              className="player-rank" 
+              style={{ 
+                backgroundColor: team?.primaryColor || '#0056b3',
+                color: 'white'
+              }}
+            >
+              <img 
+                src={team?.logoUrl} 
+                alt={team?.name} 
+                className="rank-logo"
+              />
+              <div className="rank-overlay" style={{ backgroundColor: team?.primaryColor || '#0056b3' }}></div>
+              <span className="rank-number">{index + 1}</span>
+            </div>
+            
+            <div className="player-info">
+              <div className="player-name">{player.fullName || player.name}</div>
+              <div className="player-team-odds">
+                <span className="player-team">{team?.abbreviation || player.team}</span>
+                {formattedOdds && (
+                  <>
+                    <span className="odds-separator">•</span>
+                    <span 
+                      className="player-odds"
+                      style={{ color: oddsColor }}
+                      title={`Betting odds for ${player.name} to hit a home run`}
+                    >
+                      {formattedOdds}
+                    </span>
+                  </>
                 )}
-                
-                {/* Rank circle with team colors */}
-                <div 
-                  className="player-rank" 
-                  style={{ 
-                    backgroundColor: team?.primaryColor || '#0056b3',
-                    color: 'white'
-                  }}
-                >
-                  <img 
-                    src={team?.logoUrl} 
-                    alt={team?.name} 
-                    className="rank-logo"
-                  />
-                  <div className="rank-overlay" style={{ backgroundColor: team?.primaryColor || '#0056b3' }}></div>
-                  <span className="rank-number">{index + 1}</span>
-                </div>
-                
-                <div className="player-info">
-                  <div className="player-name">{player.fullName || player.name}</div>
-                  <div className="player-team-odds">
-                    <span className="player-team">{team?.abbreviation || player.team}</span>
-                    {formattedOdds && (
-                      <>
-                        <span className="odds-separator">•</span>
-                        <span 
-                          className="player-odds"
-                          style={{ color: oddsColor }}
-                          title={`Betting odds for ${player.name} to hit a home run`}
-                        >
-                          {formattedOdds}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="player-stat">
-                  <span className="hr-deficit">
-                    {player.gamesSinceLastHR === 0 ? 'Hit HR last game' : 
-                     `${player.gamesSinceLastHR} games since HR`}
+              </div>
+            </div>
+            
+            <div className="player-stat">
+              <span className="hr-deficit">
+                {player.gamesSinceLastHR === 0 ? 'Hit HR last game' : 
+                 `${player.gamesSinceLastHR} games since HR`}
+              </span>
+              <div className="hr-detail">
+                {player.homeRunsThisSeason || 0} HRs this season
+                {player.daysSinceLastHR > 0 && (
+                  <span className="days-since">
+                    {player.daysSinceLastHR === 1 ? '1 day ago' : `${player.daysSinceLastHR} days ago`}
                   </span>
-                  <div className="hr-detail">
-                    {player.homeRunsThisSeason || 0} HRs this season
-                    {player.daysSinceLastHR > 0 && (
-                      <span className="days-since">
-                        {player.daysSinceLastHR === 1 ? '1 day ago' : `${player.daysSinceLastHR} days ago`}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+                )}
+              </div>
+            </div>
+          </li>
+        );
+      })}
+  </ul>
+</div>
 
       {oddsData.size > 0 && (
         <div className="odds-footer">
