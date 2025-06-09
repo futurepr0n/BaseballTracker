@@ -30,6 +30,8 @@ import SlotMachineCard from './cards/SlotMachineCard/SlotMachineCard';
 
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
 
+import { TeamComingOffWinCard, TeamComingOffLossCard } from './cards/TeamLastResultCards/TeamLastResultCards';
+
 import { CurrentSeriesHitsCard, CurrentSeriesHRCard } from './cards/CurrentSeriesCards/CurrentSeriesCards';
 import { TimeSlotHitsCard, TimeSlotHRCard } from './cards/TimeSlotHitsCard/TimeSlotHitsCard';
 
@@ -1154,13 +1156,24 @@ const noFilteredData = isFiltering &&
             isLoading={!playerPerformance}
             teams={teamData} 
           />
+
+          {/* Team Last Result Cards */}
+<TeamComingOffWinCard 
+  gameData={gameData}
+  playerData={filteredBatterData.concat(filteredPitcherData)}
+  teamData={teamData}
+    currentDate={currentDate}  
+/>
+
+<TeamComingOffLossCard 
+  teamData={teamData}
+  currentDate={currentDate}
+/>
           
           {/* Over-Performing Players Card */}
           <PerformanceCard 
-            performingPlayers={topPerformers.overPerforming}
-            isLoading={!playerPerformance}
-            type="over"
-            teams={teamData} 
+  teamData={teamData}
+  currentDate={currentDate}
           />
           
           {/* Under-Performing Players Card */}
