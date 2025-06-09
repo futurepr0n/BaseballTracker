@@ -1,9 +1,9 @@
 node_modules
 
-public/data/logos/
-public/data/2025/
-public/data/rolling_stats/
-public/data/predictions/
+public/data/logos/*
+public/data/2025/*
+public/data/rolling_stats/*
+public/data/predictions/*
 public/data/predictions/hr_predictions_latest.json
 public/data/predictions/player_performance_latest.json
 public/data/stats/batters-batted-ball-bat-left-pitch-hand-left-2022.csv
