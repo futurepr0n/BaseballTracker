@@ -109,6 +109,7 @@ function loadAllSeasonData() {
 
 /**
  * Calculate multi-hit game performance for a player
+ * UPDATED: Excludes 0 from multi-performance and adds drought analysis
  */
 function calculateMultiHitPerformance(playerEntries) {
   const hitDistribution = {};
@@ -120,6 +121,12 @@ function calculateMultiHitPerformance(playerEntries) {
   let totalHRs = 0;
   let maxHitsInGame = 0;
   let maxHRsInGame = 0;
+  
+  // Drought tracking
+  let hitDroughts = [];
+  let hrDroughts = [];
+  let currentHitDrought = 0;
+  let currentHRDrought = 0;
 
   playerEntries.forEach(entry => {
     entry.games.forEach(game => {
@@ -140,16 +147,49 @@ function calculateMultiHitPerformance(playerEntries) {
         maxHitsInGame = Math.max(maxHitsInGame, hits);
         maxHRsInGame = Math.max(maxHRsInGame, hrs);
         
-        // Track hit distribution
+        // Track hit distribution (including 0)
         hitDistribution[hits] = (hitDistribution[hits] || 0) + 1;
+        
+        // Track HR distribution (including 0)
+        hrDistribution[hrs] = (hrDistribution[hrs] || 0) + 1;
+        
+        // UPDATED: Multi-hit games exclude 0 hits
         if (hits >= 2) totalMultiHitGames++;
         
-        // Track HR distribution
-        hrDistribution[hrs] = (hrDistribution[hrs] || 0) + 1;
+        // UPDATED: Multi-HR games exclude 0 HRs  
         if (hrs >= 1) totalMultiHRGames++;
+        
+        // Drought tracking for hits
+        if (hits >= 2) {
+          if (currentHitDrought > 0) {
+            hitDroughts.push(currentHitDrought);
+            currentHitDrought = 0;
+          }
+        } else {
+          currentHitDrought++;
+        }
+        
+        // Drought tracking for HRs
+        if (hrs >= 1) {
+          if (currentHRDrought > 0) {
+            hrDroughts.push(currentHRDrought);
+            currentHRDrought = 0;
+          }
+        } else {
+          currentHRDrought++;
+        }
       }
     });
   });
+
+  // Calculate drought statistics
+  const avgHitDrought = hitDroughts.length > 0 ? 
+    parseFloat((hitDroughts.reduce((sum, d) => sum + d, 0) / hitDroughts.length).toFixed(1)) : 
+    currentHitDrought;
+    
+  const avgHRDrought = hrDroughts.length > 0 ? 
+    parseFloat((hrDroughts.reduce((sum, d) => sum + d, 0) / hrDroughts.length).toFixed(1)) : 
+    currentHRDrought;
 
   const multiHitRate = totalGames > 0 ? (totalMultiHitGames / totalGames * 100) : 0;
   const multiHRRate = totalGames > 0 ? (totalMultiHRGames / totalGames * 100) : 0;
@@ -167,7 +207,15 @@ function calculateMultiHitPerformance(playerEntries) {
     hitDistribution,
     hrDistribution,
     maxHitsInGame,
-    maxHRsInGame
+    maxHRsInGame,
+    
+    // NEW: Drought statistics
+    avgGamesBetweenMultiHits: avgHitDrought,
+    avgGamesBetweenHRs: avgHRDrought,
+    currentHitDrought,
+    currentHRDrought,
+    longestHitDrought: hitDroughts.length > 0 ? Math.max(...hitDroughts, currentHitDrought) : currentHitDrought,
+    longestHRDrought: hrDroughts.length > 0 ? Math.max(...hrDroughts, currentHRDrought) : currentHRDrought
   };
 }
 

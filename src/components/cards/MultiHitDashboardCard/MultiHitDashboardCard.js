@@ -290,9 +290,11 @@ const MultiHitDashboardCard = () => {
                 <div className="distribution-bars">
                   {Object.entries(player.performanceCounts)
                     .sort(([a], [b]) => parseInt(a) - parseInt(b))
+                    .filter(([level]) => parseInt(level) > 0) // EXCLUDE 0s from display
                     .map(([level, count]) => {
                       const levelNum = parseInt(level);
-                      const width = Math.max((count / player.totalGames) * 100, 0);
+                      const nonZeroGames = player.totalGames - (player.performanceCounts[0] || 0);
+                      const width = nonZeroGames > 0 ? Math.max((count / nonZeroGames) * 100, 0) : 0;
                       
                       return (
                         <div
@@ -301,7 +303,7 @@ const MultiHitDashboardCard = () => {
                           style={{
                             width: `${width}%`,
                             backgroundColor: getPerformanceColor(levelNum, player.maxPerformance),
-                            minWidth: count > 0 ? '24px' : '0px'
+                            minWidth: count > 0 ? '20px' : '0px'
                           }}
                         >
                           {count > 0 && <span>{count}</span>}
@@ -317,12 +319,12 @@ const MultiHitDashboardCard = () => {
                     })}
                 </div>
                 
-                {/* Legend */}
+                {/* Legend with Drought Info */}
                 <div className="distribution-legend">
                   {Object.entries(player.performanceCounts)
                     .sort(([a], [b]) => parseInt(a) - parseInt(b))
-                    .filter(([, count]) => count > 0)
-                    .slice(0, 5)
+                    .filter(([level, count]) => count > 0 && parseInt(level) > 0) // EXCLUDE 0s
+                    .slice(0, 4)
                     .map(([level]) => (
                       <span key={level} className="legend-item">
                         <div
@@ -332,6 +334,14 @@ const MultiHitDashboardCard = () => {
                         {formatMetricLabel(parseInt(level))}
                       </span>
                     ))}
+                  
+                  {/* Show drought info if there are 0s */}
+                  {(player.performanceCounts[0] || 0) > 0 && (
+                    <span className="legend-item drought-info">
+                      <div className="legend-color" style={{ backgroundColor: '#f3f4f6' }}></div>
+                      <span>0: {player.performanceCounts[0]} games</span>
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
