@@ -1364,7 +1364,8 @@
     transform: none;
     box-shadow: none;
   }
-} FIXED MOBILE */
+} 
+
 @media (max-width: 1024px) {
   .multi-hit-dashboard {
     padding: 12px;
