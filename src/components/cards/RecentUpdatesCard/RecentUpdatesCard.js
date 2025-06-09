@@ -69,7 +69,7 @@ const RecentUpdatesCard = ({
               <span>Loading page views...</span>
             ) : (
               <span>
-                <strong>{Number(visitCount || 0).toLocaleString()}</strong> total page loads
+                <strong>{Number(visitCount || 0).toLocaleString()}</strong> Smart Cappers Checked In
               </span>
             )}
           </div>

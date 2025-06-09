@@ -1,7 +1,7 @@
 /* PitcherMatchupCard.css */
 
 .pitcher-matchup-card {
-  grid-column: span 2;
+  grid-column: 1 / -1;
   background-color: #f9f9f9;
   position: relative;
 }

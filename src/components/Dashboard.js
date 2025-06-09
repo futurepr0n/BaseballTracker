@@ -1157,40 +1157,6 @@ const noFilteredData = isFiltering &&
             teams={teamData} 
           />
 
-          {/* Team Last Result Cards */}
-<TeamComingOffWinCard 
-  gameData={gameData}
-  playerData={filteredBatterData.concat(filteredPitcherData)}
-  teamData={teamData}
-    currentDate={currentDate}  
-/>
-
-<TeamComingOffLossCard 
-  teamData={teamData}
-  currentDate={currentDate}
-/>
-          
-          {/* Over-Performing Players Card */}
-          <PerformanceCard 
-  teamData={teamData}
-  currentDate={currentDate}
-          />
-          
-          {/* Under-Performing Players Card */}
-          <PerformanceCard 
-            performingPlayers={topPerformers.underPerforming}
-            isLoading={!playerPerformance}
-            type="under"
-            teams={teamData} 
-          />
-          
-          {/* Pitcher Matchup Analysis Card */}
-          <PitcherMatchupCard 
-            pitcherMatchups={pitcherMatchups}
-            isLoading={matchupsLoading}
-            currentDate={currentDate}
-          />
-          
           {/* Hit Streak Card */}
           <HitStreakCard 
             hitStreakData={hitStreakData}
@@ -1262,6 +1228,61 @@ const noFilteredData = isFiltering &&
             teams={teamData}
           />
 
+                      <PitcherHRsAllowedCard 
+              currentDate={currentDate}
+              teams={teamData}
+              maxItems={15}
+            />
+      
+            <PitcherHitsAllowedCard 
+              currentDate={currentDate}
+              teams={teamData}
+              maxItems={15}
+            />
+
+          <HitDroughtBounceBackCard 
+            gameData={filteredGameData}
+            currentDate={currentDate}
+            teams={teamData}
+          />
+
+          {/* Over-Performing Players Card */}
+          <PerformanceCard 
+  teamData={teamData}
+  currentDate={currentDate}
+          />
+          
+          {/* Under-Performing Players Card */}
+          <PerformanceCard 
+            performingPlayers={topPerformers.underPerforming}
+            isLoading={!playerPerformance}
+            type="under"
+            teams={teamData} 
+          />
+
+          {/* Team Last Result Cards */}
+<TeamComingOffWinCard 
+  gameData={gameData}
+  playerData={filteredBatterData.concat(filteredPitcherData)}
+  teamData={teamData}
+    currentDate={currentDate}  
+/>
+
+<TeamComingOffLossCard 
+  teamData={teamData}
+  currentDate={currentDate}
+/>
+          
+          
+          
+          {/* Pitcher Matchup Analysis Card */}
+          <PitcherMatchupCard 
+            pitcherMatchups={pitcherMatchups}
+            isLoading={matchupsLoading}
+            currentDate={currentDate}
+          />
+          
+          
           {/* 
             SLOT MACHINE CARD - FULL WIDTH
             Enhanced with all the new quick add options
@@ -1282,23 +1303,7 @@ const noFilteredData = isFiltering &&
             fridayHitLeaders={slotMachineCardData.fridayHitLeaders}
           />
 
-            <PitcherHRsAllowedCard 
-              currentDate={currentDate}
-              teams={teamData}
-              maxItems={15}
-            />
-      
-            <PitcherHitsAllowedCard 
-              currentDate={currentDate}
-              teams={teamData}
-              maxItems={15}
-            />
 
-          <HitDroughtBounceBackCard 
-            gameData={filteredGameData}
-            currentDate={currentDate}
-            teams={teamData}
-          />
           
           {/* Recent Updates Card */}
           <RecentUpdatesCard 
