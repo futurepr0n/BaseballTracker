@@ -30,6 +30,8 @@ import SlotMachineCard from './cards/SlotMachineCard/SlotMachineCard';
 
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
 
+import MultiHitDashboardCard from './cards/MultiHitDashboardCard/MultiHitDashboardCard';
+
 import { TeamComingOffWinCard, TeamComingOffLossCard } from './cards/TeamLastResultCards/TeamLastResultCards';
 
 import { CurrentSeriesHitsCard, CurrentSeriesHRCard } from './cards/CurrentSeriesCards/CurrentSeriesCards';
@@ -1245,6 +1247,8 @@ const noFilteredData = isFiltering &&
             currentDate={currentDate}
             teams={teamData}
           />
+
+          <MultiHitDashboardCard />
 
           {/* Over-Performing Players Card */}
           <PerformanceCard 

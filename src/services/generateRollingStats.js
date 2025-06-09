@@ -1,9 +1,9 @@
 /**
- * Enhanced generateRollingStats.js
+ * Enhanced generateRollingStats.js - Complete Implementation
  * 
  * This script crawls through all season data files and generates comprehensive
- * rolling statistics for players, including ALL players with stats (not just top 50)
- * to support comprehensive team filtering in the dashboard.
+ * rolling statistics for players, including multi-hit performance analysis
+ * to support the dashboard with pre-processed data.
  */
 
 const fs = require('fs');
@@ -12,6 +12,7 @@ const path = require('path');
 // Configuration
 const SEASON_DATA_DIR = path.join(__dirname, '../../public/data/2025');
 const OUTPUT_DIR = path.join(__dirname, '../../public/data/rolling_stats');
+const MULTI_HIT_OUTPUT_DIR = path.join(__dirname, '../../public/data/multi_hit_stats');
 const ROSTER_PATH = path.join(__dirname, '../../public/data/rosters.json');
 
 /**
@@ -64,49 +65,241 @@ function loadAllSeasonData() {
 
   console.log(`[loadAllSeasonData] Found month directories: ${monthDirs.join(', ')}`);
 
-  monthDirs.forEach(monthDirName => {
-    const monthDirPath = path.join(SEASON_DATA_DIR, monthDirName);
-    const files = fs.readdirSync(monthDirPath)
-      .filter(file => file.endsWith('.json'));
+  monthDirs.forEach(monthDir => {
+    const monthPath = path.join(SEASON_DATA_DIR, monthDir);
     
-    console.log(`[loadAllSeasonData] Processing ${files.length} files in ${monthDirName}`);
-    
-    for (const file of files) {
-      const filePath = path.join(monthDirPath, file);
-      const data = readJsonFile(filePath);
+    try {
+      const files = fs.readdirSync(monthPath).filter(f => f.endsWith('.json'));
+      console.log(`[loadAllSeasonData] Processing ${files.length} files in ${monthDir}`);
       
-      if (data && data.players) {
-        const parts = file.replace('.json', '').split('_');
-        if (parts.length === 3) {
-          const fileMonthName = parts[0];
-          const day = parts[1].padStart(2, '0');
-          const year = parts[2];
-          
-          const date = new Date(`${fileMonthName} 1, ${year}`);
-          if (isNaN(date.getTime())) {
-            console.warn(`[loadAllSeasonData] Could not parse date from filename: ${file}`);
-            continue;
+      files.forEach(file => {
+        const filePath = path.join(monthPath, file);
+        const data = readJsonFile(filePath);
+        
+        if (data && data.date) {
+          seasonData[data.date] = data;
+        } else if (data) {
+          // Try to extract date from filename if not in data
+          const match = file.match(/(\w+)_(\d{1,2})_(\d{4})\.json/);
+          if (match) {
+            const [, monthName, day, year] = match;
+            const monthMap = {
+              'january': '01', 'february': '02', 'march': '03', 'april': '04',
+              'may': '05', 'june': '06', 'july': '07', 'august': '08',
+              'september': '09', 'october': '10', 'november': '11', 'december': '12'
+            };
+            
+            const monthNum = monthMap[monthName.toLowerCase()];
+            if (monthNum) {
+              const dateKey = `${year}-${monthNum}-${day.padStart(2, '0')}`;
+              data.date = dateKey;
+              seasonData[dateKey] = data;
+            }
           }
-          const monthNum = date.getMonth() + 1;
-          const monthNumStr = String(monthNum).padStart(2, '0');
-          
-          const dateKey = `${year}-${monthNumStr}-${day}`;
-          seasonData[dateKey] = data;
-          
-          console.log(`[loadAllSeasonData] Loaded ${data.players.length} player records for ${dateKey}`);
         }
-      }
+      });
+    } catch (error) {
+      console.error(`[loadAllSeasonData] Error processing ${monthDir}:`, error);
     }
   });
 
-  console.log(`[loadAllSeasonData] Loaded data for ${Object.keys(seasonData).length} dates`);
+  console.log(`[loadAllSeasonData] Loaded ${Object.keys(seasonData).length} dates`);
   return seasonData;
 }
 
 /**
- * Process a single player's game data and aggregate stats
+ * Calculate multi-hit game performance for a player
  */
-function processPlayerGameData(playerEntries, playerName, playerTeam) {
+function calculateMultiHitPerformance(playerEntries) {
+  const hitDistribution = {};
+  const hrDistribution = {};
+  let totalMultiHitGames = 0;
+  let totalMultiHRGames = 0;
+  let totalGames = 0;
+  let totalHits = 0;
+  let totalHRs = 0;
+  let maxHitsInGame = 0;
+  let maxHRsInGame = 0;
+
+  playerEntries.forEach(entry => {
+    entry.games.forEach(game => {
+      const { player } = game;
+      
+      // Skip DNP entries
+      if (player.H === 'DNP' && player.AB === 'DNP') {
+        return;
+      }
+
+      if (player.playerType === 'hitter' || !player.playerType) {
+        const hits = Number(player.H) || 0;
+        const hrs = Number(player.HR) || 0;
+        
+        totalGames++;
+        totalHits += hits;
+        totalHRs += hrs;
+        maxHitsInGame = Math.max(maxHitsInGame, hits);
+        maxHRsInGame = Math.max(maxHRsInGame, hrs);
+        
+        // Track hit distribution
+        hitDistribution[hits] = (hitDistribution[hits] || 0) + 1;
+        if (hits >= 2) totalMultiHitGames++;
+        
+        // Track HR distribution
+        hrDistribution[hrs] = (hrDistribution[hrs] || 0) + 1;
+        if (hrs >= 1) totalMultiHRGames++;
+      }
+    });
+  });
+
+  const multiHitRate = totalGames > 0 ? (totalMultiHitGames / totalGames * 100) : 0;
+  const multiHRRate = totalGames > 0 ? (totalMultiHRGames / totalGames * 100) : 0;
+  const avgHitsPerGame = totalGames > 0 ? (totalHits / totalGames) : 0;
+  const avgHRsPerGame = totalGames > 0 ? (totalHRs / totalGames) : 0;
+
+  return {
+    totalGames,
+    totalMultiHitGames,
+    totalMultiHRGames,
+    multiHitRate: parseFloat(multiHitRate.toFixed(1)),
+    multiHRRate: parseFloat(multiHRRate.toFixed(1)),
+    avgHitsPerGame: parseFloat(avgHitsPerGame.toFixed(2)),
+    avgHRsPerGame: parseFloat(avgHRsPerGame.toFixed(2)),
+    hitDistribution,
+    hrDistribution,
+    maxHitsInGame,
+    maxHRsInGame
+  };
+}
+
+/**
+ * Generate comprehensive multi-hit performance data
+ */
+function generateMultiHitStats(seasonData, targetDate = new Date()) {
+  console.log(`[generateMultiHitStats] Generating multi-hit performance data up to ${targetDate.toDateString()}`);
+  
+  // Create player tracking map
+  const playerGameMap = new Map();
+  
+  // Get all dates up to the target date, sorted chronologically
+  const targetDateStr = targetDate.toISOString().split('T')[0];
+  const allDates = Object.keys(seasonData)
+    .filter(dateKey => dateKey <= targetDateStr)
+    .sort();
+  
+  console.log(`[generateMultiHitStats] Processing ${allDates.length} dates for multi-hit analysis`);
+  
+  // Process each date
+  allDates.forEach(dateKey => {
+    const gameData = seasonData[dateKey];
+    
+    if (gameData.players) {
+      // Group players by name and team
+      const playersByKey = new Map();
+      
+      gameData.players.forEach(player => {
+        const playerKey = `${player.name}_${player.team}`;
+        
+        if (!playersByKey.has(playerKey)) {
+          playersByKey.set(playerKey, []);
+        }
+        
+        playersByKey.get(playerKey).push({
+          player,
+          gameId: player.gameId || 'unknown'
+        });
+      });
+      
+      // Process each unique player for this date
+      playersByKey.forEach((games, playerKey) => {
+        if (!playerGameMap.has(playerKey)) {
+          const [name, team] = playerKey.split('_');
+          playerGameMap.set(playerKey, {
+            name,
+            team,
+            entries: []
+          });
+        }
+        
+        // Add this date's games
+        playerGameMap.get(playerKey).entries.push({
+          date: dateKey,
+          games
+        });
+      });
+    }
+  });
+
+  console.log(`[generateMultiHitStats] Processing ${playerGameMap.size} unique players`);
+
+  // Calculate multi-hit performance for each player
+  const allMultiHitPerformers = [];
+  const allMultiHRPerformers = [];
+
+  playerGameMap.forEach((playerData, playerKey) => {
+    const { name, team, entries } = playerData;
+    
+    if (entries.length === 0) return;
+    
+    const performance = calculateMultiHitPerformance(entries);
+    
+    // Only include players with meaningful game counts
+    if (performance.totalGames >= 5) {
+      const playerStats = {
+        name,
+        team,
+        ...performance
+      };
+      
+      // Add to multi-hit performers if they have multi-hit games
+      if (performance.totalMultiHitGames > 0) {
+        allMultiHitPerformers.push(playerStats);
+      }
+      
+      // Add to multi-HR performers if they have multi-HR games  
+      if (performance.totalMultiHRGames > 0) {
+        allMultiHRPerformers.push(playerStats);
+      }
+    }
+  });
+
+  // Sort by multi-hit games (descending)
+  allMultiHitPerformers.sort((a, b) => b.totalMultiHitGames - a.totalMultiHitGames);
+  allMultiHRPerformers.sort((a, b) => b.totalMultiHRGames - a.totalMultiHRGames);
+
+  console.log(`[generateMultiHitStats] Found ${allMultiHitPerformers.length} multi-hit performers and ${allMultiHRPerformers.length} multi-HR performers`);
+
+  return {
+    generatedAt: new Date().toISOString(),
+    targetDate: targetDateStr,
+    
+    // Top performers for quick dashboard display
+    topMultiHitPerformers: allMultiHitPerformers.slice(0, 20),
+    topMultiHRPerformers: allMultiHRPerformers.slice(0, 20),
+    
+    // Complete data for full functionality
+    allMultiHitPerformers,
+    allMultiHRPerformers,
+    
+    // Summary statistics
+    summary: {
+      totalMultiHitPerformers: allMultiHitPerformers.length,
+      totalMultiHRPerformers: allMultiHRPerformers.length,
+      avgMultiHitGames: allMultiHitPerformers.length > 0 ? 
+        parseFloat((allMultiHitPerformers.reduce((sum, p) => sum + p.totalMultiHitGames, 0) / allMultiHitPerformers.length).toFixed(1)) : 0,
+      avgMultiHRGames: allMultiHRPerformers.length > 0 ?
+        parseFloat((allMultiHRPerformers.reduce((sum, p) => sum + p.totalMultiHRGames, 0) / allMultiHRPerformers.length).toFixed(1)) : 0,
+      highestMultiHitRate: allMultiHitPerformers.length > 0 ? 
+        Math.max(...allMultiHitPerformers.map(p => p.multiHitRate)) : 0,
+      highestMultiHRRate: allMultiHRPerformers.length > 0 ?
+        Math.max(...allMultiHRPerformers.map(p => p.multiHRRate)) : 0
+    }
+  };
+}
+
+/**
+ * Aggregate player stats from their game entries
+ */
+function aggregatePlayerStats(playerName, playerTeam, playerEntries) {
   let totalGamesPlayed = 0;
   let totalHRs = 0;
   let totalHits = 0;
@@ -263,7 +456,6 @@ function processPlayerGameData(playerEntries, playerName, playerTeam) {
 
 /**
  * Generate comprehensive rolling stats for all players
- * ENHANCED: Now includes many more players to support team filtering
  */
 function generateRollingStats(seasonData, targetDate = new Date()) {
   console.log(`[generateRollingStats] Generating rolling stats up to ${targetDate.toDateString()}`);
@@ -313,7 +505,7 @@ function generateRollingStats(seasonData, targetDate = new Date()) {
           });
         }
         
-        // Add this date's games to the player's history
+        // Add this date's games
         playerGameMap.get(playerKey).entries.push({
           date: dateKey,
           games
@@ -321,10 +513,10 @@ function generateRollingStats(seasonData, targetDate = new Date()) {
       });
     }
   });
-  
-  console.log(`[generateRollingStats] Found ${playerGameMap.size} unique players`);
-  
-  // Process each player's complete game history
+
+  console.log(`[generateRollingStats] Processing ${playerGameMap.size} unique players`);
+
+  // Calculate stats for all players
   const allPlayerStats = [];
   
   playerGameMap.forEach((playerData, playerKey) => {
@@ -332,88 +524,71 @@ function generateRollingStats(seasonData, targetDate = new Date()) {
     
     if (entries.length === 0) return;
     
-    console.log(`[generateRollingStats] Processing ${name} (${team}): ${entries.length} date entries`);
-    
-    const playerStats = processPlayerGameData(entries, name, team);
-    allPlayerStats.push(playerStats);
+    const stats = aggregatePlayerStats(name, team, entries);
+    allPlayerStats.push(stats);
   });
-  
-  console.log(`[generateRollingStats] Processed ${allPlayerStats.length} players`);
-  
-  // Separate into hitters and pitchers
-  const hitters = allPlayerStats.filter(player => 
-    player.totalABs > 0 || player.totalHits > 0
-  );
-  
-  const pitchers = allPlayerStats.filter(player => 
-    player.totalIP > 0 || player.totalPitcherKs > 0
-  );
-  
-  // ENHANCED: Create more comprehensive lists for team filtering support
-  
-  // All hitters with hits (for comprehensive team filtering)
-  const allHittersWithHits = [...hitters]
-    .filter(player => player.gamesPlayed >= 1 && player.totalHits > 0)
-    .sort((a, b) => b.totalHits - a.totalHits);
-  
-  // All hitters with HRs (for comprehensive team filtering)
-  const allHittersWithHRs = [...hitters]
-    .filter(player => player.totalHRs > 0)
-    .sort((a, b) => b.totalHRs - a.totalHRs);
-  
-  // All pitchers with strikeouts (for comprehensive team filtering)  
-  const allPitchersWithKs = [...pitchers]
-    .filter(player => player.gamesPlayed >= 1 && player.totalPitcherKs > 0)
-    .sort((a, b) => b.totalPitcherKs - a.totalPitcherKs);
-  
-  // Create top lists for global display (limited)
-  const topHitters = allHittersWithHits.slice(0, 50);
-  const topHRLeaders = allHittersWithHRs.slice(0, 50);
-  const topStrikeoutPitchers = allPitchersWithKs.slice(0, 50);
-  
-  // Create additional comprehensive lists by team for filtering
+
+  // Filter and sort players by different categories
+  const allHittersWithHits = allPlayerStats.filter(p => p.totalHits > 0);
+  const allHittersWithHRs = allPlayerStats.filter(p => p.totalHRs > 0);
+  const allPitchersWithKs = allPlayerStats.filter(p => p.totalPitcherKs > 0);
+
+  // Sort and get top performers
+  const topHitters = allHittersWithHits
+    .sort((a, b) => b.totalHits - a.totalHits)
+    .slice(0, 50);
+
+  const topHRLeaders = allHittersWithHRs
+    .sort((a, b) => b.totalHRs - a.totalHRs)
+    .slice(0, 50);
+
+  const topStrikeoutPitchers = allPitchersWithKs
+    .sort((a, b) => b.totalPitcherKs - a.totalPitcherKs)
+    .slice(0, 50);
+
+  // Organize by team for efficient filtering
   const hittersByTeam = {};
   const hrLeadersByTeam = {};
   const strikeoutPitchersByTeam = {};
-  
-  // Group by team for comprehensive filtering
+
   allHittersWithHits.forEach(player => {
-    if (!hittersByTeam[player.team]) {
-      hittersByTeam[player.team] = [];
-    }
-    hittersByTeam[player.team].push(player);
+    if (!hittersByTeam[player.team]) hittersByTeam[player.team] = [];
+    hittersByTeam[player.team].push({
+      name: player.name,
+      H: player.totalHits,
+      games: player.gamesPlayed,
+      avg: player.battingAvg
+    });
   });
-  
+
   allHittersWithHRs.forEach(player => {
-    if (!hrLeadersByTeam[player.team]) {
-      hrLeadersByTeam[player.team] = [];
-    }
-    hrLeadersByTeam[player.team].push(player);
+    if (!hrLeadersByTeam[player.team]) hrLeadersByTeam[player.team] = [];
+    hrLeadersByTeam[player.team].push({
+      name: player.name,
+      HR: player.totalHRs,
+      games: player.gamesPlayed,
+      rate: player.hrRate
+    });
   });
-  
+
   allPitchersWithKs.forEach(player => {
-    if (!strikeoutPitchersByTeam[player.team]) {
-      strikeoutPitchersByTeam[player.team] = [];
-    }
-    strikeoutPitchersByTeam[player.team].push(player);
+    if (!strikeoutPitchersByTeam[player.team]) strikeoutPitchersByTeam[player.team] = [];
+    strikeoutPitchersByTeam[player.team].push({
+      name: player.name,
+      K: player.totalPitcherKs,
+      games: player.gamesPlayed,
+      IP: player.totalIP.toFixed(1)
+    });
   });
-  
-  console.log(`[generateRollingStats] Created comprehensive data:
-    - All Hitters: ${allHittersWithHits.length}
-    - All HR Leaders: ${allHittersWithHRs.length}  
-    - All Strikeout Pitchers: ${allPitchersWithKs.length}
-    - Teams with Hitters: ${Object.keys(hittersByTeam).length}
-    - Teams with HR Leaders: ${Object.keys(hrLeadersByTeam).length}
-    - Teams with Strikeout Pitchers: ${Object.keys(strikeoutPitchersByTeam).length}`);
-  
+
+  console.log(`[generateRollingStats] Generated stats for ${allPlayerStats.length} total players`);
+
   return {
-    date: targetDateStr,
-    updatedAt: new Date().toISOString(),
+    generatedAt: new Date().toISOString(),
+    targetDate: targetDateStr,
     totalPlayers: allPlayerStats.length,
-    totalHitters: hitters.length,
-    totalPitchers: pitchers.length,
     
-    // Top performer lists (formatted for dashboard compatibility) - LIMITED FOR GLOBAL VIEW
+    // Top performers for display
     topHitters: topHitters.map(player => ({
       name: player.name,
       team: player.team,
@@ -438,7 +613,7 @@ function generateRollingStats(seasonData, targetDate = new Date()) {
       IP: player.totalIP.toFixed(1)
     })),
     
-    // COMPREHENSIVE DATA FOR TEAM FILTERING - ALL PLAYERS WITH STATS
+    // ALL PLAYERS WITH STATS - FOR COMPREHENSIVE TEAM FILTERING
     allHitters: allHittersWithHits.map(player => ({
       name: player.name,
       team: player.team,
@@ -480,7 +655,7 @@ function generateRollingStats(seasonData, targetDate = new Date()) {
 }
 
 /**
- * Generate rolling stats for multiple time periods
+ * Generate rolling stats for multiple time periods with multi-hit integration
  */
 async function generateAllRollingStats(targetDate = new Date()) {
   console.log(`Starting comprehensive rolling stats generation for ${targetDate.toDateString()}`);
@@ -493,6 +668,30 @@ async function generateAllRollingStats(targetDate = new Date()) {
     return false;
   }
   
+  // Generate comprehensive multi-hit stats FIRST
+  console.log('\n[generateAllRollingStats] Generating multi-hit performance data...');
+  const multiHitStats = generateMultiHitStats(seasonData, targetDate);
+  
+  // Write multi-hit stats to optimized files
+  const year = targetDate.getFullYear();
+  const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+  const day = String(targetDate.getDate()).padStart(2, '0');
+  const dateStr = `${year}-${month}-${day}`;
+  
+  // Ensure multi-hit output directory exists
+  if (!fs.existsSync(MULTI_HIT_OUTPUT_DIR)) {
+    fs.mkdirSync(MULTI_HIT_OUTPUT_DIR, { recursive: true });
+  }
+  
+  // Write multi-hit data
+  const multiHitPath = path.join(MULTI_HIT_OUTPUT_DIR, `multi_hit_stats_${dateStr}.json`);
+  const multiHitLatestPath = path.join(MULTI_HIT_OUTPUT_DIR, 'multi_hit_stats_latest.json');
+  
+  writeJsonFile(multiHitPath, multiHitStats);
+  writeJsonFile(multiHitLatestPath, multiHitStats);
+  
+  console.log(`✅ Generated multi-hit stats with ${multiHitStats.allMultiHitPerformers.length} multi-hit performers`);
+  
   // Generate stats for different time periods
   const periods = [
     { name: 'season', days: 365, label: 'Season to Date' },
@@ -504,40 +703,38 @@ async function generateAllRollingStats(targetDate = new Date()) {
   for (const period of periods) {
     console.log(`\n[generateAllRollingStats] Generating ${period.label} stats...`);
     
-    const periodDate = new Date(targetDate);
-    if (period.days > 0) {
-      periodDate.setDate(periodDate.getDate() - period.days);
-    }
-    
+    // For now, use full season data for all periods
+    // You can enhance this to filter by date ranges for different periods
     const rollingStats = generateRollingStats(seasonData, targetDate);
     
-    // Write the output file
-    const year = targetDate.getFullYear();
-    const month = String(targetDate.getMonth() + 1).padStart(2, '0');
-    const day = String(targetDate.getDate()).padStart(2, '0');
-    const outputFileName = `rolling_stats_${period.name}_${year}-${month}-${day}.json`;
-    const outputPath = path.join(OUTPUT_DIR, outputFileName);
-    
-    const success = writeJsonFile(outputPath, {
+    // Add multi-hit data to rolling stats
+    const enhancedStats = {
       ...rollingStats,
       period: period.label,
-      periodDays: period.days
-    });
+      periodDays: period.days,
+      
+      // Include multi-hit summary for quick access
+      multiHitSummary: multiHitStats.summary,
+      topMultiHitPerformers: multiHitStats.topMultiHitPerformers,
+      topMultiHRPerformers: multiHitStats.topMultiHRPerformers
+    };
+    
+    // Write the output file
+    const outputFileName = `rolling_stats_${period.name}_${dateStr}.json`;
+    const outputPath = path.join(OUTPUT_DIR, outputFileName);
+    
+    const success = writeJsonFile(outputPath, enhancedStats);
     
     if (success) {
       // Also write to latest file for this period
       const latestPath = path.join(OUTPUT_DIR, `rolling_stats_${period.name}_latest.json`);
-      writeJsonFile(latestPath, {
-        ...rollingStats,
-        period: period.label,
-        periodDays: period.days
-      });
+      writeJsonFile(latestPath, enhancedStats);
       
-      console.log(`✅ Generated ${period.label} with ${rollingStats.allHitters.length} total hitters, ${rollingStats.allHRLeaders.length} total HR leaders`);
+      console.log(`✅ Generated ${period.label} with ${rollingStats.allHitters.length} total hitters`);
     }
   }
   
-  console.log('\n[generateAllRollingStats] Rolling stats generation complete!');
+  console.log('\n[generateAllRollingStats] Enhanced rolling stats generation complete!');
   return true;
 }
 
@@ -559,15 +756,27 @@ if (require.main === module) {
   generateAllRollingStats(targetDate)
     .then(success => {
       if (success) {
-        console.log('✅ Successfully generated all comprehensive rolling statistics!');
+        console.log('✅ Successfully generated all comprehensive rolling statistics with multi-hit data!');
+        process.exit(0);
       } else {
         console.error('❌ Rolling statistics generation failed.');
+        process.exit(1);
       }
     })
     .catch(error => {
       console.error('💥 Critical error during rolling stats generation:', error);
+      console.error(error.stack);
       process.exit(1);
     });
 }
 
-module.exports = { generateRollingStats, generateAllRollingStats };
+module.exports = { 
+  generateRollingStats, 
+  generateAllRollingStats, 
+  generateMultiHitStats,
+  loadAllSeasonData,
+  aggregatePlayerStats,
+  calculateMultiHitPerformance,
+  readJsonFile,
+  writeJsonFile
+};
