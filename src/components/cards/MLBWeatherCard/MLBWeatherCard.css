@@ -1,0 +1,262 @@
+/* src/components/cards/MLBWeatherCard/MLBWeatherCard.css */
+
+/* Main Weather Card Container */
+.mlb-weather-card {
+  /* Card will inherit base styles from parent .card class */
+  min-height: 400px;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.mlb-weather-card .card-header {
+  flex-shrink: 0;
+}
+
+.mlb-weather-card .card-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.card-subtitle {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* Scrollable Container */
+.weather-cards-scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Custom scrollbar for webkit browsers */
+.weather-cards-scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.weather-cards-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.weather-cards-scroll-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.weather-cards-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Mini Weather Card */
+.mini-weather-card {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  transition: all 0.2s ease;
+}
+
+.mini-weather-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Mini Card Header */
+.mini-card-header {
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 8px;
+}
+
+.mini-card-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.venue-name {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Mini Hourly Forecast */
+.mini-hourly-forecast {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.mini-hour-slot {
+  flex: 1;
+  text-align: center;
+  padding: 8px 4px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.hour-time {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #666;
+  margin: 0 0 4px 0;
+}
+
+.mini-hour-slot .temp {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.mini-hour-slot .precip,
+.mini-hour-slot .wind {
+  font-size: 0.75rem;
+  margin: 2px 0;
+  white-space: nowrap;
+}
+
+/* Mini Wind Factor Section */
+.mini-wind-factor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.mini-wind-factor .wind-factor-text {
+  flex: 1;
+}
+
+.mini-wind-factor .wind-factor-text strong {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+  color: #1d9bf0;
+}
+
+.mini-wind-factor .wind-factor-text span {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+/* Wind Diagram Styles */
+.wind-diagram-container {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  flex-shrink: 0;
+}
+
+.mini-wind-factor .wind-diagram-container {
+  width: 40px;
+  height: 40px;
+}
+
+.field-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.arrow-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.5s ease;
+}
+
+/* Weather Condition Coloring */
+.positive {
+  color: #28a745 !important;
+  font-weight: 600 !important;
+}
+
+.negative {
+  color: #dc3545 !important;
+  font-weight: 600 !important;
+}
+
+.caution {
+  color: #fd7e14 !important;
+  font-weight: 600 !important;
+}
+
+/* Loading and Error States */
+.loading-state,
+.error-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: #666;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #0056b3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+/* Dome Message */
+.dome-message {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .mini-hourly-forecast {
+    flex-wrap: wrap;
+  }
+  
+  .mini-hour-slot {
+    min-width: calc(50% - 4px);
+  }
+  
+  .mini-wind-factor {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+}

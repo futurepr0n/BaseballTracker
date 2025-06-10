@@ -250,102 +250,93 @@ const MultiHitDashboardCard = () => {
         
         <div className="rankings-scroll">
           {processedData.map((player, index) => (
-            <div key={player.name} className="player-row">
-              {/* Rank */}
-              <div className="player-rank">
-                <span className={`rank-badge ${
-                  index === 0 ? 'gold' :
-                  index === 1 ? 'silver' :
-                  index === 2 ? 'bronze' :
-                  'regular'
-                }`}>
-                  {index + 1}
-                </span>
-              </div>
-              
-              {/* Player Info */}
-              <div className="player-info">
-                <div className="player-name">{player.name}</div>
-                <div className="player-team">{player.team}</div>
-              </div>
-              
-              {/* Multi-Games Count */}
-              <div className="multi-games-stat">
-                <span className="multi-games-count">{player.totalMultiGames}</span>
-                <span className="multi-games-total">/{player.totalGames}</span>
-              </div>
-              
-              {/* Rate */}
-              <div className="stat-column">
-                <span className="stat-value">{player.multiGameRate.toFixed(1)}%</span>
-              </div>
-              
-              {/* Average */}
-              <div className="stat-column">
-                <span className="stat-value">{player.average.toFixed(2)}</span>
-              </div>
-              
-              {/* Performance Distribution */}
-              <div className="performance-distribution">
-                <div className="distribution-bars">
-                  {Object.entries(player.performanceCounts)
-                    .sort(([a], [b]) => parseInt(a) - parseInt(b))
-                    .filter(([level]) => parseInt(level) > 0) // EXCLUDE 0s from display
-                    .map(([level, count]) => {
-                      const levelNum = parseInt(level);
-                      const nonZeroGames = player.totalGames - (player.performanceCounts[0] || 0);
-                      const width = nonZeroGames > 0 ? Math.max((count / nonZeroGames) * 100, 0) : 0;
-                      
-                      return (
-                        <div
-                          key={level}
-                          className="distribution-bar"
-                          style={{
-                            width: `${width}%`,
-                            backgroundColor: getPerformanceColor(levelNum, player.maxPerformance),
-                            minWidth: count > 0 ? '20px' : '0px'
-                          }}
-                        >
-                          {count > 0 && <span>{count}</span>}
-                          
-                          {/* Tooltip */}
-                          {count > 0 && (
-                            <div className="performance-tooltip">
-                              {formatMetricLabel(levelNum)}: {count} games ({((count / player.totalGames) * 100).toFixed(1)}%)
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                </div>
+  <div key={player.name} className="player-row">
+    {/* Mobile two-row wrapper */}
+    <div className="player-row-top">
+      {/* Rank */}
+      <div className="player-rank">
+        <span className={`rank-badge ${
+          index === 0 ? 'gold' :
+          index === 1 ? 'silver' :
+          index === 2 ? 'bronze' :
+          'regular'
+        }`}>
+          {index + 1}
+        </span>
+      </div>
+      
+      {/* Player Info */}
+      <div className="player-info">
+        <div className="player-name">{player.name}</div>
+        <div className="player-team">{player.team}</div>
+      </div>
+      
+      {/* Multi-Games Count */}
+      <div className="multi-games-stat">
+        <span className="multi-games-count">{player.totalMultiGames}</span>
+        <span className="multi-games-total">/{player.totalGames}</span>
+      </div>
+      
+      {/* Rate and Average in single column for mobile */}
+      <div className="stat-column stats-combined">
+        <span className="stat-value stat-rate">{player.multiGameRate.toFixed(1)}%</span>
+        <span className="stat-value stat-avg">{player.average.toFixed(2)}</span>
+      </div>
+    </div>
+    
+    {/* Performance Distribution - Second row on mobile */}
+    <div className="performance-distribution">
+      <div className="distribution-bars">
+        {Object.entries(player.performanceCounts)
+          .sort(([a], [b]) => parseInt(a) - parseInt(b))
+          .filter(([level]) => parseInt(level) > 0) // EXCLUDE 0s from display
+          .map(([level, count]) => {
+            const levelNum = parseInt(level);
+            const nonZeroGames = player.totalGames - (player.performanceCounts[0] || 0);
+            const width = nonZeroGames > 0 ? Math.max((count / nonZeroGames) * 100, 0) : 0;
+            
+            return (
+              <div
+                key={level}
+                className="distribution-bar"
+                style={{
+                  width: `${width}%`,
+                  backgroundColor: getPerformanceColor(levelNum, player.maxPerformance),
+                  minWidth: count > 0 ? '20px' : '0px'
+                }}
+              >
+                {count > 0 && <span>{count}</span>}
                 
-                {/* Legend with Drought Info */}
-                <div className="distribution-legend">
-                  {Object.entries(player.performanceCounts)
-                    .sort(([a], [b]) => parseInt(a) - parseInt(b))
-                    .filter(([level, count]) => count > 0 && parseInt(level) > 0) // EXCLUDE 0s
-                    .slice(0, 4)
-                    .map(([level]) => (
-                      <span key={level} className="legend-item">
-                        <div
-                          className="legend-color"
-                          style={{ backgroundColor: getPerformanceColor(parseInt(level), player.maxPerformance) }}
-                        />
-                        {formatMetricLabel(parseInt(level))}
-                      </span>
-                    ))}
-                  
-                  {/* Show drought info if there are 0s */}
-                  {(player.performanceCounts[0] || 0) > 0 && (
-                    <span className="legend-item drought-info">
-                      <div className="legend-color" style={{ backgroundColor: '#f3f4f6' }}></div>
-                      <span>0: {player.performanceCounts[0]} games</span>
-                    </span>
-                  )}
-                </div>
+                {/* Tooltip */}
+                {count > 0 && (
+                  <div className="performance-tooltip">
+                    {formatMetricLabel(levelNum)}: {count} games ({((count / player.totalGames) * 100).toFixed(1)}%)
+                  </div>
+                )}
               </div>
-            </div>
+            );
+          })}
+      </div>
+      
+      {/* Legend - shown on mobile in compact form */}
+      <div className="distribution-legend mobile-legend">
+        {Object.entries(player.performanceCounts)
+          .sort(([a], [b]) => parseInt(a) - parseInt(b))
+          .filter(([level, count]) => count > 0 && parseInt(level) > 0)
+          .slice(0, 3) // Show only top 3 on mobile
+          .map(([level]) => (
+            <span key={level} className="legend-item">
+              <div
+                className="legend-color"
+                style={{ backgroundColor: getPerformanceColor(parseInt(level), player.maxPerformance) }}
+              />
+              {formatMetricLabel(parseInt(level))}
+            </span>
           ))}
+      </div>
+    </div>
+  </div>
+))}
         </div>
       </div>
 

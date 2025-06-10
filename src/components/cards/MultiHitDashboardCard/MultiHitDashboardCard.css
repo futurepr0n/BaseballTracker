@@ -176,9 +176,9 @@
 .rankings-scroll {
   flex: 1;
   overflow-y: auto;
-  overflow-x: hidden; /* Prevent horizontal scroll */
-  min-height: 450px; /* GUARANTEED MINIMUM */
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  overflow-x: hidden;
+  min-height: 450px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .rankings-scroll::-webkit-scrollbar {
@@ -207,9 +207,18 @@
   border-color: #d1d5db;
 }
 
+/* For two-row layout wrapper */
+.player-row-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
 .player-rank {
   width: 30px;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .rank-badge {
@@ -252,6 +261,7 @@
 .multi-games-stat {
   width: 60px;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .multi-games-count {
@@ -269,12 +279,30 @@
 .stat-column {
   width: 40px;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .stat-value {
   font-size: 10px;
   font-weight: 600;
   color: #374151;
+}
+
+/* Combined stats column for mobile */
+.stats-combined {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+}
+
+.stat-rate {
+  color: #10b981;
+}
+
+.stat-avg {
+  color: #6366f1;
+  font-size: 9px;
 }
 
 /* Distribution */
@@ -363,13 +391,11 @@
   color: #6b7280;
 }
 
-/* MOBILE RESPONSIVE - ENHANCED */
-@media (max-width: 768px) {
+/* MOBILE RESPONSIVE - PORTRAIT TWO-ROW LAYOUT */
+@media (max-width: 768px) and (orientation: portrait) {
   .multi-hit-dashboard {
     height: 500px;
     padding: 8px;
-    width: 100%;
-    overflow: hidden; /* Ensure no horizontal overflow */
   }
   
   .dashboard-header {
@@ -395,60 +421,130 @@
     font-size: 6px;
   }
   
-  .rankings-container {
-    overflow: hidden; /* Prevent overflow */
+  .rankings-header {
+    display: none; /* Hide header in portrait */
   }
   
   .rankings-scroll {
-    min-height: 350px;
-    overflow-x: hidden; /* Force no horizontal scroll */
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    min-height: 380px;
   }
   
+  /* Two-row layout */
   .player-row {
-    padding: 6px;
-    overflow: hidden; /* Prevent row overflow */
+    flex-direction: column;
+    padding: 8px;
+    gap: 0;
+    align-items: stretch;
+  }
+  
+  .player-row-top {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+  }
+  
+  .player-info {
+    flex: 1;
+    min-width: 0;
   }
   
   .player-name {
     font-size: 11px;
-    max-width: 90px; /* Limit width on mobile */
-  }
-  
-  /* Adjust column widths for mobile */
-  .rankings-header span:nth-child(1) { width: 25px; }
-  .rankings-header span:nth-child(3) { width: 45px; }
-  .rankings-header span:nth-child(4) { width: 35px; }
-  .rankings-header span:nth-child(5) { width: 30px; }
-  
-  /* CRUCIAL: Make percentage smaller on mobile */
-  .stat-column {
-    width: 35px;
-  }
-  
-  .stat-value {
-    font-size: 9px; /* Smaller percentage text */
   }
   
   .multi-games-stat {
-    width: 45px;
+    width: auto;
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
   }
   
   .multi-games-count {
-    font-size: 12px; /* Slightly smaller */
+    font-size: 13px;
   }
   
-  /* Hide distribution on very small screens if needed */
+  .stats-combined {
+    width: auto;
+    padding: 0 6px;
+    border-left: 1px solid #e5e7eb;
+  }
+  
+  .stat-rate {
+    font-size: 11px;
+    font-weight: 700;
+  }
+  
+  .stat-avg {
+    font-size: 9px;
+    font-weight: 500;
+  }
+  
+  /* Distribution on second row */
   .performance-distribution {
-    display: none; /* Hide on mobile to save space */
+    display: block !important;
+    width: 100%;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid #e5e7eb;
   }
   
-  .rankings-header span:nth-child(6) { 
-    display: none; /* Hide distribution header */
+  .distribution-bars {
+    height: 18px;
+  }
+  
+  .distribution-bar {
+    font-size: 9px;
+  }
+  
+  .mobile-legend {
+    margin-top: 2px;
+  }
+  
+  .mobile-legend .legend-item {
+    font-size: 7px;
+  }
+  
+  .mobile-legend .legend-color {
+    width: 5px;
+    height: 5px;
   }
 }
 
+/* MOBILE RESPONSIVE - LANDSCAPE SINGLE ROW */
+@media (max-width: 768px) and (orientation: landscape) {
+  .multi-hit-dashboard {
+    height: 400px;
+    padding: 6px;
+  }
+  
+  .rankings-scroll {
+    min-height: 280px;
+  }
+  
+  .player-row {
+    padding: 5px;
+    gap: 6px;
+  }
+  
+  .player-name {
+    font-size: 10px;
+  }
+  
+  .stat-value {
+    font-size: 9px;
+  }
+  
+  .distribution-bars {
+    height: 14px;
+  }
+  
+  .distribution-bar {
+    font-size: 7px;
+  }
+}
+
+/* VERY SMALL SCREENS */
 @media (max-width: 480px) {
   .multi-hit-dashboard {
     height: 450px;
@@ -464,21 +560,15 @@
   }
   
   .rankings-scroll {
-    min-height: 300px;
+    min-height: 320px;
   }
   
   .player-row {
-    padding: 5px;
-    gap: 4px; /* Tighter gaps */
+    padding: 6px;
   }
   
   .player-name {
     font-size: 10px;
-    max-width: 80px; /* Even more limited on small screens */
-  }
-  
-  .player-team {
-    font-size: 8px;
   }
   
   .rank-badge {
@@ -487,42 +577,40 @@
     font-size: 8px;
   }
   
-  /* Even smaller percentage on very small screens */
-  .stat-value {
-    font-size: 8px;
-    font-weight: 500; /* Slightly less bold to save space */
-  }
-  
   .multi-games-count {
-    font-size: 11px;
+    font-size: 12px;
   }
   
-  .multi-games-total {
-    font-size: 7px;
+  .stat-rate {
+    font-size: 10px;
   }
   
-  /* Further adjust columns */
-  .stat-column {
-    width: 30px;
+  .stat-avg {
+    font-size: 8px;
   }
   
-  .multi-games-stat {
-    width: 40px;
+  .distribution-bars {
+    height: 16px;
+  }
+  
+  .distribution-bar {
+    font-size: 8px;
+    min-width: 16px !important;
   }
 }
 
-/* Ensure content doesn't overflow horizontally */
+/* Ensure no horizontal scroll */
+.multi-hit-dashboard * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 @media (max-width: 768px) {
-  .multi-hit-dashboard * {
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-  
-  /* Prevent any child from causing horizontal scroll */
   .rankings-container,
   .rankings-scroll,
   .player-row {
     width: 100%;
     max-width: 100%;
+    overflow-x: hidden;
   }
 }
