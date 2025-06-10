@@ -190,7 +190,7 @@
   border-radius: 2px;
 }
 
-/* Player Rows - READABLE SIZE */
+/* Player Rows - DEFAULT DESKTOP LAYOUT */
 .player-row {
   display: flex;
   align-items: center;
@@ -207,12 +207,49 @@
   border-color: #d1d5db;
 }
 
-/* For two-row layout wrapper */
+/* Wrapper for mobile two-row layout */
 .player-row-top {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: contents; /* By default, acts as if wrapper doesn't exist */
   width: 100%;
+}
+
+/* DESKTOP SPECIFIC STYLES */
+@media (min-width: 769px) {
+  /* Ensure player row shows all elements in single row */
+  .player-row {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+  }
+  
+  /* All direct children should be flex items */
+  .player-row > * {
+    flex-shrink: 0;
+  }
+  
+  /* Ensure distribution takes remaining space */
+  .performance-distribution {
+    flex: 1 1 auto !important;
+    min-width: 150px;
+    display: flex !important;
+    flex-direction: column;
+  }
+  
+  /* Force distribution bars to be visible */
+  .distribution-bars {
+    display: flex !important;
+    width: 100%;
+    height: 20px; /* Slightly taller on desktop */
+  }
+  
+  /* Ensure legend doesn't break layout */
+  .distribution-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    font-size: 7px;
+    margin-top: 2px;
+  }
 }
 
 .player-rank {
@@ -276,6 +313,7 @@
   color: #9ca3af;
 }
 
+/* Desktop shows separate columns */
 .stat-column {
   width: 40px;
   text-align: center;
@@ -288,45 +326,52 @@
   color: #374151;
 }
 
-/* Combined stats column for mobile */
+/* Hide combined stats on desktop */
 .stats-combined {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  align-items: center;
+  display: none;
 }
 
-.stat-rate {
-  color: #10b981;
-}
-
-.stat-avg {
-  color: #6366f1;
-  font-size: 9px;
-}
-
-/* Distribution */
+/* Distribution - ALWAYS VISIBLE */
 .performance-distribution {
   flex: 1;
   min-width: 0;
+  display: block !important;
 }
 
 .distribution-bars {
-  display: flex;
+  display: flex !important; /* Force display */
   gap: 1px;
   height: 16px;
   margin-bottom: 3px;
+  min-height: 16px; /* Ensure minimum height */
 }
 
 .distribution-bar {
   border-radius: 2px;
-  display: flex;
+  display: flex !important; /* Force display */
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 8px;
   font-weight: 600;
   position: relative;
+  min-height: 16px; /* Ensure bars have height */
+}
+
+/* Desktop-specific distribution styles */
+@media (min-width: 769px) {
+  .performance-distribution {
+    min-width: 200px; /* Ensure adequate space */
+  }
+  
+  .distribution-legend {
+    font-size: 7px; /* Smaller legend on desktop to save space */
+  }
+  
+  .legend-color {
+    width: 5px;
+    height: 5px;
+  }
 }
 
 .distribution-legend {
@@ -444,6 +489,34 @@
     width: 100%;
   }
   
+  /* Hide individual stat columns on mobile portrait */
+  .stat-column:not(.stats-combined) {
+    display: none;
+  }
+  
+  /* Show combined stats on mobile portrait */
+  .stats-combined {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+    width: auto;
+    padding: 0 6px;
+    border-left: 1px solid #e5e7eb;
+  }
+  
+  .stat-rate {
+    color: #10b981;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  
+  .stat-avg {
+    color: #6366f1;
+    font-size: 9px;
+    font-weight: 500;
+  }
+  
   .player-info {
     flex: 1;
     min-width: 0;
@@ -462,22 +535,6 @@
   
   .multi-games-count {
     font-size: 13px;
-  }
-  
-  .stats-combined {
-    width: auto;
-    padding: 0 6px;
-    border-left: 1px solid #e5e7eb;
-  }
-  
-  .stat-rate {
-    font-size: 11px;
-    font-weight: 700;
-  }
-  
-  .stat-avg {
-    font-size: 9px;
-    font-weight: 500;
   }
   
   /* Distribution on second row */
@@ -542,6 +599,11 @@
   .distribution-bar {
     font-size: 7px;
   }
+  
+  /* Keep distribution visible in landscape */
+  .performance-distribution {
+    display: block !important;
+  }
 }
 
 /* VERY SMALL SCREENS */
@@ -596,6 +658,11 @@
   .distribution-bar {
     font-size: 8px;
     min-width: 16px !important;
+  }
+  
+  /* Hide legend on very small screens to save space */
+  .distribution-legend {
+    display: none;
   }
 }
 
