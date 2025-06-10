@@ -176,7 +176,9 @@
 .rankings-scroll {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden; /* Prevent horizontal scroll */
   min-height: 450px; /* GUARANTEED MINIMUM */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
 .rankings-scroll::-webkit-scrollbar {
@@ -361,11 +363,13 @@
   color: #6b7280;
 }
 
-/* MOBILE RESPONSIVE */
+/* MOBILE RESPONSIVE - ENHANCED */
 @media (max-width: 768px) {
   .multi-hit-dashboard {
     height: 500px;
     padding: 8px;
+    width: 100%;
+    overflow: hidden; /* Ensure no horizontal overflow */
   }
   
   .dashboard-header {
@@ -391,22 +395,58 @@
     font-size: 6px;
   }
   
+  .rankings-container {
+    overflow: hidden; /* Prevent overflow */
+  }
+  
   .rankings-scroll {
     min-height: 350px;
+    overflow-x: hidden; /* Force no horizontal scroll */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .player-row {
     padding: 6px;
+    overflow: hidden; /* Prevent row overflow */
   }
   
   .player-name {
     font-size: 11px;
+    max-width: 90px; /* Limit width on mobile */
   }
   
+  /* Adjust column widths for mobile */
   .rankings-header span:nth-child(1) { width: 25px; }
-  .rankings-header span:nth-child(3) { width: 50px; }
+  .rankings-header span:nth-child(3) { width: 45px; }
   .rankings-header span:nth-child(4) { width: 35px; }
-  .rankings-header span:nth-child(5) { width: 35px; }
+  .rankings-header span:nth-child(5) { width: 30px; }
+  
+  /* CRUCIAL: Make percentage smaller on mobile */
+  .stat-column {
+    width: 35px;
+  }
+  
+  .stat-value {
+    font-size: 9px; /* Smaller percentage text */
+  }
+  
+  .multi-games-stat {
+    width: 45px;
+  }
+  
+  .multi-games-count {
+    font-size: 12px; /* Slightly smaller */
+  }
+  
+  /* Hide distribution on very small screens if needed */
+  .performance-distribution {
+    display: none; /* Hide on mobile to save space */
+  }
+  
+  .rankings-header span:nth-child(6) { 
+    display: none; /* Hide distribution header */
+  }
 }
 
 @media (max-width: 480px) {
@@ -429,15 +469,60 @@
   
   .player-row {
     padding: 5px;
+    gap: 4px; /* Tighter gaps */
   }
   
   .player-name {
     font-size: 10px;
+    max-width: 80px; /* Even more limited on small screens */
+  }
+  
+  .player-team {
+    font-size: 8px;
   }
   
   .rank-badge {
     width: 16px;
     height: 16px;
     font-size: 8px;
+  }
+  
+  /* Even smaller percentage on very small screens */
+  .stat-value {
+    font-size: 8px;
+    font-weight: 500; /* Slightly less bold to save space */
+  }
+  
+  .multi-games-count {
+    font-size: 11px;
+  }
+  
+  .multi-games-total {
+    font-size: 7px;
+  }
+  
+  /* Further adjust columns */
+  .stat-column {
+    width: 30px;
+  }
+  
+  .multi-games-stat {
+    width: 40px;
+  }
+}
+
+/* Ensure content doesn't overflow horizontally */
+@media (max-width: 768px) {
+  .multi-hit-dashboard * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* Prevent any child from causing horizontal scroll */
+  .rankings-container,
+  .rankings-scroll,
+  .player-row {
+    width: 100%;
+    max-width: 100%;
   }
 }
