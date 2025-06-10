@@ -29,6 +29,7 @@ import PitcherHitsAllowedCard from './cards/PitcherHitsAllowedCard/PitcherHitsAl
 import SlotMachineCard from './cards/SlotMachineCard/SlotMachineCard';
 
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
+import MLBWeatherCard from './cards/MLBWeatherCard/MLBWeatherCard';
 
 import MultiHitDashboardCard from './cards/MultiHitDashboardCard/MultiHitDashboardCard';
 
@@ -1114,6 +1115,7 @@ const noFilteredData = isFiltering &&
           />
 
           <LiveScoresCard teams={teamData} />
+          <MLBWeatherCard teams={teamData} />
           
           {/* HR Prediction Card */}
           <HRPredictionCard 
