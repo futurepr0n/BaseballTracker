@@ -9,6 +9,9 @@ import { useTeamFilter } from './TeamFilterContext';
 // Import reusable tooltip utilities
 import { createSafeId } from './utils/tooltipUtils';
 
+import PoorPerformanceCard from './cards/PoorPerformanceCard/PoorPerformanceCard';
+
+
 // Import individual card components
 import StatsSummaryCard from './cards/StatsSummaryCard/StatsSummaryCard';
 import HRPredictionCard from './cards/HRPredictionCard/HRPredictionCard';
@@ -129,6 +132,9 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     fridayHitLeaders: []
   });
 
+  const [poorPerformancePredictions, setPoorPerformancePredictions] = useState([]);
+  const [poorPerformanceLoading, setPoorPerformanceLoading] = useState(true);
+
   // Simple effect to populate slot machine data from existing sources
   useEffect(() => {
     const populateSlotMachineData = () => {
@@ -179,6 +185,55 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     loadStadiumData();
   }, [currentDate]);
   
+
+  useEffect(() => {
+  const loadPoorPerformancePredictions = async () => {
+    try {
+      setPoorPerformanceLoading(true);
+      
+      // Format date for file name (matching your HR prediction pattern)
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+      
+      // Try to load the specific date file first
+      let response = await fetch(`/data/predictions/poor_performance_predictions_${dateStr}.json`);
+      
+      // If not found, try to load the latest predictions
+      if (!response.ok) {
+        response = await fetch('/data/predictions/poor_performance_predictions_latest.json');
+      }
+      
+      if (!response.ok) {
+        console.warn('No poor performance predictions found');
+        setPoorPerformancePredictions([]);
+      } else {
+        const data = await response.json();
+        let predictions = data.predictions || [];
+        
+        // Apply team filtering if needed (matching your HR prediction logic)
+        if (isFiltering) {
+          predictions = predictions.filter(player => 
+            shouldIncludePlayer(player.team)
+          );
+        }
+        
+        setPoorPerformancePredictions(predictions);
+        console.log(`Loaded ${predictions.length} poor performance predictions`);
+      }
+    } catch (error) {
+      console.error('Error loading poor performance predictions:', error);
+      setPoorPerformancePredictions([]);
+    } finally {
+      setPoorPerformanceLoading(false);
+    }
+  };
+  
+  loadPoorPerformancePredictions();
+}, [currentDate, isFiltering, shouldIncludePlayer]); // Same dependencies as your HR predictions
+
+
   // Filter player data based on team selection
   const filteredPlayerData = useMemo(() => {
     if (!isFiltering) return playerData;
@@ -1259,12 +1314,12 @@ const noFilteredData = isFiltering &&
           />
           
           {/* Under-Performing Players Card */}
-          <PerformanceCard 
-            performingPlayers={topPerformers.underPerforming}
-            isLoading={!playerPerformance}
-            type="under"
-            teams={teamData} 
-          />
+  <PoorPerformanceCard 
+    poorPerformancePredictions={poorPerformancePredictions}
+    isLoading={poorPerformanceLoading}
+    teams={teamData}
+  />
+
 
           {/* Team Last Result Cards */}
 <TeamComingOffWinCard 

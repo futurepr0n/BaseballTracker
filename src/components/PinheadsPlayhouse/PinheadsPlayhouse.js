@@ -1,348 +1,560 @@
-// PinheadsPlayhouse.js
-// Complete React component matching Python HR prediction analysis
-
 import React, { useState, useEffect, useCallback } from 'react';
-//import './PinheadsPlayhouse.css';
-import { initializeData } from './dataLoader';
-import { processPitcherVsTeam } from './EnhancedMatchupAnalyzer';
-import { createEnhancedPredictionsCSV, downloadCSV } from './EnhancedCSVGenerator';
+import { useBaseballAnalysis } from '../../services/baseballAnalysisService';
+import './PinheadsPlayhouse.css';
 
+/**
+ * PinheadsPlayhouse Component - FastAPI Backend Version
+ * 
+ * Now uses the FastAPI backend for all analysis instead of complex JavaScript calculations.
+ * Provides a clean interface for baseball HR prediction and analysis.
+ */
 const PinheadsPlayhouse = () => {
-  // State for data
-  const [masterPlayerData, setMasterPlayerData] = useState({});
-  const [nameToPlayerIdMap, setNameToPlayerIdMap] = useState({});
-  const [dailyGameData, setDailyGameData] = useState({});
-  const [rostersData, setRostersData] = useState([]);
-  const [historicalData, setHistoricalData] = useState({});
-  const [leagueAvgStats, setLeagueAvgStats] = useState({});
-  const [metricRanges, setMetricRanges] = useState({});
-  
-  // State for UI
-  const [isLoading, setIsLoading] = useState(true);
-  const [dataLoadError, setDataLoadError] = useState(null);
-  const [selectedPitcher, setSelectedPitcher] = useState('');
-  const [opposingTeam, setOpposingTeam] = useState('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResults, setAnalysisResults] = useState([]);
-  const [csvExportData, setCsvExportData] = useState(null);
-  
-  // Get unique pitchers and teams from roster data
-  const pitchers = React.useMemo(() => {
-    return Object.values(masterPlayerData)
-      .filter(player => player.roster_info?.type === 'pitcher')
-      .map(player => ({
-        id: player.roster_info.mlbam_id_resolved,
-        name: player.roster_info.fullName_resolved || player.roster_info.fullName_cleaned,
-        team: player.roster_info.team
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name));
-  }, [masterPlayerData]);
-  
-  const teams = React.useMemo(() => {
-    const teamSet = new Set();
-    Object.values(masterPlayerData).forEach(player => {
-      if (player.roster_info?.team) {
-        teamSet.add(player.roster_info.team);
-      }
-    });
-    return Array.from(teamSet).sort();
-  }, [masterPlayerData]);
-  
-  // Load data on component mount
+  // API service hook
+  const { 
+    initialized, 
+    loading: apiLoading, 
+    error: apiError, 
+    analyzePitcherVsTeam,
+    batchAnalysis,
+    searchPlayers,
+    service
+  } = useBaseballAnalysis();
+
+  // Component state
+  const [analysisType, setAnalysisType] = useState('single'); // 'single' or 'batch'
+  const [singleAnalysisParams, setSingleAnalysisParams] = useState({
+    pitcherName: '',
+    teamAbbr: '',
+    sortBy: 'hr',
+    ascending: false,
+    limit: 20,
+    detailed: false
+  });
+
+  const [batchMatchups, setBatchMatchups] = useState([
+    { pitcher_name: '', team_abbr: '' }
+  ]);
+
+  const [batchParams, setBatchParams] = useState({
+    sortBy: 'hr',
+    ascending: false,
+    limit: 50,
+    applyFilters: null,
+    hittersFilter: null
+  });
+
+  // Results state
+  const [predictions, setPredictions] = useState([]);
+  const [analysisResults, setAnalysisResults] = useState(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [analysisError, setAnalysisError] = useState(null);
+
+  // Search state
+  const [pitcherSearchTerm, setPitcherSearchTerm] = useState('');
+  const [pitcherSearchResults, setPitcherSearchResults] = useState([]);
+  const [showPitcherSearch, setShowPitcherSearch] = useState(false);
+
+  // Sort options
+  const [sortOptions, setSortOptions] = useState({});
+  const [selectedColumns, setSelectedColumns] = useState([
+    'player_name', 'team', 'batter_hand', 'hr_score', 'hr_probability', 'hit_probability', 
+    'recent_avg', 'hr_rate', 'ab_due', 'arsenal_matchup', 'contact_trend'
+  ]);
+
+  // Available columns for table display
+  const availableColumns = [
+    { key: 'player_name', label: 'Player', always: true },
+    { key: 'team', label: 'Team', always: true },
+    { key: 'batter_hand', label: 'B Hand' },
+    { key: 'hr_score', label: 'HR Score', always: true },
+    { key: 'hr_probability', label: 'HR Prob %' },
+    { key: 'hit_probability', label: 'Hit Prob %' },
+    { key: 'reach_base_probability', label: 'Reach Base %' },
+    { key: 'strikeout_probability', label: 'K Prob %' },
+    { key: 'recent_avg', label: 'Recent Avg' },
+    { key: 'hr_rate', label: 'HR Rate %' },
+    { key: 'obp', label: 'OBP' },
+    { key: 'ab_due', label: 'AB Due' },
+    { key: 'hits_due', label: 'Hits Due' },
+    { key: 'heating_up', label: 'Heating Up' },
+    { key: 'cold', label: 'Cold' },
+    { key: 'arsenal_matchup', label: 'Arsenal' },
+    { key: 'batter_overall', label: 'Batter' },
+    { key: 'pitcher_overall', label: 'Pitcher' },
+    { key: 'historical_yoy_csv', label: 'Historical' },
+    { key: 'recent_daily_games', label: 'Recent' },
+    { key: 'contextual', label: 'Context' },
+    { key: 'ab_since_last_hr', label: 'AB Since HR' },
+    { key: 'expected_ab_per_hr', label: 'Exp AB/HR' },
+    { key: 'h_since_last_hr', label: 'H Since HR' },
+    { key: 'expected_h_per_hr', label: 'Exp H/HR' },
+    { key: 'contact_trend', label: 'Contact Trend' },
+    { key: 'iso_2024', label: 'ISO 2024' },
+    { key: 'iso_2025', label: 'ISO 2025' },
+    { key: 'iso_trend', label: 'ISO Trend' },
+    { key: 'batter_pa_2025', label: 'PA 2025' },
+    { key: 'ev_matchup_score', label: 'EV Matchup' },
+    { key: 'hitter_slg', label: 'Hitter SLG' },
+    { key: 'pitcher_slg', label: 'Pitcher SLG' }
+  ];
+
+  // Load sort options on mount
   useEffect(() => {
-    const loadAllData = async () => {
-      setIsLoading(true);
-      setDataLoadError(null);
-      
+    const loadSortOptions = async () => {
       try {
-        console.log("Starting data initialization...");
-        
-        const {
-          masterPlayerData: masterData,
-          playerIdToNameMap,
-          nameToPlayerIdMap: nameToIdMap,
-          dailyGameData: dailyData,
-          rostersData: rosters,
-          historicalData: historical,
-          leagueAvgStats: leagueAvg,
-          metricRanges: ranges
-        } = await initializeData('/data/', [2022, 2023, 2024, 2025]);
-        
-        console.log("Data initialization complete:", {
-          players: Object.keys(masterData).length,
-          dailyDates: Object.keys(dailyData).length,
-          rosters: rosters.length
-        });
-        
-        setMasterPlayerData(masterData);
-        setNameToPlayerIdMap(nameToIdMap);
-        setDailyGameData(dailyData);
-        setRostersData(rosters);
-        setHistoricalData(historical);
-        setLeagueAvgStats(leagueAvg);
-        setMetricRanges(ranges);
-        
+        const options = await service.getSortOptions();
+        setSortOptions(options.sort_options || {});
       } catch (error) {
-        console.error("Failed to load data:", error);
-        setDataLoadError(error.message || "Failed to load data");
-      } finally {
-        setIsLoading(false);
+        console.error('Failed to load sort options:', error);
       }
     };
-    
-    loadAllData();
-  }, []);
-  
-  // Run analysis
-  const runAnalysis = useCallback(async () => {
-    if (!selectedPitcher || !opposingTeam) {
-      alert("Please select both a pitcher and opposing team");
+
+    if (initialized) {
+      loadSortOptions();
+    }
+  }, [initialized, service]);
+
+  // Debounced pitcher search
+  useEffect(() => {
+    const timeoutId = setTimeout(async () => {
+      if (pitcherSearchTerm.length > 2) {
+        try {
+          const results = await searchPlayers(pitcherSearchTerm, 'pitcher');
+          setPitcherSearchResults(results.players || []);
+          setShowPitcherSearch(true);
+        } catch (error) {
+          console.error('Search failed:', error);
+          setPitcherSearchResults([]);
+        }
+      } else {
+        setPitcherSearchResults([]);
+        setShowPitcherSearch(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [pitcherSearchTerm, searchPlayers]);
+
+  // Handle single matchup analysis
+  const handleSingleAnalysis = useCallback(async () => {
+    if (!singleAnalysisParams.pitcherName || !singleAnalysisParams.teamAbbr) {
+      setAnalysisError('Please enter both pitcher name and team abbreviation');
       return;
     }
-    
-    setIsAnalyzing(true);
-    setAnalysisResults([]);
-    
+
+    setAnalysisLoading(true);
+    setAnalysisError(null);
+
     try {
-      console.log(`Running analysis: ${selectedPitcher} vs ${opposingTeam}`);
-      
-      const predictions = await processPitcherVsTeam(
-        selectedPitcher,
-        opposingTeam,
-        masterPlayerData,
-        nameToPlayerIdMap,
-        dailyGameData,
-        rostersData,
-        historicalData,
-        leagueAvgStats,
-        metricRanges
-      );
-      
-      console.log(`Analysis complete: ${predictions.length} predictions`);
-      
-      setAnalysisResults(predictions);
-      
-      // Generate CSV data
-      if (predictions.length > 0) {
-        const csvString = createEnhancedPredictionsCSV(predictions);
-        setCsvExportData({
-          csv: csvString,
-          filename: `analysis_enhanced_${selectedPitcher.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`
-        });
-      }
-      
+      const result = await analyzePitcherVsTeam(singleAnalysisParams);
+      setPredictions(result.predictions || []);
+      setAnalysisResults(result);
     } catch (error) {
-      console.error("Analysis failed:", error);
-      alert(`Analysis failed: ${error.message}`);
+      setAnalysisError(error.message);
+      setPredictions([]);
     } finally {
-      setIsAnalyzing(false);
+      setAnalysisLoading(false);
     }
-  }, [selectedPitcher, opposingTeam, masterPlayerData, nameToPlayerIdMap, dailyGameData, rostersData, historicalData, leagueAvgStats, metricRanges]);
-  
-  // Export CSV
-  const handleExportCSV = () => {
-    if (csvExportData) {
-      downloadCSV(csvExportData.csv, csvExportData.filename);
-    }
-  };
-  
-  // Format number for display
-  const formatNumber = (value, decimals = 2) => {
-    if (value === null || value === undefined || isNaN(value)) {
-      return 'N/A';
-    }
-    return Number(value).toFixed(decimals);
-  };
-  
-  // Format pitcher trend display
-  const formatPitcherTrend = (pitcherData) => {
-    const trends = pitcherData?.trends_summary_obj || {};
-    if (!trends.trend_direction) return 'N/A';
+  }, [singleAnalysisParams, analyzePitcherVsTeam]);
+
+  // Handle batch analysis
+  const handleBatchAnalysis = useCallback(async () => {
+    const validMatchups = batchMatchups.filter(m => m.pitcher_name && m.team_abbr);
     
-    return `${trends.trend_direction} (${formatNumber(trends.avg_era, 3)} ERA)`;
+    if (validMatchups.length === 0) {
+      setAnalysisError('Please add at least one valid matchup');
+      return;
+    }
+
+    setAnalysisLoading(true);
+    setAnalysisError(null);
+
+    try {
+      const result = await batchAnalysis({
+        matchups: validMatchups,
+        ...batchParams
+      });
+      setPredictions(result.combined_predictions || []);
+      setAnalysisResults(result);
+    } catch (error) {
+      setAnalysisError(error.message);
+      setPredictions([]);
+    } finally {
+      setAnalysisLoading(false);
+    }
+  }, [batchMatchups, batchParams, batchAnalysis]);
+
+  // Handle adding/removing batch matchups
+  const addBatchMatchup = () => {
+    setBatchMatchups([...batchMatchups, { pitcher_name: '', team_abbr: '' }]);
   };
-  
-  if (isLoading) {
+
+  const removeBatchMatchup = (index) => {
+    setBatchMatchups(batchMatchups.filter((_, i) => i !== index));
+  };
+
+  const updateBatchMatchup = (index, field, value) => {
+    const updated = [...batchMatchups];
+    updated[index][field] = value;
+    setBatchMatchups(updated);
+  };
+
+  // Format percentage values (they're already percentages from API)
+  const formatPercentage = (value) => {
+    return typeof value === 'number' ? `${value.toFixed(1)}%` : 'N/A';
+  };
+
+  // Format numeric values
+  const formatNumber = (value, decimals = 1) => {
+    return typeof value === 'number' ? value.toFixed(decimals) : 'N/A';
+  };
+
+  // Get value color class for visual feedback
+  const getValueColorClass = (value, type) => {
+    if (typeof value !== 'number') return '';
+    
+    switch (type) {
+      case 'hr_score':
+        if (value >= 70) return 'value-excellent';
+        if (value >= 50) return 'value-good';
+        if (value >= 30) return 'value-average';
+        return 'value-poor';
+      case 'hr_probability':
+        if (value >= 15) return 'value-excellent';  // 15% or higher
+        if (value >= 10) return 'value-good';       // 10-15%
+        if (value >= 5) return 'value-average';     // 5-10%
+        return 'value-poor';                        // Under 5%
+      case 'ab_due':
+        if (value >= 15) return 'value-excellent';
+        if (value >= 10) return 'value-good';
+        if (value >= 5) return 'value-average';
+        return 'value-poor';
+      default:
+        return '';
+    }
+  };
+
+  // Render loading state
+  if (apiLoading) {
     return (
       <div className="pinheads-playhouse">
-        <div className="loading-message">
-          <h2>Loading Baseball Analysis System...</h2>
-          <p>Initializing data...</p>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <h2>Loading Analysis System...</h2>
+          <p>Initializing baseball data and models...</p>
         </div>
       </div>
     );
   }
-  
-  if (dataLoadError) {
+
+  // Render error state
+  if (apiError) {
     return (
       <div className="pinheads-playhouse">
-        <div className="error-message">
-          <h2>Error Loading Data</h2>
-          <p>{dataLoadError}</p>
+        <div className="error-container">
+          <h2>System Error</h2>
+          <p>{apiError}</p>
+          <button onClick={() => window.location.reload()}>Reload Page</button>
         </div>
       </div>
     );
   }
-  
+
+  // Render not initialized state
+  if (!initialized) {
+    return (
+      <div className="pinheads-playhouse">
+        <div className="initializing-container">
+          <h2>Initializing Data...</h2>
+          <p>Please wait while the baseball analysis system loads.</p>
+          <div className="loading-spinner"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="pinheads-playhouse">
-      <header className="playhouse-header">
+      <div className="playhouse-header">
         <h1>🎯 Pinheads Playhouse</h1>
-        <p>Advanced HR Prediction Analysis - Pitcher vs Team</p>
-        <p className="header-stats">
-          Loaded: {Object.keys(masterPlayerData).length} players • {pitchers.length} pitchers • {teams.length} teams • {Object.keys(dailyGameData).length} days of data
-        </p>
-      </header>
-      
-      <section className="analysis-controls">
-        <div className="control-group">
-          <label htmlFor="pitcher-select">Select Pitcher:</label>
-          <select 
-            id="pitcher-select"
-            value={selectedPitcher} 
-            onChange={(e) => setSelectedPitcher(e.target.value)}
-            disabled={isAnalyzing}
-          >
-            <option value="">-- Select Pitcher --</option>
-            {pitchers.map(pitcher => (
-              <option key={pitcher.id} value={pitcher.name}>
-                {pitcher.name} ({pitcher.team})
-              </option>
-            ))}
-          </select>
-        </div>
-        
-        <div className="control-group">
-          <label htmlFor="team-select">Opposing Team:</label>
-          <select 
-            id="team-select"
-            value={opposingTeam} 
-            onChange={(e) => setOpposingTeam(e.target.value)}
-            disabled={isAnalyzing}
-          >
-            <option value="">-- Select Team --</option>
-            {teams.map(team => (
-              <option key={team} value={team}>
-                {team}
-              </option>
-            ))}
-          </select>
-        </div>
-        
-        <button 
-          className="analyze-button"
-          onClick={runAnalysis}
-          disabled={isAnalyzing || !selectedPitcher || !opposingTeam}
+        <p>Advanced Baseball Home Run Analysis - Powered by AI</p>
+      </div>
+
+      {/* Analysis Type Selector */}
+      <div className="analysis-type-selector">
+        <button
+          className={analysisType === 'single' ? 'active' : ''}
+          onClick={() => setAnalysisType('single')}
         >
-          {isAnalyzing ? '⏳ Analyzing...' : '▶️ Run Analysis'}
+          Single Matchup
         </button>
-      </section>
-      
-      {analysisResults.length > 0 && (
-        <section className="results-section">
+        <button
+          className={analysisType === 'batch' ? 'active' : ''}
+          onClick={() => setAnalysisType('batch')}
+        >
+          Batch Analysis
+        </button>
+      </div>
+
+      {/* Single Analysis Form */}
+      {analysisType === 'single' && (
+        <div className="analysis-form single-form">
+          <h3>Single Pitcher vs Team Analysis</h3>
+          <div className="form-row">
+            <div className="form-group pitcher-search-group">
+              <label>Pitcher Name:</label>
+              <input
+                type="text"
+                value={singleAnalysisParams.pitcherName}
+                onChange={(e) => {
+                  setSingleAnalysisParams({...singleAnalysisParams, pitcherName: e.target.value});
+                  setPitcherSearchTerm(e.target.value);
+                }}
+                placeholder="e.g., MacKenzie Gore"
+                className="pitcher-search-input"
+              />
+              {showPitcherSearch && pitcherSearchResults.length > 0 && (
+                <div className="search-dropdown">
+                  {pitcherSearchResults.map((pitcher, idx) => (
+                    <div
+                      key={idx}
+                      className="search-result"
+                      onClick={() => {
+                        setSingleAnalysisParams({...singleAnalysisParams, pitcherName: pitcher.name});
+                        setPitcherSearchTerm(pitcher.name);
+                        setShowPitcherSearch(false);
+                      }}
+                    >
+                      <span className="pitcher-name">{pitcher.name}</span>
+                      <span className="pitcher-team">({pitcher.team})</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="form-group">
+              <label>Team Abbreviation:</label>
+              <input
+                type="text"
+                value={singleAnalysisParams.teamAbbr}
+                onChange={(e) => setSingleAnalysisParams({...singleAnalysisParams, teamAbbr: e.target.value.toUpperCase()})}
+                placeholder="e.g., SEA"
+                maxLength="3"
+              />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Sort By:</label>
+              <select
+                value={singleAnalysisParams.sortBy}
+                onChange={(e) => setSingleAnalysisParams({...singleAnalysisParams, sortBy: e.target.value})}
+              >
+                {Object.entries(sortOptions).map(([key, description]) => (
+                  <option key={key} value={key}>{description}</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Order:</label>
+              <select
+                value={singleAnalysisParams.ascending}
+                onChange={(e) => setSingleAnalysisParams({...singleAnalysisParams, ascending: e.target.value === 'true'})}
+              >
+                <option value="false">Highest First</option>
+                <option value="true">Lowest First</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Limit:</label>
+              <input
+                type="number"
+                value={singleAnalysisParams.limit}
+                onChange={(e) => setSingleAnalysisParams({...singleAnalysisParams, limit: parseInt(e.target.value)})}
+                min="1"
+                max="50"
+              />
+            </div>
+          </div>
+          <button
+            onClick={handleSingleAnalysis}
+            disabled={analysisLoading || !singleAnalysisParams.pitcherName || !singleAnalysisParams.teamAbbr}
+            className="analyze-btn"
+          >
+            {analysisLoading ? 'Analyzing...' : 'Analyze Matchup'}
+          </button>
+        </div>
+      )}
+
+      {/* Batch Analysis Form */}
+      {analysisType === 'batch' && (
+        <div className="analysis-form batch-form">
+          <h3>Batch Pitcher vs Team Analysis</h3>
+          <div className="batch-matchups">
+            <h4>Matchups:</h4>
+            {batchMatchups.map((matchup, index) => (
+              <div key={index} className="batch-matchup-row">
+                <input
+                  type="text"
+                  placeholder="Pitcher Name"
+                  value={matchup.pitcher_name}
+                  onChange={(e) => updateBatchMatchup(index, 'pitcher_name', e.target.value)}
+                />
+                <input
+                  type="text"
+                  placeholder="Team"
+                  value={matchup.team_abbr}
+                  onChange={(e) => updateBatchMatchup(index, 'team_abbr', e.target.value.toUpperCase())}
+                  maxLength="3"
+                />
+                {batchMatchups.length > 1 && (
+                  <button onClick={() => removeBatchMatchup(index)} className="remove-btn">×</button>
+                )}
+              </div>
+            ))}
+            <button onClick={addBatchMatchup} className="add-matchup-btn">+ Add Matchup</button>
+          </div>
+          <div className="batch-options">
+            <div className="form-group">
+              <label>Sort By:</label>
+              <select
+                value={batchParams.sortBy}
+                onChange={(e) => setBatchParams({...batchParams, sortBy: e.target.value})}
+              >
+                {Object.entries(sortOptions).map(([key, description]) => (
+                  <option key={key} value={key}>{description}</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Total Results Limit:</label>
+              <input
+                type="number"
+                value={batchParams.limit}
+                onChange={(e) => setBatchParams({...batchParams, limit: parseInt(e.target.value)})}
+                min="1"
+                max="100"
+              />
+            </div>
+          </div>
+          <button
+            onClick={handleBatchAnalysis}
+            disabled={analysisLoading}
+            className="analyze-btn"
+          >
+            {analysisLoading ? 'Analyzing...' : 'Run Batch Analysis'}
+          </button>
+        </div>
+      )}
+
+      {/* Error Display */}
+      {analysisError && (
+        <div className="error-message">
+          <span>⚠️ {analysisError}</span>
+          <button onClick={() => setAnalysisError(null)}>×</button>
+        </div>
+      )}
+
+      {/* Column Selector */}
+      {predictions.length > 0 && (
+        <div className="column-selector">
+          <h4>Table Columns:</h4>
+          <div className="column-checkboxes">
+            {availableColumns.map(col => (
+              <label key={col.key} className="column-checkbox">
+                <input
+                  type="checkbox"
+                  checked={selectedColumns.includes(col.key)}
+                  onChange={(e) => {
+                    if (col.always) return; // Can't uncheck always-shown columns
+                    if (e.target.checked) {
+                      setSelectedColumns([...selectedColumns, col.key]);
+                    } else {
+                      setSelectedColumns(selectedColumns.filter(c => c !== col.key));
+                    }
+                  }}
+                  disabled={col.always}
+                />
+                {col.label}
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Results Table */}
+      {predictions.length > 0 && (
+        <div className="results-section">
           <div className="results-header">
-            <h2>
-              Analysis Results: {selectedPitcher} vs {opposingTeam} 
-              ({analysisResults.length} hitters)
-            </h2>
-            <button 
-              className="export-button"
-              onClick={handleExportCSV}
-              disabled={!csvExportData}
-            >
-              📊 Export CSV
-            </button>
+            <h3>Analysis Results</h3>
+            {analysisResults && (
+              <div className="results-summary">
+                <span>Total Predictions: {analysisResults.total_predictions || predictions.length}</span>
+                {analysisResults.matchup_summaries && (
+                  <span>Matchups: {analysisResults.matchup_summaries.length}</span>
+                )}
+              </div>
+            )}
           </div>
-          
-          <div className="results-filters">
-            <label>
-              Filters: 
-              <span>All Trends</span>
-            </label>
-          </div>
-          
-          <div className="results-table-container">
-            <table className="results-table">
+
+          <div className="table-container">
+            <table className="predictions-table">
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Batter</th>
-                  <th>Hand</th>
-                  <th>HR Score</th>
-                  <th>HR %</th>
-                  <th>Hit %</th>
-                  <th>OB %</th>
-                  <th>K %</th>
-                  <th>PA</th>
-                  <th>AB since HR</th>
-                  <th>Exp AB/HR</th>
-                  <th>AB Due</th>
-                  <th>H since HR</th>
-                  <th>Exp H/HR</th>
-                  <th>H Due</th>
-                  <th>Contact Trend</th>
-                  <th>Heat</th>
-                  <th>Cold</th>
-                  <th>ISO 2024</th>
-                  <th>ISO 2025</th>
-                  <th>ISO Trend</th>
-                  <th>Trend</th>
-                  <th>HR Rate</th>
-                  <th>AVG</th>
-                  <th>Games</th>
-                  <th>P Trend</th>
-                  <th>Arsenal</th>
-                  <th>Batter</th>
-                  <th>Pitcher</th>
-                  <th>Context</th>
+                  {selectedColumns.map(colKey => {
+                    const col = availableColumns.find(c => c.key === colKey);
+                    return <th key={colKey}>{col?.label || colKey}</th>;
+                  })}
                 </tr>
               </thead>
               <tbody>
-                {analysisResults.map((result, index) => {
-                  const details = result.details || {};
-                  const recentTrends = result.recent_N_games_raw_data?.trends_summary_obj || {};
-                  const pitcherTrends = result.pitcher_recent_data?.trends_summary_obj || {};
-                  const components = result.matchup_components || {};
-                  
-                  return (
-                    <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td>{result.batter_name}</td>
-                      <td>{result.batter_hand}</td>
-                      <td className="score-cell">{formatNumber(result.score, 2)}</td>
-                      <td>{formatNumber(result.outcome_probabilities.homerun, 1)}</td>
-                      <td>{formatNumber(result.outcome_probabilities.hit, 1)}</td>
-                      <td>{formatNumber(result.outcome_probabilities.reach_base, 1)}</td>
-                      <td>{formatNumber(result.outcome_probabilities.strikeout, 1)}</td>
-                      <td>{details.batter_pa_2025 || 0}</td>
-                      <td>{details.ab_since_last_hr !== undefined ? details.ab_since_last_hr : 'N/A'}</td>
-                      <td>{details.expected_ab_per_hr !== undefined ? formatNumber(details.expected_ab_per_hr, 1) : 'N/A'}</td>
-                      <td>{details.due_for_hr_ab_raw_score !== undefined ? formatNumber(details.due_for_hr_ab_raw_score, 1) : 'N/A'}</td>
-                      <td>{details.h_since_last_hr !== undefined ? details.h_since_last_hr : 'N/A'}</td>
-                      <td>{details.expected_h_per_hr !== undefined ? formatNumber(details.expected_h_per_hr, 1) : 'N/A'}</td>
-                      <td>{details.due_for_hr_hits_raw_score !== undefined ? formatNumber(details.due_for_hr_hits_raw_score, 1) : 'N/A'}</td>
-                      <td className="trend-cell">{details.contact_trend || 'stable'}</td>
-                      <td>{formatNumber(details.heating_up_contact_raw_score, 0)}</td>
-                      <td>{formatNumber(details.cold_batter_contact_raw_score, 0)}</td>
-                      <td>{formatNumber(details.iso_2024, 3)}</td>
-                      <td>{formatNumber(details.iso_2025_adj_for_trend, 3)}</td>
-                      <td>{formatNumber(details.iso_trend_2025v2024, 3)}</td>
-                      <td className="trend-cell">{recentTrends.trend_direction || 'stable'}</td>
-                      <td>{formatNumber(recentTrends.hr_rate, 3)}</td>
-                      <td>{formatNumber(recentTrends.avg_avg, 3)}</td>
-                      <td>{recentTrends.total_games || 0}</td>
-                      <td className="trend-cell">{pitcherTrends.trend_direction || 'stable'}</td>
-                      <td>{formatNumber(components.arsenal_matchup, 1)}</td>
-                      <td>{formatNumber(components.batter_overall, 1)}</td>
-                      <td>{formatNumber(components.pitcher_overall, 1)}</td>
-                      <td>{formatNumber(components.contextual, 1)}</td>
-                    </tr>
-                  );
-                })}
+                {predictions.map((prediction, index) => (
+                  <tr key={index}>
+                    {selectedColumns.map(colKey => {
+                      let value = prediction[colKey];
+                      let displayValue = value;
+                      let className = '';
+
+                      // Format different types of values
+                      if (colKey.includes('probability') || colKey === 'hr_rate') {
+                        displayValue = formatPercentage(value);  // Already percentages
+                        className = getValueColorClass(value, colKey);
+                      } else if (colKey === 'hr_score') {
+                        displayValue = formatNumber(value, 1);
+                        className = getValueColorClass(value, colKey);
+                      } else if (colKey === 'recent_avg' || colKey === 'obp') {
+                        displayValue = formatNumber(value, 3);
+                      } else if (colKey === 'contact_trend') {
+                        displayValue = value || 'N/A';
+                      } else if (colKey === 'batter_hand' || colKey === 'pitcher_hand') {
+                        displayValue = value || '';
+                      } else if (typeof value === 'number') {
+                        displayValue = formatNumber(value, 1);
+                        if (colKey === 'ab_due') {
+                          className = getValueColorClass(value, colKey);
+                        }
+                      }
+
+                      return (
+                        <td key={colKey} className={className}>
+                          {displayValue}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
-        </section>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!analysisLoading && predictions.length === 0 && !analysisError && (
+        <div className="empty-state">
+          <h3>Ready for Analysis</h3>
+          <p>Enter a pitcher and team above to get started with home run predictions.</p>
+        </div>
       )}
     </div>
   );
