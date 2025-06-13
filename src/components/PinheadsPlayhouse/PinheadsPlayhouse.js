@@ -1,6 +1,95 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useBaseballAnalysis } from '../../services/baseballAnalysisService';
 import './PinheadsPlayhouse.css';
+
+
+const SearchableDropdown = ({ 
+  value, 
+  onChange, 
+  options, 
+  placeholder, 
+  displayKey = 'label', 
+  valueKey = 'value',
+  showSecondary = false,
+  secondaryKey = 'secondary'
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Filter options based on search term
+  const filteredOptions = useMemo(() => {
+    if (!searchTerm) return options;
+    
+    const term = searchTerm.toLowerCase();
+    return options.filter(option => {
+      const display = option[displayKey]?.toLowerCase() || '';
+      const value = option[valueKey]?.toLowerCase() || '';
+      const secondary = option[secondaryKey]?.toLowerCase() || '';
+      return display.includes(term) || value.includes(term) || secondary.includes(term);
+    });
+  }, [options, searchTerm, displayKey, valueKey, secondaryKey]);
+
+  const handleSelect = (option) => {
+    onChange(option[valueKey]);
+    setSearchTerm(option[displayKey]);
+    setIsOpen(false);
+  };
+
+  // Update search term when value changes externally
+  useEffect(() => {
+    const selected = options.find(opt => opt[valueKey] === value);
+    if (selected) {
+      setSearchTerm(selected[displayKey]);
+    } else if (!isOpen) {
+      setSearchTerm('');
+    }
+  }, [value, options, valueKey, displayKey, isOpen]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.pitcher-search-group')) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  return (
+    <>
+      <input
+        type="text"
+        value={searchTerm}
+        onChange={(e) => {
+          setSearchTerm(e.target.value);
+          setIsOpen(true);
+        }}
+        onFocus={() => setIsOpen(true)}
+        placeholder={placeholder}
+        className="pitcher-search-input"
+      />
+      {isOpen && filteredOptions.length > 0 && (
+        <div className="search-dropdown">
+          {filteredOptions.map((option, idx) => (
+            <div
+              key={idx}
+              className="search-result"
+              onClick={() => handleSelect(option)}
+            >
+              <span className="pitcher-name">{option[displayKey]}</span>
+              {showSecondary && option[secondaryKey] && (
+                <span className="pitcher-team">({option[secondaryKey]})</span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </>
+  );
+};
+
 
 /**
  * PinheadsPlayhouse Component - FastAPI Backend Version
@@ -8,6 +97,9 @@ import './PinheadsPlayhouse.css';
  * Now uses the FastAPI backend for all analysis instead of complex JavaScript calculations.
  * Provides a clean interface for baseball HR prediction and analysis.
  */
+
+
+
 const PinheadsPlayhouse = () => {
   // API service hook
   const { 
@@ -22,6 +114,10 @@ const PinheadsPlayhouse = () => {
 
   // Component state
   const [analysisType, setAnalysisType] = useState('single'); // 'single' or 'batch'
+
+  const [teamsData, setTeamsData] = useState({});
+  const [rostersData, setRostersData] = useState([]);
+
   const [singleAnalysisParams, setSingleAnalysisParams] = useState({
     pitcherName: '',
     teamAbbr: '',
@@ -58,7 +154,7 @@ const PinheadsPlayhouse = () => {
   const [sortOptions, setSortOptions] = useState({});
   const [selectedColumns, setSelectedColumns] = useState([
     'player_name', 'team', 'batter_hand', 'hr_score', 'hr_probability', 'hit_probability', 
-    'recent_avg', 'hr_rate', 'ab_due', 'arsenal_matchup', 'contact_trend'
+    'recent_avg', 'hr_rate', 'ab_due', 'arsenal_matchup', 'contact_trend', 'pitcher_hand', 'pitcher_trend_dir'
   ]);
 
   // Available columns for table display
@@ -95,8 +191,43 @@ const PinheadsPlayhouse = () => {
     { key: 'batter_pa_2025', label: 'PA 2025' },
     { key: 'ev_matchup_score', label: 'EV Matchup' },
     { key: 'hitter_slg', label: 'Hitter SLG' },
-    { key: 'pitcher_slg', label: 'Pitcher SLG' }
+    { key: 'pitcher_slg', label: 'Pitcher SLG' },
+    // Pitcher information (same for all batters)
+    { key: 'pitcher_hand', label: 'P Hand' },
+    { key: 'pitcher_era', label: 'P ERA' },
+    { key: 'pitcher_whip', label: 'P WHIP' },
+    { key: 'pitcher_trend_dir', label: 'P Trend' },
+    { key: 'pitcher_h_per_game', label: 'P H/Game' },
+    { key: 'pitcher_hr_per_game', label: 'P HR/Game' },
+    { key: 'pitcher_k_per_game', label: 'P K/Game' }
   ];
+
+  // Load JSON data on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [teamsResponse, rostersResponse] = await Promise.all([
+          fetch('/data/teams.json'),
+          fetch('/data/rosters.json')
+        ]);
+
+        if (!teamsResponse.ok || !rostersResponse.ok) {
+          throw new Error('Failed to load data files');
+        }
+
+        const teams = await teamsResponse.json();
+        const rosters = await rostersResponse.json();
+
+        setTeamsData(teams);
+        setRostersData(rosters);
+      } catch (error) {
+        console.error('Error loading data:', error);
+        // Don't set error state - fallback to manual entry
+      }
+    };
+
+    loadData();
+  }, []);
 
   // Load sort options on mount
   useEffect(() => {
@@ -135,6 +266,25 @@ const PinheadsPlayhouse = () => {
     return () => clearTimeout(timeoutId);
   }, [pitcherSearchTerm, searchPlayers]);
 
+
+  // Prepare dropdown options
+  const pitcherOptions = useMemo(() => {
+    return rostersData
+      .filter(player => player.type === 'pitcher')
+      .map(pitcher => ({
+        value: pitcher.fullName || pitcher.name,
+        label: pitcher.fullName || pitcher.name,
+        secondary: pitcher.team
+      }));
+  }, [rostersData]);
+
+  const teamOptions = useMemo(() => {
+    return Object.entries(teamsData).map(([abbr, team]) => ({
+      value: abbr,
+      label: team.name,
+      secondary: abbr
+    }));
+  }, [teamsData]);
   // Handle single matchup analysis
   const handleSingleAnalysis = useCallback(async () => {
     if (!singleAnalysisParams.pitcherName || !singleAnalysisParams.teamAbbr) {
@@ -303,44 +453,43 @@ const PinheadsPlayhouse = () => {
           <div className="form-row">
             <div className="form-group pitcher-search-group">
               <label>Pitcher Name:</label>
-              <input
-                type="text"
-                value={singleAnalysisParams.pitcherName}
-                onChange={(e) => {
-                  setSingleAnalysisParams({...singleAnalysisParams, pitcherName: e.target.value});
-                  setPitcherSearchTerm(e.target.value);
-                }}
-                placeholder="e.g., MacKenzie Gore"
-                className="pitcher-search-input"
-              />
-              {showPitcherSearch && pitcherSearchResults.length > 0 && (
-                <div className="search-dropdown">
-                  {pitcherSearchResults.map((pitcher, idx) => (
-                    <div
-                      key={idx}
-                      className="search-result"
-                      onClick={() => {
-                        setSingleAnalysisParams({...singleAnalysisParams, pitcherName: pitcher.name});
-                        setPitcherSearchTerm(pitcher.name);
-                        setShowPitcherSearch(false);
-                      }}
-                    >
-                      <span className="pitcher-name">{pitcher.name}</span>
-                      <span className="pitcher-team">({pitcher.team})</span>
-                    </div>
-                  ))}
-                </div>
+              {pitcherOptions.length > 0 ? (
+                <SearchableDropdown
+                  value={singleAnalysisParams.pitcherName}
+                  onChange={(value) => setSingleAnalysisParams({...singleAnalysisParams, pitcherName: value})}
+                  options={pitcherOptions}
+                  placeholder="Search for a pitcher..."
+                  showSecondary={true}
+                />
+              ) : (
+                <input
+                  type="text"
+                  value={singleAnalysisParams.pitcherName}
+                  onChange={(e) => setSingleAnalysisParams({...singleAnalysisParams, pitcherName: e.target.value})}
+                  placeholder="e.g., MacKenzie Gore"
+                />
               )}
             </div>
-            <div className="form-group">
+            <div className="form-group pitcher-search-group">
               <label>Team Abbreviation:</label>
-              <input
-                type="text"
-                value={singleAnalysisParams.teamAbbr}
-                onChange={(e) => setSingleAnalysisParams({...singleAnalysisParams, teamAbbr: e.target.value.toUpperCase()})}
-                placeholder="e.g., SEA"
-                maxLength="3"
-              />
+              {teamOptions.length > 0 ? (
+                <SearchableDropdown
+                  value={singleAnalysisParams.teamAbbr}
+                  onChange={(value) => setSingleAnalysisParams({...singleAnalysisParams, teamAbbr: value})}
+                  options={teamOptions}
+                  placeholder="Search for a team..."
+                  displayKey="label"
+                  showSecondary={true}
+                />
+              ) : (
+                <input
+                  type="text"
+                  value={singleAnalysisParams.teamAbbr}
+                  onChange={(e) => setSingleAnalysisParams({...singleAnalysisParams, teamAbbr: e.target.value.toUpperCase()})}
+                  placeholder="e.g., SEA"
+                  maxLength="3"
+                />
+              )}
             </div>
           </div>
           <div className="form-row">
@@ -391,28 +540,60 @@ const PinheadsPlayhouse = () => {
         <div className="analysis-form batch-form">
           <h3>Batch Pitcher vs Team Analysis</h3>
           <div className="batch-matchups">
-            <h4>Matchups:</h4>
+            <h4>Matchups</h4>
             {batchMatchups.map((matchup, index) => (
               <div key={index} className="batch-matchup-row">
-                <input
-                  type="text"
-                  placeholder="Pitcher Name"
-                  value={matchup.pitcher_name}
-                  onChange={(e) => updateBatchMatchup(index, 'pitcher_name', e.target.value)}
-                />
-                <input
-                  type="text"
-                  placeholder="Team"
-                  value={matchup.team_abbr}
-                  onChange={(e) => updateBatchMatchup(index, 'team_abbr', e.target.value.toUpperCase())}
-                  maxLength="3"
-                />
+                <div className="pitcher-search-group" style={{flex: 1}}>
+                  {pitcherOptions.length > 0 ? (
+                    <SearchableDropdown
+                      value={matchup.pitcher_name}
+                      onChange={(value) => updateBatchMatchup(index, 'pitcher_name', value)}
+                      options={pitcherOptions}
+                      placeholder="Search pitcher..."
+                      showSecondary={true}
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={matchup.pitcher_name}
+                      onChange={(e) => updateBatchMatchup(index, 'pitcher_name', e.target.value)}
+                      placeholder="Pitcher name"
+                    />
+                  )}
+                </div>
+                <div className="pitcher-search-group" style={{flex: 1}}>
+                  {teamOptions.length > 0 ? (
+                    <SearchableDropdown
+                      value={matchup.team_abbr}
+                      onChange={(value) => updateBatchMatchup(index, 'team_abbr', value)}
+                      options={teamOptions}
+                      placeholder="Search team..."
+                      displayKey="label"
+                      showSecondary={true}
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={matchup.team_abbr}
+                      onChange={(e) => updateBatchMatchup(index, 'team_abbr', e.target.value.toUpperCase())}
+                      placeholder="Team"
+                      maxLength="3"
+                    />
+                  )}
+                </div>
                 {batchMatchups.length > 1 && (
-                  <button onClick={() => removeBatchMatchup(index)} className="remove-btn">×</button>
+                  <button 
+                    className="remove-btn"
+                    onClick={() => removeBatchMatchup(index)}
+                  >
+                    ×
+                  </button>
                 )}
               </div>
             ))}
-            <button onClick={addBatchMatchup} className="add-matchup-btn">+ Add Matchup</button>
+            <button className="add-matchup-btn" onClick={addBatchMatchup}>
+              + Add Matchup
+            </button>
           </div>
           <div className="batch-options">
             <div className="form-group">
@@ -524,7 +705,9 @@ const PinheadsPlayhouse = () => {
                         className = getValueColorClass(value, colKey);
                       } else if (colKey === 'recent_avg' || colKey === 'obp') {
                         displayValue = formatNumber(value, 3);
-                      } else if (colKey === 'contact_trend') {
+                      } else if (colKey === 'pitcher_era' || colKey === 'pitcher_whip') {
+                        displayValue = formatNumber(value, 2);
+                      } else if (colKey === 'contact_trend' || colKey === 'pitcher_trend_dir') {
                         displayValue = value || 'N/A';
                       } else if (colKey === 'batter_hand' || colKey === 'pitcher_hand') {
                         displayValue = value || '';
