@@ -1,9 +1,23 @@
 /* PitcherMatchupCard.css */
 
 .pitcher-matchup-card {
-  grid-column: 1 / -1;
-  background-color: #f9f9f9;
-  position: relative;
+  background-color: var(--card-bg, #fff);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 400px;
+  grid-column: span 3;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color: #333;
 }
 
 /* Team Selector */
@@ -11,116 +25,188 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 15px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #eee;
-  max-width: 100%;
+  margin-bottom: 16px;
   overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 5px;
 }
 
-.team-button {
-  padding: 5px 10px;
+.team-item {
+  padding: 6px 12px;
+  border-radius: 20px;
   background-color: #f0f0f0;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-size: 0.85rem;
   white-space: nowrap;
+  user-select: none;
 }
 
-.team-button:hover {
+.team-item:hover {
   background-color: #e0e0e0;
 }
 
-.team-button.active {
-  background-color: #0056b3;
+.team-item.active {
+  background-color: #1890ff;
   color: white;
 }
 
-/* Matchup Actions Row */
+.team-item.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.team-item.disabled:hover {
+  background-color: #f0f0f0;
+}
+
+/* Matchup Actions */
 .matchup-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 16px;
+  gap: 16px;
 }
 
-/* Sort Toggle */
 .sort-toggle {
   display: flex;
   align-items: center;
-  font-size: 0.9rem;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .sort-toggle span {
-  margin-right: 10px;
+  font-size: 0.85rem;
   color: #666;
 }
 
 .sort-button {
-  padding: 5px 12px;
-  background-color: #f0f0f0;
-  border: none;
+  padding: 6px 12px;
+  border: 1px solid #d9d9d9;
+  background-color: white;
   border-radius: 4px;
-  margin-right: 10px;
-  font-size: 0.85rem;
   cursor: pointer;
+  font-size: 0.8rem;
   transition: all 0.2s ease;
 }
 
 .sort-button:hover {
-  background-color: #e0e0e0;
+  border-color: #1890ff;
+  color: #1890ff;
 }
 
 .sort-button.active {
-  background-color: #0056b3;
+  background-color: #1890ff;
   color: white;
+  border-color: #1890ff;
 }
 
-/* Restore Button */
 .restore-button {
-  padding: 5px 12px;
-  background-color: #f0f0f0;
+  padding: 6px 12px;
+  background-color: #52c41a;
+  color: white;
   border: none;
   border-radius: 4px;
-  font-size: 0.85rem;
   cursor: pointer;
+  font-size: 0.8rem;
   transition: all 0.2s ease;
-  color: #666;
 }
 
 .restore-button:hover {
-  background-color: #e0e0e0;
-  color: #333;
+  background-color: #389e0d;
 }
 
 /* Pitchers Count */
 .pitchers-count {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #666;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   font-style: italic;
 }
 
-/* Pitcher Matchup Item */
-.pitcher-matchup-item {
-  padding: 12px 8px;
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
-  position: relative;
+/* Scrollable Container */
+.scrollable-container {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 600px;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
 }
 
-.pitcher-matchup-item:hover {
+/* Player List */
+.player-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.player-item {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.player-item:hover {
+  background-color: #fafafa;
+}
+
+.player-item:last-child {
+  border-bottom: none;
+}
+
+.player-item.expanded {
   background-color: #f5f5f5;
 }
 
-/* Player Name Row with Remove Button */
-.player-name-row {
+/* Pitcher Main Row */
+.pitcher-main-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  width: 100%;
+  padding: 12px 16px;
+  gap: 16px;
+}
+
+/* Player Rank */
+.player-rank {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+/* Player Info */
+.player-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.player-name-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.player-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333;
+}
+
+.player-team {
+  font-size: 0.85rem;
+  color: #666;
+  padding: 2px 6px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
 }
 
 /* Hide Pitcher Button */
@@ -185,6 +271,30 @@
   color: #ad6800;
 }
 
+.pitch-count {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+/* Arsenal Toggle Button */
+.arsenal-toggle-btn {
+  padding: 2px 8px;
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.arsenal-toggle-btn:hover {
+  background-color: #4f46e5;
+}
+
 /* Matchup Stats */
 .matchup-stats {
   display: flex;
@@ -235,7 +345,26 @@
   margin-top: 5px;
 }
 
-/* Fixed Tooltip Container - Positioned on the body element */
+/* Arsenal Container */
+.pitcher-arsenal-container {
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e5e7eb;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 800px;
+  }
+}
+
+/* Tooltip Styles */
 body .batter-tooltip {
   position: fixed;
   z-index: 1500;
@@ -352,6 +481,14 @@ body .batter-tooltip {
   font-size: 1rem;
 }
 
+/* No Data State */
+.no-data {
+  text-align: center;
+  color: #999;
+  padding: 40px 20px;
+  font-style: italic;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .pitcher-matchup-card {
@@ -368,84 +505,124 @@ body .batter-tooltip {
     align-items: flex-start;
     gap: 10px;
   }
-}
 
-/* Add these rules to the bottom of your existing PitcherMatchupCard.css file */
-
-/* Fix for mobile viewport stretching */
-@media (max-width: 768px) {
-  .pitcher-matchup-card {
-    grid-column: 1 / -1; /* Make card full width on mobile */
-    width: 100%;         /* Constrain to container width */
-    max-width: 100vw;    /* Prevent viewport overflow */
-    overflow-x: hidden;  /* Hide horizontal overflow */
-    box-sizing: border-box; /* Include padding in width calculation */
-  }
-  
-  /* Fix team selector overflow */
-  .team-selector {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;    /* Enable horizontal scrolling */
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS */
-    padding-bottom: 10px;
-    scrollbar-width: none; /* Hide scrollbar on Firefox */
-    margin-right: -10px;  /* Compensate for container padding */
-    margin-left: -10px;
-    padding-left: 10px;
-    padding-right: 10px;
-    width: calc(100% + 20px);
-  }
-  
-  .team-selector::-webkit-scrollbar {
-    display: none; /* Hide scrollbar on Chrome/Safari */
-  }
-  
-  .team-button {
-    flex: 0 0 auto; /* Prevent team buttons from shrinking */
-  }
-  
-  /* Adjust matchup stats for mobile */
-  .matchup-stats {
-    min-width: 110px; /* Reduce min-width to prevent overflow */
-  }
-  
-  /* Make action buttons wrap properly */
-  .matchup-actions {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  
-  .sort-toggle {
+  .pitcher-main-row {
     flex-wrap: wrap;
-    gap: 5px;
+  }
+
+  .matchup-stats {
+    flex-direction: row;
+    min-width: unset;
+    width: 100%;
+    justify-content: space-around;
+    margin-top: 8px;
+  }
+
+  .pitcher-arsenal-container {
+    padding: 12px;
+  }
+}
+
+/* Additional Arsenal-specific styles for PitcherArsenalDisplay integration */
+.pitcher-arsenal-display {
+  margin-top: 8px;
+}
+
+.pitcher-arsenal-display .pitch-usage-bar {
+  margin-bottom: 16px;
+}
+
+.pitcher-arsenal-display .pitch-card {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+}
+
+.pitcher-arsenal-display .pitch-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .pitcher-matchup-card {
+    background-color: #1f2937;
+    color: #f3f4f6;
   }
   
-  /* Fix player item layout */
-  .player-item.pitcher-matchup-item {
-    flex-wrap: nowrap; /* Prevent wrapping of player items */
+  .card-title {
+    color: #f3f4f6;
   }
   
-  /* Ensure tooltips don't cause viewport issues */
+  .team-item {
+    background-color: #374151;
+    color: #f3f4f6;
+  }
+  
+  .team-item:hover {
+    background-color: #4b5563;
+  }
+  
+  .team-item.active {
+    background-color: #3b82f6;
+  }
+  
+  .sort-button {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #f3f4f6;
+  }
+  
+  .sort-button:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+  }
+  
+  .sort-button.active {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+  }
+  
+  .scrollable-container {
+    border-color: #374151;
+  }
+  
+  .player-item {
+    border-color: #374151;
+  }
+  
+  .player-item:hover {
+    background-color: #111827;
+  }
+  
+  .player-item.expanded {
+    background-color: #1f2937;
+  }
+  
+  .player-name {
+    color: #f3f4f6;
+  }
+  
+  .player-team {
+    background-color: #374151;
+    color: #d1d5db;
+  }
+  
   .batter-tooltip {
-    max-width: 90vw;
-    width: 280px;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
+    background-color: #1f2937;
+    border-color: #374151;
   }
-}
-
-.team-button.disabled {
-  opacity: 0.5;
-  pointer-events: none;
-  cursor: not-allowed;
-  background-color: #f0f0f0;
-  color: #999;
-}
-
-/* Special highlight for when filter is active */
-.team-button.filter-active {
-  border: 2px solid #0056b3;
-  font-weight: bold;
+  
+  .tooltip-header {
+    background-color: #111827;
+    border-color: #374151;
+  }
+  
+  .batter-item {
+    border-color: #374151;
+  }
+  
+  .pitcher-arsenal-container {
+    background-color: #111827;
+    border-color: #374151;
+  }
 }

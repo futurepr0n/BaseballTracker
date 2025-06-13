@@ -579,3 +579,88 @@
     padding: 0.4rem;
   }
 }
+
+.pitcher-search-group {
+  position: relative;
+}
+
+/* Keep existing input styles but ensure they work with dropdown */
+.pitcher-search-input {
+  /* Your existing styles remain unchanged */
+}
+
+/* Dropdown menu styles */
+.search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Dropdown item styles */
+.search-result {
+  padding: 0.75rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-result:hover {
+  background: #f8fafc;
+}
+
+.search-result:last-child {
+  border-bottom: none;
+}
+
+/* Pitcher name and team in dropdown */
+.pitcher-name {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.pitcher-team {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* Batch matchup row adjustment for dropdowns */
+.batch-matchup-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  align-items: center;
+}
+
+.batch-matchup-row .pitcher-search-group {
+  flex: 1;
+}
+
+/* Scrollbar styling for dropdown */
+.search-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.search-dropdown::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+.search-dropdown::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 4px;
+}
+
+.search-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
