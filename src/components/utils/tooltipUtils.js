@@ -1,6 +1,6 @@
 /**
  * Enhanced tooltip utilities for MLB dashboard
- * Fixed flickering issue with mouse hover
+ * Now uses global tooltip system to prevent multiple tooltips and z-index issues
  */
 
 // Create a safe ID from player name and team
@@ -8,6 +8,9 @@ export const createSafeId = (name, team) => {
   if (!name) return 'unknown';
   return `${name.replace(/[^a-zA-Z0-9]/g, '_')}_${team?.replace(/[^a-zA-Z0-9]/g, '_') || 'team'}`;
 };
+
+// This utility file now focuses on helper functions
+// For tooltip state management, import useTooltip directly from './TooltipContext'
 
 // Position the tooltip relative to its trigger element
 // Returns the positioned element for chaining

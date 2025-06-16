@@ -6,7 +6,9 @@ import TeamFilter from './TeamFilter';
 import FilterIndicator from './FilterIndicator';
 import { useTeamFilter } from './TeamFilterContext';
 
-// Import reusable tooltip utilities
+// Import tooltip system
+import { TooltipProvider } from './utils/TooltipContext';
+import GlobalTooltip from './utils/GlobalTooltip';
 import { createSafeId } from './utils/tooltipUtils';
 
 import PoorPerformanceCard from './cards/PoorPerformanceCard/PoorPerformanceCard';
@@ -1106,7 +1108,8 @@ const noFilteredData = isFiltering &&
   
   
   return (
-    <div className="dashboard">
+    <TooltipProvider>
+      <div className="dashboard">
       <header className="dashboard-header">
         <h2> <img
               src='data/logos/Major_League_Baseball_logo.svg'
@@ -1380,7 +1383,11 @@ const noFilteredData = isFiltering &&
           <div />
         </div>
       )}
+      
+      {/* Global tooltip */}
+      <GlobalTooltip />
     </div>
+    </TooltipProvider>
   );
 }
 
