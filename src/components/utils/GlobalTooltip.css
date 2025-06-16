@@ -1,0 +1,430 @@
+/**
+ * Global Tooltip Styles
+ * Single source of truth for tooltip styling with proper z-index management
+ */
+
+.global-tooltip {
+  position: fixed;
+  z-index: 9999; /* Highest z-index to ensure tooltips are always on top */
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  max-height: 80vh;
+  overflow-y: auto;
+  min-width: 280px;
+  max-width: 90vw;
+  
+  /* Performance optimizations */
+  will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+  
+  /* Smooth entrance animation */
+  animation: tooltipFadeIn 0.2s ease-out forwards;
+  
+  /* Ensure tooltip receives mouse events */
+  pointer-events: auto;
+}
+
+@keyframes tooltipFadeIn {
+  from { 
+    opacity: 0; 
+    transform: translate3d(0, -10px, 0); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translate3d(0, 0, 0); 
+  }
+}
+
+/* Tooltip header */
+.global-tooltip .tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #eee;
+  font-weight: 500;
+  font-size: 0.95rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  user-select: none;
+}
+
+.global-tooltip .tooltip-title {
+  color: #333;
+  font-weight: 600;
+}
+
+.global-tooltip .close-tooltip {
+  background: none;
+  border: none;
+  height: 28px;
+  width: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #666;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.global-tooltip .close-tooltip:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #333;
+}
+
+.global-tooltip .close-tooltip:focus {
+  outline: 2px solid #1890ff;
+  outline-offset: 2px;
+}
+
+/* Tooltip content */
+.global-tooltip .tooltip-content {
+  padding: 16px;
+  max-height: calc(80vh - 60px); /* Account for header height */
+  overflow-y: auto;
+}
+
+/* Scrollbar styling for tooltip content */
+.global-tooltip .tooltip-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.global-tooltip .tooltip-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.global-tooltip .tooltip-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.global-tooltip .tooltip-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Desktop optimizations */
+@media (min-width: 769px) {
+  .global-tooltip {
+    width: 450px;
+    max-width: 90vw;
+    max-height: 80vh;
+    
+    /* Enhanced shadow for desktop */
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+    
+    /* Smooth positioning transitions */
+    transition: all 0.2s ease-out;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .global-tooltip {
+    width: 90vw;
+    max-width: 400px;
+    max-height: 70vh;
+    
+    /* Center on mobile */
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    
+    /* Enhanced shadow for mobile */
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  }
+  
+  .global-tooltip .tooltip-header {
+    padding: 14px 16px;
+  }
+  
+  .global-tooltip .close-tooltip {
+    height: 32px;
+    width: 32px;
+  }
+}
+
+/* Backdrop for all screen sizes */
+.tooltip-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9998; /* Just below tooltip */
+  opacity: 0;
+  animation: backdropFadeIn 0.2s ease-out forwards;
+  cursor: pointer;
+}
+
+/* Desktop backdrop - subtle */
+.tooltip-backdrop.desktop-backdrop {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile backdrop - more prominent */
+.tooltip-backdrop.mobile-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+@keyframes backdropFadeIn {
+  to { opacity: 1; }
+}
+
+/* Ensure tooltip triggers are clickable */
+.tooltip-trigger {
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  transition: background-color 0.2s ease;
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.tooltip-trigger:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.tooltip-trigger:focus {
+  outline: 2px solid #1890ff;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .global-tooltip {
+    border: 2px solid #333;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+  
+  .global-tooltip .tooltip-header {
+    border-bottom: 2px solid #333;
+  }
+  
+  .global-tooltip .close-tooltip {
+    border: 1px solid #333;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .global-tooltip {
+    animation: none;
+  }
+  
+  .tooltip-backdrop {
+    animation: none;
+    opacity: 1;
+  }
+  
+  .tooltip-trigger {
+    transition: none;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .global-tooltip {
+    background-color: #1f2937;
+    border-color: #374151;
+    color: #f9fafb;
+  }
+  
+  .global-tooltip .tooltip-header {
+    background-color: #374151;
+    border-bottom-color: #4b5563;
+  }
+  
+  .global-tooltip .tooltip-title {
+    color: #f9fafb;
+  }
+  
+  .global-tooltip .close-tooltip {
+    color: #d1d5db;
+  }
+  
+  .global-tooltip .close-tooltip:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #f9fafb;
+  }
+}
+
+/* Prevent any lower z-index conflicts */
+.global-tooltip * {
+  box-sizing: border-box;
+}
+
+/* Force tooltip to always be on top of everything */
+.global-tooltip {
+  z-index: 2147483647 !important; /* Maximum safe z-index value */
+}
+
+/* Streak tooltip specific styles */
+.global-tooltip .streak-details {
+  padding: 0;
+}
+
+.global-tooltip .streak-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.global-tooltip .streak-summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.global-tooltip .summary-label {
+  font-weight: 500;
+  color: #666;
+}
+
+.global-tooltip .summary-value {
+  font-weight: 600;
+  color: #333;
+}
+
+.global-tooltip .summary-value.highlight {
+  color: #0056b3;
+  font-weight: 700;
+}
+
+.global-tooltip .streak-progression-header {
+  margin-bottom: 12px;
+}
+
+.global-tooltip .streak-progression-header h4 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.global-tooltip .streak-progression-explainer {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}
+
+.global-tooltip .streak-progression-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.global-tooltip .streak-progression-table th,
+.global-tooltip .streak-progression-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.global-tooltip .streak-progression-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.global-tooltip .streak-progression-table tr.current-streak {
+  background-color: #e6f7ff;
+  font-weight: 600;
+}
+
+.global-tooltip .streak-progression-table .high-rate {
+  color: #52c41a;
+  font-weight: 600;
+}
+
+.global-tooltip .streak-progression-table .medium-rate {
+  color: #faad14;
+  font-weight: 600;
+}
+
+.global-tooltip .streak-progression-table .low-rate {
+  color: #ff4d4f;
+  font-weight: 600;
+}
+
+.global-tooltip .no-progression-data {
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* Day hit tooltip specific styles */
+.global-tooltip .day-hit-details {
+  padding: 0;
+}
+
+.global-tooltip .day-hit-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.global-tooltip .day-hit-summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.global-tooltip .day-hit-games {
+  margin-top: 16px;
+}
+
+.global-tooltip .day-hit-games h4 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.global-tooltip .day-hit-date-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.global-tooltip .day-hit-date-item {
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.global-tooltip .day-hit-date-item:last-child {
+  border-bottom: none;
+}
+
+.global-tooltip .day-hit-more-dates {
+  margin: 8px 0 0 0;
+  font-size: 0.85rem;
+  color: #888;
+  font-style: italic;
+}
+
+.global-tooltip .no-date-data {
+  color: #888;
+  font-style: italic;
+  text-align: center;
+  padding: 20px 0;
+}

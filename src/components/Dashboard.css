@@ -379,20 +379,9 @@
   color: #333;
 }
 
-/* Tooltip base styling that's shared across components */
-/* Position fixed tooltips outside the flow to avoid clipping issues */
-body .batter-tooltip,
-body .streak-tooltip {
-  position: fixed;
-  z-index: 1500;  /* Make sure tooltips appear above everything */
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-  max-height: 80vh; /* Limit height to 80% of viewport */
-  overflow-y: auto;
-}
+/* Legacy tooltip styles - DEPRECATED 
+   These are kept for backwards compatibility but should not be used
+   Use GlobalTooltip component instead */
 
 /* Shared tooltip header styles */
 .tooltip-header {
@@ -433,25 +422,11 @@ body .streak-tooltip {
 }
 
 
+/* DEPRECATED: Legacy tooltip styles - Use GlobalTooltip instead */
 .streak-tooltip,
 .batter-tooltip,
 .day-hit-tooltip {
-  position: fixed;
-  z-index: 1500;
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  max-height: 80vh;
-  overflow-y: auto;
-  transition: opacity 0.15s ease;
-  opacity: 1;
-  min-width: 280px;
-  max-width: 90vw;
-  
-  /* Prevent tooltip content from interfering with parent events */
-  pointer-events: auto;
+  display: none !important; /* Hide legacy tooltips */
 }
 
 /* Common tooltip header styles */
@@ -502,7 +477,7 @@ body .streak-tooltip {
   cursor: pointer;
 }
 
-/* Tooltip container for trigger elements */
+/* DEPRECATED: Use tooltip-trigger class instead */
 .tooltip-container {
   cursor: pointer;
   position: relative;
@@ -597,42 +572,34 @@ body .streak-tooltip {
 
 
 
-/* Anti-flicker tooltip styles */
+/* DEPRECATED: All legacy tooltip styles removed - Use GlobalTooltip component */
 
-/* Base tooltip styles applied to all tooltip types */
-.streak-tooltip,
-.batter-tooltip,
-.day-hit-tooltip {
-  position: fixed;
-  z-index: 1500;
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  max-height: 80vh;
-  overflow-y: auto;
-  
-  /* These properties help prevent flickering */
-  pointer-events: auto !important; /* Ensure tooltip receives mouse events */
-  will-change: transform, opacity; /* Performance optimization */
-  transform: translate3d(0, 0, 0); /* Force hardware acceleration */
-  
-  /* Control transition timing */
-  transition: opacity 0.15s ease;
-  opacity: 1;
-  
-  /* Dimensions */
-  min-width: 280px;
-  max-width: 90vw;
+/* Modern tooltip trigger styles */
+.tooltip-trigger {
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  user-select: none;
+  transition: background-color 0.2s ease;
+  border-radius: 4px;
+  padding: 4px 8px;
 }
 
-/* Make tooltip containers receive mouse events */
+.tooltip-trigger:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.tooltip-trigger:focus {
+  outline: 2px solid #1890ff;
+  outline-offset: 2px;
+}
+
+/* Legacy support for existing tooltip-container class */
 .tooltip-container {
   cursor: pointer;
   position: relative;
   z-index: 1;
-  user-select: none; /* Prevent text selection */
+  user-select: none;
 }
 
 /* Create a buffer area around triggering elements to prevent accidental mouseout */
