@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './PitcherMatchupCard.css';
-import { createSafeId, positionTooltip, setupTooltipCloseHandler } from '../../utils/tooltipUtils';
+import { createSafeId } from '../../utils/tooltipUtils';
 import { useTeamFilter } from '../../TeamFilterContext';
+import { useTooltip } from '../../utils/TooltipContext';
 import PitcherArsenalDisplay from '../PitcherArsenalDisplay/PitcherArsenalDisplay';
 
 /**
@@ -21,13 +22,15 @@ const PitcherMatchupCard = ({
     isFiltering
   } = useTeamFilter();
 
+  // Get tooltip context
+  const { openTooltip } = useTooltip();
+
   // State variables for the pitcher matchup display
   const [selectedPitcherTeam, setSelectedPitcherTeam] = useState('ALL');
   const [allTeams, setAllTeams] = useState([]);
   const [filteredPitchers, setFilteredPitchers] = useState([]);
   const [pitcherSortMethod, setPitcherSortMethod] = useState('sameHanded');
   const [hiddenPitchers, setHiddenPitchers] = useState(new Set());
-  const [activeTooltip, setActiveTooltip] = useState(null);
   const [previousFilterState, setPreviousFilterState] = useState({ isFiltering, selectedTeam });
   const [expandedPitchers, setExpandedPitchers] = useState(new Set()); // New state for arsenal expansion
 
@@ -189,31 +192,17 @@ const PitcherMatchupCard = ({
     });
   }, []);
 
-  // Tooltip handlers
-  const showTooltip = useCallback((event, pitcher, handType) => {
-    const tooltipId = `${createSafeId(pitcher.name, pitcher.team)}_${handType}`;
+  // Tooltip handler using GlobalTooltip system
+  const handleBatterGroupClick = useCallback((event, pitcher, handType) => {
+    const safeId = createSafeId(pitcher.name, pitcher.team);
+    const tooltipId = `pitcher_matchup_${safeId}_${handType}`;
     
-    // If clicking the same tooltip, hide it
-    if (activeTooltip === tooltipId) {
-      setActiveTooltip(null);
-      return;
-    }
-    
-    setActiveTooltip(tooltipId);
-    
-    // Use setTimeout to ensure DOM is ready
-    setTimeout(() => {
-      const tooltip = document.getElementById(tooltipId);
-      if (tooltip) {
-        positionTooltip(event, tooltip);
-        
-        // Set up click outside handler
-        setupTooltipCloseHandler(tooltip, () => {
-          setActiveTooltip(null);
-        });
-      }
-    }, 10);
-  }, [activeTooltip]);
+    openTooltip(tooltipId, event.currentTarget, {
+      type: 'pitcher_matchup',
+      pitcher: pitcher,
+      handType: handType
+    });
+  }, [openTooltip]);
 
   // Loading state
   if (isLoading) {
@@ -320,17 +309,39 @@ const PitcherMatchupCard = ({
                       <div className="matchup-stats">
                         <div 
                           className={`matchup-stat ${pitcher.sameHandednessPercentage > 60 ? 'favorable' : ''}`}
-                          onClick={(e) => showTooltip(e, pitcher, 'same')}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('SAME HAND CLICKED:', pitcher.name, 'Event:', e);
+                            handleBatterGroupClick(e, pitcher, 'same');
+                          }}
+                          style={{ 
+                            cursor: 'pointer',
+                            zIndex: 10,
+                            pointerEvents: 'auto',
+                            position: 'relative'
+                          }}
                         >
-                          <span className="matchup-value">{pitcher.sameHandednessPercentage}%</span>
+                          <span className="matchup-value">{Math.round(pitcher.sameHandednessPercentage * 100)}%</span>
                           <span className="matchup-label">same hand</span>
                         </div>
                         
                         <div 
                           className={`matchup-stat ${pitcher.oppositeHandednessPercentage > 60 ? 'tough' : ''}`}
-                          onClick={(e) => showTooltip(e, pitcher, 'opposite')}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('OPPOSITE HAND CLICKED:', pitcher.name, 'Event:', e);
+                            handleBatterGroupClick(e, pitcher, 'opposite');
+                          }}
+                          style={{ 
+                            cursor: 'pointer',
+                            zIndex: 10,
+                            pointerEvents: 'auto',
+                            position: 'relative'
+                          }}
                         >
-                          <span className="matchup-value">{pitcher.oppositeHandednessPercentage}%</span>
+                          <span className="matchup-value">{Math.round(pitcher.oppositeHandednessPercentage * 100)}%</span>
                           <span className="matchup-label">opposite hand</span>
                         </div>
                       </div>
@@ -356,76 +367,6 @@ const PitcherMatchupCard = ({
             </ul>
           </div>
           
-          {/* Hidden Tooltips - for batter lists */}
-          {filteredPitchers.map(pitcher => {
-            const safeId = createSafeId(pitcher.name, pitcher.team);
-            const sameTooltipId = `${safeId}_same`;
-            const oppositeTooltipId = `${safeId}_opposite`;
-            
-            return (
-              <React.Fragment key={safeId}>
-                {/* Same Hand Tooltip */}
-                {activeTooltip === sameTooltipId && (
-                  <div id={sameTooltipId} className="batter-tooltip">
-                    <div className="tooltip-header">
-                      <span>Same-Handed Batters ({pitcher.sameHandedBattersList?.length || 0})</span>
-                      <button 
-                        className="close-tooltip" 
-                        onClick={() => setActiveTooltip(null)}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                    {pitcher.sameHandedBattersList && pitcher.sameHandedBattersList.length > 0 ? (
-                      <ul className="batter-list">
-                        {pitcher.sameHandedBattersList.map((batter, idx) => (
-                          <li key={idx} className="batter-item">
-                            <span className="batter-name">{batter.name}</span>
-                            <span className={`batter-hand ${batter.isSwitch ? 'switch' : ''}`}>
-                              {batter.hand}
-                              {batter.isSwitch && ' (Switch)'}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="no-batters">No specific batter data available</p>
-                    )}
-                  </div>
-                )}
-                
-                {/* Opposite Hand Tooltip */}
-                {activeTooltip === oppositeTooltipId && (
-                  <div id={oppositeTooltipId} className="batter-tooltip">
-                    <div className="tooltip-header">
-                      <span>Opposite-Handed Batters ({pitcher.oppositeHandedBattersList?.length || 0})</span>
-                      <button 
-                        className="close-tooltip" 
-                        onClick={() => setActiveTooltip(null)}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                    {pitcher.oppositeHandedBattersList && pitcher.oppositeHandedBattersList.length > 0 ? (
-                      <ul className="batter-list">
-                        {pitcher.oppositeHandedBattersList.map((batter, idx) => (
-                          <li key={idx} className="batter-item">
-                            <span className="batter-name">{batter.name}</span>
-                            <span className={`batter-hand ${batter.isSwitch ? 'switch' : ''}`}>
-                              {batter.hand}
-                              {batter.isSwitch && ' (Switch)'}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="no-batters">No specific batter data available</p>
-                    )}
-                  </div>
-                )}
-              </React.Fragment>
-            );
-          })}
           
           <div className="matchup-legend">
             <div className="legend-item">

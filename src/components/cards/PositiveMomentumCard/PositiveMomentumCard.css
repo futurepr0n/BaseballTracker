@@ -1,0 +1,230 @@
+/**
+ * Positive Momentum Card Styles
+ * Displays players with positive performance indicators and hot momentum
+ */
+
+.positive-momentum-card .momentum-item {
+  display: grid;
+  grid-template-columns: 60px 1fr auto auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.positive-momentum-card .momentum-item:hover {
+  background-color: rgba(82, 196, 26, 0.05);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.positive-momentum-card .momentum-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 90px;
+}
+
+.positive-momentum-card .momentum-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.positive-momentum-card .momentum-score .stat-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #52c41a;
+  line-height: 1;
+}
+
+.positive-momentum-card .momentum-score .stat-label {
+  font-size: 0.7rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.positive-momentum-card .momentum-level {
+  margin-top: 4px;
+}
+
+.positive-momentum-card .momentum-badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 12px;
+  background-color: rgba(82, 196, 26, 0.1);
+  border: 1px solid rgba(82, 196, 26, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.positive-momentum-card .momentum-factors {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 120px;
+  font-size: 0.85rem;
+}
+
+.positive-momentum-card .factor-count {
+  color: #52c41a;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.positive-momentum-card .top-factor {
+  color: #666;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+  line-height: 1.2;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Player info hover effects */
+.positive-momentum-card .player-info {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.positive-momentum-card .player-info:hover {
+  background-color: rgba(82, 196, 26, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .positive-momentum-card .momentum-item {
+    grid-template-columns: 50px 1fr auto auto;
+    gap: 8px;
+  }
+  
+  .positive-momentum-card .momentum-factors {
+    display: none; /* Hide on mobile to save space */
+  }
+  
+  .positive-momentum-card .momentum-stats {
+    min-width: 70px;
+  }
+  
+  .positive-momentum-card .momentum-score .stat-value {
+    font-size: 1.1rem;
+  }
+  
+  .positive-momentum-card .momentum-badge {
+    font-size: 0.7rem;
+    padding: 1px 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .positive-momentum-card .momentum-item {
+    grid-template-columns: 40px 1fr auto;
+    gap: 6px;
+  }
+  
+  .positive-momentum-card .momentum-level {
+    display: none; /* Hide momentum level on very small screens */
+  }
+}
+
+/* Loading and no-data states */
+.positive-momentum-card .loading-indicator,
+.positive-momentum-card .no-data {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.positive-momentum-card .loading-indicator {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes loading-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Card subtitle styling */
+.positive-momentum-card .card-subtitle {
+  font-size: 0.8rem;
+  color: #52c41a;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+/* Positive momentum specific animations */
+.positive-momentum-card .momentum-item {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.positive-momentum-card .momentum-item:nth-child(1) { animation-delay: 0.1s; }
+.positive-momentum-card .momentum-item:nth-child(2) { animation-delay: 0.15s; }
+.positive-momentum-card .momentum-item:nth-child(3) { animation-delay: 0.2s; }
+.positive-momentum-card .momentum-item:nth-child(4) { animation-delay: 0.25s; }
+.positive-momentum-card .momentum-item:nth-child(5) { animation-delay: 0.3s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Exceptional momentum players get special styling */
+.positive-momentum-card .momentum-item[data-momentum="EXCEPTIONAL"] {
+  background: linear-gradient(135deg, rgba(255, 77, 79, 0.05) 0%, rgba(255, 77, 79, 0.02) 100%);
+  border-left: 3px solid #ff4d4f;
+}
+
+.positive-momentum-card .momentum-item[data-momentum="HIGH"] {
+  background: linear-gradient(135deg, rgba(82, 196, 26, 0.05) 0%, rgba(82, 196, 26, 0.02) 100%);
+  border-left: 3px solid #52c41a;
+}
+
+.positive-momentum-card .momentum-item[data-momentum="GOOD"] {
+  background: linear-gradient(135deg, rgba(24, 144, 255, 0.05) 0%, rgba(24, 144, 255, 0.02) 100%);
+  border-left: 3px solid #1890ff;
+}
+
+/* Tooltip trigger button */
+.positive-momentum-card .tooltip-trigger {
+  background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(82, 196, 26, 0.2);
+}
+
+.positive-momentum-card .tooltip-trigger:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(82, 196, 26, 0.3);
+  background: linear-gradient(135deg, #389e0d 0%, #237804 100%);
+}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { BarChart3, TrendingUp, Target, Loader2, AlertCircle } from 'lucide-react';
+import { useTeamFilter } from '../../TeamFilterContext';
 import './MultiHitDashboardCard.css'; // Import your CSS styles
 
 const MultiHitDashboardCard = () => {
@@ -8,6 +9,7 @@ const MultiHitDashboardCard = () => {
   const [error, setError] = useState(null);
   const [gameData, setGameData] = useState({});
   const [rosterData, setRosterData] = useState([]);
+  const { selectedTeam, includeMatchup, matchupTeam, shouldIncludePlayer } = useTeamFilter();
 
   // Clean player names utility function
   const cleanPlayerName = (nameInput) => {
@@ -108,7 +110,10 @@ const MultiHitDashboardCard = () => {
     const activeData = activeMetric === 'hits' ? gameData.multiHitPerformers : gameData.multiHRPerformers;
     const threshold = activeMetric === 'hits' ? 2 : 1;
     
-    return activeData.map(player => ({
+    // Apply team filtering before mapping and slicing
+    const filteredData = activeData.filter(player => shouldIncludePlayer(player.team));
+    
+    return filteredData.map(player => ({
       name: player.name,
       team: player.team,
       totalMultiGames: activeMetric === 'hits' ? player.totalMultiHitGames : player.totalMultiHRGames,
@@ -118,7 +123,7 @@ const MultiHitDashboardCard = () => {
       performanceCounts: activeMetric === 'hits' ? player.hitDistribution : player.hrDistribution,
       maxPerformance: activeMetric === 'hits' ? player.maxHitsInGame : player.maxHRsInGame
     })).slice(0, 20); // Top 20 for display
-  }, [gameData, activeMetric]);
+  }, [gameData, activeMetric, selectedTeam, includeMatchup, matchupTeam, shouldIncludePlayer]);
 
   const getPerformanceColor = (level, maxLevel) => {
     const intensity = Math.min(level / Math.max(maxLevel, 4), 1);
@@ -344,8 +349,8 @@ const MultiHitDashboardCard = () => {
       <div className="dashboard-footer">
         <div className="footer-content">
           <div className="footer-info">
-            Showing {activeMetric === 'hits' ? 'multi-hit games (2+ hits)' : 'home run games (1+ HR)'} from pre-processed data
-            {gameData.targetDate && <span className="ml-2 text-gray-400">({gameData.targetDate})</span>}
+            Showing {activeMetric === 'hits' ? 'multi-hit games (2+ hits)' : 'home run games (1+ HR)'} - Season-long statistics
+            {gameData.seasonYear && <span className="ml-2 text-gray-400">({gameData.seasonYear} Season)</span>}
           </div>
           <div className="footer-stats">
             <span>Distribution shows frequency of each performance level</span>

@@ -177,6 +177,18 @@ const TimeSlotHitsCard = ({ gameData, currentDate, teams }) => {
                   )}
                   
                   <div className="player-rank" style={{ backgroundColor: '#FF9800' }}>
+                    {teamInfo.logoUrl && (
+                      <>
+                        <img 
+                          src={teamInfo.logoUrl} 
+                          alt="" 
+                          className="rank-logo"
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
                     <span className="rank-number">{index + 1}</span>
                   </div>
                   
@@ -374,6 +386,18 @@ const TimeSlotHRCard = ({ gameData, currentDate, teams }) => {
                   )}
                   
                   <div className="player-rank" style={{ backgroundColor: '#e63946' }}>
+                    {teamInfo.logoUrl && (
+                      <>
+                        <img 
+                          src={teamInfo.logoUrl} 
+                          alt="" 
+                          className="rank-logo"
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
                     <span className="rank-number">{index + 1}</span>
                   </div>
                   

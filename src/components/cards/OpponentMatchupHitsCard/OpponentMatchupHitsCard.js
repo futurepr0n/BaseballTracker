@@ -5,6 +5,7 @@ import {
   fetchRosterData,
   generateMatchupAnalysis 
 } from '../../../services/dataService';
+import './OpponentMatchupHitsCard.css';
 
 const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
   const [matchupData, setMatchupData] = useState([]);
@@ -80,9 +81,14 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
     };
   };
 
+  const getTeamLogo = (teamCode) => {
+    if (!teams[teamCode]) return null;
+    return `/data/logos/${teamCode.toLowerCase()}_logo.png`;
+  };
+
   if (loading) {
     return (
-      <div className="card">
+      <div className="card opponent-matchup-hits-card">
         <h3>🎯 Hits vs Current Opponent</h3>
         <div className="loading-indicator">
           Analyzing opponent matchups...
@@ -97,7 +103,7 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
 
   if (error) {
     return (
-      <div className="card">
+      <div className="card opponent-matchup-hits-card">
         <h3>🎯 Hits vs Current Opponent</h3>
         <div className="no-data">
           Error: {error}
@@ -111,7 +117,7 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
   }
 
   return (
-    <div className="card">
+    <div className="card opponent-matchup-hits-card">
       <h3>🎯 Hits vs Current Opponent</h3>
       <p className="card-subtitle">
         Players with best performance vs today's opponent (min. 3 games)
@@ -131,31 +137,35 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
             {matchupData.map((player, index) => {
               const teamInfo = getTeamInfo(player.playerTeam);
               const opponentInfo = getTeamInfo(player.opponentTeam);
+              // Use same approach as working DayOfWeekHitsCard
+              const teamData = teams && player.playerTeam ? teams[player.playerTeam] : null;
+              const logoUrl = teamData ? teamData.logoUrl : null;
               
               return (
                 <li key={`${player.playerName}_${player.playerTeam}_${index}`} className="player-item">
-                  {/* Team logo background */}
-                  {teamInfo.logoUrl && (
-                    <img 
-                      src={teamInfo.logoUrl} 
-                      alt={`${teamInfo.name} logo`}
-                      className="team-logo-bg"
-                    />
-                  )}
-                  
-                  <div className="player-rank" style={{ backgroundColor: teamInfo.primaryColor }}>
+                  <div className="player-rank" style={{ backgroundColor: teams[player.playerTeam]?.colors?.primary || '#007bff' }}>
+                    {logoUrl && (
+                      <>
+                        <img 
+                          src={logoUrl} 
+                          alt="" 
+                          className="rank-logo"
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
                     <span className="rank-number">{index + 1}</span>
                   </div>
                   
                   <div className="player-info">
                     <div className="player-name">{player.playerName}</div>
-                    <div className="player-team">
-                      {teamInfo.name} vs {opponentInfo.abbreviation || opponentInfo.name}
-                    </div>
+                    <div className="player-team">{player.playerTeam}</div>
                   </div>
                   
                   <div className="player-stat">
-                    <span className="stat-highlight" style={{ color: teamInfo.primaryColor }}>
+                    <span className="stat-highlight" style={{ color: teams[player.playerTeam]?.colors?.primary || '#007bff' }}>
                       {player.hitsPerGame} H/G
                     </span>
                     <small className="stat-note">
@@ -166,6 +176,17 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
                       )}
                     </small>
                   </div>
+                  
+                  {/* Enhanced background logo */}
+                  {logoUrl && (
+                    <img 
+                      src={logoUrl} 
+                      alt="" 
+                      className="team-logo-bg" 
+                      loading="lazy"
+                      aria-hidden="true"
+                    />
+                  )}
                 </li>
               );
             })}
@@ -245,6 +266,11 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
     };
   };
 
+  const getTeamLogo = (teamCode) => {
+    if (!teams[teamCode]) return null;
+    return `/data/logos/${teamCode.toLowerCase()}_logo.png`;
+  };
+
   if (loading) {
     return (
       <div className="card">
@@ -296,30 +322,35 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
             {matchupData.map((player, index) => {
               const teamInfo = getTeamInfo(player.playerTeam);
               const opponentInfo = getTeamInfo(player.opponentTeam);
+              // Use same approach as working DayOfWeekHitsCard
+              const teamData = teams && player.playerTeam ? teams[player.playerTeam] : null;
+              const logoUrl = teamData ? teamData.logoUrl : null;
               
               return (
                 <li key={`${player.playerName}_${player.playerTeam}_${index}`} className="player-item">
-                  {teamInfo.logoUrl && (
-                    <img 
-                      src={teamInfo.logoUrl} 
-                      alt={`${teamInfo.name} logo`}
-                      className="team-logo-bg"
-                    />
-                  )}
-                  
-                  <div className="player-rank" style={{ backgroundColor: '#e63946' }}>
+                  <div className="player-rank" style={{ backgroundColor: teams[player.playerTeam]?.colors?.primary || '#e63946' }}>
+                    {logoUrl && (
+                      <>
+                        <img 
+                          src={logoUrl} 
+                          alt="" 
+                          className="rank-logo"
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
                     <span className="rank-number">{index + 1}</span>
                   </div>
                   
                   <div className="player-info">
                     <div className="player-name">{player.playerName}</div>
-                    <div className="player-team">
-                      {teamInfo.name} vs {opponentInfo.abbreviation || opponentInfo.name}
-                    </div>
+                    <div className="player-team">{player.playerTeam}</div>
                   </div>
                   
                   <div className="player-stat">
-                    <span className="stat-highlight" style={{ color: '#e63946' }}>
+                    <span className="stat-highlight" style={{ color: teams[player.playerTeam]?.colors?.primary || '#e63946' }}>
                       {player.hrsPerGame} HR/G
                     </span>
                     <small className="stat-note">
@@ -329,6 +360,17 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
                       )}
                     </small>
                   </div>
+                  
+                  {/* Enhanced background logo */}
+                  {logoUrl && (
+                    <img 
+                      src={logoUrl} 
+                      alt="" 
+                      className="team-logo-bg" 
+                      loading="lazy"
+                      aria-hidden="true"
+                    />
+                  )}
                 </li>
               );
             })}

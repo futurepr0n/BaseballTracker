@@ -124,6 +124,17 @@
     /* Smooth positioning transitions */
     transition: all 0.2s ease-out;
   }
+  
+  /* Override for pitcher tooltips on desktop */
+  .global-tooltip[data-tooltip-id*="pitcher_hrs"],
+  .global-tooltip[data-tooltip-id*="pitcher_hits"] {
+    width: 600px !important;
+    max-width: 95vw !important;
+    min-width: 600px !important;
+    height: auto !important;
+    max-height: 80vh !important;
+    min-height: 500px !important; /* Restore large window size */
+  }
 }
 
 /* Mobile optimizations */
@@ -149,6 +160,17 @@
   .global-tooltip .close-tooltip {
     height: 32px;
     width: 32px;
+  }
+  
+  /* Override pitcher tooltips on mobile */
+  .global-tooltip[data-tooltip-id*="pitcher_hrs"],
+  .global-tooltip[data-tooltip-id*="pitcher_hits"] {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    min-width: 320px !important;
+    height: auto !important;
+    max-height: 80vh !important;
+    min-height: 60vh !important; /* Restore large window size for mobile */
   }
 }
 
@@ -428,3 +450,623 @@
   text-align: center;
   padding: 20px 0;
 }
+
+/* Pitcher tooltip specific styles */
+.global-tooltip .pitcher-hr-details {
+  padding: 0;
+}
+
+/* Fix content positioning for pitcher tooltips to prevent empty space at top */
+.global-tooltip[data-tooltip-id*="pitcher_hrs"] .tooltip-content,
+.global-tooltip[data-tooltip-id*="pitcher_hits"] .tooltip-content {
+  padding: 16px !important; /* Standard padding */
+  max-height: calc(80vh - 60px) !important; /* Account for header */
+  overflow-y: auto !important;
+  height: auto !important; /* Let content determine height */
+  display: flex !important; /* Use flexbox for proper alignment */
+  flex-direction: column !important;
+  justify-content: flex-start !important; /* Align content to top */
+  align-items: stretch !important;
+}
+
+/* Ensure pitcher summary starts immediately */
+.global-tooltip .pitcher-hr-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 20px 0 !important; /* Remove any top margin */
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.global-tooltip .pitcher-hr-summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.global-tooltip .pitcher-hr-breakdown {
+  margin-bottom: 20px;
+}
+
+.global-tooltip .pitcher-hr-breakdown h4 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.global-tooltip .home-away-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.global-tooltip .stat-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.global-tooltip .venue-label {
+  font-weight: 500;
+  color: #666;
+}
+
+.global-tooltip .venue-stats {
+  color: #333;
+}
+
+.global-tooltip .venue-rate {
+  color: #666;
+  font-size: 0.9rem;
+  margin-left: 4px;
+}
+
+.global-tooltip .pitcher-hr-opponents {
+  margin-bottom: 20px;
+}
+
+.global-tooltip .pitcher-hr-opponents h4 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.global-tooltip .opponents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.global-tooltip .opponent-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.global-tooltip .opponent-stat:last-child {
+  border-bottom: none;
+}
+
+.global-tooltip .opponent-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.global-tooltip .opponent-count {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.global-tooltip .pitcher-hr-recent {
+  margin-bottom: 20px;
+}
+
+.global-tooltip .pitcher-hr-recent h4 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.global-tooltip .recent-games {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.global-tooltip .game-entry {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+
+.global-tooltip .game-entry:last-child {
+  border-bottom: none;
+}
+
+.global-tooltip .game-date {
+  color: #666;
+}
+
+.global-tooltip .game-venue {
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.global-tooltip .game-opponent {
+  font-weight: 500;
+  color: #333;
+}
+
+.global-tooltip .game-hrs {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Positive momentum tooltip specific styles */
+.global-tooltip .positive-momentum-details {
+  padding: 0;
+}
+
+.global-tooltip .momentum-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  background-color: #f6ffed;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #b7eb8f;
+}
+
+.global-tooltip .momentum-summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.global-tooltip .momentum-factors-breakdown {
+  margin-bottom: 20px;
+}
+
+.global-tooltip .momentum-factors-breakdown h4 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.global-tooltip .momentum-factor {
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  border-left: 3px solid #52c41a;
+}
+
+.global-tooltip .factor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.global-tooltip .factor-type {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.global-tooltip .factor-points {
+  background-color: #52c41a;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.global-tooltip .factor-description {
+  color: #666;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.global-tooltip .factor-details {
+  font-size: 0.8rem;
+  color: #888;
+  font-style: italic;
+}
+
+.global-tooltip .current-streak-info {
+  background-color: #fff2e8;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  border: 1px solid #ffbb96;
+}
+
+.global-tooltip .current-streak-info h4 {
+  margin: 0 0 10px 0;
+  color: #fa541c;
+  font-size: 1rem;
+}
+
+.global-tooltip .streak-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.global-tooltip .streak-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.global-tooltip .streak-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.global-tooltip .streak-value {
+  color: #fa541c;
+  font-weight: 600;
+}
+
+.global-tooltip .team-momentum-info {
+  background-color: #e6f7ff;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  border: 1px solid #91d5ff;
+}
+
+.global-tooltip .team-momentum-info h4 {
+  margin: 0 0 10px 0;
+  color: #1890ff;
+  font-size: 1rem;
+}
+
+.global-tooltip .team-momentum-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.global-tooltip .momentum-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.global-tooltip .momentum-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.global-tooltip .momentum-value {
+  color: #1890ff;
+  font-weight: 600;
+}
+
+/* Override for positive momentum tooltips on desktop */
+@media (min-width: 769px) {
+  .global-tooltip[data-tooltip-id*="positive_momentum"] {
+    width: 550px !important;
+    max-width: 95vw !important;
+    min-width: 550px !important;
+    height: auto !important;
+    max-height: 80vh !important;
+    min-height: 400px !important;
+  }
+}
+
+/* Override for positive momentum tooltips on mobile */
+@media (max-width: 768px) {
+  .global-tooltip[data-tooltip-id*="positive_momentum"] {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    min-width: 320px !important;
+    height: auto !important;
+    max-height: 80vh !important;
+    min-height: 50vh !important;
+  }
+}
+
+/* Poor performance tooltip specific styles */
+.global-tooltip .poor-performance-details {
+  padding: 0;
+}
+
+.global-tooltip .risk-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  background-color: #fff5f5;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ffc9c9;
+}
+
+.global-tooltip .risk-summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.global-tooltip .risk-factors-breakdown {
+  margin-bottom: 20px;
+}
+
+.global-tooltip .risk-factors-breakdown h4 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.global-tooltip .risk-factor {
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  border-left: 3px solid #dc3545;
+}
+
+.global-tooltip .factor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.global-tooltip .factor-type {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.global-tooltip .factor-points {
+  background-color: #dc3545;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.global-tooltip .factor-description {
+  color: #666;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.global-tooltip .factor-details {
+  font-size: 0.8rem;
+  color: #888;
+  font-style: italic;
+}
+
+.global-tooltip .recent-performance-info {
+  background-color: #f8f9fa;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  border: 1px solid #e9ecef;
+}
+
+.global-tooltip .recent-performance-info h4 {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.global-tooltip .performance-games {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.global-tooltip .performance-game {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.9rem;
+}
+
+.global-tooltip .performance-game:last-child {
+  border-bottom: none;
+}
+
+.global-tooltip .game-date {
+  color: #666;
+}
+
+.global-tooltip .game-stats {
+  font-weight: 500;
+  color: #333;
+}
+
+.global-tooltip .game-avg {
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.global-tooltip .fatigue-info {
+  background-color: #fff3cd;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  border: 1px solid #ffeaa7;
+}
+
+.global-tooltip .fatigue-info h4 {
+  margin: 0 0 10px 0;
+  color: #856404;
+  font-size: 1rem;
+}
+
+.global-tooltip .fatigue-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.global-tooltip .fatigue-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.global-tooltip .fatigue-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.global-tooltip .fatigue-value {
+  color: #856404;
+  font-weight: 600;
+}
+
+/* Override for poor performance tooltips on desktop */
+@media (min-width: 769px) {
+  .global-tooltip[data-tooltip-id*="poor_performance"] {
+    width: 550px !important;
+    max-width: 95vw !important;
+    min-width: 550px !important;
+    height: auto !important;
+    max-height: 80vh !important;
+    min-height: 400px !important;
+  }
+}
+
+/* Override for poor performance tooltips on mobile */
+@media (max-width: 768px) {
+  .global-tooltip[data-tooltip-id*="poor_performance"] {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    min-width: 320px !important;
+    height: auto !important;
+    max-height: 80vh !important;
+    min-height: 50vh !important;
+  }
+}
+
+/* Pitcher Matchup Tooltip Styles */
+.pitcher-matchup-details h4 {
+  margin: 0 0 12px 0;
+  color: #1f2937;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.matchup-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: #f8fafc;
+  border-radius: 6px;
+}
+
+.matchup-percentage {
+  text-align: center;
+}
+
+.percentage-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.percentage-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.pitcher-hand {
+  font-size: 0.85rem;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.batters-list h5 {
+  margin: 0 0 8px 0;
+  color: #374151;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.batters-grid {
+  display: grid;
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.batter-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  background-color: #f9fafb;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.batter-name {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.batter-team {
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+.batter-hand {
+  color: #4b5563;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.no-batters {
+  text-align: center;
+  padding: 16px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.matchup-context {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+  text-align: center;
+  color: #6b7280;
+}
+
