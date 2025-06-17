@@ -118,22 +118,40 @@ This application integrates with a **FastAPI-based analysis engine** located at 
 - **Real-time Integration**: React service layer (`baseballAnalysisService.js`)
 - **Component Scoring**: Arsenal Matchup (40%), Contextual (20%), Batter Overall (15%), etc.
 
+**Enhanced Features (Version 2.0):**
+- **🛡️ Missing Data Fallbacks**: Automatic fallback to league averages when Baseball Savant scraping fails
+- **📊 Confidence Scoring**: Every prediction includes data quality confidence (0-100%)
+- **⚖️ Dynamic Weight Adjustment**: Component weights automatically adjust based on data availability
+- **🏟️ Team-Based Estimates**: Use team pitching profiles when individual pitcher data unavailable
+- **🎯 Position-Based Profiles**: Different analysis baselines for starters vs relievers
+- **📈 Real-time League Averages**: Calculate current league performance by pitch type
+
 **API Endpoints:**
-- **Primary**: `POST /pitcher-vs-team` - Analyze specific pitcher vs team
+- **Enhanced**: `POST /analyze/pitcher-vs-team` - Analysis with missing data handling
+- **Original**: `POST /pitcher-vs-team` - Original analysis (requires full data)
 - **Health**: `GET /health` - Check API status and data initialization
-- **Search**: `GET /players/search` - Find players by name/type
-- **Batch**: `POST /batch-analysis` - Multiple matchup analysis
+- **Quality**: `GET /analyze/data-quality` - Data quality assessment
+- **Bulk**: `POST /analyze/bulk-predictions` - Multiple matchup analysis
+- **Report**: `POST /analyze/generate-report` - Comprehensive analysis reports
 
 **Integration Points:**
-- **Pinheads Playhouse**: Uses `useBaseballAnalysis()` hook for real-time analysis
+- **Pinheads Playhouse**: Uses enhanced `useBaseballAnalysis()` hook with confidence indicators
 - **Shared Data**: BaseballAPI reads from same data sources as BaseballTracker
-- **Service Layer**: `baseballAnalysisService.js` handles API communication
+- **Service Layer**: `baseballAnalysisService.js` handles API communication with fallback support
+- **Graceful Degradation**: Analysis continues even when external data sources fail
 
 **Starting BaseballAPI:**
 ```bash
 cd ../BaseballAPI
+
+# Enhanced version (recommended)
+python enhanced_main.py
+# Runs on localhost:8000 with missing data handling
+
+# Original version  
 python main.py
-# Runs on localhost:8000
+# Runs on localhost:8000 (requires complete data)
+
 # Data auto-initializes from ../BaseballTracker/build/data
 ```
 
