@@ -1,6 +1,7 @@
 node_modules
 build/
 public/
+public/data/*
 public/data/logos/*
 public/data/2025/*
 public/data/rolling_stats/*
