@@ -6,7 +6,7 @@
  */
 
 // MLB Stadium coordinates (latitude, longitude)
-export const STADIUM_COORDINATES = {
+const STADIUM_COORDINATES = {
   // American League
   'Yankee Stadium': { lat: 40.8296, lng: -73.9262, city: 'New York', state: 'NY', timezone: 'America/New_York' },
   'Fenway Park': { lat: 42.3467, lng: -71.0972, city: 'Boston', state: 'MA', timezone: 'America/New_York' },
@@ -47,7 +47,7 @@ export const STADIUM_COORDINATES = {
 };
 
 // Team to stadium mapping (matches your existing VENUE_MAPPING)
-export const TEAM_TO_STADIUM = {
+const TEAM_TO_STADIUM = {
   'ARI': 'Chase Field',
   'ATL': 'Truist Park',
   'BAL': 'Camden Yards',
@@ -89,7 +89,7 @@ export const TEAM_TO_STADIUM = {
  * @param {number} lng2 - Longitude of second point
  * @returns {number} Distance in miles
  */
-export function calculateDistance(lat1, lng1, lat2, lng2) {
+function calculateDistance(lat1, lng1, lat2, lng2) {
   const R = 3959; // Earth's radius in miles
   const dLat = toRadians(lat2 - lat1);
   const dLng = toRadians(lng2 - lng1);
@@ -115,7 +115,7 @@ function toRadians(degrees) {
  * @param {string} stadium2 - Name of second stadium
  * @returns {number|null} Distance in miles, or null if stadium not found
  */
-export function getStadiumDistance(stadium1, stadium2) {
+function getStadiumDistance(stadium1, stadium2) {
   const coords1 = STADIUM_COORDINATES[stadium1];
   const coords2 = STADIUM_COORDINATES[stadium2];
   
@@ -133,7 +133,7 @@ export function getStadiumDistance(stadium1, stadium2) {
  * @param {string} team2 - Second team abbreviation
  * @returns {number|null} Distance in miles
  */
-export function getTeamDistance(team1, team2) {
+function getTeamDistance(team1, team2) {
   const stadium1 = TEAM_TO_STADIUM[team1];
   const stadium2 = TEAM_TO_STADIUM[team2];
   
@@ -150,7 +150,7 @@ export function getTeamDistance(team1, team2) {
  * @param {number} miles - Distance in miles
  * @returns {string} Travel category: 'local', 'regional', 'long', 'cross-country'
  */
-export function categorizeTravelDistance(miles) {
+function categorizeTravelDistance(miles) {
   if (miles === null || miles === undefined) return 'unknown';
   if (miles < 300) return 'local';        // Same region/nearby cities
   if (miles < 800) return 'regional';     // Within same part of country
@@ -163,7 +163,7 @@ export function categorizeTravelDistance(miles) {
  * @param {string} stadium - Stadium name
  * @returns {Array} Array of {stadium, distance, category} objects
  */
-export function getAllDistancesFrom(stadium) {
+function getAllDistancesFrom(stadium) {
   const baseCoords = STADIUM_COORDINATES[stadium];
   if (!baseCoords) return [];
   
@@ -186,7 +186,7 @@ export function getAllDistancesFrom(stadium) {
  * Find the longest potential trips from each stadium
  * @returns {Object} Map of stadium to longest trip info
  */
-export function getLongestTripsFromEachStadium() {
+function getLongestTripsFromEachStadium() {
   const longestTrips = {};
   
   Object.keys(STADIUM_COORDINATES).forEach(stadium => {
@@ -204,7 +204,7 @@ export function getLongestTripsFromEachStadium() {
  * @param {string} toStadium - Destination stadium
  * @returns {number} Time difference in hours (positive = destination is ahead)
  */
-export function getTimezoneDifference(fromStadium, toStadium) {
+function getTimezoneDifference(fromStadium, toStadium) {
   const fromTz = STADIUM_COORDINATES[fromStadium]?.timezone;
   const toTz = STADIUM_COORDINATES[toStadium]?.timezone;
   
@@ -232,7 +232,7 @@ export function getTimezoneDifference(fromStadium, toStadium) {
  * @param {number} timezoneDiff - Timezone difference in hours
  * @returns {Object} Travel difficulty assessment
  */
-export function assessTravelDifficulty(distance, timezoneDiff) {
+function assessTravelDifficulty(distance, timezoneDiff) {
   let difficultyScore = 0;
   let factors = [];
   
@@ -280,10 +280,24 @@ export function assessTravelDifficulty(distance, timezoneDiff) {
   };
 }
 
-// Export common distance calculations for quick reference
-export const COMMON_DISTANCES = {
+// Common distance calculations for quick reference
+const COMMON_DISTANCES = {
   'coast_to_coast': ['Oakland Coliseum', 'Fenway Park', getStadiumDistance('Oakland Coliseum', 'Fenway Park')],
   'ny_to_la': ['Yankee Stadium', 'Dodger Stadium', getStadiumDistance('Yankee Stadium', 'Dodger Stadium')],
   'miami_to_seattle': ['LoanDepot Park', 'T-Mobile Park', getStadiumDistance('LoanDepot Park', 'T-Mobile Park')],
   'texas_to_toronto': ['Globe Life Field', 'Rogers Centre', getStadiumDistance('Globe Life Field', 'Rogers Centre')]
+};
+
+module.exports = {
+  STADIUM_COORDINATES,
+  TEAM_TO_STADIUM,
+  calculateDistance,
+  getStadiumDistance,
+  getTeamDistance,
+  categorizeTravelDistance,
+  getAllDistancesFrom,
+  getLongestTripsFromEachStadium,
+  getTimezoneDifference,
+  assessTravelDifficulty,
+  COMMON_DISTANCES
 };
