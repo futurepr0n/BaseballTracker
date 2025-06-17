@@ -133,7 +133,7 @@ function updateRostersFile(playersData, gameDate) {
             }
             
             // Update fullName if we have more complete information
-            if (player.name.length > existingRoster.fullName.length) {
+            if (!existingRoster.fullName || player.name.length > existingRoster.fullName.length) {
                 existingRoster.fullName = player.name;
                 playersUpdated++;
             }
