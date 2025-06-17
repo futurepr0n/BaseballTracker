@@ -154,7 +154,8 @@ const PinheadsPlayhouse = () => {
   const [sortOptions, setSortOptions] = useState({});
   const [selectedColumns, setSelectedColumns] = useState([
     'player_name', 'team', 'batter_hand', 'hr_score', 'hr_probability', 'hit_probability', 
-    'recent_avg', 'hr_rate', 'ab_due', 'arsenal_matchup', 'contact_trend', 'pitcher_hand', 'pitcher_trend_dir'
+    'recent_avg', 'hr_rate', 'ab_due', 'arsenal_matchup', 'contact_trend', 'recent_trend_dir', 
+    'pitcher_hand', 'pitcher_trend_dir', 'pitcher_home_hr_total'
   ]);
 
   // Available columns for table display
@@ -192,14 +193,21 @@ const PinheadsPlayhouse = () => {
     { key: 'ev_matchup_score', label: 'EV Matchup' },
     { key: 'hitter_slg', label: 'Hitter SLG' },
     { key: 'pitcher_slg', label: 'Pitcher SLG' },
+    // Trend directions
+    { key: 'recent_trend_dir', label: 'Recent Trend Dir' },
     // Pitcher information (same for all batters)
     { key: 'pitcher_hand', label: 'P Hand' },
     { key: 'pitcher_era', label: 'P ERA' },
     { key: 'pitcher_whip', label: 'P WHIP' },
-    { key: 'pitcher_trend_dir', label: 'P Trend' },
+    { key: 'pitcher_trend_dir', label: 'P Trend Dir' },
     { key: 'pitcher_h_per_game', label: 'P H/Game' },
     { key: 'pitcher_hr_per_game', label: 'P HR/Game' },
-    { key: 'pitcher_k_per_game', label: 'P K/Game' }
+    { key: 'pitcher_k_per_game', label: 'P K/Game' },
+    // Pitcher home stats (comprehensive data)
+    { key: 'pitcher_home_h_total', label: 'P Home H Total' },
+    { key: 'pitcher_home_hr_total', label: 'P Home HR Total' },
+    { key: 'pitcher_home_k_total', label: 'P Home K Total' },
+    { key: 'pitcher_home_games', label: 'P Home Games' }
   ];
 
   // Load JSON data on mount
@@ -233,10 +241,27 @@ const PinheadsPlayhouse = () => {
   useEffect(() => {
     const loadSortOptions = async () => {
       try {
-        const options = await service.getSortOptions();
-        setSortOptions(options.sort_options || {});
+        const response = await service.getSortOptions();
+        // Handle both API response format and fallback format
+        const optionsArray = response.options || response.sort_options || [];
+        
+        // Convert array to key-value object for dropdown compatibility
+        const optionsObject = {};
+        optionsArray.forEach(option => {
+          optionsObject[option.key] = option.label || option.description;
+        });
+        
+        setSortOptions(optionsObject);
       } catch (error) {
         console.error('Failed to load sort options:', error);
+        // Set default options as fallback
+        setSortOptions({
+          'score': 'Overall HR Score',
+          'hr': 'HR Probability',
+          'hit': 'Hit Probability',
+          'reach_base': 'Reach Base Probability',
+          'strikeout': 'Strikeout Probability'
+        });
       }
     };
 
@@ -324,7 +349,7 @@ const PinheadsPlayhouse = () => {
         matchups: validMatchups,
         ...batchParams
       });
-      setPredictions(result.combined_predictions || []);
+      setPredictions(result.predictions || []);
       setAnalysisResults(result);
     } catch (error) {
       setAnalysisError(error.message);
