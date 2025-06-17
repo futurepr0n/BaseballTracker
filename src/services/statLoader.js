@@ -17,6 +17,7 @@
 const fs = require('fs');
 const path = require('path');
 const { parse } = require('csv-parse/sync');
+const playerMappingService = require('./playerMappingService');
 
 // --- Configuration ---
 const BASE_DATA_DIR = path.join('public', 'data');
@@ -56,8 +57,9 @@ function createShortName(fullName) {
 
 /**
  * Updates the rosters.json file with any new players found in the stats
+ * Now integrates with playerMappingService for team change detection
  */
-function updateRostersFile(playersData) {
+function updateRostersFile(playersData, gameDate) {
     console.log('Checking for new players to add to rosters...');
     
     // Read existing rosters
@@ -76,23 +78,71 @@ function updateRostersFile(playersData) {
     }
     
     let newPlayersAdded = 0;
+    let playersUpdated = 0;
     
     for (const player of playersData) {
-        // Check if player already exists in rosters by checking both full name and short name matches
-        const existingPlayer = rosters.find(r => {
-            const teamMatch = r.team === player.team;
-            const nameMatch = r.fullName === player.name || 
-                             r.name === player.name ||
-                             r.fullName === createShortName(player.name) ||
-                             r.name === createShortName(player.name);
-            return teamMatch && nameMatch;
-        });
+        // Use player mapping service to find or create player
+        const mappedPlayer = playerMappingService.findOrCreatePlayer(
+            createShortName(player.name), 
+            player.team, 
+            player.name, 
+            gameDate
+        );
         
-        if (!existingPlayer) {
-            // Create shortened name (first initial + last name)
+        if (!mappedPlayer) {
+            console.warn(`Failed to create player mapping for ${player.name}`);
+            continue;
+        }
+        
+        // Check if player exists in rosters by playerId or name+team match
+        let existingRosterIndex = -1;
+        
+        // First try to find by playerId
+        if (mappedPlayer.playerId) {
+            existingRosterIndex = rosters.findIndex(r => r.playerId === mappedPlayer.playerId);
+        }
+        
+        // If not found by playerId, try name+team match (legacy lookup)
+        if (existingRosterIndex === -1) {
+            existingRosterIndex = rosters.findIndex(r => {
+                const teamMatch = r.team === player.team;
+                const nameMatch = r.fullName === player.name || 
+                                 r.name === createShortName(player.name) ||
+                                 r.fullName === createShortName(player.name) ||
+                                 r.name === player.name;
+                return teamMatch && nameMatch;
+            });
+        }
+        
+        if (existingRosterIndex >= 0) {
+            // Update existing roster entry
+            const existingRoster = rosters[existingRosterIndex];
+            
+            // Add playerId if missing
+            if (!existingRoster.playerId) {
+                existingRoster.playerId = mappedPlayer.playerId;
+                playersUpdated++;
+                console.log(`Added playerId ${mappedPlayer.playerId} to existing roster entry: ${player.name}`);
+            }
+            
+            // Update team if changed
+            if (existingRoster.team !== player.team) {
+                console.log(`Updated team for ${player.name}: ${existingRoster.team} → ${player.team}`);
+                existingRoster.team = player.team;
+                playersUpdated++;
+            }
+            
+            // Update fullName if we have more complete information
+            if (player.name.length > existingRoster.fullName.length) {
+                existingRoster.fullName = player.name;
+                playersUpdated++;
+            }
+        } else {
+            // Create new roster entry
             const shortName = createShortName(player.name);
             
             const newRosterEntry = {
+                playerId: mappedPlayer.playerId,
                 name: shortName,
                 team: player.team,
                 type: player.playerType,
@@ -125,11 +175,11 @@ function updateRostersFile(playersData) {
             
             rosters.push(newRosterEntry);
             newPlayersAdded++;
-            console.log(`Added new player to roster: ${player.name} (${player.team}, ${player.playerType})`);
+            console.log(`Added new player to roster: ${player.name} (${player.team}, ${player.playerType}) with ID ${mappedPlayer.playerId}`);
         }
     }
     
-    if (newPlayersAdded > 0) {
+    if (newPlayersAdded > 0 || playersUpdated > 0) {
         try {
             // Sort rosters by name for consistency
             rosters.sort((a, b) => a.name.localeCompare(b.name));
@@ -139,12 +189,12 @@ function updateRostersFile(playersData) {
             createDirectoryIfNotExists(rostersDir);
             
             fs.writeFileSync(ROSTERS_FILE_PATH, JSON.stringify(rosters, null, 2));
-            console.log(`Successfully updated rosters file with ${newPlayersAdded} new players`);
+            console.log(`Successfully updated rosters file: ${newPlayersAdded} new players, ${playersUpdated} updated`);
         } catch (error) {
             console.error(`Error writing updated rosters file: ${error.message}`);
         }
     } else {
-        console.log('No new players to add to rosters file');
+        console.log('No changes needed for rosters file');
     }
 }
 
@@ -381,7 +431,8 @@ function processStatsFile(csvFilePath) {
     }
 
     // 6. Update Rosters File with New Players
-    updateRostersFile(playersData);
+    const gameDate = `${year}-${monthLower === 'january' ? '01' : monthLower === 'february' ? '02' : monthLower === 'march' ? '03' : monthLower === 'april' ? '04' : monthLower === 'may' ? '05' : monthLower === 'june' ? '06' : monthLower === 'july' ? '07' : monthLower === 'august' ? '08' : monthLower === 'september' ? '09' : monthLower === 'october' ? '10' : monthLower === 'november' ? '11' : '12'}-${dayPadded}`;
+    updateRostersFile(playersData, gameDate);
 
     // 7. Read Existing JSON Data
     let jsonData;

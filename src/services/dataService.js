@@ -1,7 +1,10 @@
 /**
  * Data service for MLB Statistics Tracker
- * Enhanced to support multi-game historical data
+ * Enhanced to support multi-game historical data and team changes
  */
+
+// Note: playerLookupService integration will be handled in component files
+// Keeping legacy functions for backward compatibility
 
 // Cache for loaded data to minimize file reads
 const dataCache = {
@@ -241,14 +244,15 @@ export const fetchPlayerDataForDateRange = async (startDate, initialDaysToLookBa
 };
 
 /**
- * Find most recent stats for a specific player within date range data
+ * Find most recent stats for a specific player (Enhanced with team change support)
  * @param {Object} dateRangeData - Map of date -> player data arrays
  * @param {string} playerName - Player name
  * @param {string} teamAbbr - Team abbreviation
+ * @param {string} gameDate - Optional game date for team validation
  * @returns {Object} Player stats and the date they're from
  */
-export const findMostRecentPlayerStats = (dateRangeData, playerName, teamAbbr) => {
-  // Sort dates from newest to oldest
+export const findMostRecentPlayerStats = (dateRangeData, playerName, teamAbbr, gameDate = null) => {
+  // Legacy implementation - enhanced version available in playerLookupService
   const sortedDates = Object.keys(dateRangeData).sort().reverse();
   
   for (const dateStr of sortedDates) {
@@ -265,11 +269,7 @@ export const findMostRecentPlayerStats = (dateRangeData, playerName, teamAbbr) =
     }
   }
   
-  // No data found
-  return {
-    data: null,
-    date: null
-  };
+  return { data: null, date: null };
 };
 
 /**
@@ -280,7 +280,44 @@ export const findMostRecentPlayerStats = (dateRangeData, playerName, teamAbbr) =
  * @param {number} numGames - Number of games to retrieve (default 3)
  * @returns {Array} Array of player game data objects, each with stats and date
  */
-export const findMultiGamePlayerStats = (dateRangeData, playerName, teamAbbr, numGames = 3) => {
+export const findMultiGamePlayerStats = (dateRangeData, playerName, teamAbbr, numGames = 3, gameDate = null) => {
+  // Legacy implementation - enhanced version available in playerLookupService
+  // Generate cache key
+  const cacheKey = `${playerName}-${teamAbbr}-${numGames}`;
+  
+  // Check cache first
+  if (dataCache.multiGameData[cacheKey]) {
+    return dataCache.multiGameData[cacheKey];
+  }
+  
+  // Sort dates from newest to oldest
+  const sortedDates = Object.keys(dateRangeData).sort().reverse();
+  const games = [];
+  
+  for (const dateStr of sortedDates) {
+    if (games.length >= numGames) break;
+    
+    const playersForDate = dateRangeData[dateStr];
+    const playerData = playersForDate.find(p => 
+      p.name === playerName && p.team === teamAbbr
+    );
+    
+    if (playerData) {
+      games.push({
+        data: playerData,
+        date: dateStr
+      });
+    }
+  }
+  
+  // Cache the result
+  dataCache.multiGameData[cacheKey] = games;
+  
+  return games;
+};
+
+// Legacy function for backwards compatibility
+export const findMultiGamePlayerStatsLegacy = (dateRangeData, playerName, teamAbbr, numGames = 3) => {
   // Generate cache key
   const cacheKey = `${playerName}-${teamAbbr}-${numGames}`;
   
@@ -474,7 +511,99 @@ export const clearCache = () => {
  * @param {Object} dateRangeData - Historical data
  * @returns {Object} Performance stats vs opponent
  */
-export const analyzePlayerVsOpponent = async (playerName, playerTeam, opponentTeam, dateRangeData) => {
+export const analyzePlayerVsOpponent = async (playerName, playerTeam, opponentTeam, dateRangeData, gameDate = null) => {
+  // Legacy implementation - enhanced version available in playerLookupService
+  console.log(`[analyzePlayerVsOpponent] Looking for ${playerName} (${playerTeam}) vs ${opponentTeam}`);
+  
+  let totalGames = 0;
+  let totalAB = 0;
+  let totalHits = 0;
+  let totalHRs = 0;
+  let gameDetails = [];
+  
+  // Process each date in the range
+  const sortedDates = Object.keys(dateRangeData).sort();
+  
+  for (const dateStr of sortedDates) {
+    const playersForDate = dateRangeData[dateStr];
+    const playerData = playersForDate.find(p => 
+      p.name === playerName && p.team === playerTeam
+    );
+    
+    if (playerData) {
+      // Load game data to verify opponent
+      try {
+        const gameData = await fetchGameData(dateStr);
+        if (!gameData || !Array.isArray(gameData.games)) {
+          console.log(`[analyzePlayerVsOpponent] Could not load game data for ${dateStr}, using player count heuristic`);
+          
+          // Fallback: check if opponent team players also played
+          const opponentPlayers = playersForDate.filter(p => p.team === opponentTeam);
+          if (opponentPlayers.length === 0) {
+            continue;
+          }
+        } else {
+          // Verify teams actually played each other
+          const gameExists = gameData.games.some(game => 
+            (game.homeTeam === playerTeam && game.awayTeam === opponentTeam) ||
+            (game.homeTeam === opponentTeam && game.awayTeam === playerTeam)
+          );
+          
+          if (!gameExists) {
+            console.log(`[analyzePlayerVsOpponent] ${dateStr}: Teams did not play each other`);
+            continue;
+          }
+        }
+        
+        // Valid game found
+        totalGames++;
+        totalAB += parseInt(playerData.AB) || 0;
+        totalHits += parseInt(playerData.H) || 0;
+        totalHRs += parseInt(playerData.HR) || 0;
+        
+        gameDetails.push({
+          date: dateStr,
+          AB: playerData.AB || 0,
+          H: playerData.H || 0,
+          HR: playerData.HR || 0,
+          AVG: playerData.AVG || '.000'
+        });
+        
+        console.log(`[analyzePlayerVsOpponent] Found game on ${dateStr}: ${playerName} played vs ${opponentTeam}`);
+      } catch (error) {
+        console.error(`[analyzePlayerVsOpponent] Error processing ${dateStr}:`, error);
+      }
+    }
+  }
+  
+  if (totalGames === 0) {
+    console.log(`[analyzePlayerVsOpponent] No games found for ${playerName} vs ${opponentTeam}`);
+    return {
+      games: 0,
+      AB: 0,
+      hits: 0,
+      homeRuns: 0,
+      average: '.000',
+      details: []
+    };
+  }
+  
+  const average = totalAB > 0 ? (totalHits / totalAB).toFixed(3) : '.000';
+  
+  console.log(`[analyzePlayerVsOpponent] Found ${totalGames} games for ${playerName} vs ${opponentTeam}: ${totalHits}H, ${totalHRs}HR in ${totalAB}AB`);
+  
+  return {
+    games: totalGames,
+    AB: totalAB,
+    hits: totalHits,
+    homeRuns: totalHRs,
+    average: average,
+    details: gameDetails
+  };
+};
+
+// Legacy function for backwards compatibility
+export const analyzePlayerVsOpponentLegacy = async (playerName, playerTeam, opponentTeam, dateRangeData) => {
   const gamesVsOpponent = [];
   const sortedDates = Object.keys(dateRangeData).sort();
   
