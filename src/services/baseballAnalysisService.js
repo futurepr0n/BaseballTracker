@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
 class BaseballAnalysisService {
-  constructor(baseURL = 'http://localhost:8000') {
+  constructor(baseURL = 'https://pinhead.capping.pro') {
     this.baseURL = baseURL;
     this.initialized = false;
   }
