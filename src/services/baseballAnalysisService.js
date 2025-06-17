@@ -4,9 +4,11 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import dashboardContextService from './dashboardContextService';
+import { badgeManager } from '../utils/playerBadgeSystem';
 
 class BaseballAnalysisService {
-  constructor(baseURL = 'https://pinhead.capping.pro') {
+  constructor(baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8000') {
     this.baseURL = baseURL;
     this.initialized = false;
   }
@@ -164,6 +166,125 @@ class BaseballAnalysisService {
   }
 
   /**
+   * Enhance predictions with dashboard context
+   * @param {Array} predictions - Array of prediction objects
+   * @param {string} date - Date for dashboard context (optional)
+   * @returns {Array} Enhanced predictions with dashboard context
+   */
+  async enhancePredictionsWithDashboardContext(predictions, date = null) {
+    if (!predictions || predictions.length === 0) {
+      return predictions;
+    }
+
+    try {
+      // Process predictions in parallel for performance
+      const enhancedPredictions = await Promise.all(
+        predictions.map(async (prediction) => {
+          try {
+            // Get dashboard context for this player
+            const context = await dashboardContextService.getPlayerContext(
+              prediction.player_name,
+              prediction.team,
+              date
+            );
+
+            // Create badges based on context
+            const badges = [];
+            context.badges.forEach(badgeText => {
+              // Parse badge text to extract badge type
+              const badgeType = this.parseBadgeType(badgeText);
+              if (badgeType) {
+                const badge = badgeManager.createBadge(badgeType, {
+                  source: 'dashboard_context'
+                });
+                if (badge) badges.push(badge);
+              }
+            });
+
+            // Calculate standout score
+            const standoutInfo = badgeManager.getStandoutScore(
+              prediction.hr_score || prediction.score || 0,
+              badges
+            );
+
+            // Categorize player
+            const category = badgeManager.categorizePlayer(
+              badges,
+              prediction.hr_score || prediction.score || 0
+            );
+
+            // Generate tooltip content
+            const tooltipContent = badgeManager.generateTooltipContent(badges);
+
+            // Return enhanced prediction
+            return {
+              ...prediction,
+              dashboard_context: {
+                badges: badges.map(badge => badgeManager.formatBadge(badge)),
+                badgeObjects: badges,
+                confidence_boost: context.confidenceBoost,
+                standout_reasons: context.standoutReasons,
+                risk_factors: context.riskFactors,
+                context_summary: context.contextSummary,
+                standout_score: standoutInfo.standoutScore,
+                is_standout: standoutInfo.isStandout,
+                category: category,
+                tooltip_content: tooltipContent
+              },
+              // Add enhanced confidence if it wasn't already present
+              enhanced_confidence: (prediction.confidence || 50) + context.confidenceBoost,
+              // Update hr_score with dashboard boost for sorting
+              enhanced_hr_score: (prediction.hr_score || prediction.score || 0) + context.confidenceBoost
+            };
+          } catch (error) {
+            console.error(`Error enhancing prediction for ${prediction.player_name}:`, error);
+            // Return original prediction if enhancement fails
+            return {
+              ...prediction,
+              dashboard_context: {
+                badges: [],
+                confidence_boost: 0,
+                standout_reasons: [],
+                risk_factors: ['Error loading dashboard context'],
+                context_summary: 'Dashboard context unavailable'
+              }
+            };
+          }
+        })
+      );
+
+      return enhancedPredictions;
+    } catch (error) {
+      console.error('Error enhancing predictions with dashboard context:', error);
+      return predictions; // Return original predictions if enhancement fails
+    }
+  }
+
+  /**
+   * Parse badge text to determine badge type
+   * @param {string} badgeText - Badge text (e.g., "🔥 Hot Streak")
+   * @returns {string|null} Badge type key
+   */
+  parseBadgeType(badgeText) {
+    const badgeMap = {
+      '🔥 Hot Streak': 'HOT_STREAK',
+      '🔥 Active Streak': 'ACTIVE_STREAK',
+      '⚡ Due for HR': 'DUE_FOR_HR',
+      '⚡ HR Candidate': 'HR_CANDIDATE',
+      '📈 Likely Hit': 'LIKELY_HIT',
+      '🎯 Multi-Hit': 'MULTI_HIT',
+      '⚠️ Risk': 'RISK',
+      '🏠 Home Advantage': 'HOME_ADVANTAGE',
+      '⏰ Time Slot': 'TIME_SLOT',
+      '🆚 Matchup Edge': 'MATCHUP_EDGE',
+      '📉 Bounce Back': 'BOUNCE_BACK',
+      '📊 Improved Form': 'IMPROVED_FORM'
+    };
+
+    return badgeMap[badgeText] || null;
+  }
+
+  /**
    * Search for players
    */
   async searchPlayers(query, playerType = null) {
@@ -200,7 +321,9 @@ class BaseballAnalysisService {
     ascending = false,
     limit = 20,
     detailed = false,
-    includeConfidence = true
+    includeConfidence = true,
+    includeDashboardContext = true,
+    date = null
   }) {
     const requestData = {
       pitcher_name: pitcherName,
@@ -211,8 +334,9 @@ class BaseballAnalysisService {
     };
 
     // Try enhanced endpoint first, fallback to original
+    let result;
     try {
-      const result = await this.makeRequest('/analyze/pitcher-vs-team', {
+      result = await this.makeRequest('/analyze/pitcher-vs-team', {
         method: 'POST',
         body: JSON.stringify(requestData)
       });
@@ -221,8 +345,6 @@ class BaseballAnalysisService {
       if (result && result.predictions) {
         result.predictions = result.predictions.map(prediction => this.transformPrediction(prediction));
       }
-      
-      return result;
     } catch (error) {
       console.warn('Enhanced endpoint failed, trying original:', error.message);
       
@@ -236,7 +358,7 @@ class BaseballAnalysisService {
         detailed
       };
       
-      const result = await this.makeRequest('/pitcher-vs-team', {
+      result = await this.makeRequest('/pitcher-vs-team', {
         method: 'POST',
         body: JSON.stringify(fallbackData)
       });
@@ -245,9 +367,20 @@ class BaseballAnalysisService {
       if (result && result.predictions) {
         result.predictions = result.predictions.map(prediction => this.transformPrediction(prediction));
       }
-      
-      return result;
     }
+
+    // Enhance with dashboard context if requested
+    if (includeDashboardContext && result && result.predictions) {
+      try {
+        result.predictions = await this.enhancePredictionsWithDashboardContext(result.predictions, date);
+        result.enhanced_with_dashboard = true;
+      } catch (error) {
+        console.error('Failed to enhance with dashboard context:', error);
+        result.enhanced_with_dashboard = false;
+      }
+    }
+    
+    return result;
   }
 
   /**
