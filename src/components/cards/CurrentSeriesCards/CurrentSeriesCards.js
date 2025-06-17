@@ -345,18 +345,25 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
             {seriesData.map((player, index) => {
               const teamInfo = getTeamInfo(player.team);
               const opponentInfo = getTeamInfo(player.opponent);
+              // Use same approach as working DayOfWeekHitsCard
+              const teamData = teams && player.team ? teams[player.team] : null;
+              const logoUrl = teamData ? teamData.logoUrl : null;
               
               return (
                 <li key={`${player.name}_${player.team}_${index}`} className="player-item">
-                  {teamInfo.logoUrl && (
-                    <img 
-                      src={teamInfo.logoUrl} 
-                      alt={`${teamInfo.name} logo`}
-                      className="team-logo-bg"
-                    />
-                  )}
-                  
                   <div className="player-rank" style={{ backgroundColor: '#2196F3' }}>
+                    {logoUrl && (
+                      <>
+                        <img 
+                          src={logoUrl} 
+                          alt="" 
+                          className="rank-logo"
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
                     <span className="rank-number">{index + 1}</span>
                   </div>
                   
@@ -375,6 +382,17 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
                       {player.gamesInSeries}G | {player.avgInSeries} AVG
                     </small>
                   </div>
+                  
+                  {/* Enhanced background logo */}
+                  {logoUrl && (
+                    <img 
+                      src={logoUrl} 
+                      alt="" 
+                      className="team-logo-bg" 
+                      loading="lazy"
+                      aria-hidden="true"
+                    />
+                  )}
                 </li>
               );
             })}
@@ -552,18 +570,25 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
             {seriesData.map((player, index) => {
               const teamInfo = getTeamInfo(player.team);
               const opponentInfo = getTeamInfo(player.opponent);
+              // Use same approach as working DayOfWeekHitsCard
+              const teamData = teams && player.team ? teams[player.team] : null;
+              const logoUrl = teamData ? teamData.logoUrl : null;
               
               return (
                 <li key={`${player.name}_${player.team}_${index}`} className="player-item">
-                  {teamInfo.logoUrl && (
-                    <img 
-                      src={teamInfo.logoUrl} 
-                      alt={`${teamInfo.name} logo`}
-                      className="team-logo-bg"
-                    />
-                  )}
-                  
                   <div className="player-rank" style={{ backgroundColor: '#e63946' }}>
+                    {logoUrl && (
+                      <>
+                        <img 
+                          src={logoUrl} 
+                          alt="" 
+                          className="rank-logo"
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
                     <span className="rank-number">{index + 1}</span>
                   </div>
                   
@@ -582,6 +607,17 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
                       {player.gamesInSeries} games | {player.hrsPerGameInSeries}/G
                     </small>
                   </div>
+                  
+                  {/* Enhanced background logo */}
+                  {logoUrl && (
+                    <img 
+                      src={logoUrl} 
+                      alt="" 
+                      className="team-logo-bg" 
+                      loading="lazy"
+                      aria-hidden="true"
+                    />
+                  )}
                 </li>
               );
             })}

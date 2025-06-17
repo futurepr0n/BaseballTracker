@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import useTeamFilteredData from '../../useTeamFilter';
+import { useTooltip } from '../../utils/TooltipContext';
+import { createSafeId } from '../../utils/tooltipUtils';
 import './PoorPerformanceCard.css';
 
-const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: teamData }) => {
+const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: teamData, maxItems = 15 }) => {
   const [error, setError] = useState(null);
+  const { openTooltip } = useTooltip();
+
+  // Apply team filtering
+  const filteredData = useTeamFilteredData(poorPerformancePredictions, 'team');
 
   // No useEffect needed - data comes from props
 
@@ -32,32 +39,24 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
     }
   };
 
-  const formatRiskFactors = (riskFactors) => {
-    return riskFactors.map(factor => {
-      switch (factor.type) {
-        case 'consecutive_games_fatigue':
-          return `Fatigue Risk: ${factor.description}`;
-        case 'post_peak_regression':
-          return `Post-Peak Decline: Following strong performance`;
-        case 'rest_day_pattern':
-          return `Rest Day Struggle: ${Math.round(factor.historicalPoorPct * 100)}% poor games historically`;
-        case 'road_series_position':
-          return `Road Series: ${factor.description}`;
-        case 'recent_slump':
-          return `Recent Slump: ${factor.recentAvg} avg (vs ${factor.seasonAvg} season)`;
-        case 'first_game_after_travel':
-          return `Travel Fatigue: ${factor.travelDetails.distance}mi from ${factor.travelDetails.fromVenue}`;
-        case 'last_game_before_travel':
-          return `Pre-Travel Distraction: ${factor.travelDetails.distance}mi trip ahead`;
-        default:
-          return factor.description;
-      }
+  const handlePlayerClick = (player, event) => {
+    const safeId = createSafeId(player.playerName, player.team);
+    const tooltipId = `poor_performance_${safeId}`;
+    
+    openTooltip(tooltipId, event.currentTarget, {
+      type: 'poor_performance',
+      player: player
     });
+  };
+
+  const getTeamLogo = (teamCode) => {
+    if (!teamData[teamCode]) return null;
+    return `/data/logos/${teamCode.toLowerCase()}_logo.png`;
   };
 
   if (isLoading) {
     return (
-      <div className="card poor-performance">
+      <div className="card poor-performance-card">
         <h3>⚠️ Poor Performance Risks</h3>
         <div className="loading-indicator">Loading performance risk analysis...</div>
       </div>
@@ -66,140 +65,110 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
 
   if (error) {
     return (
-      <div className="card poor-performance">
+      <div className="card poor-performance-card">
         <h3>⚠️ Poor Performance Risks</h3>
         <div className="error-message">Error: {error}</div>
       </div>
     );
   }
 
-  if (!poorPerformancePredictions || poorPerformancePredictions.length === 0) {
+  const displayData = filteredData.slice(0, maxItems);
+
+  if (displayData.length === 0) {
     return (
-      <div className="card poor-performance">
+      <div className="card poor-performance-card">
         <h3>⚠️ Poor Performance Risks</h3>
-        <div className="no-data">No significant performance risks identified</div>
+        <div className="no-data">No significant performance risks identified for the selected teams.</div>
       </div>
     );
   }
 
   return (
-    <div className="card poor-performance">
-      <div className="card-header">
-        <h3>⚠️ Poor Performance Risks</h3>
-        <div className="risk-summary">
-          <span className="risk-count high">
-            {poorPerformancePredictions.filter(p => p.riskLevel === 'HIGH').length} High Risk
-          </span>
-          <span className="risk-count medium">
-            {poorPerformancePredictions.filter(p => p.riskLevel === 'MEDIUM').length} Medium Risk
-          </span>
-        </div>
+    <div className="card poor-performance-card">
+      <h3>⚠️ Poor Performance Risks</h3>
+      <div className="card-subtitle">
+        {displayData.filter(p => p.riskLevel === 'HIGH').length} High Risk, {displayData.filter(p => p.riskLevel === 'MEDIUM').length} Medium Risk
       </div>
-
+      
       <div className="scrollable-container">
-        <ul className="risk-list">
-          {poorPerformancePredictions.slice(0, 20).map((prediction, index) => {
-            const team = teamData[prediction.team];
+        <ul className="player-list">
+          {displayData.map((prediction, index) => {
+            const playerKey = `${prediction.playerName}_${prediction.team}`;
             const riskColor = getRiskLevelColor(prediction.riskLevel);
             const riskIcon = getRiskLevelIcon(prediction.riskLevel);
-            const formattedFactors = formatRiskFactors(prediction.riskFactors);
-
+            // Use same approach as working DayOfWeekHitsCard
+            const teamInfo = teamData && prediction.team ? teamData[prediction.team] : null;
+            const logoUrl = teamInfo ? teamInfo.logoUrl : null;
+            
             return (
-              <li key={`${prediction.playerName}_${prediction.team}_${index}`} className="risk-item">
-                {/* Team logo background */}
-                {team && team.logoUrl && (
-                  <div 
-                    className="team-logo-bg"
-                    style={{
-                      backgroundImage: `url(${team.logoUrl})`,
-                      opacity: 0.1
-                    }}
+              <li key={playerKey} className="player-item risk-item">
+                <div className="player-rank" style={{ backgroundColor: teamData[prediction.team]?.colors?.primary || '#333' }}>
+                  {logoUrl && (
+                    <>
+                      <img 
+                        src={logoUrl} 
+                        alt="" 
+                        className="rank-logo"
+                        loading="lazy"
+                        aria-hidden="true"
+                      />
+                      <div className="rank-overlay"></div>
+                    </>
+                  )}
+                  <span className="rank-number">{index + 1}</span>
+                </div>
+                
+                <div className="player-info" onClick={(e) => handlePlayerClick(prediction, e)}>
+                  <div className="player-name">{prediction.playerName}</div>
+                  <div className="player-team">{prediction.team}</div>
+                </div>
+                
+                <div className="player-stat risk-stats">
+                  <div className="risk-score">
+                    <span className="stat-value" style={{ color: riskColor }}>{prediction.totalRiskScore}</span>
+                    <span className="stat-label">Risk Pts</span>
+                  </div>
+                  <div className="risk-level">
+                    <span 
+                      className="risk-badge"
+                      style={{ color: riskColor }}
+                    >
+                      {riskIcon} {prediction.riskLevel}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="risk-factors">
+                  <div className="factor-count">
+                    {prediction.riskFactors.length} factor{prediction.riskFactors.length !== 1 ? 's' : ''}
+                  </div>
+                  <div className="top-factor">
+                    {prediction.riskFactors[0]?.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  </div>
+                </div>
+
+                <button 
+                  className="expand-toggle tooltip-trigger"
+                  onClick={(e) => handlePlayerClick(prediction, e)}
+                  aria-label="View detailed risk analysis"
+                >
+                  ℹ️
+                </button>
+                
+                {/* Enhanced background logo */}
+                {logoUrl && (
+                  <img 
+                    src={logoUrl} 
+                    alt="" 
+                    className="team-logo-bg" 
+                    loading="lazy"
+                    aria-hidden="true"
                   />
                 )}
-                
-                <div className="risk-content">
-                  <div className="player-info">
-                    <div className="player-header">
-                      <span className="player-name">{prediction.playerName}</span>
-                      <span className="team-name" style={{ color: team?.primaryColor || '#333' }}>
-                        {prediction.team}
-                      </span>
-                    </div>
-                    
-                    <div className="risk-score">
-                      <span className="risk-icon">{riskIcon}</span>
-                      <span 
-                        className="score-value"
-                        style={{ color: riskColor, fontWeight: 'bold' }}
-                      >
-                        {prediction.totalRiskScore} pts
-                      </span>
-                      <span 
-                        className="risk-level"
-                        style={{ 
-                          color: riskColor,
-                          backgroundColor: `${riskColor}20`,
-                          padding: '2px 6px',
-                          borderRadius: '3px',
-                          fontSize: '0.7rem'
-                        }}
-                      >
-                        {prediction.riskLevel}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="risk-factors">
-                    {formattedFactors.map((factor, factorIndex) => (
-                      <div key={factorIndex} className="risk-factor">
-                        <span className="factor-text">{factor}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Recent performance indicator */}
-                  {prediction.analysis?.gameHistory && (
-                    <div className="recent-performance">
-                      <span className="performance-label">Last 5:</span>
-                      <div className="performance-dots">
-                        {prediction.analysis.gameHistory.slice(-5).map((game, gameIndex) => {
-                          const hitRate = game.hits / Math.max(game.atBats, 1);
-                          const dotColor = hitRate >= 0.300 ? '#28a745' : 
-                                          hitRate >= 0.150 ? '#ffc107' : '#dc3545';
-                          return (
-                            <span
-                              key={gameIndex}
-                              className="performance-dot"
-                              style={{ backgroundColor: dotColor }}
-                              title={`${game.hits}/${game.atBats} (${(hitRate * 100).toFixed(0)}%)`}
-                            />
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </div>
               </li>
             );
           })}
         </ul>
-      </div>
-
-      <div className="card-footer">
-        <div className="legend">
-          <span className="legend-item">
-            <span className="legend-dot" style={{ backgroundColor: '#dc3545' }}></span>
-            High Risk (50+ pts)
-          </span>
-          <span className="legend-item">
-            <span className="legend-dot" style={{ backgroundColor: '#fd7e14' }}></span>
-            Medium Risk (25-49 pts)
-          </span>
-          <span className="legend-item">
-            <span className="legend-dot" style={{ backgroundColor: '#ffc107' }}></span>
-            Low Risk (15-24 pts)
-          </span>
-        </div>
       </div>
     </div>
   );

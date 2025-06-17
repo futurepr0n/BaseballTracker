@@ -228,6 +228,18 @@ const HitDroughtBounceBackCard = ({ gameData, currentDate, teams }) => {
                   )}
                   
                   <div className="player-rank" style={{ backgroundColor: '#4CAF50' }}>
+                    {teamInfo.logoUrl && (
+                      <>
+                        <img 
+                          src={teamInfo.logoUrl} 
+                          alt="" 
+                          className="rank-logo"
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
                     <span className="rank-number">{index + 1}</span>
                   </div>
                   

@@ -223,16 +223,13 @@ function calculateMultiHitPerformance(playerEntries) {
  * Generate comprehensive multi-hit performance data
  */
 function generateMultiHitStats(seasonData, targetDate = new Date()) {
-  console.log(`[generateMultiHitStats] Generating multi-hit performance data up to ${targetDate.toDateString()}`);
+  console.log(`[generateMultiHitStats] Generating season-long multi-hit performance data`);
   
   // Create player tracking map
   const playerGameMap = new Map();
   
-  // Get all dates up to the target date, sorted chronologically
-  const targetDateStr = targetDate.toISOString().split('T')[0];
-  const allDates = Object.keys(seasonData)
-    .filter(dateKey => dateKey <= targetDateStr)
-    .sort();
+  // Get ALL dates for season-long analysis, sorted chronologically
+  const allDates = Object.keys(seasonData).sort();
   
   console.log(`[generateMultiHitStats] Processing ${allDates.length} dates for multi-hit analysis`);
   
@@ -318,7 +315,8 @@ function generateMultiHitStats(seasonData, targetDate = new Date()) {
 
   return {
     generatedAt: new Date().toISOString(),
-    targetDate: targetDateStr,
+    dataType: "season-long",
+    seasonYear: "2025",
     
     // Top performers for quick dashboard display
     topMultiHitPerformers: allMultiHitPerformers.slice(0, 20),

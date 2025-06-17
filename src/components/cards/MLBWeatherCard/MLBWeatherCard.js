@@ -10,6 +10,7 @@ import {
   getWindSpeedClass,
   getWindFactorClass 
 } from './stylingUtils';
+import { useTeamFilter } from '../../TeamFilterContext';
 import './MLBWeatherCard.css';
 
 /**
@@ -93,6 +94,7 @@ const MLBWeatherCard = ({ teams }) => {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { selectedTeam, includeMatchup, matchupTeam, shouldIncludePlayer } = useTeamFilter();
 
   useEffect(() => {
     const fetchGameData = async () => {
@@ -159,7 +161,8 @@ const MLBWeatherCard = ({ teams }) => {
         );
         
         // Filter out any games we skipped (e.g., neutral site games not in our data)
-        setGames(gamesWithWeather.filter(g => g !== null));
+        const validGames = gamesWithWeather.filter(g => g !== null);
+        setGames(validGames);
       } catch (err) {
         setError('Failed to fetch weather data');
         console.error(err);
@@ -170,6 +173,24 @@ const MLBWeatherCard = ({ teams }) => {
 
     fetchGameData();
   }, []);
+
+  // Apply team filtering to games
+  const filteredGames = React.useMemo(() => {
+    if (!selectedTeam) return games;
+    
+    return games.filter(game => {
+      const homeTeamAbbr = teams ? Object.keys(teams).find(key => 
+        teams[key].name === game.homeTeam || teams[key].abbreviation === game.homeTeam
+      ) : null;
+      
+      const awayTeamAbbr = teams ? Object.keys(teams).find(key => 
+        teams[key].name === game.awayTeam || teams[key].abbreviation === game.awayTeam
+      ) : null;
+      
+      // Check if either team should be included based on team filter
+      return shouldIncludePlayer(homeTeamAbbr) || shouldIncludePlayer(awayTeamAbbr);
+    });
+  }, [games, selectedTeam, includeMatchup, matchupTeam, shouldIncludePlayer, teams]);
 
   return (
     <div className="card mlb-weather-card">
@@ -192,15 +213,15 @@ const MLBWeatherCard = ({ teams }) => {
           </div>
         )}
         
-        {!loading && !error && games.length === 0 && (
+        {!loading && !error && filteredGames.length === 0 && (
           <div className="empty-state">
-            <p>No games scheduled for today</p>
+            <p>{selectedTeam ? 'No games for selected team(s) today' : 'No games scheduled for today'}</p>
           </div>
         )}
         
-        {!loading && !error && games.length > 0 && (
+        {!loading && !error && filteredGames.length > 0 && (
           <div className="weather-cards-scroll-container">
-            {games.map(game => (
+            {filteredGames.map(game => (
               <MiniGameWeatherCard key={game.id} game={game} />
             ))}
           </div>

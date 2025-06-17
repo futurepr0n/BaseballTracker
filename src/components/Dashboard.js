@@ -12,6 +12,7 @@ import GlobalTooltip from './utils/GlobalTooltip';
 import { createSafeId } from './utils/tooltipUtils';
 
 import PoorPerformanceCard from './cards/PoorPerformanceCard/PoorPerformanceCard';
+import PositiveMomentumCard from './cards/PositiveMomentumCard/PositiveMomentumCard';
 
 
 // Import individual card components
@@ -136,6 +137,9 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
 
   const [poorPerformancePredictions, setPoorPerformancePredictions] = useState([]);
   const [poorPerformanceLoading, setPoorPerformanceLoading] = useState(true);
+  
+  const [positiveMomentumPredictions, setPositiveMomentumPredictions] = useState([]);
+  const [positiveMomentumLoading, setPositiveMomentumLoading] = useState(true);
 
   // Simple effect to populate slot machine data from existing sources
   useEffect(() => {
@@ -234,6 +238,53 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
   
   loadPoorPerformancePredictions();
 }, [currentDate, isFiltering, shouldIncludePlayer]); // Same dependencies as your HR predictions
+
+useEffect(() => {
+  const loadPositiveMomentumPredictions = async () => {
+    try {
+      setPositiveMomentumLoading(true);
+      
+      // Format date for file name (matching your HR prediction pattern)
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+      
+      // Try to load the specific date file first
+      let response = await fetch(`/data/predictions/positive_performance_predictions_${dateStr}.json`);
+      
+      // If not found, try to load the latest predictions
+      if (!response.ok) {
+        response = await fetch('/data/predictions/positive_performance_predictions_latest.json');
+      }
+      
+      if (!response.ok) {
+        console.warn('No positive momentum predictions found');
+        setPositiveMomentumPredictions([]);
+      } else {
+        const data = await response.json();
+        let predictions = data.predictions || [];
+        
+        // Apply team filtering if needed (matching your HR prediction logic)
+        if (isFiltering) {
+          predictions = predictions.filter(player => 
+            shouldIncludePlayer(player.team)
+          );
+        }
+        
+        setPositiveMomentumPredictions(predictions);
+        console.log(`Loaded ${predictions.length} positive momentum predictions`);
+      }
+    } catch (error) {
+      console.error('Error loading positive momentum predictions:', error);
+      setPositiveMomentumPredictions([]);
+    } finally {
+      setPositiveMomentumLoading(false);
+    }
+  };
+  
+  loadPositiveMomentumPredictions();
+}, [currentDate, isFiltering, shouldIncludePlayer]); // Same dependencies as other predictions
 
 
   // Filter player data based on team selection
@@ -1320,6 +1371,12 @@ const noFilteredData = isFiltering &&
   <PoorPerformanceCard 
     poorPerformancePredictions={poorPerformancePredictions}
     isLoading={poorPerformanceLoading}
+    teams={teamData}
+  />
+
+  {/* Positive Momentum Players Card */}
+  <PositiveMomentumCard 
+    currentDate={currentDate}
     teams={teamData}
   />
 

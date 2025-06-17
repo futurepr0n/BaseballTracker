@@ -177,7 +177,7 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  min-height: 450px;
+  min-height: 0;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -423,9 +423,11 @@
 /* Footer - MINIMAL */
 .dashboard-footer {
   margin-top: 6px;
-  padding-top: 4px;
+  padding: 4px 0;
   border-top: 1px solid #e5e7eb;
   flex-shrink: 0;
+  min-height: 40px;
+  background: white;
 }
 
 .footer-content {
@@ -434,6 +436,38 @@
   align-items: center;
   font-size: 9px;
   color: #6b7280;
+  gap: 8px;
+}
+
+.footer-info {
+  flex: 1;
+  text-align: left;
+}
+
+.footer-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.footer-legend {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.footer-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 8px;
+}
+
+.footer-legend-color {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
 }
 
 /* MOBILE RESPONSIVE - PORTRAIT TWO-ROW LAYOUT */
@@ -471,7 +505,7 @@
   }
   
   .rankings-scroll {
-    min-height: 380px;
+    min-height: 0;
   }
   
   /* Two-row layout */
@@ -576,7 +610,7 @@
   }
   
   .rankings-scroll {
-    min-height: 280px;
+    min-height: 0;
   }
   
   .player-row {
@@ -622,7 +656,7 @@
   }
   
   .rankings-scroll {
-    min-height: 320px;
+    min-height: 0;
   }
   
   .player-row {

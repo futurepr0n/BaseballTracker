@@ -54,6 +54,7 @@ export const TEAM_TO_STADIUM = {
   'BOS': 'Fenway Park',
   'CHC': 'Wrigley Field',
   'CHW': 'Guaranteed Rate Field',
+  'CWS': 'Guaranteed Rate Field',
   'CIN': 'Great American Ball Park',
   'CLE': 'Progressive Field',
   'COL': 'Coors Field',
