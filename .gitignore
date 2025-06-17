@@ -111,3 +111,7 @@ public/data/stats/hitterpitcharsenalstats_2025.csv
 public/data/stats/pitcherarsenalstats_2025.csv
 .claude/settings.local.json
 issue/
+public/data/predictions/hr_predictions_latest.json
+public/data/predictions/player_performance_latest.json
+public/data/stats/hitterpitcharsenalstats_2025.csv
+public/data/stats/pitcherpitcharsenalstats_2025.csv
