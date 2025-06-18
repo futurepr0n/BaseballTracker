@@ -430,46 +430,7 @@ const PinheadsPlayhouse = () => {
     }
   };
 
-  // Render loading state
-  if (apiLoading) {
-    return (
-      <div className="pinheads-playhouse">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <h2>Loading Analysis System...</h2>
-          <p>Initializing baseball data and models...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Render error state
-  if (apiError) {
-    return (
-      <div className="pinheads-playhouse">
-        <div className="error-container">
-          <h2>System Error</h2>
-          <p>{apiError}</p>
-          <button onClick={() => window.location.reload()}>Reload Page</button>
-        </div>
-      </div>
-    );
-  }
-
-  // Render not initialized state
-  if (!initialized) {
-    return (
-      <div className="pinheads-playhouse">
-        <div className="initializing-container">
-          <h2>Initializing Data...</h2>
-          <p>Please wait while the baseball analysis system loads.</p>
-          <div className="loading-spinner"></div>
-        </div>
-      </div>
-    );
-  }
-
-  // Filter predictions based on dashboard context
+  // Filter predictions based on dashboard context (moved before early returns)
   const filteredPredictions = useMemo(() => {
     if (!predictions || predictions.length === 0) return [];
 
@@ -528,6 +489,45 @@ const PinheadsPlayhouse = () => {
       return true;
     });
   }, [predictions, dashboardFilters]);
+
+  // Render loading state
+  if (apiLoading) {
+    return (
+      <div className="pinheads-playhouse">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <h2>Loading Analysis System...</h2>
+          <p>Initializing baseball data and models...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Render error state
+  if (apiError) {
+    return (
+      <div className="pinheads-playhouse">
+        <div className="error-container">
+          <h2>System Error</h2>
+          <p>{apiError}</p>
+          <button onClick={() => window.location.reload()}>Reload Page</button>
+        </div>
+      </div>
+    );
+  }
+
+  // Render not initialized state
+  if (!initialized) {
+    return (
+      <div className="pinheads-playhouse">
+        <div className="initializing-container">
+          <h2>Initializing Data...</h2>
+          <p>Please wait while the baseball analysis system loads.</p>
+          <div className="loading-spinner"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pinheads-playhouse">

@@ -173,14 +173,19 @@ class BaseballAnalysisService {
    */
   async enhancePredictionsWithDashboardContext(predictions, date = null) {
     if (!predictions || predictions.length === 0) {
+      console.log(`❌ No predictions to enhance`);
       return predictions;
     }
+
+    console.log(`🔄 Starting enhancement for ${predictions.length} predictions`);
 
     try {
       // Process predictions in parallel for performance
       const enhancedPredictions = await Promise.all(
-        predictions.map(async (prediction) => {
+        predictions.map(async (prediction, index) => {
           try {
+            console.log(`🔄 Enhancing prediction ${index + 1}: ${prediction.player_name} (${prediction.team})`);
+            
             // Get dashboard context for this player
             const context = await dashboardContextService.getPlayerContext(
               prediction.player_name,
@@ -372,12 +377,20 @@ class BaseballAnalysisService {
     // Enhance with dashboard context if requested
     if (includeDashboardContext && result && result.predictions) {
       try {
+        console.log(`🎯 Enhancing ${result.predictions.length} predictions with dashboard context`);
         result.predictions = await this.enhancePredictionsWithDashboardContext(result.predictions, date);
         result.enhanced_with_dashboard = true;
+        console.log(`✅ Dashboard enhancement complete`);
       } catch (error) {
         console.error('Failed to enhance with dashboard context:', error);
         result.enhanced_with_dashboard = false;
       }
+    } else {
+      console.log(`❌ Dashboard enhancement skipped:`, {
+        includeDashboardContext,
+        hasResult: !!result,
+        hasPredictions: !!(result && result.predictions)
+      });
     }
     
     return result;

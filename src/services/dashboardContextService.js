@@ -4,12 +4,34 @@
  * for enhanced baseball analysis and predictions
  */
 
-import { dataService } from './dataService';
+// Dashboard Context Service - aggregates all dashboard card data
 
 class DashboardContextService {
   constructor() {
     this.cache = new Map();
     this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
+  }
+
+  /**
+   * Helper method to load prediction data files
+   */
+  async loadPredictionData(type, date) {
+    try {
+      const dateStr = date || new Date().toISOString().split('T')[0];
+      const fileName = `${type}_${dateStr.replace(/-/g, '-')}.json`;
+      
+      let response = await fetch(`/data/predictions/${fileName}`);
+      if (!response.ok) {
+        // Try latest fallback
+        response = await fetch(`/data/predictions/${type}_latest.json`);
+        if (!response.ok) return null;
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error(`Error loading ${type} data:`, error);
+      return null;
+    }
   }
 
   /**
@@ -22,10 +44,14 @@ class DashboardContextService {
   async getPlayerContext(playerName, team, date = null) {
     const cacheKey = `${playerName}-${team}-${date || 'today'}`;
     
+    // Add debugging
+    console.log(`🔍 Getting dashboard context for: ${playerName} (${team})`);
+    
     // Check cache first
     if (this.cache.has(cacheKey)) {
       const cached = this.cache.get(cacheKey);
       if (Date.now() - cached.timestamp < this.cacheTimeout) {
+        console.log(`📄 Using cached context for ${playerName}`);
         return cached.data;
       }
     }
@@ -79,6 +105,12 @@ class DashboardContextService {
         timestamp: Date.now()
       });
 
+      console.log(`🎯 Final context for ${playerName}:`, {
+        badges: context.badges,
+        confidenceBoost: context.confidenceBoost,
+        standoutReasons: context.standoutReasons
+      });
+
       return context;
 
     } catch (error) {
@@ -100,13 +132,36 @@ class DashboardContextService {
    */
   async checkHitStreakCard(playerName, team, date) {
     try {
-      const data = await dataService.loadPredictionData('hit_streak_analysis', date);
-      if (!data || !data.players) return null;
+      console.log(`🔥 Checking hit streak for: ${playerName} (${team})`);
+      const data = await this.loadPredictionData('hit_streak_analysis', date);
+      if (!data) {
+        console.log(`❌ No hit streak data found`);
+        return null;
+      }
 
-      return data.players.find(player => 
+      // The hit streak data has 'hitStreaks' not 'players'
+      const players = data.hitStreaks || data.players;
+      if (!players) {
+        console.log(`❌ No hitStreaks/players array found`);
+        return null;
+      }
+
+      console.log(`📊 Found ${players.length} players in hit streak data`);
+      
+      const foundPlayer = players.find(player => 
         this.matchPlayerName(player.name, playerName) && 
         this.matchTeam(player.team, team)
       );
+
+      if (foundPlayer) {
+        console.log(`✅ Found ${playerName} with ${foundPlayer.currentStreak} game streak`);
+      } else {
+        console.log(`❌ ${playerName} not found in hit streak data`);
+        // Debug: show available players
+        console.log(`Available players:`, players.map(p => `${p.name} (${p.team})`));
+      }
+
+      return foundPlayer;
     } catch (error) {
       console.error('Error checking hit streak card:', error);
       return null;
@@ -118,7 +173,7 @@ class DashboardContextService {
    */
   async checkHRPredictionCard(playerName, team, date) {
     try {
-      const data = await dataService.loadPredictionData('hr_predictions', date);
+      const data = await this.loadPredictionData('hr_predictions', date);
       if (!data || !data.predictions) return null;
 
       const playerIndex = data.predictions.findIndex(player => 
@@ -141,7 +196,7 @@ class DashboardContextService {
    */
   async checkLikelyToHitCard(playerName, team, date) {
     try {
-      const data = await dataService.loadPredictionData('player_performance', date);
+      const data = await this.loadPredictionData('player_performance', date);
       if (!data || !data.likely_to_hit) return null;
 
       return data.likely_to_hit.find(player => 
@@ -159,7 +214,7 @@ class DashboardContextService {
    */
   async checkMultiHitCard(playerName, team, date) {
     try {
-      const data = await dataService.loadData('multi_hit_stats', date);
+      const data = await this.loadPredictionData('multi_hit_stats', date);
       if (!data || !data.players) return null;
 
       return data.players.find(player => 
@@ -177,7 +232,7 @@ class DashboardContextService {
    */
   async checkPoorPerformanceCard(playerName, team, date) {
     try {
-      const data = await dataService.loadPredictionData('poor_performance_predictions', date);
+      const data = await this.loadPredictionData('poor_performance_predictions', date);
       if (!data || !data.predictions) return null;
 
       return data.predictions.find(player => 
@@ -195,7 +250,7 @@ class DashboardContextService {
    */
   async checkTimeSlotCards(playerName, team, date) {
     try {
-      const data = await dataService.loadPredictionData('day_of_week_hits', date);
+      const data = await this.loadPredictionData('day_of_week_hits', date);
       if (!data || !data.players) return null;
 
       return data.players.find(player => 
@@ -226,18 +281,26 @@ class DashboardContextService {
    * Process hit streak data and update context
    */
   processHitStreakData(context, hitStreakData) {
-    if (!hitStreakData) return;
+    if (!hitStreakData) {
+      console.log(`🔥 No hit streak data to process`);
+      return;
+    }
 
     const streakLength = hitStreakData.currentStreak || hitStreakData.streak || 0;
+    console.log(`🔥 Processing hit streak: ${streakLength} games`);
     
     if (streakLength >= 8) {
       context.badges.push('🔥 Hot Streak');
       context.confidenceBoost += 15;
       context.standoutReasons.push(`${streakLength}-game hit streak (elite level)`);
+      console.log(`✅ Added Hot Streak badge (${streakLength} games)`);
     } else if (streakLength >= 5) {
       context.badges.push('🔥 Active Streak');
       context.confidenceBoost += 10;
       context.standoutReasons.push(`${streakLength}-game hit streak`);
+      console.log(`✅ Added Active Streak badge (${streakLength} games)`);
+    } else {
+      console.log(`❌ Streak too short for badge (${streakLength} games)`);
     }
   }
 
