@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useBaseballAnalysis } from '../../services/baseballAnalysisService';
+import batchSummaryService from '../../services/batchSummaryService';
+import BatchSummarySection from '../BatchSummarySection';
 import './PinheadsPlayhouse.css';
 
 
@@ -145,6 +147,11 @@ const PinheadsPlayhouse = () => {
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState(null);
 
+  // Batch summary state
+  const [batchSummary, setBatchSummary] = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState(null);
+
   // Search state
   const [pitcherSearchTerm, setPitcherSearchTerm] = useState('');
   const [pitcherSearchResults, setPitcherSearchResults] = useState([]);
@@ -166,7 +173,7 @@ const PinheadsPlayhouse = () => {
   const [selectedColumns, setSelectedColumns] = useState([
     'player_name', 'team', 'dashboard_badges', 'standout_score', 'hr_score', 'hr_probability', 'hit_probability', 
     'recent_avg', 'hr_rate', 'ab_due', 'arsenal_matchup', 'enhanced_confidence', 'category',
-    'pitcher_hand', 'pitcher_trend_dir', 'pitcher_home_hr_total'
+    'pitcher_hand', 'pitcher_trend_dir', 'pitcher_home_hr_total', 'stadium_factor', 'pitcher_vulnerability'
   ]);
 
   // Available columns for table display
@@ -219,6 +226,17 @@ const PinheadsPlayhouse = () => {
     { key: 'pitcher_home_hr_total', label: 'P Home HR Total' },
     { key: 'pitcher_home_k_total', label: 'P Home K Total' },
     { key: 'pitcher_home_games', label: 'P Home Games' },
+    
+    // Stadium & Weather Context Columns
+    { key: 'stadium_factor', label: 'Park Factor', description: 'Stadium HR park factor (>1.0 hitter friendly)' },
+    { key: 'stadium_category', label: 'Park Type', description: 'Stadium category (Hitter/Pitcher Friendly)' },
+    { key: 'weather_impact', label: 'Weather', description: 'Weather conditions impact on HR potential' },
+    { key: 'wind_factor', label: 'Wind Factor', description: 'Wind impact on ball flight' },
+    
+    // Enhanced Pitcher Form Columns
+    { key: 'pitcher_form_index', label: 'P Form Index', description: 'Recent pitcher performance index' },
+    { key: 'pitcher_vulnerability', label: 'P Vulnerability', description: 'Pitcher vulnerability to HR (higher = more vulnerable)' },
+    { key: 'pitcher_recent_era', label: 'P Recent ERA', description: 'Pitcher ERA over last 5 starts' },
     
     // Dashboard Context Columns (Enhanced Analysis)
     { key: 'dashboard_badges', label: 'Context', description: 'Dashboard context badges' },
@@ -312,6 +330,35 @@ const PinheadsPlayhouse = () => {
     return () => clearTimeout(timeoutId);
   }, [pitcherSearchTerm, searchPlayers]);
 
+  // Generate batch summary when predictions change
+  useEffect(() => {
+    const generateSummary = async () => {
+      if (!predictions || predictions.length === 0) {
+        setBatchSummary(null);
+        setSummaryLoading(false);
+        setSummaryError(null);
+        return;
+      }
+
+      setSummaryLoading(true);
+      setSummaryError(null);
+
+      try {
+        console.log(`🔄 Generating batch summary for ${predictions.length} predictions`);
+        const summary = await batchSummaryService.generateBatchSummary(predictions, batchMatchups);
+        setBatchSummary(summary);
+        console.log(`✅ Batch summary generated successfully`);
+      } catch (error) {
+        console.error('Error generating batch summary:', error);
+        setSummaryError(error.message);
+        setBatchSummary(null);
+      } finally {
+        setSummaryLoading(false);
+      }
+    };
+
+    generateSummary();
+  }, [predictions, batchMatchups]);
 
   // Prepare dropdown options
   const pitcherOptions = useMemo(() => {
@@ -784,6 +831,14 @@ const PinheadsPlayhouse = () => {
             )}
           </div>
 
+          {/* Batch Summary Section */}
+          <BatchSummarySection
+            summary={batchSummary}
+            loading={summaryLoading}
+            error={summaryError}
+            className="pinheads-batch-summary"
+          />
+
           {/* Dashboard Filtering Controls */}
           <div className="dashboard-filters">
             <h4>🎯 Dashboard Context Filters</h4>
@@ -946,6 +1001,65 @@ const PinheadsPlayhouse = () => {
                         displayValue = formatNumber(value, 3);
                       } else if (colKey === 'pitcher_era' || colKey === 'pitcher_whip') {
                         displayValue = formatNumber(value, 2);
+                      } else if (colKey === 'pitcher_hr_per_game') {
+                        // Calculate HR per game from home stats
+                        const hrTotal = prediction.pitcher_home_hr_total || 0;
+                        const games = prediction.pitcher_home_games || 1;
+                        value = hrTotal / games;
+                        displayValue = formatNumber(value, 2);
+                        className = value > 1.5 ? 'value-poor' : value > 1.0 ? 'value-average' : value > 0.5 ? 'value-good' : 'value-excellent';
+                      } else if (colKey === 'pitcher_h_per_game') {
+                        // Calculate H per game from home stats  
+                        const hTotal = prediction.pitcher_home_h_total || 0;
+                        const games = prediction.pitcher_home_games || 1;
+                        value = hTotal / games;
+                        displayValue = formatNumber(value, 1);
+                        className = value > 10 ? 'value-poor' : value > 8 ? 'value-average' : value > 6 ? 'value-good' : 'value-excellent';
+                      } else if (colKey === 'pitcher_k_per_game') {
+                        // Calculate K per game from home stats
+                        const kTotal = prediction.pitcher_home_k_total || 0;
+                        const games = prediction.pitcher_home_games || 1;
+                        value = kTotal / games;
+                        displayValue = formatNumber(value, 1);
+                        className = value > 8 ? 'value-excellent' : value > 6 ? 'value-good' : value > 4 ? 'value-average' : 'value-poor';
+                      } else if (colKey === 'stadium_factor') {
+                        // Display stadium park factor (placeholder for now - will be enhanced with actual data)
+                        value = prediction.stadium_context?.parkFactor || 1.0;
+                        displayValue = formatNumber(value, 2);
+                        className = value > 1.1 ? 'value-excellent' : value > 1.05 ? 'value-good' : value < 0.9 ? 'value-poor' : value < 0.95 ? 'value-average' : '';
+                      } else if (colKey === 'stadium_category') {
+                        // Display stadium category
+                        displayValue = prediction.stadium_context?.category || 'Neutral';
+                        className = prediction.stadium_context?.isHitterFriendly ? 'value-good' : prediction.stadium_context?.isPitcherFriendly ? 'value-poor' : '';
+                      } else if (colKey === 'weather_impact') {
+                        // Display weather impact
+                        displayValue = prediction.weather_context?.badge || '⛅ Standard';
+                        className = prediction.weather_context?.weatherImpact === 'favorable' ? 'value-good' : 
+                                   prediction.weather_context?.weatherImpact === 'unfavorable' ? 'value-poor' : '';
+                      } else if (colKey === 'wind_factor') {
+                        // Display wind factor
+                        value = prediction.weather_context?.windFactor?.factor || 1.0;
+                        displayValue = formatNumber(value, 2);
+                        className = value > 1.1 ? 'value-excellent' : value > 1.05 ? 'value-good' : value < 0.9 ? 'value-poor' : '';
+                      } else if (colKey === 'pitcher_form_index') {
+                        // Calculate pitcher form index based on recent performance
+                        const recentERA = prediction.pitcher_recent_era || prediction.pitcher_era || 4.5;
+                        const recentHR = (prediction.pitcher_home_hr_total || 0) / (prediction.pitcher_home_games || 1);
+                        value = Math.max(0, 100 - (recentERA * 10) - (recentHR * 20));
+                        displayValue = formatNumber(value, 0);
+                        className = value > 75 ? 'value-excellent' : value > 60 ? 'value-good' : value > 40 ? 'value-average' : 'value-poor';
+                      } else if (colKey === 'pitcher_vulnerability') {
+                        // Calculate pitcher vulnerability to HR
+                        const hrRate = (prediction.pitcher_home_hr_total || 0) / (prediction.pitcher_home_games || 1);
+                        const era = prediction.pitcher_era || 4.5;
+                        value = (hrRate * 50) + (era * 5);
+                        displayValue = formatNumber(value, 1);
+                        className = value > 30 ? 'value-poor' : value > 20 ? 'value-average' : value > 10 ? 'value-good' : 'value-excellent';
+                      } else if (colKey === 'pitcher_recent_era') {
+                        // Display recent ERA (calculated or fallback to season ERA)
+                        value = prediction.pitcher_recent_era || prediction.pitcher_era || 0;
+                        displayValue = formatNumber(value, 2);
+                        className = value > 5.0 ? 'value-poor' : value > 4.0 ? 'value-average' : value > 3.0 ? 'value-good' : 'value-excellent';
                       } else if (colKey === 'contact_trend' || colKey === 'pitcher_trend_dir') {
                         displayValue = value || 'N/A';
                       } else if (colKey === 'batter_hand' || colKey === 'pitcher_hand') {

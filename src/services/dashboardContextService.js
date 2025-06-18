@@ -17,17 +17,37 @@ class DashboardContextService {
    */
   async loadPredictionData(type, date) {
     try {
-      const dateStr = date || new Date().toISOString().split('T')[0];
-      const fileName = `${type}_${dateStr.replace(/-/g, '-')}.json`;
+      // For dashboard context, prioritize latest files for better reliability
+      // since concurrent requests seem to interfere with each other
+      const cacheBuster = Date.now();
       
-      let response = await fetch(`/data/predictions/${fileName}`);
-      if (!response.ok) {
-        // Try latest fallback
-        response = await fetch(`/data/predictions/${type}_latest.json`);
-        if (!response.ok) return null;
+      console.log(`📂 Loading prediction data for type: ${type}`);
+      
+      // Try latest file first (most reliable)
+      let response = await fetch(`/data/predictions/${type}_latest.json?cb=${cacheBuster}`);
+      
+      if (response.ok) {
+        console.log(`✅ Successfully loaded ${type}_latest.json`);
+        const jsonData = await response.json();
+        return jsonData;
       }
       
-      return await response.json();
+      // If latest doesn't exist, try the specific date
+      const dateStr = date || new Date().toISOString().split('T')[0];
+      const fileName = `${type}_${dateStr}.json`;
+      
+      console.log(`📂 Latest not found, trying: ${fileName}`);
+      response = await fetch(`/data/predictions/${fileName}?cb=${cacheBuster}`);
+      
+      if (response.ok) {
+        console.log(`✅ Successfully loaded ${fileName}`);
+        const jsonData = await response.json();
+        return jsonData;
+      }
+      
+      console.log(`❌ No data found for ${type} (tried latest and ${dateStr})`);
+      return null;
+      
     } catch (error) {
       console.error(`Error loading ${type} data:`, error);
       return null;
@@ -68,12 +88,11 @@ class DashboardContextService {
         contextSummary: ''
       };
 
-      // Aggregate data from all dashboard cards
+      // Aggregate data from all dashboard cards (only those with existing files)
       const [
         hitStreakStatus,
         hrPredictionRank,
         likelyToHit,
-        multiHitCandidate,
         poorPerformanceRisk,
         timeSlotAdvantage,
         opponentHistory
@@ -81,7 +100,6 @@ class DashboardContextService {
         this.checkHitStreakCard(playerName, team, date),
         this.checkHRPredictionCard(playerName, team, date),
         this.checkLikelyToHitCard(playerName, team, date),
-        this.checkMultiHitCard(playerName, team, date),
         this.checkPoorPerformanceCard(playerName, team, date),
         this.checkTimeSlotCards(playerName, team, date),
         this.checkOpponentMatchupCards(playerName, team, date)
@@ -91,7 +109,6 @@ class DashboardContextService {
       this.processHitStreakData(context, hitStreakStatus);
       this.processHRPredictionData(context, hrPredictionRank);
       this.processLikelyToHitData(context, likelyToHit);
-      this.processMultiHitData(context, multiHitCandidate);
       this.processPoorPerformanceData(context, poorPerformanceRisk);
       this.processTimeSlotData(context, timeSlotAdvantage);
       this.processOpponentMatchupData(context, opponentHistory);
@@ -396,17 +413,19 @@ class DashboardContextService {
       context.standoutReasons.push(`Appears in ${badgeCount} dashboard cards`);
     }
 
-    // Generate context summary
-    if (boost > 20) {
+    // Generate context summary based on badges and boost
+    if (boost < -10) {
+      context.contextSummary = 'Caution advised - risk factors present';
+    } else if (boost > 20) {
       context.contextSummary = 'High-confidence play with multiple positive indicators';
     } else if (boost > 10) {
       context.contextSummary = 'Solid play with favorable context';
+    } else if (badgeCount > 0) {
+      context.contextSummary = 'Additional context indicators present';
     } else if (boost > 0) {
       context.contextSummary = 'Some positive indicators present';
-    } else if (boost < -10) {
-      context.contextSummary = 'Caution advised - risk factors present';
     } else {
-      context.contextSummary = 'Standard analysis - limited additional context';
+      context.contextSummary = 'Base analysis only';
     }
   }
 
@@ -416,10 +435,55 @@ class DashboardContextService {
   matchPlayerName(name1, name2) {
     if (!name1 || !name2) return false;
     
+    // Clean both names - remove punctuation and extra spaces
     const clean1 = name1.toLowerCase().replace(/[^a-z\s]/g, '').trim();
     const clean2 = name2.toLowerCase().replace(/[^a-z\s]/g, '').trim();
     
-    return clean1 === clean2;
+    // Direct match
+    if (clean1 === clean2) return true;
+    
+    // Handle abbreviated names (e.g., "J. Smith" vs "Josh Smith")
+    const parts1 = clean1.split(/\s+/);
+    const parts2 = clean2.split(/\s+/);
+    
+    // If one name has initials and the other has full first name
+    if (parts1.length >= 2 && parts2.length >= 2) {
+      const lastName1 = parts1[parts1.length - 1];
+      const lastName2 = parts2[parts2.length - 1];
+      
+      // Last names must match
+      if (lastName1 !== lastName2) return false;
+      
+      const firstName1 = parts1[0];
+      const firstName2 = parts2[0];
+      
+      // Check if one is an initial of the other
+      if (firstName1.length === 1 && firstName2.startsWith(firstName1)) return true;
+      if (firstName2.length === 1 && firstName1.startsWith(firstName2)) return true;
+      
+      // Handle middle names/initials - just check if first names match
+      if (firstName1 === firstName2) return true;
+    }
+    
+    // Handle "lastname, firstname" format vs "firstname lastname"
+    if (clean1.includes(',') || clean2.includes(',')) {
+      const normalized1 = this.normalizeNameFormat(clean1);
+      const normalized2 = this.normalizeNameFormat(clean2);
+      return this.matchPlayerName(normalized1, normalized2);
+    }
+    
+    return false;
+  }
+
+  /**
+   * Helper to normalize "lastname, firstname" to "firstname lastname"
+   */
+  normalizeNameFormat(name) {
+    if (name.includes(',')) {
+      const [last, first] = name.split(',').map(s => s.trim());
+      return `${first} ${last}`;
+    }
+    return name;
   }
 
   /**

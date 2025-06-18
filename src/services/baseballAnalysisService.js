@@ -218,6 +218,9 @@ class BaseballAnalysisService {
               prediction.hr_score || prediction.score || 0
             );
 
+            // Debug category assignment
+            console.log(`🏷️ Player ${prediction.player_name}: Category = ${category.label}, Badges = ${badges.length}, Score = ${prediction.hr_score || prediction.score || 0}`);
+
             // Generate tooltip content
             const tooltipContent = badgeManager.generateTooltipContent(badges);
 
@@ -283,7 +286,23 @@ class BaseballAnalysisService {
       '⏰ Time Slot': 'TIME_SLOT',
       '🆚 Matchup Edge': 'MATCHUP_EDGE',
       '📉 Bounce Back': 'BOUNCE_BACK',
-      '📊 Improved Form': 'IMPROVED_FORM'
+      '📊 Improved Form': 'IMPROVED_FORM',
+      // Stadium Context Badges
+      '🚀 Launch Pad': 'LAUNCH_PAD',
+      '🏟️ Hitter Paradise': 'HITTER_PARADISE',
+      '🛡️ Pitcher Fortress': 'PITCHER_FORTRESS',
+      '⚾ Pitcher Park': 'PITCHER_FRIENDLY',
+      // Weather Context Badges
+      '🌪️ Wind Boost': 'WIND_BOOST',
+      '💨 Wind Helper': 'WIND_HELPER',
+      '🔥 Hot Weather': 'HOT_WEATHER',
+      '🏟️ Dome Game': 'DOME_GAME',
+      '🥶 Cold Weather': 'COLD_WEATHER',
+      '🌬️ Wind Against': 'WIND_AGAINST',
+      // Multi-Hit Context Badges
+      '🎯 Multi-Hit Pro': 'MULTI_HIT_SPECIALIST',
+      '📈 Due Multi-Hit': 'DUE_MULTI_HIT',
+      '🔥 Multi-Hit Streak': 'MULTI_HIT_STREAK'
     };
 
     return badgeMap[badgeText] || null;
@@ -405,7 +424,9 @@ class BaseballAnalysisService {
     ascending = false,
     limit = 20,
     applyFilters = null,
-    hittersFilter = null
+    hittersFilter = null,
+    includeDashboardContext = true,
+    date = null
   }) {
     const requestData = {
       matchups,
@@ -424,6 +445,25 @@ class BaseballAnalysisService {
     // Transform the response to match what the React component expects
     if (result && result.predictions) {
       result.predictions = result.predictions.map(prediction => this.transformPrediction(prediction));
+    }
+
+    // Enhance with dashboard context if requested
+    if (includeDashboardContext && result && result.predictions) {
+      try {
+        console.log(`🎯 Enhancing ${result.predictions.length} batch predictions with dashboard context`);
+        result.predictions = await this.enhancePredictionsWithDashboardContext(result.predictions, date);
+        result.enhanced_with_dashboard = true;
+        console.log(`✅ Batch dashboard enhancement complete`);
+      } catch (error) {
+        console.error('Failed to enhance batch predictions with dashboard context:', error);
+        result.enhanced_with_dashboard = false;
+      }
+    } else {
+      console.log(`❌ Batch dashboard enhancement skipped:`, {
+        includeDashboardContext,
+        hasResult: !!result,
+        hasPredictions: !!(result && result.predictions)
+      });
     }
     
     return result;

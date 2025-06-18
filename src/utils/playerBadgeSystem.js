@@ -88,6 +88,100 @@ export const BADGE_TYPES = {
     description: 'Player showing recent improvement in performance',
     confidenceBoost: 6,
     priority: 4
+  },
+  // Stadium Context Badges
+  LAUNCH_PAD: {
+    emoji: '🚀',
+    label: 'Launch Pad',
+    description: 'Playing at extreme hitter-friendly stadium',
+    confidenceBoost: 12,
+    priority: 2
+  },
+  HITTER_PARADISE: {
+    emoji: '🏟️',
+    label: 'Hitter Paradise',
+    description: 'Playing at hitter-friendly stadium',
+    confidenceBoost: 8,
+    priority: 3
+  },
+  PITCHER_FORTRESS: {
+    emoji: '🛡️',
+    label: 'Pitcher Fortress',
+    description: 'Playing at extreme pitcher-friendly stadium',
+    confidenceBoost: -10,
+    priority: 2
+  },
+  PITCHER_FRIENDLY: {
+    emoji: '⚾',
+    label: 'Pitcher Park',
+    description: 'Playing at pitcher-friendly stadium',
+    confidenceBoost: -6,
+    priority: 3
+  },
+  // Weather Context Badges
+  WIND_BOOST: {
+    emoji: '🌪️',
+    label: 'Wind Boost',
+    description: 'Strong favorable wind for home runs',
+    confidenceBoost: 10,
+    priority: 2
+  },
+  WIND_HELPER: {
+    emoji: '💨',
+    label: 'Wind Helper',
+    description: 'Favorable wind conditions',
+    confidenceBoost: 6,
+    priority: 3
+  },
+  HOT_WEATHER: {
+    emoji: '🔥',
+    label: 'Hot Weather',
+    description: 'Hot weather helps ball carry',
+    confidenceBoost: 5,
+    priority: 4
+  },
+  DOME_GAME: {
+    emoji: '🏟️',
+    label: 'Dome Game',
+    description: 'Indoor stadium - controlled conditions',
+    confidenceBoost: 0,
+    priority: 5
+  },
+  COLD_WEATHER: {
+    emoji: '🥶',
+    label: 'Cold Weather',
+    description: 'Cold weather reduces ball flight',
+    confidenceBoost: -8,
+    priority: 3
+  },
+  WIND_AGAINST: {
+    emoji: '🌬️',
+    label: 'Wind Against',
+    description: 'Unfavorable wind conditions',
+    confidenceBoost: -6,
+    priority: 3
+  },
+  // Multi-Hit Context Badges
+  MULTI_HIT_SPECIALIST: {
+    emoji: '🎯',
+    label: 'Multi-Hit Pro',
+    description: 'High multi-hit rate this season',
+    confidenceBoost: 8,
+    priority: 3
+  },
+  DUE_MULTI_HIT: {
+    emoji: '📈',
+    label: 'Due Multi-Hit',
+    description: 'Due for multi-hit game based on patterns',
+    confidenceBoost: 6,
+    priority: 4
+  },
+  MULTI_HIT_STREAK: {
+    emoji: '🔥',
+    label: 'Multi-Hit Streak',
+    description: 'Recent multi-hit performance',
+    confidenceBoost: 7,
+    priority: 3
   }
 };
 
@@ -227,35 +321,10 @@ export class BadgeManager {
     const badgeCount = badges.length;
     const confidenceBoost = this.calculateConfidenceBoost(badges);
     const hasRisk = badges.some(badge => badge.type === 'RISK');
+    const hasHotStreak = badges.some(badge => ['HOT_STREAK', 'ACTIVE_STREAK'].includes(badge.type));
+    const hasHRPotential = badges.some(badge => ['DUE_FOR_HR', 'HR_CANDIDATE'].includes(badge.type));
     
-    // Hidden Gem: Lower base score but high dashboard presence
-    if (baseScore < 70 && badgeCount >= 3 && !hasRisk) {
-      return {
-        category: 'hidden_gem',
-        label: 'Hidden Gem',
-        description: 'High dashboard context, potentially undervalued'
-      };
-    }
-    
-    // High Confidence: High base score + dashboard support
-    if (baseScore >= 80 && confidenceBoost >= 15) {
-      return {
-        category: 'high_confidence',
-        label: 'High Confidence',
-        description: 'Strong metrics with dashboard support'
-      };
-    }
-    
-    // Situational Star: Strong in specific contexts
-    if (badges.some(badge => ['TIME_SLOT', 'MATCHUP_EDGE', 'HOME_ADVANTAGE'].includes(badge.type))) {
-      return {
-        category: 'situational',
-        label: 'Situational Star',
-        description: 'Strong contextual advantages'
-      };
-    }
-    
-    // Risk Warning: Has risk factors
+    // Risk Warning: Has risk factors (highest priority)
     if (hasRisk) {
       return {
         category: 'risk',
@@ -264,11 +333,65 @@ export class BadgeManager {
       };
     }
     
-    // Standard: Limited additional context
+    // High Confidence: High base score + dashboard support
+    if (baseScore >= 70 && confidenceBoost >= 10) {
+      return {
+        category: 'high_confidence',
+        label: 'High Confidence',
+        description: 'Strong metrics with dashboard support'
+      };
+    }
+    
+    // Hidden Gem: Lower base score but strong dashboard presence
+    if (baseScore < 70 && badgeCount >= 2 && confidenceBoost >= 8) {
+      return {
+        category: 'hidden_gem',
+        label: 'Hidden Gem',
+        description: 'High dashboard context, potentially undervalued'
+      };
+    }
+    
+    // Hot Hand: Active hitting streaks
+    if (hasHotStreak) {
+      return {
+        category: 'hot_hand',
+        label: 'Hot Hand',
+        description: 'Currently on a hitting streak'
+      };
+    }
+    
+    // Power Play: HR potential
+    if (hasHRPotential) {
+      return {
+        category: 'power_play',
+        label: 'Power Play',
+        description: 'Strong home run potential'
+      };
+    }
+    
+    // Situational Star: Strong in specific contexts or multiple badges
+    if (badgeCount >= 2 || badges.some(badge => ['TIME_SLOT', 'MATCHUP_EDGE', 'HOME_ADVANTAGE'].includes(badge.type))) {
+      return {
+        category: 'situational',
+        label: 'Situational Star',
+        description: 'Strong contextual advantages'
+      };
+    }
+    
+    // Enhanced: Has any dashboard context
+    if (badgeCount > 0 || confidenceBoost > 0) {
+      return {
+        category: 'enhanced',
+        label: 'Enhanced',
+        description: 'Additional context available'
+      };
+    }
+    
+    // Standard: No additional context
     return {
       category: 'standard',
       label: 'Standard',
-      description: 'Limited additional context'
+      description: 'Base analysis only'
     };
   }
 
