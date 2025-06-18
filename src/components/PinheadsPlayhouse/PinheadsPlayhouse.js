@@ -957,8 +957,26 @@ const PinheadsPlayhouse = () => {
                         }
                       }
 
+                      // Add tooltip for dashboard context columns
+                      let tooltip = '';
+                      if (colKey === 'dashboard_badges' && prediction.dashboard_context) {
+                        tooltip = prediction.dashboard_context.tooltip_content || '';
+                      } else if (colKey === 'context_summary' && prediction.dashboard_context) {
+                        const context = prediction.dashboard_context;
+                        tooltip = `Confidence Boost: ${context.confidence_boost || 0}%\n` +
+                                 `Standout Reasons: ${context.standout_reasons?.join(', ') || 'None'}\n` +
+                                 (context.risk_factors?.length > 0 ? `Risk Factors: ${context.risk_factors.join(', ')}` : '');
+                      } else if (colKey === 'category' && prediction.dashboard_context?.category) {
+                        tooltip = prediction.dashboard_context.category.description || '';
+                      }
+
                       return (
-                        <td key={colKey} className={className}>
+                        <td 
+                          key={colKey} 
+                          className={className}
+                          title={tooltip}
+                          style={tooltip ? { cursor: 'help' } : {}}
+                        >
                           {displayValue}
                         </td>
                       );
