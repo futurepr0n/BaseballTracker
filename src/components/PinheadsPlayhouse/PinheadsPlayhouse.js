@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useBaseballAnalysis } from '../../services/baseballAnalysisService';
+import batchSummaryService from '../../services/batchSummaryService';
+import BatchSummarySection from '../BatchSummarySection';
 import './PinheadsPlayhouse.css';
 
 
@@ -145,17 +147,33 @@ const PinheadsPlayhouse = () => {
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState(null);
 
+  // Batch summary state
+  const [batchSummary, setBatchSummary] = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState(null);
+
   // Search state
   const [pitcherSearchTerm, setPitcherSearchTerm] = useState('');
   const [pitcherSearchResults, setPitcherSearchResults] = useState([]);
   const [showPitcherSearch, setShowPitcherSearch] = useState(false);
 
+  // Dashboard filtering state
+  const [dashboardFilters, setDashboardFilters] = useState({
+    showStandoutOnly: false,
+    showHotStreaksOnly: false,
+    showHiddenGemsOnly: false,
+    showRiskWarningsOnly: false,
+    showSituationalOnly: false,
+    minConfidenceBoost: null,
+    categories: []
+  });
+
   // Sort options
   const [sortOptions, setSortOptions] = useState({});
   const [selectedColumns, setSelectedColumns] = useState([
-    'player_name', 'team', 'batter_hand', 'hr_score', 'hr_probability', 'hit_probability', 
-    'recent_avg', 'hr_rate', 'ab_due', 'arsenal_matchup', 'contact_trend', 'recent_trend_dir', 
-    'pitcher_hand', 'pitcher_trend_dir', 'pitcher_home_hr_total'
+    'player_name', 'team', 'dashboard_badges', 'standout_score', 'hr_score', 'hr_probability', 'hit_probability', 
+    'recent_avg', 'hr_rate', 'ab_due', 'arsenal_matchup', 'enhanced_confidence', 'category',
+    'pitcher_hand', 'pitcher_trend_dir', 'pitcher_home_hr_total', 'stadium_factor', 'pitcher_vulnerability'
   ]);
 
   // Available columns for table display
@@ -207,7 +225,25 @@ const PinheadsPlayhouse = () => {
     { key: 'pitcher_home_h_total', label: 'P Home H Total' },
     { key: 'pitcher_home_hr_total', label: 'P Home HR Total' },
     { key: 'pitcher_home_k_total', label: 'P Home K Total' },
-    { key: 'pitcher_home_games', label: 'P Home Games' }
+    { key: 'pitcher_home_games', label: 'P Home Games' },
+    
+    // Stadium & Weather Context Columns
+    { key: 'stadium_factor', label: 'Park Factor', description: 'Stadium HR park factor (>1.0 hitter friendly)' },
+    { key: 'stadium_category', label: 'Park Type', description: 'Stadium category (Hitter/Pitcher Friendly)' },
+    { key: 'weather_impact', label: 'Weather', description: 'Weather conditions impact on HR potential' },
+    { key: 'wind_factor', label: 'Wind Factor', description: 'Wind impact on ball flight' },
+    
+    // Enhanced Pitcher Form Columns
+    { key: 'pitcher_form_index', label: 'P Form Index', description: 'Recent pitcher performance index' },
+    { key: 'pitcher_vulnerability', label: 'P Vulnerability', description: 'Pitcher vulnerability to HR (higher = more vulnerable)' },
+    { key: 'pitcher_recent_era', label: 'P Recent ERA', description: 'Pitcher ERA over last 5 starts' },
+    
+    // Dashboard Context Columns (Enhanced Analysis)
+    { key: 'dashboard_badges', label: 'Context', description: 'Dashboard context badges' },
+    { key: 'standout_score', label: 'Standout Score', description: 'Enhanced score with dashboard context' },
+    { key: 'enhanced_confidence', label: 'Enhanced Confidence', description: 'Confidence with dashboard boost' },
+    { key: 'context_summary', label: 'Summary', description: 'Context summary' },
+    { key: 'category', label: 'Category', description: 'Player category (Hidden Gem, High Confidence, etc.)' }
   ];
 
   // Load JSON data on mount
@@ -260,7 +296,10 @@ const PinheadsPlayhouse = () => {
           'hr': 'HR Probability',
           'hit': 'Hit Probability',
           'reach_base': 'Reach Base Probability',
-          'strikeout': 'Strikeout Probability'
+          'strikeout': 'Strikeout Probability',
+          'enhanced_hr_score': 'Standout Score (Dashboard Enhanced)',
+          'enhanced_confidence': 'Enhanced Confidence',
+          'dashboard_context': 'Dashboard Context Level'
         });
       }
     };
@@ -291,6 +330,35 @@ const PinheadsPlayhouse = () => {
     return () => clearTimeout(timeoutId);
   }, [pitcherSearchTerm, searchPlayers]);
 
+  // Generate batch summary when predictions change
+  useEffect(() => {
+    const generateSummary = async () => {
+      if (!predictions || predictions.length === 0) {
+        setBatchSummary(null);
+        setSummaryLoading(false);
+        setSummaryError(null);
+        return;
+      }
+
+      setSummaryLoading(true);
+      setSummaryError(null);
+
+      try {
+        console.log(`🔄 Generating batch summary for ${predictions.length} predictions`);
+        const summary = await batchSummaryService.generateBatchSummary(predictions, batchMatchups);
+        setBatchSummary(summary);
+        console.log(`✅ Batch summary generated successfully`);
+      } catch (error) {
+        console.error('Error generating batch summary:', error);
+        setSummaryError(error.message);
+        setBatchSummary(null);
+      } finally {
+        setSummaryLoading(false);
+      }
+    };
+
+    generateSummary();
+  }, [predictions, batchMatchups]);
 
   // Prepare dropdown options
   const pitcherOptions = useMemo(() => {
@@ -408,6 +476,66 @@ const PinheadsPlayhouse = () => {
         return '';
     }
   };
+
+  // Filter predictions based on dashboard context (moved before early returns)
+  const filteredPredictions = useMemo(() => {
+    if (!predictions || predictions.length === 0) return [];
+
+    return predictions.filter(prediction => {
+      const context = prediction.dashboard_context;
+      if (!context) return true; // Include predictions without context
+
+      // Show standout players only
+      if (dashboardFilters.showStandoutOnly && !context.is_standout) {
+        return false;
+      }
+
+      // Show hot streaks only
+      if (dashboardFilters.showHotStreaksOnly) {
+        const hasHotStreak = context.badges.some(badge => 
+          badge.includes('🔥') || badge.includes('Hot Streak') || badge.includes('Active Streak')
+        );
+        if (!hasHotStreak) return false;
+      }
+
+      // Show hidden gems only
+      if (dashboardFilters.showHiddenGemsOnly) {
+        const isHiddenGem = context.category?.category === 'hidden_gem';
+        if (!isHiddenGem) return false;
+      }
+
+      // Show risk warnings only
+      if (dashboardFilters.showRiskWarningsOnly) {
+        const hasRisk = context.badges.some(badge => badge.includes('⚠️') || badge.includes('Risk'));
+        if (!hasRisk) return false;
+      }
+
+      // Show situational players only
+      if (dashboardFilters.showSituationalOnly) {
+        const isSituational = context.badges.some(badge => 
+          badge.includes('⏰') || badge.includes('🆚') || badge.includes('🏠')
+        );
+        if (!isSituational) return false;
+      }
+
+      // Minimum confidence boost filter
+      if (dashboardFilters.minConfidenceBoost !== null) {
+        if ((context.confidence_boost || 0) < dashboardFilters.minConfidenceBoost) {
+          return false;
+        }
+      }
+
+      // Category filter
+      if (dashboardFilters.categories.length > 0) {
+        const playerCategory = context.category?.category;
+        if (!dashboardFilters.categories.includes(playerCategory)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [predictions, dashboardFilters]);
 
   // Render loading state
   if (apiLoading) {
@@ -703,6 +831,118 @@ const PinheadsPlayhouse = () => {
             )}
           </div>
 
+          {/* Batch Summary Section */}
+          <BatchSummarySection
+            summary={batchSummary}
+            loading={summaryLoading}
+            error={summaryError}
+            className="pinheads-batch-summary"
+          />
+
+          {/* Dashboard Filtering Controls */}
+          <div className="dashboard-filters">
+            <h4>🎯 Dashboard Context Filters</h4>
+            <div className="filter-grid">
+              <label className="filter-checkbox">
+                <input
+                  type="checkbox"
+                  checked={dashboardFilters.showStandoutOnly}
+                  onChange={(e) => setDashboardFilters({
+                    ...dashboardFilters,
+                    showStandoutOnly: e.target.checked
+                  })}
+                />
+                ⭐ Standout Players Only
+              </label>
+
+              <label className="filter-checkbox">
+                <input
+                  type="checkbox"
+                  checked={dashboardFilters.showHotStreaksOnly}
+                  onChange={(e) => setDashboardFilters({
+                    ...dashboardFilters,
+                    showHotStreaksOnly: e.target.checked
+                  })}
+                />
+                🔥 Hot Streaks Only
+              </label>
+
+              <label className="filter-checkbox">
+                <input
+                  type="checkbox"
+                  checked={dashboardFilters.showHiddenGemsOnly}
+                  onChange={(e) => setDashboardFilters({
+                    ...dashboardFilters,
+                    showHiddenGemsOnly: e.target.checked
+                  })}
+                />
+                💎 Hidden Gems Only
+              </label>
+
+              <label className="filter-checkbox">
+                <input
+                  type="checkbox"
+                  checked={dashboardFilters.showRiskWarningsOnly}
+                  onChange={(e) => setDashboardFilters({
+                    ...dashboardFilters,
+                    showRiskWarningsOnly: e.target.checked
+                  })}
+                />
+                ⚠️ Risk Warnings Only
+              </label>
+
+              <label className="filter-checkbox">
+                <input
+                  type="checkbox"
+                  checked={dashboardFilters.showSituationalOnly}
+                  onChange={(e) => setDashboardFilters({
+                    ...dashboardFilters,
+                    showSituationalOnly: e.target.checked
+                  })}
+                />
+                🎯 Situational Stars Only
+              </label>
+
+              <div className="filter-input-group">
+                <label>Minimum Confidence Boost:</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="50"
+                  step="5"
+                  value={dashboardFilters.minConfidenceBoost || ''}
+                  onChange={(e) => setDashboardFilters({
+                    ...dashboardFilters,
+                    minConfidenceBoost: e.target.value ? parseInt(e.target.value) : null
+                  })}
+                  placeholder="e.g., 10"
+                />
+              </div>
+
+              <button 
+                className="clear-filters-btn"
+                onClick={() => setDashboardFilters({
+                  showStandoutOnly: false,
+                  showHotStreaksOnly: false,
+                  showHiddenGemsOnly: false,
+                  showRiskWarningsOnly: false,
+                  showSituationalOnly: false,
+                  minConfidenceBoost: null,
+                  categories: []
+                })}
+              >
+                🗑️ Clear All Filters
+              </button>
+            </div>
+            
+            <div className="filter-results-summary">
+              Showing {filteredPredictions.length} of {predictions.length} predictions
+              {filteredPredictions.length !== predictions.length && (
+                <span className="filter-applied-indicator"> (filtered)</span>
+              )}
+            </div>
+          </div>
+
           <div className="table-container">
             <table className="predictions-table">
               <thead>
@@ -714,7 +954,7 @@ const PinheadsPlayhouse = () => {
                 </tr>
               </thead>
               <tbody>
-                {predictions.map((prediction, index) => (
+                {filteredPredictions.map((prediction, index) => (
                   <tr key={index}>
                     {selectedColumns.map(colKey => {
                       let value = prediction[colKey];
@@ -722,7 +962,36 @@ const PinheadsPlayhouse = () => {
                       let className = '';
 
                       // Format different types of values
-                      if (colKey.includes('probability') || colKey === 'hr_rate') {
+                      if (colKey === 'dashboard_badges') {
+                        // Display badges as emoji string
+                        const context = prediction.dashboard_context;
+                        displayValue = context?.badges?.join(' ') || '';
+                        className = 'dashboard-badges';
+                      } else if (colKey === 'standout_score') {
+                        // Display standout score with enhanced formatting
+                        const context = prediction.dashboard_context;
+                        value = context?.standout_score || prediction.enhanced_hr_score || prediction.hr_score;
+                        displayValue = formatNumber(value, 1);
+                        className = context?.is_standout ? 'value-standout' : getValueColorClass(value, 'hr_score');
+                      } else if (colKey === 'enhanced_confidence') {
+                        // Display enhanced confidence with boost indicator
+                        const context = prediction.dashboard_context;
+                        value = prediction.enhanced_confidence || prediction.confidence;
+                        const boost = context?.confidence_boost || 0;
+                        displayValue = `${formatNumber(value, 1)}% ${boost > 0 ? `(+${boost})` : boost < 0 ? `(${boost})` : ''}`;
+                        className = boost > 10 ? 'value-excellent' : boost > 0 ? 'value-good' : boost < 0 ? 'value-poor' : '';
+                      } else if (colKey === 'context_summary') {
+                        // Display context summary
+                        const context = prediction.dashboard_context;
+                        displayValue = context?.context_summary || 'No context';
+                        className = 'context-summary';
+                      } else if (colKey === 'category') {
+                        // Display player category with appropriate styling
+                        const context = prediction.dashboard_context;
+                        const category = context?.category;
+                        displayValue = category?.label || 'Standard';
+                        className = `category-${category?.category || 'standard'}`;
+                      } else if (colKey.includes('probability') || colKey === 'hr_rate') {
                         displayValue = formatPercentage(value);  // Already percentages
                         className = getValueColorClass(value, colKey);
                       } else if (colKey === 'hr_score') {
@@ -732,6 +1001,65 @@ const PinheadsPlayhouse = () => {
                         displayValue = formatNumber(value, 3);
                       } else if (colKey === 'pitcher_era' || colKey === 'pitcher_whip') {
                         displayValue = formatNumber(value, 2);
+                      } else if (colKey === 'pitcher_hr_per_game') {
+                        // Calculate HR per game from home stats
+                        const hrTotal = prediction.pitcher_home_hr_total || 0;
+                        const games = prediction.pitcher_home_games || 1;
+                        value = hrTotal / games;
+                        displayValue = formatNumber(value, 2);
+                        className = value > 1.5 ? 'value-poor' : value > 1.0 ? 'value-average' : value > 0.5 ? 'value-good' : 'value-excellent';
+                      } else if (colKey === 'pitcher_h_per_game') {
+                        // Calculate H per game from home stats  
+                        const hTotal = prediction.pitcher_home_h_total || 0;
+                        const games = prediction.pitcher_home_games || 1;
+                        value = hTotal / games;
+                        displayValue = formatNumber(value, 1);
+                        className = value > 10 ? 'value-poor' : value > 8 ? 'value-average' : value > 6 ? 'value-good' : 'value-excellent';
+                      } else if (colKey === 'pitcher_k_per_game') {
+                        // Calculate K per game from home stats
+                        const kTotal = prediction.pitcher_home_k_total || 0;
+                        const games = prediction.pitcher_home_games || 1;
+                        value = kTotal / games;
+                        displayValue = formatNumber(value, 1);
+                        className = value > 8 ? 'value-excellent' : value > 6 ? 'value-good' : value > 4 ? 'value-average' : 'value-poor';
+                      } else if (colKey === 'stadium_factor') {
+                        // Display stadium park factor (placeholder for now - will be enhanced with actual data)
+                        value = prediction.stadium_context?.parkFactor || 1.0;
+                        displayValue = formatNumber(value, 2);
+                        className = value > 1.1 ? 'value-excellent' : value > 1.05 ? 'value-good' : value < 0.9 ? 'value-poor' : value < 0.95 ? 'value-average' : '';
+                      } else if (colKey === 'stadium_category') {
+                        // Display stadium category
+                        displayValue = prediction.stadium_context?.category || 'Neutral';
+                        className = prediction.stadium_context?.isHitterFriendly ? 'value-good' : prediction.stadium_context?.isPitcherFriendly ? 'value-poor' : '';
+                      } else if (colKey === 'weather_impact') {
+                        // Display weather impact
+                        displayValue = prediction.weather_context?.badge || '⛅ Standard';
+                        className = prediction.weather_context?.weatherImpact === 'favorable' ? 'value-good' : 
+                                   prediction.weather_context?.weatherImpact === 'unfavorable' ? 'value-poor' : '';
+                      } else if (colKey === 'wind_factor') {
+                        // Display wind factor
+                        value = prediction.weather_context?.windFactor?.factor || 1.0;
+                        displayValue = formatNumber(value, 2);
+                        className = value > 1.1 ? 'value-excellent' : value > 1.05 ? 'value-good' : value < 0.9 ? 'value-poor' : '';
+                      } else if (colKey === 'pitcher_form_index') {
+                        // Calculate pitcher form index based on recent performance
+                        const recentERA = prediction.pitcher_recent_era || prediction.pitcher_era || 4.5;
+                        const recentHR = (prediction.pitcher_home_hr_total || 0) / (prediction.pitcher_home_games || 1);
+                        value = Math.max(0, 100 - (recentERA * 10) - (recentHR * 20));
+                        displayValue = formatNumber(value, 0);
+                        className = value > 75 ? 'value-excellent' : value > 60 ? 'value-good' : value > 40 ? 'value-average' : 'value-poor';
+                      } else if (colKey === 'pitcher_vulnerability') {
+                        // Calculate pitcher vulnerability to HR
+                        const hrRate = (prediction.pitcher_home_hr_total || 0) / (prediction.pitcher_home_games || 1);
+                        const era = prediction.pitcher_era || 4.5;
+                        value = (hrRate * 50) + (era * 5);
+                        displayValue = formatNumber(value, 1);
+                        className = value > 30 ? 'value-poor' : value > 20 ? 'value-average' : value > 10 ? 'value-good' : 'value-excellent';
+                      } else if (colKey === 'pitcher_recent_era') {
+                        // Display recent ERA (calculated or fallback to season ERA)
+                        value = prediction.pitcher_recent_era || prediction.pitcher_era || 0;
+                        displayValue = formatNumber(value, 2);
+                        className = value > 5.0 ? 'value-poor' : value > 4.0 ? 'value-average' : value > 3.0 ? 'value-good' : 'value-excellent';
                       } else if (colKey === 'contact_trend' || colKey === 'pitcher_trend_dir') {
                         displayValue = value || 'N/A';
                       } else if (colKey === 'batter_hand' || colKey === 'pitcher_hand') {
@@ -743,8 +1071,26 @@ const PinheadsPlayhouse = () => {
                         }
                       }
 
+                      // Add tooltip for dashboard context columns
+                      let tooltip = '';
+                      if (colKey === 'dashboard_badges' && prediction.dashboard_context) {
+                        tooltip = prediction.dashboard_context.tooltip_content || '';
+                      } else if (colKey === 'context_summary' && prediction.dashboard_context) {
+                        const context = prediction.dashboard_context;
+                        tooltip = `Confidence Boost: ${context.confidence_boost || 0}%\n` +
+                                 `Standout Reasons: ${context.standout_reasons?.join(', ') || 'None'}\n` +
+                                 (context.risk_factors?.length > 0 ? `Risk Factors: ${context.risk_factors.join(', ')}` : '');
+                      } else if (colKey === 'category' && prediction.dashboard_context?.category) {
+                        tooltip = prediction.dashboard_context.category.description || '';
+                      }
+
                       return (
-                        <td key={colKey} className={className}>
+                        <td 
+                          key={colKey} 
+                          className={className}
+                          title={tooltip}
+                          style={tooltip ? { cursor: 'help' } : {}}
+                        >
                           {displayValue}
                         </td>
                       );

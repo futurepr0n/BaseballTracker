@@ -1,0 +1,704 @@
+/**
+ * BatchSummarySection Styles
+ * Comprehensive styling for strategic analysis dashboard
+ */
+
+.batch-summary-section {
+  background: linear-gradient(135deg, #1a1d23 0%, #2a2f38 100%);
+  border: 1px solid #3a4554;
+  border-radius: 12px;
+  margin: 20px 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.batch-summary-section:hover {
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Header Styles */
+.summary-header {
+  background: linear-gradient(90deg, #2d5016 0%, #4a7c59 100%);
+  padding: 16px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.3s ease;
+}
+
+.summary-header:hover {
+  background: linear-gradient(90deg, #345c1a 0%, #52956b 100%);
+}
+
+.summary-header h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle-icon {
+  font-size: 14px;
+  transition: transform 0.3s ease;
+}
+
+.player-count {
+  font-size: 14px;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.header-stats {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.stat-item {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.alert-indicator {
+  background: rgba(255, 69, 58, 0.2);
+  border: 1px solid rgba(255, 69, 58, 0.4);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Content Styles */
+.summary-content {
+  padding: 0;
+}
+
+/* Quick Insights Section */
+.quick-insights-section {
+  background: #242932;
+  padding: 20px;
+  border-bottom: 1px solid #3a4554;
+}
+
+.quick-insights-section h4 {
+  margin: 0 0 16px 0;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.insight-card {
+  background: linear-gradient(135deg, #2a2f38 0%, #34394a 100%);
+  border: 1px solid #3a4554;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.insight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.insight-icon {
+  font-size: 24px;
+  min-width: 32px;
+  text-align: center;
+}
+
+.insight-content {
+  flex: 1;
+}
+
+.insight-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #4ade80;
+  line-height: 1;
+}
+
+.insight-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 4px 0 2px 0;
+}
+
+.insight-description {
+  font-size: 12px;
+  color: #9ca3af;
+  line-height: 1.3;
+}
+
+/* Alerts Section */
+.alerts-section {
+  background: #1f2937;
+  padding: 20px;
+  border-bottom: 1px solid #3a4554;
+}
+
+.alerts-section h4 {
+  margin: 0 0 16px 0;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.alert-item {
+  background: linear-gradient(135deg, #2a2f38 0%, #34394a 100%);
+  border-left: 4px solid #6b7280;
+  border-radius: 6px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.alert-item.opportunity {
+  border-left-color: #10b981;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+}
+
+.alert-item.warning {
+  border-left-color: #f59e0b;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+}
+
+.alert-item.high {
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.alert-content {
+  flex: 1;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.alert-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.alert-badge {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #e5e7eb;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  background: #1f2937;
+  display: flex;
+  padding: 0;
+  border-bottom: 1px solid #3a4554;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  padding: 16px 24px;
+  color: #9ca3af;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-bottom: 3px solid transparent;
+  flex: 1;
+  text-align: center;
+}
+
+.tab-button:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #e5e7eb;
+}
+
+.tab-button.active {
+  color: #4ade80;
+  border-bottom-color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+}
+
+/* Tab Content */
+.tab-content {
+  background: #242932;
+  padding: 24px;
+}
+
+/* Opportunities Tab */
+.opportunities-tab {
+  width: 100%;
+}
+
+.opportunities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 24px;
+}
+
+/* Larger screens - make tables bigger */
+@media (min-width: 1400px) {
+  .opportunities-grid {
+    grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+    gap: 32px;
+  }
+}
+
+@media (min-width: 1800px) {
+  .opportunities-grid {
+    grid-template-columns: repeat(auto-fit, minmax(700px, 1fr));
+    gap: 40px;
+  }
+}
+
+/* Table Styles */
+.opportunity-table,
+.pitcher-table {
+  background: linear-gradient(135deg, #2a2f38 0%, #34394a 100%);
+  border: 1px solid #3a4554;
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Improve table container to flex */
+.opportunity-table .table-container,
+.pitcher-table .table-container {
+  flex: 1;
+  min-height: 0; /* Allow shrinking */
+}
+
+.opportunity-table h5,
+.pitcher-table h5 {
+  background: linear-gradient(90deg, #374151 0%, #4b5563 100%);
+  margin: 0;
+  padding: 12px 16px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 1px solid #3a4554;
+}
+
+.table-container {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #4ade80 #2a2f38;
+}
+
+/* Custom scrollbar for webkit browsers */
+.table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #2a2f38;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #4ade80;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #52956b;
+}
+
+/* Larger screens - taller tables */
+@media (min-width: 1200px) {
+  .table-container {
+    max-height: 500px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .table-container {
+    max-height: 600px;
+  }
+}
+
+.opportunity-table table,
+.pitcher-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.opportunity-table th,
+.pitcher-table th {
+  background: #374151;
+  color: #e5e7eb;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 10px 12px;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.opportunity-table td,
+.pitcher-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #374151;
+  color: #e5e7eb;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.opportunity-table tr:hover,
+.pitcher-table tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Must-Play Table Special Styling */
+.must-play-table {
+  border: 2px solid #ef4444;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+.must-play-table h5 {
+  background: linear-gradient(90deg, #dc2626 0%, #ef4444 100%);
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from { box-shadow: 0 0 5px rgba(239, 68, 68, 0.5); }
+  to { box-shadow: 0 0 15px rgba(239, 68, 68, 0.8); }
+}
+
+/* Badge Cells */
+.badges-cell {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.badge-item {
+  background: rgba(74, 222, 128, 0.2);
+  color: #4ade80;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.badge-more {
+  background: rgba(156, 163, 175, 0.2);
+  color: #9ca3af;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 10px;
+}
+
+/* Pitcher Intelligence Tab */
+.pitcher-intelligence-tab {
+  width: 100%;
+}
+
+.pitcher-tables {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.vulnerable-pitchers {
+  border-color: #ef4444;
+}
+
+.vulnerable-pitchers h5 {
+  background: linear-gradient(90deg, #dc2626 0%, #ef4444 100%);
+}
+
+.dominant-pitchers {
+  border-color: #3b82f6;
+}
+
+.dominant-pitchers h5 {
+  background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+}
+
+/* Category Breakdown Tab */
+.category-breakdown-tab {
+  width: 100%;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.category-card {
+  background: linear-gradient(135deg, #2a2f38 0%, #34394a 100%);
+  border: 1px solid #3a4554;
+  border-radius: 8px;
+  padding: 16px;
+  transition: transform 0.2s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-2px);
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #3a4554;
+}
+
+.category-header h5 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.category-count {
+  background: rgba(74, 222, 128, 0.2);
+  color: #4ade80;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.category-stats {
+  margin-bottom: 12px;
+}
+
+.category-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.stat-label {
+  color: #9ca3af;
+}
+
+.stat-value {
+  color: #4ade80;
+  font-weight: 600;
+}
+
+.category-players {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.category-player {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  padding: 4px 0;
+}
+
+.player-name {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.player-team {
+  color: #9ca3af;
+  font-size: 11px;
+}
+
+.player-score {
+  color: #4ade80;
+  font-weight: 600;
+}
+
+.more-players {
+  color: #9ca3af;
+  font-size: 11px;
+  font-style: italic;
+  text-align: center;
+  padding: 4px 0;
+}
+
+/* Loading and Error States */
+.batch-summary-section.loading,
+.batch-summary-section.error {
+  text-align: center;
+}
+
+.loading-content {
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #3a4554;
+  border-top: 3px solid #4ade80;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-content {
+  padding: 20px;
+  color: #ef4444;
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+  .header-stats {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  .insights-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .opportunities-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .category-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tab-navigation {
+    flex-direction: column;
+  }
+
+  .tab-button {
+    text-align: left;
+    border-bottom: 1px solid #3a4554;
+    border-right: none;
+  }
+
+  .tab-button.active {
+    border-bottom-color: #3a4554;
+    border-left: 3px solid #4ade80;
+  }
+
+  /* Mobile table styling - almost full viewport */
+  .opportunity-table,
+  .pitcher-table {
+    margin-bottom: 20px;
+  }
+
+  .table-container {
+    max-height: 85vh;
+    max-width: 100vw;
+    margin: 0 -20px; /* Extend to screen edges */
+    padding: 0 20px;
+    box-sizing: border-box;
+  }
+
+  .opportunity-table table,
+  .pitcher-table table {
+    min-width: 100%;
+    font-size: 12px;
+  }
+
+  .opportunity-table th,
+  .pitcher-table th,
+  .opportunity-table td,
+  .pitcher-table td {
+    padding: 8px 6px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .header-stats {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .tab-content {
+    padding: 12px;
+  }
+
+  /* Extra small mobile - full viewport tables */
+  .table-container {
+    max-height: 90vh;
+    margin: 0 -12px;
+    padding: 0 12px;
+  }
+
+  .opportunity-table table,
+  .pitcher-table table {
+    font-size: 11px;
+  }
+
+  .opportunity-table th,
+  .pitcher-table th,
+  .opportunity-table td,
+  .pitcher-table td {
+    padding: 6px 4px;
+  }
+
+  /* Badge cells smaller on mobile */
+  .badge-item {
+    font-size: 10px;
+    padding: 1px 4px;
+  }
+
+  .badge-more {
+    font-size: 9px;
+  }
+}
