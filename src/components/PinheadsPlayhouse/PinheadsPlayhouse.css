@@ -840,3 +840,126 @@
   color: #991b1b;
   font-weight: 500;
 }
+
+/* Fallback Data Indicators */
+.fallback-info-panel {
+  background: #fef3c7;
+  border: 2px solid #f59e0b;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fallback-info-panel .icon {
+  font-size: 1.25rem;
+  color: #d97706;
+}
+
+.fallback-info-content h4 {
+  margin: 0 0 0.25rem 0;
+  color: #92400e;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.fallback-info-content p {
+  margin: 0;
+  color: #a16207;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.fallback-prediction {
+  border-left: 4px solid #f59e0b;
+  position: relative;
+}
+
+.fallback-prediction td {
+  /* Don't override cell background colors - preserve heat mapping */
+}
+
+.fallback-indicator {
+  font-size: 0.65rem;
+  background: rgba(245, 158, 11, 0.8);
+  color: white;
+  padding: 0.1rem 0.3rem;
+  border-radius: 2px;
+  margin-left: 0.25rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.results-summary .fallback-notice {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #f59e0b;
+  font-weight: 500;
+}
+
+/* Batch Fallback Specific Styling */
+.fallback-pitcher-list {
+  margin: 0.75rem 0;
+  padding: 0.5rem;
+  background: #fefbf3;
+  border-radius: 4px;
+  border-left: 3px solid #f59e0b;
+}
+
+.fallback-pitcher-list ul {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.5rem;
+  list-style-type: disc;
+}
+
+.fallback-pitcher-list li {
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+  color: #a16207;
+}
+
+.failed-matchups {
+  margin: 0.75rem 0;
+  padding: 0.5rem;
+  background: #fef2f2;
+  border-radius: 4px;
+  border-left: 3px solid #dc2626;
+}
+
+.failed-matchups ul {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.5rem;
+  list-style-type: disc;
+}
+
+.failed-matchups li {
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+  color: #991b1b;
+}
+
+.fallback-details {
+  line-height: 1.5;
+}
+
+.fallback-details p {
+  margin: 0.5rem 0;
+}
+
+.fallback-stats {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.fallback-stats span {
+  background: #f8fafc;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  border: 1px solid #e2e8f0;
+}

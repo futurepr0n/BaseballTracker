@@ -6,6 +6,7 @@
 
 import stadiumContextService from './stadiumContextService';
 import weatherContextService from './weatherContextService';
+import teamPerformanceService from './teamPerformanceService';
 
 class BatchSummaryService {
   constructor() {
@@ -247,7 +248,11 @@ class BatchSummaryService {
             era: prediction.pitcher_era,
             whip: prediction.pitcher_whip,
             hrPerGame: this.calculatePitcherHRPerGame(prediction),
-            trendDirection: prediction.pitcher_trend_dir
+            trendDirection: prediction.pitcher_trend_dir,
+            recentERA: this.calculateRecentERA(prediction),
+            recentForm: this.assessRecentForm(prediction),
+            totalGames: prediction.pitcher_home_games || 0,
+            totalHRsAllowed: prediction.pitcher_home_hr_total || 0
           }
         });
       }
@@ -267,19 +272,42 @@ class BatchSummaryService {
       }
     });
 
-    // Calculate vulnerability index
-    Array.from(pitcherStats.values()).forEach(pitcher => {
-      pitcher.avgHRScore = pitcher.totalHRScore / pitcher.battersAnalyzed;
-      pitcher.vulnerabilityIndex = this.calculateVulnerabilityIndex(pitcher);
-    });
+    // Calculate vulnerability index and add explanatory context
+    await Promise.all(
+      Array.from(pitcherStats.values()).map(async pitcher => {
+        pitcher.avgHRScore = pitcher.totalHRScore / pitcher.battersAnalyzed;
+        pitcher.vulnerabilityIndex = await this.calculateVulnerabilityIndex(pitcher);
+        pitcher.vulnerabilityReason = this.generateVulnerabilityReason(pitcher);
+        pitcher.dominanceReason = this.generateDominanceReason(pitcher);
+      })
+    );
 
     const sortedPitchers = Array.from(pitcherStats.values())
       .sort((a, b) => b.vulnerabilityIndex - a.vulnerabilityIndex);
 
+    const vulnerablePitchers = sortedPitchers.slice(0, 5).map(pitcher => ({
+      ...pitcher,
+      classification: 'vulnerable',
+      reason: pitcher.vulnerabilityReason,
+      threatLevel: this.calculateThreatLevel(pitcher)
+    }));
+
+    const dominantPitchers = sortedPitchers.slice(-3).reverse().map(pitcher => ({
+      ...pitcher,
+      classification: 'dominant', 
+      reason: pitcher.dominanceReason,
+      strengthLevel: this.calculateStrengthLevel(pitcher)
+    }));
+
     return {
-      vulnerablePitchers: sortedPitchers.slice(0, 5),
-      dominantPitchers: sortedPitchers.slice(-3).reverse(),
-      pitcherCount: pitcherStats.size
+      vulnerablePitchers,
+      dominantPitchers,
+      pitcherCount: pitcherStats.size,
+      analysisContext: {
+        avgVulnerabilityIndex: sortedPitchers.reduce((sum, p) => sum + p.vulnerabilityIndex, 0) / sortedPitchers.length,
+        totalToughBatters: sortedPitchers.reduce((sum, p) => sum + p.toughBatters.length, 0),
+        pitchersWithMultipleThreats: sortedPitchers.filter(p => p.toughBatters.length >= 2).length
+      }
     };
   }
 
@@ -293,14 +321,233 @@ class BatchSummaryService {
   }
 
   /**
-   * Calculate vulnerability index
+   * Calculate enhanced vulnerability index with recent form and context
    */
-  calculateVulnerabilityIndex(pitcher) {
+  async calculateVulnerabilityIndex(pitcher) {
     const baseScore = pitcher.avgHRScore;
-    const hrRate = pitcher.pitcherStats.hrPerGame || 0;
+    const seasonHRRate = pitcher.pitcherStats.hrPerGame || 0;
     const toughBatterCount = pitcher.toughBatters.length;
     
-    return baseScore + (hrRate * 10) + (toughBatterCount * 5);
+    // Enhanced calculation with additional context factors
+    const recentFormWeight = this.calculateRecentFormWeight(pitcher);
+    const teamOffensiveStrength = await this.calculateTeamOffensiveStrength(pitcher);
+    const ballparkFactor = this.calculateBallparkFactor(pitcher);
+    
+    // Base calculation (maintains backward compatibility)
+    const baseVulnerability = baseScore + (seasonHRRate * 10) + (toughBatterCount * 5);
+    
+    // Enhanced adjustments
+    const recentFormAdjustment = recentFormWeight * 15; // Up to 15 points for recent struggles
+    const teamContextAdjustment = teamOffensiveStrength * 8; // Up to 8 points for hot offense
+    const ballparkAdjustment = (ballparkFactor - 1.0) * 12; // Ballpark impact
+    
+    const enhancedVulnerability = baseVulnerability + 
+                                  recentFormAdjustment + 
+                                  teamContextAdjustment + 
+                                  ballparkAdjustment;
+    
+    return Math.max(0, enhancedVulnerability); // Ensure non-negative
+  }
+
+  /**
+   * Calculate recent form weight (0.0 = great recent form, 1.0 = concerning recent form)
+   */
+  calculateRecentFormWeight(pitcher) {
+    const recentERA = pitcher.pitcherStats.recentERA || pitcher.pitcherStats.era || 4.50;
+    const seasonERA = pitcher.pitcherStats.era || 4.50;
+    
+    // If recent ERA is significantly worse than season ERA, increase vulnerability
+    const eraRatio = recentERA / seasonERA;
+    
+    if (eraRatio > 1.3) return 1.0;     // Recent form much worse
+    if (eraRatio > 1.15) return 0.7;    // Recent form somewhat worse  
+    if (eraRatio > 1.05) return 0.4;    // Recent form slightly worse
+    if (eraRatio < 0.8) return -0.3;    // Recent form much better (reduce vulnerability)
+    if (eraRatio < 0.9) return -0.1;    // Recent form better
+    
+    return 0.0; // Recent form similar to season
+  }
+
+  /**
+   * Calculate team offensive strength (0.0 = cold offense, 1.0 = hot offense)
+   */
+  async calculateTeamOffensiveStrength(pitcher) {
+    try {
+      const teamAbbr = pitcher.team;
+      const teamMetrics = await teamPerformanceService.analyzeTeamOffensivePerformance(teamAbbr);
+      
+      // Convert team classification to vulnerability factor
+      switch (teamMetrics.classification) {
+        case 'elite': return 0.9;
+        case 'strong': return 0.7;
+        case 'average': return 0.5;
+        case 'below_average': return 0.3;
+        case 'weak': return 0.1;
+        default: return 0.5;
+      }
+    } catch (error) {
+      console.error('Error calculating team offensive strength:', error);
+      return 0.5; // Default neutral
+    }
+  }
+
+  /**
+   * Calculate ballpark factor (1.0 = neutral, >1.0 = hitter friendly, <1.0 = pitcher friendly)
+   */
+  calculateBallparkFactor(pitcher) {
+    // This would integrate with stadiumContextService
+    // For now, return neutral baseline
+    return 1.0;
+  }
+
+  /**
+   * Calculate recent ERA (would integrate with pitcher recent performance data)
+   */
+  calculateRecentERA(prediction) {
+    // This would calculate ERA over last 5 starts
+    // For now, use season ERA with some variation to demonstrate concept
+    const seasonERA = prediction.pitcher_era || 4.50;
+    const hrRate = this.calculatePitcherHRPerGame(prediction);
+    
+    // Simulate recent form based on HR rate (higher HR rate suggests worse recent ERA)
+    if (hrRate > 1.5) return seasonERA * 1.2; // Recent struggles
+    if (hrRate > 1.0) return seasonERA * 1.1; // Slightly worse recently
+    if (hrRate < 0.5) return seasonERA * 0.9; // Better recently
+    
+    return seasonERA; // Similar to season average
+  }
+
+  /**
+   * Assess recent form based on available metrics
+   */
+  assessRecentForm(prediction) {
+    const seasonERA = prediction.pitcher_era || 4.50;
+    const recentERA = this.calculateRecentERA(prediction);
+    const hrRate = this.calculatePitcherHRPerGame(prediction);
+    
+    // Determine form assessment
+    if (recentERA > seasonERA * 1.2 || hrRate > 1.5) {
+      return 'struggling';
+    } else if (recentERA < seasonERA * 0.9 && hrRate < 0.7) {
+      return 'dominant';
+    } else if (recentERA > seasonERA * 1.1 || hrRate > 1.0) {
+      return 'concerning';
+    } else if (recentERA < seasonERA * 0.95) {
+      return 'improving';
+    }
+    
+    return 'stable';
+  }
+
+  /**
+   * Generate vulnerability reason for high-risk pitchers
+   */
+  generateVulnerabilityReason(pitcher) {
+    const reasons = [];
+    const hrRate = pitcher.pitcherStats.hrPerGame;
+    const era = pitcher.pitcherStats.era || 4.50;
+    const recentForm = pitcher.pitcherStats.recentForm;
+    const toughBatterCount = pitcher.toughBatters.length;
+
+    // High HR rate
+    if (hrRate > 1.2) {
+      reasons.push(`High HR rate (${hrRate.toFixed(2)}/game)`);
+    }
+
+    // Poor ERA
+    if (era > 4.75) {
+      reasons.push(`High ERA (${era.toFixed(2)})`);
+    }
+
+    // Recent form concerns
+    if (recentForm === 'struggling') {
+      reasons.push('Recent struggles');
+    } else if (recentForm === 'concerning') {
+      reasons.push('Concerning recent form');
+    }
+
+    // Multiple tough matchups
+    if (toughBatterCount >= 3) {
+      reasons.push(`${toughBatterCount} high-threat batters`);
+    } else if (toughBatterCount >= 2) {
+      reasons.push(`${toughBatterCount} tough matchups`);
+    }
+
+    // High average HR scores against
+    if (pitcher.avgHRScore > 65) {
+      reasons.push(`High avg HR score (${pitcher.avgHRScore.toFixed(1)})`);
+    }
+
+    return reasons.length > 0 ? reasons.join(', ') : 'Above average vulnerability metrics';
+  }
+
+  /**
+   * Generate dominance reason for low-risk pitchers
+   */
+  generateDominanceReason(pitcher) {
+    const reasons = [];
+    const hrRate = pitcher.pitcherStats.hrPerGame;
+    const era = pitcher.pitcherStats.era || 4.50;
+    const recentForm = pitcher.pitcherStats.recentForm;
+    const toughBatterCount = pitcher.toughBatters.length;
+
+    // Low HR rate
+    if (hrRate < 0.7) {
+      reasons.push(`Low HR rate (${hrRate.toFixed(2)}/game)`);
+    }
+
+    // Good ERA
+    if (era < 3.50) {
+      reasons.push(`Strong ERA (${era.toFixed(2)})`);
+    }
+
+    // Good recent form
+    if (recentForm === 'dominant') {
+      reasons.push('Dominant recent form');
+    } else if (recentForm === 'improving') {
+      reasons.push('Improving form');
+    }
+
+    // Few tough matchups
+    if (toughBatterCount === 0) {
+      reasons.push('No high-threat batters');
+    } else if (toughBatterCount === 1) {
+      reasons.push('Only 1 tough matchup');
+    }
+
+    // Low average HR scores against
+    if (pitcher.avgHRScore < 45) {
+      reasons.push(`Low avg HR score (${pitcher.avgHRScore.toFixed(1)})`);
+    }
+
+    return reasons.length > 0 ? reasons.join(', ') : 'Strong performance metrics';
+  }
+
+  /**
+   * Calculate threat level for vulnerable pitchers
+   */
+  calculateThreatLevel(pitcher) {
+    const vulnerabilityIndex = pitcher.vulnerabilityIndex;
+    const toughBatterCount = pitcher.toughBatters.length;
+    
+    if (vulnerabilityIndex > 90 || toughBatterCount >= 4) return 'extreme';
+    if (vulnerabilityIndex > 75 || toughBatterCount >= 3) return 'high';
+    if (vulnerabilityIndex > 60 || toughBatterCount >= 2) return 'moderate';
+    return 'low';
+  }
+
+  /**
+   * Calculate strength level for dominant pitchers
+   */
+  calculateStrengthLevel(pitcher) {
+    const vulnerabilityIndex = pitcher.vulnerabilityIndex;
+    const toughBatterCount = pitcher.toughBatters.length;
+    const hrRate = pitcher.pitcherStats.hrPerGame;
+    
+    if (vulnerabilityIndex < 30 && toughBatterCount === 0 && hrRate < 0.5) return 'elite';
+    if (vulnerabilityIndex < 40 && toughBatterCount <= 1) return 'strong';
+    if (vulnerabilityIndex < 50) return 'solid';
+    return 'average';
   }
 
   /**

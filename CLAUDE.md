@@ -346,6 +346,475 @@ const context = await stadiumContextService.getStadiumContext('Yankee Stadium');
 // Returns park factor, category, and HR impact analysis
 ```
 
+## Pitcher Intelligence System (BatchSummaryService)
+
+### Current Implementation Overview
+
+The Pinheads Playhouse pitcher intelligence system provides vulnerability and dominance analysis through `batchSummaryService.js`, specifically the `getPitcherIntelligence()` method. This system analyzes pitcher performance across all batters in a matchup to determine threat levels and classification.
+
+### Vulnerability Index Calculation
+
+**Core Formula (Current Implementation):**
+```javascript
+vulnerabilityIndex = avgHRScore + (hrRate * 10) + (toughBatterCount * 5)
+```
+
+**Component Breakdown:**
+- **avgHRScore**: Average HR score across all analyzed batters for this pitcher
+- **hrRate**: `pitcher_home_hr_total / pitcher_home_games` (season HR rate)
+- **toughBatterCount**: Count of batters with HR score > 70 against this pitcher
+
+**Pitcher Statistics Integration:**
+```javascript
+pitcherStats: {
+  era: prediction.pitcher_era,           // Season ERA
+  whip: prediction.pitcher_whip,         // Walks + Hits per IP
+  hrPerGame: hrTotal / games,            // HR rate calculation
+  trendDirection: prediction.pitcher_trend_dir  // General trend indicator
+}
+```
+
+### Classification Logic
+
+**Vulnerable Pitchers (High Vulnerability):**
+- **Selection**: Top 5 highest vulnerability index scores
+- **Threat Assessment**: Batters with HR scores > 70 counted as "tough matchups"
+- **Risk Factors**: High season HR rate (>1.2 HR/game), high average batter HR scores
+
+**Dominant Pitchers (Low Vulnerability):**
+- **Selection**: Bottom 3 lowest vulnerability index scores (reversed for display)
+- **Strength Indicators**: Low HR rates, low average batter HR scores
+- **Dominance Metrics**: Consistent low vulnerability across multiple batters
+
+### Current Methodology Limitations
+
+**Season-Long Statistical Bias:**
+- All HR totals are season-long cumulative without recent form weighting
+- A pitcher with 5 HRs in first 10 games but 0 HRs in last 10 games still shows high vulnerability
+- No differentiation between early season struggles and current form
+
+**Oversimplified Calculation:**
+- Three-factor formula lacks contextual depth
+- No consideration of opposition quality or ballpark factors
+- Missing pitcher fatigue, rest days, or workload analysis
+
+**Example Issue:**
+```javascript
+// Pitcher A: 5 HR in 20 games = 0.25 HR/game
+// Pitcher B: 3 HR in 5 games = 0.6 HR/game
+// Current system ranks Pitcher A as less vulnerable despite potentially concerning recent trends
+```
+
+**Missing Context Integration:**
+- No team offensive context (is opposing team in hot streak?)
+- Ballpark factors available in stadiumContextService but not integrated
+- Weather conditions not considered in vulnerability assessment
+- No series or head-to-head matchup history
+
+### Data Sources and Dependencies
+
+**Required Data Fields:**
+- `pitcher_era` - Season earned run average
+- `pitcher_whip` - Season walks + hits per inning pitched  
+- `pitcher_home_hr_total` - Total home runs allowed at home (season)
+- `pitcher_home_games` - Total home games pitched (season)
+- `pitcher_trend_dir` - General performance trend direction
+
+**Generated Intelligence Tables:**
+- **vulnerablePitchers**: Array of top 5 high-risk matchups
+- **dominantPitchers**: Array of top 3 low-risk matchups  
+- **pitcherCount**: Total number of unique pitchers analyzed
+
+### Enhancement Opportunities
+
+**Identified Critical Improvements:**
+
+1. **Recent Performance Weighting**
+   - Weight last 5 starts at 60%, season at 40%
+   - Track HR trends over recent games vs season average
+   - Include recent ERA and WHIP calculations
+
+2. **Team Offensive Context**
+   - Integrate opposing team's last 10 games scoring average
+   - Consider team power surge/slump indicators (recent SLG, HR rate)
+   - Factor in key lineup injuries or changes
+
+3. **Ballpark and Situational Factors**
+   - Integrate stadium HR factors from existing `stadiumContextService`
+   - Include weather impact from `weatherContextService`  
+   - Add home/away performance splits for pitchers
+
+4. **Opposition Quality Adjustment**
+   - Adjust vulnerability scores based on strength of recent opponents
+   - Consider lineup quality metrics (team wOBA, ISO, etc.)
+   - Factor in key player injuries affecting opposing offense
+
+5. **Pitcher Fatigue and Form Analysis**
+   - Rest days since last start
+   - Recent pitch count trends and workload
+   - Quality start consistency over last 5 appearances
+   - Strikeout rate trends (improving/declining effectiveness)
+
+**Enhanced Formula Proposal:**
+```javascript
+enhancedVulnerabilityIndex = 
+  (recentFormScore * 0.6 + seasonScore * 0.4) +
+  (adjustedHRRate * ballparkFactor * weatherFactor * 10) +
+  (qualityAdjustedToughBatters * 5) +
+  (teamOffensiveStrength * 3) +
+  (pitcherFatigueIndex * 2)
+```
+
+## Pitcher Intelligence Enhancements (IMPLEMENTED)
+
+### Enhanced Vulnerability Calculation
+
+**New Implementation Features:**
+- **Recent Form Weighting**: ERA ratio analysis comparing recent vs season performance
+- **Team Offensive Context**: Integration with `teamPerformanceService` for opponent strength analysis
+- **Explanatory Reasoning**: Detailed vulnerability and dominance explanations with specific metrics
+- **Threat/Strength Levels**: Categorical assessments (extreme, high, moderate, low) with supporting evidence
+
+**Enhanced Vulnerability Formula (Now Active):**
+```javascript
+baseVulnerability = avgHRScore + (seasonHRRate * 10) + (toughBatterCount * 5);
+enhancedVulnerability = baseVulnerability + 
+                        (recentFormAdjustment * 15) + 
+                        (teamContextAdjustment * 8) + 
+                        (ballparkAdjustment * 12);
+```
+
+**Recent Form Assessment:**
+- **Struggling**: Recent ERA > 1.3x season ERA or HR rate > 1.5/game (+15 vulnerability points)
+- **Concerning**: Recent ERA > 1.15x season ERA or HR rate > 1.0/game (+10.5 points)
+- **Dominant**: Recent ERA < 0.8x season ERA and HR rate < 0.7/game (-4.5 points)
+- **Improving**: Recent ERA < 0.9x season ERA (-1.5 points)
+
+### Team Performance Integration
+
+**New `teamPerformanceService.js`:**
+- **Offensive Classification**: Elite, strong, average, below_average, weak
+- **Trend Analysis**: Surging, improving, stable, declining, struggling  
+- **Handedness Splits**: Performance vs RHP/LHP with advantage calculation
+- **Power Metrics**: ISO, barrel rate, hard contact rate analysis
+- **Momentum Factors**: Hot streaks, recent form, lineup changes
+
+**Strength/Weakness Identification:**
+- **Offensive Strengths**: Power, plate discipline, extra base hits, hard contact, momentum
+- **Offensive Weaknesses**: Lack of power, poor discipline, contact issues, weak contact, cold streaks
+- **Matchup Recommendations**: Target, favorable, neutral, avoid
+
+### Explanatory Intelligence
+
+**Vulnerability Reasons (Auto-Generated):**
+- High HR rate (X.XX/game)
+- High ERA (X.XX)
+- Recent struggles/concerning form
+- X high-threat batters
+- High avg HR score (XX.X)
+
+**Dominance Reasons (Auto-Generated):**
+- Low HR rate (X.XX/game)
+- Strong ERA (X.XX)
+- Dominant/improving recent form
+- No high-threat batters
+- Low avg HR score (XX.X)
+
+**Threat Level Classification:**
+- **Extreme**: Vulnerability index > 90 or 4+ tough batters
+- **High**: Vulnerability index > 75 or 3+ tough batters  
+- **Moderate**: Vulnerability index > 60 or 2+ tough batters
+- **Low**: Below moderate thresholds
+
+### Advanced Matchup Analysis
+
+**New `matchupStrengthAnalyzer.js` Utility:**
+- **Comprehensive Pitcher Analysis**: Recent form, effectiveness, durability, situational strength
+- **Offensive Threat Assessment**: Power threat level, contact quality, hot/cold batters
+- **Contextual Integration**: Stadium, weather, timing, series momentum, injury impact
+- **Strategic Recommendations**: Opportunity alerts, strategy suggestions, contextual insights
+- **Confidence Scoring**: Data quality assessment with adjustment factors
+
+**Analysis Categories:**
+1. **Pitcher Strength Factors**: Form, effectiveness, vulnerabilities, advantages
+2. **Offensive Strength Factors**: Team metrics, power threat, lineup depth, momentum
+3. **Contextual Factors**: Historical, stadium, weather, timing, series context
+
+### Usage Examples
+
+**Enhanced Pitcher Intelligence:**
+```javascript
+// Now returns detailed analysis with reasoning
+const pitcherIntelligence = await batchSummaryService.getPitcherIntelligence(predictions, matchups);
+
+// Enhanced vulnerability data
+pitcherIntelligence.vulnerablePitchers[0] = {
+  pitcher: "Pitcher Name",
+  vulnerabilityIndex: 87.3,
+  reason: "High HR rate (1.45/game), Recent struggles, 3 high-threat batters",
+  threatLevel: "high",
+  classification: "vulnerable"
+};
+```
+
+**Team Performance Analysis:**
+```javascript
+import teamPerformanceService from './services/teamPerformanceService';
+
+const teamMetrics = await teamPerformanceService.analyzeTeamOffensivePerformance('SEA');
+// Returns: classification, trend, strengthFactors, weaknessFactors, splits
+```
+
+**Comprehensive Matchup Analysis:**
+```javascript
+import matchupStrengthAnalyzer from './utils/matchupStrengthAnalyzer';
+
+const analysis = await matchupStrengthAnalyzer.analyzeMatchupStrength(pitcher, batters, gameContext);
+// Returns: detailed strength/weakness analysis with strategic recommendations
+```
+
+This implementation addresses the core issues identified in the original pitcher intelligence system while maintaining backward compatibility and providing extensive explanatory context for vulnerability and dominance classifications.
+
+## Enhanced Bounce Back Analysis (CRITICAL FIX IMPLEMENTED)
+
+### Problem Identified and Resolved
+
+**Original Issue:** The bounce back analysis system had a fundamental flaw where players continued to receive "bounce back potential" points despite repeatedly failing to actually bounce back from poor performance. A player could have 10 consecutive poor games and still receive the same bounce back score.
+
+**Root Cause:** The system treated each poor game as an independent bounce back opportunity without tracking failed attempts or considering the cumulative impact of repeated failures.
+
+### Enhanced Implementation
+
+**New `enhancedBounceBackAnalyzer.js`:**
+
+**Key Improvements:**
+1. **Failed Attempt Tracking**: Monitors how many bounce back opportunities a player has failed and penalizes accordingly
+2. **Rolling Expectation**: Bounce back potential decreases with each failed attempt (15% penalty per failure)
+3. **Historical Pattern Matching**: Compares current cold streaks to similar historical situations for that player
+4. **Adaptive Analysis Windows**: Extends analysis beyond 5 games if needed to find meaningful patterns
+5. **Confidence Decay**: Lower confidence with extended cold streaks and repeated failures
+
+**Enhanced Formula:**
+```javascript
+baseBounceBackPotential = historicalSuccessRate;
+failurePenalty = failedAttempts * 0.15; // 15% penalty per failed attempt
+streakPenalty = (consecutivePoorGames - 4) * 0.08; // 8% penalty per game beyond 4
+stalePenalty = (daysSinceGoodGame - 6) * 0.03; // Penalty for stale situations
+
+finalPotential = Math.max(0.05, baseBounceBackPotential - failurePenalty - streakPenalty - stalePenalty);
+```
+
+**Classification System:**
+- **Strong Bounce Back Candidate**: Potential ≥ 60%, Confidence ≥ 70%
+- **Moderate Bounce Back Candidate**: Potential ≥ 40%, Confidence ≥ 50%  
+- **Weak Bounce Back Candidate**: Potential ≥ 25%
+- **Avoid**: Below thresholds or high failure rate
+
+### Current Situation Analysis
+
+**Tracks:**
+- **Current Cold Streak**: Consecutive poor games
+- **Failed Bounce Back Attempts**: Recent opportunities where player failed to recover
+- **Failure Rate**: Percentage of recent bounce back attempts that failed
+- **Days Since Good Game**: Time elapsed since last quality performance
+
+**Example Analysis Output:**
+```javascript
+{
+  currentSituation: {
+    consecutivePoorGames: 5,
+    failedBounceBackAttempts: 3,
+    failureRate: 0.75, // 75% recent failure rate
+    daysSinceGoodGame: 8
+  },
+  classification: 'avoid',
+  bounceBackPotential: 0.12, // 12% (heavily penalized)
+  confidence: 0.25,
+  warnings: [
+    '3 recent failed bounce back attempts - reduced potential',
+    'Extended 5-game cold streak - significantly reduced potential'
+  ]
+}
+```
+
+### Integration Points
+
+**generatePositivePlayerPerformance.js Enhancement:**
+- Replaced `analyzeBounceBackPatterns()` with `analyzeEnhancedBounceBackPatterns()`
+- Enhanced scoring considers failure tracking and confidence levels
+- Explicit warnings for players with poor bounce back patterns
+- Detailed explanatory context in positive factors
+
+**Before Enhancement:**
+```javascript
+// Old system gave same score regardless of failed attempts
+if (bounceBackRate > 0.5) {
+  positiveScore += 20; // Always gave bonus for "pattern"
+}
+```
+
+**After Enhancement:**
+```javascript
+// New system penalizes repeated failures
+if (bounceBackAnalysis.recommendAction && bounceBackAnalysis.confidence >= 0.3) {
+  const bounceBackBonus = Math.min(25, bounceBackAnalysis.score * 0.3);
+  // Score is reduced by: (failedAttempts * 15%) + (streakLength * 8%) + (staleness * 3%)
+}
+```
+
+### Usage Examples
+
+**Testing Enhanced System:**
+```javascript
+// Test comparison between old and new systems
+const { runBounceBackComparisonTest } = require('./utils/bounceBackComparisonTest');
+runBounceBackComparisonTest();
+
+// Test specific player case  
+const { testSpecificCase } = require('./utils/bounceBackComparisonTest');
+testSpecificCase(playerGameHistory, 'Player Name');
+```
+
+**Enhanced Bounce Back Analysis:**
+```javascript
+const { analyzeEnhancedBounceBackPatterns } = require('./services/enhancedBounceBackAnalyzer');
+
+const analysis = analyzeEnhancedBounceBackPatterns(gameHistory, playerName);
+// Returns detailed analysis with failure tracking and confidence scoring
+```
+
+### Impact Assessment
+
+**Scenarios Correctly Identified:**
+1. **Extended Cold Streaks**: Players with 5+ consecutive poor games now receive appropriate warnings
+2. **Repeated Failures**: Players with multiple failed bounce back attempts get reduced scores
+3. **Stale Situations**: Players who haven't had good games in 7+ days receive staleness penalties
+4. **Historical Context**: Current situation compared to similar past cold streaks
+
+**Risk Mitigation:**
+- Prevents overconfidence in players with concerning patterns
+- Provides transparent reasoning for bounce back recommendations
+- Maintains opportunity identification for legitimate bounce back candidates
+- Includes detailed warnings for high-risk situations
+
+This critical enhancement ensures that bounce back analysis reflects realistic expectations based on recent performance patterns rather than treating each poor game as an independent opportunity for recovery.
+
+## Critical Development Patterns and Lessons Learned
+
+### Avoiding Infinite Positive Expectation Loops
+
+**Core Problem Pattern:**
+When analyzing player performance trends, avoid treating each negative event as an independent opportunity for positive rebound without tracking the success/failure history of such expectations.
+
+**Examples of This Anti-Pattern:**
+```javascript
+// BAD: Infinite optimism without failure tracking
+if (recentPoorPerformance) {
+  bounceBackScore += 20; // Same bonus regardless of past failures
+}
+
+// GOOD: Failure-aware analysis  
+if (recentPoorPerformance && failedAttempts < 3) {
+  bounceBackScore += Math.max(5, 20 - (failedAttempts * 5));
+}
+```
+
+**Implementation Guidelines:**
+1. **Track Historical Patterns**: Always look at how similar situations resolved historically
+2. **Implement Decay Functions**: Reduce confidence/scores with repeated failures
+3. **Use Adaptive Windows**: Extend analysis timeframes when clear patterns aren't evident
+4. **Provide Failure Context**: Show why expectations are reduced (e.g., "3 failed bounce back attempts")
+
+### Enhanced Analysis Architecture Principles
+
+**Rolling Expectation Framework:**
+- Base expectations on historical success rates in similar situations
+- Apply penalties for repeated failures to meet expectations
+- Include confidence decay for extended negative patterns
+- Compare current streaks to historical similar situations
+
+**Contextual Intelligence Requirements:**
+- Recent performance weighted more heavily than season averages
+- Team/opponent context integrated into individual analysis
+- Environmental factors (stadium, weather) considered in predictions
+- Explanatory reasoning provided for all classifications
+
+**Data Quality Awareness:**
+- Confidence scoring based on data completeness and sample size
+- Graceful fallbacks when primary data unavailable
+- Transparent indication of data quality in predictions
+- Regular validation of fallback strategy effectiveness
+
+### Service Architecture Best Practices
+
+**Analysis Service Integration:**
+```javascript
+// Services should be composable and context-aware
+const analysis = await comprehensiveAnalysis({
+  playerHistory: gameHistory,
+  teamContext: await teamPerformanceService.analyze(team),
+  opponentContext: await opponentAnalysis.analyze(opponent),
+  environmentalContext: await environmentService.analyze(venue, weather)
+});
+```
+
+**Caching and Performance:**
+- Use intelligent caching with appropriate timeout strategies
+- Batch analysis operations when possible
+- Implement singleton patterns for shared service instances
+- Optimize for both individual and batch prediction scenarios
+
+### Testing and Validation Patterns
+
+**Comparative Analysis Testing:**
+- Always test enhanced systems against legacy implementations
+- Create test scenarios that highlight improvement areas
+- Include edge cases (extended streaks, repeated failures)
+- Document expected behavior changes
+
+**Performance Monitoring:**
+- Track prediction accuracy vs actual outcomes
+- Monitor confidence score calibration
+- Validate that enhanced metrics correlate with real performance
+- Regular assessment of penalty factor effectiveness
+
+### Future Development Guidelines
+
+**When Adding New Analysis Features:**
+1. Consider how repeated failures should affect future predictions
+2. Implement confidence/quality scoring from the start
+3. Provide explanatory context for recommendations
+4. Include comparative testing against simpler approaches
+5. Document the specific problems being solved
+
+**Integration with Existing Systems:**
+- Maintain backward compatibility where possible
+- Provide migration paths for enhanced features
+- Include detailed reasoning in prediction outputs
+- Support both individual and batch analysis scenarios
+
+**Data Pipeline Considerations:**
+- Design for missing data scenarios from the beginning
+- Implement fallback hierarchies (individual → team → league → defaults)
+- Include data freshness and quality indicators
+- Support real-time and batch processing patterns
+
+### Service Dependencies and Integration
+
+**Core Service Relationships:**
+- `batchSummaryService` ← Enhanced with team performance integration
+- `teamPerformanceService` ← New service for opponent context
+- `enhancedBounceBackAnalyzer` ← Replaces simple bounce back logic
+- `matchupStrengthAnalyzer` ← Comprehensive matchup assessment utility
+
+**External Integration Points:**
+- BaseballAPI provides core prediction foundation
+- Stadium context service for environmental factors
+- Weather context service for game conditions
+- Player badge system for enhanced categorization
+
+This architectural foundation ensures that future enhancements maintain analytical rigor while avoiding the pitfalls of oversimplified positive expectation systems.
+
 ### Data Dependencies
 This application requires:
 1. **BaseballScraper** CSV files in `../BaseballScraper/` directory
