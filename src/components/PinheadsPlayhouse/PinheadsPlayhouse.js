@@ -150,11 +150,22 @@ const PinheadsPlayhouse = () => {
   const [pitcherSearchResults, setPitcherSearchResults] = useState([]);
   const [showPitcherSearch, setShowPitcherSearch] = useState(false);
 
+  // Dashboard filtering state
+  const [dashboardFilters, setDashboardFilters] = useState({
+    showStandoutOnly: false,
+    showHotStreaksOnly: false,
+    showHiddenGemsOnly: false,
+    showRiskWarningsOnly: false,
+    showSituationalOnly: false,
+    minConfidenceBoost: null,
+    categories: []
+  });
+
   // Sort options
   const [sortOptions, setSortOptions] = useState({});
   const [selectedColumns, setSelectedColumns] = useState([
-    'player_name', 'team', 'batter_hand', 'hr_score', 'hr_probability', 'hit_probability', 
-    'recent_avg', 'hr_rate', 'ab_due', 'arsenal_matchup', 'contact_trend', 'recent_trend_dir', 
+    'player_name', 'team', 'dashboard_badges', 'standout_score', 'hr_score', 'hr_probability', 'hit_probability', 
+    'recent_avg', 'hr_rate', 'ab_due', 'arsenal_matchup', 'enhanced_confidence', 'category',
     'pitcher_hand', 'pitcher_trend_dir', 'pitcher_home_hr_total'
   ]);
 
@@ -207,7 +218,14 @@ const PinheadsPlayhouse = () => {
     { key: 'pitcher_home_h_total', label: 'P Home H Total' },
     { key: 'pitcher_home_hr_total', label: 'P Home HR Total' },
     { key: 'pitcher_home_k_total', label: 'P Home K Total' },
-    { key: 'pitcher_home_games', label: 'P Home Games' }
+    { key: 'pitcher_home_games', label: 'P Home Games' },
+    
+    // Dashboard Context Columns (Enhanced Analysis)
+    { key: 'dashboard_badges', label: 'Context', description: 'Dashboard context badges' },
+    { key: 'standout_score', label: 'Standout Score', description: 'Enhanced score with dashboard context' },
+    { key: 'enhanced_confidence', label: 'Enhanced Confidence', description: 'Confidence with dashboard boost' },
+    { key: 'context_summary', label: 'Summary', description: 'Context summary' },
+    { key: 'category', label: 'Category', description: 'Player category (Hidden Gem, High Confidence, etc.)' }
   ];
 
   // Load JSON data on mount
@@ -260,7 +278,10 @@ const PinheadsPlayhouse = () => {
           'hr': 'HR Probability',
           'hit': 'Hit Probability',
           'reach_base': 'Reach Base Probability',
-          'strikeout': 'Strikeout Probability'
+          'strikeout': 'Strikeout Probability',
+          'enhanced_hr_score': 'Standout Score (Dashboard Enhanced)',
+          'enhanced_confidence': 'Enhanced Confidence',
+          'dashboard_context': 'Dashboard Context Level'
         });
       }
     };
@@ -447,6 +468,66 @@ const PinheadsPlayhouse = () => {
       </div>
     );
   }
+
+  // Filter predictions based on dashboard context
+  const filteredPredictions = useMemo(() => {
+    if (!predictions || predictions.length === 0) return [];
+
+    return predictions.filter(prediction => {
+      const context = prediction.dashboard_context;
+      if (!context) return true; // Include predictions without context
+
+      // Show standout players only
+      if (dashboardFilters.showStandoutOnly && !context.is_standout) {
+        return false;
+      }
+
+      // Show hot streaks only
+      if (dashboardFilters.showHotStreaksOnly) {
+        const hasHotStreak = context.badges.some(badge => 
+          badge.includes('🔥') || badge.includes('Hot Streak') || badge.includes('Active Streak')
+        );
+        if (!hasHotStreak) return false;
+      }
+
+      // Show hidden gems only
+      if (dashboardFilters.showHiddenGemsOnly) {
+        const isHiddenGem = context.category?.category === 'hidden_gem';
+        if (!isHiddenGem) return false;
+      }
+
+      // Show risk warnings only
+      if (dashboardFilters.showRiskWarningsOnly) {
+        const hasRisk = context.badges.some(badge => badge.includes('⚠️') || badge.includes('Risk'));
+        if (!hasRisk) return false;
+      }
+
+      // Show situational players only
+      if (dashboardFilters.showSituationalOnly) {
+        const isSituational = context.badges.some(badge => 
+          badge.includes('⏰') || badge.includes('🆚') || badge.includes('🏠')
+        );
+        if (!isSituational) return false;
+      }
+
+      // Minimum confidence boost filter
+      if (dashboardFilters.minConfidenceBoost !== null) {
+        if ((context.confidence_boost || 0) < dashboardFilters.minConfidenceBoost) {
+          return false;
+        }
+      }
+
+      // Category filter
+      if (dashboardFilters.categories.length > 0) {
+        const playerCategory = context.category?.category;
+        if (!dashboardFilters.categories.includes(playerCategory)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [predictions, dashboardFilters]);
 
   return (
     <div className="pinheads-playhouse">
@@ -703,6 +784,110 @@ const PinheadsPlayhouse = () => {
             )}
           </div>
 
+          {/* Dashboard Filtering Controls */}
+          <div className="dashboard-filters">
+            <h4>🎯 Dashboard Context Filters</h4>
+            <div className="filter-grid">
+              <label className="filter-checkbox">
+                <input
+                  type="checkbox"
+                  checked={dashboardFilters.showStandoutOnly}
+                  onChange={(e) => setDashboardFilters({
+                    ...dashboardFilters,
+                    showStandoutOnly: e.target.checked
+                  })}
+                />
+                ⭐ Standout Players Only
+              </label>
+
+              <label className="filter-checkbox">
+                <input
+                  type="checkbox"
+                  checked={dashboardFilters.showHotStreaksOnly}
+                  onChange={(e) => setDashboardFilters({
+                    ...dashboardFilters,
+                    showHotStreaksOnly: e.target.checked
+                  })}
+                />
+                🔥 Hot Streaks Only
+              </label>
+
+              <label className="filter-checkbox">
+                <input
+                  type="checkbox"
+                  checked={dashboardFilters.showHiddenGemsOnly}
+                  onChange={(e) => setDashboardFilters({
+                    ...dashboardFilters,
+                    showHiddenGemsOnly: e.target.checked
+                  })}
+                />
+                💎 Hidden Gems Only
+              </label>
+
+              <label className="filter-checkbox">
+                <input
+                  type="checkbox"
+                  checked={dashboardFilters.showRiskWarningsOnly}
+                  onChange={(e) => setDashboardFilters({
+                    ...dashboardFilters,
+                    showRiskWarningsOnly: e.target.checked
+                  })}
+                />
+                ⚠️ Risk Warnings Only
+              </label>
+
+              <label className="filter-checkbox">
+                <input
+                  type="checkbox"
+                  checked={dashboardFilters.showSituationalOnly}
+                  onChange={(e) => setDashboardFilters({
+                    ...dashboardFilters,
+                    showSituationalOnly: e.target.checked
+                  })}
+                />
+                🎯 Situational Stars Only
+              </label>
+
+              <div className="filter-input-group">
+                <label>Minimum Confidence Boost:</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="50"
+                  step="5"
+                  value={dashboardFilters.minConfidenceBoost || ''}
+                  onChange={(e) => setDashboardFilters({
+                    ...dashboardFilters,
+                    minConfidenceBoost: e.target.value ? parseInt(e.target.value) : null
+                  })}
+                  placeholder="e.g., 10"
+                />
+              </div>
+
+              <button 
+                className="clear-filters-btn"
+                onClick={() => setDashboardFilters({
+                  showStandoutOnly: false,
+                  showHotStreaksOnly: false,
+                  showHiddenGemsOnly: false,
+                  showRiskWarningsOnly: false,
+                  showSituationalOnly: false,
+                  minConfidenceBoost: null,
+                  categories: []
+                })}
+              >
+                🗑️ Clear All Filters
+              </button>
+            </div>
+            
+            <div className="filter-results-summary">
+              Showing {filteredPredictions.length} of {predictions.length} predictions
+              {filteredPredictions.length !== predictions.length && (
+                <span className="filter-applied-indicator"> (filtered)</span>
+              )}
+            </div>
+          </div>
+
           <div className="table-container">
             <table className="predictions-table">
               <thead>
@@ -714,7 +899,7 @@ const PinheadsPlayhouse = () => {
                 </tr>
               </thead>
               <tbody>
-                {predictions.map((prediction, index) => (
+                {filteredPredictions.map((prediction, index) => (
                   <tr key={index}>
                     {selectedColumns.map(colKey => {
                       let value = prediction[colKey];
@@ -722,7 +907,36 @@ const PinheadsPlayhouse = () => {
                       let className = '';
 
                       // Format different types of values
-                      if (colKey.includes('probability') || colKey === 'hr_rate') {
+                      if (colKey === 'dashboard_badges') {
+                        // Display badges as emoji string
+                        const context = prediction.dashboard_context;
+                        displayValue = context?.badges?.join(' ') || '';
+                        className = 'dashboard-badges';
+                      } else if (colKey === 'standout_score') {
+                        // Display standout score with enhanced formatting
+                        const context = prediction.dashboard_context;
+                        value = context?.standout_score || prediction.enhanced_hr_score || prediction.hr_score;
+                        displayValue = formatNumber(value, 1);
+                        className = context?.is_standout ? 'value-standout' : getValueColorClass(value, 'hr_score');
+                      } else if (colKey === 'enhanced_confidence') {
+                        // Display enhanced confidence with boost indicator
+                        const context = prediction.dashboard_context;
+                        value = prediction.enhanced_confidence || prediction.confidence;
+                        const boost = context?.confidence_boost || 0;
+                        displayValue = `${formatNumber(value, 1)}% ${boost > 0 ? `(+${boost})` : boost < 0 ? `(${boost})` : ''}`;
+                        className = boost > 10 ? 'value-excellent' : boost > 0 ? 'value-good' : boost < 0 ? 'value-poor' : '';
+                      } else if (colKey === 'context_summary') {
+                        // Display context summary
+                        const context = prediction.dashboard_context;
+                        displayValue = context?.context_summary || 'No context';
+                        className = 'context-summary';
+                      } else if (colKey === 'category') {
+                        // Display player category with appropriate styling
+                        const context = prediction.dashboard_context;
+                        const category = context?.category;
+                        displayValue = category?.label || 'Standard';
+                        className = `category-${category?.category || 'standard'}`;
+                      } else if (colKey.includes('probability') || colKey === 'hr_rate') {
                         displayValue = formatPercentage(value);  // Already percentages
                         className = getValueColorClass(value, colKey);
                       } else if (colKey === 'hr_score') {
