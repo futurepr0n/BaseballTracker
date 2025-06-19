@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useBaseballAnalysis } from '../../services/baseballAnalysisService';
 import batchSummaryService from '../../services/batchSummaryService';
+import startingLineupService from '../../services/startingLineupService';
 import BatchSummarySection from '../BatchSummarySection';
+import AutoFillButton from './AutoFillButton';
+import LineupRefreshButton from './LineupRefreshButton';
 import './PinheadsPlayhouse.css';
 
 
@@ -378,6 +381,74 @@ const PinheadsPlayhouse = () => {
       secondary: abbr
     }));
   }, [teamsData]);
+
+  // Auto-populate handler for lineup integration
+  const handleAutoFill = useCallback(async (result) => {
+    if (result.pitcher && result.pitcher !== 'TBD') {
+      setSingleAnalysisParams(prev => ({
+        ...prev,
+        pitcherName: result.pitcher
+      }));
+    }
+    if (result.team) {
+      setSingleAnalysisParams(prev => ({
+        ...prev,
+        teamAbbr: result.team
+      }));
+    }
+  }, []);
+
+  // Clear single matchup fields
+  const clearSingleMatchup = useCallback(() => {
+    setSingleAnalysisParams(prev => ({
+      ...prev,
+      pitcherName: '',
+      teamAbbr: ''
+    }));
+  }, []);
+
+  // Auto-populate when pitcher name changes
+  const handlePitcherChange = useCallback(async (value) => {
+    setSingleAnalysisParams(prev => ({...prev, pitcherName: value}));
+    
+    // Only auto-populate if team is empty and pitcher has meaningful length
+    if (value && value.trim().length > 2 && !singleAnalysisParams.teamAbbr.trim()) {
+      try {
+        const pitcherData = await startingLineupService.getTeamFromPitcher(value);
+        if (pitcherData && pitcherData.opponent) {
+          setSingleAnalysisParams(prev => ({
+            ...prev,
+            teamAbbr: pitcherData.opponent
+          }));
+          console.log(`✅ Auto-populated: ${pitcherData.opponent} batters vs ${value}`);
+        }
+      } catch (error) {
+        console.log('Auto-populate failed:', error);
+      }
+    }
+  }, [singleAnalysisParams.teamAbbr]);
+
+  // Auto-populate when team changes
+  const handleTeamChange = useCallback(async (value) => {
+    setSingleAnalysisParams(prev => ({...prev, teamAbbr: value}));
+    
+    // Only auto-populate if pitcher is empty and team has proper format
+    if (value && value.trim().length === 3 && !singleAnalysisParams.pitcherName.trim()) {
+      try {
+        const matchupData = await startingLineupService.getMatchupFromTeam(value);
+        if (matchupData && matchupData.opponentPitcher && matchupData.opponentPitcher !== 'TBD') {
+          setSingleAnalysisParams(prev => ({
+            ...prev,
+            pitcherName: matchupData.opponentPitcher
+          }));
+          console.log(`✅ Auto-populated: ${value} batters vs ${matchupData.opponentPitcher}`);
+        }
+      } catch (error) {
+        console.log('Auto-populate failed:', error);
+      }
+    }
+  }, [singleAnalysisParams.pitcherName]);
+
   // Handle single matchup analysis
   const handleSingleAnalysis = useCallback(async () => {
     if (!singleAnalysisParams.pitcherName || !singleAnalysisParams.teamAbbr) {
@@ -441,6 +512,75 @@ const PinheadsPlayhouse = () => {
     updated[index][field] = value;
     setBatchMatchups(updated);
   };
+
+  // Auto-populate handlers for batch matchups
+  const handleBatchPitcherChange = useCallback(async (index, value) => {
+    updateBatchMatchup(index, 'pitcher_name', value);
+    
+    // Only auto-populate if team is empty and pitcher has meaningful length
+    if (value && value.trim().length > 2 && !batchMatchups[index].team_abbr.trim()) {
+      try {
+        const pitcherData = await startingLineupService.getTeamFromPitcher(value);
+        if (pitcherData && pitcherData.opponent) {
+          updateBatchMatchup(index, 'team_abbr', pitcherData.opponent);
+          console.log(`✅ Batch auto-populated: ${pitcherData.opponent} batters vs ${value}`);
+        }
+      } catch (error) {
+        console.log('Batch auto-populate failed:', error);
+      }
+    }
+  }, [batchMatchups]);
+
+  const handleBatchTeamChange = useCallback(async (index, value) => {
+    updateBatchMatchup(index, 'team_abbr', value);
+    
+    // Only auto-populate if pitcher is empty and team has proper format
+    if (value && value.trim().length === 3 && !batchMatchups[index].pitcher_name.trim()) {
+      try {
+        const matchupData = await startingLineupService.getMatchupFromTeam(value);
+        if (matchupData && matchupData.opponentPitcher && matchupData.opponentPitcher !== 'TBD') {
+          updateBatchMatchup(index, 'pitcher_name', matchupData.opponentPitcher);
+          console.log(`✅ Batch auto-populated: ${value} batters vs ${matchupData.opponentPitcher}`);
+        }
+      } catch (error) {
+        console.log('Batch auto-populate failed:', error);
+      }
+    }
+  }, [batchMatchups]);
+
+  // Auto-fill specific batch matchup
+  const handleBatchAutoFill = useCallback(async (index, result) => {
+    if (result.pitcher && result.pitcher !== 'TBD') {
+      updateBatchMatchup(index, 'pitcher_name', result.pitcher);
+    }
+    if (result.team) {
+      updateBatchMatchup(index, 'team_abbr', result.team);
+    }
+  }, []);
+
+  // Clear specific batch matchup
+  const clearBatchMatchup = useCallback((index) => {
+    updateBatchMatchup(index, 'pitcher_name', '');
+    updateBatchMatchup(index, 'team_abbr', '');
+  }, []);
+
+  // Fill all batch matchups from today's lineups
+  const fillAllFromLineups = useCallback(async () => {
+    try {
+      const matchups = await startingLineupService.getTodaysMatchups();
+      if (matchups && matchups.length > 0) {
+        // Use ALL available matchups, don't limit to 10
+        const lineupMatchups = matchups.map(matchup => ({
+          pitcher_name: matchup.awayPitcher,
+          team_abbr: matchup.home
+        }));
+        setBatchMatchups(lineupMatchups);
+        console.log(`✅ Filled ${lineupMatchups.length} matchups from today's lineups`);
+      }
+    } catch (error) {
+      console.error('Failed to fill from lineups:', error);
+    }
+  }, []);
 
   // Format percentage values (they're already percentages from API)
   const formatPercentage = (value) => {
@@ -609,7 +749,7 @@ const PinheadsPlayhouse = () => {
               {pitcherOptions.length > 0 ? (
                 <SearchableDropdown
                   value={singleAnalysisParams.pitcherName}
-                  onChange={(value) => setSingleAnalysisParams({...singleAnalysisParams, pitcherName: value})}
+                  onChange={handlePitcherChange}
                   options={pitcherOptions}
                   placeholder="Search for a pitcher..."
                   showSecondary={true}
@@ -618,7 +758,7 @@ const PinheadsPlayhouse = () => {
                 <input
                   type="text"
                   value={singleAnalysisParams.pitcherName}
-                  onChange={(e) => setSingleAnalysisParams({...singleAnalysisParams, pitcherName: e.target.value})}
+                  onChange={(e) => handlePitcherChange(e.target.value)}
                   placeholder="e.g., MacKenzie Gore"
                 />
               )}
@@ -628,7 +768,7 @@ const PinheadsPlayhouse = () => {
               {teamOptions.length > 0 ? (
                 <SearchableDropdown
                   value={singleAnalysisParams.teamAbbr}
-                  onChange={(value) => setSingleAnalysisParams({...singleAnalysisParams, teamAbbr: value})}
+                  onChange={handleTeamChange}
                   options={teamOptions}
                   placeholder="Search for a team..."
                   displayKey="label"
@@ -638,11 +778,34 @@ const PinheadsPlayhouse = () => {
                 <input
                   type="text"
                   value={singleAnalysisParams.teamAbbr}
-                  onChange={(e) => setSingleAnalysisParams({...singleAnalysisParams, teamAbbr: e.target.value.toUpperCase()})}
+                  onChange={(e) => handleTeamChange(e.target.value.toUpperCase())}
                   placeholder="e.g., SEA"
                   maxLength="3"
                 />
               )}
+            </div>
+            <div className="form-group lineup-buttons">
+              <label>Lineup Tools:</label>
+              <div className="lineup-button-row">
+                <AutoFillButton
+                  onAutoFill={handleAutoFill}
+                  currentPitcher={singleAnalysisParams.pitcherName}
+                  currentTeam={singleAnalysisParams.teamAbbr}
+                  size="small"
+                />
+                <LineupRefreshButton
+                  size="small"
+                  showStatus={false}
+                />
+                <button
+                  type="button"
+                  onClick={clearSingleMatchup}
+                  className="clear-btn"
+                  title="Clear both fields"
+                >
+                  🗑️ Clear
+                </button>
+              </div>
             </div>
           </div>
           <div className="form-row">
@@ -693,14 +856,30 @@ const PinheadsPlayhouse = () => {
         <div className="analysis-form batch-form">
           <h3>Batch Pitcher vs Team Analysis</h3>
           <div className="batch-matchups">
-            <h4>Matchups</h4>
+            <div className="batch-header">
+              <h4>Matchups</h4>
+              <div className="batch-toolbar">
+                <button
+                  type="button"
+                  onClick={fillAllFromLineups}
+                  className="fill-lineups-btn"
+                  title="Fill with today's starting lineups"
+                >
+                  📋 Fill from Lineups
+                </button>
+                <LineupRefreshButton
+                  size="small"
+                  showStatus={false}
+                />
+              </div>
+            </div>
             {batchMatchups.map((matchup, index) => (
               <div key={index} className="batch-matchup-row">
                 <div className="pitcher-search-group" style={{flex: 1}}>
                   {pitcherOptions.length > 0 ? (
                     <SearchableDropdown
                       value={matchup.pitcher_name}
-                      onChange={(value) => updateBatchMatchup(index, 'pitcher_name', value)}
+                      onChange={(value) => handleBatchPitcherChange(index, value)}
                       options={pitcherOptions}
                       placeholder="Search pitcher..."
                       showSecondary={true}
@@ -709,7 +888,7 @@ const PinheadsPlayhouse = () => {
                     <input
                       type="text"
                       value={matchup.pitcher_name}
-                      onChange={(e) => updateBatchMatchup(index, 'pitcher_name', e.target.value)}
+                      onChange={(e) => handleBatchPitcherChange(index, e.target.value)}
                       placeholder="Pitcher name"
                     />
                   )}
@@ -718,7 +897,7 @@ const PinheadsPlayhouse = () => {
                   {teamOptions.length > 0 ? (
                     <SearchableDropdown
                       value={matchup.team_abbr}
-                      onChange={(value) => updateBatchMatchup(index, 'team_abbr', value)}
+                      onChange={(value) => handleBatchTeamChange(index, value)}
                       options={teamOptions}
                       placeholder="Search team..."
                       displayKey="label"
@@ -728,20 +907,37 @@ const PinheadsPlayhouse = () => {
                     <input
                       type="text"
                       value={matchup.team_abbr}
-                      onChange={(e) => updateBatchMatchup(index, 'team_abbr', e.target.value.toUpperCase())}
+                      onChange={(e) => handleBatchTeamChange(index, e.target.value.toUpperCase())}
                       placeholder="Team"
                       maxLength="3"
                     />
                   )}
                 </div>
-                {batchMatchups.length > 1 && (
-                  <button 
-                    className="remove-btn"
-                    onClick={() => removeBatchMatchup(index)}
+                <div className="batch-row-buttons">
+                  <AutoFillButton
+                    onAutoFill={(result) => handleBatchAutoFill(index, result)}
+                    currentPitcher={matchup.pitcher_name}
+                    currentTeam={matchup.team_abbr}
+                    size="small"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => clearBatchMatchup(index)}
+                    className="clear-btn"
+                    title="Clear this matchup"
                   >
-                    ×
+                    🗑️
                   </button>
-                )}
+                  {batchMatchups.length > 1 && (
+                    <button 
+                      className="remove-btn"
+                      onClick={() => removeBatchMatchup(index)}
+                      title="Remove this matchup"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
             <button className="add-matchup-btn" onClick={addBatchMatchup}>

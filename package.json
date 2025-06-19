@@ -9,6 +9,7 @@
         "axios": "^1.9.0",
         "body-parser": "^2.2.0",
         "concurrently": "^9.1.2",
+        "cors": "^2.8.5",
         "csv-parse": "^5.6.0",
         "express": "^5.1.0",
         "lodash": "^4.17.21",
