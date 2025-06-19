@@ -1,5 +1,87 @@
 /* PinheadsPlayhouse.css - FastAPI Backend Version */
 
+/* Lineup Integration Styles */
+.lineup-buttons {
+  min-width: 160px;
+}
+
+.lineup-button-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.lineup-button-row > * {
+  flex-shrink: 0;
+}
+
+.clear-btn {
+  padding: 4px 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  background-color: #ffffff;
+  color: #6b7280;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.clear-btn:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+/* Batch Analysis Lineup Integration */
+.batch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.batch-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.fill-lineups-btn {
+  padding: 6px 12px;
+  border: 1px solid #3b82f6;
+  border-radius: 6px;
+  background-color: #3b82f6;
+  color: white;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.fill-lineups-btn:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.batch-row-buttons {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.batch-matchup-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.batch-row-buttons .clear-btn {
+  padding: 2px 6px;
+  font-size: 0.7rem;
+}
+
 .pinheads-playhouse {
   max-width: 1400px;
   margin: 0 auto;

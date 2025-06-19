@@ -267,12 +267,47 @@ export const getAvailableLineupDates = async () => {
 };
 
 /**
- * Force refresh lineup data (clears cache)
+ * Force refresh lineup data from MLB API (fetches new data)
  */
 export const refreshLineupData = async () => {
-  lineupCache.data = null;
-  lineupCache.lastLoaded = null;
-  return await getTodaysLineups();
+  try {
+    console.log('🔄 Requesting fresh lineup data from MLB API...');
+    
+    // Call the BaseballAPI to fetch fresh data
+    const response = await fetch('http://localhost:8000/refresh-lineups', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Refresh failed: ${response.status} ${response.statusText}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      console.log('✅ Fresh lineup data fetched successfully');
+      
+      // Clear cache and reload from new file
+      lineupCache.data = null;
+      lineupCache.lastLoaded = null;
+      
+      return await getTodaysLineups();
+    } else {
+      throw new Error(result.message || 'Refresh failed');
+    }
+    
+  } catch (error) {
+    console.error('❌ Failed to refresh lineup data:', error);
+    
+    // Fallback to cache clear only
+    console.log('🔄 Falling back to cache refresh only...');
+    lineupCache.data = null;
+    lineupCache.lastLoaded = null;
+    return await getTodaysLineups();
+  }
 };
 
 /**
@@ -281,23 +316,22 @@ export const refreshLineupData = async () => {
 export const getTodaysMatchups = async () => {
   try {
     const lineupData = await getTodaysLineups();
-    if (!lineupData || !lineupData.quickLookup) {
+    if (!lineupData || !lineupData.games) {
       return [];
     }
     
-    const matchups = [];
-    for (const [team, data] of Object.entries(lineupData.quickLookup.byTeam)) {
-      if (data.homeAway === 'away') { // Only include away teams to avoid duplicates
-        matchups.push({
-          away: team,
-          home: data.opponent,
-          awayPitcher: data.pitcher,
-          homePitcher: data.opponentPitcher,
-          gameTime: data.gameTime,
-          matchupKey: `${team}@${data.opponent}`
-        });
-      }
-    }
+    // Use actual games data instead of quickLookup to get all games including doubleheaders
+    const matchups = lineupData.games.map(game => ({
+      away: game.teams.away.abbr,
+      home: game.teams.home.abbr,
+      awayPitcher: game.pitchers.away.name,
+      homePitcher: game.pitchers.home.name,
+      gameTime: game.gameTime,
+      gameId: game.gameId,
+      matchupKey: game.matchupKey || `${game.teams.away.abbr}@${game.teams.home.abbr}_${game.gameTime}`,
+      venue: game.venue.name,
+      status: game.status
+    }));
     
     return matchups.sort((a, b) => a.gameTime.localeCompare(b.gameTime));
   } catch (error) {
