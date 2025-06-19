@@ -1,0 +1,160 @@
+.auto-fill-container {
+  position: relative;
+  display: inline-block;
+}
+
+.auto-fill-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+}
+
+.auto-fill-button:hover:not(.disabled) {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.auto-fill-button:active:not(.disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.auto-fill-button.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+}
+
+.auto-fill-button.success {
+  background-color: rgba(34, 197, 94, 0.1);
+  border-color: #22c55e;
+  color: #059669;
+}
+
+.auto-fill-button.warning {
+  background-color: rgba(251, 191, 36, 0.1);
+  border-color: #fbbf24;
+  color: #d97706;
+}
+
+.auto-fill-button.error {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+/* Size variants */
+.auto-fill-button.small {
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  gap: 4px;
+}
+
+.auto-fill-button.large {
+  padding: 10px 16px;
+  font-size: 1rem;
+  gap: 8px;
+}
+
+.button-icon {
+  font-size: 1em;
+  line-height: 1;
+}
+
+.button-text {
+  line-height: 1;
+}
+
+/* Game info tooltip */
+.game-info-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 4px;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.auto-fill-container:hover .game-info-tooltip {
+  opacity: 1;
+}
+
+.tooltip-content {
+  background-color: #1f2937;
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tooltip-content::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid #1f2937;
+}
+
+.game-time,
+.venue,
+.home-away {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Loading animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.auto-fill-button.disabled .button-icon {
+  animation: spin 1s linear infinite;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .auto-fill-button {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+  
+  .auto-fill-button.small {
+    padding: 4px 6px;
+    font-size: 0.7rem;
+  }
+  
+  .button-text {
+    display: none;
+  }
+  
+  .auto-fill-button .button-icon {
+    font-size: 1.2em;
+  }
+}
