@@ -171,9 +171,9 @@ const PinheadsPlayhouse = () => {
   // Sort options
   const [sortOptions, setSortOptions] = useState({});
   const [selectedColumns, setSelectedColumns] = useState([
-    'player_name', 'team', 'dashboard_badges', 'standout_score', 'hr_score', 'hr_probability', 'hit_probability', 
+    'player_name', 'team', 'batter_hand', 'pitcher_hand', 'dashboard_badges', 'standout_score', 'hr_score', 'hr_probability', 'hit_probability', 
     'recent_avg', 'hr_rate', 'ab_due', 'arsenal_matchup', 'enhanced_confidence', 'category',
-    'pitcher_hand', 'pitcher_trend_dir', 'pitcher_home_hr_total', 'stadium_factor', 'pitcher_vulnerability'
+    'pitcher_trend_dir', 'pitcher_home_hr_total', 'stadium_factor', 'pitcher_vulnerability'
   ]);
 
   // Available columns for table display
@@ -827,9 +827,88 @@ const PinheadsPlayhouse = () => {
                 {analysisResults.matchup_summaries && (
                   <span>Matchups: {analysisResults.matchup_summaries.length}</span>
                 )}
+                {/* Show fallback indicator if using league averages */}
+                {(analysisResults.used_client_fallback || analysisResults.batch_fallback_info?.used_fallback) && (
+                  <div className="fallback-indicator">
+                    <span className="fallback-badge">⚠️ League Average Fallback</span>
+                    {analysisResults.batch_fallback_info?.used_fallback ? (
+                      <span className="fallback-reason">
+                        {analysisResults.batch_fallback_info.fallback_count} of {analysisResults.batch_fallback_info.successful_matchups} matchups using fallback
+                      </span>
+                    ) : (
+                      <span className="fallback-reason">{analysisResults.fallback_reason}</span>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
+
+          {/* Fallback Information Panel */}
+          {(analysisResults?.used_client_fallback || analysisResults?.batch_fallback_info?.used_fallback) && (
+            <div className="fallback-info-panel">
+              <div className="icon">⚠️</div>
+              <div className="fallback-info-content">
+                <h4>📊 Using League Average Projections</h4>
+                
+                {/* Single Matchup Fallback */}
+                {analysisResults.used_client_fallback && !analysisResults.batch_fallback_info && (
+                  <div className="fallback-details">
+                    <p><strong>Reason:</strong> {analysisResults.fallback_reason}</p>
+                    <p><strong>Methodology:</strong> {analysisResults.fallback_info?.methodology || 'League average performance vs typical pitcher profile'}</p>
+                  </div>
+                )}
+
+                {/* Batch Analysis Fallback */}
+                {analysisResults.batch_fallback_info?.used_fallback && (
+                  <div className="fallback-details">
+                    <p><strong>Batch Analysis Fallback:</strong> {analysisResults.batch_fallback_info.fallback_count} of {analysisResults.batch_fallback_info.successful_matchups} matchups required fallback predictions.</p>
+                    <p><strong>Methodology:</strong> {analysisResults.batch_fallback_info.methodology}</p>
+                    
+                    {/* Show details of which pitchers needed fallback */}
+                    {analysisResults.batch_fallback_info.fallback_details && analysisResults.batch_fallback_info.fallback_details.length > 0 && (
+                      <div className="fallback-pitcher-list">
+                        <strong>Pitchers using fallback:</strong>
+                        <ul>
+                          {analysisResults.batch_fallback_info.fallback_details.map((detail, index) => (
+                            <li key={index}>
+                              <strong>{detail.pitcher}</strong> vs {detail.team}: {detail.reason}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Show any complete failures */}
+                    {analysisResults.batch_fallback_info.partial_failures && analysisResults.batch_fallback_info.partial_failures.length > 0 && (
+                      <div className="failed-matchups">
+                        <strong>⚠️ Failed Matchups:</strong>
+                        <ul>
+                          {analysisResults.batch_fallback_info.partial_failures.map((failure, index) => (
+                            <li key={index}>
+                              <strong>{failure.pitcher}</strong> vs {failure.team}: {failure.error}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="confidence-notice">
+                  <strong>⚠️ Lower Confidence:</strong> These predictions use league averages rather than specific pitcher data. 
+                  Consider them baseline estimates rather than precise matchup analysis.
+                </div>
+                
+                <div className="fallback-stats">
+                  <span>Avg HR Score: {analysisResults.analysis_summary?.avg_hr_score?.toFixed(1) || '45.0'}</span>
+                  <span>Avg Confidence: {((analysisResults.analysis_summary?.avg_confidence || 0.4) * 100).toFixed(0)}%</span>
+                  <span>Data Quality: {analysisResults.analysis_summary?.data_completeness ? 
+                    `${(analysisResults.analysis_summary.data_completeness * 100).toFixed(0)}%` : 'Low'}</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Batch Summary Section */}
           <BatchSummarySection
@@ -954,15 +1033,43 @@ const PinheadsPlayhouse = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredPredictions.map((prediction, index) => (
-                  <tr key={index}>
+                {filteredPredictions.map((prediction, index) => {
+                  // Check if THIS SPECIFIC prediction is from fallback
+                  const isFallbackPrediction = prediction.is_fallback_prediction || 
+                                               prediction.used_fallback ||
+                                               prediction.fallback_type === 'league_average';
+                  
+                  return (
+                  <tr 
+                    key={index} 
+                    className={isFallbackPrediction ? 'fallback-prediction' : ''}
+                  >
                     {selectedColumns.map(colKey => {
                       let value = prediction[colKey];
                       let displayValue = value;
                       let className = '';
 
+                      // Add fallback indicator to player name if applicable
+                      if (colKey === 'player_name' && isFallbackPrediction) {
+                        // Debug: log which predictions are being marked as fallback
+                        console.log(`🔍 Fallback player: ${value}`, {
+                          is_fallback_prediction: prediction.is_fallback_prediction,
+                          used_fallback: prediction.used_fallback,
+                          fallback_type: prediction.fallback_type,
+                          matchup_pitcher: prediction.matchup_pitcher,
+                          matchup_team: prediction.matchup_team
+                        });
+                        
+                        displayValue = (
+                          <span>
+                            {value}
+                            <span className="fallback-indicator">FALLBACK</span>
+                          </span>
+                        );
+                      }
+                      
                       // Format different types of values
-                      if (colKey === 'dashboard_badges') {
+                      else if (colKey === 'dashboard_badges') {
                         // Display badges as emoji string
                         const context = prediction.dashboard_context;
                         displayValue = context?.badges?.join(' ') || '';
@@ -1096,7 +1203,8 @@ const PinheadsPlayhouse = () => {
                       );
                     })}
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

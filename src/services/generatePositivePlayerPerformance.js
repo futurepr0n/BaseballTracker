@@ -7,13 +7,16 @@
  * Patterns analyzed:
  * - Hot streaks and momentum continuation
  * - Post-rest excellence patterns
- * - Bounce-back performance after struggles
+ * - ENHANCED Bounce-back performance after struggles (with failure tracking)
  * - Home comfort and series advantages
  * - Travel advantages over opponents
  * - Favorable matchup situations
  * - Team momentum and confidence factors
  * - Historical breakout patterns
  * - Weather and stadium advantages
+ * 
+ * CRITICAL ENHANCEMENT: Bounce back analysis now tracks failed attempts and reduces
+ * potential scores for players who repeatedly fail to bounce back from cold streaks.
  */
 
 const fs = require('fs');
@@ -27,6 +30,12 @@ const {
   assessTravelDifficulty,
   TEAM_TO_STADIUM
 } = require('./stadiumCoordinates');
+
+// Import enhanced bounce back analyzer
+const {
+  analyzeEnhancedBounceBackPatterns,
+  generateBounceBackSummary
+} = require('./enhancedBounceBackAnalyzer');
 console.log('✅ Positive momentum analysis enabled - stadium coordinates loaded');
 
 // Configuration
@@ -258,45 +267,23 @@ function analyzePostRestExcellence(gameHistory, playerName) {
 /**
  * Analyze bounce-back patterns after poor performance - PLAYER-SPECIFIC ANALYSIS
  */
-function analyzeBounceBackPatterns(gameHistory, playerName) {
-  const playerSeasonAvg = gameHistory.reduce((sum, game) => sum + game.avg, 0) / Math.max(gameHistory.length, 1);
-  const poorGameThreshold = Math.max(0.150, playerSeasonAvg * 0.7);
-  const bounceBackAnalysis = [];
-  
-  gameHistory.forEach((game, index) => {
-    if (index >= gameHistory.length - 1) return;
-    
-    // Check if this was a poor performance game
-    if (game.avg < poorGameThreshold && game.atBats >= 2) {
-      const nextGames = gameHistory.slice(index + 1, Math.min(index + 4, gameHistory.length));
-      
-      if (nextGames.length > 0) {
-        const bounceBackGames = nextGames.filter(g => g.avg >= playerSeasonAvg * 1.2);
-        const strongBounceBack = nextGames.some(g => g.avg >= 0.400 || g.hits >= 3);
-        
-        bounceBackAnalysis.push({
-          poorGame: game,
-          nextGames: nextGames,
-          hasBounceBack: bounceBackGames.length > 0,
-          hasStrongBounceBack: strongBounceBack
-        });
-      }
-    }
-  });
-  
-  const bounceBackRate = bounceBackAnalysis.length > 0 ? 
-    bounceBackAnalysis.filter(b => b.hasBounceBack).length / bounceBackAnalysis.length : 0;
-  
-  const strongBounceBackRate = bounceBackAnalysis.length > 0 ?
-    bounceBackAnalysis.filter(b => b.hasStrongBounceBack).length / bounceBackAnalysis.length : 0;
-  
-  return {
-    bounceBackOpportunities: bounceBackAnalysis.length,
-    bounceBackRate,
-    strongBounceBackRate,
-    isReliablePattern: bounceBackAnalysis.length >= 5
-  };
-}
+// LEGACY FUNCTION - REPLACED BY ENHANCED BOUNCE BACK ANALYZER
+// This function had a critical flaw: it didn't penalize repeated failed bounce back attempts
+// Players could have 10 straight poor games and still get the same "bounce back potential"
+// 
+// function analyzeBounceBackPatterns(gameHistory, playerName) {
+//   // ... old implementation commented out
+//   // SEE enhancedBounceBackAnalyzer.js for improved logic that tracks failures
+// }
+
+/**
+ * ENHANCED BOUNCE BACK ANALYSIS - Key Improvements:
+ * 1. Tracks failed bounce back attempts and reduces scores accordingly
+ * 2. Uses adaptive analysis windows to find meaningful patterns
+ * 3. Compares current cold streaks to similar historical situations
+ * 4. Implements rolling expectation that decreases with each failure
+ * 5. Provides detailed explanations for why bounce back is/isn't likely
+ */
 
 /**
  * Analyze home field advantages and series positioning
@@ -607,7 +594,7 @@ function calculatePositivePerformanceScore(player, seasonData, todaysGameContext
   const playerContext = analyzePlayerCurrentContext(player.name, player.team, seasonData);
   
   const postRestPatterns = analyzePostRestExcellence(hotStreakAnalysis.gameHistory, player.name);
-  const bounceBackAnalysis = analyzeBounceBackPatterns(hotStreakAnalysis.gameHistory, player.name);
+  const bounceBackAnalysis = analyzeEnhancedBounceBackPatterns(hotStreakAnalysis.gameHistory, player.name);
   const homeFieldAnalysis = analyzeHomeFieldAdvantages(player.name, player.team, seasonData);
   const opponentAnalysis = analyzeOpponentDisadvantages(player.team, seasonData, todaysGameContext);
   const teamMomentumAnalysis = analyzeTeamMomentum(player.team, seasonData);
@@ -650,19 +637,42 @@ function calculatePositivePerformanceScore(player, seasonData, todaysGameContext
     }
   }
   
-  // Factor 3: Bounce-back potential - ONLY if player had recent poor performance to bounce back from
+  // Factor 3: ENHANCED Bounce-back potential - WITH FAILURE TRACKING
   if (playerContext.hadRecentPoorPerformance && !playerContext.hadRecentExceptionalPerformance) {
-    if (bounceBackAnalysis.isReliablePattern && bounceBackAnalysis.bounceBackRate > 0.5) {
-      const bounceBackBonus = Math.min(20, bounceBackAnalysis.strongBounceBackRate * 30);
-      positiveScore += bounceBackBonus;
-      positiveFactors.push({
-        type: 'bounce_back_potential',
-        description: `Strong bounce-back pattern - ${(bounceBackAnalysis.strongBounceBackRate * 100).toFixed(1)}% rate after poor games`,
-        positivePoints: bounceBackBonus,
-        bounceBackRate: bounceBackAnalysis.bounceBackRate,
-        strongBounceBackRate: bounceBackAnalysis.strongBounceBackRate,
-        lastPoorGame: playerContext.lastPoorGameDate
-      });
+    if (bounceBackAnalysis.recommendAction && bounceBackAnalysis.confidence >= 0.3) {
+      // Use the enhanced scoring system that penalizes failed attempts
+      const bounceBackBonus = Math.min(25, bounceBackAnalysis.score * 0.3); // Scale the 0-100 score
+      
+      if (bounceBackBonus > 5) { // Only add if meaningful bonus
+        positiveScore += bounceBackBonus;
+        
+        const summary = generateBounceBackSummary(bounceBackAnalysis);
+        positiveFactors.push({
+          type: 'enhanced_bounce_back_potential',
+          description: summary.recommendation,
+          positivePoints: bounceBackBonus,
+          bounceBackPotential: bounceBackAnalysis.bounceBackPotential,
+          confidence: bounceBackAnalysis.confidence,
+          classification: bounceBackAnalysis.classification,
+          failedAttempts: bounceBackAnalysis.currentSituation.failedBounceBackAttempts,
+          coldStreakLength: bounceBackAnalysis.currentSituation.consecutivePoorGames,
+          lastPoorGame: playerContext.lastPoorGameDate,
+          keyFactors: summary.keyFactors,
+          warnings: summary.riskFactors
+        });
+      }
+      
+      // Add warnings for concerning patterns
+      if (bounceBackAnalysis.currentSituation.failedBounceBackAttempts >= 2) {
+        contextualWarnings.push(`⚠️ ${bounceBackAnalysis.currentSituation.failedBounceBackAttempts} recent failed bounce back attempts - reduced confidence`);
+      }
+      
+      if (bounceBackAnalysis.currentSituation.consecutivePoorGames >= 5) {
+        contextualWarnings.push(`⚠️ Extended ${bounceBackAnalysis.currentSituation.consecutivePoorGames}-game cold streak - avoid until signs of recovery`);
+      }
+    } else {
+      // Explicitly warn against bounce back expectations when pattern is poor
+      contextualWarnings.push(`❌ Bounce back unlikely - ${bounceBackAnalysis.warnings?.join(', ') || 'poor historical pattern with recent failures'}`);
     }
   } else if (playerContext.hadRecentExceptionalPerformance) {
     contextualWarnings.push('Recent exceptional performance - bounce-back analysis not applicable');
@@ -833,10 +843,13 @@ module.exports = {
   calculatePositivePerformanceScore,
   analyzeHotStreaks,
   analyzePostRestExcellence,
-  analyzeBounceBackPatterns,
+  // analyzeBounceBackPatterns - REMOVED: Replaced by enhancedBounceBackAnalyzer
   analyzeHomeFieldAdvantages,
   analyzeOpponentDisadvantages,
-  analyzeTeamMomentum
+  analyzeTeamMomentum,
+  
+  // Enhanced bounce back analysis is imported from separate module
+  // See enhancedBounceBackAnalyzer.js for failure-tracking implementation
 };
 
 // Run if called directly
