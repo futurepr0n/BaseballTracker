@@ -1,29 +1,9 @@
 # Dependencies
 node_modules/
 
-# Build output
+# Build output and data directories
 build/
-
-# Dynamic data files that change daily - should not be tracked
-public/data/stats/
-public/data/lineups/
-public/data/2025/
-public/data/rolling_stats/
-public/data/predictions/
-public/data/injuries/
-public/data/multi_hit_stats/
-public/data/odds/
-
-# Build artifacts
-build/data/stats/
-build/data/lineups/
-# Static data files that should be tracked
-!public/data/teams.json
-!public/data/rosters.json
-!public/data/handicappers.json
-!public/data/playerMappings.json
-!public/data/logos/
-!public/data/stadium/
+public/data/
 
 # IDE and local settings
 .claude/settings.local.json
