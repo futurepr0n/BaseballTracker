@@ -8,7 +8,7 @@ import './PositiveMomentumCard.css';
  * Card component showing players with positive momentum and performance indicators
  * Displays players with hot streaks, post-rest advantages, bounce-back potential, etc.
  */
-const PositiveMomentumCard = ({ currentDate, teams, maxItems = 15 }) => {
+const PositiveMomentumCard = ({ currentDate, teams, maxItems = 25 }) => {
   const [momentumData, setMomentumData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);

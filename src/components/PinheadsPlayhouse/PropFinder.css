@@ -281,6 +281,38 @@
   line-height: 1.3;
 }
 
+/* Lineup Context Styling */
+.lineup-context {
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+.batting-order {
+  background: #007bff;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+/* Enhanced prop item with lineup info */
+.prop-item.enhanced {
+  border-left: 3px solid #28a745;
+  padding-left: 8px;
+}
+
+.prop-item.lineup-confirmed {
+  position: relative;
+}
+
+.prop-item.lineup-confirmed::before {
+  content: "📋";
+  position: absolute;
+  left: -2px;
+  top: 0;
+  font-size: 10px;
+}
+
 /* No Props State */
 .no-props {
   padding: 40px 20px;
