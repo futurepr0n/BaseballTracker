@@ -11,6 +11,8 @@ const lineupCache = {
   cacheTimeout: 15 * 60 * 1000 // 15 minutes
 };
 
+// No automatic background refresh - keep it simple and manual
+
 /**
  * Format date as string (YYYY-MM-DD)
  */
@@ -63,9 +65,9 @@ const loadLineupData = async (dateStr = null) => {
 };
 
 /**
- * Get today's lineup data with caching
+ * Get today's lineup data with caching and auto-refresh
  */
-export const getTodaysLineups = async (date = null) => {
+export const getTodaysLineups = async (date = null, autoRefresh = true) => {
   try {
     // Use cache if fresh
     if (!date && isCacheFresh()) {
@@ -80,16 +82,22 @@ export const getTodaysLineups = async (date = null) => {
       return data;
     }
     
-    // Try previous day if today's data not available
-    if (!date) {
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayStr = formatDateString(yesterday);
-      
-      console.warn(`Today's lineup data not available, trying ${yesterdayStr}`);
-      return await loadLineupData(yesterdayStr);
+    // Auto-refresh if no data found and it's for today
+    if (!date && autoRefresh) {
+      console.log(`🔄 No lineup data found for today (${dateStr}). Auto-refreshing...`);
+      try {
+        const refreshedData = await refreshLineupData();
+        if (refreshedData) {
+          console.log(`✅ Auto-refresh successful for ${dateStr}`);
+          return refreshedData;
+        }
+      } catch (refreshError) {
+        console.error(`❌ Auto-refresh failed:`, refreshError);
+      }
     }
     
+    // DO NOT fall back to previous day - different teams/opponents would invalidate analysis
+    console.warn(`⚠️ No lineup data available for ${dateStr}. Click "Refresh Lineups" to fetch fresh data.`);
     return null;
   } catch (error) {
     console.error('Error in getTodaysLineups:', error);
@@ -294,7 +302,11 @@ export const refreshLineupData = async () => {
       lineupCache.data = null;
       lineupCache.lastLoaded = null;
       
-      return await getTodaysLineups();
+      // Add small delay to ensure file is fully written
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Reload data without auto-refresh to prevent infinite loops
+      return await getTodaysLineups(null, false);
     } else {
       throw new Error(result.message || 'Refresh failed');
     }
@@ -306,7 +318,7 @@ export const refreshLineupData = async () => {
     console.log('🔄 Falling back to cache refresh only...');
     lineupCache.data = null;
     lineupCache.lastLoaded = null;
-    return await getTodaysLineups();
+    return await getTodaysLineups(null, false);
   }
 };
 
