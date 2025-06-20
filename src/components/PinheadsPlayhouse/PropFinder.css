@@ -1,0 +1,425 @@
+/**
+ * PropFinder.css
+ * 
+ * Styles for the prop betting opportunities component
+ */
+
+.prop-finder {
+  margin-top: 30px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.prop-finder-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.prop-finder-header h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.prop-summary {
+  display: flex;
+  gap: 20px;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.prop-summary span {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+}
+
+/* Loading and Error States */
+.prop-loading, .prop-error {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.prop-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: #666;
+}
+
+.prop-error {
+  color: #d32f2f;
+  background: #ffebee;
+  margin: 20px;
+  border-radius: 6px;
+}
+
+/* Controls */
+.prop-controls {
+  padding: 16px 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.prop-filters {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-group label {
+  font-weight: 500;
+  color: #555;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.filter-group select {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  font-size: 0.9rem;
+  min-width: 120px;
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+/* Table */
+.prop-table-container {
+  overflow-x: auto;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.prop-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.prop-table th {
+  background: #f1f3f4;
+  padding: 12px 8px;
+  text-align: left;
+  font-weight: 600;
+  color: #444;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.prop-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: top;
+}
+
+.prop-table tr:hover {
+  background: #f8f9fa;
+}
+
+/* Player Info */
+.player-info {
+  white-space: nowrap;
+  overflow: visible;
+}
+
+.player-info .player-name {
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.player-info .player-team {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: visible;
+}
+
+/* Best Prop */
+.best-prop .prop-type {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.best-prop .prop-trend {
+  font-size: 1.2rem;
+}
+
+/* Prop Rate */
+.prop-rate .rate-percentage {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.prop-rate .rate-record {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* Probability Classes */
+.prob-excellent .rate-percentage {
+  color: #4caf50;
+}
+
+.prob-high .rate-percentage {
+  color: #8bc34a;
+}
+
+.prob-good .rate-percentage {
+  color: #ffb74d;
+}
+
+.prob-medium .rate-percentage {
+  color: #ff9800;
+}
+
+.prob-low .rate-percentage {
+  color: #f44336;
+}
+
+/* Confidence */
+.confidence .confidence-level {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.confidence .confidence-score {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* Confidence Classes */
+.confidence-excellent .confidence-level {
+  color: #4caf50;
+}
+
+.confidence-high .confidence-level {
+  color: #8bc34a;
+}
+
+.confidence-good .confidence-level {
+  color: #2196f3;
+}
+
+.confidence-medium .confidence-level {
+  color: #ff9800;
+}
+
+.confidence-low .confidence-level {
+  color: #f44336;
+}
+
+/* All Props */
+.all-props .props-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.prop-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+}
+
+.prop-icon {
+  font-size: 0.9rem;
+}
+
+.prop-name {
+  flex: 1;
+  color: #555;
+}
+
+.prop-prob {
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: #f0f0f0;
+}
+
+.more-props {
+  font-size: 0.75rem;
+  color: #888;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* Situational Boost */
+.situational-boost .boost-text {
+  font-size: 0.8rem;
+  color: #666;
+  line-height: 1.3;
+}
+
+/* No Props State */
+.no-props {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.no-props-message {
+  color: #666;
+}
+
+.no-props-message span {
+  font-size: 1.2rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.no-props-message p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Legend */
+.prop-legend {
+  padding: 16px 20px;
+  background: #f8f9fa;
+  border-top: 1px solid #e0e0e0;
+}
+
+.prop-legend h4 {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  color: #444;
+}
+
+.legend-grid {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.legend-icon {
+  font-size: 1rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .prop-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .filter-group {
+    justify-content: space-between;
+  }
+
+  .filter-group select {
+    min-width: auto;
+    flex: 1;
+  }
+
+  .prop-table {
+    font-size: 0.8rem;
+  }
+
+  .prop-table th,
+  .prop-table td {
+    padding: 8px 4px;
+  }
+
+  /* Adjust player column for mobile */
+  .prop-table th:nth-child(1),
+  .prop-table td:nth-child(1) {
+    width: 25%; /* Larger percentage on mobile */
+    min-width: 100px;
+  }
+
+  .legend-grid {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .prop-summary {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* Specific column widths for better layout */
+.prop-table th:nth-child(1),
+.prop-table td:nth-child(1) {
+  width: 18%; /* Player - increased width */
+  min-width: 120px; /* Ensure minimum width for player names */
+}
+
+.prop-table th:nth-child(2),
+.prop-table td:nth-child(2) {
+  width: 18%; /* Best Prop - reduced slightly */
+}
+
+.prop-table th:nth-child(3),
+.prop-table td:nth-child(3) {
+  width: 12%; /* Rate */
+}
+
+.prop-table th:nth-child(4),
+.prop-table td:nth-child(4) {
+  width: 12%; /* Confidence */
+}
+
+.prop-table th:nth-child(5),
+.prop-table td:nth-child(5) {
+  width: 24%; /* All Props - reduced slightly */
+}
+
+.prop-table th:nth-child(6),
+.prop-table td:nth-child(6) {
+  width: 16%; /* Context */
+}
+
+/* Loading spinner */
+.loading-spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

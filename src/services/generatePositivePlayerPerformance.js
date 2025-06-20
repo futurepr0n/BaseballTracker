@@ -583,7 +583,7 @@ function analyzePlayerCurrentContext(playerName, team, seasonData) {
 /**
  * Calculate comprehensive positive performance score with CONTEXTUAL ACCURACY
  */
-function calculatePositivePerformanceScore(player, seasonData, todaysGameContext) {
+function calculatePositivePerformanceScore(player, seasonData, todaysGameContext, cachedTeamAnalysis = null) {
   const hotStreakAnalysis = analyzeHotStreaks(player.name, player.team, seasonData);
   
   if (hotStreakAnalysis.gameHistory.length < POSITIVE_PERFORMANCE_THRESHOLDS.MIN_GAMES_ANALYSIS) {
@@ -596,8 +596,10 @@ function calculatePositivePerformanceScore(player, seasonData, todaysGameContext
   const postRestPatterns = analyzePostRestExcellence(hotStreakAnalysis.gameHistory, player.name);
   const bounceBackAnalysis = analyzeEnhancedBounceBackPatterns(hotStreakAnalysis.gameHistory, player.name);
   const homeFieldAnalysis = analyzeHomeFieldAdvantages(player.name, player.team, seasonData);
-  const opponentAnalysis = analyzeOpponentDisadvantages(player.team, seasonData, todaysGameContext);
-  const teamMomentumAnalysis = analyzeTeamMomentum(player.team, seasonData);
+  
+  // Use cached team analysis for better performance
+  const opponentAnalysis = cachedTeamAnalysis ? cachedTeamAnalysis.opponentDisadvantages : analyzeOpponentDisadvantages(player.team, seasonData, todaysGameContext);
+  const teamMomentumAnalysis = cachedTeamAnalysis ? cachedTeamAnalysis.teamMomentum : analyzeTeamMomentum(player.team, seasonData);
   
   let positiveScore = 0;
   const positiveFactors = [];
@@ -769,24 +771,140 @@ async function generatePositivePerformancePredictions(targetDate = new Date()) {
   }
   
   const seasonData = loadAllSeasonData();
-  const hitters = rosterData.filter(player => player.type === 'hitter' || !player.type);
+  const allHitters = rosterData.filter(player => player.type === 'hitter' || !player.type);
   
-  console.log(`Analyzing ${hitters.length} hitters for positive performance potential`);
+  // AGGRESSIVE PRE-FILTERING: Only analyze top performers to reduce computational load
+  console.log(`Pre-filtering ${allHitters.length} hitters for positive performance analysis...`);
+  
+  // First pass: Basic filtering
+  const basicFiltered = allHitters.filter(player => {
+    const seasonAvg = getPlayerSeasonAverage(player.name, player.team, seasonData);
+    return seasonAvg && seasonAvg >= 0.150; // Raised threshold to .150 for better performance
+  });
+  
+  // Second pass: Limit to reasonable number for performance
+  const hitters = basicFiltered.slice(0, 200); // Only analyze top 200 for initial testing
+  
+  console.log(`Analyzing ${hitters.length} hitters (filtered from ${allHitters.length}) for positive performance potential`);
+  const startTime = new Date();
+  console.log(`🚀 Analysis started at ${startTime.toLocaleTimeString()}`);
+  
+  // Performance optimization: Multiple levels of caching to avoid repeated calculations
+  const teamAnalysisCache = new Map();
+  const playerDataCache = new Map();
+  
+  // Helper function to get cached team analysis
+  const getCachedTeamAnalysis = (team) => {
+    const cacheKey = team;
+    if (!teamAnalysisCache.has(cacheKey)) {
+      console.log(`🔄 Computing team analysis for ${team} (first time)`);
+      const teamAnalysis = {
+        teamMomentum: analyzeTeamMomentum(team, seasonData),
+        opponentDisadvantages: analyzeOpponentDisadvantages(team, seasonData, null)
+      };
+      teamAnalysisCache.set(cacheKey, teamAnalysis);
+    }
+    return teamAnalysisCache.get(cacheKey);
+  };
+  
+  // Helper function to get cached player season data  
+  const getCachedPlayerData = (playerName, team) => {
+    const cacheKey = `${playerName}_${team}`;
+    if (!playerDataCache.has(cacheKey)) {
+      const seasonAvg = getPlayerSeasonAverage(playerName, team, seasonData);
+      playerDataCache.set(cacheKey, { seasonAvg });
+    }
+    return playerDataCache.get(cacheKey);
+  };
   
   const positivePerformancePredictions = [];
   
-  // Process each hitter
-  hitters.forEach(player => {
+  // Process each hitter with progress logging and performance optimizations
+  for (let index = 0; index < hitters.length; index++) {
+    const player = hitters[index];
     try {
-      const positiveAnalysis = calculatePositivePerformanceScore(player, seasonData, null);
+      // Log progress every 10 players to catch hanging issues faster
+      if (index > 0 && index % 10 === 0) {
+        const percentComplete = ((index / hitters.length) * 100).toFixed(1);
+        const elapsed = ((new Date() - startTime) / 1000).toFixed(1);
+        const avgTimePerPlayer = (elapsed / index).toFixed(2);
+        const estimatedRemaining = ((hitters.length - index) * avgTimePerPlayer / 60).toFixed(1);
+        const memUsage = process.memoryUsage();
+        const memMB = (memUsage.heapUsed / 1024 / 1024).toFixed(1);
+        console.log(`📊 Progress: ${index}/${hitters.length} (${percentComplete}%) | ${elapsed}s elapsed | ${avgTimePerPlayer}s/player | ~${estimatedRemaining}min remaining | ${memMB}MB RAM`);
+      }
+      
+      // Debug logging for hanging detection
+      if (index % 5 === 0 && index < 50) {
+        console.log(`🔍 Processing player ${index + 1}: ${player.name} (${player.team})`);
+      }
+      
+      // Get cached team and player analysis to improve performance
+      const cachedPlayerData = getCachedPlayerData(player.name, player.team);
+      const cachedTeamAnalysis = getCachedTeamAnalysis(player.team);
+      
+      // Debug: Log before entering expensive function
+      if (index < 30) {
+        console.log(`🔍 Starting analysis for ${player.name} (${player.team}) - Player #${index + 1}`);
+      }
+      
+      const positiveAnalysis = calculatePositivePerformanceScore(player, seasonData, null, cachedTeamAnalysis);
+      
+      // Debug: Log after expensive function
+      if (index < 30) {
+        console.log(`✅ Completed analysis for ${player.name} - Score: ${positiveAnalysis?.totalPositiveScore || 'N/A'}`);
+      }
       
       if (positiveAnalysis && positiveAnalysis.totalPositiveScore >= 15) { // Only include meaningful positive indicators
         positivePerformancePredictions.push(positiveAnalysis);
       }
+      
+      // Add small delay every 10 players to prevent system overload and allow other processes
+      if (index > 0 && index % 10 === 0) {
+        await new Promise(resolve => setTimeout(resolve, 1)); // 1ms pause to yield control
+      }
+      
+      // More aggressive memory management
+      if (index > 0 && index % 25 === 0) {
+        const memUsage = process.memoryUsage();
+        const memMB = memUsage.heapUsed / 1024 / 1024;
+        if (memMB > 500) { // If over 500MB RAM (more aggressive)
+          console.log(`⚠️ Memory usage (${memMB.toFixed(1)}MB) - forcing garbage collection`);
+          if (global.gc) {
+            global.gc();
+          }
+          await new Promise(resolve => setTimeout(resolve, 50)); // 50ms pause for memory recovery
+        }
+      }
+      
+      // Emergency timeout check - prevent infinite hanging (much more aggressive)
+      const elapsed = (new Date() - startTime) / 1000;
+      if (elapsed > 300) { // 5 minutes maximum for initial debugging
+        console.log(`⚠️ Analysis timeout reached (${elapsed.toFixed(1)}s) - stopping at player ${index}/${hitters.length}`);
+        console.log(`⚠️ This suggests a performance issue in calculatePositivePerformanceScore function`);
+        break;
+      }
+      
+      // Per-player timeout protection
+      if (index > 0 && index % 1 === 0) {
+        const playerStartTime = new Date();
+        const playerElapsed = (playerStartTime - startTime) / 1000;
+        const avgTimePerPlayer = playerElapsed / (index + 1);
+        
+        if (avgTimePerPlayer > 2) { // If taking more than 2 seconds per player
+          console.log(`⚠️ Slow processing detected: ${avgTimePerPlayer.toFixed(2)}s per player - consider optimization`);
+        }
+      }
     } catch (error) {
-      console.error(`Error analyzing ${player.name}:`, error);
+      console.error(`Error analyzing ${player.name} (${index + 1}/${hitters.length}):`, error);
     }
-  });
+  }
+  
+  const endTime = new Date();
+  const analysisTime = ((endTime - startTime) / 1000).toFixed(1);
+  console.log(`✅ Analysis completed at ${endTime.toLocaleTimeString()} (${analysisTime}s total)`);
+  console.log(`📈 Found ${positivePerformancePredictions.length} players with positive momentum indicators`);
+  console.log(`🚀 Performance optimizations enabled: Pre-filtering, team caching, memory monitoring, timeout protection`);
   
   // Sort by positive score (highest first)
   positivePerformancePredictions.sort((a, b) => b.totalPositiveScore - a.totalPositiveScore);

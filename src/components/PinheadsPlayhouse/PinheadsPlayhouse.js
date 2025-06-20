@@ -5,6 +5,7 @@ import startingLineupService from '../../services/startingLineupService';
 import BatchSummarySection from '../BatchSummarySection';
 import AutoFillButton from './AutoFillButton';
 import LineupRefreshButton from './LineupRefreshButton';
+import PropFinder from './PropFinder';
 import './PinheadsPlayhouse.css';
 
 
@@ -569,13 +570,26 @@ const PinheadsPlayhouse = () => {
     try {
       const matchups = await startingLineupService.getTodaysMatchups();
       if (matchups && matchups.length > 0) {
-        // Use ALL available matchups, don't limit to 10
-        const lineupMatchups = matchups.map(matchup => ({
-          pitcher_name: matchup.awayPitcher,
-          team_abbr: matchup.home
-        }));
+        // Create TWO matchups per game: away pitcher vs home team AND home pitcher vs away team
+        const lineupMatchups = [];
+        matchups.forEach(matchup => {
+          // Away pitcher vs Home team batters (include TBD for manual completion)
+          if (matchup.awayPitcher) {
+            lineupMatchups.push({
+              pitcher_name: matchup.awayPitcher,
+              team_abbr: matchup.home
+            });
+          }
+          // Home pitcher vs Away team batters (include TBD for manual completion)
+          if (matchup.homePitcher) {
+            lineupMatchups.push({
+              pitcher_name: matchup.homePitcher,
+              team_abbr: matchup.away
+            });
+          }
+        });
         setBatchMatchups(lineupMatchups);
-        console.log(`✅ Filled ${lineupMatchups.length} matchups from today's lineups`);
+        console.log(`✅ Filled ${lineupMatchups.length} matchups from ${matchups.length} games (2 per game)`);
       }
     } catch (error) {
       console.error('Failed to fill from lineups:', error);
@@ -615,6 +629,93 @@ const PinheadsPlayhouse = () => {
       default:
         return '';
     }
+  };
+
+  // Enhance hand information by checking lineup data when UNKNOWN
+  const enhanceHandInformation = (value, prediction, colKey) => {
+    // If we already have valid hand information, return it
+    if (value && value !== 'UNKNOWN' && value !== 'TBD' && value !== '') {
+      return value;
+    }
+
+    // Try to get hand information from various sources
+    try {
+      if (colKey === 'pitcher_hand') {
+        const pitcherName = prediction.matchup_pitcher || prediction.pitcher_name;
+        
+        // 1. Check batch matchups data
+        if (pitcherName && batchMatchups.length > 0) {
+          const matchup = batchMatchups.find(m => m.pitcher_name === pitcherName);
+          if (matchup && matchup.pitcher_hand) {
+            return matchup.pitcher_hand === 'RHP' ? 'R' : 
+                   matchup.pitcher_hand === 'LHP' ? 'L' : 
+                   matchup.pitcher_hand;
+          }
+        }
+
+        // 2. Check rosters data for pitcher
+        if (pitcherName && rostersData.length > 0) {
+          const pitcher = rostersData.find(p => 
+            (p.fullName === pitcherName || p.name === pitcherName) && p.type === 'pitcher'
+          );
+          if (pitcher && pitcher.hand) {
+            return pitcher.hand;
+          }
+        }
+
+        // 3. Try to get from starting lineup service (synchronously check cache)
+        try {
+          const lineupData = startingLineupService.getCachedLineupData();
+          if (lineupData && lineupData.length > 0) {
+            for (const game of lineupData) {
+              if (game.awayPitcher === pitcherName && game.awayPitcherHand) {
+                return game.awayPitcherHand === 'RHP' ? 'R' : 
+                       game.awayPitcherHand === 'LHP' ? 'L' : 
+                       game.awayPitcherHand;
+              }
+              if (game.homePitcher === pitcherName && game.homePitcherHand) {
+                return game.homePitcherHand === 'RHP' ? 'R' : 
+                       game.homePitcherHand === 'LHP' ? 'L' : 
+                       game.homePitcherHand;
+              }
+            }
+          }
+        } catch (err) {
+          // Lineup service might not have cached data
+        }
+
+      } else if (colKey === 'batter_hand') {
+        const playerName = prediction.player_name;
+        const team = prediction.team;
+        
+        // 1. Check rosters data
+        if (playerName && team && rostersData.length > 0) {
+          const player = rostersData.find(p => 
+            (p.fullName === playerName || p.name === playerName) && p.team === team
+          );
+          if (player && player.hand) {
+            return player.hand;
+          }
+        }
+
+        // 2. Try alternative name matching (last name only)
+        if (playerName && team && rostersData.length > 0) {
+          const lastName = playerName.split(' ').pop();
+          const player = rostersData.find(p => 
+            p.team === team && 
+            (p.fullName?.includes(lastName) || p.name?.includes(lastName))
+          );
+          if (player && player.hand) {
+            return player.hand;
+          }
+        }
+      }
+    } catch (error) {
+      console.warn(`Failed to enhance hand info for ${colKey}:`, error);
+    }
+
+    // Return 'UNK' instead of 'UNKNOWN' for cleaner display
+    return 'UNK';
   };
 
   // Filter predictions based on dashboard context (moved before early returns)
@@ -1366,7 +1467,7 @@ const PinheadsPlayhouse = () => {
                       } else if (colKey === 'contact_trend' || colKey === 'pitcher_trend_dir') {
                         displayValue = value || 'N/A';
                       } else if (colKey === 'batter_hand' || colKey === 'pitcher_hand') {
-                        displayValue = value || '';
+                        displayValue = enhanceHandInformation(value, prediction, colKey);
                       } else if (typeof value === 'number') {
                         displayValue = formatNumber(value, 1);
                         if (colKey === 'ab_due') {
@@ -1404,6 +1505,12 @@ const PinheadsPlayhouse = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Prop Finder Section */}
+          <PropFinder 
+            predictions={filteredPredictions}
+            gameData={analysisResults}
+          />
         </div>
       )}
 
