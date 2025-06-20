@@ -260,6 +260,14 @@ const PropFinder = ({ predictions, gameData }) => {
                     <div className="boost-text">
                       {opportunity.situationalBoost}
                     </div>
+                    {/* Show lineup context if available */}
+                    {opportunity.lineupContext?.isInLineup && (
+                      <div className="lineup-context">
+                        <span className="batting-order">
+                          #{opportunity.lineupContext.battingOrder} {opportunity.lineupContext.position}
+                        </span>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}

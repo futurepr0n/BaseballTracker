@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useBaseballAnalysis } from '../../services/baseballAnalysisService';
 import batchSummaryService from '../../services/batchSummaryService';
 import startingLineupService from '../../services/startingLineupService';
+import handednessResolver from '../../utils/handednessResolver';
 import BatchSummarySection from '../BatchSummarySection';
 import AutoFillButton from './AutoFillButton';
 import LineupRefreshButton from './LineupRefreshButton';
@@ -180,6 +181,9 @@ const PinheadsPlayhouse = () => {
     'pitcher_trend_dir', 'pitcher_home_hr_total', 'stadium_factor', 'pitcher_vulnerability'
   ]);
 
+  // Column selector collapsible state
+  const [isColumnSelectorOpen, setIsColumnSelectorOpen] = useState(false);
+
   // Available columns for table display
   const availableColumns = [
     { key: 'player_name', label: 'Player', always: true },
@@ -249,6 +253,26 @@ const PinheadsPlayhouse = () => {
     { key: 'context_summary', label: 'Summary', description: 'Context summary' },
     { key: 'category', label: 'Category', description: 'Player category (Hidden Gem, High Confidence, etc.)' }
   ];
+
+  // Track visitor on mount
+  useEffect(() => {
+    const trackVisit = async () => {
+      try {
+        await fetch('https://visits.capping.pro/visits', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        // Don't need to process response for tracking
+      } catch (error) {
+        // Silent fail for visit tracking
+        console.debug('Visit tracking failed:', error);
+      }
+    };
+
+    trackVisit();
+  }, []);
 
   // Load JSON data on mount
   useEffect(() => {
@@ -631,92 +655,50 @@ const PinheadsPlayhouse = () => {
     }
   };
 
-  // Enhance hand information by checking lineup data when UNKNOWN
-  const enhanceHandInformation = (value, prediction, colKey) => {
+  // Enhanced handedness resolution using the new handedness resolver
+  const [handednessCache, setHandednessCache] = useState(new Map());
+
+  const enhanceHandInformation = useCallback(async (value, prediction, colKey) => {
     // If we already have valid hand information, return it
     if (value && value !== 'UNKNOWN' && value !== 'TBD' && value !== '') {
       return value;
     }
 
-    // Try to get hand information from various sources
-    try {
-      if (colKey === 'pitcher_hand') {
-        const pitcherName = prediction.matchup_pitcher || prediction.pitcher_name;
-        
-        // 1. Check batch matchups data
-        if (pitcherName && batchMatchups.length > 0) {
-          const matchup = batchMatchups.find(m => m.pitcher_name === pitcherName);
-          if (matchup && matchup.pitcher_hand) {
-            return matchup.pitcher_hand === 'RHP' ? 'R' : 
-                   matchup.pitcher_hand === 'LHP' ? 'L' : 
-                   matchup.pitcher_hand;
-          }
-        }
+    // Create cache key
+    const cacheKey = colKey === 'pitcher_hand' ? 
+      `pitcher_${prediction.matchup_pitcher || prediction.pitcher_name}` :
+      `batter_${prediction.player_name}_${prediction.team}`;
 
-        // 2. Check rosters data for pitcher
-        if (pitcherName && rostersData.length > 0) {
-          const pitcher = rostersData.find(p => 
-            (p.fullName === pitcherName || p.name === pitcherName) && p.type === 'pitcher'
-          );
-          if (pitcher && pitcher.hand) {
-            return pitcher.hand;
-          }
-        }
-
-        // 3. Try to get from starting lineup service (synchronously check cache)
-        try {
-          const lineupData = startingLineupService.getCachedLineupData();
-          if (lineupData && lineupData.length > 0) {
-            for (const game of lineupData) {
-              if (game.awayPitcher === pitcherName && game.awayPitcherHand) {
-                return game.awayPitcherHand === 'RHP' ? 'R' : 
-                       game.awayPitcherHand === 'LHP' ? 'L' : 
-                       game.awayPitcherHand;
-              }
-              if (game.homePitcher === pitcherName && game.homePitcherHand) {
-                return game.homePitcherHand === 'RHP' ? 'R' : 
-                       game.homePitcherHand === 'LHP' ? 'L' : 
-                       game.homePitcherHand;
-              }
-            }
-          }
-        } catch (err) {
-          // Lineup service might not have cached data
-        }
-
-      } else if (colKey === 'batter_hand') {
-        const playerName = prediction.player_name;
-        const team = prediction.team;
-        
-        // 1. Check rosters data
-        if (playerName && team && rostersData.length > 0) {
-          const player = rostersData.find(p => 
-            (p.fullName === playerName || p.name === playerName) && p.team === team
-          );
-          if (player && player.hand) {
-            return player.hand;
-          }
-        }
-
-        // 2. Try alternative name matching (last name only)
-        if (playerName && team && rostersData.length > 0) {
-          const lastName = playerName.split(' ').pop();
-          const player = rostersData.find(p => 
-            p.team === team && 
-            (p.fullName?.includes(lastName) || p.name?.includes(lastName))
-          );
-          if (player && player.hand) {
-            return player.hand;
-          }
-        }
-      }
-    } catch (error) {
-      console.warn(`Failed to enhance hand info for ${colKey}:`, error);
+    // Check cache first
+    if (handednessCache.has(cacheKey)) {
+      return handednessCache.get(cacheKey);
     }
 
-    // Return 'UNK' instead of 'UNKNOWN' for cleaner display
-    return 'UNK';
-  };
+    try {
+      let handednessResult;
+
+      if (colKey === 'pitcher_hand') {
+        const pitcherName = prediction.matchup_pitcher || prediction.pitcher_name;
+        handednessResult = await handednessResolver.getPitcherHandedness(pitcherName, prediction);
+      } else if (colKey === 'batter_hand') {
+        handednessResult = await handednessResolver.getBatterHandedness(
+          prediction.player_name, 
+          prediction.team, 
+          prediction
+        );
+      }
+
+      const finalHandedness = handednessResult?.available ? handednessResult.handedness : 'UNK';
+      
+      // Cache the result
+      setHandednessCache(prev => new Map(prev.set(cacheKey, finalHandedness)));
+      
+      return finalHandedness;
+    } catch (error) {
+      console.warn(`Failed to enhance hand info for ${colKey}:`, error);
+      return 'UNK';
+    }
+  }, [handednessCache]);
 
   // Filter predictions based on dashboard context (moved before early returns)
   const filteredPredictions = useMemo(() => {
@@ -1089,27 +1071,37 @@ const PinheadsPlayhouse = () => {
       {/* Column Selector */}
       {predictions.length > 0 && (
         <div className="column-selector">
-          <h4>Table Columns:</h4>
-          <div className="column-checkboxes">
-            {availableColumns.map(col => (
-              <label key={col.key} className="column-checkbox">
-                <input
-                  type="checkbox"
-                  checked={selectedColumns.includes(col.key)}
-                  onChange={(e) => {
-                    if (col.always) return; // Can't uncheck always-shown columns
-                    if (e.target.checked) {
-                      setSelectedColumns([...selectedColumns, col.key]);
-                    } else {
-                      setSelectedColumns(selectedColumns.filter(c => c !== col.key));
-                    }
-                  }}
-                  disabled={col.always}
-                />
-                {col.label}
-              </label>
-            ))}
+          <div 
+            className="column-selector-header"
+            onClick={() => setIsColumnSelectorOpen(!isColumnSelectorOpen)}
+          >
+            <h4>Table Columns:</h4>
+            <span className={`collapse-icon ${isColumnSelectorOpen ? 'open' : ''}`}>
+              {isColumnSelectorOpen ? '▼' : '▶'}
+            </span>
           </div>
+          {isColumnSelectorOpen && (
+            <div className="column-checkboxes">
+              {availableColumns.map(col => (
+                <label key={col.key} className="column-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={selectedColumns.includes(col.key)}
+                    onChange={(e) => {
+                      if (col.always) return; // Can't uncheck always-shown columns
+                      if (e.target.checked) {
+                        setSelectedColumns([...selectedColumns, col.key]);
+                      } else {
+                        setSelectedColumns(selectedColumns.filter(c => c !== col.key));
+                      }
+                    }}
+                    disabled={col.always}
+                  />
+                  {col.label}
+                </label>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -1467,7 +1459,21 @@ const PinheadsPlayhouse = () => {
                       } else if (colKey === 'contact_trend' || colKey === 'pitcher_trend_dir') {
                         displayValue = value || 'N/A';
                       } else if (colKey === 'batter_hand' || colKey === 'pitcher_hand') {
-                        displayValue = enhanceHandInformation(value, prediction, colKey);
+                        // Use existing value or 'UNK' - async resolution happens in background
+                        displayValue = (value && value !== 'UNKNOWN' && value !== 'UNK' && value !== '') ? value : 'UNK';
+                        
+                        // Trigger async handedness resolution in background
+                        if (displayValue === 'UNK') {
+                          enhanceHandInformation(value, prediction, colKey).then(enhanced => {
+                            if (enhanced !== 'UNK' && enhanced !== value) {
+                              // Force re-render when handedness is resolved
+                              setTimeout(() => {
+                                // This will trigger a re-render of the component
+                                setHandednessCache(prev => new Map(prev));
+                              }, 100);
+                            }
+                          });
+                        }
                       } else if (typeof value === 'number') {
                         displayValue = formatNumber(value, 1);
                         if (colKey === 'ab_due') {

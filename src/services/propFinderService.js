@@ -1,14 +1,199 @@
 /**
  * propFinderService.js
  * 
- * Analyzes player props based on recent performance data
- * Calculates hit rates, power rates, and betting prop probabilities
+ * Enhanced MLB Prop Finder with Lineup Integration
+ * Analyzes player props based on recent performance data, batting order context, and confirmed lineups
+ * Provides batting-order weighted RBI analysis and lineup-aware player filtering
  */
+
+import handednessResolver from '../utils/handednessResolver.js';
 
 class PropFinderService {
   constructor() {
     this.cache = new Map();
     this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
+    this.lineupCache = null;
+    this.lineupCacheTimeout = 15 * 60 * 1000; // 15 minutes
+    this.lastLineupLoad = null;
+  }
+
+  /**
+   * Load today's lineup data with caching
+   */
+  async loadLineupData() {
+    if (this.lineupCache && this.lastLineupLoad && 
+        (Date.now() - this.lastLineupLoad) < this.lineupCacheTimeout) {
+      return this.lineupCache;
+    }
+
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const response = await fetch(`/data/lineups/starting_lineups_${today}.json`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      this.lineupCache = await response.json();
+      this.lastLineupLoad = Date.now();
+      
+      console.log(`✅ PropFinder loaded lineup data: ${this.lineupCache.totalGames} games`);
+      return this.lineupCache;
+    } catch (error) {
+      console.warn('PropFinder: Lineup data not available:', error.message);
+      return null;
+    }
+  }
+
+  /**
+   * Get batting order context for RBI analysis
+   */
+  async getBattingOrderContext(playerName, team) {
+    try {
+      const lineupData = await this.loadLineupData();
+      if (!lineupData) {
+        return { isInLineup: false, battingOrder: null, rbiMultiplier: 1.0 };
+      }
+
+      // Search for player in lineups
+      for (const game of lineupData.games) {
+        // Check home team
+        if (game.teams.home.abbr === team && game.lineups.home.batting_order) {
+          for (const player of game.lineups.home.batting_order) {
+            if (this.matchPlayerName(player.name, playerName)) {
+              return {
+                isInLineup: true,
+                battingOrder: player.order,
+                position: player.position,
+                rbiMultiplier: this.calculateRBIMultiplier(player.order),
+                source: 'confirmed_lineup'
+              };
+            }
+          }
+        }
+
+        // Check away team
+        if (game.teams.away.abbr === team && game.lineups.away.batting_order) {
+          for (const player of game.lineups.away.batting_order) {
+            if (this.matchPlayerName(player.name, playerName)) {
+              return {
+                isInLineup: true,
+                battingOrder: player.order,
+                position: player.position,
+                rbiMultiplier: this.calculateRBIMultiplier(player.order),
+                source: 'confirmed_lineup'
+              };
+            }
+          }
+        }
+      }
+
+    } catch (error) {
+      console.warn('Error getting batting order context:', error);
+    }
+
+    return { isInLineup: false, battingOrder: null, rbiMultiplier: 1.0 };
+  }
+
+  /**
+   * Calculate RBI multiplier based on batting order position
+   */
+  calculateRBIMultiplier(battingOrder) {
+    switch (battingOrder) {
+      case 1: return 0.7;  // Leadoff - fewer RBI opportunities
+      case 2: return 0.8;  // #2 hitter - some RBI chances
+      case 3: return 1.2;  // #3 hitter - prime RBI position
+      case 4: return 1.3;  // Cleanup - highest RBI potential
+      case 5: return 1.2;  // #5 hitter - good RBI opportunities
+      case 6: return 1.0;  // #6 hitter - average
+      case 7: return 1.0;  // #7 hitter - average
+      case 8: return 0.8;  // #8 hitter - fewer opportunities
+      case 9: return 0.8;  // #9 hitter - least RBI chances
+      default: return 1.0; // Unknown position
+    }
+  }
+
+  /**
+   * Get batting order description for display
+   */
+  getBattingOrderDescription(battingOrder) {
+    switch (battingOrder) {
+      case 1: return 'Leadoff';
+      case 2: return '#2';
+      case 3: return '#3';
+      case 4: return 'Cleanup';
+      case 5: return '#5';
+      case 6: return '#6';
+      case 7: return '#7';
+      case 8: return '#8';
+      case 9: return '#9';
+      default: return 'Unknown';
+    }
+  }
+
+  /**
+   * Match player names with various formats
+   */
+  matchPlayerName(name1, name2) {
+    if (!name1 || !name2) return false;
+    
+    const normalize = (name) => name.toLowerCase().trim()
+      .replace(/[.,]/g, '')
+      .replace(/\s+/g, ' ');
+    
+    const n1 = normalize(name1);
+    const n2 = normalize(name2);
+    
+    // Exact match
+    if (n1 === n2) return true;
+    
+    // Check if one contains the other
+    if (n1.includes(n2) || n2.includes(n1)) return true;
+    
+    // Last name match
+    const lastName1 = n1.split(' ').pop();
+    const lastName2 = n2.split(' ').pop();
+    if (lastName1 === lastName2 && lastName1.length > 2) return true;
+    
+    return false;
+  }
+
+  /**
+   * Filter predictions to only starting lineup players when lineups are available
+   */
+  async filterToStartingLineup(predictions) {
+    const lineupData = await this.loadLineupData();
+    if (!lineupData) {
+      console.log('📋 No lineup data available - analyzing all team players');
+      return predictions; // Return all if no lineup data
+    }
+
+    const startingPlayers = [];
+    const benchPlayers = [];
+
+    for (const prediction of predictions) {
+      const context = await this.getBattingOrderContext(prediction.player_name, prediction.team);
+      
+      if (context.isInLineup) {
+        startingPlayers.push({
+          ...prediction,
+          lineupContext: context
+        });
+      } else {
+        benchPlayers.push(prediction);
+      }
+    }
+
+    const lineupRate = (startingPlayers.length / predictions.length * 100).toFixed(1);
+    console.log(`📋 Lineup filtering: ${startingPlayers.length} starters, ${benchPlayers.length} bench (${lineupRate}% lineup coverage)`);
+
+    // Prioritize starting players but include some bench players if lineup coverage is low
+    if (lineupRate < 50) {
+      console.log('⚠️ Low lineup coverage - including bench players');
+      return [...startingPlayers, ...benchPlayers.slice(0, 10)];
+    }
+
+    return startingPlayers;
   }
 
   /**
@@ -27,19 +212,26 @@ class PropFinderService {
       }
     }
 
+    // Filter to starting lineup players when possible
+    const filteredPredictions = await this.filterToStartingLineup(predictions);
     const propOpportunities = [];
 
-    for (const prediction of predictions) {
+    for (const prediction of filteredPredictions) {
       try {
         const playerProps = await this.analyzePlayerProps(prediction, gameData);
         if (playerProps && playerProps.length > 0) {
+          // Get lineup context for additional metadata
+          const lineupContext = prediction.lineupContext || 
+                               await this.getBattingOrderContext(prediction.player_name, prediction.team);
+
           propOpportunities.push({
             playerName: prediction.player_name,
             team: prediction.team,
             props: playerProps,
             bestProp: this.getBestProp(playerProps),
             confidence: this.calculateOverallConfidence(playerProps),
-            situationalBoost: this.calculateSituationalBoost(prediction)
+            situationalBoost: this.calculateSituationalBoost(prediction),
+            lineupContext: lineupContext
           });
         }
       } catch (error) {
@@ -47,10 +239,12 @@ class PropFinderService {
       }
     }
 
-    // Sort by confidence and prop quality
+    // Sort by confidence and prop quality, with lineup context boost
     propOpportunities.sort((a, b) => {
-      const aScore = a.confidence * (a.bestProp?.probability || 0);
-      const bScore = b.confidence * (b.bestProp?.probability || 0);
+      const aScore = a.confidence * (a.bestProp?.probability || 0) * 
+                    (a.lineupContext?.isInLineup ? 1.1 : 1.0);
+      const bScore = b.confidence * (b.bestProp?.probability || 0) * 
+                    (b.lineupContext?.isInLineup ? 1.1 : 1.0);
       return bScore - aScore;
     });
 
@@ -88,8 +282,8 @@ class PropFinderService {
     const powerProps = this.analyzePowerProps(last10Games);
     props.push(...powerProps);
 
-    // RBI Props
-    const rbiProps = this.analyzeRBIProps(last10Games);
+    // RBI Props (enhanced with batting order context)
+    const rbiProps = await this.analyzeRBIProps(last10Games, prediction);
     props.push(...rbiProps);
 
     // Runs Props
@@ -100,8 +294,8 @@ class PropFinderService {
     const totalBasesProps = this.analyzeTotalBasesProps(last10Games);
     props.push(...totalBasesProps);
 
-    // Strikeout Props (for high-K batters)
-    const strikeoutProps = this.analyzeStrikeoutProps(last10Games);
+    // Enhanced Strikeout Props (considers pitcher matchup)
+    const strikeoutProps = this.analyzeEnhancedStrikeoutProps(last10Games, prediction);
     props.push(...strikeoutProps);
 
     // Filter to high-probability props only
@@ -115,11 +309,11 @@ class PropFinderService {
     const props = [];
     const gameCount = games.length;
 
-    // 1+ Hits
+    // 1+ Hits - Lowered threshold to 45% to be more inclusive
     const oneHitGames = games.filter(g => g.hits >= 1).length;
     const oneHitRate = (oneHitGames / gameCount) * 100;
     
-    if (oneHitRate >= 50) {
+    if (oneHitRate >= 45) {
       props.push({
         type: "1+ Hits",
         probability: oneHitRate,
@@ -204,39 +398,77 @@ class PropFinderService {
   }
 
   /**
-   * Analyze RBI props
+   * Analyze RBI props with batting order context
    */
-  analyzeRBIProps(games) {
+  async analyzeRBIProps(games, prediction) {
     const props = [];
     const gameCount = games.length;
 
-    // 1+ RBI
+    // Get batting order context for RBI weighting
+    const battingContext = await this.getBattingOrderContext(
+      prediction.player_name, 
+      prediction.team
+    );
+
+    // 1+ RBI analysis with batting order multiplier
     const oneRBIGames = games.filter(g => g.rbi >= 1).length;
-    const oneRBIRate = (oneRBIGames / gameCount) * 100;
+    let oneRBIRate = (oneRBIGames / gameCount) * 100;
     
-    if (oneRBIRate >= 40) {
+    // Apply batting order multiplier
+    const adjustedRBIRate = oneRBIRate * battingContext.rbiMultiplier;
+    
+    // Dynamic threshold based on batting position
+    let threshold = 45; // Default threshold
+    if (battingContext.battingOrder) {
+      if (battingContext.battingOrder >= 3 && battingContext.battingOrder <= 5) {
+        threshold = 35; // Lower threshold for heart of order
+      } else if (battingContext.battingOrder === 1) {
+        threshold = 55; // Higher threshold for leadoff
+      }
+    }
+    
+    if (adjustedRBIRate >= threshold) {
       props.push({
         type: "1+ RBI",
-        probability: oneRBIRate,
+        probability: Math.min(95, adjustedRBIRate), // Cap at 95%
+        baseRate: oneRBIRate,
         last10: `${oneRBIGames}/${gameCount}`,
         trend: this.getTrend(games.slice(-5).filter(g => g.rbi >= 1).length, 5),
-        confidence: this.calculatePropConfidence(oneRBIRate, gameCount),
-        category: 'rbi'
+        confidence: this.calculatePropConfidence(adjustedRBIRate, gameCount),
+        category: 'rbi',
+        battingOrder: battingContext.battingOrder,
+        rbiMultiplier: battingContext.rbiMultiplier,
+        notes: battingContext.isInLineup ? 
+          `${this.getBattingOrderDescription(battingContext.battingOrder)} hitter` : 
+          'Batting order TBD'
       });
     }
 
-    // 2+ RBI
+    // 2+ RBI with batting order context
     const twoRBIGames = games.filter(g => g.rbi >= 2).length;
-    const twoRBIRate = (twoRBIGames / gameCount) * 100;
+    let twoRBIRate = (twoRBIGames / gameCount) * 100;
+    const adjustedTwoRBIRate = twoRBIRate * battingContext.rbiMultiplier;
     
-    if (twoRBIRate >= 20) {
+    // 2+ RBI is harder, so lower thresholds
+    let twoRBIThreshold = 20;
+    if (battingContext.battingOrder >= 3 && battingContext.battingOrder <= 5) {
+      twoRBIThreshold = 15; // Lower threshold for cleanup hitters
+    }
+    
+    if (adjustedTwoRBIRate >= twoRBIThreshold) {
       props.push({
         type: "2+ RBI",
-        probability: twoRBIRate,
+        probability: Math.min(85, adjustedTwoRBIRate), // Cap at 85%
+        baseRate: twoRBIRate,
         last10: `${twoRBIGames}/${gameCount}`,
         trend: this.getTrend(games.slice(-5).filter(g => g.rbi >= 2).length, 5),
-        confidence: this.calculatePropConfidence(twoRBIRate, gameCount),
-        category: 'rbi'
+        confidence: this.calculatePropConfidence(adjustedTwoRBIRate, gameCount),
+        category: 'rbi',
+        battingOrder: battingContext.battingOrder,
+        rbiMultiplier: battingContext.rbiMultiplier,
+        notes: battingContext.isInLineup ? 
+          `${this.getBattingOrderDescription(battingContext.battingOrder)} hitter` : 
+          'Batting order TBD'
       });
     }
 
@@ -300,7 +532,77 @@ class PropFinderService {
   }
 
   /**
-   * Analyze strikeout props (for high-K batters)
+   * Enhanced strikeout props analysis (considers pitcher matchup)
+   */
+  analyzeEnhancedStrikeoutProps(games, prediction) {
+    const props = [];
+    const gameCount = games.length;
+    const avgStrikeouts = games.reduce((sum, g) => sum + (g.strikeouts || 0), 0) / gameCount;
+
+    // Get pitcher strikeout data from prediction
+    const pitcherKPerGame = prediction.pitcher_k_per_game || 
+                           (prediction.pitcher_home_k_total / (prediction.pitcher_home_games || 1)) || 
+                           6.5; // League average fallback
+
+    // 1+ Strikeouts analysis with pitcher consideration
+    const oneKGames = games.filter(g => (g.strikeouts || 0) >= 1).length;
+    const oneKRate = (oneKGames / gameCount) * 100;
+    
+    // Enhanced logic: Consider both batter tendency AND pitcher strikeout ability
+    let adjustedRate = oneKRate;
+    
+    // Boost probability if pitcher has high strikeout rate
+    if (pitcherKPerGame >= 8.0) {
+      adjustedRate *= 1.15; // 15% boost for high-K pitcher
+    } else if (pitcherKPerGame >= 7.0) {
+      adjustedRate *= 1.10; // 10% boost for above-average K pitcher
+    } else if (pitcherKPerGame <= 5.0) {
+      adjustedRate *= 0.85; // 15% penalty for low-K pitcher
+    }
+
+    // More inclusive threshold since we consider pitcher matchup
+    if (adjustedRate >= 40 && (avgStrikeouts >= 0.7 || pitcherKPerGame >= 7.0)) {
+      props.push({
+        type: "1+ Strikeouts",
+        probability: Math.min(95, adjustedRate), // Cap at 95%
+        last10: `${oneKGames}/${gameCount}`,
+        trend: this.getTrend(games.slice(-5).filter(g => (g.strikeouts || 0) >= 1).length, 5),
+        confidence: this.calculatePropConfidence(adjustedRate, gameCount),
+        category: 'strikeouts',
+        notes: pitcherKPerGame >= 7.0 ? `High-K pitcher (${pitcherKPerGame.toFixed(1)} K/G)` : 
+               avgStrikeouts >= 1.0 ? `High-K batter (${avgStrikeouts.toFixed(1)} K/G)` : 'Matchup-based'
+      });
+    }
+
+    // 2+ Strikeouts for extreme cases
+    const twoKGames = games.filter(g => (g.strikeouts || 0) >= 2).length;
+    const twoKRate = (twoKGames / gameCount) * 100;
+    let adjustedTwoKRate = twoKRate;
+
+    if (pitcherKPerGame >= 9.0) {
+      adjustedTwoKRate *= 1.20; // 20% boost for elite strikeout pitcher
+    } else if (pitcherKPerGame >= 8.0) {
+      adjustedTwoKRate *= 1.15; // 15% boost for high-K pitcher
+    }
+
+    if (adjustedTwoKRate >= 25 && (avgStrikeouts >= 1.2 || pitcherKPerGame >= 8.0)) {
+      props.push({
+        type: "2+ Strikeouts", 
+        probability: Math.min(85, adjustedTwoKRate), // Cap at 85%
+        last10: `${twoKGames}/${gameCount}`,
+        trend: this.getTrend(games.slice(-5).filter(g => (g.strikeouts || 0) >= 2).length, 5),
+        confidence: this.calculatePropConfidence(adjustedTwoKRate, gameCount),
+        category: 'strikeouts',
+        notes: pitcherKPerGame >= 8.0 ? `Elite K pitcher (${pitcherKPerGame.toFixed(1)} K/G)` : 
+               `High-K matchup`
+      });
+    }
+
+    return props;
+  }
+
+  /**
+   * Legacy strikeout props analysis (kept for reference)
    */
   analyzeStrikeoutProps(games) {
     const props = [];
