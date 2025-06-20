@@ -624,6 +624,9 @@ const GlobalTooltip = () => {
     }
 
     if (type === 'positive_momentum' && player) {
+      const tooltipData = player.tooltipData;
+      const sophisticatedAnalysis = player.sophisticatedAnalysis;
+      
       return (
         <div className="positive-momentum-details">
           <div className="momentum-summary">
@@ -636,13 +639,17 @@ const GlobalTooltip = () => {
               <span className="summary-value">{player.momentumLevel}</span>
             </div>
             <div className="momentum-summary-item">
-              <span className="summary-label">Positive Factors:</span>
-              <span className="summary-value">{player.positiveFactors.length}</span>
+              <span className="summary-label">Season Average:</span>
+              <span className="summary-value">{(player.seasonAvg * 100).toFixed(1)}%</span>
+            </div>
+            <div className="momentum-summary-item">
+              <span className="summary-label">Current Streak:</span>
+              <span className="summary-value">{player.currentStreak} games</span>
             </div>
           </div>
           
           <div className="momentum-factors-breakdown">
-            <h4>🚀 Positive Momentum Factors</h4>
+            <h4>🚀 Positive Momentum Factors ({player.positiveFactors.length})</h4>
             {player.positiveFactors.map((factor, idx) => (
               <div key={idx} className="momentum-factor">
                 <div className="factor-header">
@@ -651,116 +658,217 @@ const GlobalTooltip = () => {
                 </div>
                 <div className="factor-description">{factor.description}</div>
                 
-                {factor.type === 'hot_streak_momentum' && (
+                {/* Enhanced factor details from sophisticated analysis */}
+                {factor.type === 'hot_streak' && factor.details && (
                   <div className="factor-details">
-                    <span>Historical Sample: {factor.sampleSize} occurrences</span>
-                  </div>
-                )}
-                
-                {factor.type === 'post_rest_excellence' && (
-                  <div className="factor-details">
-                    <span>Sample Size: {factor.sampleSize} games</span>
-                  </div>
-                )}
-                
-                {factor.type === 'bounce_back_potential' && (
-                  <div className="factor-details">
-                    <span>Overall Bounce-Back Rate: {(factor.bounceBackRate * 100).toFixed(1)}%</span>
-                    {player.analysis?.lastPoorGame && (
-                      <div className="poor-game-context">
-                        <strong>Recent Poor Game:</strong> {new Date(player.analysis.lastPoorGame).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric',
-                          year: 'numeric'
-                        })} - Expecting bounce-back performance
+                    <span>Current Streak: {factor.details.current_streak} games</span>
+                    <span>Longest Streak: {factor.details.longest_streak} games</span>
+                    {factor.details.streak_patterns && Object.keys(factor.details.streak_patterns).length > 0 && (
+                      <div className="streak-patterns">
+                        <small>Continuation rates:</small>
+                        {Object.entries(factor.details.streak_patterns).map(([length, pattern]) => (
+                          <div key={length} className="pattern-item">
+                            {length}-game: {(pattern.continuation_rate * 100).toFixed(1)}% 
+                            ({pattern.total_occurrences} times)
+                          </div>
+                        ))}
                       </div>
                     )}
-                    <span>Strong bounce-back rate: {(factor.strongBounceBackRate * 100).toFixed(1)}%</span>
                   </div>
                 )}
                 
-                {factor.type === 'team_positive_momentum' && (
+                {factor.type === 'post_rest_excellence' && factor.details && (
                   <div className="factor-details">
-                    <span>Team Win Rate: {(factor.teamWinRate * 100).toFixed(1)}%</span>
+                    <span>Rest Days: {factor.details.rest_days}</span>
+                    <span>Sample Size: {factor.details.sample_size} games</span>
+                    {factor.details.performance_boost != null && !isNaN(factor.details.performance_boost) && (
+                      <span>Performance Boost: +{(factor.details.performance_boost * 100).toFixed(1)}%</span>
+                    )}
+                    <span>Contextually Relevant: {factor.details.contextually_relevant ? 'Yes' : 'No'}</span>
+                  </div>
+                )}
+                
+                {factor.type === 'bounce_back' && factor.details && (
+                  <div className="factor-details">
+                    <span>Failed Attempts: {factor.details.current_situation.failed_bounce_back_attempts || 0}</span>
+                    {factor.details.current_situation.failure_rate != null && !isNaN(factor.details.current_situation.failure_rate) && (
+                      <span>Failure Rate: {(factor.details.current_situation.failure_rate * 100).toFixed(1)}%</span>
+                    )}
+                    {factor.details.current_situation.last_good_game && (
+                      <span>Last Good Game: {factor.details.current_situation.last_good_game.date} 
+                        ({factor.details.current_situation.last_good_game.hits}/{factor.details.current_situation.last_good_game.abs})
+                      </span>
+                    )}
+                    {factor.details.warnings && factor.details.warnings.length > 0 && (
+                      <div className="bounce-back-warnings">
+                        {factor.details.warnings.map((warning, wIdx) => (
+                          <div key={wIdx} className="warning-item">⚠️ {warning}</div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {factor.type === 'recent_form' && factor.details && (
+                  <div className="factor-details">
+                    <span>Recent Avg: {factor.details.recent_games && factor.details.recent_games.length > 0 ? 
+                      (() => {
+                        const totalHits = factor.details.recent_games.reduce((sum, g) => sum + (g.hits || 0), 0);
+                        const totalAbs = factor.details.recent_games.reduce((sum, g) => sum + (g.abs || 0), 0);
+                        return totalAbs > 0 ? ((totalHits / totalAbs) * 100).toFixed(1) : '0.0';
+                      })() : 'N/A'}%
+                    </span>
+                    <span>Last 5 Games: {factor.details.recent_games ? 
+                      factor.details.recent_games.reduce((sum, g) => sum + (g.hits || 0), 0) : 0}/
+                      {factor.details.recent_games ? 
+                      factor.details.recent_games.reduce((sum, g) => sum + (g.abs || 0), 0) : 0}
+                    </span>
                   </div>
                 )}
               </div>
             ))}
           </div>
 
-          {(player.analysis?.gameHistory || player.analysis?.hotStreakAnalysis?.gameHistory) && (player.analysis?.gameHistory || player.analysis?.hotStreakAnalysis?.gameHistory).length > 0 && (
-            <div className="recent-performance-info">
-              <h4>📊 Recent Performance (Last 5 Games)</h4>
-              <div className="performance-games">
-                {(player.analysis.gameHistory || player.analysis.hotStreakAnalysis.gameHistory).slice(-5).reverse().map((game, idx) => {
-                  const gameAvg = game.avg || (game.hits / Math.max(game.atBats, 1));
-                  const isRestDay = game.restDay || game.restDays > 0;
-                  const isPoor = gameAvg < 0.200;
-                  const isExceptional = gameAvg >= 0.500 || game.hits >= 3;
-                  
-                  return (
-                    <div key={idx} className={`performance-game ${isPoor ? 'poor-game' : ''} ${isExceptional ? 'exceptional-game' : ''}`}>
-                      <span className="game-date">
-                        {new Date(game.date).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}
-                      </span>
-                      <span className="game-stats">
-                        {game.hits}/{game.atBats}
-                      </span>
-                      <span className="game-avg">
-                        {(gameAvg * 100).toFixed(0)}%
-                      </span>
-                      {isRestDay && (
-                        <span className="rest-indicator" title="Rest day before this game">💤</span>
-                      )}
-                      {isPoor && (
-                        <span className="poor-indicator" title="Poor performance">📉</span>
-                      )}
-                      {isExceptional && (
-                        <span className="exceptional-indicator" title="Peak performance">🔥</span>
-                      )}
+          {/* Enhanced Detailed Game Table */}
+          {tooltipData?.detailedGameTable && tooltipData.detailedGameTable.length > 0 && (
+            <div className="detailed-game-table">
+              <h4>📊 Recent Game-by-Game Performance</h4>
+              <div className="game-table-container">
+                <table className="enhanced-game-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>AB</th>
+                      <th>H</th>
+                      <th>HR</th>
+                      <th>RBI</th>
+                      <th>K</th>
+                      <th>AVG</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tooltipData.detailedGameTable.map((game, idx) => (
+                      <tr key={idx} className={`
+                        ${game.performance_level === 'exceptional' ? 'exceptional-game' : ''}
+                        ${game.performance_level === 'poor' ? 'poor-game' : ''}
+                        ${game.is_multi_hit ? 'multi-hit-game' : ''}
+                        ${game.is_power_game ? 'power-game' : ''}
+                      `}>
+                        <td>{game.date_display}</td>
+                        <td>{game.abs}</td>
+                        <td className={game.has_hit ? 'has-hit' : 'no-hit'}>{game.hits}</td>
+                        <td className={game.hr > 0 ? 'has-hr' : ''}>{game.hr}</td>
+                        <td>{game.rbi}</td>
+                        <td className={game.strikeouts > 0 ? 'has-strikeout' : ''}>{game.strikeouts}</td>
+                        <td className={`avg-${game.performance_level}`}>
+                          {(game.avg * 100).toFixed(0)}%
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              {tooltipData.gameLogSummary && (
+                <div className="game-summary-totals">
+                  <strong>Totals:</strong> {tooltipData.gameLogSummary.totals.hits}/{tooltipData.gameLogSummary.totals.ab} 
+                  (.{tooltipData.gameLogSummary.totals.avg}), {tooltipData.gameLogSummary.totals.hr} HR, 
+                  {tooltipData.gameLogSummary.totals.strikeouts} K
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Performance Indicators */}
+          {tooltipData?.performanceIndicators && (
+            <div className="performance-indicators">
+              <h4>📈 Performance Indicators</h4>
+              <div className="indicators-grid">
+                <div className="indicator-item">
+                  <span className="indicator-label">Multi-Hit Games:</span>
+                  <span className="indicator-value">{tooltipData.performanceIndicators.multi_hit_games}</span>
+                </div>
+                <div className="indicator-item">
+                  <span className="indicator-label">Power Games:</span>
+                  <span className="indicator-value">{tooltipData.performanceIndicators.power_games}</span>
+                </div>
+                <div className="indicator-item">
+                  <span className="indicator-label">Hitless Games:</span>
+                  <span className="indicator-value">{tooltipData.performanceIndicators.hitless_games}</span>
+                </div>
+                <div className="indicator-item">
+                  <span className="indicator-label">Strikeout Rate:</span>
+                  <span className="indicator-value">{(tooltipData.performanceIndicators.strikeout_rate * 100).toFixed(1)}%</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Cross-Referenced Cards */}
+          {tooltipData?.crossReferencedCards && tooltipData.crossReferencedCards.length > 0 && (
+            <div className="cross-referenced-cards">
+              <h4>🔗 Also Appears In</h4>
+              <div className="cross-refs-list">
+                {tooltipData.crossReferencedCards
+                  .filter(card => card.appears_in)
+                  .map((card, idx) => (
+                    <div key={idx} className="cross-ref-item">
+                      <span className="cross-ref-name">{card.card_name}</span>
+                      <span className="cross-ref-type">({card.card_type})</span>
                     </div>
-                  );
-                })}
-              </div>
-              <div className="performance-legend">
-                <small>💤 = Rest day | 📉 = Poor performance | 🔥 = Peak performance</small>
+                  ))}
               </div>
             </div>
           )}
 
-          {player.analysis?.hotStreakAnalysis?.currentStreak > 0 && (
-            <div className="current-streak-info">
-              <h4>🔥 Current Hot Streak</h4>
-              <div className="streak-stats">
-                <div className="streak-stat">
-                  <span className="streak-label">Current Streak:</span>
-                  <span className="streak-value">{player.analysis.hotStreakAnalysis.currentStreak} games</span>
-                </div>
-                <div className="streak-stat">
-                  <span className="streak-label">Longest This Season:</span>
-                  <span className="streak-value">{player.analysis.hotStreakAnalysis.longestStreak} games</span>
-                </div>
+          {/* Weather Context */}
+          {tooltipData?.weatherContext && tooltipData.weatherContext.available && (
+            <div className="weather-context">
+              <h4>🌤️ Weather Context</h4>
+              <div className="weather-info">
+                <span>{tooltipData.weatherContext.message}</span>
+                {tooltipData.weatherContext.integration_note && (
+                  <div className="weather-note">
+                    <small>{tooltipData.weatherContext.integration_note}</small>
+                  </div>
+                )}
               </div>
             </div>
           )}
 
-          {player.analysis?.teamMomentumAnalysis?.hasPositiveMomentum && (
-            <div className="team-momentum-info">
-              <h4>📈 Team Momentum</h4>
-              <div className="team-momentum-stats">
-                <div className="momentum-stat">
-                  <span className="momentum-label">Recent Record:</span>
-                  <span className="momentum-value">
-                    {player.analysis.teamMomentumAnalysis.recentWins}-{player.analysis.teamMomentumAnalysis.recentGames - player.analysis.teamMomentumAnalysis.recentWins}
-                  </span>
-                </div>
-                <div className="momentum-stat">
-                  <span className="momentum-label">Win Rate:</span>
-                  <span className="momentum-value">{(player.analysis.teamMomentumAnalysis.winRate * 100).toFixed(1)}%</span>
-                </div>
+          {/* Sophisticated Analysis Summary */}
+          {sophisticatedAnalysis && (
+            <div className="sophisticated-analysis-summary">
+              <h4>🧠 Sophisticated Analysis</h4>
+              <div className="analysis-highlights">
+                {sophisticatedAnalysis.bounceBackAnalysis && sophisticatedAnalysis.bounceBackAnalysis.confidence != null && !isNaN(sophisticatedAnalysis.bounceBackAnalysis.confidence) && (
+                  <div className="analysis-item">
+                    <span className="analysis-label">Bounce Back Confidence:</span>
+                    <span className="analysis-value">
+                      {(sophisticatedAnalysis.bounceBackAnalysis.confidence * 100).toFixed(1)}%
+                    </span>
+                  </div>
+                )}
+                {sophisticatedAnalysis.restExcellence && sophisticatedAnalysis.restExcellence.performance_boost != null && !isNaN(sophisticatedAnalysis.restExcellence.performance_boost) && (
+                  <div className="analysis-item">
+                    <span className="analysis-label">Rest Day Performance:</span>
+                    <span className="analysis-value">
+                      +{(sophisticatedAnalysis.restExcellence.performance_boost * 100).toFixed(1)}% boost
+                    </span>
+                  </div>
+                )}
+                {sophisticatedAnalysis.hotStreakDetails && (
+                  <div className="analysis-item">
+                    <span className="analysis-label">Streak Continuation:</span>
+                    <span className="analysis-value">
+                      {sophisticatedAnalysis.hotStreakDetails.continuation_probability != null && 
+                       !isNaN(sophisticatedAnalysis.hotStreakDetails.continuation_probability) && 
+                       sophisticatedAnalysis.hotStreakDetails.continuation_probability > 0 ? 
+                        (sophisticatedAnalysis.hotStreakDetails.continuation_probability * 100).toFixed(1) + '%' : 
+                        'Pattern-based analysis'}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           )}
