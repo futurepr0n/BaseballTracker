@@ -129,55 +129,72 @@ function calculateMultiHitPerformance(playerEntries) {
   let currentHRDrought = 0;
 
   playerEntries.forEach(entry => {
+    // Group games by gameId to avoid double-counting when same player appears as hitter and pitcher
+    const gamesByGameId = new Map();
+    
     entry.games.forEach(game => {
       const { player } = game;
+      const gameId = player.gameId || 'unknown';
       
-      // Skip DNP entries
-      if (player.H === 'DNP' && player.AB === 'DNP') {
+      if (!gamesByGameId.has(gameId)) {
+        gamesByGameId.set(gameId, { hitter: null, pitcher: null });
+      }
+      
+      if (player.playerType === 'hitter' || !player.playerType) {
+        gamesByGameId.get(gameId).hitter = player;
+      } else if (player.playerType === 'pitcher') {
+        gamesByGameId.get(gameId).pitcher = player;
+      }
+    });
+    
+    // Process each unique game (by gameId) only once for hitting stats
+    gamesByGameId.forEach((gameData, gameId) => {
+      const hitterData = gameData.hitter;
+      
+      // Skip if no hitter data or DNP entries
+      if (!hitterData || (hitterData.H === 'DNP' && hitterData.AB === 'DNP')) {
         return;
       }
-
-      if (player.playerType === 'hitter' || !player.playerType) {
-        const hits = Number(player.H) || 0;
-        const hrs = Number(player.HR) || 0;
-        
-        totalGames++;
-        totalHits += hits;
-        totalHRs += hrs;
-        maxHitsInGame = Math.max(maxHitsInGame, hits);
-        maxHRsInGame = Math.max(maxHRsInGame, hrs);
-        
-        // Track hit distribution (including 0)
-        hitDistribution[hits] = (hitDistribution[hits] || 0) + 1;
-        
-        // Track HR distribution (including 0)
-        hrDistribution[hrs] = (hrDistribution[hrs] || 0) + 1;
-        
-        // UPDATED: Multi-hit games exclude 0 hits
-        if (hits >= 2) totalMultiHitGames++;
-        
-        // UPDATED: Multi-HR games exclude 0 HRs  
-        if (hrs >= 1) totalMultiHRGames++;
-        
-        // Drought tracking for hits
-        if (hits >= 2) {
-          if (currentHitDrought > 0) {
-            hitDroughts.push(currentHitDrought);
-            currentHitDrought = 0;
-          }
-        } else {
-          currentHitDrought++;
+      
+      const hits = Number(hitterData.H) || 0;
+      const hrs = Number(hitterData.HR) || 0;
+      
+      totalGames++;
+      totalHits += hits;
+      totalHRs += hrs;
+      maxHitsInGame = Math.max(maxHitsInGame, hits);
+      maxHRsInGame = Math.max(maxHRsInGame, hrs);
+      
+      // Track hit distribution (including 0)
+      hitDistribution[hits] = (hitDistribution[hits] || 0) + 1;
+      
+      // Track HR distribution (including 0)
+      hrDistribution[hrs] = (hrDistribution[hrs] || 0) + 1;
+      
+      // UPDATED: Multi-hit games exclude 0 hits
+      if (hits >= 2) totalMultiHitGames++;
+      
+      // UPDATED: Multi-HR games exclude 0 HRs  
+      if (hrs >= 1) totalMultiHRGames++;
+      
+      // Drought tracking for hits
+      if (hits >= 2) {
+        if (currentHitDrought > 0) {
+          hitDroughts.push(currentHitDrought);
+          currentHitDrought = 0;
         }
-        
-        // Drought tracking for HRs
-        if (hrs >= 1) {
-          if (currentHRDrought > 0) {
-            hrDroughts.push(currentHRDrought);
-            currentHRDrought = 0;
-          }
-        } else {
-          currentHRDrought++;
+      } else {
+        currentHitDrought++;
+      }
+      
+      // Drought tracking for HRs
+      if (hrs >= 1) {
+        if (currentHRDrought > 0) {
+          hrDroughts.push(currentHRDrought);
+          currentHRDrought = 0;
         }
+      } else {
+        currentHRDrought++;
       }
     });
   });
@@ -370,28 +387,41 @@ function aggregatePlayerStats(playerName, playerTeam, playerEntries) {
   playerEntries.forEach(entry => {
     const { date, games } = entry;
     
-    // Process each game for this date
+    // Group games by gameId to avoid double-counting when same player appears as hitter and pitcher
+    const gamesByGameId = new Map();
+    
     games.forEach((game, gameIndex) => {
       const { player, gameId } = game;
       
-      // Skip DNP entries for game counting
-      if (player.H === 'DNP' && player.AB === 'DNP') {
-        return;
+      if (!gamesByGameId.has(gameId)) {
+        gamesByGameId.set(gameId, { hitter: null, pitcher: null, gameIndex });
       }
       
-      totalGamesPlayed++;
-      
-      // Process hitter stats
       if (player.playerType === 'hitter' || !player.playerType) {
-        const hrs = Number(player.HR) || 0;
-        const hits = Number(player.H) || 0;
-        const abs = Number(player.AB) || 0;
-        const runs = Number(player.R) || 0;
-        const rbis = Number(player.RBI) || 0;
-        const doubles = Number(player['2B']) || 0;
-        const triples = Number(player['3B']) || 0;
-        const bbs = Number(player.BB) || 0;
-        const ks = Number(player.K) || 0;
+        gamesByGameId.get(gameId).hitter = player;
+      } else if (player.playerType === 'pitcher') {
+        gamesByGameId.get(gameId).pitcher = player;
+      }
+    });
+    
+    // Process each unique game (by gameId) only once for counting
+    gamesByGameId.forEach((gameData, gameId) => {
+      const { hitter, pitcher, gameIndex } = gameData;
+      
+      // Skip DNP entries for game counting
+      if (hitter && !(hitter.H === 'DNP' && hitter.AB === 'DNP')) {
+        totalGamesPlayed++;
+        
+        // Process hitter stats
+        const hrs = Number(hitter.HR) || 0;
+        const hits = Number(hitter.H) || 0;
+        const abs = Number(hitter.AB) || 0;
+        const runs = Number(hitter.R) || 0;
+        const rbis = Number(hitter.RBI) || 0;
+        const doubles = Number(hitter['2B']) || 0;
+        const triples = Number(hitter['3B']) || 0;
+        const bbs = Number(hitter.BB) || 0;
+        const ks = Number(hitter.K) || 0;
         
         totalHRs += hrs;
         totalHits += hits;
@@ -416,14 +446,14 @@ function aggregatePlayerStats(playerName, playerTeam, playerEntries) {
         });
       }
       
-      // Process pitcher stats
-      if (player.playerType === 'pitcher') {
-        const ip = Number(player.IP) || 0;
-        const hits = Number(player.H) || 0;
-        const er = Number(player.ER) || 0;
-        const bbs = Number(player.BB) || 0;
-        const ks = Number(player.K) || 0;
-        const hrs = Number(player.HR) || 0;
+      // Process pitcher stats separately (doesn't affect game counting)
+      if (pitcher) {
+        const ip = Number(pitcher.IP) || 0;
+        const hits = Number(pitcher.H) || 0;
+        const er = Number(pitcher.ER) || 0;
+        const bbs = Number(pitcher.BB) || 0;
+        const ks = Number(pitcher.K) || 0;
+        const hrs = Number(pitcher.HR) || 0;
         
         totalIP += ip;
         totalPitcherHits += hits;
