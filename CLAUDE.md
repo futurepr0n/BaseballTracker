@@ -82,6 +82,14 @@ node src/services/generatePitcherMatchups.js
 - **Responsive Design**: Mobile-first with full-viewport scrollable tables
 - **Real-time Enhancement**: Automatic batch summary generation with actionable insights
 
+**Strategic Matchup Context (New Feature):**
+- **Integrated Analysis Component**: Real-time strategic analysis with 5 tabs (Targets, Avoids, Hot Streaks, Team Trends, Pitcher Intel)
+- **Real Team Trends Service**: `realTeamTrendsService.js` - Analyzes actual game data over last 7 days for comprehensive team performance
+- **Enhanced CSS Styling**: Professional styling with flex-based badge layout preventing stacking issues, matches PropFinder quality
+- **Team Performance Metrics**: Runs/game, hits/game, HRs/game, momentum analysis, hot/cold players, key trends identification
+- **Strategic Intelligence**: Target scoring with confidence levels, risk assessment, pitcher vulnerability analysis with explanatory context
+- **Data Integration**: Uses `fetchPlayerData()` from dataService for historical game analysis across multiple dates
+
 **Component Patterns:**
 - **Hook-based State**: Custom hooks in `hooks/` for reusable logic
 - **CSS Modules**: Component-specific styling with `.css` files
@@ -95,6 +103,14 @@ node src/services/generatePitcherMatchups.js
 - `generateAdditionalStats.js` - Player performance metrics
 - `generatePitcherMatchups.js` - Pitcher vs batter analysis
 - `generateRollingStats.js` - Rolling statistical windows (7/30/season)
+
+**Data Service Import Pattern (CRITICAL):**
+- **dataService.js uses named exports only** - no default export available
+- **Correct import**: `import { fetchPlayerData, fetchGameData } from './dataService'`
+- **Available functions**: fetchPlayerData, fetchPlayerDataForDateRange, fetchTeamData, fetchGameData, fetchRosterData, checkDataExists, findClosestDateWithData
+- **Common Error**: Using `import dataService from './dataService'` will cause build failures
+- **Historical Data**: Use `fetchPlayerData(dateStr)` for daily player data, returns array of player objects
+- **Team Filtering**: Filter by `player.team === teamAbbr || player.Team === teamAbbr` for consistent team matching
 
 **Strategic Intelligence Services:**
 - `batchSummaryService.js` - Comprehensive batch analysis with strategic categorization
