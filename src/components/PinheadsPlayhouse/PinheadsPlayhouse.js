@@ -7,6 +7,7 @@ import BatchSummarySection from '../BatchSummarySection';
 import AutoFillButton from './AutoFillButton';
 import LineupRefreshButton from './LineupRefreshButton';
 import PropFinder from './PropFinder';
+import MatchupContextSection from '../MatchupContextSection/MatchupContextSection';
 import './PinheadsPlayhouse.css';
 
 
@@ -183,6 +184,8 @@ const PinheadsPlayhouse = () => {
 
   // Column selector collapsible state
   const [isColumnSelectorOpen, setIsColumnSelectorOpen] = useState(false);
+  
+  // Remove the modal window state since we're using integrated section now
 
   // Available columns for table display
   const availableColumns = [
@@ -1109,7 +1112,9 @@ const PinheadsPlayhouse = () => {
       {predictions.length > 0 && (
         <div className="results-section">
           <div className="results-header">
-            <h3>Analysis Results</h3>
+            <div className="results-title-section">
+              <h3>Analysis Results</h3>
+            </div>
             {analysisResults && (
               <div className="results-summary">
                 <span>Total Predictions: {analysisResults.total_predictions || predictions.length}</span>
@@ -1511,6 +1516,12 @@ const PinheadsPlayhouse = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Matchup Context Section */}
+          <MatchupContextSection 
+            predictions={filteredPredictions}
+            analysisResults={analysisResults}
+          />
 
           {/* Prop Finder Section */}
           <PropFinder 
