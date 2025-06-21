@@ -110,9 +110,9 @@ class BaseballAnalysisService {
       strikeout_probability: outcome_probabilities.strikeout || prediction.strikeout_probability,
       
       // Recent performance
-      recent_avg: prediction.recent_avg,
-      hr_rate: prediction.hr_rate,
-      obp: prediction.obp,
+      recent_avg: prediction.recent_N_games_raw_data?.trends_summary_obj?.avg_avg || prediction.recent_avg || 0,
+      hr_rate: prediction.recent_N_games_raw_data?.trends_summary_obj?.hr_rate || prediction.hr_rate || 0,
+      obp: prediction.recent_N_games_raw_data?.trends_summary_obj?.obp_calc || prediction.obp || 0,
       
       // Due factors
       ab_due: prediction.ab_due,
