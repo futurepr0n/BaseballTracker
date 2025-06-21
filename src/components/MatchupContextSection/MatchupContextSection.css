@@ -355,8 +355,8 @@
   border: 1px solid #cbd5e1;
 }
 
-/* Enhanced player lists */
-.player-list {
+/* Enhanced player lists - SCOPED to MatchupContextSection only */
+.matchup-context-section .player-list {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
@@ -560,7 +560,7 @@
     max-width: 200px;
   }
   
-  .player-list {
+  .matchup-context-section .player-list {
     max-width: 120px;
   }
   
@@ -629,7 +629,7 @@
     font-size: 2rem;
   }
   
-  .player-list {
+  .matchup-context-section .player-list {
     max-width: 100px;
   }
   
