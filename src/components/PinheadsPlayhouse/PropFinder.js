@@ -49,8 +49,15 @@ const PropFinder = ({ predictions, gameData }) => {
     let filtered = propOpportunities.filter(opportunity => {
       // Filter by category
       if (filterCategory !== 'all') {
-        const hasCategory = opportunity.props.some(prop => prop.category === filterCategory);
-        if (!hasCategory) return false;
+        if (filterCategory === 'pitcher_strikeouts') {
+          // Filter for pitcher strikeout props only
+          if (opportunity.playerType !== 'pitcher') return false;
+        } else {
+          // Filter for batter props by category
+          if (opportunity.playerType !== 'batter') return false;
+          const hasCategory = opportunity.props.some(prop => prop.category === filterCategory);
+          if (!hasCategory) return false;
+        }
       }
 
       // Filter by minimum probability
@@ -100,7 +107,7 @@ const PropFinder = ({ predictions, gameData }) => {
       case 'rbi': return '💪';
       case 'runs': return '🏃';
       case 'total_bases': return '📏';
-      case 'strikeouts': return '⚾';
+      case 'pitcher_strikeouts': return '⚾';
       default: return '📊';
     }
   };
@@ -157,7 +164,7 @@ const PropFinder = ({ predictions, gameData }) => {
               <option value="rbi">💪 RBI</option>
               <option value="runs">🏃 Runs</option>
               <option value="total_bases">📏 Total Bases</option>
-              <option value="strikeouts">⚾ Strikeouts</option>
+              <option value="pitcher_strikeouts">⚾ Pitcher Strikeouts</option>
             </select>
           </div>
 
@@ -207,8 +214,14 @@ const PropFinder = ({ predictions, gameData }) => {
               {filteredOpportunities.slice(0, 20).map((opportunity, index) => (
                 <tr key={index}>
                   <td className="player-info">
-                    <div className="player-name">{opportunity.playerName}</div>
-                    <div className="player-team">{opportunity.team}</div>
+                    <div className="player-name">
+                      {opportunity.playerType === 'pitcher' && '⚾ '}
+                      {opportunity.playerName}
+                    </div>
+                    <div className="player-team">
+                      {opportunity.team}
+                      {opportunity.playerType === 'pitcher' && ' (P)'}
+                    </div>
                   </td>
                   
                   <td className="best-prop">

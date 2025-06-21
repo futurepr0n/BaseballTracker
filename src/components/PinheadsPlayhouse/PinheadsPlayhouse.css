@@ -530,6 +530,38 @@
   font-weight: 600;
 }
 
+.results-title-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.strategic-analysis-btn {
+  background: linear-gradient(135deg, #ff6b35, #f44336);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+.strategic-analysis-btn:hover {
+  background: linear-gradient(135deg, #e55a2b, #d32f2f);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+.strategic-analysis-btn:active {
+  transform: translateY(0);
+}
+
 .results-summary {
   display: flex;
   gap: 1.5rem;

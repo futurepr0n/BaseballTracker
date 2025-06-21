@@ -7,6 +7,7 @@
  */
 
 import handednessResolver from '../utils/handednessResolver.js';
+import pitcherStrikeoutAnalyzer from './pitcherStrikeoutAnalyzer.js';
 
 class PropFinderService {
   constructor() {
@@ -216,6 +217,7 @@ class PropFinderService {
     const filteredPredictions = await this.filterToStartingLineup(predictions);
     const propOpportunities = [];
 
+    // 1. Analyze batter props (existing logic)
     for (const prediction of filteredPredictions) {
       try {
         const playerProps = await this.analyzePlayerProps(prediction, gameData);
@@ -227,6 +229,7 @@ class PropFinderService {
           propOpportunities.push({
             playerName: prediction.player_name,
             team: prediction.team,
+            playerType: 'batter',
             props: playerProps,
             bestProp: this.getBestProp(playerProps),
             confidence: this.calculateOverallConfidence(playerProps),
@@ -237,6 +240,33 @@ class PropFinderService {
       } catch (error) {
         console.warn(`Failed to analyze props for ${prediction.player_name}:`, error);
       }
+    }
+
+    // 2. Analyze pitcher strikeout props (NEW)
+    try {
+      const pitcherProps = await pitcherStrikeoutAnalyzer.analyzePitcherStrikeoutProps(
+        filteredPredictions, 
+        gameData
+      );
+      
+      // Add pitcher props to opportunities
+      pitcherProps.forEach(pitcherProp => {
+        propOpportunities.push({
+          playerName: pitcherProp.playerName,
+          team: pitcherProp.team,
+          playerType: 'pitcher',
+          props: [pitcherProp], // Single prop per pitcher
+          bestProp: pitcherProp,
+          confidence: pitcherProp.confidence,
+          situationalBoost: 0, // No situational boost for pitchers yet
+          pitcherContext: pitcherProp.context
+        });
+      });
+      
+      console.log(`✅ Added ${pitcherProps.length} pitcher strikeout props`);
+      
+    } catch (error) {
+      console.warn('Failed to analyze pitcher strikeout props:', error);
     }
 
     // Sort by confidence and prop quality, with lineup context boost
@@ -294,9 +324,8 @@ class PropFinderService {
     const totalBasesProps = this.analyzeTotalBasesProps(last10Games);
     props.push(...totalBasesProps);
 
-    // Enhanced Strikeout Props (considers pitcher matchup)
-    const strikeoutProps = this.analyzeEnhancedStrikeoutProps(last10Games, prediction);
-    props.push(...strikeoutProps);
+    // TODO: Add pitcher strikeout props (separate from batter props)
+    // Note: Removed incorrect batter strikeout props - strikeouts are pitcher props, not batter props
 
     // Filter to high-probability props only
     return props.filter(prop => prop.probability >= 40); // 40%+ hit rate
@@ -531,104 +560,9 @@ class PropFinderService {
     return props;
   }
 
-  /**
-   * Enhanced strikeout props analysis (considers pitcher matchup)
-   */
-  analyzeEnhancedStrikeoutProps(games, prediction) {
-    const props = [];
-    const gameCount = games.length;
-    const avgStrikeouts = games.reduce((sum, g) => sum + (g.strikeouts || 0), 0) / gameCount;
-
-    // Get pitcher strikeout data from prediction
-    const pitcherKPerGame = prediction.pitcher_k_per_game || 
-                           (prediction.pitcher_home_k_total / (prediction.pitcher_home_games || 1)) || 
-                           6.5; // League average fallback
-
-    // 1+ Strikeouts analysis with pitcher consideration
-    const oneKGames = games.filter(g => (g.strikeouts || 0) >= 1).length;
-    const oneKRate = (oneKGames / gameCount) * 100;
-    
-    // Enhanced logic: Consider both batter tendency AND pitcher strikeout ability
-    let adjustedRate = oneKRate;
-    
-    // Boost probability if pitcher has high strikeout rate
-    if (pitcherKPerGame >= 8.0) {
-      adjustedRate *= 1.15; // 15% boost for high-K pitcher
-    } else if (pitcherKPerGame >= 7.0) {
-      adjustedRate *= 1.10; // 10% boost for above-average K pitcher
-    } else if (pitcherKPerGame <= 5.0) {
-      adjustedRate *= 0.85; // 15% penalty for low-K pitcher
-    }
-
-    // More inclusive threshold since we consider pitcher matchup
-    if (adjustedRate >= 40 && (avgStrikeouts >= 0.7 || pitcherKPerGame >= 7.0)) {
-      props.push({
-        type: "1+ Strikeouts",
-        probability: Math.min(95, adjustedRate), // Cap at 95%
-        last10: `${oneKGames}/${gameCount}`,
-        trend: this.getTrend(games.slice(-5).filter(g => (g.strikeouts || 0) >= 1).length, 5),
-        confidence: this.calculatePropConfidence(adjustedRate, gameCount),
-        category: 'strikeouts',
-        notes: pitcherKPerGame >= 7.0 ? `High-K pitcher (${pitcherKPerGame.toFixed(1)} K/G)` : 
-               avgStrikeouts >= 1.0 ? `High-K batter (${avgStrikeouts.toFixed(1)} K/G)` : 'Matchup-based'
-      });
-    }
-
-    // 2+ Strikeouts for extreme cases
-    const twoKGames = games.filter(g => (g.strikeouts || 0) >= 2).length;
-    const twoKRate = (twoKGames / gameCount) * 100;
-    let adjustedTwoKRate = twoKRate;
-
-    if (pitcherKPerGame >= 9.0) {
-      adjustedTwoKRate *= 1.20; // 20% boost for elite strikeout pitcher
-    } else if (pitcherKPerGame >= 8.0) {
-      adjustedTwoKRate *= 1.15; // 15% boost for high-K pitcher
-    }
-
-    if (adjustedTwoKRate >= 25 && (avgStrikeouts >= 1.2 || pitcherKPerGame >= 8.0)) {
-      props.push({
-        type: "2+ Strikeouts", 
-        probability: Math.min(85, adjustedTwoKRate), // Cap at 85%
-        last10: `${twoKGames}/${gameCount}`,
-        trend: this.getTrend(games.slice(-5).filter(g => (g.strikeouts || 0) >= 2).length, 5),
-        confidence: this.calculatePropConfidence(adjustedTwoKRate, gameCount),
-        category: 'strikeouts',
-        notes: pitcherKPerGame >= 8.0 ? `Elite K pitcher (${pitcherKPerGame.toFixed(1)} K/G)` : 
-               `High-K matchup`
-      });
-    }
-
-    return props;
-  }
-
-  /**
-   * Legacy strikeout props analysis (kept for reference)
-   */
-  analyzeStrikeoutProps(games) {
-    const props = [];
-    const gameCount = games.length;
-    const avgStrikeouts = games.reduce((sum, g) => sum + (g.strikeouts || 0), 0) / gameCount;
-
-    // Only analyze K props for players who strike out frequently
-    if (avgStrikeouts >= 1.0) {
-      // 1+ Strikeouts
-      const oneKGames = games.filter(g => (g.strikeouts || 0) >= 1).length;
-      const oneKRate = (oneKGames / gameCount) * 100;
-      
-      if (oneKRate >= 60) {
-        props.push({
-          type: "1+ Strikeouts",
-          probability: oneKRate,
-          last10: `${oneKGames}/${gameCount}`,
-          trend: this.getTrend(games.slice(-5).filter(g => (g.strikeouts || 0) >= 1).length, 5),
-          confidence: this.calculatePropConfidence(oneKRate, gameCount),
-          category: 'strikeouts'
-        });
-      }
-    }
-
-    return props;
-  }
+  // Removed incorrect batter strikeout methods
+  // Strikeout props belong to PITCHERS, not batters
+  // TODO: Implement proper pitcher strikeout analysis in separate service
 
   /**
    * Calculate trend indicator
