@@ -90,6 +90,13 @@ node src/services/generatePitcherMatchups.js
 - **Strategic Intelligence**: Target scoring with confidence levels, risk assessment, pitcher vulnerability analysis with explanatory context
 - **Data Integration**: Uses `fetchPlayerData()` from dataService for historical game analysis across multiple dates
 
+**Enhanced Tooltip System (Updated):**
+- **Poor Performance Card**: Updated tooltip to match PositiveMomentumCard style with enhanced game-by-game table
+- **Detailed Game Table**: 10-game performance history with AB, H, HR, RBI, K, AVG columns and visual indicators
+- **Performance Classification**: Games marked as poor, exceptional, multi-hit, power games with color coding
+- **Statistical Summary**: Automatic totals calculation for recent performance overview
+- **Visual Indicators**: Rest day markers (💤), performance level styling, and comprehensive game analysis
+
 **Component Patterns:**
 - **Hook-based State**: Custom hooks in `hooks/` for reusable logic
 - **CSS Modules**: Component-specific styling with `.css` files

@@ -566,44 +566,70 @@ const GlobalTooltip = () => {
           </div>
 
           {player.analysis?.gameHistory && player.analysis.gameHistory.length > 0 && (
-            <div className="recent-performance-info">
-              <h4>📊 Recent Performance (Last 5 Games)</h4>
-              <div className="performance-games">
-                {(player.analysis.gameHistory || player.analysis.hotStreakAnalysis.gameHistory).slice(-5).reverse().map((game, idx) => {
-                  const gameAvg = game.avg || (game.hits / Math.max(game.atBats, 1));
-                  const isRestDay = game.restDay || game.restDays > 0;
-                  const isPoor = gameAvg < 0.200;
-                  const isExceptional = gameAvg >= 0.500 || game.hits >= 3;
-                  
-                  return (
-                    <div key={idx} className={`performance-game ${isPoor ? 'poor-game' : ''} ${isExceptional ? 'exceptional-game' : ''}`}>
-                      <span className="game-date">
-                        {new Date(game.date).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}
-                      </span>
-                      <span className="game-stats">
-                        {game.hits}/{game.atBats}
-                      </span>
-                      <span className="game-avg">
-                        {(gameAvg * 100).toFixed(0)}%
-                      </span>
-                      {isRestDay && (
-                        <span className="rest-indicator" title="Rest day before this game">💤</span>
-                      )}
-                      {isPoor && (
-                        <span className="poor-indicator" title="Poor performance">📉</span>
-                      )}
-                      {isExceptional && (
-                        <span className="exceptional-indicator" title="Peak performance">🔥</span>
-                      )}
-                    </div>
-                  );
-                })}
+            <div className="detailed-game-table">
+              <h4>📊 Recent Game-by-Game Performance</h4>
+              <div className="game-table-container">
+                <table className="enhanced-game-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>AB</th>
+                      <th>H</th>
+                      <th>HR</th>
+                      <th>RBI</th>
+                      <th>K</th>
+                      <th>AVG</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {player.analysis.gameHistory.slice(-10).reverse().map((game, idx) => {
+                      const gameAvg = game.avg || (game.hits / Math.max(game.atBats || game.abs || 1, 1));
+                      const isRestDay = game.restDay || game.restDays > 0;
+                      const isPoor = gameAvg < 0.200;
+                      const isExceptional = gameAvg >= 0.500 || (game.hits || 0) >= 3;
+                      const isMultiHit = (game.hits || 0) >= 2;
+                      const isPowerGame = (game.hr || 0) >= 1;
+                      
+                      return (
+                        <tr key={idx} className={`
+                          ${isExceptional ? 'exceptional-game' : ''}
+                          ${isPoor ? 'poor-game' : ''}
+                          ${isMultiHit ? 'multi-hit-game' : ''}
+                          ${isPowerGame ? 'power-game' : ''}
+                        `}>
+                          <td>
+                            {new Date(game.date).toLocaleDateString('en-US', { 
+                              month: 'short', 
+                              day: 'numeric' 
+                            })}
+                            {isRestDay && <span className="rest-indicator" title="Rest day before this game"> 💤</span>}
+                          </td>
+                          <td>{game.atBats || game.abs || 0}</td>
+                          <td className={(game.hits || 0) > 0 ? 'has-hit' : 'no-hit'}>{game.hits || 0}</td>
+                          <td className={(game.hr || 0) > 0 ? 'has-hr' : ''}>{game.hr || 0}</td>
+                          <td>{game.rbi || 0}</td>
+                          <td className={(game.strikeouts || game.k || 0) > 0 ? 'has-strikeout' : ''}>{game.strikeouts || game.k || 0}</td>
+                          <td className={`avg-${isPoor ? 'poor' : isExceptional ? 'exceptional' : 'average'}`}>
+                            {(gameAvg * 100).toFixed(0)}%
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
-              <div className="performance-legend">
-                <small>💤 = Rest day | 📉 = Poor performance | 🔥 = Peak performance</small>
+              
+              <div className="game-summary-totals">
+                <strong>Last 10 Games:</strong> 
+                {(() => {
+                  const recentGames = player.analysis.gameHistory.slice(-10);
+                  const totalHits = recentGames.reduce((sum, g) => sum + (g.hits || 0), 0);
+                  const totalAB = recentGames.reduce((sum, g) => sum + (g.atBats || g.abs || 0), 0);
+                  const totalHR = recentGames.reduce((sum, g) => sum + (g.hr || 0), 0);
+                  const totalK = recentGames.reduce((sum, g) => sum + (g.strikeouts || g.k || 0), 0);
+                  const avgCalc = totalAB > 0 ? (totalHits / totalAB) : 0;
+                  return ` ${totalHits}/${totalAB} (.${(avgCalc * 1000).toFixed(0)}), ${totalHR} HR, ${totalK} K`;
+                })()}
               </div>
             </div>
           )}
