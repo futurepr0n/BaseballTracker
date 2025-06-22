@@ -36,7 +36,7 @@ const MatchupAnalysisWindow = ({ predictions, analysisResults, isOpen, onClose }
     const hrScore = prediction.hr_score || 0;
     const hrProb = prediction.hr_probability || 0;
     const hitProb = prediction.hit_probability || 0;
-    const recentAvg = prediction.recent_avg || 0;
+    const recentAvg = prediction.recent_N_games_raw_data?.trends_summary_obj?.avg_avg || prediction.recent_avg || 0;
     const context = prediction.dashboard_context || {};
     const badges = context.badges || [];
 

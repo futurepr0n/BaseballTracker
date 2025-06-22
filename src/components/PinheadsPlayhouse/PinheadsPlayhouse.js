@@ -8,6 +8,7 @@ import AutoFillButton from './AutoFillButton';
 import LineupRefreshButton from './LineupRefreshButton';
 import PropFinder from './PropFinder';
 import MatchupContextSection from '../MatchupContextSection/MatchupContextSection';
+import { batchDebugger } from '../../utils/batchAnalysisDebugger';
 import './PinheadsPlayhouse.css';
 
 
@@ -488,10 +489,22 @@ const PinheadsPlayhouse = () => {
     setAnalysisError(null);
 
     try {
+      batchDebugger.log('🎯 SINGLE ANALYSIS: Starting', singleAnalysisParams);
       const result = await analyzePitcherVsTeam(singleAnalysisParams);
+      batchDebugger.log('✅ SINGLE ANALYSIS: Complete', { 
+        predictionCount: result.predictions?.length || 0,
+        hasResult: !!result 
+      });
+      
+      if (result.predictions && result.predictions.length > 0) {
+        batchDebugger.analyzePredictionStructure(result.predictions[0], 'SINGLE MODE FIRST PREDICTION');
+        batchDebugger.trackDataSource(result.predictions, 'Single Analysis API', singleAnalysisParams);
+      }
+      
       setPredictions(result.predictions || []);
       setAnalysisResults(result);
     } catch (error) {
+      batchDebugger.log('❌ SINGLE ANALYSIS: Error', error.message);
       setAnalysisError(error.message);
       setPredictions([]);
     } finally {
@@ -512,19 +525,51 @@ const PinheadsPlayhouse = () => {
     setAnalysisError(null);
 
     try {
+      batchDebugger.log('🚀 BATCH ANALYSIS: Starting', { 
+        validMatchups, 
+        batchParams,
+        matchupCount: validMatchups.length 
+      });
+      
       const result = await batchAnalysis({
         matchups: validMatchups,
         ...batchParams
       });
+      
+      batchDebugger.log('✅ BATCH ANALYSIS: Complete', { 
+        predictionCount: result.predictions?.length || 0,
+        hasResult: !!result,
+        resultStructure: result ? Object.keys(result) : []
+      });
+      
+      if (result.predictions && result.predictions.length > 0) {
+        batchDebugger.analyzePredictionStructure(result.predictions[0], 'BATCH MODE FIRST PREDICTION');
+        batchDebugger.trackDataSource(result.predictions, 'Batch Analysis API', { validMatchups, batchParams });
+        
+        // Analyze pitcher data variation
+        batchDebugger.analyzePitcherDataVariation(result.predictions);
+        
+        // Compare with any existing single mode data
+        const currentPredictions = predictions;
+        if (currentPredictions.length > 0) {
+          batchDebugger.compareModes(currentPredictions, result.predictions);
+        }
+      }
+      
       setPredictions(result.predictions || []);
       setAnalysisResults(result);
     } catch (error) {
+      batchDebugger.log('❌ BATCH ANALYSIS: Error', { 
+        error: error.message,
+        stack: error.stack,
+        matchups: validMatchups 
+      });
       setAnalysisError(error.message);
       setPredictions([]);
     } finally {
       setAnalysisLoading(false);
     }
-  }, [batchMatchups, batchParams, batchAnalysis]);
+  }, [batchMatchups, batchParams, batchAnalysis, predictions]);
 
   // Handle adding/removing batch matchups
   const addBatchMatchup = () => {
@@ -807,6 +852,51 @@ const PinheadsPlayhouse = () => {
       <div className="playhouse-header">
         <h1>🎯 Pinheads Playhouse</h1>
         <p>Advanced Baseball Home Run Analysis - Powered by AI</p>
+        {/* Debug Tools - only show in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="debug-tools">
+            <button 
+              onClick={() => {
+                const logs = batchDebugger.exportLogs();
+                console.log('🔍 BATCH DEBUG LOGS EXPORTED:', logs);
+                alert('Debug logs exported to console. Check developer tools.');
+              }}
+              style={{ 
+                padding: '4px 8px', 
+                fontSize: '12px', 
+                backgroundColor: '#ff9800', 
+                color: 'white', 
+                border: 'none', 
+                borderRadius: '4px',
+                cursor: 'pointer',
+                marginTop: '8px'
+              }}
+              title="Export debug logs to help diagnose batch vs single mode differences"
+            >
+              🔍 Export Debug Logs
+            </button>
+            <button 
+              onClick={() => {
+                batchDebugger.clear();
+                console.log('🧹 Debug logs cleared');
+              }}
+              style={{ 
+                padding: '4px 8px', 
+                fontSize: '12px', 
+                backgroundColor: '#9e9e9e', 
+                color: 'white', 
+                border: 'none', 
+                borderRadius: '4px',
+                cursor: 'pointer',
+                marginTop: '8px',
+                marginLeft: '8px'
+              }}
+              title="Clear debug logs"
+            >
+              🧹 Clear Logs
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Analysis Type Selector */}
@@ -1461,7 +1551,7 @@ const PinheadsPlayhouse = () => {
                         value = prediction.pitcher_recent_era || prediction.pitcher_era || 0;
                         displayValue = formatNumber(value, 2);
                         className = value > 5.0 ? 'value-poor' : value > 4.0 ? 'value-average' : value > 3.0 ? 'value-good' : 'value-excellent';
-                      } else if (colKey === 'contact_trend' || colKey === 'pitcher_trend_dir') {
+                      } else if (colKey === 'contact_trend' || colKey === 'pitcher_trend_dir' || colKey === 'recent_trend_dir') {
                         displayValue = value || 'N/A';
                       } else if (colKey === 'batter_hand' || colKey === 'pitcher_hand') {
                         // Use existing value or 'UNK' - async resolution happens in background
