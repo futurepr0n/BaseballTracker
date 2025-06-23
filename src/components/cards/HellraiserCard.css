@@ -1,0 +1,444 @@
+.hellraiser-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+  min-height: 500px;
+  height: auto;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.hellraiser-card .card-header {
+  background: linear-gradient(135deg, #d32f2f 0%, #f57c00 100%);
+  color: white;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.hellraiser-card .card-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.hellraiser-card .header-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hellraiser-card .header-stats .stat {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.hellraiser-card .header-stats .stat strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+.hellraiser-card .compact-filters {
+  background: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+  padding: 8px 12px;
+}
+
+.hellraiser-card .filter-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.hellraiser-card .filter-row:last-child {
+  margin-bottom: 0;
+}
+
+.hellraiser-card .filter-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  min-width: 45px;
+}
+
+.hellraiser-card .filter-row button {
+  padding: 2px 8px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: white;
+  color: #666;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.hellraiser-card .filter-row button:hover {
+  background: #f0f0f0;
+  border-color: #bbb;
+}
+
+.hellraiser-card .filter-row button.active {
+  background: #1976d2;
+  color: white;
+  border-color: #1976d2;
+  font-weight: 500;
+}
+
+.hellraiser-card .pathway-filters button {
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.hellraiser-card .pathway-filters button:hover {
+  background: #e0e0e0;
+}
+
+.hellraiser-card .pathway-filters button.active {
+  background: white;
+  border-bottom-color: #d32f2f;
+  font-weight: 600;
+  color: #d32f2f;
+}
+
+.hellraiser-card .pathway-description {
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.hellraiser-card .pathway-description h4 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.hellraiser-card .pathway-description p {
+  margin: 0;
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.hellraiser-card .picks-container {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.hellraiser-card .loading-state,
+.hellraiser-card .error-state,
+.hellraiser-card .no-picks {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #666;
+}
+
+.hellraiser-card .loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #d32f2f;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.hellraiser-card .retry-button {
+  padding: 8px 16px;
+  background: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.hellraiser-card .retry-button:hover {
+  background: #b71c1c;
+}
+
+.hellraiser-card .picks-list {
+  padding: 8px;
+}
+
+.hellraiser-card .pick-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.hellraiser-card .pick-item:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-color: #d32f2f;
+}
+
+.hellraiser-card .pick-header {
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hellraiser-card .pick-main-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hellraiser-card .player-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: #333;
+}
+
+.hellraiser-card .team {
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.hellraiser-card .vs-info {
+  font-size: 11px;
+  color: #666;
+}
+
+.hellraiser-card .pick-metrics {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hellraiser-card .confidence-score {
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 24px;
+  text-align: center;
+}
+
+.hellraiser-card .classification {
+  background: #f3e5f5;
+  color: #7b1fa2;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.hellraiser-card .odds {
+  background: #e8f5e8;
+  color: #388e3c;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.hellraiser-card .pick-summary {
+  padding: 0 12px 8px 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.hellraiser-card .pathway-tag {
+  background: #fff3e0;
+  color: #f57c00;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.hellraiser-card .game-info {
+  font-size: 11px;
+  color: #666;
+}
+
+.hellraiser-card .value-tag {
+  background: #e8f5e8;
+  color: #2e7d32;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.hellraiser-card .pick-details {
+  background: #f8f9fa;
+  padding: 12px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.hellraiser-card .pick-details h5 {
+  margin: 0 0 6px 0;
+  font-size: 12px;
+  color: #333;
+  font-weight: 600;
+}
+
+.hellraiser-card .reasoning-section p {
+  margin: 0;
+  font-size: 11px;
+  color: #555;
+  line-height: 1.4;
+}
+
+.hellraiser-card .risk-factors {
+  margin-top: 8px;
+}
+
+.hellraiser-card .risk-factors ul {
+  margin: 4px 0 0 0;
+  padding-left: 16px;
+}
+
+.hellraiser-card .risk-factor {
+  font-size: 11px;
+  color: #d84315;
+  margin-bottom: 2px;
+}
+
+.hellraiser-card .market-analysis {
+  margin-top: 8px;
+}
+
+.hellraiser-card .market-details {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.hellraiser-card .market-details span {
+  font-size: 10px;
+  color: #666;
+}
+
+.hellraiser-card .edge.positive {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.hellraiser-card .edge.negative {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.hellraiser-card .edge.neutral {
+  color: #666;
+}
+
+.hellraiser-card .card-footer {
+  border-top: 1px solid #e0e0e0;
+  padding: 8px 16px;
+  background: #f8f9fa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.hellraiser-card .methodology-info small,
+.hellraiser-card .last-updated small {
+  font-size: 10px;
+  color: #666;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .hellraiser-card .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .hellraiser-card .header-stats {
+    gap: 12px;
+  }
+  
+  .hellraiser-card .pick-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .hellraiser-card .market-details {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .hellraiser-card .card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+/* Scrollbar styling */
+.hellraiser-card .picks-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.hellraiser-card .picks-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.hellraiser-card .picks-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.hellraiser-card .picks-container::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Value Reasoning Styles */
+.hellraiser-card .value-reasoning {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-left: 3px solid #1976d2;
+  border-radius: 4px;
+}
+
+.hellraiser-card .value-reasoning em {
+  font-size: 12px;
+  color: #555;
+  line-height: 1.4;
+}

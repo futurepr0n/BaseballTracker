@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Hellraiser Service</title>
+</head>
+<body>
+    <h1>Testing Hellraiser Service</h1>
+    <div id="results"></div>
+    
+    <script>
+        // Test the service
+        async function testHellraiser() {
+            try {
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = 'Loading...';
+                
+                // Try to load the service
+                const { default: hellraiserService } = await import('./src/services/hellraiserAnalysisService.js');
+                
+                const today = new Date().toISOString().split('T')[0];
+                const analysis = await hellraiserService.analyzeDay(today);
+                
+                resultsDiv.innerHTML = `
+                    <h2>Hellraiser Analysis Results</h2>
+                    <p><strong>Date:</strong> ${analysis.date}</p>
+                    <p><strong>Total Picks:</strong> ${analysis.summary.totalPicks}</p>
+                    <p><strong>Personal Straight:</strong> ${analysis.summary.personalStraight}</p>
+                    <p><strong>Longshots:</strong> ${analysis.summary.longshots}</p>
+                    
+                    <h3>Sample Pick:</h3>
+                    ${analysis.picks.length > 0 ? `
+                        <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
+                            <p><strong>${analysis.picks[0].playerName}</strong> (${analysis.picks[0].team}) vs ${analysis.picks[0].pitcher}</p>
+                            <p>Confidence: ${analysis.picks[0].confidenceScore} | ${analysis.picks[0].classification}</p>
+                            <p>Pathway: ${analysis.picks[0].pathway}</p>
+                            <p>Reasoning: ${analysis.picks[0].reasoning}</p>
+                        </div>
+                    ` : '<p>No picks generated</p>'}
+                `;
+                
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <h2>Error</h2>
+                    <pre>${error.message}</pre>
+                    <pre>${error.stack}</pre>
+                `;
+            }
+        }
+        
+        testHellraiser();
+    </script>
+</body>
+</html>

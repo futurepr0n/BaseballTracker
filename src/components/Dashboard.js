@@ -33,6 +33,7 @@ import PerformanceCard from './cards/PerformanceCard/PerformanceCard';
 import PitcherHRsAllowedCard from './cards/PitcherHRsAllowedCard/PitcherHRsAllowedCard';
 import PitcherHitsAllowedCard from './cards/PitcherHitsAllowedCard/PitcherHitsAllowedCard';
 import SlotMachineCard from './cards/SlotMachineCard/SlotMachineCard';
+import HellraiserCard from './cards/HellraiserCard';
 
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
 import MLBWeatherCard from './cards/MLBWeatherCard/MLBWeatherCard';
@@ -1225,6 +1226,9 @@ const noFilteredData = isFiltering &&
 
           <LiveScoresCard teams={teamData} />
           <MLBWeatherCard teams={teamData} />
+          
+          {/* Hellraiser HR Analysis Card */}
+          <HellraiserCard currentDate={currentDate} />
           
           {/* HR Prediction Card */}
           <HRPredictionCard 
