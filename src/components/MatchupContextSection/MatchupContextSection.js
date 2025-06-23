@@ -81,19 +81,48 @@ const MatchupContextSection = ({ predictions, analysisResults }) => {
       const hrScore = prediction.hr_score || 0;
       const hrProb = prediction.hr_probability || 0;
       const hitProb = prediction.hit_probability || 0;
-      const recentAvg = prediction.recent_avg || 0;
+      // Fix: Access recent_avg from correct nested structure
+      const recentAvgFromAPI = prediction.recent_N_games_raw_data?.trends_summary_obj?.avg_avg;
+      const recentAvgFallback = prediction.recent_avg; // Direct fallback if structure changes
+      const recentAvg = recentAvgFromAPI || recentAvgFallback || 0;
+      
+      // Debug logging for first few predictions (remove after testing)
+      if (predictions.indexOf(prediction) < 3) {
+        console.log(`[MatchupContext Debug] Player: ${prediction.player_name}`);
+        console.log(`  Recent AVG from API: ${recentAvgFromAPI}`);
+        console.log(`  Recent AVG fallback: ${recentAvgFallback}`);
+        console.log(`  Final Recent AVG: ${recentAvg}`);
+        console.log(`  Prediction structure keys:`, Object.keys(prediction));
+        if (prediction.recent_N_games_raw_data) {
+          console.log(`  recent_N_games_raw_data keys:`, Object.keys(prediction.recent_N_games_raw_data));
+          if (prediction.recent_N_games_raw_data.trends_summary_obj) {
+            console.log(`  trends_summary_obj keys:`, Object.keys(prediction.recent_N_games_raw_data.trends_summary_obj));
+          }
+        }
+      }
 
       // TARGET ANALYSIS
       let targetScore = 0;
       const targetReasons = [];
 
-      // Hot streak detection
+      // Hot streak detection - improved with actual recent_avg analysis
       const hasHotStreak = badges.some(badge => 
         badge.includes('🔥') || badge.includes('Hot Streak') || badge.includes('Active Streak')
       );
+      const hasGoodRecentAvg = recentAvg >= 0.280; // .280+ is considered hot
+      
       if (hasHotStreak) {
         targetScore += 20;
-        targetReasons.push('Hot Streak');
+        targetReasons.push('Hot Streak Badge');
+      }
+      
+      // Additional hot streak based on actual avg
+      if (hasGoodRecentAvg && recentAvg >= 0.320) {
+        targetScore += 15;
+        targetReasons.push(`Very Hot Bat (.${(recentAvg * 1000).toFixed(0)})`);
+      } else if (hasGoodRecentAvg) {
+        targetScore += 10;
+        targetReasons.push(`Good Form (.${(recentAvg * 1000).toFixed(0)})`);
       }
 
       // High probability
@@ -123,14 +152,10 @@ const MatchupContextSection = ({ predictions, analysisResults }) => {
         targetReasons.push('Wind Boost');
       }
 
-      // Recent form
-      if (recentAvg >= 0.300) {
-        targetScore += 10;
-        targetReasons.push(`Hot Bat (.${(recentAvg * 1000).toFixed(0)})`);
-      }
+      // Recent form (already handled above in improved hot streak detection)
 
-      // Add to targets if significant
-      if (targetScore >= 30) {
+      // Add to targets if significant (lowered threshold for more results)
+      if (targetScore >= 20) {
         analysis.targets.push({
           player: prediction.player_name,
           team: prediction.team,
@@ -177,8 +202,8 @@ const MatchupContextSection = ({ predictions, analysisResults }) => {
         riskReasons.push('Wind Against');
       }
 
-      // Add to avoids if significant risk
-      if (riskScore >= 25) {
+      // Add to avoids if significant risk (lowered threshold for more results)
+      if (riskScore >= 20) {
         analysis.avoids.push({
           player: prediction.player_name,
           team: prediction.team,
@@ -191,14 +216,14 @@ const MatchupContextSection = ({ predictions, analysisResults }) => {
         });
       }
 
-      // HOT/COLD STREAK TRACKING
-      if (hasHotStreak) {
+      // HOT/COLD STREAK TRACKING - Enhanced with actual performance data
+      if (hasHotStreak || hasGoodRecentAvg) {
         analysis.hotStreaks.push({
           player: prediction.player_name,
           team: prediction.team,
           recentAvg,
           hrScore,
-          badges: badges.filter(badge => badge.includes('🔥')).join(' ')
+          badges: badges.filter(badge => badge.includes('🔥')).join(' ') || `Hot Form (.${(recentAvg * 1000).toFixed(0)})`
         });
       }
 

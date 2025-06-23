@@ -93,10 +93,12 @@ class PitcherStrikeoutAnalyzer {
     // This is a fallback - in real implementation, we'd have better batter K rates
     const baseRate = 0.22; // MLB average ~22% strikeout rate
     
-    // Adjust based on any available indicators
-    if (prediction.recent_avg && prediction.recent_avg < 0.200) {
+    // Adjust based on any available indicators - fix recent_avg access
+    const recentAvg = prediction.recent_N_games_raw_data?.trends_summary_obj?.avg_avg || prediction.recent_avg || 0;
+    
+    if (recentAvg > 0 && recentAvg < 0.200) {
       return baseRate * 1.2; // Struggling batters strike out more
-    } else if (prediction.recent_avg && prediction.recent_avg > 0.300) {
+    } else if (recentAvg > 0.300) {
       return baseRate * 0.8; // Hot batters strike out less
     }
     
