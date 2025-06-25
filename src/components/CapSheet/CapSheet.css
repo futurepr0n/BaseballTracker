@@ -311,6 +311,10 @@
   margin-bottom: 0; /* Remove default margin if section-container handles it */
   max-width: 100%;
   isolation: isolate;
+  /* Prevent scroll lock by ensuring table doesn't capture all scroll events */
+  overscroll-behavior-x: contain;
+  /* Allow vertical scroll to bubble up to parent elements */
+  overscroll-behavior-y: auto;
 }
 
 .capsheet-table {
@@ -333,7 +337,7 @@
 .capsheet-table td:first-child {
   position: sticky;
   left: 0;
-  z-index: 2;
+  z-index: 1; /* Reduced from 2 to prevent scroll interference */
   background-color: inherit; /* Will inherit from tr */
   box-shadow: 1px 0 5px rgba(0, 0, 0, 0.1);
 }
@@ -344,7 +348,7 @@
   border-bottom: 2px solid #ddd;
   position: sticky;
   top: 0;
-  z-index: 2; /* Ensure header is above dropdown menu content if scrolling */
+  z-index: 1; /* Reduced from 2 to prevent scroll interference */
 }
 
 /* Stat header styling */
@@ -464,7 +468,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1000; /* Keep high for true modals */
   padding: 20px; /* Add padding for smaller screens */
 }
 

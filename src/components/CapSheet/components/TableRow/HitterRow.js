@@ -219,7 +219,7 @@ const HitterRow = ({
     renderCount.current += 1;
   });
 
-  // Custom styles for select dropdown to fix cutoff issue
+  // Custom styles for select dropdown to fix cutoff issue and prevent scroll lock
   const customSelectStyles = {
     // Control is the main input element
     control: (base) => ({
@@ -228,17 +228,17 @@ const HitterRow = ({
       height: '30px',
       fontSize: '0.9em'
     }),
-    // Make sure the menu appears in front of other elements
+    // Reduce z-index to prevent scroll lock issues - use reasonable z-index
     menu: (base) => ({
       ...base,
-      zIndex: 9999,
-      width: 'auto', // Allow menu to expand beyond control width
-      minWidth: '100%' // But start at control width
+      zIndex: 100, // Much lower z-index to prevent interference
+      width: 'auto',
+      minWidth: '100%'
     }),
-    // Make sure the menu portal is positioned correctly
+    // Lower z-index for menu portal as well
     menuPortal: (base) => ({
       ...base,
-      zIndex: 9999
+      zIndex: 100 // Reduced from 9999 to prevent scroll lock
     })
   };
 
@@ -343,9 +343,8 @@ const HitterRow = ({
                 isClearable
                 placeholder="Select pitcher..."
                 styles={customSelectStyles}
-                // Render dropdown in portal to avoid container clipping
-                menuPortalTarget={document.body}
-                menuPosition="fixed"
+                // Remove portal rendering to prevent scroll lock issues
+                menuPlacement="auto"
               />
               {player.pitcherId && selectedPitcher && (
                 <div className="button-group">
@@ -437,9 +436,8 @@ const HitterRow = ({
                 isClearable
                 placeholder="Select 2nd pitcher..."
                 styles={customSelectStyles}
-                // Render dropdown in portal to avoid container clipping
-                menuPortalTarget={document.body}
-                menuPosition="fixed"
+                // Remove portal rendering to prevent scroll lock issues
+                menuPlacement="auto"
               />
               {secondPitcherId && (
                 <button 
