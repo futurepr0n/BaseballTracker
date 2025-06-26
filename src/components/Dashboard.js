@@ -34,6 +34,7 @@ import PitcherHRsAllowedCard from './cards/PitcherHRsAllowedCard/PitcherHRsAllow
 import PitcherHitsAllowedCard from './cards/PitcherHitsAllowedCard/PitcherHitsAllowedCard';
 import SlotMachineCard from './cards/SlotMachineCard/SlotMachineCard';
 import HellraiserCard from './cards/HellraiserCard';
+import BarrelMatchupCard from './cards/BarrelMatchupCard';
 
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
 import MLBWeatherCard from './cards/MLBWeatherCard/MLBWeatherCard';
@@ -1229,6 +1230,11 @@ const noFilteredData = isFiltering &&
           
           {/* Hellraiser HR Analysis Card */}
           <HellraiserCard currentDate={currentDate} />
+          
+          {/* Barrel Matchup Analysis Card */}
+          <div style={{ gridColumn: '1 / -1' }}>
+            <BarrelMatchupCard currentDate={currentDate} />
+          </div>
           
           {/* HR Prediction Card */}
           <HRPredictionCard 

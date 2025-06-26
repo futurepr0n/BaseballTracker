@@ -1,0 +1,377 @@
+.barrel-matchup-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  height: 500px; /* Fixed height for consistency */
+  display: flex;
+  flex-direction: column;
+}
+
+.barrel-matchup-card .card-header {
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.barrel-matchup-card .card-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.barrel-matchup-card .card-subtitle {
+  font-size: 12px;
+  opacity: 0.8;
+  font-weight: normal;
+}
+
+/* Table Container */
+.barrel-matchup-card .table-container {
+  flex: 1;
+  overflow: auto;
+  background: #f8f9fa;
+}
+
+/* Table Styling */
+.barrel-matchup-card .matchup-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  table-layout: fixed; /* Fixed layout for better column control */
+}
+
+.barrel-matchup-card .matchup-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #e9ecef;
+}
+
+.barrel-matchup-card .matchup-table th {
+  padding: 12px 8px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #dee2e6;
+  white-space: nowrap;
+}
+
+.barrel-matchup-card .matchup-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.barrel-matchup-card .matchup-table th.sortable:hover {
+  background-color: #dee2e6;
+}
+
+.barrel-matchup-card .header-subtitle {
+  display: block;
+  font-size: 10px;
+  font-weight: normal;
+  color: #6c757d;
+  margin-top: 2px;
+}
+
+/* Table Body */
+.barrel-matchup-card .matchup-table tbody tr.data-row {
+  background: white;
+  border-bottom: 1px solid #e9ecef;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  height: 50px; /* Fixed row height for consistency */
+}
+
+.barrel-matchup-card .matchup-table tbody tr.data-row:hover {
+  background-color: #f8f9fa;
+}
+
+.barrel-matchup-card .matchup-table td {
+  padding: 8px 6px;
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Player Cell */
+.barrel-matchup-card .player-cell {
+  min-width: 180px;
+}
+
+.barrel-matchup-card .player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.barrel-matchup-card .player-name {
+  font-weight: 600;
+  color: #212529;
+}
+
+.barrel-matchup-card .team-info {
+  font-size: 11px;
+  color: #6c757d;
+}
+
+/* Metric Cells */
+.barrel-matchup-card .metric-cell {
+  text-align: center;
+  font-weight: 500;
+  min-width: 80px;
+  transition: background-color 0.3s;
+}
+
+.barrel-matchup-card .score-cell {
+  text-align: center;
+  min-width: 90px;
+}
+
+.barrel-matchup-card .matchup-score {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-weight: 600;
+  background: linear-gradient(135deg, 
+    hsl(calc(120 - var(--score)), 70%, 50%) 0%, 
+    hsl(calc(120 - var(--score)), 70%, 40%) 100%);
+  color: white;
+  font-size: 14px;
+}
+
+/* Expanded Row */
+.barrel-matchup-card .expanded-row td {
+  padding: 0;
+  background: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.barrel-matchup-card .expanded-content {
+  padding: 20px;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.barrel-matchup-card .analysis-section {
+  margin-bottom: 16px;
+}
+
+.barrel-matchup-card .analysis-section h5 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.barrel-matchup-card .analysis-section p {
+  margin: 0;
+  line-height: 1.5;
+  color: #212529;
+}
+
+.barrel-matchup-card .details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.barrel-matchup-card .detail-item {
+  display: flex;
+  gap: 8px;
+}
+
+.barrel-matchup-card .detail-item .label {
+  font-weight: 600;
+  color: #6c757d;
+}
+
+.barrel-matchup-card .detail-item .value {
+  color: #212529;
+}
+
+.barrel-matchup-card .risk-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #dee2e6;
+}
+
+.barrel-matchup-card .risk-section h5 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #dc3545;
+}
+
+.barrel-matchup-card .risk-section ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #dc3545;
+}
+
+.barrel-matchup-card .risk-section li {
+  margin-bottom: 4px;
+}
+
+/* Loading and Error States */
+.barrel-matchup-card .loading-state,
+.barrel-matchup-card .error-state,
+.barrel-matchup-card .no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: #6c757d;
+}
+
+.barrel-matchup-card .loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e9ecef;
+  border-top-color: #2c3e50;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.barrel-matchup-card .retry-button {
+  margin-top: 16px;
+  padding: 8px 16px;
+  background: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.barrel-matchup-card .retry-button:hover {
+  background: #34495e;
+}
+
+/* Footer */
+.barrel-matchup-card .card-footer {
+  padding: 12px 20px;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.barrel-matchup-card .legend {
+  display: flex;
+  gap: 16px;
+}
+
+.barrel-matchup-card .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #6c757d;
+}
+
+.barrel-matchup-card .last-updated {
+  color: #6c757d;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .barrel-matchup-card .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .barrel-matchup-card .details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .barrel-matchup-card .card-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .barrel-matchup-card .legend {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* Column specific widths for full-width layout */
+.barrel-matchup-card .player-col {
+  width: 200px;
+}
+
+.barrel-matchup-card .matchup-table th:nth-child(2),
+.barrel-matchup-card .matchup-table td:nth-child(2) {
+  width: 110px; /* Pitcher Contact */
+}
+
+.barrel-matchup-card .matchup-table th:nth-child(3),
+.barrel-matchup-card .matchup-table td:nth-child(3) {
+  width: 110px; /* Pitcher Barrels */
+}
+
+.barrel-matchup-card .matchup-table th:nth-child(4),
+.barrel-matchup-card .matchup-table td:nth-child(4) {
+  width: 110px; /* Player Exit Velo */
+}
+
+.barrel-matchup-card .matchup-table th:nth-child(5),
+.barrel-matchup-card .matchup-table td:nth-child(5) {
+  width: 110px; /* Player Barrels */
+}
+
+.barrel-matchup-card .matchup-table th:nth-child(6),
+.barrel-matchup-card .matchup-table td:nth-child(6) {
+  width: 130px; /* Player Hard Contact */
+}
+
+.barrel-matchup-card .matchup-table th:nth-child(7),
+.barrel-matchup-card .matchup-table td:nth-child(7) {
+  width: 130px; /* Pitcher Hard Contact */
+}
+
+.barrel-matchup-card .matchup-table th:nth-child(8),
+.barrel-matchup-card .matchup-table td:nth-child(8) {
+  width: 90px; /* Confidence */
+}
+
+.barrel-matchup-card .matchup-table th:nth-child(9),
+.barrel-matchup-card .matchup-table td:nth-child(9) {
+  width: 100px; /* Market Edge */
+}
+
+.barrel-matchup-card .matchup-table th:nth-child(10),
+.barrel-matchup-card .matchup-table td:nth-child(10) {
+  width: 110px; /* Matchup Score */
+}
