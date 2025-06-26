@@ -1,0 +1,505 @@
+/* Batter Matchup Table Styles */
+.batter-matchup-table {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+}
+
+.batter-matchup-table.no-data {
+  text-align: center;
+  padding: 3rem;
+  color: #b0b8c4;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.table-header h3 {
+  font-size: 1.5rem;
+  margin: 0;
+  color: #ffffff;
+}
+
+.table-info {
+  color: #b0b8c4;
+  font-size: 0.9rem;
+}
+
+/* Table Container */
+.table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.matchup-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+/* Table Header */
+.matchup-table thead th {
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.matchup-table thead th.sortable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.matchup-table thead th.sortable:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f7931e;
+}
+
+/* Table Body */
+.matchup-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+.player-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.matchup-table td {
+  padding: 1rem 0.75rem;
+  vertical-align: middle;
+}
+
+/* Player Cell */
+.player-cell {
+  min-width: 150px;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.player-name {
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.player-position {
+  font-size: 0.7rem;
+  color: #b0b8c4;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Team Cell */
+.team-badge {
+  background: #f7931e;
+  color: #000000;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Score Cells */
+.total-score {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #ffffff;
+}
+
+.base-score {
+  color: #b0b8c4;
+  font-weight: 500;
+}
+
+.adjustment {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.adjustment.positive {
+  color: #4caf50;
+}
+
+.adjustment.negative {
+  color: #f44336;
+}
+
+/* Confidence Cell */
+.confidence {
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.confidence.high-confidence {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+}
+
+.confidence.medium-confidence {
+  background: rgba(255, 152, 0, 0.2);
+  color: #ff9800;
+}
+
+.confidence.low-confidence {
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+}
+
+/* Recommendation Cell */
+.recommendation {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-width: 200px;
+}
+
+.action {
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.action.strong-target {
+  background: rgba(76, 175, 80, 0.8);
+  color: #ffffff;
+}
+
+.action.target {
+  background: rgba(76, 175, 80, 0.6);
+  color: #ffffff;
+}
+
+.action.consider {
+  background: rgba(33, 150, 243, 0.6);
+  color: #ffffff;
+}
+
+.action.neutral {
+  background: rgba(158, 158, 158, 0.6);
+  color: #ffffff;
+}
+
+.action.caution {
+  background: rgba(255, 152, 0, 0.7);
+  color: #000000;
+}
+
+.action.avoid {
+  background: rgba(244, 67, 54, 0.8);
+  color: #ffffff;
+}
+
+.reason {
+  font-size: 0.75rem;
+  color: #b0b8c4;
+  line-height: 1.2;
+}
+
+/* Details Cell */
+.details-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.8rem;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.details-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #f7931e;
+}
+
+/* Expanded Row */
+.expanded-row td {
+  padding: 0;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.expanded-details {
+  padding: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.detail-section {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.detail-section h4 {
+  font-size: 1.1rem;
+  margin: 0 0 1rem 0;
+  color: #f7931e;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.5rem;
+}
+
+/* Factor List */
+.factor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.factor-item {
+  display: grid;
+  grid-template-columns: 1fr auto 2fr;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+}
+
+.factor-label {
+  font-size: 0.85rem;
+  color: #b0b8c4;
+  font-weight: 500;
+}
+
+.factor-value {
+  font-weight: 600;
+  text-align: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  min-width: 50px;
+}
+
+.factor-value.positive {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+}
+
+.factor-value.negative {
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+}
+
+.factor-desc {
+  font-size: 0.8rem;
+  color: #b0b8c4;
+  line-height: 1.3;
+}
+
+/* Detail Stats */
+.venue-details,
+.travel-details,
+.env-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.venue-stat,
+.travel-stat,
+.env-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #b0b8c4;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.venue-description,
+.travel-description,
+.env-description {
+  font-size: 0.85rem;
+  color: #b0b8c4;
+  line-height: 1.4;
+  font-style: italic;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+  border-left: 3px solid #f7931e;
+}
+
+/* Environmental Factors */
+.env-factors {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.env-factor {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.5rem;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+.env-factor span {
+  color: #b0b8c4;
+}
+
+.no-data {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 1rem;
+}
+
+/* Row Color Coding */
+.player-row.strong-target {
+  border-left: 4px solid #4caf50;
+}
+
+.player-row.target {
+  border-left: 4px solid #8bc34a;
+}
+
+.player-row.consider {
+  border-left: 4px solid #2196f3;
+}
+
+.player-row.neutral {
+  border-left: 4px solid #9e9e9e;
+}
+
+.player-row.caution {
+  border-left: 4px solid #ff9800;
+}
+
+.player-row.avoid {
+  border-left: 4px solid #f44336;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .details-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .factor-item {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .batter-matchup-table {
+    padding: 1rem;
+  }
+  
+  .table-header {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+  
+  .table-container {
+    font-size: 0.8rem;
+  }
+  
+  .matchup-table td,
+  .matchup-table th {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .recommendation {
+    max-width: 150px;
+  }
+  
+  .expanded-details {
+    padding: 1rem;
+  }
+  
+  .details-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .detail-section {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .matchup-table {
+    font-size: 0.75rem;
+  }
+  
+  .matchup-table td,
+  .matchup-table th {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .player-name {
+    font-size: 0.85rem;
+  }
+  
+  .total-score {
+    font-size: 1rem;
+  }
+  
+  .recommendation {
+    max-width: 120px;
+  }
+  
+  .action {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+  }
+  
+  .reason {
+    font-size: 0.7rem;
+  }
+}

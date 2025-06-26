@@ -1,0 +1,690 @@
+/* Pitcher Stats Section Styles */
+.pitcher-stats-section {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+}
+
+.pitcher-stats-section.no-data {
+  text-align: center;
+  padding: 3rem;
+  color: #b0b8c4;
+}
+
+/* Section Header */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-header h3 {
+  font-size: 1.5rem;
+  margin: 0;
+  color: #ffffff;
+}
+
+.tab-navigation {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tab-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #b0b8c4;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.tab-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.tab-button.active {
+  background: linear-gradient(45deg, #ff6b35, #f7931e);
+  border-color: #f7931e;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Overview Content */
+.overview-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.pitcher-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.pitcher-info h3 {
+  font-size: 1.8rem;
+  margin: 0 0 0.5rem 0;
+  color: #ffffff;
+}
+
+.pitcher-meta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.team-info {
+  color: #b0b8c4;
+  font-size: 0.9rem;
+}
+
+.era,
+.whip {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.api-summary {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.predictions-count,
+.avg-score {
+  text-align: center;
+}
+
+.count,
+.score {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f7931e;
+}
+
+.label {
+  display: block;
+  font-size: 0.8rem;
+  color: #b0b8c4;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0.25rem;
+}
+
+/* Matchup Summary */
+.matchup-summary {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.opponents-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.opponent-section h4 {
+  font-size: 1.2rem;
+  margin: 0 0 1rem 0;
+  color: #ffffff;
+  text-align: center;
+}
+
+.vs-divider {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f7931e;
+  text-align: center;
+  align-self: center;
+}
+
+.team-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #b0b8c4;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.stat-value.strength-elite {
+  color: #4caf50;
+}
+
+.stat-value.strength-strong {
+  color: #8bc34a;
+}
+
+.stat-value.strength-average {
+  color: #ff9800;
+}
+
+.stat-value.strength-below_average {
+  color: #ff5722;
+}
+
+.stat-value.strength-weak {
+  color: #f44336;
+}
+
+.no-analysis {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 2rem;
+}
+
+/* Top Threats */
+.top-threats {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.top-threats h4 {
+  font-size: 1.2rem;
+  margin: 0 0 1.5rem 0;
+  color: #ffffff;
+}
+
+.threats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.threat-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.threat-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.threat-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.player-name {
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.hr-score {
+  font-weight: 700;
+  color: #f7931e;
+  font-size: 1.1rem;
+}
+
+.threat-details {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.probability {
+  text-align: center;
+}
+
+.probability .label {
+  font-size: 0.7rem;
+  color: #b0b8c4;
+  margin-bottom: 0.25rem;
+}
+
+.probability .value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* Predictions Content */
+.predictions-content {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.predictions-table-container {
+  overflow-x: auto;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.table-header h4 {
+  font-size: 1.2rem;
+  margin: 0;
+  color: #ffffff;
+}
+
+.table-info {
+  color: #b0b8c4;
+  font-size: 0.9rem;
+}
+
+.predictions-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.predictions-table th {
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.predictions-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+}
+
+.predictions-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.player-cell .player-name {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.score-cell .hr-score {
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.hr-score.high {
+  background: rgba(76, 175, 80, 0.8);
+  color: #ffffff;
+}
+
+.hr-score.medium {
+  background: rgba(255, 152, 0, 0.8);
+  color: #ffffff;
+}
+
+.hr-score.low {
+  background: rgba(158, 158, 158, 0.6);
+  color: #ffffff;
+}
+
+.percentage-cell,
+.arsenal-cell,
+.avg-cell {
+  color: #b0b8c4;
+  font-weight: 500;
+}
+
+.context-indicators {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.indicator {
+  padding: 0.15rem 0.3rem;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.indicator.home {
+  background: #4caf50;
+  color: #ffffff;
+}
+
+.indicator.hot {
+  background: #ff5722;
+  color: #ffffff;
+}
+
+.indicator.venue {
+  background: #2196f3;
+  color: #ffffff;
+}
+
+.indicator.venue-neg {
+  background: #f44336;
+  color: #ffffff;
+}
+
+/* No Predictions */
+.no-predictions {
+  text-align: center;
+  padding: 3rem;
+}
+
+.no-predictions h4 {
+  color: #f7931e;
+  margin-bottom: 1rem;
+}
+
+.prediction-fallback {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.prediction-fallback ul {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0 0;
+}
+
+.prediction-fallback li {
+  padding: 0.5rem 0;
+  color: #b0b8c4;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.prediction-fallback li::before {
+  content: '✓';
+  color: #4caf50;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
+
+/* Analysis Content */
+.analysis-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.analysis-sections {
+  display: grid;
+  gap: 2rem;
+}
+
+.vulnerability-analysis,
+.matchup-breakdown {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.vulnerability-analysis h4,
+.matchup-breakdown h4 {
+  font-size: 1.2rem;
+  margin: 0 0 1.5rem 0;
+  color: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.5rem;
+}
+
+.pitcher-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.stat-box .stat-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #b0b8c4;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-box .stat-value {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.vulnerability-factors h5 {
+  font-size: 1rem;
+  margin: 0 0 1rem 0;
+  color: #f7931e;
+}
+
+.factors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.factor-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+}
+
+.factor-label {
+  font-size: 0.85rem;
+  color: #b0b8c4;
+}
+
+.factor-value {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.no-pitcher-data {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 2rem;
+}
+
+/* Matchup Breakdown */
+.breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.team-breakdown {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 1.5rem;
+}
+
+.team-breakdown h5 {
+  font-size: 1rem;
+  margin: 0 0 1rem 0;
+  color: #ffffff;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.5rem;
+}
+
+.target-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.target-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+}
+
+.target-name {
+  font-size: 0.85rem;
+  color: #ffffff;
+}
+
+.target-score {
+  font-weight: 600;
+  color: #f7931e;
+  font-size: 0.85rem;
+}
+
+.no-targets {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 1.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .opponents-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .vs-divider {
+    display: none;
+  }
+  
+  .threats-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+  
+  .breakdown-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .pitcher-stats-section {
+    padding: 1rem;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .tab-navigation {
+    width: 100%;
+  }
+  
+  .tab-button {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .pitcher-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .api-summary {
+    width: 100%;
+    justify-content: space-around;
+  }
+  
+  .threats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .pitcher-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .section-header h3 {
+    font-size: 1.3rem;
+  }
+  
+  .tab-button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+  
+  .pitcher-info h3 {
+    font-size: 1.5rem;
+  }
+  
+  .predictions-table {
+    font-size: 0.8rem;
+  }
+  
+  .predictions-table th,
+  .predictions-table td {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .pitcher-stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+}

@@ -21,6 +21,7 @@ import {
 } from './services/dataService';
 
 import PinheadsPlayhouse from './components/PinheadsPlayhouse/PinheadsPlayhouse';
+import HRMatchupHub from './components/HRMatchupHub/HRMatchupHub';
 
 import './App.css';
 
@@ -164,6 +165,13 @@ function App() {
               />} />
 
               <Route path="/pinheads-playhouse" element={<PinheadsPlayhouse 
+                  playerData={playerData} 
+                  teamData={teamData} 
+                  gameData={gameData} 
+                  currentDate={currentDate}
+                />} />
+
+              <Route path="/hr-matchups" element={<HRMatchupHub 
                   playerData={playerData} 
                   teamData={teamData} 
                   gameData={gameData} 
