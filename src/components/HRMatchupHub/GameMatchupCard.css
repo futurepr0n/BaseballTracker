@@ -131,6 +131,53 @@
   color: #ffffff;
 }
 
+/* Pitcher Matchup */
+.pitcher-matchup {
+  background: linear-gradient(135deg, rgba(247, 147, 30, 0.1), rgba(255, 107, 53, 0.1));
+  border: 1px solid rgba(247, 147, 30, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.pitcher-vs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.away-pitcher, .home-pitcher {
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 0.95rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  min-width: 100px;
+  text-align: center;
+}
+
+.away-pitcher {
+  border-left: 3px solid #ff6b6b;
+}
+
+.home-pitcher {
+  border-left: 3px solid #4ecdc4;
+}
+
+.vs-text {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #f7931e;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0.2rem 0.5rem;
+  background: rgba(247, 147, 30, 0.2);
+  border-radius: 4px;
+}
+
 /* Team Summaries */
 .team-summaries {
   display: grid;
@@ -314,6 +361,15 @@
     gap: 0.75rem;
   }
 
+  .pitcher-vs {
+    gap: 0.75rem;
+  }
+
+  .away-pitcher, .home-pitcher {
+    font-size: 0.9rem;
+    min-width: 90px;
+  }
+
   .card-footer {
     flex-direction: column;
     gap: 1rem;
@@ -347,10 +403,25 @@
     align-items: center;
   }
 
+  .pitcher-vs {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .away-pitcher, .home-pitcher {
+    font-size: 0.85rem;
+    min-width: 80px;
+  }
+
   .team-header {
     flex-direction: column;
     gap: 0.5rem;
     align-items: flex-start;
+  }
+
+  .team-label {
+    font-size: 0.8rem;
+    line-height: 1.2;
   }
 
   .analysis-indicators {

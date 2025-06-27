@@ -13,11 +13,70 @@ import enhancedTravelService from './enhancedTravelService';
 import comprehensiveWeatherService from './comprehensiveWeatherService';
 import advancedPitcherIntelligence from './advancedPitcherIntelligence';
 import enhancedPitcherIntelligenceService from './enhancedPitcherIntelligenceService';
+import { debugLog } from '../utils/debugConfig';
 
 class ComprehensiveMatchupService {
   constructor() {
     this.cache = new Map();
     this.cacheTimeout = 15 * 60 * 1000; // 15 minutes for faster updates
+  }
+
+  /**
+   * Validate if a date is within reasonable MLB season range (RELAXED VERSION)
+   */
+  isValidMLBDate(dateStr) {
+    // Basic format check
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+    
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // 0-based to 1-based
+    
+    // Check for valid year (reasonable range)
+    if (year < 2020 || year > 2030) return false;
+    
+    // RELAXED: Only block obvious off-season months to prevent major spam
+    // Allow most dates since we have various data sources and fallbacks
+    if (year <= 2024 && month === 1) return false; // Only block January for past years
+    
+    return true; // Let the system handle missing data gracefully
+  }
+
+  /**
+   * Extract active players from today's games only (PERFORMANCE OPTIMIZATION)
+   */
+  extractActivePlayersFromGames(gameData, lineupData) {
+    const activeTeams = new Set();
+    const activePlayerSet = new Set();
+    
+    // Get teams playing today
+    gameData.forEach(game => {
+      activeTeams.add(game.homeTeam);
+      activeTeams.add(game.awayTeam);
+    });
+    
+    // If we have lineup data, use actual starting lineups
+    if (lineupData && lineupData.games) {
+      lineupData.games.forEach(game => {
+        // Add players from confirmed lineups
+        if (game.lineups?.home?.batting_order && game.lineups.home.batting_order.length > 0) {
+          game.lineups.home.batting_order.forEach(player => {
+            if (player.name) activePlayerSet.add(`${player.name}:${game.teams.home.abbr}`);
+          });
+        }
+        if (game.lineups?.away?.batting_order && game.lineups.away.batting_order.length > 0) {
+          game.lineups.away.batting_order.forEach(player => {
+            if (player.name) activePlayerSet.add(`${player.name}:${game.teams.away.abbr}`);
+          });
+        }
+      });
+    }
+    
+    return {
+      activeTeams: Array.from(activeTeams),
+      activePlayerKeys: Array.from(activePlayerSet),
+      hasLineupsPosted: activePlayerSet.size > 0
+    };
   }
 
   /**
@@ -45,33 +104,75 @@ class ComprehensiveMatchupService {
     }
 
     try {
-      console.log('Generating comprehensive matchup analysis...');
+      debugLog.log('SERVICES', 'Generating comprehensive matchup analysis...');
       
       let dateStr = dateObj.toISOString().split('T')[0];
-      console.log('Current date object:', dateObj);
-      console.log('Calculated dateStr:', dateStr);
+      debugLog.log('SERVICES', 'Current date object:', dateObj);
+      debugLog.log('SERVICES', 'Calculated dateStr:', dateStr);
       
-      // TEMPORARY FIX: Force to today's date if it's calculating tomorrow
-      if (dateStr === '2025-06-27') {
-        dateStr = '2025-06-26';
-        console.log('Corrected dateStr to:', dateStr);
+      // Allow natural date progression - no hardcoded date corrections
+      
+      debugLog.log('SERVICES', 'Looking for lineup file:', `/data/lineups/starting_lineups_${dateStr}.json`);
+      
+      // PERFORMANCE OPTIMIZATION: Load lineup data to filter players
+      const lineupData = await this.loadPredictionData(`/data/lineups/starting_lineups_${dateStr}.json`);
+      const activePlayerInfo = this.extractActivePlayersFromGames(gameData, lineupData);
+      
+      debugLog.log('SERVICES', `Active teams today: ${activePlayerInfo.activeTeams.join(', ')}`);
+      debugLog.log('SERVICES', `Starting lineups posted: ${activePlayerInfo.hasLineupsPosted ? 'YES' : 'NO'}`);
+      
+      // RELAXED: Only skip obviously invalid dates, allow system to handle missing data
+      if (!this.isValidMLBDate(dateStr)) {
+        debugLog.log('SERVICES', `Potentially invalid MLB date: ${dateStr}, trying prediction-based analysis`);
+        return await this.generatePredictionBasedAnalysis(dateObj, gameData, dateStr);
       }
-      
-      console.log('Looking for lineup file:', `/data/lineups/starting_lineups_${dateStr}.json`);
       
       // Get player data for the date
       const playerData = await fetchPlayerData(dateStr);
       
       // If no historical player data, try to generate predictions using prediction data
       if (!playerData || playerData.length === 0) {
-        console.log('No historical player data found, generating prediction-based analysis...');
+        debugLog.log('SERVICES', 'No historical player data found, generating prediction-based analysis...');
         return await this.generatePredictionBasedAnalysis(dateObj, gameData, dateStr);
       }
+      
+      // PERFORMANCE OPTIMIZATION: Filter to only players from active teams (if available)
+      let filteredPlayerData = playerData;
+      
+      if (activePlayerInfo.activeTeams.length > 0) {
+        filteredPlayerData = playerData.filter(player => 
+          activePlayerInfo.activeTeams.includes(player.team) || 
+          activePlayerInfo.activeTeams.includes(player.Team)
+        );
+        
+        // If filtering results in very few players, use all data to ensure analysis works
+        if (filteredPlayerData.length < 20) {
+          debugLog.log('SERVICES', `Filtered data too small (${filteredPlayerData.length}), using all player data`);
+          filteredPlayerData = playerData;
+        }
+      }
+      
+      // Final safety: limit to prevent overload but ensure we have enough data
+      if (filteredPlayerData.length > 200) {
+        filteredPlayerData = filteredPlayerData.slice(0, 200);
+      }
 
-      // Generate analyses for each game (original logic for historical data)
-      const gameAnalyses = await Promise.all(
-        gameData.map(game => this.analyzeIndividualGame(game, playerData, dateObj))
+      debugLog.log('SERVICES', `Using ${filteredPlayerData.length} players for analysis (was ${playerData.length})`);
+
+      // Generate analyses for each game (using filtered player data) with timeout protection
+      const gameAnalysisPromises = gameData.map(game => 
+        Promise.race([
+          this.analyzeIndividualGame(game, filteredPlayerData, dateObj),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error(`Game analysis timeout for ${game.homeTeam} vs ${game.awayTeam}`)), 15000)
+          )
+        ]).catch(error => {
+          console.warn(`Failed to analyze game ${game.homeTeam} vs ${game.awayTeam}:`, error.message);
+          return null; // Return null for failed game analyses
+        })
       );
+      
+      const gameAnalyses = await Promise.all(gameAnalysisPromises);
 
       const comprehensiveAnalysis = {
         date: dateStr,
@@ -105,6 +206,15 @@ class ComprehensiveMatchupService {
       
       // Ensure currentDate is a valid Date object
       const dateObj = currentDate instanceof Date ? currentDate : new Date(currentDate);
+      const dateStr = dateObj.toISOString().split('T')[0];
+      
+      // Load lineup data to extract pitcher information
+      const lineupData = await this.loadPredictionData(`/data/lineups/starting_lineups_${dateStr}.json`);
+      const gameLineupData = this.findGameLineupData(lineupData, homeTeam, awayTeam);
+      
+      // Extract pitcher information from lineup data
+      const pitchers = this.extractPitchersFromLineup(gameLineupData, homeTeam, awayTeam);
+      debugLog.log('SERVICES', 'Extracted pitchers for individual game:', pitchers);
       
       // Get players for both teams
       const homeTeamPlayers = playerData.filter(player => 
@@ -125,10 +235,12 @@ class ComprehensiveMatchupService {
       // Get BaseballAPI predictions if available
       let apiPredictions = null;
       try {
-        if (pitcher && pitcher.name) {
+        // Use pitcher from lineup data if available, fallback to game data
+        const pitcherForAPI = pitchers.home || pitchers.away || pitcher;
+        if (pitcherForAPI && pitcherForAPI.name) {
           const allPlayers = [...homeTeamPlayers, ...awayTeamPlayers];
           apiPredictions = await baseballAnalysisService.analyzePitcherVsTeam(
-            pitcher.name, 
+            pitcherForAPI.name, 
             homeTeam, 
             allPlayers
           );
@@ -142,6 +254,7 @@ class ComprehensiveMatchupService {
         homeTeam,
         awayTeam,
         pitcher,
+        pitchers, // Add extracted pitchers data
         venue: homeTeam,
         gameTime: game.dateTime || game.time,
         homeTeamAnalysis: homeAnalysis,
@@ -166,12 +279,20 @@ class ComprehensiveMatchupService {
 
     const venue = isHome ? teamCode : game.homeTeam;
     
-    // Analyze each player with all factors
-    const playerAnalyses = await Promise.all(
-      players.slice(0, 15).map(player => // Limit to top 15 players for performance
-        this.analyzePlayerComprehensively(player, venue, teamCode, currentDate, isHome)
-      )
+    // Analyze each player with all factors (with timeout protection)
+    const playerAnalysisPromises = players.slice(0, 15).map(player => // Limit to top 15 players for performance
+      Promise.race([
+        this.analyzePlayerComprehensively(player, venue, teamCode, currentDate, isHome),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error(`Player analysis timeout for ${player.name}`)), 10000)
+        )
+      ]).catch(error => {
+        console.warn(`Failed to analyze player ${player.name}:`, error.message);
+        return null; // Return null for failed analyses
+      })
     );
+    
+    const playerAnalyses = await Promise.all(playerAnalysisPromises);
 
     const validAnalyses = playerAnalyses.filter(analysis => analysis !== null);
 
@@ -707,35 +828,31 @@ class ComprehensiveMatchupService {
       const dateObj = currentDate instanceof Date ? currentDate : new Date(currentDate);
       let dateStr = dateObj.toISOString().split('T')[0];
       
-      // TEMPORARY FIX: Force to today's date if it's calculating tomorrow
-      if (dateStr === '2025-06-27') {
-        dateStr = '2025-06-26';
-        console.log('Corrected dateStr in analyzePredictiveGame to:', dateStr);
-      }
+      // Allow natural date progression - no hardcoded date corrections
       
       // Find game-specific lineup data
-      console.log('Looking for lineup data for:', homeTeam, 'vs', awayTeam);
+      debugLog.log('SERVICES', 'Looking for lineup data for:', homeTeam, 'vs', awayTeam);
       const gameLineupData = this.findGameLineupData(lineupData, homeTeam, awayTeam);
-      console.log('Found lineup data:', gameLineupData ? 'YES' : 'NO');
+      debugLog.log('SERVICES', 'Found lineup data:', gameLineupData ? 'YES' : 'NO');
       if (gameLineupData) {
-        console.log('Lineup pitchers:', gameLineupData.pitchers);
+        debugLog.log('SERVICES', 'Lineup pitchers:', gameLineupData.pitchers);
       }
       
       // Extract players for both teams using hierarchical approach
       const homeTeamPlayers = await this.extractTeamPlayers(hrPredictions, homeTeam, gameLineupData, currentDate);
       const awayTeamPlayers = await this.extractTeamPlayers(hrPredictions, awayTeam, gameLineupData, currentDate);
       
-      console.log(`Final player counts: ${homeTeam}=${homeTeamPlayers.length}, ${awayTeam}=${awayTeamPlayers.length}`);
-      console.log(`Home team players:`, homeTeamPlayers.map(p => `${p.name} (${p.source})`));
-      console.log(`Away team players:`, awayTeamPlayers.map(p => `${p.name} (${p.source})`));
-      console.log(`Players with HR context: Home=${homeTeamPlayers.filter(p => p.hrContextAvailable).length}, Away=${awayTeamPlayers.filter(p => p.hrContextAvailable).length}`);
+      debugLog.log('SERVICES', `Final player counts: ${homeTeam}=${homeTeamPlayers.length}, ${awayTeam}=${awayTeamPlayers.length}`);
+      debugLog.log('SERVICES', `Home team players:`, homeTeamPlayers.map(p => `${p.name} (${p.source})`));
+      debugLog.log('SERVICES', `Away team players:`, awayTeamPlayers.map(p => `${p.name} (${p.source})`));
+      debugLog.log('SERVICES', `Players with HR context: Home=${homeTeamPlayers.filter(p => p.hrContextAvailable).length}, Away=${awayTeamPlayers.filter(p => p.hrContextAvailable).length}`);
 
       // Find pitcher matchup data and generate advanced pitcher intelligence first
       const matchupData = this.findPitcherMatchupData(pitcherMatchups, homeTeam, awayTeam);
       
       // Extract pitcher information from lineup data
       const pitchers = this.extractPitchersFromLineup(gameLineupData, homeTeam, awayTeam);
-      console.log('Extracted pitchers:', pitchers);
+      debugLog.log('SERVICES', 'Extracted pitchers:', pitchers);
       
       // Prepare pitcher data for analysis
       const homePitcher = pitchers.home || (game.pitcher && game.homeTeam === homeTeam ? game.pitcher : null);
@@ -758,7 +875,7 @@ class ComprehensiveMatchupService {
             }
           );
           
-          console.log('Enhanced pitcher intelligence generated:', pitcherIntelligence);
+          debugLog.log('SERVICES', 'Enhanced pitcher intelligence generated:', pitcherIntelligence);
         } catch (error) {
           console.warn('Enhanced pitcher intelligence failed, trying basic:', error);
           
@@ -821,28 +938,28 @@ class ComprehensiveMatchupService {
    * 3. HR predictions as enhancement context
    */
   async extractTeamPlayers(predictions, team, gameLineupData = null, currentDate = new Date()) {
-    console.log(`Extracting players for team: ${team}`);
+    debugLog.log('SERVICES', `Extracting players for team: ${team}`);
     
     try {
       // Step 1: Try to get players from batting order (when lineups are posted)
       const battingOrderPlayers = this.extractPlayersFromBattingOrder(gameLineupData, team);
       
       if (battingOrderPlayers.length > 0) {
-        console.log(`✅ Found ${battingOrderPlayers.length} players from LINEUP for ${team} (no restrictions applied)`);
+        debugLog.log('SERVICES', `✅ Found ${battingOrderPlayers.length} players from LINEUP for ${team} (no restrictions applied)`);
         return await this.enhancePlayersWithHRContext(battingOrderPlayers, predictions, team);
       }
       
       // Step 2: Fall back to roster data for comprehensive team analysis
-      console.log(`No batting order available, using roster data for ${team} with restrictions (10+ games, active in last 3 games)`);
+      debugLog.log('SERVICES', `No batting order available, using roster data for ${team} with restrictions (10+ games, active in last 3 games)`);
       const rosterPlayers = await this.extractPlayersFromRoster(team, 10, currentDate);
       
       if (rosterPlayers.length > 0) {
-        console.log(`🔍 Found ${rosterPlayers.length} players from ROSTER for ${team} (after applying restrictions)`);
+        debugLog.log('SERVICES', `🔍 Found ${rosterPlayers.length} players from ROSTER for ${team} (after applying restrictions)`);
         return await this.enhancePlayersWithHRContext(rosterPlayers, predictions, team);
       }
       
       // Step 3: Emergency fallback to HR predictions only
-      console.log(`No roster data available, using HR predictions only for ${team}`);
+      debugLog.log('SERVICES', `No roster data available, using HR predictions only for ${team}`);
       return this.extractPlayersFromHRPredictions(predictions, team);
       
     } catch (error) {
@@ -956,7 +1073,7 @@ class ComprehensiveMatchupService {
         player.stats['2024_Games'] >= minGames // Must have played at least minimum games
       );
 
-      console.log(`Initial roster filter for ${team}: ${initialFilter.length} players with ${minGames}+ games`);
+      debugLog.log('SERVICES', `Initial roster filter for ${team}: ${initialFilter.length} players with ${minGames}+ games`);
       
       // Apply recent activity restriction
       const activePlayersPromises = initialFilter.map(async (player) => {
@@ -975,11 +1092,11 @@ class ComprehensiveMatchupService {
         .filter(player => player !== null)
         .sort((a, b) => (b.stats['2024_Games'] || 0) - (a.stats['2024_Games'] || 0)); // Sort by games played
       
-      console.log(`After recent activity filter for ${team}: ${teamPlayers.length} active players`);
+      debugLog.log('SERVICES', `After recent activity filter for ${team}: ${teamPlayers.length} active players`);
       
       if (initialFilter.length > teamPlayers.length) {
         const filtered = initialFilter.length - teamPlayers.length;
-        console.log(`⚠️ Filtered out ${filtered} players from ${team} roster (inactive in last 3 games)`);
+        debugLog.log('SERVICES', `⚠️ Filtered out ${filtered} players from ${team} roster (inactive in last 3 games)`);
       }
       
       // Convert roster players to consistent format
@@ -1840,7 +1957,7 @@ class ComprehensiveMatchupService {
       (game.teams?.home?.abbr === homeTeam && game.teams?.away?.abbr === awayTeam)
     );
     
-    console.log(`Lineup data for ${homeTeam} vs ${awayTeam}:`, foundGame ? 'Found' : 'Not found');
+    debugLog.log('SERVICES', `Lineup data for ${homeTeam} vs ${awayTeam}:`, foundGame ? 'Found' : 'Not found');
     return foundGame;
   }
 
@@ -2202,7 +2319,7 @@ class ComprehensiveMatchupService {
    * Calculate enhanced contextual score using Hellraiser and badge systems
    */
   async calculateEnhancedContextualScore(player, baseScore) {
-    console.log(`🔥 Calculating contextual bonuses for ${player.name || player.fullName}`);
+    debugLog.log('SERVICES', `🔥 Calculating contextual bonuses for ${player.name || player.fullName}`);
     
     let contextualBonus = 0;
     const badges = [];
@@ -2274,7 +2391,7 @@ class ComprehensiveMatchupService {
           explanations.push(`Value Bet (+5)`);
         }
 
-        console.log(`🔥 Hellraiser bonuses for ${player.name}: +${contextualBonus - 15} (excluding base)`);
+        debugLog.log('SERVICES', `🔥 Hellraiser bonuses for ${player.name}: +${contextualBonus - 15} (excluding base)`);
       }
 
       // 2. Badge system integration (for additional context)
@@ -2299,7 +2416,7 @@ class ComprehensiveMatchupService {
       if (stadiumBonus > 0) explanations.push(`Stadium Advantage (+${stadiumBonus})`);
       if (teamContextBonus > 0) explanations.push(`Team Context (+${teamContextBonus})`);
 
-      console.log(`🔥 Total contextual bonus for ${player.name}: +${contextualBonus}`);
+      debugLog.log('SERVICES', `🔥 Total contextual bonus for ${player.name}: +${contextualBonus}`);
 
     } catch (error) {
       console.error(`Error calculating contextual score for ${player.name}:`, error);
@@ -2326,11 +2443,7 @@ class ComprehensiveMatchupService {
       const currentDate = new Date();
       let dateStr = currentDate.toISOString().split('T')[0];
       
-      // TEMPORARY FIX: Use same date correction as main analysis
-      if (dateStr === '2025-06-27') {
-        dateStr = '2025-06-26';
-        console.log('🔥 Corrected dateStr for Hellraiser lookup to:', dateStr);
-      }
+      // Allow natural date progression - no hardcoded date corrections
       
       // Load Hellraiser analysis
       const analysis = await hellraiserAnalysisService.analyzeDay(dateStr);
@@ -2370,7 +2483,7 @@ class ComprehensiveMatchupService {
       // Market edge
       const marketEdge = hellraiserPick.marketEfficiency?.edge || 0;
 
-      console.log(`🔥 Found Hellraiser data for ${playerName}: Exit Velo: ${exitVelocity}, Barrel: ${barrelRate}%, Hard Contact: ${hardContact}%`);
+      debugLog.log('SERVICES', `🔥 Found Hellraiser data for ${playerName}: Exit Velo: ${exitVelocity}, Barrel: ${barrelRate}%, Hard Contact: ${hardContact}%`);
 
       return {
         isHellraiserPick: true,

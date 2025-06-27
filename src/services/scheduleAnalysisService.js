@@ -3,7 +3,7 @@
  * Analyzes consecutive games, rest patterns, and schedule-related performance impacts
  */
 
-import { fetchPlayerDataForDateRange, fetchGameData } from './dataService';
+import { fetchPlayerDataForDateRange, fetchGameData, convertDataMapToArray } from './dataService';
 
 class ScheduleAnalysisService {
   constructor() {
@@ -26,7 +26,10 @@ class ScheduleAnalysisService {
 
     try {
       // Get historical player data
-      const historicalData = await fetchPlayerDataForDateRange(currentDate, lookbackDays, lookbackDays);
+      const historicalDataMap = await fetchPlayerDataForDateRange(currentDate, lookbackDays, lookbackDays);
+      
+      // CRITICAL FIX: fetchPlayerDataForDateRange now returns a Map, not an array
+      const historicalData = convertDataMapToArray(historicalDataMap);
       
       // Filter for this player's games
       const playerGames = historicalData.filter(data => 

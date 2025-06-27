@@ -1,5 +1,6 @@
 // src/components/cards/CurrentSeriesCards/CurrentSeriesCard.js
 import React, { useState, useEffect } from 'react';
+import { debugLog } from '../../../utils/debugConfig';
 import { 
   fetchPlayerDataForDateRange, 
   fetchRosterData,
@@ -16,12 +17,12 @@ import {
  * @returns {Array} Player stats for the current series
  */
 const findCurrentSeriesStats = async (playerTeam, opponentTeam, dateRangeData, currentDate) => {
-  console.log(`[findCurrentSeriesStats] Analyzing current series: ${playerTeam} vs ${opponentTeam}`);
+  debugLog.log('CARDS', `[findCurrentSeriesStats] Analyzing current series: ${playerTeam} vs ${opponentTeam}`);
   
   const playerSeriesStats = new Map();
   const sortedDates = Object.keys(dateRangeData).sort().reverse(); // Start from most recent
   
-  console.log(`[findCurrentSeriesStats] Available dates: ${sortedDates.join(', ')}`);
+  debugLog.log('CARDS', `[findCurrentSeriesStats] Available dates: ${sortedDates.join(', ')}`);
   
   let seriesGames = [];
   let foundSeriesEnd = false;
@@ -31,7 +32,7 @@ const findCurrentSeriesStats = async (playerTeam, opponentTeam, dateRangeData, c
     const playersForDate = dateRangeData[dateStr];
     
     if (!playersForDate || playersForDate.length === 0) {
-      console.log(`[findCurrentSeriesStats] No players data for ${dateStr}`);
+      debugLog.log('CARDS', `[findCurrentSeriesStats] No players data for ${dateStr}`);
       continue;
     }
     
@@ -51,14 +52,14 @@ const findCurrentSeriesStats = async (playerTeam, opponentTeam, dateRangeData, c
         (game.homeTeam === opponentTeam && game.awayTeam === playerTeam)
       );
     } catch (error) {
-      console.log(`[findCurrentSeriesStats] Could not load game data for ${dateStr}`);
+      debugLog.log('CARDS', `[findCurrentSeriesStats] Could not load game data for ${dateStr}`);
       // Fallback: if both teams have 8+ players, they likely played
       teamsPlayedEachOther = playerTeamPlayers.length >= 8 && opponentTeamPlayers.length >= 8;
     }
     
     if (teamsPlayedEachOther) {
       // These teams played each other on this date
-      console.log(`[findCurrentSeriesStats] ✅ Found series game on ${dateStr}: ${playerTeam} vs ${opponentTeam}`);
+      debugLog.log('CARDS', `[findCurrentSeriesStats] ✅ Found series game on ${dateStr}: ${playerTeam} vs ${opponentTeam}`);
       
       // Add this game to the series
       seriesGames.unshift({ 
@@ -68,7 +69,7 @@ const findCurrentSeriesStats = async (playerTeam, opponentTeam, dateRangeData, c
     } else if (playerTeamPlayers.length > 0 || opponentTeamPlayers.length > 0) {
       // One of the teams played but not against each other - series has ended
       if (seriesGames.length > 0) {
-        console.log(`[findCurrentSeriesStats] 🛑 Series ended - teams played different opponents on ${dateStr}`);
+        debugLog.log('CARDS', `[findCurrentSeriesStats] 🛑 Series ended - teams played different opponents on ${dateStr}`);
         foundSeriesEnd = true;
         break;
       }
@@ -77,21 +78,21 @@ const findCurrentSeriesStats = async (playerTeam, opponentTeam, dateRangeData, c
     // Stop if we've gone back too far (more than 10 days)
     const daysDiff = Math.floor((currentDate - new Date(dateStr)) / (1000 * 60 * 60 * 24));
     if (daysDiff > 10 && seriesGames.length === 0) {
-      console.log(`[findCurrentSeriesStats] No series found within 10 days`);
+      debugLog.log('CARDS', `[findCurrentSeriesStats] No series found within 10 days`);
       break;
     }
   }
   
-  console.log(`[findCurrentSeriesStats] Found ${seriesGames.length} games in current series`);
+  debugLog.log('CARDS', `[findCurrentSeriesStats] Found ${seriesGames.length} games in current series`);
   
   if (seriesGames.length === 0) {
-    console.log(`[findCurrentSeriesStats] No current series found between ${playerTeam} and ${opponentTeam}`);
+    debugLog.log('CARDS', `[findCurrentSeriesStats] No current series found between ${playerTeam} and ${opponentTeam}`);
     return [];
   }
   
   // Process each game to collect player stats
   seriesGames.forEach((gameData, gameIndex) => {
-    console.log(`[findCurrentSeriesStats] Processing series game ${gameIndex + 1} on ${gameData.date}`);
+    debugLog.log('CARDS', `[findCurrentSeriesStats] Processing series game ${gameIndex + 1} on ${gameData.date}`);
     
     gameData.players.forEach(player => {
       // Only process hitters
@@ -135,7 +136,7 @@ const findCurrentSeriesStats = async (playerTeam, opponentTeam, dateRangeData, c
             ab
           });
           
-          console.log(`[findCurrentSeriesStats] ${player.name}: ${hits}H, ${hrs}HR in ${ab}AB on ${gameData.date}`);
+          debugLog.log('CARDS', `[findCurrentSeriesStats] ${player.name}: ${hits}H, ${hrs}HR in ${ab}AB on ${gameData.date}`);
         }
       }
     });
@@ -162,7 +163,7 @@ const findCurrentSeriesStats = async (playerTeam, opponentTeam, dateRangeData, c
       seriesLength: seriesGames.length
     }));
   
-  console.log(`[findCurrentSeriesStats] Final result: ${result.length} players with series stats`);
+  debugLog.log('CARDS', `[findCurrentSeriesStats] Final result: ${result.length} players with series stats`);
   
   return result;
 };
@@ -182,7 +183,7 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
         setDebugInfo('Starting series analysis...');
         
         if (!gameData || gameData.length === 0) {
-          console.log('[CurrentSeriesHitsCard] No game data available');
+          debugLog.log('CARDS', '[CurrentSeriesHitsCard] No game data available');
           setDebugInfo('No games scheduled for today');
           setSeriesData([]);
           return;
@@ -192,7 +193,7 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
         setDebugInfo(`Analyzing ${gameData.length} games...`);
         
         // Load recent historical data
-        console.log('[CurrentSeriesHitsCard] Loading historical data...');
+        debugLog.log('CARDS', '[CurrentSeriesHitsCard] Loading historical data...');
         setDebugInfo('Loading historical player data...');
         
         const dateRangeData = await fetchPlayerDataForDateRange(currentDate, 14, 14);
@@ -211,7 +212,7 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
         const allSeriesStats = [];
         
         for (const game of gameData) {
-          console.log(`[CurrentSeriesHitsCard] Processing game: ${game.awayTeam} @ ${game.homeTeam}`);
+          debugLog.log('CARDS', `[CurrentSeriesHitsCard] Processing game: ${game.awayTeam} @ ${game.homeTeam}`);
           setDebugInfo(`Analyzing ${game.awayTeam} @ ${game.homeTeam} series...`);
           
           // Analyze both teams' current series
@@ -229,12 +230,12 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
             currentDate
           );
           
-          console.log(`[CurrentSeriesHitsCard] Results: ${homeSeriesStats.length} home players, ${awaySeriesStats.length} away players`);
+          debugLog.log('CARDS', `[CurrentSeriesHitsCard] Results: ${homeSeriesStats.length} home players, ${awaySeriesStats.length} away players`);
           
           allSeriesStats.push(...homeSeriesStats, ...awaySeriesStats);
         }
         
-        console.log(`[CurrentSeriesHitsCard] Total series stats: ${allSeriesStats.length}`);
+        debugLog.log('CARDS', `[CurrentSeriesHitsCard] Total series stats: ${allSeriesStats.length}`);
         setDebugInfo(`Found ${allSeriesStats.length} players with series data`);
         
         // Sort by hits in current series
@@ -248,7 +249,7 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
           })
           .slice(0, 25);
         
-        console.log(`[CurrentSeriesHitsCard] Final sorted stats: ${sortedStats.length} players`);
+        debugLog.log('CARDS', `[CurrentSeriesHitsCard] Final sorted stats: ${sortedStats.length} players`);
         
         setSeriesData(sortedStats);
         

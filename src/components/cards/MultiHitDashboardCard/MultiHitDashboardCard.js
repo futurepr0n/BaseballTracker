@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { BarChart3, TrendingUp, Target, Loader2, AlertCircle } from 'lucide-react';
 import { useTeamFilter } from '../../TeamFilterContext';
+import { debugLog } from '../../../utils/debugConfig';
 import './MultiHitDashboardCard.css'; // Import your CSS styles
 
 const MultiHitDashboardCard = () => {
@@ -70,7 +71,7 @@ const MultiHitDashboardCard = () => {
         }
         const multiHitData = await multiHitResponse.json();
         
-        console.log(`Loaded pre-processed multi-hit data: ${multiHitData.allMultiHitPerformers?.length || 0} multi-hit performers, ${multiHitData.allMultiHRPerformers?.length || 0} multi-HR performers`);
+        debugLog.log('CARDS', `Loaded pre-processed multi-hit data: ${multiHitData.allMultiHitPerformers?.length || 0} multi-hit performers, ${multiHitData.allMultiHRPerformers?.length || 0} multi-HR performers`);
         
         // Transform the pre-processed data for our component
         const transformedData = {

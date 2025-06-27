@@ -1,5 +1,6 @@
 // src/components/cards/TimeSlotHitsCard/TimeSlotHitsCard.js
 import React, { useState, useEffect } from 'react';
+import { debugLog } from '../../../utils/debugConfig';
 import { 
   fetchPlayerDataForDateRange, 
   fetchRosterData,
@@ -30,7 +31,7 @@ const TimeSlotHitsCard = ({ gameData, currentDate, teams }) => {
         const dateRangeData = await fetchPlayerDataForDateRange(
           currentDate, 
           30,   // Initial lookback
-          365   // Max lookback (1 year)
+          90    // Max lookback (3 months) - reduced from 365 days
         );
         
         // Create a map of team -> game time slot
@@ -68,9 +69,9 @@ const TimeSlotHitsCard = ({ gameData, currentDate, teams }) => {
         });
         
         // Log what we found
-        console.log('[analyzeTimeSlot] Team time slots:');
+        debugLog.log('CARDS', '[analyzeTimeSlot] Team time slots:');
         teamTimeSlots.forEach((value, team) => {
-          console.log(`  ${team}: ${value.displayText}`);
+          debugLog.log('CARDS', `  ${team}: ${value.displayText}`);
         });
         
         // Analyze each team's players in their specific time slot
@@ -95,7 +96,7 @@ const TimeSlotHitsCard = ({ gameData, currentDate, teams }) => {
           allTimeSlotPlayers.push(...teamPlayers);
         }
         
-        console.log(`[analyzeTimeSlot] Found ${allTimeSlotPlayers.length} total players across all time slots`);
+        debugLog.log('CARDS', `[analyzeTimeSlot] Found ${allTimeSlotPlayers.length} total players across all time slots`);
         
         // Sort by performance and take top 25
         const sortedPlayers = allTimeSlotPlayers
@@ -276,9 +277,9 @@ const TimeSlotHRCard = ({ gameData, currentDate, teams }) => {
       });
       
       // Log what we found
-      console.log('[analyzeTimeSlot] Team time slots:');
+      debugLog.log('CARDS', '[analyzeTimeSlot] Team time slots:');
       teamTimeSlots.forEach((value, team) => {
-        console.log(`  ${team}: ${value.displayText}`);
+        debugLog.log('CARDS', `  ${team}: ${value.displayText}`);
       });
       
       // Analyze each team's players in their specific time slot
@@ -303,7 +304,7 @@ const TimeSlotHRCard = ({ gameData, currentDate, teams }) => {
         allTimeSlotPlayers.push(...teamPlayers);
       }
       
-      console.log(`[analyzeTimeSlot] Found ${allTimeSlotPlayers.length} total players across all time slots`);
+      debugLog.log('CARDS', `[analyzeTimeSlot] Found ${allTimeSlotPlayers.length} total players across all time slots`);
       
       // Sort by performance and take top 25
       const sortedPlayers = allTimeSlotPlayers

@@ -1,7 +1,13 @@
 /**
  * Data service for MLB Statistics Tracker
  * Enhanced to support multi-game historical data and team changes
+ * 
+ * CRITICAL FIX: Now uses SharedDataManager to eliminate infinite request loops
  */
+
+// Import the SharedDataManager for efficient data loading
+import { getSharedDateRangeData, getDataManagerStats } from './SharedDataManager';
+import { debugLog } from '../utils/debugConfig';
 
 // Note: playerLookupService integration will be handled in component files
 // Keeping legacy functions for backward compatibility
@@ -96,11 +102,38 @@ export const findClosestDateWithData = async (dateStr, direction = -1, maxAttemp
 };
 
 /**
+ * Validate if a date is within reasonable MLB data range (PERFORMANCE CRITICAL)
+ */
+const isValidMLBDataDate = (dateStr) => {
+  // Basic format check
+  if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+  
+  const date = new Date(dateStr);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1; // 0-based to 1-based
+  
+  // Check for valid year (our data range) - RELAXED
+  if (year < 2023 || year > 2027) return false;
+  
+  // RELAXED: Only block obvious off-season dates to prevent major request spam
+  // Allow most of the year since we have various data sources
+  if (year <= 2024 && month === 1) return false; // Only block January for past years
+  
+  return true; // Allow most dates, let the system handle missing data gracefully
+};
+
+/**
  * Fetch player statistics for a specific date
  * @param {string} dateStr - Date string in 'YYYY-MM-DD' format
  * @returns {Promise<Array>} Array of player statistics
  */
 export const fetchPlayerData = async (dateStr) => {
+  // CRITICAL PERFORMANCE FIX: Validate date before any processing
+  if (!isValidMLBDataDate(dateStr)) {
+    debugLog.log('DATA_SERVICE', `Skipping invalid MLB date: ${dateStr}`);
+    return DEFAULT_PLAYER_DATA;
+  }
+
   // Check cache first
   if (dataCache.players[dateStr]) {
     return dataCache.players[dateStr];
@@ -116,7 +149,7 @@ export const fetchPlayerData = async (dateStr) => {
     // Construct the file path
     const filePath = `/data/${year}/${monthName}/${monthName}_${day}_${year}.json`;
     
-    console.log(`Loading player data from: ${filePath}`);
+    debugLog.log('DATA_SERVICE', `Loading player data from: ${filePath}`);
     
     // Fetch the data
     const response = await fetch(filePath);
@@ -126,7 +159,7 @@ export const fetchPlayerData = async (dateStr) => {
       const closestDate = await findClosestDateWithData(dateStr);
       
       if (closestDate) {
-        console.log(`No data found for ${dateStr}, using closest available date: ${closestDate}`);
+        debugLog.log('DATA_SERVICE', `No data found for ${dateStr}, using closest available date: ${closestDate}`);
         return fetchPlayerData(closestDate);
       }
       
@@ -135,7 +168,7 @@ export const fetchPlayerData = async (dateStr) => {
       const seasonStart = new Date('2025-03-18'); // Earliest data we have
       
       if (requestDate >= seasonStart) {
-        console.log(`📅 No player data available for ${dateStr} (no alternative found)`);
+        debugLog.log('DATA_SERVICE', `📅 No player data available for ${dateStr} (no alternative found)`);
       }
       return DEFAULT_PLAYER_DATA;
     }
@@ -154,110 +187,55 @@ export const fetchPlayerData = async (dateStr) => {
 };
 
 /**
- * Fetch player data for a range of dates with adaptive loading strategy
+ * Convert SharedDataManager Map result to flat array (COMPATIBILITY HELPER)
+ * @param {Map} dataMap - Map from SharedDataManager
+ * @returns {Array} Flat array of player data
+ */
+export const convertDataMapToArray = (dataMap) => {
+  const flatArray = [];
+  if (dataMap && typeof dataMap.values === 'function') {
+    for (const dateData of dataMap.values()) {
+      if (Array.isArray(dateData)) {
+        flatArray.push(...dateData);
+      }
+    }
+  }
+  return flatArray;
+};
+
+/**
+ * Fetch player data for a range of dates with SharedDataManager
+ * 
+ * CRITICAL FIX: Replaces problematic fetchPlayerDataForDateRange that caused
+ * thousands of HTTP requests and browser freeze. Now uses:
+ * - Request deduplication across dashboard cards
+ * - Smart date filtering (weekdays, in-season only) 
+ * - Silent error handling for missing dates
+ * - Reasonable default limits (90 days vs 730)
+ * 
  * @param {Date} startDate - The starting date
  * @param {number} initialDaysToLookBack - Initial number of days to look back (default: 30)
- * @param {number} maxDaysToLookBack - Maximum days to look back for season data (default: 180)
+ * @param {number} maxDaysToLookBack - Maximum days to look back for season data (default: 90)
  * @returns {Promise<Object>} Map of date -> player data arrays
  */
-export const fetchPlayerDataForDateRange = async (startDate, initialDaysToLookBack = 30, maxDaysToLookBack = 180) => {
-  // Generate a unique cache key for this range
-  const cacheKey = `${formatDateString(startDate)}_${initialDaysToLookBack}`;
+export const fetchPlayerDataForDateRange = async (startDate, initialDaysToLookBack = 30, maxDaysToLookBack = 90) => {
+  // Use SharedDataManager for efficient, deduplicated data loading
+  debugLog.dataService(`Using SharedDataManager for date range: ${formatDateString(startDate)}, max ${maxDaysToLookBack} days`);
   
-  // Check cache first
-  if (dataCache.dateRangeData[cacheKey]) {
-    console.log(`[DataService] Using cached date range data for ${cacheKey}`);
-    return dataCache.dateRangeData[cacheKey];
+  const result = await getSharedDateRangeData(startDate, maxDaysToLookBack);
+  
+  // Log performance stats periodically
+  const stats = getDataManagerStats();
+  if (stats.totalRequests % 10 === 0 && stats.totalRequests > 0) {
+    debugLog.performance('DATA_SERVICE', 'SharedDataManager batch', Date.now(), {
+      totalRequests: stats.totalRequests,
+      cacheHitRate: `${stats.cacheHitRate}%`,
+      deduplicationRate: `${stats.deduplicationRate}%`,
+      actualFetches: stats.actualFetches
+    });
   }
   
-  console.log(`[DataService] Fetching player data for ${initialDaysToLookBack} days starting from ${formatDateString(startDate)}`);
-  const result = {};
-  
-  // Track how many days we've searched and dates with data
-  let daysSearched = 0;
-  let datesWithData = 0;
-  
-  // First pass: search the initial window
-  for (let daysBack = 0; daysBack < initialDaysToLookBack; daysBack++) {
-    const searchDate = new Date(startDate);
-    searchDate.setDate(searchDate.getDate() - daysBack);
-    const dateStr = formatDateString(searchDate);
-    daysSearched++;
-    
-    try {
-      // Get player data for this date
-      const playersForDate = await fetchPlayerData(dateStr);
-      
-      if (playersForDate && playersForDate.length > 0) {
-        console.log(`[DataService] Found ${playersForDate.length} player records for ${dateStr}`);
-        result[dateStr] = playersForDate;
-        datesWithData++;
-      } else {
-        console.log(`[DataService] No player data found for ${dateStr}`);
-      }
-    } catch (error) {
-      // Only log errors for dates within expected data range
-      const requestDate = new Date(dateStr);
-      const seasonStart = new Date('2025-03-18'); // Earliest data we have
-      
-      if (requestDate >= seasonStart) {
-        console.error(`[DataService] Error fetching player data for ${dateStr}:`, error);
-      }
-    }
-  }
-  
-  // Second pass: If we need more data, extend the search
-  // This is particularly helpful for pitchers who might not play frequently
-  if (datesWithData < Math.min(10, initialDaysToLookBack / 3)) {
-    console.log(`[DataService] Found only ${datesWithData} dates with data. Extending search to find more historical data...`);
-    
-    // Calculate how many more days to search
-    const additionalDaysToSearch = Math.min(
-      maxDaysToLookBack - initialDaysToLookBack,  // Don't exceed max days
-      180  // Reasonable limit for extended search
-    );
-    
-    // Only proceed if we have more days to search
-    if (additionalDaysToSearch > 0) {
-      // Skip days we've already searched
-      for (let daysBack = initialDaysToLookBack; daysBack < initialDaysToLookBack + additionalDaysToSearch; daysBack++) {
-        const searchDate = new Date(startDate);
-        searchDate.setDate(searchDate.getDate() - daysBack);
-        const dateStr = formatDateString(searchDate);
-        daysSearched++;
-        
-        try {
-          // Check if we've found enough dates with data
-          if (datesWithData >= 30) {
-            console.log(`[DataService] Found ${datesWithData} dates with data, stopping extended search`);
-            break;
-          }
-          
-          // Get player data for this date
-          const playersForDate = await fetchPlayerData(dateStr);
-          
-          if (playersForDate && playersForDate.length > 0) {
-            console.log(`[DataService] Found ${playersForDate.length} player records for ${dateStr}`);
-            result[dateStr] = playersForDate;
-            datesWithData++;
-          }
-        } catch (error) {
-          // Only log errors for dates within expected data range
-          const requestDate = new Date(dateStr);
-          const seasonStart = new Date('2025-03-18'); // Earliest data we have
-          
-          if (requestDate >= seasonStart) {
-            console.error(`[DataService] Error fetching player data for ${dateStr}:`, error);
-          }
-        }
-      }
-    }
-  }
-  
-  // Store in cache
-  dataCache.dateRangeData[cacheKey] = result;
-  
-  console.log(`[DataService] Completed fetching data for ${Object.keys(result).length} dates (searched ${daysSearched} days)`);
+  debugLog.dataService(`Completed: ${Object.keys(result).length} dates with data`);
   return result;
 };
 
@@ -543,7 +521,7 @@ export const clearCache = () => {
  */
 export const analyzePlayerVsOpponent = async (playerName, playerTeam, opponentTeam, dateRangeData, gameDate = null) => {
   // Legacy implementation - enhanced version available in playerLookupService
-  console.log(`[analyzePlayerVsOpponent] Looking for ${playerName} (${playerTeam}) vs ${opponentTeam}`);
+  debugLog.log('MATCHUP_ANALYSIS', `Looking for ${playerName} (${playerTeam}) vs ${opponentTeam}`);
   
   let totalGames = 0;
   let totalAB = 0;
@@ -565,7 +543,7 @@ export const analyzePlayerVsOpponent = async (playerName, playerTeam, opponentTe
       try {
         const gameData = await fetchGameData(dateStr);
         if (!gameData || !Array.isArray(gameData.games)) {
-          console.log(`[analyzePlayerVsOpponent] Could not load game data for ${dateStr}, using player count heuristic`);
+          debugLog.log('MATCHUP_ANALYSIS', `Could not load game data for ${dateStr}, using player count heuristic`);
           
           // Fallback: check if opponent team players also played
           const opponentPlayers = playersForDate.filter(p => p.team === opponentTeam);
@@ -599,9 +577,9 @@ export const analyzePlayerVsOpponent = async (playerName, playerTeam, opponentTe
           AVG: playerData.AVG || '.000'
         });
         
-        console.log(`[analyzePlayerVsOpponent] Found game on ${dateStr}: ${playerName} played vs ${opponentTeam}`);
+        debugLog.log('MATCHUP_ANALYSIS', `Found game on ${dateStr}: ${playerName} played vs ${opponentTeam}`);
       } catch (error) {
-        console.error(`[analyzePlayerVsOpponent] Error processing ${dateStr}:`, error);
+        debugLog.error('MATCHUP_ANALYSIS', `Error processing ${dateStr}:`, error);
       }
     }
   }
@@ -620,7 +598,7 @@ export const analyzePlayerVsOpponent = async (playerName, playerTeam, opponentTe
   
   const average = totalAB > 0 ? (totalHits / totalAB).toFixed(3) : '.000';
   
-  console.log(`[analyzePlayerVsOpponent] Found ${totalGames} games for ${playerName} vs ${opponentTeam}: ${totalHits}H, ${totalHRs}HR in ${totalAB}AB`);
+  debugLog.log('MATCHUP_ANALYSIS', `Found ${totalGames} games for ${playerName} vs ${opponentTeam}: ${totalHits}H, ${totalHRs}HR in ${totalAB}AB`);
   
   return {
     games: totalGames,
@@ -637,7 +615,7 @@ export const analyzePlayerVsOpponentLegacy = async (playerName, playerTeam, oppo
   const gamesVsOpponent = [];
   const sortedDates = Object.keys(dateRangeData).sort();
   
-  console.log(`[analyzePlayerVsOpponent] Looking for ${playerName} (${playerTeam}) vs ${opponentTeam}`);
+  debugLog.log('MATCHUP_ANALYSIS', `Looking for ${playerName} (${playerTeam}) vs ${opponentTeam}`);
   
   // For each date, we need to check if these teams actually played each other
   for (const dateStr of sortedDates) {
@@ -672,7 +650,7 @@ export const analyzePlayerVsOpponentLegacy = async (playerName, playerTeam, oppo
         });
       }
     } catch (error) {
-      console.log(`[analyzePlayerVsOpponent] Could not load game data for ${dateStr}, using player count heuristic`);
+      debugLog.log('MATCHUP_ANALYSIS', `Could not load game data for ${dateStr}, using player count heuristic`);
       // Fallback: if we can't load game data, use a very strict heuristic
       // Both teams must have at least 8 players with stats (stronger indicator of actual game)
       actuallyPlayed = playerTeamPlayers.length >= 8 && opponentTeamPlayers.length >= 8;
@@ -687,7 +665,7 @@ export const analyzePlayerVsOpponentLegacy = async (playerName, playerTeam, oppo
     const playerData = playerTeamPlayers.find(p => p.name === playerName);
     
     if (playerData && playerData.H !== 'DNP') {
-      console.log(`[analyzePlayerVsOpponent] Found game on ${dateStr}: ${playerName} played vs ${opponentTeam}`);
+      debugLog.log('MATCHUP_ANALYSIS', `Found game on ${dateStr}: ${playerName} played vs ${opponentTeam}`);
       gamesVsOpponent.push({
         date: dateStr,
         hits: Number(playerData.H) || 0,
@@ -712,7 +690,7 @@ export const analyzePlayerVsOpponentLegacy = async (playerName, playerTeam, oppo
   const totalRBI = gamesVsOpponent.reduce((sum, game) => sum + game.rbi, 0);
   const totalRuns = gamesVsOpponent.reduce((sum, game) => sum + game.runs, 0);
   
-  console.log(`[analyzePlayerVsOpponent] Found ${totalGames} games for ${playerName} vs ${opponentTeam}: ${totalHits}H, ${totalHRs}HR in ${totalAB}AB`);
+  debugLog.log('MATCHUP_ANALYSIS', `Found ${totalGames} games for ${playerName} vs ${opponentTeam}: ${totalHits}H, ${totalHRs}HR in ${totalAB}AB`);
   
   return {
     playerName,
@@ -1065,7 +1043,7 @@ const estimateGameTime = (gameDate, dayOfWeek) => {
 export const findPlayersInTimeSlot = (targetDayOfWeek, targetTimeBlock, dateRangeData) => {
   const playerStats = new Map();
   
-  console.log(`[findPlayersInTimeSlot] Looking for ${targetDayOfWeek} ${targetTimeBlock} games`);
+  debugLog.log('MATCHUP_ANALYSIS', `Looking for ${targetDayOfWeek} ${targetTimeBlock} games`);
   
   Object.keys(dateRangeData).forEach(dateStr => {
     const gameDate = new Date(dateStr);

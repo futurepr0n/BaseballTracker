@@ -1,0 +1,360 @@
+/* PlayerItemStyles.css - Unified styles for consistent player list items across all cards */
+
+/* ========================================
+   CSS CUSTOM PROPERTIES (VARIABLES)
+   ======================================== */
+:root {
+  /* Spacing */
+  --player-item-padding: 12px;
+  --player-item-padding-mobile: 10px 8px;
+  --player-item-min-height: 72px;
+  --player-item-min-height-compact: 56px;
+  --player-item-min-height-mobile: 60px;
+  
+  /* Rank Circle */
+  --rank-size: 42px;
+  --rank-size-mobile: 36px;
+  --rank-size-small: 32px;
+  
+  /* Colors */
+  --border-color: #f0f0f0;
+  --hover-bg: rgba(0, 0, 0, 0.015);
+  --logo-opacity: 0.12; /* More visible again */
+  --logo-opacity-hover: 0.18;
+  
+  /* Dark mode colors */
+  --dark-border-color: rgba(255, 255, 255, 0.1);
+  --dark-hover-bg: rgba(255, 255, 255, 0.03);
+  --dark-logo-opacity: 0.08; /* More visible in dark mode too */
+  --dark-logo-opacity-hover: 0.12;
+}
+
+/* ========================================
+   BASE PLAYER ITEM STYLES
+   ======================================== */
+.player-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: var(--player-item-padding);
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+  min-height: var(--player-item-min-height);
+  background-color: transparent;
+  overflow: visible; /* Allow logos to extend beyond bounds */
+}
+
+.player-item:hover {
+  background-color: var(--hover-bg);
+  transform: translateX(1px); /* Subtler movement */
+}
+
+.player-item:last-child {
+  border-bottom: none;
+}
+
+/* ========================================
+   TEAM LOGO BACKGROUND - CLEAN VERSION
+   ======================================== */
+/* Removed black gradient overlay - cleaner look */
+
+.player-item .team-logo-bg {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 160%; /* Back to more visible size */
+  width: auto;
+  max-width: 200px;
+  opacity: var(--logo-opacity);
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  object-fit: contain;
+  /* More subtle mask for better visibility */
+  mask-image: linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0) 100%);
+}
+
+.player-item:hover .team-logo-bg {
+  opacity: var(--logo-opacity-hover);
+}
+
+/* Ensure content appears above logo */
+.player-item > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* ========================================
+   COMPACT VARIANTS
+   ======================================== */
+.compact-card .player-item,
+.hits-by-time-slot .player-item,
+.current-series-hits .player-item {
+  min-height: var(--player-item-min-height-compact);
+  padding: 8px 12px;
+}
+
+.compact-card .team-logo-bg {
+  height: 120%;
+  max-width: 140px;
+}
+
+/* ========================================
+   PLAYER RANK CIRCLE - ENHANCED
+   ======================================== */
+.player-rank {
+  width: var(--rank-size);
+  height: var(--rank-size);
+  min-width: var(--rank-size);
+  min-height: var(--rank-size);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-right: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+  background-color: #4f46e5; /* Default color */
+}
+
+.player-rank .rank-logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.7;
+}
+
+.player-rank .rank-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0.3;
+}
+
+.player-rank .rank-number {
+  position: relative;
+  z-index: 10;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  line-height: 1;
+}
+
+/* ========================================
+   PLAYER INFO SECTION
+   ======================================== */
+.player-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-right: 12px;
+  min-width: 0; /* Enable text truncation */
+}
+
+.player-name {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-team {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 500;
+}
+
+/* ========================================
+   PLAYER STATS SECTION
+   ======================================== */
+.player-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 100px;
+}
+
+.stat-highlight {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #0056b3;
+}
+
+.stat-detail {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* ========================================
+   DARK MODE SUPPORT
+   ======================================== */
+@media (prefers-color-scheme: dark) {
+  .player-item {
+    border-bottom-color: var(--dark-border-color);
+  }
+  
+  .player-item:hover {
+    background-color: var(--dark-hover-bg);
+  }
+  
+  .player-item::before {
+    background: linear-gradient(to left, transparent 0%, transparent 60%, #1a1a1a 100%);
+  }
+  
+  .player-item .team-logo-bg {
+    opacity: var(--dark-logo-opacity);
+    filter: brightness(0.8);
+  }
+  
+  .player-item:hover .team-logo-bg {
+    opacity: var(--dark-logo-opacity-hover);
+  }
+  
+  .player-name {
+    color: #e8e8e8;
+  }
+  
+  .player-team {
+    color: #a0a0a0;
+  }
+  
+  .stat-highlight {
+    filter: brightness(1.2);
+  }
+  
+  .player-rank {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* ========================================
+   RESPONSIVE MOBILE STYLES
+   ======================================== */
+@media (max-width: 768px) {
+  .player-item {
+    padding: var(--player-item-padding-mobile);
+    min-height: var(--player-item-min-height-mobile);
+  }
+  
+  .player-item .team-logo-bg {
+    height: 120%;
+    max-width: 140px;
+  }
+  
+  .player-rank {
+    width: var(--rank-size-mobile);
+    height: var(--rank-size-mobile);
+    min-width: var(--rank-size-mobile);
+    min-height: var(--rank-size-mobile);
+    margin-right: 12px;
+  }
+  
+  .player-rank .rank-number {
+    font-size: 0.95rem;
+  }
+  
+  .player-name {
+    font-size: 0.9rem;
+  }
+  
+  .player-team {
+    font-size: 0.8rem;
+  }
+  
+  .player-stat {
+    min-width: 80px;
+  }
+  
+  .stat-highlight {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .player-item {
+    padding: 8px 6px;
+    min-height: 52px;
+  }
+  
+  .player-rank {
+    width: var(--rank-size-small);
+    height: var(--rank-size-small);
+    min-width: var(--rank-size-small);
+    min-height: var(--rank-size-small);
+    margin-right: 10px;
+  }
+  
+  .player-rank .rank-number {
+    font-size: 0.85rem;
+  }
+  
+  .stat-highlight {
+    font-size: 0.95rem;
+  }
+}
+
+/* ========================================
+   SCROLLABLE CONTAINER IMPROVEMENTS
+   ======================================== */
+.scrollable-container {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  position: relative;
+}
+
+/* Custom scrollbar styling */
+.scrollable-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.scrollable-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Dark mode scrollbar */
+@media (prefers-color-scheme: dark) {
+  .scrollable-container::-webkit-scrollbar-track {
+    background: #2a2a2a;
+  }
+  
+  .scrollable-container::-webkit-scrollbar-thumb {
+    background: #4a4a4a;
+  }
+  
+  .scrollable-container::-webkit-scrollbar-thumb:hover {
+    background: #5a5a5a;
+  }
+  
+  /* Adjust card colors for dark mode */
+  .card {
+    background-color: #1e1e1e;
+    color: #e8e8e8;
+  }
+  
+  .card h3 {
+    color: #e8e8e8;
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+}

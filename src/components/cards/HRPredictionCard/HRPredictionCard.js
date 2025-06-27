@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
+import { debugLog } from '../../../utils/debugConfig';
 import './HRPredictionCard.css';
 
 /**
@@ -17,7 +18,7 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
         setOddsLoading(true);
         setOddsError(null);
 
-        console.log('[HRPredictionCard] Loading odds data...');
+        debugLog.log('CARDS', '[HRPredictionCard] Loading odds data...');
 
         // Try to load the HR-only CSV first (cleaner format)
         let response = await fetch('/data/odds/mlb-hr-odds-only.csv');
@@ -25,35 +26,35 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
         
         // If HR-only file doesn't exist, try the full file
         if (!response.ok) {
-          console.log('[HRPredictionCard] HR-only file not found, trying full file...');
+          debugLog.log('CARDS', '[HRPredictionCard] HR-only file not found, trying full file...');
           response = await fetch('/data/odds/mlb-hr-odds.csv');
           dataSource = 'Full file';
         }
 
         if (!response.ok) {
           console.warn('[HRPredictionCard] No odds data file found');
-          console.log('[HRPredictionCard] Tried URLs:');
-          console.log('  - /data/odds/mlb-hr-odds-only.csv');
-          console.log('  - /data/odds/mlb-hr-odds.csv');
+          debugLog.log('CARDS', '[HRPredictionCard] Tried URLs:');
+          debugLog.log('CARDS', '  - /data/odds/mlb-hr-odds-only.csv');
+          debugLog.log('CARDS', '  - /data/odds/mlb-hr-odds.csv');
           setOddsData(new Map());
           setOddsError('Odds file not found');
           return;
         }
 
-        console.log(`[HRPredictionCard] Loading odds from ${dataSource}`);
+        debugLog.log('CARDS', `[HRPredictionCard] Loading odds from ${dataSource}`);
         const csvText = await response.text();
-        console.log(`[HRPredictionCard] CSV content length: ${csvText.length} characters`);
+        debugLog.log('CARDS', `[HRPredictionCard] CSV content length: ${csvText.length} characters`);
         
         // Show first few lines of CSV for debugging
         const lines = csvText.split('\n').slice(0, 3);
-        console.log('[HRPredictionCard] First few lines of CSV:', lines);
+        debugLog.log('CARDS', '[HRPredictionCard] First few lines of CSV:', lines);
         
         // Parse CSV data
         Papa.parse(csvText, {
           header: true,
           skipEmptyLines: true,
           complete: (results) => {
-            console.log(`[HRPredictionCard] Parsed ${results.data.length} rows from CSV`);
+            debugLog.log('CARDS', `[HRPredictionCard] Parsed ${results.data.length} rows from CSV`);
             
             const oddsMap = new Map();
             let processedCount = 0;
@@ -65,7 +66,7 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
               
               // Debug first few rows
               if (index < 3) {
-                console.log(`[HRPredictionCard] Row ${index}:`, {
+                debugLog.log('CARDS', `[HRPredictionCard] Row ${index}:`, {
                   player_name: playerName,
                   odds: odds,
                   prop_type: propType
@@ -120,19 +121,19 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
                 
                 // Debug name variations for first few players
                 if (index < 3) {
-                  console.log(`[HRPredictionCard] Name variations for "${playerName}":`, nameVariations);
+                  debugLog.log('CARDS', `[HRPredictionCard] Name variations for "${playerName}":`, nameVariations);
                 }
               }
             });
             
-            console.log(`[HRPredictionCard] Processed ${processedCount} HR odds entries`);
-            console.log(`[HRPredictionCard] Created ${oddsMap.size} total name variations`);
+            debugLog.log('CARDS', `[HRPredictionCard] Processed ${processedCount} HR odds entries`);
+            debugLog.log('CARDS', `[HRPredictionCard] Created ${oddsMap.size} total name variations`);
             
             // Show some sample entries with shortened names
             const sampleEntries = Array.from(oddsMap.entries())
               .filter(([key, value]) => key.includes('.') || key.length < value.originalName.length)
               .slice(0, 10);
-            console.log('[HRPredictionCard] Sample shortened name entries:', sampleEntries);
+            debugLog.log('CARDS', '[HRPredictionCard] Sample shortened name entries:', sampleEntries);
             
             setOddsData(oddsMap);
           },
@@ -161,7 +162,7 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
       return null;
     }
     
-    console.log(`[HRPredictionCard] Looking for odds for: "${playerName}"`);
+    debugLog.log('CARDS', `[HRPredictionCard] Looking for odds for: "${playerName}"`);
     
     // Create all possible variations of the search name
     const searchVariations = [
@@ -176,22 +177,22 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
     for (const variation of searchVariations) {
       const odds = oddsData.get(variation);
       if (odds) {
-        console.log(`[HRPredictionCard] ✅ Found match for: "${playerName}" using variation: "${variation}" -> ${odds.odds} (original: "${odds.originalName}")`);
+        debugLog.log('CARDS', `[HRPredictionCard] ✅ Found match for: "${playerName}" using variation: "${variation}" -> ${odds.odds} (original: "${odds.originalName}")`);
         return odds;
       }
     }
     
     // If no exact matches, show what names are available for debugging
     if (playerName === "N. Hoerner" || playerName === "K. Tucker" || playerName === "P. Alonso") {
-      console.log(`[HRPredictionCard] 🔍 Debug for "${playerName}" - checking available names starting with same letter:`);
+      debugLog.log('CARDS', `[HRPredictionCard] 🔍 Debug for "${playerName}" - checking available names starting with same letter:`);
       const firstLetter = playerName.charAt(0).toLowerCase();
       const availableNames = Array.from(oddsData.keys())
         .filter(name => name.toLowerCase().startsWith(firstLetter))
         .slice(0, 10);
-      console.log(`[HRPredictionCard] Available names starting with "${firstLetter}":`, availableNames);
+      debugLog.log('CARDS', `[HRPredictionCard] Available names starting with "${firstLetter}":`, availableNames);
     }
     
-    console.log(`[HRPredictionCard] ❌ No odds found for: "${playerName}"`);
+    debugLog.log('CARDS', `[HRPredictionCard] ❌ No odds found for: "${playerName}"`);
     return null;
   };
 

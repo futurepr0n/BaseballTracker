@@ -3,7 +3,7 @@
  * Analyzes travel patterns, fatigue, and performance impacts
  */
 
-import { fetchPlayerDataForDateRange } from './dataService';
+import { fetchPlayerDataForDateRange, convertDataMapToArray } from './dataService';
 
 class TravelImpactAnalyzer {
   constructor() {
@@ -437,7 +437,10 @@ class TravelImpactAnalyzer {
    */
   async analyzePlayerTravelPattern(playerName, teamCode, dateRange = 180) {
     try {
-      const historicalData = await fetchPlayerDataForDateRange(new Date(), dateRange, dateRange);
+      const historicalDataMap = await fetchPlayerDataForDateRange(new Date(), dateRange, dateRange);
+      
+      // CRITICAL FIX: fetchPlayerDataForDateRange now returns a Map, not an array
+      const historicalData = convertDataMapToArray(historicalDataMap);
       
       // Filter for this player's games
       const playerGames = historicalData.filter(data => 

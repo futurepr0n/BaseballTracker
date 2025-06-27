@@ -3,7 +3,7 @@
  * Analyzes player performance across different climate and environmental conditions
  */
 
-import { fetchPlayerDataForDateRange } from './dataService';
+import { fetchPlayerDataForDateRange, convertDataMapToArray } from './dataService';
 import { getSeasonSafeDateRange, formatDateRangeDescription } from '../utils/seasonDateUtils';
 
 class EnvironmentalAdaptationService {
@@ -128,9 +128,12 @@ class EnvironmentalAdaptationService {
       const currentDate = new Date();
       const dateRange = getSeasonSafeDateRange(currentDate, maxDaysBack);
       
-      console.log(`🌍 Environmental adaptation analysis for ${playerName}: ${formatDateRangeDescription(dateRange)}`);
+      // console.log(`🌍 Environmental adaptation analysis for ${playerName}: ${formatDateRangeDescription(dateRange)}`);
       
-      const historicalData = await fetchPlayerDataForDateRange(dateRange.startDate, dateRange.endDate);
+      const historicalDataMap = await fetchPlayerDataForDateRange(dateRange.startDate, dateRange.endDate);
+      
+      // CRITICAL FIX: fetchPlayerDataForDateRange now returns a Map, not an array
+      const historicalData = convertDataMapToArray(historicalDataMap);
       
       const playerGames = historicalData.filter(data => 
         (data.name === playerName || data.fullName === playerName)

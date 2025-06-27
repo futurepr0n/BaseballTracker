@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import useTeamFilteredData from '../../useTeamFilter';
 import { useTooltip } from '../../utils/TooltipContext';
 import { createSafeId } from '../../utils/tooltipUtils';
+import { debugLog } from '../../../utils/debugConfig';
 import './PositiveMomentumCard.css';
 
 /**
@@ -22,7 +23,7 @@ const PositiveMomentumCard = ({ currentDate, teams, maxItems = 25 }) => {
       setIsLoading(true);
       
       try {
-        console.log('[PositiveMomentumCard] Loading positive momentum predictions...');
+        debugLog.log('CARDS', '[PositiveMomentumCard] Loading positive momentum predictions...');
         
         // Load the latest positive momentum predictions
         const response = await fetch('/data/predictions/positive_performance_predictions_latest.json');
@@ -34,7 +35,7 @@ const PositiveMomentumCard = ({ currentDate, teams, maxItems = 25 }) => {
         const data = await response.json();
         
         if (data && data.predictions && Array.isArray(data.predictions)) {
-          console.log(`[PositiveMomentumCard] Loaded ${data.predictions.length} momentum predictions`);
+          debugLog.log('CARDS', `[PositiveMomentumCard] Loaded ${data.predictions.length} momentum predictions`);
           setMomentumData(data.predictions);
           setLastUpdated(data.generatedAt ? new Date(data.generatedAt) : new Date());
         } else {

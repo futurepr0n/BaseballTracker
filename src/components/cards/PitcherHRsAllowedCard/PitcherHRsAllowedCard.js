@@ -3,6 +3,7 @@ import useTeamFilteredData from '../../useTeamFilter';
 import { fetchPlayerDataForDateRange, fetchGameData } from '../../../services/dataService';
 import { useTooltip } from '../../utils/TooltipContext';
 import { createSafeId } from '../../utils/tooltipUtils';
+import { debugLog } from '../../../utils/debugConfig';
 import './PitcherHRsAllowedCard.css';
 
 /**
@@ -23,7 +24,7 @@ const PitcherHRsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
       setIsLoading(true);
       
       try {
-        console.log('[PitcherHRsAllowedCard] Starting pitcher HR analysis...');
+        debugLog.log('CARDS', '[PitcherHRsAllowedCard] Starting pitcher HR analysis...');
         
         // Fetch historical data for last 90 days
         const startDate = new Date(currentDate);
@@ -48,7 +49,7 @@ const PitcherHRsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
           totalDays: dateKeys.length
         });
 
-        console.log(`[PitcherHRsAllowedCard] Analyzing ${dateKeys.length} days of data`);
+        debugLog.log('CARDS', `[PitcherHRsAllowedCard] Analyzing ${dateKeys.length} days of data`);
         
         // Map to store pitcher data: pitcherKey -> analysis
         const pitcherAnalysis = new Map();
@@ -168,7 +169,7 @@ const PitcherHRsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
           .filter(pitcher => pitcher.totalHRsAllowed > 0) // Only include pitchers who have allowed HRs
           .sort((a, b) => b.totalHRsAllowed - a.totalHRsAllowed);
         
-        console.log(`[PitcherHRsAllowedCard] Analysis complete: ${sortedPitchers.length} pitchers with HRs allowed`);
+        debugLog.log('CARDS', `[PitcherHRsAllowedCard] Analysis complete: ${sortedPitchers.length} pitchers with HRs allowed`);
         
         setPitcherHRData(sortedPitchers);
         

@@ -1,0 +1,77 @@
+/* Dashboard.css Patch - Remove conflicting player-item styles */
+
+/* REMOVE lines 196-206 (old player-item base styles) */
+/* REMOVE lines 719-794 (duplicated player-item styles) */
+/* REMOVE lines 1285-1314 (another duplicate set) */
+
+/* Keep only these essential dashboard-specific styles: */
+
+/* Dashboard grid and layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+/* Card base styles */
+.card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Import the new unified styles */
+@import './common/PlayerItemStyles.css';
+
+/* Card-specific color overrides using CSS custom properties */
+.hr-prediction .player-rank {
+  background-color: #e63946; /* Red for HR predictions */
+}
+
+.top-hitters-card .player-rank {
+  background-color: #4f46e5; /* Blue for hits */
+}
+
+.hr-rate-card .player-rank {
+  background-color: #FF9900; /* Orange for HR rate */
+}
+
+.home-run-leaders-card .player-rank {
+  background-color: #e63946; /* Red for HR leaders */
+}
+
+.recent-homers-card .player-rank {
+  background-color: #FF6D00; /* Deep orange for recent HRs */
+}
+
+/* Dark mode card styles */
+@media (prefers-color-scheme: dark) {
+  .card {
+    background-color: #1e1e1e;
+    color: #e8e8e8;
+  }
+  
+  .card h3 {
+    color: #e8e8e8;
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .card {
+    padding: 15px;
+    margin: 0;
+  }
+}

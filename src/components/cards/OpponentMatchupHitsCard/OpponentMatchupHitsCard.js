@@ -5,6 +5,7 @@ import {
   fetchRosterData,
   generateMatchupAnalysis 
 } from '../../../services/dataService';
+import { debugLog } from '../../../utils/debugConfig';
 import './OpponentMatchupHitsCard.css';
 
 const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
@@ -26,32 +27,32 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
           return;
         }
         
-        console.log(`[OpponentMatchupHitsCard] Analyzing matchups for ${gameData.length} games`);
+        debugLog.card('OpponentMatchupHitsCard', `Analyzing matchups for ${gameData.length} games`);
         setDebugInfo(`Analyzing ${gameData.length} games...`);
         
-        // Load historical data (2 years back for good sample size)
-        console.log('[OpponentMatchupHitsCard] Loading historical data...');
+        // Load historical data (reasonable sample size - 90 days max)
+        debugLog.card('OpponentMatchupHitsCard', 'Loading historical data...');
         const dateRangeData = await fetchPlayerDataForDateRange(
           currentDate, 
           30,   // Initial lookback
-          730   // Max lookback (2 years)
+          90    // Max lookback (3 months) - reduced from 730 days
         );
         
         const dateCount = Object.keys(dateRangeData).length;
-        console.log(`[OpponentMatchupHitsCard] Loaded ${dateCount} dates of historical data`);
+        debugLog.card('OpponentMatchupHitsCard', `Loaded ${dateCount} dates of historical data`);
         setDebugInfo(`Loaded ${dateCount} dates of data...`);
         
         // Load current roster
-        console.log('[OpponentMatchupHitsCard] Loading roster data...');
+        debugLog.card('OpponentMatchupHitsCard', 'Loading roster data...');
         const rosterData = await fetchRosterData();
-        console.log(`[OpponentMatchupHitsCard] Loaded ${rosterData.length} roster entries`);
+        debugLog.card('OpponentMatchupHitsCard', `Loaded ${rosterData.length} roster entries`);
         
         // Generate comprehensive analysis
-        console.log('[OpponentMatchupHitsCard] Generating matchup analysis...');
+        debugLog.card('OpponentMatchupHitsCard', 'Generating matchup analysis...');
         setDebugInfo('Analyzing player vs opponent stats...');
         const analysis = await generateMatchupAnalysis(gameData, dateRangeData, rosterData);
         
-        console.log(`[OpponentMatchupHitsCard] Analysis complete:`, {
+        debugLog.card('OpponentMatchupHitsCard', 'Analysis complete:', {
           opponentHits: analysis.opponentMatchupHits.length,
           totalMatchups: analysis.totalMatchupsAnalyzed,
           totalPlayers: analysis.totalPlayersAnalyzed

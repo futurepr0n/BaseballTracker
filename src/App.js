@@ -5,6 +5,11 @@ import {
   Route,
   Link
 } from 'react-router-dom';
+
+// Import debug control for immediate availability in console
+import './utils/debugControl';
+// Import console quiet mode for emergency spam control
+import './utils/consoleQuiet';
 import PlayerStats from './components/PlayerStats';
 import TeamStats from './components/TeamStats';
 import GameResults from './components/GameResults';
@@ -22,6 +27,7 @@ import {
 
 import PinheadsPlayhouse from './components/PinheadsPlayhouse/PinheadsPlayhouse';
 import HRMatchupHub from './components/HRMatchupHub/HRMatchupHub';
+import CSSFixesTest from './components/test/CSSFixesTest';
 
 import './App.css';
 
@@ -178,6 +184,7 @@ function App() {
                   currentDate={currentDate}
                 />} />
 
+              <Route path="/css-test" element={<CSSFixesTest />} />
 
             </Routes>
           </TeamFilterProvider>

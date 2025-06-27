@@ -9,7 +9,7 @@ const GameMatchupCard = ({ gameAnalysis, isSelected, onSelect, teamData }) => {
     return null;
   }
 
-  const { homeTeam, awayTeam, overallGameRating, homeTeamAnalysis, awayTeamAnalysis, pitcher } = gameAnalysis;
+  const { homeTeam, awayTeam, overallGameRating, homeTeamAnalysis, awayTeamAnalysis, pitcher, pitchers } = gameAnalysis;
 
   const getTeamInfo = (teamCode) => {
     return teamData[teamCode] || {
@@ -107,17 +107,26 @@ const GameMatchupCard = ({ gameAnalysis, isSelected, onSelect, teamData }) => {
       </div>
 
       <div className="card-content">
-        {pitcher && (
-          <div className="pitcher-info">
-            <span className="label">Pitcher:</span>
-            <span className="pitcher-name">{pitcher.name || 'TBD'}</span>
+        {(pitchers?.home || pitchers?.away) && (
+          <div className="pitcher-matchup">
+            <div className="pitcher-vs">
+              <span className="away-pitcher">
+                {pitchers?.away?.name || 'TBD'}
+              </span>
+              <span className="vs-text">vs</span>
+              <span className="home-pitcher">
+                {pitchers?.home?.name || 'TBD'}
+              </span>
+            </div>
           </div>
         )}
 
         <div className="team-summaries">
           <div className="team-summary away">
             <div className="team-header">
-              <span className="team-label">{awayTeam} (Away)</span>
+              <span className="team-label">
+                {awayTeam} (Away) - vs {pitchers?.home?.name || 'TBD'}
+              </span>
               <span className="team-strength">
                 {awayTeamAnalysis?.teamSummary?.teamStrength || 'N/A'}
               </span>
@@ -142,7 +151,9 @@ const GameMatchupCard = ({ gameAnalysis, isSelected, onSelect, teamData }) => {
 
           <div className="team-summary home">
             <div className="team-header">
-              <span className="team-label">{homeTeam} (Home)</span>
+              <span className="team-label">
+                {homeTeam} (Home) - vs {pitchers?.away?.name || 'TBD'}
+              </span>
               <span className="team-strength">
                 {homeTeamAnalysis?.teamSummary?.teamStrength || 'N/A'}
               </span>

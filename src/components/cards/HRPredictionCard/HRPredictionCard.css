@@ -215,25 +215,20 @@
   /* Much more compact stats section */
   .hr-prediction .player-stat {
     min-width: 120px; /* Even smaller width */
-    text-align: right;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 1px; /* Minimal gap */
   }
   
-  .hr-deficit {
+  .hr-prediction .hr-deficit {
     font-size: 0.8rem; /* Smaller main stat */
     line-height: 1.1;
   }
   
-  .hr-detail {
+  .hr-prediction .hr-detail {
     font-size: 0.65rem; /* Much smaller detail text */
     line-height: 1.1;
     margin-top: 1px; /* Minimal margin */
   }
   
-  .days-since {
+  .hr-prediction .days-since {
     font-size: 0.6rem; /* Even smaller for days since */
   }
   
@@ -258,20 +253,20 @@
   }
   
   /* Smaller status indicators */
-  .odds-loading,
-  .odds-error,
-  .odds-info {
+  .hr-prediction .odds-loading,
+  .hr-prediction .odds-error,
+  .hr-prediction .odds-info {
     font-size: 0.65rem;
     padding: 2px 6px;
   }
   
   /* Compact footer */
-  .odds-footer {
+  .hr-prediction .odds-footer {
     margin-top: 8px;
     padding-top: 6px;
   }
   
-  .odds-footer small {
+  .hr-prediction .odds-footer small {
     font-size: 0.6rem;
   }
 }

@@ -21,8 +21,11 @@ const HRMatchupHub = ({ playerData, teamData, gameData, currentDate }) => {
   const [filterOption, setFilterOption] = useState('all');
 
   useEffect(() => {
-    loadComprehensiveAnalysis();
-  }, [currentDate, gameData]);
+    // Only load if we have gameData and currentDate is valid
+    if (gameData && gameData.length > 0 && currentDate) {
+      loadComprehensiveAnalysis();
+    }
+  }, [currentDate?.toISOString?.(), gameData?.length]); // Stable dependencies to prevent infinite loops
 
   const loadComprehensiveAnalysis = async () => {
     try {
@@ -31,27 +34,35 @@ const HRMatchupHub = ({ playerData, teamData, gameData, currentDate }) => {
 
       if (!gameData || gameData.length === 0) {
         setAnalysis(null);
+        setLoading(false);
         return;
       }
 
       // Ensure currentDate is a valid Date object
       const dateToUse = currentDate instanceof Date ? currentDate : new Date(currentDate);
       
-      const comprehensiveAnalysis = await comprehensiveMatchupService.generateComprehensiveMatchups(
+      // Add timeout to prevent infinite processing
+      const analysisPromise = comprehensiveMatchupService.generateComprehensiveMatchups(
         dateToUse,
         gameData
       );
+      
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Analysis timeout - took longer than 90 seconds')), 90000)
+      );
+      
+      const comprehensiveAnalysis = await Promise.race([analysisPromise, timeoutPromise]);
 
       setAnalysis(comprehensiveAnalysis);
       
       // Auto-select first game
-      if (comprehensiveAnalysis.gameAnalyses && comprehensiveAnalysis.gameAnalyses.length > 0) {
+      if (comprehensiveAnalysis?.gameAnalyses && comprehensiveAnalysis.gameAnalyses.length > 0) {
         setSelectedGame(comprehensiveAnalysis.gameAnalyses[0]);
       }
 
     } catch (err) {
       console.error('Error loading comprehensive analysis:', err);
-      setError('Failed to load matchup analysis');
+      setError(err.message || 'Failed to load matchup analysis');
     } finally {
       setLoading(false);
     }

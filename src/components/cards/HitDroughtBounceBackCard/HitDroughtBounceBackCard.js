@@ -16,11 +16,11 @@ const HitDroughtBounceBackCard = ({ gameData, currentDate, teams }) => {
         setLoading(true);
         setError(null);
         
-        // Load historical data (1 year for good sample)
+        // Load historical data (reasonable sample for bounce back analysis)
         const dateRangeData = await fetchPlayerDataForDateRange(
           currentDate, 
           30,   // Initial lookback
-          365   // Max lookback (1 year)
+          120   // Max lookback (4 months) - reduced from 365 days
         );
         
         // Load current roster to focus on active players
