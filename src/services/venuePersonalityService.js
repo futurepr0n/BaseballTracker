@@ -65,8 +65,10 @@ class VenuePersonalityService {
       const playerGames = [];
       const endDate = new Date();
       
-      // Check last 90 days of games to find venue history
-      for (let i = 1; i <= 90; i++) {
+      console.log(`🏟️ Analyzing venue history for ${playerName} at ${venue}`);
+      
+      // Check last 365 days of games to find venue history (extended from 90)
+      for (let i = 1; i <= 365; i++) {
         const checkDate = new Date(endDate);
         checkDate.setDate(endDate.getDate() - i);
         
@@ -74,23 +76,50 @@ class VenuePersonalityService {
           const dateStr = checkDate.toISOString().split('T')[0];
           const historicalData = await this.fetchPlayerDataForDate(dateStr);
           
-          if (historicalData && historicalData.length > 0) {
-            // Find this player's games at this specific venue
-            const playerVenueGames = historicalData.filter(playerData => 
-              this.isPlayerMatch(playerData, playerName) &&
-              this.isGameAtVenue(playerData, venue)
-            );
+          if (historicalData && historicalData.players && historicalData.games) {
+            // Find this player's games at this specific venue using enhanced linking
+            const playerVenueGames = historicalData.players.filter(playerData => {
+              const isPlayerMatch = this.isPlayerMatch(playerData, playerName);
+              const isAtVenue = this.isPlayerAtVenue(playerData, venue, historicalData.games);
+              
+              if (isPlayerMatch && isAtVenue) {
+                console.log(`🏟️ Found game for ${playerName} at ${venue} on ${dateStr}:`, {
+                  player: playerData.name,
+                  stats: `${playerData.H || 0}H/${playerData.AB || 0}AB`,
+                  HR: playerData.HR || 0,
+                  hits: playerData.H || 0
+                });
+              }
+              
+              return isPlayerMatch && isAtVenue;
+            });
             
-            playerGames.push(...playerVenueGames);
+            // Enhance player records with venue information
+            const enhancedGames = playerVenueGames.map(playerData => ({
+              ...playerData,
+              venue: this.linkPlayerToVenue(playerData, historicalData.games),
+              date: dateStr,
+              // Ensure we have numerical values for stats
+              H: parseInt(playerData.H) || 0,
+              AB: parseInt(playerData.AB) || 0,
+              HR: parseInt(playerData.HR) || 0,
+              RBI: parseInt(playerData.RBI) || 0,
+              BB: parseInt(playerData.BB) || 0,
+              R: parseInt(playerData.R) || 0
+            }));
+            
+            playerGames.push(...enhancedGames);
           }
         } catch (dateError) {
           // Skip dates that don't have data
           continue;
         }
         
-        // Stop if we have enough games or checked enough dates
-        if (playerGames.length >= 10 || i >= 60) break;
+        // Stop if we have enough games or checked enough dates  
+        if (playerGames.length >= 15 || i >= 180) break;
       }
+      
+      console.log(`🏟️ Found ${playerGames.length} venue games for ${playerName} at ${venue}`);
 
       // Calculate venue-specific stats
       const venueStats = this.calculateVenueStats(playerGames);
@@ -121,7 +150,7 @@ class VenuePersonalityService {
   }
 
   /**
-   * Fetch player data for a specific date
+   * Fetch player data for a specific date with game information
    */
   async fetchPlayerDataForDate(dateStr) {
     try {
@@ -134,14 +163,21 @@ class VenuePersonalityService {
       if (!response.ok) return null;
       
       const gameData = await response.json();
-      return gameData.playerStats || gameData.players || [];
+      
+      // Return both players and games data for proper linking
+      return {
+        players: gameData.players || [],
+        games: gameData.games || [],
+        date: dateStr
+      };
     } catch (error) {
+      console.warn(`Failed to fetch data for ${dateStr}:`, error);
       return null;
     }
   }
 
   /**
-   * Check if player data matches target player name
+   * Check if player data matches target player name (enhanced for abbreviations)
    */
   isPlayerMatch(playerData, targetPlayerName) {
     const playerName = playerData.name || playerData.fullName || playerData.playerName || '';
@@ -151,46 +187,186 @@ class VenuePersonalityService {
     // Exact match
     if (currentName === targetName) return true;
     
-    // Check if names contain each other (handles "First Last" vs "Last, First" formats)
-    const targetParts = targetName.split(/[\s,]+/).filter(p => p.length > 1);
-    const currentParts = currentName.split(/[\s,]+/).filter(p => p.length > 1);
+    // Parse name parts
+    const targetParts = targetName.split(/[\s,\.]+/).filter(p => p.length > 0);
+    const currentParts = currentName.split(/[\s,\.]+/).filter(p => p.length > 0);
     
-    // If both first and last names match
+    if (targetParts.length === 0 || currentParts.length === 0) return false;
+    
+    // Handle abbreviated first names (e.g., "T. Freeman" vs "Tyler Freeman")
+    const matchesAbbreviation = (abbrev, fullName) => {
+      return abbrev.length === 1 && fullName.toLowerCase().startsWith(abbrev.toLowerCase());
+    };
+    
+    // Try different matching strategies
+    for (let targetFirst of targetParts.slice(0, -1)) { // All but last part as potential first names
+      for (let currentFirst of currentParts.slice(0, -1)) {
+        // Check if one is abbreviation of the other
+        if (matchesAbbreviation(targetFirst, currentFirst) || matchesAbbreviation(currentFirst, targetFirst)) {
+          // Now check last names
+          const targetLast = targetParts[targetParts.length - 1];
+          const currentLast = currentParts[currentParts.length - 1];
+          
+          if (targetLast === currentLast || 
+              targetLast.includes(currentLast) || 
+              currentLast.includes(targetLast)) {
+            console.log(`🏟️ Matched abbreviated name: "${targetPlayerName}" ↔ "${playerName}"`);
+            return true;
+          }
+        }
+      }
+    }
+    
+    // Standard name part matching
     if (targetParts.length >= 2 && currentParts.length >= 2) {
-      return targetParts.every(part => currentParts.some(cp => cp.includes(part) || part.includes(cp)));
+      const targetLast = targetParts[targetParts.length - 1];
+      const currentLast = currentParts[currentParts.length - 1];
+      
+      // Last names must match closely
+      if (targetLast === currentLast || 
+          (targetLast.length > 3 && currentLast.length > 3 && 
+           (targetLast.includes(currentLast) || currentLast.includes(targetLast)))) {
+        
+        // Check first names (can be partial matches)
+        const targetFirst = targetParts[0];
+        const currentFirst = currentParts[0];
+        
+        if (targetFirst === currentFirst ||
+            targetFirst.includes(currentFirst) ||
+            currentFirst.includes(targetFirst) ||
+            matchesAbbreviation(targetFirst, currentFirst) ||
+            matchesAbbreviation(currentFirst, targetFirst)) {
+          console.log(`🏟️ Matched name parts: "${targetPlayerName}" ↔ "${playerName}"`);
+          return true;
+        }
+      }
+    }
+    
+    // Fallback: check if all target parts exist somewhere in current name
+    if (targetParts.length >= 2) {
+      const allPartsMatch = targetParts.every(part => 
+        currentParts.some(cp => 
+          cp.includes(part) || part.includes(cp) || 
+          matchesAbbreviation(part, cp) || matchesAbbreviation(cp, part)
+        )
+      );
+      
+      if (allPartsMatch) {
+        console.log(`🏟️ Matched all parts: "${targetPlayerName}" ↔ "${playerName}"`);
+        return true;
+      }
     }
     
     return false;
   }
 
   /**
-   * Determine if game was played at specific venue
+   * Link player record to venue using game data
    */
-  isGameAtVenue(playerData, venue) {
-    // Check various possible venue field names in the data
-    const gameVenue = playerData.venue || playerData.stadium || playerData.ballpark || '';
+  linkPlayerToVenue(playerRecord, allGames) {
+    if (!playerRecord.gameId || !allGames) return null;
     
-    if (gameVenue) {
-      // Direct venue name match
-      if (gameVenue.toLowerCase().includes(venue.toLowerCase()) || 
-          venue.toLowerCase().includes(gameVenue.toLowerCase())) {
-        return true;
-      }
-    }
+    // Find the corresponding game for this player
+    const game = allGames.find(g => 
+      g.originalId?.toString() === playerRecord.gameId?.toString() ||
+      g.gameId?.toString() === playerRecord.gameId?.toString()
+    );
     
-    // Check opponent field - if player's team != opponent's home team and it matches venue
-    const opponent = playerData.opponent || playerData.opposingTeam || '';
-    if (opponent && this.getVenueFromTeam(opponent) === venue) {
-      return true;
-    }
+    return game ? game.venue : null;
+  }
+
+  /**
+   * Determine if player played at specific venue (enhanced version)
+   */
+  isPlayerAtVenue(playerRecord, targetVenue, allGames) {
+    // Get the actual venue from the linked game
+    const actualVenue = this.linkPlayerToVenue(playerRecord, allGames);
     
-    // Check if this is an away game at the venue
-    const isHome = playerData.isHome || playerData.gameLocation === 'home';
-    if (!isHome && opponent) {
-      return this.getVenueFromTeam(opponent) === venue;
-    }
+    if (!actualVenue) return false;
     
-    return false;
+    // Normalize venue names for comparison
+    const normalizedActual = this.normalizeVenueName(actualVenue);
+    const normalizedTarget = this.normalizeVenueName(targetVenue);
+    
+    return normalizedActual === normalizedTarget;
+  }
+
+  /**
+   * Normalize venue names for consistent matching
+   */
+  normalizeVenueName(venue) {
+    if (!venue) return '';
+    
+    const venueStr = venue.toString().toLowerCase().trim();
+    
+    // Comprehensive map of team codes to venue names and vice versa
+    const venueMapping = {
+      // Team codes to venues
+      'col': 'coors field',
+      'lad': 'dodger stadium', 
+      'nyy': 'yankee stadium',
+      'bos': 'fenway park',
+      'hou': 'minute maid park',
+      'chw': 'guaranteed rate field',
+      'min': 'target field',
+      'sea': 't-mobile park',
+      'laa': 'angel stadium',
+      'oak': 'oakland coliseum',
+      'tex': 'globe life field',
+      'cle': 'progressive field',
+      'det': 'comerica park',
+      'kc': 'kauffman stadium',
+      'atl': 'truist park',
+      'mia': 'loandepot park',
+      'nym': 'citi field',
+      'phi': 'citizens bank park',
+      'wsh': 'nationals park',
+      'chc': 'wrigley field',
+      'cin': 'great american ball park',
+      'mil': 'american family field',
+      'pit': 'pnc park',
+      'stl': 'busch stadium',
+      'ari': 'chase field',
+      'sd': 'petco park',
+      'sf': 'oracle park',
+      'tor': 'rogers centre',
+      'bal': 'oriole park at camden yards',
+      'tb': 'tropicana field',
+      
+      // Venue names to standardized names
+      'coors field': 'coors field',
+      'dodger stadium': 'dodger stadium',
+      'yankee stadium': 'yankee stadium',
+      'fenway park': 'fenway park',
+      'minute maid park': 'minute maid park',
+      'guaranteed rate field': 'guaranteed rate field',
+      'target field': 'target field',
+      't-mobile park': 't-mobile park',
+      'angel stadium': 'angel stadium',
+      'oakland coliseum': 'oakland coliseum',
+      'globe life field': 'globe life field',
+      'progressive field': 'progressive field',
+      'comerica park': 'comerica park',
+      'kauffman stadium': 'kauffman stadium',
+      'truist park': 'truist park',
+      'loandepot park': 'loandepot park',
+      'citi field': 'citi field',
+      'citizens bank park': 'citizens bank park',
+      'nationals park': 'nationals park',
+      'wrigley field': 'wrigley field',
+      'great american ball park': 'great american ball park',
+      'american family field': 'american family field',
+      'pnc park': 'pnc park',
+      'busch stadium': 'busch stadium',
+      'chase field': 'chase field',
+      'petco park': 'petco park',
+      'oracle park': 'oracle park',
+      'rogers centre': 'rogers centre',
+      'oriole park at camden yards': 'oriole park at camden yards',
+      'tropicana field': 'tropicana field'
+    };
+    
+    return venueMapping[venueStr] || venueStr;
   }
 
   /**
@@ -245,7 +421,9 @@ class VenuePersonalityService {
         hits: 0,
         atBats: 0,
         sluggingPercentage: 0,
-        onBasePercentage: 0
+        onBasePercentage: 0,
+        hitToHRRatio: 0,
+        gamesPlayed: 0
       };
     }
 
@@ -263,6 +441,10 @@ class VenuePersonalityService {
     const onBasePercentage = (totals.atBats + totals.walks) > 0 ? 
       (totals.hits + totals.walks) / (totals.atBats + totals.walks) : 0;
 
+    const sluggingPercentage = totals.atBats > 0 ? 
+      (totals.hits + totals.homeRuns) / totals.atBats : 0; // Simple SLG approximation
+    const hitToHRRatio = totals.homeRuns > 0 ? totals.hits / totals.homeRuns : totals.hits;
+
     return {
       battingAverage: parseFloat(battingAverage.toFixed(3)),
       homeRuns: totals.homeRuns,
@@ -272,6 +454,8 @@ class VenuePersonalityService {
       runs: totals.runs,
       walks: totals.walks,
       onBasePercentage: parseFloat(onBasePercentage.toFixed(3)),
+      sluggingPercentage: parseFloat(sluggingPercentage.toFixed(3)),
+      hitToHRRatio: parseFloat(hitToHRRatio.toFixed(1)),
       gamesPlayed: games.length
     };
   }
@@ -401,6 +585,8 @@ class VenuePersonalityService {
         hits: 0,
         atBats: 0,
         onBasePercentage: 0,
+        sluggingPercentage: 0,
+        hitToHRRatio: 0,
         gamesPlayed: 0
       },
       venuePersonality: {

@@ -171,8 +171,16 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
                   <span className="stat-value">{venueAnalysis.venueStats?.battingAverage?.toFixed(3) || 'N/A'}</span>
                 </div>
                 <div className="venue-stat">
+                  <span className="stat-label">Venue Hits:</span>
+                  <span className="stat-value">{venueAnalysis.venueStats?.hits || 0}</span>
+                </div>
+                <div className="venue-stat">
                   <span className="stat-label">Venue HRs:</span>
                   <span className="stat-value">{venueAnalysis.venueStats?.homeRuns || 0}</span>
+                </div>
+                <div className="venue-stat">
+                  <span className="stat-label">Hit/HR Ratio:</span>
+                  <span className="stat-value">{venueAnalysis.venueStats?.hitToHRRatio?.toFixed(1) || 'N/A'}</span>
                 </div>
                 <div className="venue-description">
                   {venueAnalysis.venuePersonality.description}
