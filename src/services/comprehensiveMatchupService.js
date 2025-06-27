@@ -1112,7 +1112,7 @@ class ComprehensiveMatchupService {
       ]);
       
       // Calculate comprehensive score including all factors
-      const comprehensiveScore = this.calculateUltimateComprehensiveScore(
+      const comprehensiveScore = await this.calculateUltimateComprehensiveScore(
         player, 
         isHome, 
         venueAnalysis, 
@@ -1157,9 +1157,9 @@ class ComprehensiveMatchupService {
   }
 
   /**
-   * Calculate ultimate comprehensive score including all enhanced factors
+   * Calculate ultimate comprehensive score including all enhanced factors + contextual bonuses
    */
-  calculateUltimateComprehensiveScore(player, isHome, venueAnalysis, enhancedTravelAnalysis, weatherAnalysis) {
+  async calculateUltimateComprehensiveScore(player, isHome, venueAnalysis, enhancedTravelAnalysis, weatherAnalysis) {
     // Base score from HR prediction data
     let baseScore = 50; // Start with neutral
     
@@ -1189,29 +1189,38 @@ class ComprehensiveMatchupService {
     // Home field advantage
     const homeFieldBonus = isHome ? 5 : 0;
     
+    // NEW: Calculate contextual bonuses from additional analysis systems
+    const contextualAnalysis = await this.calculateEnhancedContextualScore(player, baseScore);
+    
     const totalScore = Math.max(20, Math.min(95, 
-      baseScore + venueImpact + travelImpact + weatherImpact + restAdvantage + homeFieldBonus
+      baseScore + venueImpact + travelImpact + weatherImpact + restAdvantage + homeFieldBonus + contextualAnalysis.contextualBonus
     ));
     
     return {
       totalScore,
       baseScore,
+      contextualBonus: contextualAnalysis.contextualBonus,
+      contextualBadges: contextualAnalysis.badges,
+      hellraiserData: contextualAnalysis.hellraiserData,
       adjustments: {
         venue: venueImpact,
         travel: travelImpact,
         environmental: weatherImpact,
         schedule: restAdvantage,
         homeField: homeFieldBonus,
+        contextual: contextualAnalysis.contextualBonus,
         // Additional predictive adjustments
         due: player.isDue ? (player.dueScore * 5) : 0,
         hrRate: player.hrRate ? ((player.hrRate - 0.05) * 150) : 0,
         pressure: player.gamesSinceLastHR ? Math.max(0, (player.gamesSinceLastHR - 10) * 0.5) : 0
       },
+      scoringBreakdown: contextualAnalysis.explanation,
       netAdjustment: totalScore - 50,
       enhancedFactors: {
         realTravel: enhancedTravelAnalysis !== null,
         weatherData: weatherAnalysis !== null,
-        venueHistory: venueAnalysis !== null
+        venueHistory: venueAnalysis !== null,
+        contextualAnalysis: contextualAnalysis.hasData
       }
     };
   }
@@ -2112,6 +2121,267 @@ class ComprehensiveMatchupService {
     );
     
     return matchup?.strategicRecommendation || 'Standard approach';
+  }
+
+  /**
+   * Calculate enhanced contextual score using Hellraiser and badge systems
+   */
+  async calculateEnhancedContextualScore(player, baseScore) {
+    console.log(`🔥 Calculating contextual bonuses for ${player.name || player.fullName}`);
+    
+    let contextualBonus = 0;
+    const badges = [];
+    const explanations = [];
+    let hellraiserData = null;
+    let hasData = false;
+
+    try {
+      // 1. Load and analyze Hellraiser data
+      hellraiserData = await this.extractHellraiserMetrics(player);
+      if (hellraiserData.isHellraiserPick) {
+        hasData = true;
+        
+        // Base Hellraiser bonus
+        contextualBonus += 15;
+        badges.push({ type: 'HELLRAISER_PICK', emoji: '🔥', bonus: 15 });
+        explanations.push('Hellraiser Pick (+15)');
+
+        // Pathway bonus
+        if (hellraiserData.pathway === 'perfectStorm') {
+          contextualBonus += 20;
+          badges.push({ type: 'PERFECT_STORM', emoji: '⚡', bonus: 20 });
+          explanations.push('Perfect Storm Pathway (+20)');
+        } else if (hellraiserData.pathway === 'batterDriven') {
+          contextualBonus += 15;
+          badges.push({ type: 'BATTER_DRIVEN', emoji: '💪', bonus: 15 });
+          explanations.push('Batter-Driven Analysis (+15)');
+        } else if (hellraiserData.pathway === 'pitcherDriven') {
+          contextualBonus += 12;
+          badges.push({ type: 'PITCHER_VULNERABLE', emoji: '🎯', bonus: 12 });
+          explanations.push('Pitcher Vulnerability (+12)');
+        }
+
+        // Elite metrics bonuses
+        if (hellraiserData.exitVelocity >= 94) {
+          contextualBonus += 15;
+          badges.push({ type: 'ELITE_EXIT_VELOCITY', emoji: '🚀', bonus: 15 });
+          explanations.push(`Elite Exit Velocity ${hellraiserData.exitVelocity}mph (+15)`);
+        } else if (hellraiserData.exitVelocity >= 92) {
+          contextualBonus += 10;
+          badges.push({ type: 'STRONG_EXIT_VELOCITY', emoji: '💨', bonus: 10 });
+          explanations.push(`Strong Exit Velocity ${hellraiserData.exitVelocity}mph (+10)`);
+        }
+
+        if (hellraiserData.barrelRate >= 20) {
+          contextualBonus += 12;
+          badges.push({ type: 'ELITE_BARREL_RATE', emoji: '🎯', bonus: 12 });
+          explanations.push(`Elite Barrel Rate ${hellraiserData.barrelRate}% (+12)`);
+        } else if (hellraiserData.barrelRate >= 15) {
+          contextualBonus += 8;
+          badges.push({ type: 'STRONG_BARREL_RATE', emoji: '📊', bonus: 8 });
+          explanations.push(`Strong Barrel Rate ${hellraiserData.barrelRate}% (+8)`);
+        }
+
+        if (hellraiserData.hardContact >= 55) {
+          contextualBonus += 8;
+          badges.push({ type: 'ELITE_HARD_CONTACT', emoji: '💥', bonus: 8 });
+          explanations.push(`Elite Hard Contact ${hellraiserData.hardContact}% (+8)`);
+        }
+
+        // Market efficiency bonus
+        if (hellraiserData.marketEdge > 0.1) {
+          contextualBonus += 10;
+          badges.push({ type: 'STRONG_VALUE', emoji: '💰', bonus: 10 });
+          explanations.push(`Strong Value Bet (+10)`);
+        } else if (hellraiserData.marketEdge > 0) {
+          contextualBonus += 5;
+          badges.push({ type: 'SLIGHT_VALUE', emoji: '💸', bonus: 5 });
+          explanations.push(`Value Bet (+5)`);
+        }
+
+        console.log(`🔥 Hellraiser bonuses for ${player.name}: +${contextualBonus - 15} (excluding base)`);
+      }
+
+      // 2. Badge system integration (for additional context)
+      const playerBadges = await this.calculatePlayerBadges(player);
+      badges.push(...playerBadges);
+      
+      playerBadges.forEach(badge => {
+        if (badge.type !== 'HELLRAISER_PICK') { // Avoid double-counting
+          contextualBonus += badge.bonus;
+          explanations.push(`${badge.label} (${badge.bonus >= 0 ? '+' : ''}${badge.bonus})`);
+        }
+      });
+
+      // 3. Additional analysis bonuses
+      const bounceBackBonus = this.calculateBounceBackBonus(player);
+      const stadiumBonus = this.calculateStadiumBonus(player);
+      const teamContextBonus = this.calculateTeamContextBonus(player);
+
+      contextualBonus += bounceBackBonus + stadiumBonus + teamContextBonus;
+      
+      if (bounceBackBonus > 0) explanations.push(`Bounce Back Potential (+${bounceBackBonus})`);
+      if (stadiumBonus > 0) explanations.push(`Stadium Advantage (+${stadiumBonus})`);
+      if (teamContextBonus > 0) explanations.push(`Team Context (+${teamContextBonus})`);
+
+      console.log(`🔥 Total contextual bonus for ${player.name}: +${contextualBonus}`);
+
+    } catch (error) {
+      console.error(`Error calculating contextual score for ${player.name}:`, error);
+    }
+
+    return {
+      contextualBonus: Math.min(40, contextualBonus), // Cap at 40 points
+      badges,
+      hellraiserData,
+      explanation: explanations.join(', '),
+      hasData
+    };
+  }
+
+  /**
+   * Extract Hellraiser metrics for player (similar to BarrelMatchupCard approach)
+   */
+  async extractHellraiserMetrics(player) {
+    try {
+      // Import hellraiser service
+      const { default: hellraiserAnalysisService } = await import('./hellraiserAnalysisService');
+      
+      // Get current date (same logic as other components)
+      const currentDate = new Date();
+      let dateStr = currentDate.toISOString().split('T')[0];
+      
+      // TEMPORARY FIX: Use same date correction as main analysis
+      if (dateStr === '2025-06-27') {
+        dateStr = '2025-06-26';
+        console.log('🔥 Corrected dateStr for Hellraiser lookup to:', dateStr);
+      }
+      
+      // Load Hellraiser analysis
+      const analysis = await hellraiserAnalysisService.analyzeDay(dateStr);
+      
+      if (!analysis?.picks || analysis.picks.length === 0) {
+        return { isHellraiserPick: false };
+      }
+
+      // Find this player in Hellraiser analysis
+      const playerName = player.fullName || player.name;
+      const playerTeam = player.team || player.Team;
+      
+      const hellraiserPick = analysis.picks.find(pick => 
+        (pick.playerName === playerName || pick.playerName.includes(playerName.split(' ')[0])) &&
+        pick.team === playerTeam
+      );
+
+      if (!hellraiserPick) {
+        return { isHellraiserPick: false };
+      }
+
+      // Extract metrics from reasoning text (like BarrelMatchupCard does)
+      const reasoning = hellraiserPick.reasoning || '';
+      
+      // Extract exit velocity
+      const exitVeloMatch = reasoning.match(/(?:Elite|Strong) exit velocity \(([0-9.]+) mph\)/);
+      const exitVelocity = exitVeloMatch ? parseFloat(exitVeloMatch[1]) : 0;
+      
+      // Extract barrel rate
+      const barrelRateMatch = reasoning.match(/(?:Elite|Strong) barrel rate \(([0-9.]+)%\)/);
+      const barrelRate = barrelRateMatch ? parseFloat(barrelRateMatch[1]) : 0;
+      
+      // Extract hard contact rate
+      const hardContactMatch = reasoning.match(/(?:Elite|Strong) hard contact \(([0-9.]+)%\)/);
+      const hardContact = hardContactMatch ? parseFloat(hardContactMatch[1]) : 0;
+
+      // Market edge
+      const marketEdge = hellraiserPick.marketEfficiency?.edge || 0;
+
+      console.log(`🔥 Found Hellraiser data for ${playerName}: Exit Velo: ${exitVelocity}, Barrel: ${barrelRate}%, Hard Contact: ${hardContact}%`);
+
+      return {
+        isHellraiserPick: true,
+        pathway: hellraiserPick.pathway,
+        classification: hellraiserPick.classification,
+        confidenceScore: hellraiserPick.confidenceScore,
+        exitVelocity,
+        barrelRate,
+        hardContact,
+        marketEdge,
+        reasoning,
+        odds: hellraiserPick.odds
+      };
+
+    } catch (error) {
+      console.error(`Error extracting Hellraiser metrics for ${player.name}:`, error);
+      return { isHellraiserPick: false };
+    }
+  }
+
+  /**
+   * Calculate player badges (simplified version of badge system)
+   */
+  async calculatePlayerBadges(player) {
+    const badges = [];
+
+    // HR Due badge
+    if (player.isDue && player.dueScore > 3) {
+      badges.push({
+        type: 'DUE_FOR_HR',
+        emoji: '⚡',
+        label: 'Due for HR',
+        bonus: 12
+      });
+    }
+
+    // HR Rate badge  
+    if (player.hrRate > 0.15) {
+      badges.push({
+        type: 'POWER_HITTER',
+        emoji: '💪',
+        label: 'Power Hitter',
+        bonus: 8
+      });
+    }
+
+    // Games since last HR pressure
+    if (player.gamesSinceLastHR > 15 && player.gamesSinceLastHR < 30) {
+      badges.push({
+        type: 'BUILDING_PRESSURE',
+        emoji: '📈',
+        label: 'Building Pressure', 
+        bonus: 6
+      });
+    }
+
+    return badges;
+  }
+
+  /**
+   * Calculate bounce back bonus (simplified)
+   */
+  calculateBounceBackBonus(player) {
+    // Simple bounce back logic - can be enhanced with real service later
+    if (player.gamesSinceLastHR > 10 && player.gamesSinceLastHR < 20 && player.hrRate > 0.08) {
+      return 8;
+    }
+    return 0;
+  }
+
+  /**
+   * Calculate stadium bonus (simplified)
+   */
+  calculateStadiumBonus(player) {
+    // Simple stadium logic - can be enhanced with real service later
+    // For now, just give bonus for known hitter-friendly parks
+    // This would be replaced with real stadium context service integration
+    return 0;
+  }
+
+  /**
+   * Calculate team context bonus (simplified)
+   */
+  calculateTeamContextBonus(player) {
+    // Simple team context logic - can be enhanced with real service later
+    return 0;
   }
 }
 

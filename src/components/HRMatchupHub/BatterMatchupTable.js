@@ -290,6 +290,81 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
               <div className="no-data">No pitcher intelligence available</div>
             )}
           </div>
+
+          {/* Contextual Bonuses & Badges */}
+          <div className="detail-section">
+            <h4>Contextual Analysis</h4>
+            {player.comprehensiveScore?.contextualBadges && player.comprehensiveScore.contextualBadges.length > 0 ? (
+              <div className="contextual-details">
+                <div className="contextual-stat">
+                  <span className="stat-label">Contextual Bonus:</span>
+                  <span className={`stat-value ${player.comprehensiveScore.contextualBonus >= 0 ? 'positive' : 'negative'}`}>
+                    {formatAdjustment(player.comprehensiveScore.contextualBonus || 0)}
+                  </span>
+                </div>
+                
+                {/* Hellraiser Data Section */}
+                {player.comprehensiveScore.hellraiserData?.isHellraiserPick && (
+                  <div className="hellraiser-section">
+                    <div className="section-header">
+                      <span className="hellraiser-badge">🔥 Hellraiser Pick</span>
+                      <span className="classification">{player.comprehensiveScore.hellraiserData.classification}</span>
+                    </div>
+                    <div className="hellraiser-metrics">
+                      {player.comprehensiveScore.hellraiserData.exitVelocity > 0 && (
+                        <div className="metric">
+                          <span className="metric-label">Exit Velocity:</span>
+                          <span className="metric-value">{player.comprehensiveScore.hellraiserData.exitVelocity.toFixed(1)} mph</span>
+                        </div>
+                      )}
+                      {player.comprehensiveScore.hellraiserData.barrelRate > 0 && (
+                        <div className="metric">
+                          <span className="metric-label">Barrel Rate:</span>
+                          <span className="metric-value">{player.comprehensiveScore.hellraiserData.barrelRate.toFixed(1)}%</span>
+                        </div>
+                      )}
+                      {player.comprehensiveScore.hellraiserData.hardContact > 0 && (
+                        <div className="metric">
+                          <span className="metric-label">Hard Contact:</span>
+                          <span className="metric-value">{player.comprehensiveScore.hellraiserData.hardContact.toFixed(1)}%</span>
+                        </div>
+                      )}
+                      <div className="pathway-info">
+                        <span className="pathway-label">Pathway:</span>
+                        <span className="pathway-value">{player.comprehensiveScore.hellraiserData.pathway}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Badges Display */}
+                <div className="badges-section">
+                  <div className="badges-header">Active Badges:</div>
+                  <div className="badges-list">
+                    {player.comprehensiveScore.contextualBadges.map((badge, idx) => (
+                      <div key={idx} className="badge-item" title={badge.label}>
+                        <span className="badge-emoji">{badge.emoji}</span>
+                        <span className="badge-label">{badge.label}</span>
+                        <span className={`badge-bonus ${badge.bonus >= 0 ? 'positive' : 'negative'}`}>
+                          {badge.bonus >= 0 ? '+' : ''}{badge.bonus}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Scoring Breakdown */}
+                {player.comprehensiveScore.scoringBreakdown && (
+                  <div className="scoring-breakdown">
+                    <div className="breakdown-header">Bonus Breakdown:</div>
+                    <div className="breakdown-text">{player.comprehensiveScore.scoringBreakdown}</div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="no-data">No contextual bonuses available</div>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -325,6 +400,9 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
               </th>
               <th onClick={() => handleSort('travelImpact')} className="sortable">
                 Travel {getSortIcon('travelImpact')}
+              </th>
+              <th onClick={() => handleSort('contextualBonus')} className="sortable">
+                Context {getSortIcon('contextualBonus')}
               </th>
               <th onClick={() => handleSort('confidence')} className="sortable">
                 Confidence {getSortIcon('confidence')}
@@ -362,6 +440,21 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
                       {formatAdjustment(player.comprehensiveScore.adjustments.travel || 0)}
                     </span>
                   </td>
+                  <td className="contextual-cell">
+                    <div className="contextual-info">
+                      <span className={`adjustment ${(player.comprehensiveScore.contextualBonus || 0) >= 0 ? 'positive' : 'negative'}`}>
+                        {formatAdjustment(player.comprehensiveScore.contextualBonus || 0)}
+                      </span>
+                      {player.comprehensiveScore.hellraiserData?.isHellraiserPick && (
+                        <span className="hellraiser-indicator" title="Hellraiser Pick">🔥</span>
+                      )}
+                      {player.comprehensiveScore.contextualBadges && player.comprehensiveScore.contextualBadges.length > 0 && (
+                        <span className="badge-count" title={`${player.comprehensiveScore.contextualBadges.length} active badges`}>
+                          {player.comprehensiveScore.contextualBadges.length}📊
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   <td className="confidence-cell">
                     <span className={`confidence ${getConfidenceClass(player.confidenceLevel)}`}>
                       {player.confidenceLevel}%
@@ -386,7 +479,7 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
                 </tr>
                 {expandedPlayer === player.playerName && (
                   <tr className="expanded-row">
-                    <td colSpan="9">
+                    <td colSpan="10">
                       {renderExpandedDetails(player)}
                     </td>
                   </tr>

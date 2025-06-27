@@ -586,3 +586,207 @@
     font-size: 0.7rem;
   }
 }
+
+/* Contextual Analysis Styles */
+.contextual-cell {
+  text-align: center;
+  min-width: 80px;
+}
+
+.contextual-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.hellraiser-indicator {
+  font-size: 0.9rem;
+  filter: brightness(1.2);
+}
+
+.badge-count {
+  font-size: 0.7rem;
+  color: #f7931e;
+  opacity: 0.8;
+}
+
+/* Contextual Details Section */
+.contextual-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.contextual-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+}
+
+/* Hellraiser Section */
+.hellraiser-section {
+  background: rgba(247, 147, 30, 0.1);
+  border: 1px solid rgba(247, 147, 30, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.hellraiser-badge {
+  font-weight: bold;
+  color: #f7931e;
+  font-size: 1rem;
+}
+
+.classification {
+  font-size: 0.9rem;
+  color: #b0b8c4;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.hellraiser-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+}
+
+.metric {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.metric-label {
+  color: #b0b8c4;
+  font-size: 0.85rem;
+}
+
+.metric-value {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.pathway-info {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  margin-top: 0.25rem;
+}
+
+.pathway-label {
+  color: #b0b8c4;
+  font-size: 0.85rem;
+}
+
+.pathway-value {
+  color: #f7931e;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+/* Badges Section */
+.badges-section {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  padding: 0.75rem;
+}
+
+.badges-header {
+  color: #f7931e;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.badges-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.badge-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+.badge-emoji {
+  font-size: 0.9rem;
+}
+
+.badge-label {
+  color: #ffffff;
+}
+
+.badge-bonus.positive {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.badge-bonus.negative {
+  color: #f44336;
+  font-weight: bold;
+}
+
+/* Scoring Breakdown */
+.scoring-breakdown {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  padding: 0.75rem;
+}
+
+.breakdown-header {
+  color: #f7931e;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.breakdown-text {
+  color: #b0b8c4;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Mobile responsiveness for contextual elements */
+@media (max-width: 768px) {
+  .hellraiser-metrics {
+    grid-template-columns: 1fr;
+  }
+  
+  .badges-list {
+    flex-direction: column;
+  }
+  
+  .badge-item {
+    justify-content: space-between;
+  }
+  
+  .contextual-info {
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+}
