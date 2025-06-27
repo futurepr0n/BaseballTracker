@@ -722,8 +722,8 @@ class ComprehensiveMatchupService {
       }
       
       // Extract players for both teams using hierarchical approach
-      const homeTeamPlayers = await this.extractTeamPlayers(hrPredictions, homeTeam, gameLineupData);
-      const awayTeamPlayers = await this.extractTeamPlayers(hrPredictions, awayTeam, gameLineupData);
+      const homeTeamPlayers = await this.extractTeamPlayers(hrPredictions, homeTeam, gameLineupData, currentDate);
+      const awayTeamPlayers = await this.extractTeamPlayers(hrPredictions, awayTeam, gameLineupData, currentDate);
       
       console.log(`Final player counts: ${homeTeam}=${homeTeamPlayers.length}, ${awayTeam}=${awayTeamPlayers.length}`);
       console.log(`Home team players:`, homeTeamPlayers.map(p => `${p.name} (${p.source})`));
@@ -817,10 +817,10 @@ class ComprehensiveMatchupService {
   /**
    * Extract team players using hierarchical approach
    * 1. Batting order from lineup (when available)
-   * 2. Roster data for all team players
+   * 2. Roster data for all team players (with restrictions for non-lineup players)
    * 3. HR predictions as enhancement context
    */
-  async extractTeamPlayers(predictions, team, gameLineupData = null) {
+  async extractTeamPlayers(predictions, team, gameLineupData = null, currentDate = new Date()) {
     console.log(`Extracting players for team: ${team}`);
     
     try {
@@ -828,16 +828,16 @@ class ComprehensiveMatchupService {
       const battingOrderPlayers = this.extractPlayersFromBattingOrder(gameLineupData, team);
       
       if (battingOrderPlayers.length > 0) {
-        console.log(`Found ${battingOrderPlayers.length} players from batting order for ${team}`);
+        console.log(`✅ Found ${battingOrderPlayers.length} players from LINEUP for ${team} (no restrictions applied)`);
         return await this.enhancePlayersWithHRContext(battingOrderPlayers, predictions, team);
       }
       
       // Step 2: Fall back to roster data for comprehensive team analysis
-      console.log(`No batting order available, using roster data for ${team}`);
-      const rosterPlayers = await this.extractPlayersFromRoster(team);
+      console.log(`No batting order available, using roster data for ${team} with restrictions (10+ games, active in last 3 games)`);
+      const rosterPlayers = await this.extractPlayersFromRoster(team, 10, currentDate);
       
       if (rosterPlayers.length > 0) {
-        console.log(`Found ${rosterPlayers.length} players from roster for ${team}`);
+        console.log(`🔍 Found ${rosterPlayers.length} players from ROSTER for ${team} (after applying restrictions)`);
         return await this.enhancePlayersWithHRContext(rosterPlayers, predictions, team);
       }
       
@@ -888,9 +888,57 @@ class ComprehensiveMatchupService {
   }
 
   /**
-   * Extract players from roster data (fallback when no batting order)
+   * Check if a player has played in the last N games
    */
-  async extractPlayersFromRoster(team, minGames = 20) {
+  async hasPlayedInRecentGames(playerName, team, currentDate, daysToCheck = 3) {
+    try {
+      const { fetchPlayerDataForDateRange } = await import('./dataService');
+      
+      // Get the last N days of data
+      const endDate = new Date(currentDate);
+      const startDate = new Date(currentDate);
+      startDate.setDate(startDate.getDate() - daysToCheck);
+      
+      const recentData = await fetchPlayerDataForDateRange(startDate, endDate);
+      
+      if (!recentData || recentData.length === 0) {
+        return false;
+      }
+      
+      // Check if player appears in any of the recent game data
+      for (const dayData of recentData) {
+        if (Array.isArray(dayData)) {
+          const foundPlayer = dayData.find(player => 
+            (player.name === playerName || player.fullName === playerName) && 
+            player.team === team &&
+            (player.AB > 0 || player.H > 0 || player.games > 0) // Actual game participation
+          );
+          if (foundPlayer) {
+            return true;
+          }
+        }
+      }
+      
+      return false;
+    } catch (error) {
+      console.warn(`Error checking recent games for ${playerName}:`, error);
+      // If we can't check recent games, assume they're active to avoid false negatives
+      return true;
+    }
+  }
+
+  /**
+   * Extract players from roster data (fallback when no batting order)
+   * 
+   * RESTRICTIONS FOR NON-LINEUP PLAYERS:
+   * - Minimum 10 games played in 2024 season (changed from 20)
+   * - Must have played in at least one of the last 3 games
+   * - This eliminates outlier players who haven't played significantly
+   * 
+   * NOTE: These restrictions only apply when sourcing from roster data.
+   * Players from batting order (lineup) are NOT filtered.
+   */
+  async extractPlayersFromRoster(team, minGames = 10, currentDate = new Date()) {
     try {
       const { fetchRosterData } = await import('./dataService');
       const rosterData = await fetchRosterData();
@@ -900,19 +948,46 @@ class ComprehensiveMatchupService {
         return [];
       }
       
-      const teamPlayers = rosterData.filter(player => 
+      // Apply initial filtering for team, type, and basic stats
+      const initialFilter = rosterData.filter(player => 
         player.team === team && 
         player.type === 'hitter' && 
-        player.stats && 
-        (player.stats['2024_Games'] >= minGames || player.stats['2024_HR'] >= 5) // Regular players or power hitters
-      ).sort((a, b) => (b.stats['2024_Games'] || 0) - (a.stats['2024_Games'] || 0)); // Sort by games played
+        player.stats &&
+        player.stats['2024_Games'] >= minGames // Must have played at least minimum games
+      );
+
+      console.log(`Initial roster filter for ${team}: ${initialFilter.length} players with ${minGames}+ games`);
+      
+      // Apply recent activity restriction
+      const activePlayersPromises = initialFilter.map(async (player) => {
+        const hasRecentActivity = await this.hasPlayedInRecentGames(
+          player.name, 
+          team, 
+          currentDate, 
+          3 // Last 3 days
+        );
+        
+        return hasRecentActivity ? player : null;
+      });
+      
+      const activePlayersResults = await Promise.all(activePlayersPromises);
+      const teamPlayers = activePlayersResults
+        .filter(player => player !== null)
+        .sort((a, b) => (b.stats['2024_Games'] || 0) - (a.stats['2024_Games'] || 0)); // Sort by games played
+      
+      console.log(`After recent activity filter for ${team}: ${teamPlayers.length} active players`);
+      
+      if (initialFilter.length > teamPlayers.length) {
+        const filtered = initialFilter.length - teamPlayers.length;
+        console.log(`⚠️ Filtered out ${filtered} players from ${team} roster (inactive in last 3 games)`);
+      }
       
       // Convert roster players to consistent format
       return teamPlayers.map(rosterPlayer => ({
         name: rosterPlayer.name,
         fullName: rosterPlayer.fullName,
         team: rosterPlayer.team,
-        source: 'roster',
+        source: 'roster_filtered', // Indicates this player passed the 10+ games & recent activity filter
         // Include comprehensive stats from roster
         gamesPlayed: rosterPlayer.stats['2024_Games'] || 0,
         homeRunsThisSeason: rosterPlayer.stats['2024_HR'] || 0,
