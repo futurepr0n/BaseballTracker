@@ -130,7 +130,13 @@ export const fetchPlayerData = async (dateStr) => {
         return fetchPlayerData(closestDate);
       }
       
-      console.warn(`Failed to load player data for ${dateStr} and no alternative found`);
+      // Only warn if it's within expected data range
+      const requestDate = new Date(dateStr);
+      const seasonStart = new Date('2025-03-18'); // Earliest data we have
+      
+      if (requestDate >= seasonStart) {
+        console.log(`📅 No player data available for ${dateStr} (no alternative found)`);
+      }
       return DEFAULT_PLAYER_DATA;
     }
     
@@ -190,7 +196,13 @@ export const fetchPlayerDataForDateRange = async (startDate, initialDaysToLookBa
         console.log(`[DataService] No player data found for ${dateStr}`);
       }
     } catch (error) {
-      console.error(`[DataService] Error fetching player data for ${dateStr}:`, error);
+      // Only log errors for dates within expected data range
+      const requestDate = new Date(dateStr);
+      const seasonStart = new Date('2025-03-18'); // Earliest data we have
+      
+      if (requestDate >= seasonStart) {
+        console.error(`[DataService] Error fetching player data for ${dateStr}:`, error);
+      }
     }
   }
   
@@ -230,7 +242,13 @@ export const fetchPlayerDataForDateRange = async (startDate, initialDaysToLookBa
             datesWithData++;
           }
         } catch (error) {
-          console.error(`[DataService] Error fetching player data for ${dateStr}:`, error);
+          // Only log errors for dates within expected data range
+          const requestDate = new Date(dateStr);
+          const seasonStart = new Date('2025-03-18'); // Earliest data we have
+          
+          if (requestDate >= seasonStart) {
+            console.error(`[DataService] Error fetching player data for ${dateStr}:`, error);
+          }
         }
       }
     }
@@ -411,7 +429,13 @@ export const fetchGameData = async (dateStr) => {
     const response = await fetch(filePath);
 
     if (!response.ok) {
-      console.warn(`Failed to load game data file for ${dateStr}. Returning empty game list.`);
+      // Only warn if it's within expected data range
+      const requestDate = new Date(dateStr);
+      const seasonStart = new Date('2025-03-18'); // Earliest data we have
+      
+      if (requestDate >= seasonStart) {
+        console.log(`📅 No game data available for ${dateStr} (file not found)`);
+      }
       dataCache.games[dateStr] = DEFAULT_GAME_DATA;
       return DEFAULT_GAME_DATA;
     }
@@ -421,7 +445,13 @@ export const fetchGameData = async (dateStr) => {
     return dataCache.games[dateStr];
 
   } catch (error) {
-    console.error(`Error fetching game data for ${dateStr}:`, error);
+    // Only log errors for dates within expected data range
+    const requestDate = new Date(dateStr);
+    const seasonStart = new Date('2025-03-18'); // Earliest data we have
+    
+    if (requestDate >= seasonStart) {
+      console.error(`Error fetching game data for ${dateStr}:`, error);
+    }
     return DEFAULT_GAME_DATA;
   }
 };
