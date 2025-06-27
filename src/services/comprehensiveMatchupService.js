@@ -3,7 +3,7 @@
  * Integrates all data sources for ultimate venue psychology and matchup analysis
  */
 
-import { fetchPlayerData, fetchGameData, fetchPlayerDataForDateRange } from './dataService';
+import { fetchPlayerData } from './dataService';
 import venuePersonalityService from './venuePersonalityService';
 import travelImpactAnalyzer from './travelImpactAnalyzer';
 import environmentalAdaptationService from './environmentalAdaptationService';
@@ -162,7 +162,7 @@ class ComprehensiveMatchupService {
       // Generate analyses for each game (using filtered player data) with timeout protection
       const gameAnalysisPromises = gameData.map(game => 
         Promise.race([
-          this.analyzeIndividualGame(game, filteredPlayerData, dateObj),
+          this.analyzeIndividualGame(game, filteredPlayerData, dateObj, lineupData),
           new Promise((_, reject) => 
             setTimeout(() => reject(new Error(`Game analysis timeout for ${game.homeTeam} vs ${game.awayTeam}`)), 15000)
           )
@@ -197,20 +197,25 @@ class ComprehensiveMatchupService {
     }
   }
 
+
   /**
    * Analyze individual game matchup
    */
-  async analyzeIndividualGame(game, playerData, currentDate) {
+  async analyzeIndividualGame(game, playerData, currentDate, lineupData = null) {
     try {
       const { homeTeam, awayTeam, pitcher } = game;
       
       // Ensure currentDate is a valid Date object
       const dateObj = currentDate instanceof Date ? currentDate : new Date(currentDate);
-      const dateStr = dateObj.toISOString().split('T')[0];
       
-      // Load lineup data to extract pitcher information
-      const lineupData = await this.loadPredictionData(`/data/lineups/starting_lineups_${dateStr}.json`);
-      const gameLineupData = this.findGameLineupData(lineupData, homeTeam, awayTeam);
+      // Use pre-loaded lineup data if available, otherwise load it
+      let gameLineupData = null;
+      if (lineupData) {
+        gameLineupData = this.findGameLineupData(lineupData, homeTeam, awayTeam);
+      } else {
+        // No lineup data provided - skip pitcher extraction
+        gameLineupData = null;
+      }
       
       // Extract pitcher information from lineup data
       const pitchers = this.extractPitchersFromLineup(gameLineupData, homeTeam, awayTeam);
@@ -822,6 +827,7 @@ class ComprehensiveMatchupService {
    */
   async analyzePredictiveGame(game, hrPredictions, lineupData, pitcherMatchups, currentDate) {
     try {
+      console.log('analyzePredictiveGame called for:', game.homeTeam, 'vs', game.awayTeam);
       const { homeTeam, awayTeam } = game;
       
       // Ensure currentDate is a valid Date object

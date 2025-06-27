@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import comprehensiveMatchupService from '../../services/comprehensiveMatchupService';
-import { formatDateString } from '../../services/dataService';
 import GameMatchupCard from './GameMatchupCard';
 import BatterMatchupTable from './BatterMatchupTable';
 import PitcherStatsSection from './PitcherStatsSection';
@@ -21,6 +20,14 @@ const HRMatchupHub = ({ playerData, teamData, gameData, currentDate }) => {
   const [filterOption, setFilterOption] = useState('all');
 
   useEffect(() => {
+    console.log('HRMatchupHub useEffect triggered:', {
+      gameData: gameData,
+      gameDataLength: gameData?.length,
+      currentDate: currentDate,
+      currentDateType: typeof currentDate,
+      currentDateValid: currentDate instanceof Date
+    });
+    
     // Only load if we have gameData and currentDate is valid
     if (gameData && gameData.length > 0 && currentDate) {
       loadComprehensiveAnalysis();
@@ -29,6 +36,12 @@ const HRMatchupHub = ({ playerData, teamData, gameData, currentDate }) => {
 
   const loadComprehensiveAnalysis = async () => {
     try {
+      console.log('loadComprehensiveAnalysis started:', {
+        gameData: gameData,
+        gameDataLength: gameData?.length,
+        currentDate: currentDate
+      });
+      
       setLoading(true);
       setError(null);
 
@@ -41,17 +54,17 @@ const HRMatchupHub = ({ playerData, teamData, gameData, currentDate }) => {
       // Ensure currentDate is a valid Date object
       const dateToUse = currentDate instanceof Date ? currentDate : new Date(currentDate);
       
-      // Add timeout to prevent infinite processing
-      const analysisPromise = comprehensiveMatchupService.generateComprehensiveMatchups(
+      // Call service without timeout (original method)
+      const comprehensiveAnalysis = await comprehensiveMatchupService.generateComprehensiveMatchups(
         dateToUse,
         gameData
       );
-      
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Analysis timeout - took longer than 90 seconds')), 90000)
-      );
-      
-      const comprehensiveAnalysis = await Promise.race([analysisPromise, timeoutPromise]);
+
+      console.log('Comprehensive analysis result:', {
+        analysis: comprehensiveAnalysis,
+        gameAnalysesCount: comprehensiveAnalysis?.gameAnalyses?.length,
+        hasData: !!comprehensiveAnalysis
+      });
 
       setAnalysis(comprehensiveAnalysis);
       
