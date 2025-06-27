@@ -113,81 +113,132 @@ const HRMatchupHub = ({ playerData, teamData, gameData, currentDate }) => {
     });
   };
 
-  const renderOverviewTab = () => (
-    <div className="overview-tab">
-      <div className="analysis-summary">
-        <div className="summary-header">
-          <h3>Daily Analysis Summary</h3>
-          <div className="summary-stats">
-            <div className="stat-box">
-              <span className="stat-label">Total Games</span>
-              <span className="stat-value">{analysis?.totalGames || 0}</span>
-            </div>
-            <div className="stat-box">
-              <span className="stat-label">Top Opportunities</span>
-              <span className="stat-value">{analysis?.topOpportunities?.length || 0}</span>
-            </div>
-            <div className="stat-box">
-              <span className="stat-label">Risk Warnings</span>
-              <span className="stat-value risk">{analysis?.riskWarnings?.length || 0}</span>
+  // Get top opportunities for the selected game
+  const getSelectedGameOpportunities = () => {
+    if (!selectedGame) return analysis?.topOpportunities || [];
+    
+    const allPlayers = [
+      ...(selectedGame.homeTeamAnalysis?.playerAnalyses || []),
+      ...(selectedGame.awayTeamAnalysis?.playerAnalyses || [])
+    ];
+
+    return allPlayers
+      .filter(p => p.recommendation.action === 'STRONG_TARGET' || p.recommendation.action === 'TARGET')
+      .sort((a, b) => b.comprehensiveScore.totalScore - a.comprehensiveScore.totalScore)
+      .slice(0, 5)
+      .map(p => ({
+        playerName: p.playerName,
+        team: p.team,
+        score: parseFloat(p.comprehensiveScore.totalScore).toFixed(1),
+        reason: p.recommendation.reason
+      }));
+  };
+
+  // Get risk warnings for the selected game
+  const getSelectedGameWarnings = () => {
+    if (!selectedGame) return analysis?.riskWarnings || [];
+    
+    const allPlayers = [
+      ...(selectedGame.homeTeamAnalysis?.playerAnalyses || []),
+      ...(selectedGame.awayTeamAnalysis?.playerAnalyses || [])
+    ];
+
+    return allPlayers
+      .filter(p => p.recommendation.action === 'AVOID' || p.recommendation.action === 'CAUTION')
+      .sort((a, b) => a.comprehensiveScore.totalScore - b.comprehensiveScore.totalScore)
+      .slice(0, 3)
+      .map(p => ({
+        playerName: p.playerName,
+        team: p.team,
+        reason: p.recommendation.reason
+      }));
+  };
+
+  const renderOverviewTab = () => {
+    const selectedOpportunities = getSelectedGameOpportunities();
+    const selectedWarnings = getSelectedGameWarnings();
+
+    return (
+      <div className="overview-tab">
+        <div className="analysis-summary">
+          <div className="summary-header">
+            <h3>
+              {selectedGame ? 
+                `${selectedGame.awayTeam} @ ${selectedGame.homeTeam} Analysis` : 
+                'Daily Analysis Summary'
+              }
+            </h3>
+            <div className="summary-stats">
+              <div className="stat-box">
+                <span className="stat-label">Total Games</span>
+                <span className="stat-value">{analysis?.totalGames || 0}</span>
+              </div>
+              <div className="stat-box">
+                <span className="stat-label">Top Opportunities</span>
+                <span className="stat-value">{selectedOpportunities.length}</span>
+              </div>
+              <div className="stat-box">
+                <span className="stat-label">Risk Warnings</span>
+                <span className="stat-value risk">{selectedWarnings.length}</span>
+              </div>
             </div>
           </div>
+
+          {selectedOpportunities.length > 0 && (
+            <div className="top-opportunities">
+              <h4>🎯 {selectedGame ? 'Game' : 'Top'} Opportunities</h4>
+              <div className="opportunity-list">
+                {selectedOpportunities.map((opp, index) => (
+                  <div key={index} className="opportunity-item">
+                    <div className="opportunity-info">
+                      <span className="player-name">{opp.playerName}</span>
+                      <span className="team-badge">{opp.team}</span>
+                    </div>
+                    <div className="opportunity-score">
+                      <span className="score">{opp.score}</span>
+                      <span className="reason">{opp.reason}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {selectedWarnings.length > 0 && (
+            <div className="risk-warnings">
+              <h4>⚠️ {selectedGame ? 'Game' : 'Risk'} Warnings</h4>
+              <div className="warning-list">
+                {selectedWarnings.map((warning, index) => (
+                  <div key={index} className="warning-item">
+                    <div className="warning-info">
+                      <span className="player-name">{warning.playerName}</span>
+                      <span className="team-badge">{warning.team}</span>
+                    </div>
+                    <div className="warning-reason">{warning.reason}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-
-        {analysis?.topOpportunities && analysis.topOpportunities.length > 0 && (
-          <div className="top-opportunities">
-            <h4>🎯 Top Opportunities</h4>
-            <div className="opportunity-list">
-              {analysis.topOpportunities.slice(0, 5).map((opp, index) => (
-                <div key={index} className="opportunity-item">
-                  <div className="opportunity-info">
-                    <span className="player-name">{opp.playerName}</span>
-                    <span className="team-badge">{opp.team}</span>
-                  </div>
-                  <div className="opportunity-score">
-                    <span className="score">{opp.score}</span>
-                    <span className="reason">{opp.reason}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {analysis?.riskWarnings && analysis.riskWarnings.length > 0 && (
-          <div className="risk-warnings">
-            <h4>⚠️ Risk Warnings</h4>
-            <div className="warning-list">
-              {analysis.riskWarnings.slice(0, 3).map((warning, index) => (
-                <div key={index} className="warning-item">
-                  <div className="warning-info">
-                    <span className="player-name">{warning.playerName}</span>
-                    <span className="team-badge">{warning.team}</span>
-                  </div>
-                  <div className="warning-reason">{warning.reason}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="games-grid">
         <h3>Game Matchups</h3>
-        <div className="games-container">
-          {analysis?.gameAnalyses?.map((gameAnalysis, index) => (
-            <GameMatchupCard
-              key={gameAnalysis.gameId || index}
-              gameAnalysis={gameAnalysis}
-              isSelected={selectedGame?.gameId === gameAnalysis.gameId}
-              onSelect={() => handleGameSelect(gameAnalysis)}
-              teamData={teamData}
-            />
-          ))}
+        <div className="games-grid">
+          
+          <div className="games-container">
+            {analysis?.gameAnalyses?.map((gameAnalysis, index) => (
+              <GameMatchupCard
+                key={gameAnalysis.gameId || index}
+                gameAnalysis={gameAnalysis}
+                isSelected={selectedGame?.gameId === gameAnalysis.gameId}
+                onSelect={() => handleGameSelect(gameAnalysis)}
+                teamData={teamData}
+              />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderAnalysisTab = () => (
     <div className="analysis-tab">

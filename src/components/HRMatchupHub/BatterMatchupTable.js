@@ -33,6 +33,12 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
     return 'low-confidence';
   };
 
+  const formatAdjustmentClass = (value) => {
+    if (value > 0) return 'positive';
+    if (value < 0) return 'negative';
+    return 'neutral';
+  };
+
   const formatAdjustment = (value) => {
     if (value === 0) return '0';
     return value > 0 ? `+${value.toFixed(1)}` : value.toFixed(1);
@@ -49,6 +55,87 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
   const getSortIcon = (column) => {
     return sortOption === column ? '▼' : '⇅';
   };
+
+  const renderMobileCard = (player, index) => (
+    <div key={`${player.playerName}_${player.team}_${index}`} className="mobile-player-card">
+      <div className="mobile-card-header">
+        <div className="mobile-player-info">
+          <div className="mobile-player-name">{player.playerName}</div>
+          <div className="mobile-team-position">
+            <span className="mobile-team-badge">{player.team}</span>
+            <span className="mobile-position">{player.isHome ? 'HOME' : 'AWAY'}</span>
+          </div>
+        </div>
+        <div className="mobile-total-score">{parseFloat(player.comprehensiveScore.totalScore).toFixed(1)}</div>
+      </div>
+
+      <div className="mobile-card-content">
+        <div className="mobile-stat">
+          <div className="mobile-stat-label">Base Score</div>
+          <div className="mobile-stat-value neutral">{player.comprehensiveScore.baseScore.toFixed(1)}</div>
+        </div>
+        <div className="mobile-stat">
+          <div className="mobile-stat-label">Venue</div>
+          <div className={`mobile-stat-value ${formatAdjustmentClass(player.comprehensiveScore.adjustments.venue || 0)}`}>
+            {formatAdjustment(player.comprehensiveScore.adjustments.venue || 0)}
+          </div>
+        </div>
+        <div className="mobile-stat">
+          <div className="mobile-stat-label">Travel</div>
+          <div className={`mobile-stat-value ${formatAdjustmentClass(player.comprehensiveScore.adjustments.travel || 0)}`}>
+            {formatAdjustment(player.comprehensiveScore.adjustments.travel || 0)}
+          </div>
+        </div>
+        <div className="mobile-stat">
+          <div className="mobile-stat-label">Context</div>
+          <div className={`mobile-stat-value ${formatAdjustmentClass(player.comprehensiveScore.contextualBonus || 0)}`}>
+            {formatAdjustment(player.comprehensiveScore.contextualBonus || 0)}
+          </div>
+        </div>
+      </div>
+
+      <div className="mobile-recommendation">
+        <div className={`mobile-action ${getRecommendationClass(player.recommendation)}`}>
+          {player.recommendation.action.replace('_', ' ')}
+        </div>
+        <div className="mobile-reason">{player.recommendation.reason}</div>
+      </div>
+
+      <div className="mobile-card-footer">
+        <div className="mobile-confidence">
+          <span>Confidence:</span>
+          <span className={`mobile-confidence-badge ${getConfidenceClass(player.confidenceLevel)}`}>
+            {player.confidenceLevel}%
+          </span>
+        </div>
+        <button 
+          className="mobile-expand-button"
+          onClick={() => handleRowClick(player.playerName)}
+        >
+          {expandedPlayer === player.playerName ? 'Less ▲' : 'More ▼'}
+        </button>
+      </div>
+
+      {player.comprehensiveScore.hellraiserData?.isHellraiserPick || (player.comprehensiveScore.contextualBadges && player.comprehensiveScore.contextualBadges.length > 0) ? (
+        <div className="mobile-contextual-indicators">
+          {player.comprehensiveScore.hellraiserData?.isHellraiserPick && (
+            <span className="mobile-hellraiser-indicator" title="Hellraiser Pick">🔥</span>
+          )}
+          {player.comprehensiveScore.contextualBadges && player.comprehensiveScore.contextualBadges.length > 0 && (
+            <span className="mobile-badge-count" title={`${player.comprehensiveScore.contextualBadges.length} active badges`}>
+              {player.comprehensiveScore.contextualBadges.length} badges 📊
+            </span>
+          )}
+        </div>
+      ) : null}
+
+      {expandedPlayer === player.playerName && (
+        <div style={{ marginTop: '1rem' }}>
+          {renderExpandedDetails(player)}
+        </div>
+      )}
+    </div>
+  );
 
   const renderExpandedDetails = (player) => {
     const { factorBreakdown, venueAnalysis, travelAnalysis, environmentalAnalysis, scheduleAnalysis } = player;
@@ -391,32 +478,32 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
         <table className="matchup-table">
           <thead>
             <tr>
-              <th onClick={() => handleSort('playerName')} className="sortable">
+              <th onClick={() => handleSort('playerName')} className="sortable" title="Player Name">
                 Player {getSortIcon('playerName')}
               </th>
-              <th onClick={() => handleSort('team')} className="sortable">
+              <th onClick={() => handleSort('team')} className="sortable" title="Team">
                 Team {getSortIcon('team')}
               </th>
-              <th onClick={() => handleSort('totalScore')} className="sortable">
+              <th onClick={() => handleSort('totalScore')} className="sortable" title="Total Score">
                 Score {getSortIcon('totalScore')}
               </th>
-              <th onClick={() => handleSort('basePerformance')} className="sortable">
+              <th onClick={() => handleSort('basePerformance')} className="sortable" title="Base Performance Score">
                 Base {getSortIcon('basePerformance')}
               </th>
-              <th onClick={() => handleSort('venueImpact')} className="sortable">
+              <th onClick={() => handleSort('venueImpact')} className="sortable" title="Venue Impact Adjustment">
                 Venue {getSortIcon('venueImpact')}
               </th>
-              <th onClick={() => handleSort('travelImpact')} className="sortable">
+              <th onClick={() => handleSort('travelImpact')} className="sortable" title="Travel Impact Adjustment">
                 Travel {getSortIcon('travelImpact')}
               </th>
-              <th onClick={() => handleSort('contextualBonus')} className="sortable">
+              <th onClick={() => handleSort('contextualBonus')} className="sortable" title="Contextual Bonus Points">
                 Context {getSortIcon('contextualBonus')}
               </th>
-              <th onClick={() => handleSort('confidence')} className="sortable">
-                Confidence {getSortIcon('confidence')}
+              <th onClick={() => handleSort('confidence')} className="sortable" title="Confidence Level">
+                Conf {getSortIcon('confidence')}
               </th>
-              <th>Recommendation</th>
-              <th>Details</th>
+              <th title="Recommendation">Rec</th>
+              <th title="Expand Details">▶</th>
             </tr>
           </thead>
           <tbody>
@@ -433,7 +520,7 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
                     <span className="team-badge">{player.team}</span>
                   </td>
                   <td className="score-cell">
-                    <span className="total-score">{player.comprehensiveScore.totalScore}</span>
+                    <span className="total-score">{parseFloat(player.comprehensiveScore.totalScore).toFixed(1)}</span>
                   </td>
                   <td className="base-cell">
                     <span className="base-score">{player.comprehensiveScore.baseScore.toFixed(1)}</span>
@@ -496,6 +583,11 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
             ))}
           </tbody>
         </table>
+        
+        {/* Mobile Card Layout */}
+        <div className="mobile-card-container">
+          {players.map((player, index) => renderMobileCard(player, index))}
+        </div>
       </div>
     </div>
   );
