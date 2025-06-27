@@ -137,6 +137,20 @@
   gap: 20px;
 }
 
+/* Current day featured container */
+.current-day-featured-container .live-scores-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 2px solid #0056b3;
+  box-shadow: 0 4px 20px rgba(0, 86, 179, 0.1);
+  margin-bottom: 10px;
+}
+
+.current-day-featured-container .card-header h3 {
+  color: #0056b3 !important;
+  font-size: 1.4rem !important;
+  font-weight: 600 !important;
+}
+
 /* Common Card Styling */
 .card {
   background-color: white;
