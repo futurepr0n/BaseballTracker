@@ -4,6 +4,7 @@
  */
 
 import { fetchPlayerDataForDateRange } from './dataService';
+import { getSeasonSafeDateRange, formatDateRangeDescription, getSeasonStartDate } from '../utils/seasonDateUtils';
 
 class VenuePersonalityService {
   constructor() {
@@ -50,8 +51,8 @@ class VenuePersonalityService {
   /**
    * Analyze player's venue performance history
    */
-  async analyzePlayerVenueHistory(playerName, venue, dateRange = 365) {
-    const cacheKey = `venue_history_${playerName}_${venue}_${dateRange}`;
+  async analyzePlayerVenueHistory(playerName, venue, maxDaysBack = 90) {
+    const cacheKey = `venue_history_${playerName}_${venue}_${maxDaysBack}`;
     
     if (this.cache.has(cacheKey)) {
       const cached = this.cache.get(cacheKey);
@@ -61,16 +62,25 @@ class VenuePersonalityService {
     }
 
     try {
-      // Get player's historical data from multiple recent dates
-      const playerGames = [];
-      const endDate = new Date();
+      // Get player's historical data from current season only
+      const currentDate = new Date();
+      const dateRange = getSeasonSafeDateRange(currentDate, maxDaysBack);
       
       console.log(`🏟️ Analyzing venue history for ${playerName} at ${venue}`);
+      console.log(`📅 Date range: ${formatDateRangeDescription(dateRange)}`);
       
-      // Check last 365 days of games to find venue history (extended from 90)
-      for (let i = 1; i <= 365; i++) {
-        const checkDate = new Date(endDate);
-        checkDate.setDate(endDate.getDate() - i);
+      const playerGames = [];
+      
+      // Use season-limited date range to prevent fetching non-existent 2024 files
+      const totalDays = Math.ceil((dateRange.endDate - dateRange.startDate) / (1000 * 60 * 60 * 24));
+      console.log(`🔍 Checking ${totalDays} days for venue history...`);
+      
+      for (let i = 0; i <= totalDays; i++) {
+        const checkDate = new Date(dateRange.startDate);
+        checkDate.setDate(dateRange.startDate.getDate() + i);
+        
+        // Don't go beyond the end date
+        if (checkDate > dateRange.endDate) break;
         
         try {
           const dateStr = checkDate.toISOString().split('T')[0];
@@ -160,7 +170,16 @@ class VenuePersonalityService {
       const monthName = monthNames[parseInt(month) - 1];
       
       const response = await fetch(`/data/${year}/${monthName}/${monthName}_${day}_${year}.json`);
-      if (!response.ok) return null;
+      if (!response.ok) {
+        // Only log if it's within our expected date range (to avoid spam from missing early season files)
+        const requestDate = new Date(dateStr);
+        const seasonStart = getSeasonStartDate();
+        
+        if (requestDate >= seasonStart) {
+          console.log(`📅 No data available for ${dateStr} (file not found)`);
+        }
+        return null;
+      }
       
       const gameData = await response.json();
       
@@ -171,7 +190,13 @@ class VenuePersonalityService {
         date: dateStr
       };
     } catch (error) {
-      console.warn(`Failed to fetch data for ${dateStr}:`, error);
+      // Only warn for unexpected errors, not missing files
+      const requestDate = new Date(dateStr);
+      const seasonStart = getSeasonStartDate();
+      
+      if (requestDate >= seasonStart) {
+        console.warn(`Failed to fetch data for ${dateStr}:`, error);
+      }
       return null;
     }
   }

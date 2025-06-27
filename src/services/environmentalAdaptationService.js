@@ -4,6 +4,7 @@
  */
 
 import { fetchPlayerDataForDateRange } from './dataService';
+import { getSeasonSafeDateRange, formatDateRangeDescription } from '../utils/seasonDateUtils';
 
 class EnvironmentalAdaptationService {
   constructor() {
@@ -112,8 +113,8 @@ class EnvironmentalAdaptationService {
   /**
    * Analyze player's environmental adaptation patterns
    */
-  async analyzePlayerEnvironmentalAdaptation(playerName, dateRange = 365) {
-    const cacheKey = `env_adaptation_${playerName}_${dateRange}`;
+  async analyzePlayerEnvironmentalAdaptation(playerName, maxDaysBack = 90) {
+    const cacheKey = `env_adaptation_${playerName}_${maxDaysBack}`;
     
     if (this.cache.has(cacheKey)) {
       const cached = this.cache.get(cacheKey);
@@ -123,7 +124,13 @@ class EnvironmentalAdaptationService {
     }
 
     try {
-      const historicalData = await fetchPlayerDataForDateRange(new Date(), dateRange, dateRange);
+      // Use season-limited date range to prevent fetching non-existent files
+      const currentDate = new Date();
+      const dateRange = getSeasonSafeDateRange(currentDate, maxDaysBack);
+      
+      console.log(`🌍 Environmental adaptation analysis for ${playerName}: ${formatDateRangeDescription(dateRange)}`);
+      
+      const historicalData = await fetchPlayerDataForDateRange(dateRange.startDate, dateRange.endDate);
       
       const playerGames = historicalData.filter(data => 
         (data.name === playerName || data.fullName === playerName)

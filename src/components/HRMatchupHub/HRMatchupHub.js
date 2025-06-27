@@ -4,6 +4,7 @@ import { formatDateString } from '../../services/dataService';
 import GameMatchupCard from './GameMatchupCard';
 import BatterMatchupTable from './BatterMatchupTable';
 import PitcherStatsSection from './PitcherStatsSection';
+import ExpandableOpportunityCards from './ExpandableOpportunityCards';
 import './HRMatchupHub.css';
 
 /**
@@ -125,12 +126,22 @@ const HRMatchupHub = ({ playerData, teamData, gameData, currentDate }) => {
     return allPlayers
       .filter(p => p.recommendation.action === 'STRONG_TARGET' || p.recommendation.action === 'TARGET')
       .sort((a, b) => b.comprehensiveScore.totalScore - a.comprehensiveScore.totalScore)
-      .slice(0, 5)
+      .slice(0, 8)  // Increased to show more opportunities
       .map(p => ({
         playerName: p.playerName,
         team: p.team,
-        score: parseFloat(p.comprehensiveScore.totalScore).toFixed(1),
-        reason: p.recommendation.reason
+        score: parseFloat(p.comprehensiveScore.totalScore),
+        venue: selectedGame.venue,
+        reason: p.recommendation.reason,
+        isHome: p.isHome,
+        gameId: selectedGame.gameId,
+        // Include additional properties for enhanced insights
+        hrScore: p.hrScore,
+        basePerformance: p.comprehensiveScore.baseScore,
+        venueAdjustment: p.comprehensiveScore.adjustments.venue,
+        travelAdjustment: p.comprehensiveScore.adjustments.travel,
+        confidenceLevel: p.confidenceLevel,
+        recommendation: p.recommendation
       }));
   };
 
@@ -146,11 +157,22 @@ const HRMatchupHub = ({ playerData, teamData, gameData, currentDate }) => {
     return allPlayers
       .filter(p => p.recommendation.action === 'AVOID' || p.recommendation.action === 'CAUTION')
       .sort((a, b) => a.comprehensiveScore.totalScore - b.comprehensiveScore.totalScore)
-      .slice(0, 3)
+      .slice(0, 5)  // Increased to show more warnings
       .map(p => ({
         playerName: p.playerName,
         team: p.team,
-        reason: p.recommendation.reason
+        score: parseFloat(p.comprehensiveScore.totalScore),
+        venue: selectedGame.venue,
+        reason: p.recommendation.reason,
+        isHome: p.isHome,
+        gameId: selectedGame.gameId,
+        // Include additional properties for enhanced insights
+        hrScore: p.hrScore,
+        basePerformance: p.comprehensiveScore.baseScore,
+        venueAdjustment: p.comprehensiveScore.adjustments.venue,
+        travelAdjustment: p.comprehensiveScore.adjustments.travel,
+        confidenceLevel: p.confidenceLevel,
+        recommendation: p.recommendation
       }));
   };
 
@@ -185,40 +207,19 @@ const HRMatchupHub = ({ playerData, teamData, gameData, currentDate }) => {
           </div>
 
           {selectedOpportunities.length > 0 && (
-            <div className="top-opportunities">
-              <h4>🎯 {selectedGame ? 'Game' : 'Top'} Opportunities</h4>
-              <div className="opportunity-list">
-                {selectedOpportunities.map((opp, index) => (
-                  <div key={index} className="opportunity-item">
-                    <div className="opportunity-info">
-                      <span className="player-name">{opp.playerName}</span>
-                      <span className="team-badge">{opp.team}</span>
-                    </div>
-                    <div className="opportunity-score">
-                      <span className="score">{opp.score}</span>
-                      <span className="reason">{opp.reason}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ExpandableOpportunityCards
+              players={selectedOpportunities}
+              currentDate={currentDate instanceof Date ? currentDate : new Date(currentDate)}
+              title={`🎯 ${selectedGame ? 'Game' : 'Top'} Opportunities`}
+            />
           )}
 
           {selectedWarnings.length > 0 && (
-            <div className="risk-warnings">
-              <h4>⚠️ {selectedGame ? 'Game' : 'Risk'} Warnings</h4>
-              <div className="warning-list">
-                {selectedWarnings.map((warning, index) => (
-                  <div key={index} className="warning-item">
-                    <div className="warning-info">
-                      <span className="player-name">{warning.playerName}</span>
-                      <span className="team-badge">{warning.team}</span>
-                    </div>
-                    <div className="warning-reason">{warning.reason}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ExpandableOpportunityCards
+              players={selectedWarnings}
+              currentDate={currentDate instanceof Date ? currentDate : new Date(currentDate)}
+              title={`⚠️ ${selectedGame ? 'Game' : 'Risk'} Warnings`}
+            />
           )}
         </div>
         <h3>Game Matchups</h3>
