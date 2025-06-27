@@ -15,38 +15,93 @@ const PitcherStatsSection = ({ gameAnalysis, apiPredictions }) => {
     );
   }
 
-  const { pitcher, homeTeam, awayTeam, homeTeamAnalysis, awayTeamAnalysis } = gameAnalysis;
+  const { pitcher, pitchers, homeTeam, awayTeam, homeTeamAnalysis, awayTeamAnalysis, pitcherIntelligence } = gameAnalysis;
 
   const renderOverviewTab = () => (
     <div className="overview-content">
-      <div className="pitcher-header">
-        <div className="pitcher-info">
-          <h3>{pitcher?.name || 'TBD'}</h3>
-          <div className="pitcher-meta">
-            <span className="team-info">Starting for {homeTeam}</span>
-            {pitcher?.era && <span className="era">ERA: {pitcher.era}</span>}
-            {pitcher?.whip && <span className="whip">WHIP: {pitcher.whip}</span>}
+      <div className="pitchers-section">
+        {/* Home Pitcher */}
+        <div className="pitcher-card">
+          <div className="pitcher-info">
+            <h3>{pitchers?.home?.name || 'TBD'}</h3>
+            <div className="pitcher-meta">
+              <span className="team-info">Starting for {homeTeam}</span>
+              {/* Enhanced pitcher data from intelligence service */}
+              {pitcherIntelligence?.homePitcher?.pitcher?.historicalStats ? (
+                <>
+                  <span className="era">ERA: {pitcherIntelligence.homePitcher.pitcher.historicalStats.seasonStats.era.toFixed(2) || pitchers?.home?.era || 'N/A'}</span>
+                  <span className="record">
+                    Record: {pitcherIntelligence.homePitcher.pitcher.historicalStats.seasonStats.record.wins}-{pitcherIntelligence.homePitcher.pitcher.historicalStats.seasonStats.record.losses}
+                  </span>
+                  <span className="throws">Throws: {pitchers?.home?.throws || 'Unknown'}</span>
+                  <span className="whip">WHIP: {pitcherIntelligence.homePitcher.pitcher.historicalStats.seasonStats.whip.toFixed(2) || 'N/A'}</span>
+                </>
+              ) : (
+                <>
+                  {pitchers?.home?.era !== undefined && <span className="era">ERA: {pitchers.home.era}</span>}
+                  {pitchers?.home?.record && (
+                    <span className="record">
+                      Record: {pitchers.home.record.wins}-{pitchers.home.record.losses}
+                    </span>
+                  )}
+                  {pitchers?.home?.throws && <span className="throws">Throws: {pitchers.home.throws}</span>}
+                </>
+              )}
+            </div>
           </div>
         </div>
-        
-        {apiPredictions && (
-          <div className="api-summary">
-            <div className="predictions-count">
-              <span className="count">{apiPredictions.predictions?.length || 0}</span>
-              <span className="label">Predictions</span>
-            </div>
-            <div className="avg-score">
-              <span className="score">
-                {apiPredictions.predictions?.length > 0 
-                  ? Math.round(apiPredictions.predictions.reduce((sum, p) => sum + (p.hr_score || 0), 0) / apiPredictions.predictions.length)
-                  : 'N/A'
-                }
-              </span>
-              <span className="label">Avg HR Score</span>
+
+        <div className="vs-divider">VS</div>
+
+        {/* Away Pitcher */}
+        <div className="pitcher-card">
+          <div className="pitcher-info">
+            <h3>{pitchers?.away?.name || 'TBD'}</h3>
+            <div className="pitcher-meta">
+              <span className="team-info">Starting for {awayTeam}</span>
+              {/* Enhanced pitcher data from intelligence service */}
+              {pitcherIntelligence?.awayPitcher?.pitcher?.historicalStats ? (
+                <>
+                  <span className="era">ERA: {pitcherIntelligence.awayPitcher.pitcher.historicalStats.seasonStats.era.toFixed(2) || pitchers?.away?.era || 'N/A'}</span>
+                  <span className="record">
+                    Record: {pitcherIntelligence.awayPitcher.pitcher.historicalStats.seasonStats.record.wins}-{pitcherIntelligence.awayPitcher.pitcher.historicalStats.seasonStats.record.losses}
+                  </span>
+                  <span className="throws">Throws: {pitchers?.away?.throws || 'Unknown'}</span>
+                  <span className="whip">WHIP: {pitcherIntelligence.awayPitcher.pitcher.historicalStats.seasonStats.whip.toFixed(2) || 'N/A'}</span>
+                </>
+              ) : (
+                <>
+                  {pitchers?.away?.era !== undefined && <span className="era">ERA: {pitchers.away.era}</span>}
+                  {pitchers?.away?.record && (
+                    <span className="record">
+                      Record: {pitchers.away.record.wins}-{pitchers.away.record.losses}
+                    </span>
+                  )}
+                  {pitchers?.away?.throws && <span className="throws">Throws: {pitchers.away.throws}</span>}
+                </>
+              )}
             </div>
           </div>
-        )}
+        </div>
       </div>
+        
+      {apiPredictions && (
+        <div className="api-summary">
+          <div className="predictions-count">
+            <span className="count">{apiPredictions.predictions?.length || 0}</span>
+            <span className="label">Predictions</span>
+          </div>
+          <div className="avg-score">
+            <span className="score">
+              {apiPredictions.predictions?.length > 0 
+                ? Math.round(apiPredictions.predictions.reduce((sum, p) => sum + (p.hr_score || 0), 0) / apiPredictions.predictions.length)
+                : 'N/A'
+              }
+            </span>
+            <span className="label">Avg HR Score</span>
+          </div>
+        </div>
+      )}
 
       <div className="matchup-summary">
         <div className="opponents-grid">
@@ -282,6 +337,250 @@ const PitcherStatsSection = ({ gameAnalysis, apiPredictions }) => {
             </div>
           )}
         </div>
+
+        {/* Enhanced Pitcher Intelligence Analysis */}
+        {pitcherIntelligence && (
+          <div className="enhanced-pitcher-intelligence">
+            <h4>Enhanced Pitcher Intelligence</h4>
+            
+            {/* Home Pitcher Analysis */}
+            {pitcherIntelligence.homePitcher && (
+              <div className="pitcher-analysis-section">
+                <h5>{pitchers?.home?.name} vs {awayTeam} Batters</h5>
+                <div className="intelligence-grid">
+                  {/* Handedness Breakdown */}
+                  {pitcherIntelligence.homePitcher.handednessBreakdown && (
+                    <div className="handedness-analysis">
+                      <h6>Handedness Matchups</h6>
+                      <div className="handedness-stats">
+                        <div className="handedness-item">
+                          <div className="handedness-header">
+                            <span className="label">vs Lefties ({pitcherIntelligence.homePitcher.handednessBreakdown.breakdown.vsLefty.count}):</span>
+                            <span className={`advantage ${pitcherIntelligence.homePitcher.handednessBreakdown.breakdown.vsLefty.advantage}`}>
+                              {pitcherIntelligence.homePitcher.handednessBreakdown.breakdown.vsLefty.advantage}
+                            </span>
+                          </div>
+                          {pitcherIntelligence.homePitcher.handednessBreakdown.breakdown.vsLefty.keyBatters?.length > 0 && (
+                            <div className="batter-names">
+                              {pitcherIntelligence.homePitcher.handednessBreakdown.breakdown.vsLefty.keyBatters.map((batter, idx) => (
+                                <span key={idx} className="batter-name">{batter.name}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="handedness-item">
+                          <div className="handedness-header">
+                            <span className="label">vs Righties ({pitcherIntelligence.homePitcher.handednessBreakdown.breakdown.vsRighty.count}):</span>
+                            <span className={`advantage ${pitcherIntelligence.homePitcher.handednessBreakdown.breakdown.vsRighty.advantage}`}>
+                              {pitcherIntelligence.homePitcher.handednessBreakdown.breakdown.vsRighty.advantage}
+                            </span>
+                          </div>
+                          {pitcherIntelligence.homePitcher.handednessBreakdown.breakdown.vsRighty.keyBatters?.length > 0 && (
+                            <div className="batter-names">
+                              {pitcherIntelligence.homePitcher.handednessBreakdown.breakdown.vsRighty.keyBatters.map((batter, idx) => (
+                                <span key={idx} className="batter-name">{batter.name}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        {pitcherIntelligence.homePitcher.handednessBreakdown.breakdown.vsSwitch.count > 0 && (
+                          <div className="handedness-item">
+                            <div className="handedness-header">
+                              <span className="label">vs Switch ({pitcherIntelligence.homePitcher.handednessBreakdown.breakdown.vsSwitch.count}):</span>
+                              <span className="advantage neutral">neutral</span>
+                            </div>
+                            {pitcherIntelligence.homePitcher.handednessBreakdown.breakdown.vsSwitch.keyBatters?.length > 0 && (
+                              <div className="batter-names">
+                                {pitcherIntelligence.homePitcher.handednessBreakdown.breakdown.vsSwitch.keyBatters.map((batter, idx) => (
+                                  <span key={idx} className="batter-name">{batter.name}</span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Vulnerability Assessment */}
+                  {pitcherIntelligence.homePitcher.vulnerabilityAnalysis && (
+                    <div className="vulnerability-assessment">
+                      <h6>Threat Assessment</h6>
+                      <div className="threat-analysis">
+                        <div className="threat-item">
+                          <span className="threat-label">HR Risk Level:</span>
+                          <span className={`threat-level ${pitcherIntelligence.homePitcher.vulnerabilityAnalysis.homeRunRisk.level}`}>
+                            {pitcherIntelligence.homePitcher.vulnerabilityAnalysis.homeRunRisk.level}
+                          </span>
+                        </div>
+                        <div className="threat-item">
+                          <span className="threat-label">K Potential:</span>
+                          <span className={`threat-level ${pitcherIntelligence.homePitcher.vulnerabilityAnalysis.strikeoutPotential.level}`}>
+                            {pitcherIntelligence.homePitcher.vulnerabilityAnalysis.strikeoutPotential.level}
+                          </span>
+                        </div>
+                        <div className="threat-item">
+                          <span className="threat-label">Overall Threat:</span>
+                          <span className={`threat-level ${pitcherIntelligence.homePitcher.vulnerabilityAnalysis.overallThreatLevel}`}>
+                            {pitcherIntelligence.homePitcher.vulnerabilityAnalysis.overallThreatLevel}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Key Batters to Watch */}
+                      {pitcherIntelligence.homePitcher.vulnerabilityAnalysis.homeRunRisk.threateningBatters?.length > 0 && (
+                        <div className="key-batters">
+                          <span className="batter-label">HR Threats:</span>
+                          <div className="batter-list">
+                            {pitcherIntelligence.homePitcher.vulnerabilityAnalysis.homeRunRisk.threateningBatters.slice(0, 3).map((batter, idx) => (
+                              <span key={idx} className="threatening-batter">{batter.name}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {pitcherIntelligence.homePitcher.vulnerabilityAnalysis.strikeoutPotential.vulnerableBatters?.length > 0 && (
+                        <div className="key-batters">
+                          <span className="batter-label">K Targets:</span>
+                          <div className="batter-list">
+                            {pitcherIntelligence.homePitcher.vulnerabilityAnalysis.strikeoutPotential.vulnerableBatters.slice(0, 3).map((batter, idx) => (
+                              <span key={idx} className="vulnerable-batter">{batter.name}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* Away Pitcher Analysis */}
+            {pitcherIntelligence.awayPitcher && (
+              <div className="pitcher-analysis-section">
+                <h5>{pitchers?.away?.name} vs {homeTeam} Batters</h5>
+                <div className="intelligence-grid">
+                  {/* Handedness Breakdown */}
+                  {pitcherIntelligence.awayPitcher.handednessBreakdown && (
+                    <div className="handedness-analysis">
+                      <h6>Handedness Matchups</h6>
+                      <div className="handedness-stats">
+                        <div className="handedness-item">
+                          <div className="handedness-header">
+                            <span className="label">vs Lefties ({pitcherIntelligence.awayPitcher.handednessBreakdown.breakdown.vsLefty.count}):</span>
+                            <span className={`advantage ${pitcherIntelligence.awayPitcher.handednessBreakdown.breakdown.vsLefty.advantage}`}>
+                              {pitcherIntelligence.awayPitcher.handednessBreakdown.breakdown.vsLefty.advantage}
+                            </span>
+                          </div>
+                          {pitcherIntelligence.awayPitcher.handednessBreakdown.breakdown.vsLefty.keyBatters?.length > 0 && (
+                            <div className="batter-names">
+                              {pitcherIntelligence.awayPitcher.handednessBreakdown.breakdown.vsLefty.keyBatters.map((batter, idx) => (
+                                <span key={idx} className="batter-name">{batter.name}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="handedness-item">
+                          <div className="handedness-header">
+                            <span className="label">vs Righties ({pitcherIntelligence.awayPitcher.handednessBreakdown.breakdown.vsRighty.count}):</span>
+                            <span className={`advantage ${pitcherIntelligence.awayPitcher.handednessBreakdown.breakdown.vsRighty.advantage}`}>
+                              {pitcherIntelligence.awayPitcher.handednessBreakdown.breakdown.vsRighty.advantage}
+                            </span>
+                          </div>
+                          {pitcherIntelligence.awayPitcher.handednessBreakdown.breakdown.vsRighty.keyBatters?.length > 0 && (
+                            <div className="batter-names">
+                              {pitcherIntelligence.awayPitcher.handednessBreakdown.breakdown.vsRighty.keyBatters.map((batter, idx) => (
+                                <span key={idx} className="batter-name">{batter.name}</span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        {pitcherIntelligence.awayPitcher.handednessBreakdown.breakdown.vsSwitch.count > 0 && (
+                          <div className="handedness-item">
+                            <div className="handedness-header">
+                              <span className="label">vs Switch ({pitcherIntelligence.awayPitcher.handednessBreakdown.breakdown.vsSwitch.count}):</span>
+                              <span className="advantage neutral">neutral</span>
+                            </div>
+                            {pitcherIntelligence.awayPitcher.handednessBreakdown.breakdown.vsSwitch.keyBatters?.length > 0 && (
+                              <div className="batter-names">
+                                {pitcherIntelligence.awayPitcher.handednessBreakdown.breakdown.vsSwitch.keyBatters.map((batter, idx) => (
+                                  <span key={idx} className="batter-name">{batter.name}</span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Vulnerability Assessment */}
+                  {pitcherIntelligence.awayPitcher.vulnerabilityAnalysis && (
+                    <div className="vulnerability-assessment">
+                      <h6>Threat Assessment</h6>
+                      <div className="threat-analysis">
+                        <div className="threat-item">
+                          <span className="threat-label">HR Risk Level:</span>
+                          <span className={`threat-level ${pitcherIntelligence.awayPitcher.vulnerabilityAnalysis.homeRunRisk.level}`}>
+                            {pitcherIntelligence.awayPitcher.vulnerabilityAnalysis.homeRunRisk.level}
+                          </span>
+                        </div>
+                        <div className="threat-item">
+                          <span className="threat-label">K Potential:</span>
+                          <span className={`threat-level ${pitcherIntelligence.awayPitcher.vulnerabilityAnalysis.strikeoutPotential.level}`}>
+                            {pitcherIntelligence.awayPitcher.vulnerabilityAnalysis.strikeoutPotential.level}
+                          </span>
+                        </div>
+                        <div className="threat-item">
+                          <span className="threat-label">Overall Threat:</span>
+                          <span className={`threat-level ${pitcherIntelligence.awayPitcher.vulnerabilityAnalysis.overallThreatLevel}`}>
+                            {pitcherIntelligence.awayPitcher.vulnerabilityAnalysis.overallThreatLevel}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Key Batters to Watch */}
+                      {pitcherIntelligence.awayPitcher.vulnerabilityAnalysis.homeRunRisk.threateningBatters?.length > 0 && (
+                        <div className="key-batters">
+                          <span className="batter-label">HR Threats:</span>
+                          <div className="batter-list">
+                            {pitcherIntelligence.awayPitcher.vulnerabilityAnalysis.homeRunRisk.threateningBatters.slice(0, 3).map((batter, idx) => (
+                              <span key={idx} className="threatening-batter">{batter.name}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {pitcherIntelligence.awayPitcher.vulnerabilityAnalysis.strikeoutPotential.vulnerableBatters?.length > 0 && (
+                        <div className="key-batters">
+                          <span className="batter-label">K Targets:</span>
+                          <div className="batter-list">
+                            {pitcherIntelligence.awayPitcher.vulnerabilityAnalysis.strikeoutPotential.vulnerableBatters.slice(0, 3).map((batter, idx) => (
+                              <span key={idx} className="vulnerable-batter">{batter.name}</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* Matchup Comparison */}
+            {pitcherIntelligence.matchupAnalysis && (
+              <div className="matchup-comparison">
+                <h6>Pitcher Matchup Analysis</h6>
+                <div className="comparison-result">
+                  <span className="comparison-label">Advantage:</span>
+                  <span className={`advantage-result ${pitcherIntelligence.matchupAnalysis.advantage}`}>
+                    {pitcherIntelligence.matchupAnalysis.advantage} - {pitcherIntelligence.matchupAnalysis.reasoning}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="matchup-breakdown">
           <h4>Team Matchup Breakdown</h4>

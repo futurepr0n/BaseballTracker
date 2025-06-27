@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import comprehensiveMatchupService from '../../services/comprehensiveMatchupService';
+import { formatDateString } from '../../services/dataService';
 import GameMatchupCard from './GameMatchupCard';
 import BatterMatchupTable from './BatterMatchupTable';
 import PitcherStatsSection from './PitcherStatsSection';
@@ -32,8 +33,11 @@ const HRMatchupHub = ({ playerData, teamData, gameData, currentDate }) => {
         return;
       }
 
+      // Ensure currentDate is a valid Date object
+      const dateToUse = currentDate instanceof Date ? currentDate : new Date(currentDate);
+      
       const comprehensiveAnalysis = await comprehensiveMatchupService.generateComprehensiveMatchups(
-        currentDate,
+        dateToUse,
         gameData
       );
 

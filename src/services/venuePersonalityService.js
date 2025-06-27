@@ -50,8 +50,8 @@ class VenuePersonalityService {
   /**
    * Analyze player's venue performance history
    */
-  async analyzePlayerVenueHistory(playerName, venueTeam, dateRange = 365) {
-    const cacheKey = `venue_history_${playerName}_${venueTeam}_${dateRange}`;
+  async analyzePlayerVenueHistory(playerName, venue, dateRange = 365) {
+    const cacheKey = `venue_history_${playerName}_${venue}_${dateRange}`;
     
     if (this.cache.has(cacheKey)) {
       const cached = this.cache.get(cacheKey);
@@ -61,18 +61,36 @@ class VenuePersonalityService {
     }
 
     try {
-      // Get player's historical data
+      // Get player's historical data from multiple recent dates
+      const playerGames = [];
       const endDate = new Date();
-      const startDate = new Date();
-      startDate.setDate(endDate.getDate() - dateRange);
       
-      const historicalData = await fetchPlayerDataForDateRange(endDate, dateRange, dateRange);
-      
-      // Filter for this player's games at this venue
-      const playerGames = historicalData.filter(playerData => 
-        (playerData.name === playerName || playerData.fullName === playerName) &&
-        this.isGameAtVenue(playerData, venueTeam)
-      );
+      // Check last 90 days of games to find venue history
+      for (let i = 1; i <= 90; i++) {
+        const checkDate = new Date(endDate);
+        checkDate.setDate(endDate.getDate() - i);
+        
+        try {
+          const dateStr = checkDate.toISOString().split('T')[0];
+          const historicalData = await this.fetchPlayerDataForDate(dateStr);
+          
+          if (historicalData && historicalData.length > 0) {
+            // Find this player's games at this specific venue
+            const playerVenueGames = historicalData.filter(playerData => 
+              this.isPlayerMatch(playerData, playerName) &&
+              this.isGameAtVenue(playerData, venue)
+            );
+            
+            playerGames.push(...playerVenueGames);
+          }
+        } catch (dateError) {
+          // Skip dates that don't have data
+          continue;
+        }
+        
+        // Stop if we have enough games or checked enough dates
+        if (playerGames.length >= 10 || i >= 60) break;
+      }
 
       // Calculate venue-specific stats
       const venueStats = this.calculateVenueStats(playerGames);
@@ -81,7 +99,7 @@ class VenuePersonalityService {
       const venuePersonality = this.determineVenuePersonality(venueStats, playerGames.length);
       
       const result = {
-        venueTeam,
+        venue,
         playerName,
         gamesPlayed: playerGames.length,
         venueStats,
@@ -98,23 +116,122 @@ class VenuePersonalityService {
       return result;
     } catch (error) {
       console.error('Error analyzing venue history:', error);
-      return this.getDefaultVenueAnalysis(playerName, venueTeam);
+      return this.getDefaultVenueAnalysis(playerName, venue);
     }
+  }
+
+  /**
+   * Fetch player data for a specific date
+   */
+  async fetchPlayerDataForDate(dateStr) {
+    try {
+      const [year, month, day] = dateStr.split('-');
+      const monthNames = ['january', 'february', 'march', 'april', 'may', 'june',
+                         'july', 'august', 'september', 'october', 'november', 'december'];
+      const monthName = monthNames[parseInt(month) - 1];
+      
+      const response = await fetch(`/data/${year}/${monthName}/${monthName}_${day}_${year}.json`);
+      if (!response.ok) return null;
+      
+      const gameData = await response.json();
+      return gameData.playerStats || gameData.players || [];
+    } catch (error) {
+      return null;
+    }
+  }
+
+  /**
+   * Check if player data matches target player name
+   */
+  isPlayerMatch(playerData, targetPlayerName) {
+    const playerName = playerData.name || playerData.fullName || playerData.playerName || '';
+    const targetName = targetPlayerName.toLowerCase().trim();
+    const currentName = playerName.toLowerCase().trim();
+    
+    // Exact match
+    if (currentName === targetName) return true;
+    
+    // Check if names contain each other (handles "First Last" vs "Last, First" formats)
+    const targetParts = targetName.split(/[\s,]+/).filter(p => p.length > 1);
+    const currentParts = currentName.split(/[\s,]+/).filter(p => p.length > 1);
+    
+    // If both first and last names match
+    if (targetParts.length >= 2 && currentParts.length >= 2) {
+      return targetParts.every(part => currentParts.some(cp => cp.includes(part) || part.includes(cp)));
+    }
+    
+    return false;
   }
 
   /**
    * Determine if game was played at specific venue
    */
-  isGameAtVenue(playerData, venueTeam) {
-    // Check if the game was played at the venue team's home stadium
-    // This would need to be enhanced based on your actual game data structure
-    if (playerData.gameId && playerData.venue) {
-      return playerData.venue.includes(venueTeam) || 
-             (playerData.team !== venueTeam && playerData.isAwayGame === false);
+  isGameAtVenue(playerData, venue) {
+    // Check various possible venue field names in the data
+    const gameVenue = playerData.venue || playerData.stadium || playerData.ballpark || '';
+    
+    if (gameVenue) {
+      // Direct venue name match
+      if (gameVenue.toLowerCase().includes(venue.toLowerCase()) || 
+          venue.toLowerCase().includes(gameVenue.toLowerCase())) {
+        return true;
+      }
     }
     
-    // Fallback: assume player's team was visiting if they're different teams
-    return playerData.team !== venueTeam;
+    // Check opponent field - if player's team != opponent's home team and it matches venue
+    const opponent = playerData.opponent || playerData.opposingTeam || '';
+    if (opponent && this.getVenueFromTeam(opponent) === venue) {
+      return true;
+    }
+    
+    // Check if this is an away game at the venue
+    const isHome = playerData.isHome || playerData.gameLocation === 'home';
+    if (!isHome && opponent) {
+      return this.getVenueFromTeam(opponent) === venue;
+    }
+    
+    return false;
+  }
+
+  /**
+   * Get venue name from team (simplified mapping)
+   */
+  getVenueFromTeam(team) {
+    const teamToVenue = {
+      'NYM': 'Citi Field',
+      'NYY': 'Yankee Stadium', 
+      'BOS': 'Fenway Park',
+      'TB': 'Tropicana Field',
+      'TOR': 'Rogers Centre',
+      'BAL': 'Oriole Park at Camden Yards',
+      'HOU': 'Minute Maid Park',
+      'LAA': 'Angel Stadium',
+      'OAK': 'Oakland Coliseum',
+      'SEA': 'T-Mobile Park',
+      'TEX': 'Globe Life Field',
+      'CHW': 'Guaranteed Rate Field',
+      'CLE': 'Progressive Field',
+      'DET': 'Comerica Park',
+      'KC': 'Kauffman Stadium',
+      'MIN': 'Target Field',
+      'ATL': 'Truist Park',
+      'MIA': 'loanDepot Park',
+      'NYM': 'Citi Field',
+      'PHI': 'Citizens Bank Park',
+      'WSH': 'Nationals Park',
+      'CHC': 'Wrigley Field',
+      'CIN': 'Great American Ball Park',
+      'MIL': 'American Family Field',
+      'PIT': 'PNC Park',
+      'STL': 'Busch Stadium',
+      'ARI': 'Chase Field',
+      'COL': 'Coors Field',
+      'LAD': 'Dodger Stadium',
+      'SD': 'Petco Park',
+      'SF': 'Oracle Park'
+    };
+    
+    return teamToVenue[team] || '';
   }
 
   /**
@@ -273,9 +390,9 @@ class VenuePersonalityService {
   /**
    * Get default analysis when data is insufficient
    */
-  getDefaultVenueAnalysis(playerName, venueTeam) {
+  getDefaultVenueAnalysis(playerName, venue) {
     return {
-      venueTeam,
+      venue,
       playerName,
       gamesPlayed: 0,
       venueStats: {
