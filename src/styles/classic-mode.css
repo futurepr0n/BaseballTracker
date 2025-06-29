@@ -179,17 +179,18 @@
 }
 
 /* CRITICAL PERFORMANCE OPTIMIZATIONS - FORCE REMOVE ALL GLASS EFFECTS */
-.theme-classic *,
-.theme-classic *::before,
-.theme-classic *::after {
+/* EXCEPTION: SlotMachineCard and all its children are excluded */
+.theme-classic *:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic *::before:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic *::after:not(.slot-machine-card):not(.slot-machine-card *) {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   filter: none !important;
 }
 
-/* Force override ALL glass containers */
-.theme-classic .glass-card-container,
-.theme-classic [class*="glass-"] {
+/* Force override ALL glass containers EXCEPT SlotMachineCard */
+.theme-classic .glass-card-container:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic [class*="glass-"]:not(.slot-machine-card):not(.slot-machine-card *) {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   background: rgba(255, 255, 255, 0.95) !important;
@@ -197,10 +198,10 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Force override ALL cards */
-.theme-classic .card,
-.theme-classic [class$="-card"],
-.theme-classic [class*="-card "] {
+/* Force override ALL cards EXCEPT SlotMachineCard */
+.theme-classic .card:not(.slot-machine-card),
+.theme-classic [class$="-card"]:not(.slot-machine-card),
+.theme-classic [class*="-card "]:not(.slot-machine-card) {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   background: rgba(255, 255, 255, 0.95) !important;
@@ -219,28 +220,28 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Force remove glass from headers */
-.theme-classic .glass-header,
-.theme-classic [class*="header"] {
+/* Force remove glass from headers EXCEPT SlotMachineCard */
+.theme-classic .glass-header:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic [class*="header"]:not(.slot-machine-card):not(.slot-machine-card *) {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   background: rgba(248, 250, 252, 1) !important;
   box-shadow: none !important;
 }
 
-/* Force remove glass from scrollable containers */
-.theme-classic .scrollable-container,
-.theme-classic [class*="scrollable"] {
+/* Force remove glass from scrollable containers EXCEPT SlotMachineCard */
+.theme-classic .scrollable-container:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic [class*="scrollable"]:not(.slot-machine-card):not(.slot-machine-card *) {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   background: white !important;
 }
 
-/* Force remove glass from all player items */
-.theme-classic .player-item,
-.theme-classic .mobile-card,
-.theme-classic .metric-item,
-.theme-classic [class*="item"] {
+/* Force remove glass from all player items EXCEPT SlotMachineCard */
+.theme-classic .player-item:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic .mobile-card:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic .metric-item:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic [class*="item"]:not(.slot-machine-card):not(.slot-machine-card *) {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   background: white !important;
@@ -307,31 +308,31 @@
 
 /* ABSOLUTE FINAL OVERRIDES - ENSURE NO GLASS EFFECTS */
 /* EXCEPTION: SlotMachineCard (Pick Em Prop Machine) remains unchanged */
-.theme-classic *:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic *:not(.slot-machine-card):not(.slot-machine-card *):not(.slot-machine-card [class*="card"]):not(.slot-machine-card [class*="container"]):not(.slot-machine-card [class*="header"]):not(.slot-machine-card [class*="glass"]),
 .theme-classic:not(.slot-machine-card) {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
-/* Target every possible glass element EXCEPT SlotMachineCard */
-.theme-classic [class*="glass"]:not(.slot-machine-card):not(.slot-machine-card *),
-.theme-classic [class*="blur"]:not(.slot-machine-card):not(.slot-machine-card *),
-.theme-classic [class*="card"]:not(.slot-machine-card):not(.slot-machine-card *),
-.theme-classic [class*="container"]:not(.slot-machine-card):not(.slot-machine-card *),
-.theme-classic [class*="header"]:not(.slot-machine-card):not(.slot-machine-card *),
-.theme-classic [class*="scrollable"]:not(.slot-machine-card):not(.slot-machine-card *),
-.theme-classic [class*="table"]:not(.slot-machine-card):not(.slot-machine-card *),
-.theme-classic [class*="item"]:not(.slot-machine-card):not(.slot-machine-card *),
-.theme-classic [class*="mobile"]:not(.slot-machine-card):not(.slot-machine-card *) {
+/* Target every possible glass element EXCEPT SlotMachineCard and ALL its descendants */
+.theme-classic [class*="glass"]:not(.slot-machine-card):not(.slot-machine-card *):not(.slot-machine-card [class*="glass"]):not(.slot-machine-card [class*="card"]),
+.theme-classic [class*="blur"]:not(.slot-machine-card):not(.slot-machine-card *):not(.slot-machine-card [class*="blur"]):not(.slot-machine-card [class*="card"]),
+.theme-classic [class*="card"]:not(.slot-machine-card):not(.slot-machine-card *):not(.slot-machine-card [class*="card"]),
+.theme-classic [class*="container"]:not(.slot-machine-card):not(.slot-machine-card *):not(.slot-machine-card [class*="container"]):not(.slot-machine-card [class*="card"]),
+.theme-classic [class*="header"]:not(.slot-machine-card):not(.slot-machine-card *):not(.slot-machine-card [class*="header"]):not(.slot-machine-card [class*="card"]),
+.theme-classic [class*="scrollable"]:not(.slot-machine-card):not(.slot-machine-card *):not(.slot-machine-card [class*="scrollable"]):not(.slot-machine-card [class*="card"]),
+.theme-classic [class*="table"]:not(.slot-machine-card):not(.slot-machine-card *):not(.slot-machine-card [class*="table"]):not(.slot-machine-card [class*="card"]),
+.theme-classic [class*="item"]:not(.slot-machine-card):not(.slot-machine-card *):not(.slot-machine-card [class*="item"]):not(.slot-machine-card [class*="card"]),
+.theme-classic [class*="mobile"]:not(.slot-machine-card):not(.slot-machine-card *):not(.slot-machine-card [class*="mobile"]):not(.slot-machine-card [class*="card"]) {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   filter: none !important;
 }
 
-/* Override any style attribute */
-.theme-classic [style*="backdrop-filter"],
-.theme-classic [style*="blur"],
-.theme-classic [style*="filter"] {
+/* Override any style attribute EXCEPT SlotMachineCard */
+.theme-classic [style*="backdrop-filter"]:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic [style*="blur"]:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic [style*="filter"]:not(.slot-machine-card):not(.slot-machine-card *) {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   filter: none !important;
