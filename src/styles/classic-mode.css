@@ -1,0 +1,369 @@
+/* classic-mode.css - Lightweight Classic Theme Styles */
+
+/* IMPORTANT: SlotMachineCard (Pick Em Prop Machine) is EXCLUDED from classic mode changes */
+/* The Pick Em Prop Machine maintains its original styling in both glass and classic modes */
+
+/* Classic Card Base Styles - COMPLETELY REMOVE ALL GLASS EFFECTS */
+/* EXCEPTION: slot-machine-card maintains original styling */
+.theme-classic .card:not(.slot-machine-card) {
+  background: white !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-classic .card:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-1px);
+}
+
+/* Classic Glass Card Container - NO GLASS */
+.theme-classic .glass-card-container {
+  background: white !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Classic Glass Header - NO GLASS */
+.theme-classic .glass-header {
+  background: #f8f9fa !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+/* Classic Scrollable Container - NO GLASS */
+.theme-classic .scrollable-container {
+  background: white !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Classic Scrollbars */
+.theme-classic .scrollable-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.theme-classic .scrollable-container::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 4px;
+}
+
+.theme-classic .scrollable-container::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-classic .scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* Classic Player Items */
+.theme-classic .player-item {
+  background: var(--card-bg-tertiary);
+  border: 1px solid var(--card-border);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.theme-classic .player-item:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transform: translateX(2px);
+}
+
+/* Classic Card Footers */
+.theme-classic .card-footer {
+  background: var(--footer-bg);
+  border-top: 1px solid var(--card-border);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Color-Specific Classic Cards */
+
+/* Purple Theme Classic */
+.theme-classic .under-performing-card {
+  background: var(--purple-classic-bg);
+  border-left: 4px solid #9C27B0;
+  border-color: var(--purple-classic-border);
+}
+
+.theme-classic .under-performing-card .glass-header {
+  background: var(--purple-classic-header);
+}
+
+/* Teal Theme Classic */
+.theme-classic .barrel-matchup-card {
+  background: var(--teal-classic-bg);
+  border-left: 4px solid #2F4F4F;
+  border-color: var(--teal-classic-border);
+}
+
+.theme-classic .barrel-matchup-card .glass-header {
+  background: var(--teal-classic-header);
+}
+
+/* Grey Theme Classic */
+.theme-classic .multi-hit-dashboard,
+.theme-classic .pitcher-matchup-card {
+  background: var(--grey-classic-bg);
+  border-left: 4px solid #374151;
+  border-color: var(--grey-classic-border);
+}
+
+.theme-classic .multi-hit-dashboard .glass-header,
+.theme-classic .pitcher-matchup-card .glass-header {
+  background: var(--grey-classic-header);
+}
+
+/* Red Theme Classic */
+.theme-classic .poor-performance-card {
+  background: var(--red-classic-bg);
+  border-left: 4px solid #dc2626;
+  border-color: var(--red-classic-border);
+}
+
+.theme-classic .poor-performance-card .glass-header {
+  background: var(--red-classic-header);
+}
+
+/* Classic Mobile Cards */
+.theme-classic .mobile-card {
+  background: var(--card-bg-tertiary);
+  border: 1px solid var(--card-border);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.theme-classic .mobile-card:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Classic Table Styles */
+.theme-classic .matchup-table thead {
+  background: rgba(248, 250, 252, 0.95);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-classic .matchup-table tbody tr.data-row {
+  background: var(--card-bg-tertiary);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-classic .matchup-table tbody tr.data-row:hover {
+  background: rgba(248, 250, 252, 0.8);
+}
+
+.theme-classic .expanded-row td {
+  background: var(--card-bg-secondary);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Classic Metric Items */
+.theme-classic .metric-item {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--card-border);
+}
+
+/* CRITICAL PERFORMANCE OPTIMIZATIONS - FORCE REMOVE ALL GLASS EFFECTS */
+.theme-classic *,
+.theme-classic *::before,
+.theme-classic *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Force override ALL glass containers */
+.theme-classic .glass-card-container,
+.theme-classic [class*="glass-"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Force override ALL cards */
+.theme-classic .card,
+.theme-classic [class$="-card"],
+.theme-classic [class*="-card "] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Specific overrides for known glass components */
+.theme-classic .barrel-matchup-card,
+.theme-classic .multi-hit-dashboard,
+.theme-classic .pitcher-matchup-card,
+.theme-classic .under-performing-card,
+.theme-classic .poor-performance-card {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: white !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Force remove glass from headers */
+.theme-classic .glass-header,
+.theme-classic [class*="header"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(248, 250, 252, 1) !important;
+  box-shadow: none !important;
+}
+
+/* Force remove glass from scrollable containers */
+.theme-classic .scrollable-container,
+.theme-classic [class*="scrollable"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: white !important;
+}
+
+/* Force remove glass from all player items */
+.theme-classic .player-item,
+.theme-classic .mobile-card,
+.theme-classic .metric-item,
+.theme-classic [class*="item"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: white !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Override inline styles */
+.theme-classic [style*="backdrop-filter"],
+.theme-classic [style*="blur"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Remove expensive animations in classic mode */
+.theme-classic .loading-spinner {
+  animation: simpleRotate 1s linear infinite;
+}
+
+@keyframes simpleRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Classic mode loading states */
+.theme-classic .loading-state,
+.theme-classic .error-state,
+.theme-classic .no-data {
+  background: var(--card-bg-secondary);
+}
+
+/* Classic button styles */
+.theme-classic .retry-button,
+.theme-classic .restore-button,
+.theme-classic .sort-button {
+  background: #2F4F4F;
+  border: 1px solid #1a2f2f;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.theme-classic .retry-button:hover,
+.theme-classic .restore-button:hover,
+.theme-classic .sort-button:hover {
+  background: #1a2f2f;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Classic legend and footer elements */
+.theme-classic .legend,
+.theme-classic .last-updated,
+.theme-classic .pitchers-count,
+.theme-classic .card-subtitle {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--card-border);
+}
+
+/* Disable complex transitions in classic mode for performance */
+.theme-classic .player-item,
+.theme-classic .mobile-card,
+.theme-classic .data-row {
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* ABSOLUTE FINAL OVERRIDES - ENSURE NO GLASS EFFECTS */
+/* EXCEPTION: SlotMachineCard (Pick Em Prop Machine) remains unchanged */
+.theme-classic *:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic:not(.slot-machine-card) {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Target every possible glass element EXCEPT SlotMachineCard */
+.theme-classic [class*="glass"]:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic [class*="blur"]:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic [class*="card"]:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic [class*="container"]:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic [class*="header"]:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic [class*="scrollable"]:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic [class*="table"]:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic [class*="item"]:not(.slot-machine-card):not(.slot-machine-card *),
+.theme-classic [class*="mobile"]:not(.slot-machine-card):not(.slot-machine-card *) {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Override any style attribute */
+.theme-classic [style*="backdrop-filter"],
+.theme-classic [style*="blur"],
+.theme-classic [style*="filter"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Specific card overrides with proper backgrounds */
+.theme-classic .barrel-matchup-card,
+.theme-classic .barrel-matchup-card * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-classic .multi-hit-dashboard,
+.theme-classic .multi-hit-dashboard * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-classic .pitcher-matchup-card,
+.theme-classic .pitcher-matchup-card * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-classic .under-performing-card,
+.theme-classic .under-performing-card * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-classic .poor-performance-card,
+.theme-classic .poor-performance-card * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}

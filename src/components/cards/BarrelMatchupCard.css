@@ -17,6 +17,14 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
+/* Classic mode overrides for BarrelMatchupCard */
+.theme-classic .barrel-matchup-card {
+  background: white !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
 /* Glass Header */
 .barrel-matchup-card .glass-header {
   padding: 16px 20px;
@@ -30,6 +38,15 @@
   justify-content: space-between;
   box-shadow: 0 4px 16px rgba(47, 79, 79, 0.05);
   flex-shrink: 0;
+}
+
+/* Classic mode glass header */
+.theme-classic .barrel-matchup-card .glass-header {
+  background: #f8f9fa !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid #e0e0e0 !important;
 }
 
 .barrel-matchup-card .glass-header h3 {
@@ -56,6 +73,13 @@
   background: rgba(248, 250, 252, 0.4);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+}
+
+/* Classic mode table container */
+.theme-classic .barrel-matchup-card .table-container {
+  background: white !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* Desktop View */

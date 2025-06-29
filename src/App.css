@@ -205,9 +205,46 @@ font-weight: 800;
 
   .header-top-row { /* This is key for same-line layout */
   display: flex;
-  justify-content: space-between; /* Pushes title to left, icons to right */
-  align-items: center; /* Vertically aligns title and icons */
+  justify-content: space-between; /* Pushes title to left, controls to right */
+  align-items: center; /* Vertically aligns title and controls */
   margin-bottom: 15px; /* Space before the Navigation component */
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.theme-toggle-header {
+  /* Specific styling for header theme toggle */
+}
+
+.social-icons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.social-icons a {
+  display: flex;
+  align-items: center;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.social-icons a:hover {
+  opacity: 1;
+}
+
+.social-icons a img {
+  height: 28px;
+  width: 28px;
+  transition: transform 0.2s ease;
+}
+
+.social-icons a:hover img {
+  transform: scale(1.1);
 }
 
 
@@ -327,11 +364,58 @@ font-weight: 800;
   }
 
 
-      .social-icons {
-      gap: 10px; /* Smaller gap on mobile */
+    .header-controls {
+      gap: 12px;
+    }
+    
+    .social-icons {
+      gap: 8px; /* Smaller gap on mobile */
     }
 
     .social-icons a img {
       height: 24px; /* Slightly smaller icons on mobile */
       width: 24px;
     }
+    
+    .theme-toggle-header {
+      transform: scale(0.9); /* Slightly smaller toggle on mobile */
+    }
+
+/* Theme-aware global styling */
+.theme-glass .app {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  transition: background 0.3s ease;
+}
+
+.theme-classic .app {
+  background: #f5f5f7;
+  transition: background 0.3s ease;
+}
+
+/* Theme-aware header styling */
+.theme-glass .app-header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-classic .app-header {
+  background: white;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Add transition classes for smooth theme switching */
+.theme-transition .app,
+.theme-transition .app-header,
+.theme-transition .card,
+.theme-transition .glass-card-container {
+  transition: 
+    background-color 0.3s ease,
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    backdrop-filter 0.3s ease !important;
+}
