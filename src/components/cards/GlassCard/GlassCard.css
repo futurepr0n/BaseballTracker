@@ -1,0 +1,259 @@
+/* Glass Card Effect Styling - Inspired by HR Matchups transparency effects */
+
+/* Base Glass Card Styles */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 16px !important;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+  /* Ensure glass card takes precedence over other card styling */
+  padding: 20px !important;
+}
+
+/* Glass Card Hover Effects */
+.glass-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Glass Card Header */
+.glass-card .card-header {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  margin: -20px -20px 20px -20px;
+  padding: 20px;
+  position: relative;
+}
+
+.glass-card .card-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    transparent
+  );
+}
+
+.glass-card .card-header h2,
+.glass-card .card-header h3 {
+  color: #1a1a2e;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+/* Scrollable Content Glass Effects */
+.glass-scrollable {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Sticky Header for Scrollable Content */
+.glass-scrollable .sticky-header {
+  position: sticky;
+  top: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  z-index: 10;
+  padding: 10px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+/* Player List Items with Glass Effect */
+.glass-player-item {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  padding: 12px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.glass-player-item:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.glass-player-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Scroll-based Opacity Transitions */
+.glass-scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.glass-scrollable::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.glass-scrollable::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.glass-scrollable::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Dark Theme Glass Variants */
+.glass-card.dark-theme {
+  background: rgba(26, 26, 46, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.glass-card.dark-theme:hover {
+  background: rgba(26, 26, 46, 0.9);
+}
+
+.glass-card.dark-theme .card-header {
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card.dark-theme .card-header h2,
+.glass-card.dark-theme .card-header h3 {
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.glass-card.dark-theme .glass-scrollable {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card.dark-theme .glass-player-item {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.glass-card.dark-theme .glass-player-item:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Featured Card Glass Enhancement */
+.glass-card.featured {
+  background: rgba(0, 86, 179, 0.1);
+  border: 2px solid rgba(0, 86, 179, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 86, 179, 0.2),
+    0 2px 8px rgba(0, 86, 179, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.glass-card.featured:hover {
+  background: rgba(0, 86, 179, 0.15);
+  box-shadow: 
+    0 12px 40px rgba(0, 86, 179, 0.25),
+    0 4px 12px rgba(0, 86, 179, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.glass-card.featured .card-header {
+  background: rgba(0, 86, 179, 0.1);
+  border-bottom: 1px solid rgba(0, 86, 179, 0.2);
+}
+
+.glass-card.featured .card-header h2,
+.glass-card.featured .card-header h3 {
+  color: #0056b3;
+}
+
+/* Animation Classes */
+.glass-fade-in {
+  animation: glassFadeIn 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+@keyframes glassFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+  .glass-card,
+  .glass-player-item,
+  .glass-fade-in {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #000000;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  
+  .glass-card.dark-theme {
+    background: rgba(0, 0, 0, 0.95);
+    border: 2px solid #ffffff;
+  }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .glass-card {
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+  }
+  
+  .glass-scrollable {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  .glass-player-item {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+}

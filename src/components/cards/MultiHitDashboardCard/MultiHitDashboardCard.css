@@ -1,30 +1,87 @@
-/* Multi-Hit Dashboard - SIMPLIFIED & FIXED */
+/* MultiHitDashboardCard.css - Glass Effect Black/Grey Theme */
+
+/* ========== MULTI-HIT DASHBOARD (Black/Grey Theme) ========== */
 .multi-hit-dashboard {
-  background: white;
+  grid-column: 1 / -1;
+  background: rgba(31, 41, 55, 0.05);
+  border: 1px solid rgba(31, 41, 55, 0.2);
+  border-left: 4px solid #374151;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  box-shadow: 
+    0 8px 32px rgba(31, 41, 55, 0.08),
+    0 2px 8px rgba(31, 41, 55, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   
   /* FULL WIDTH */
-  grid-column: 1 / -1;
   width: 100%;
   
   /* FIXED HEIGHT */
   height: 600px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
 }
 
-/* Header - COMPACT */
+/* Glass card container for proper layering */
+.multi-hit-dashboard .glass-card-container {
+  position: relative;
+  height: 100%;
+  min-height: 600px !important;
+  /* CRITICAL: Override any global glass optimizations that limit height */
+  max-height: none !important;
+}
+
+/* Glass header that content scrolls behind */
+.multi-hit-dashboard .glass-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: rgba(31, 41, 55, 0.08);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(31, 41, 55, 0.15);
+  padding: 20px;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(31, 41, 55, 0.05);
+}
+
+/* Glass Effect Scrollable Container */
+.multi-hit-dashboard .scrollable-container {
+  background: rgba(249, 250, 251, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+  height: 100%;
+  /* CRITICAL: Override any global height constraints */
+  max-height: none !important;
+  min-height: 440px !important; /* 600px card - 160px header = 440px min */
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 160px; /* Larger padding for dashboard header */
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 0; /* No bottom padding - extend to full card length */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header - EXTRA COMPACT */
 .dashboard-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 6px; /* Reduced margin */
+  padding-bottom: 4px; /* Reduced padding */
+  border-bottom: 1px solid rgba(31, 41, 55, 0.15);
   flex-shrink: 0;
 }
 
@@ -36,7 +93,7 @@
 
 .header-icon {
   padding: 4px;
-  background: #3b82f6;
+  background: #374151;
   border-radius: 4px;
 }
 
@@ -62,7 +119,7 @@
 /* Toggle - COMPACT */
 .metric-toggle {
   display: flex;
-  background: #f3f4f6;
+  background: rgba(31, 41, 55, 0.1);
   border-radius: 6px;
   padding: 2px;
 }
@@ -87,11 +144,11 @@
 }
 
 .toggle-button.hits.active {
-  background: #10b981;
+  background: #374151;
 }
 
 .toggle-button.homeruns.active {
-  background: #ef4444;
+  background: #4b5563;
 }
 
 .toggle-button svg {
@@ -99,35 +156,38 @@
   height: 10px;
 }
 
-/* Summary Cards - TRULY TINY */
+/* Summary Cards - EXTRA COMPACT */
 .summary-stats {
   display: flex;
   gap: 4px;
-  margin-bottom: 6px;
+  margin-bottom: 4px; /* Reduced margin */
   flex-shrink: 0;
 }
 
 .summary-card {
   flex: 1;
-  padding: 3px 6px;
+  padding: 2px 4px; /* Reduced padding */
   border-radius: 4px;
   text-align: center;
-  border: 1px solid #e5e7eb;
+  border: 1px solid rgba(31, 41, 55, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
 .summary-card.blue {
-  background: #eff6ff;
-  border-color: #bfdbfe;
+  background: rgba(243, 244, 246, 0.1);
+  border-color: rgba(31, 41, 55, 0.2);
 }
 
 .summary-card.green {
-  background: #f0fdf4;
-  border-color: #bbf7d0;
+  background: rgba(243, 244, 246, 0.1);
+  border-color: rgba(31, 41, 55, 0.2);
 }
 
 .summary-card.purple {
-  background: #faf5ff;
-  border-color: #e9d5ff;
+  background: rgba(243, 244, 246, 0.1);
+  border-color: rgba(31, 41, 55, 0.2);
 }
 
 .summary-label {
@@ -146,10 +206,11 @@
 
 /* Rankings Container - MAXIMUM SPACE */
 .rankings-container {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  overflow: hidden;
 }
 
 .rankings-header {
@@ -160,7 +221,7 @@
   font-weight: 600;
   color: #6b7280;
   padding: 4px 8px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid rgba(31, 41, 55, 0.15);
   margin-bottom: 6px;
   flex-shrink: 0;
 }
@@ -172,22 +233,34 @@
 .rankings-header span:nth-child(5) { width: 40px; text-align: center; }
 .rankings-header span:nth-child(6) { flex: 1; text-align: center; }
 
-/* SCROLLABLE AREA - FIXED HEIGHT */
+/* SCROLLABLE AREA - TAKE ALL REMAINING SPACE */
 .rankings-scroll {
-  flex: 1;
+  flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 0;
   -webkit-overflow-scrolling: touch;
 }
 
+/* Glass Effect Scrollbars */
 .rankings-scroll::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
+}
+
+.rankings-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
 }
 
 .rankings-scroll::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 2px;
+  background: rgba(31, 41, 55, 0.4);
+  border-radius: 3px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.rankings-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(31, 41, 55, 0.6);
 }
 
 /* Player Rows - DEFAULT DESKTOP LAYOUT */
@@ -197,14 +270,21 @@
   gap: 8px;
   padding: 8px;
   margin-bottom: 4px;
-  background: #f9fafb;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(31, 41, 55, 0.05);
   border-radius: 6px;
-  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .player-row:hover {
-  background: #f3f4f6;
-  border-color: #d1d5db;
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(31, 41, 55, 0.1);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* Wrapper for mobile two-row layout */
@@ -252,10 +332,46 @@
   }
 }
 
+/* Player Rank Styling - ENLARGED LOGOS */
 .player-rank {
-  width: 30px;
-  text-align: center;
+  width: 48px; /* Enlarged to match other cards */
+  height: 48px; /* Enlarged to match other cards */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
+}
+
+.player-rank .rank-logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  object-fit: cover;
+  opacity: 0.7;
+}
+
+.player-rank .rank-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0.3;
+}
+
+.player-rank .rank-number {
+  position: relative;
+  z-index: 10;
+  color: white;
+  font-size: 1.125rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  line-height: 1;
 }
 
 .rank-badge {
@@ -272,7 +388,7 @@
 .rank-badge.gold { background: #fbbf24; color: #92400e; }
 .rank-badge.silver { background: #e5e7eb; color: #374151; }
 .rank-badge.bronze { background: #fed7aa; color: #c2410c; }
-.rank-badge.regular { background: #dbeafe; color: #1d4ed8; }
+.rank-badge.regular { background: #6b7280; color: white; } /* Grey for black/grey theme */
 
 .player-info {
   flex: 1;
@@ -394,11 +510,6 @@
   border-radius: 1px;
 }
 
-.drought-info {
-  color: #9ca3af;
-  font-style: italic;
-}
-
 /* Tooltip */
 .performance-tooltip {
   position: absolute;
@@ -420,14 +531,16 @@
   opacity: 1;
 }
 
-/* Footer - MINIMAL */
+/* Footer - MINIMAL SPACE ONLY */
 .dashboard-footer {
   margin-top: 6px;
   padding: 4px 0;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid rgba(31, 41, 55, 0.15);
   flex-shrink: 0;
-  min-height: 40px;
-  background: white;
+  flex-grow: 0;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
 .footer-content {
@@ -470,11 +583,69 @@
   border-radius: 2px;
 }
 
+/* Team logo background effect */
+.player-item .team-logo-bg {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 66%;
+  opacity: 0.05;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  transform: translate(20%, -10%) scale(2.2);
+  object-fit: cover;
+  object-position: center;
+}
+
+.player-item:hover .team-logo-bg {
+  opacity: 0.1;
+}
+
+/* Loading & No Data States */
+.loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+  height: 100%;
+  min-height: 420px;
+  flex-direction: column;
+}
+
+.no-data {
+  color: #888;
+  text-align: center;
+  padding: 20px 0;
+  font-style: italic;
+  height: 100%;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
 /* MOBILE RESPONSIVE - PORTRAIT TWO-ROW LAYOUT */
 @media (max-width: 768px) and (orientation: portrait) {
   .multi-hit-dashboard {
-    height: 500px;
+    
     padding: 8px;
+    grid-column: 1 / -1;
+  }
+  
+  .multi-hit-dashboard .glass-card-container {
+    min-height: auto;
+    height: auto;
+  }
+  
+  .multi-hit-dashboard .scrollable-container {
+    position: relative;
+    height: auto;
+    padding-bottom: 10px;
   }
   
   .dashboard-header {
@@ -536,17 +707,17 @@
     align-items: center;
     width: auto;
     padding: 0 6px;
-    border-left: 1px solid #e5e7eb;
+    border-left: 1px solid rgba(31, 41, 55, 0.15);
   }
   
   .stat-rate {
-    color: #10b981;
+    color: #374151;
     font-size: 11px;
     font-weight: 700;
   }
   
   .stat-avg {
-    color: #6366f1;
+    color: #6b7280;
     font-size: 9px;
     font-weight: 500;
   }
@@ -571,13 +742,23 @@
     font-size: 13px;
   }
   
+  .player-rank {
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
+  }
+  
+  .player-rank .rank-number {
+    font-size: 1rem;
+  }
+  
   /* Distribution on second row */
   .performance-distribution {
     display: block !important;
     width: 100%;
     margin-top: 6px;
     padding-top: 6px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid rgba(31, 41, 55, 0.15);
   }
   
   .distribution-bars {
@@ -604,10 +785,7 @@
 
 /* MOBILE RESPONSIVE - LANDSCAPE SINGLE ROW */
 @media (max-width: 768px) and (orientation: landscape) {
-  .multi-hit-dashboard {
-    height: 400px;
-    padding: 6px;
-  }
+
   
   .rankings-scroll {
     min-height: 0;

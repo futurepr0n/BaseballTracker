@@ -156,13 +156,15 @@ const HellraiserCard = ({ currentDate }) => {
 
   if (loading) {
     return (
-      <div className="hellraiser-card">
-        <div className="card-header">
-          <h3>🔥 Hellraiser HR Analysis</h3>
-        </div>
-        <div className="loading-state">
-          <div className="loading-spinner"></div>
-          <p>Analyzing matchups...</p>
+      <div className="card hellraiser-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>🔥 Pinheads HR Picks</h3>
+          </div>
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
+            <p>Analyzing matchups...</p>
+          </div>
         </div>
       </div>
     );
@@ -170,18 +172,20 @@ const HellraiserCard = ({ currentDate }) => {
 
   if (error) {
     return (
-      <div className="hellraiser-card">
-        <div className="card-header">
-          <h3>🔥 Hellraiser HR Analysis</h3>
-        </div>
-        <div className="error-state">
-          <p>Error: {error}</p>
-          <button onClick={loadHellraiserAnalysis} className="retry-button">
-            Retry Analysis
-          </button>
-          <p style={{fontSize: '11px', color: '#666', marginTop: '8px'}}>
-            Check browser console for detailed error logs
-          </p>
+      <div className="card hellraiser-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>🔥 Pinheads HR Picks</h3>
+          </div>
+          <div className="error-state">
+            <p>Error: {error}</p>
+            <button onClick={loadHellraiserAnalysis} className="retry-button">
+              Retry Analysis
+            </button>
+            <p style={{fontSize: '11px', color: '#666', marginTop: '8px'}}>
+              Check browser console for detailed error logs
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -190,18 +194,20 @@ const HellraiserCard = ({ currentDate }) => {
   // Show debug info if no data loaded
   if (!analysisData) {
     return (
-      <div className="hellraiser-card">
-        <div className="card-header">
-          <h3>🔥 Hellraiser HR Analysis</h3>
-        </div>
-        <div className="error-state">
-          <p>No analysis data available</p>
-          <button onClick={loadHellraiserAnalysis} className="retry-button">
-            Load Analysis
-          </button>
-          <p style={{fontSize: '11px', color: '#666', marginTop: '8px'}}>
-            Debug: Loading={loading ? 'true' : 'false'}, Error={error || 'none'}
-          </p>
+      <div className="card hellraiser-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>🔥 Pinheads HR Picks</h3>
+          </div>
+          <div className="error-state">
+            <p>No analysis data available</p>
+            <button onClick={loadHellraiserAnalysis} className="retry-button">
+              Load Analysis
+            </button>
+            <p style={{fontSize: '11px', color: '#666', marginTop: '8px'}}>
+              Debug: Loading={loading ? 'true' : 'false'}, Error={error || 'none'}
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -210,141 +216,127 @@ const HellraiserCard = ({ currentDate }) => {
   const filteredPicks = getFilteredPicks();
 
   return (
-    <div className="hellraiser-card">
-      <div className="card-header">
-        <h3>🔥 Pinheads HR Picks</h3>
-      </div>
-
-      <div className="compact-filters">
-        <div className="filter-row">
-          <span className="filter-label">Value:</span>
-          <button className={selectedValue === 'all' ? 'active' : ''} onClick={() => setSelectedValue('all')}>All</button>
-          <button className={selectedValue === 'positive' ? 'active' : ''} onClick={() => setSelectedValue('positive')}>💰 Value</button>
-          <button className={selectedValue === 'exceptional' ? 'active' : ''} onClick={() => setSelectedValue('exceptional')}>🏆 Exceptional</button>
-          <button className={selectedValue === 'fair' ? 'active' : ''} onClick={() => setSelectedValue('fair')}>⚖️ Fair</button>
-          <button className={selectedValue === 'negative' ? 'active' : ''} onClick={() => setSelectedValue('negative')}>⚠️ Overpriced</button>
-        </div>
-        <div className="filter-row">
-          <span className="filter-label">Method:</span>
-          <button className={selectedPathway === 'all' ? 'active' : ''} onClick={() => setSelectedPathway('all')}>All</button>
-          <button className={selectedPathway === 'perfectStorm' ? 'active' : ''} onClick={() => setSelectedPathway('perfectStorm')}>Perfect Storm</button>
-          <button className={selectedPathway === 'batterDriven' ? 'active' : ''} onClick={() => setSelectedPathway('batterDriven')}>Batter-Driven</button>
-          <button className={selectedPathway === 'pitcherDriven' ? 'active' : ''} onClick={() => setSelectedPathway('pitcherDriven')}>Pitcher-Driven</button>
-        </div>
-      </div>
-
-
-      <div className="picks-container">
-        {filteredPicks.length === 0 ? (
-          <div className="no-picks">
-            <p>No picks found for {selectedPathway === 'all' ? 'today' : getPathwayLabel(selectedPathway)}</p>
+    <div className="card hellraiser-card">
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>🔥 Pinheads HR Picks</h3>
+          
+          {/* Compact filters within header */}
+          <div className="compact-filters">
+            <div className="filter-row">
+              <span className="filter-label">Value:</span>
+              <button className={selectedValue === 'all' ? 'active' : ''} onClick={() => setSelectedValue('all')}>All</button>
+              <button className={selectedValue === 'positive' ? 'active' : ''} onClick={() => setSelectedValue('positive')}>💰 Value</button>
+              <button className={selectedValue === 'exceptional' ? 'active' : ''} onClick={() => setSelectedValue('exceptional')}>🏆 Exceptional</button>
+              <button className={selectedValue === 'fair' ? 'active' : ''} onClick={() => setSelectedValue('fair')}>⚖️ Fair</button>
+              <button className={selectedValue === 'negative' ? 'active' : ''} onClick={() => setSelectedValue('negative')}>⚠️ Overpriced</button>
+            </div>
+            <div className="filter-row">
+              <span className="filter-label">Method:</span>
+              <button className={selectedPathway === 'all' ? 'active' : ''} onClick={() => setSelectedPathway('all')}>All</button>
+              <button className={selectedPathway === 'perfectStorm' ? 'active' : ''} onClick={() => setSelectedPathway('perfectStorm')}>Perfect Storm</button>
+              <button className={selectedPathway === 'batterDriven' ? 'active' : ''} onClick={() => setSelectedPathway('batterDriven')}>Batter-Driven</button>
+              <button className={selectedPathway === 'pitcherDriven' ? 'active' : ''} onClick={() => setSelectedPathway('pitcherDriven')}>Pitcher-Driven</button>
+            </div>
           </div>
-        ) : (
-          <div className="picks-list">
-            {filteredPicks.map((pick, index) => (
-              <div key={index} className="pick-item">
-                <div className="pick-header" onClick={() => toggleDetails(index)}>
-                  <div className="pick-main-info">
-                    <span className="player-name">
-                      {getClassificationIcon(pick.classification)} {pick.playerName}
-                    </span>
-                    <span className="team">{pick.team}</span>
-                    <span className="vs-info">vs {pick.pitcher}</span>
-                  </div>
-                  
-                  <div className="pick-metrics">
-                    <div 
-                      className="confidence-score"
-                      style={{ backgroundColor: getConfidenceColor(pick.confidenceScore) }}
-                    >
-                      {pick.confidenceScore}
-                    </div>
-                    <span className="classification">{pick.classification}</span>
-                    {pick.odds && (
-                      <span className="odds">
-                        {pick.odds.american}
+        </div>
+
+        <div className="scrollable-container">
+          {filteredPicks.length === 0 ? (
+            <div className="no-picks">
+              <p>No picks found for {selectedPathway === 'all' ? 'today' : getPathwayLabel(selectedPathway)}</p>
+            </div>
+          ) : (
+            <div className="picks-list">
+              {filteredPicks.map((pick, index) => (
+                <div key={index} className="pick-item">
+                  <div className="pick-header" onClick={() => toggleDetails(index)}>
+                    <div className="pick-main-info">
+                      <span className="player-name">
+                        {getClassificationIcon(pick.classification)} {pick.playerName}
                       </span>
+                      <span className="team">{pick.team}</span>
+                      <span className="vs-info">vs {pick.pitcher}</span>
+                    </div>
+                    
+                    <div className="pick-metrics">
+                      <div 
+                        className="confidence-score"
+                        style={{ backgroundColor: getConfidenceColor(pick.confidenceScore) }}
+                      >
+                        {pick.confidenceScore}
+                      </div>
+                      <span className="classification">{pick.classification}</span>
+                      {pick.odds && (
+                        <span className="odds">
+                          {pick.odds.american}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="pick-summary">
+                    <span className="pathway-tag">{getPathwayLabel(pick.pathway)}</span>
+                    <span className="game-info">{pick.game}</span>
+                    {(pick.marketEfficiency === 'Undervalued' || pick.marketEfficiency?.value === 'positive') && (
+                      <span className="value-tag">💰 Value</span>
                     )}
                   </div>
-                </div>
 
-                <div className="pick-summary">
-                  <span className="pathway-tag">{getPathwayLabel(pick.pathway)}</span>
-                  <span className="game-info">{pick.game}</span>
-                  {(pick.marketEfficiency === 'Undervalued' || pick.marketEfficiency?.value === 'positive') && (
-                    <span className="value-tag">💰 Value</span>
+                  {showDetails[index] && (
+                    <div className="pick-details">
+                      <div className="reasoning-section">
+                        <h5>Analysis Reasoning:</h5>
+                        <p>{pick.reasoning}</p>
+                      </div>
+
+                      {pick.riskFactors?.length > 0 && (
+                        <div className="risk-factors">
+                          <h5>Risk Factors:</h5>
+                          <ul>
+                            {pick.riskFactors.map((risk, i) => (
+                              <li key={i} className="risk-factor">⚠️ {risk}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {pick.marketEfficiency && (
+                        <div className="market-analysis">
+                          <h5>Market Analysis:</h5>
+                          <div className="market-details">
+                            {typeof pick.marketEfficiency === 'string' ? (
+                              // Handle legacy string format
+                              <span className={`market-efficiency ${pick.marketEfficiency.toLowerCase()}`}>
+                                Market Assessment: <strong>{pick.marketEfficiency}</strong>
+                              </span>
+                            ) : (
+                              // Handle detailed object format (preferred)
+                              <>
+                                <span>Model Probability: {(pick.marketEfficiency.modelProbability * 100).toFixed(1)}%</span>
+                                <span>Implied Probability: {(pick.marketEfficiency.impliedProbability * 100).toFixed(1)}%</span>
+                                <span className={`edge ${pick.marketEfficiency.value}`}>
+                                  Edge: {(pick.marketEfficiency.edge * 100).toFixed(1)}%
+                                </span>
+                                <span className={`assessment ${pick.marketEfficiency.value}`}>
+                                  Assessment: <strong>{pick.marketEfficiency.assessment}</strong>
+                                </span>
+                                {pick.marketEfficiency.reasoning && (
+                                  <div className="value-reasoning">
+                                    <em>{pick.marketEfficiency.reasoning}</em>
+                                  </div>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
-
-                {showDetails[index] && (
-                  <div className="pick-details">
-                    <div className="reasoning-section">
-                      <h5>Analysis Reasoning:</h5>
-                      <p>{pick.reasoning}</p>
-                    </div>
-
-                    {pick.riskFactors?.length > 0 && (
-                      <div className="risk-factors">
-                        <h5>Risk Factors:</h5>
-                        <ul>
-                          {pick.riskFactors.map((risk, i) => (
-                            <li key={i} className="risk-factor">⚠️ {risk}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {pick.marketEfficiency && (
-                      <div className="market-analysis">
-                        <h5>Market Analysis:</h5>
-                        <div className="market-details">
-                          {typeof pick.marketEfficiency === 'string' ? (
-                            // Handle legacy string format
-                            <span className={`market-efficiency ${pick.marketEfficiency.toLowerCase()}`}>
-                              Market Assessment: <strong>{pick.marketEfficiency}</strong>
-                            </span>
-                          ) : (
-                            // Handle detailed object format (preferred)
-                            <>
-                              <span>Model Probability: {(pick.marketEfficiency.modelProbability * 100).toFixed(1)}%</span>
-                              <span>Implied Probability: {(pick.marketEfficiency.impliedProbability * 100).toFixed(1)}%</span>
-                              <span className={`edge ${pick.marketEfficiency.value}`}>
-                                Edge: {(pick.marketEfficiency.edge * 100).toFixed(1)}%
-                              </span>
-                              <span className={`assessment ${pick.marketEfficiency.value}`}>
-                                Assessment: <strong>{pick.marketEfficiency.assessment}</strong>
-                              </span>
-                              {pick.marketEfficiency.reasoning && (
-                                <div className="value-reasoning">
-                                  <em>{pick.marketEfficiency.reasoning}</em>
-                                </div>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="card-footer">
-        <div className="methodology-info">
-          <small>
-            Based on the Hellraiser v3.0 systematic HR analysis model
-          </small>
-        </div>
-        <div className="last-updated">
-          <small>
-            Updated: {analysisData?.updatedAt ? 
-              new Date(analysisData.updatedAt).toLocaleTimeString() : 
-              'Unknown'
-            }
-          </small>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

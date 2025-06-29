@@ -1,7 +1,99 @@
-/**
- * Poor Performance Card Styles
- * Displays players with performance risk indicators
- */
+/* PoorPerformanceCard.css - Glass Effect with Enhanced Red/Orange Theme */
+
+.poor-performance-card {
+  grid-column: span 1;
+  background: rgba(220, 38, 38, 0.05);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-left: 4px solid #dc2626;
+  border-radius: 12px;
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  box-shadow: 
+    0 8px 32px rgba(220, 38, 38, 0.08),
+    0 2px 8px rgba(220, 38, 38, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Glass card container for proper layering */
+.poor-performance-card .glass-card-container {
+  position: relative;
+  height: 100%;
+  min-height: 420px;
+}
+
+/* Glass header that content scrolls behind */
+.poor-performance-card .glass-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: rgba(220, 38, 38, 0.08);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(220, 38, 38, 0.15);
+  padding: 20px;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.05);
+}
+
+.poor-performance-card .glass-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Glass Effect Scrollable Container */
+.poor-performance-card .scrollable-container {
+  background: rgba(254, 242, 242, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 100px; /* Space for header */
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
+
+/* Glass Effect Scrollbar */
+.poor-performance-card .scrollable-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.poor-performance-card .scrollable-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.poor-performance-card .scrollable-container::-webkit-scrollbar-thumb {
+  background: rgba(220, 38, 38, 0.4);
+  border-radius: 3px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.poor-performance-card .scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(220, 38, 38, 0.6);
+}
+
+/* Player list styling */
+.poor-performance-card .player-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 
 .poor-performance-card .risk-item {
   display: grid;
@@ -9,6 +101,11 @@
   gap: 12px;
   align-items: center;
   padding: 12px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(220, 38, 38, 0.12);
   border-radius: 8px;
   transition: all 0.2s ease;
   position: relative;
@@ -16,11 +113,87 @@
 }
 
 .poor-performance-card .risk-item:hover {
-  background-color: rgba(220, 53, 69, 0.05);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.2);
 }
 
+.poor-performance-card .risk-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Player rank styling */
+.poor-performance-card .player-rank {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #dc2626;
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.poor-performance-card .player-rank .rank-logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.7;
+}
+
+.poor-performance-card .player-rank .rank-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0.3;
+}
+
+.poor-performance-card .player-rank .rank-number {
+  position: relative;
+  z-index: 10;
+  color: white;
+  font-size: 1.125rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Player info styling */
+.poor-performance-card .player-info {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 4px;
+  border-radius: 4px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  margin-right: 10px;
+}
+
+.poor-performance-card .player-info:hover {
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+.poor-performance-card .player-name {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.poor-performance-card .player-team {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+}
+
+/* Risk stats styling */
 .poor-performance-card .risk-stats {
   display: flex;
   flex-direction: column;
@@ -58,13 +231,14 @@
   font-weight: 600;
   padding: 2px 6px;
   border-radius: 12px;
-  background-color: rgba(220, 53, 69, 0.1);
-  border: 1px solid rgba(220, 53, 69, 0.3);
+  background-color: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.3);
   display: inline-flex;
   align-items: center;
   gap: 4px;
 }
 
+/* Risk factors styling */
 .poor-performance-card .risk-factors {
   display: flex;
   flex-direction: column;
@@ -91,27 +265,106 @@
   white-space: nowrap;
 }
 
-/* Player info hover effects */
-.poor-performance-card .player-info {
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 4px;
-  border-radius: 4px;
+/* Enhanced background logo */
+.poor-performance-card .risk-item .team-logo-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 800px;
+  height: 800px;
+  opacity: 0.06;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
 }
 
-.poor-performance-card .player-info:hover {
-  background-color: rgba(220, 53, 69, 0.1);
+.poor-performance-card .risk-item:hover .team-logo-bg {
+  opacity: 0.1;
+}
+
+/* Tooltip trigger button */
+.poor-performance-card .tooltip-trigger {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
+}
+
+.poor-performance-card .tooltip-trigger:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+}
+
+/* Card subtitle styling */
+.poor-performance-card .card-subtitle {
+  font-size: 0.8rem;
+  color: #dc3545;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* Loading and no data states */
+.poor-performance-card .loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.poor-performance-card .no-data {
+  color: #888;
+  text-align: center;
+  padding: 40px 20px;
+  font-style: italic;
+}
+
+.poor-performance-card .error-message {
+  color: #dc3545;
+  text-align: center;
+  padding: 40px 20px;
+  font-style: italic;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .poor-performance-card {
+    grid-column: 1 / -1;
+  }
+  
+  .poor-performance-card .glass-card-container {
+    min-height: auto;
+    height: auto;
+  }
+  
+  .poor-performance-card .scrollable-container {
+    position: relative;
+    height: auto;
+    max-height: 60vh;
+    padding-bottom: 10px;
+    padding-top: 80px;
+  }
+  
   .poor-performance-card .risk-item {
     grid-template-columns: 50px 1fr auto auto;
     gap: 8px;
+    padding: 10px 6px;
   }
   
   .poor-performance-card .risk-factors {
-    display: none; /* Hide on mobile to save space */
+    display: none;
   }
   
   .poor-performance-card .risk-stats {
@@ -126,6 +379,16 @@
     font-size: 0.7rem;
     padding: 1px 4px;
   }
+  
+  .poor-performance-card .player-rank {
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
+  }
+  
+  .poor-performance-card .player-rank .rank-number {
+    font-size: 1rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -135,95 +398,6 @@
   }
   
   .poor-performance-card .risk-level {
-    display: none; /* Hide risk level on very small screens */
+    display: none;
   }
-}
-
-/* Loading and no-data states */
-.poor-performance-card .loading-indicator,
-.poor-performance-card .no-data {
-  text-align: center;
-  padding: 40px 20px;
-  color: #666;
-  font-style: italic;
-}
-
-.poor-performance-card .loading-indicator {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: loading-shimmer 1.5s infinite;
-  border-radius: 4px;
-}
-
-@keyframes loading-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* Card subtitle styling */
-.poor-performance-card .card-subtitle {
-  font-size: 0.8rem;
-  color: #dc3545;
-  margin-bottom: 12px;
-  font-weight: 500;
-}
-
-/* Risk-specific animations */
-.poor-performance-card .risk-item {
-  animation: fadeInUp 0.3s ease-out;
-}
-
-.poor-performance-card .risk-item:nth-child(1) { animation-delay: 0.1s; }
-.poor-performance-card .risk-item:nth-child(2) { animation-delay: 0.15s; }
-.poor-performance-card .risk-item:nth-child(3) { animation-delay: 0.2s; }
-.poor-performance-card .risk-item:nth-child(4) { animation-delay: 0.25s; }
-.poor-performance-card .risk-item:nth-child(5) { animation-delay: 0.3s; }
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Risk level specific styling */
-.poor-performance-card .risk-item[data-risk="HIGH"] {
-  background: linear-gradient(135deg, rgba(220, 53, 69, 0.05) 0%, rgba(220, 53, 69, 0.02) 100%);
-  border-left: 3px solid #dc3545;
-}
-
-.poor-performance-card .risk-item[data-risk="MEDIUM"] {
-  background: linear-gradient(135deg, rgba(253, 126, 20, 0.05) 0%, rgba(253, 126, 20, 0.02) 100%);
-  border-left: 3px solid #fd7e14;
-}
-
-.poor-performance-card .risk-item[data-risk="LOW"] {
-  background: linear-gradient(135deg, rgba(255, 193, 7, 0.05) 0%, rgba(255, 193, 7, 0.02) 100%);
-  border-left: 3px solid #ffc107;
-}
-
-/* Tooltip trigger button */
-.poor-performance-card .tooltip-trigger {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-  border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
-}
-
-.poor-performance-card .tooltip-trigger:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
-  background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
 }

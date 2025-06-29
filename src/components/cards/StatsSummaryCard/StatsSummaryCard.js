@@ -1,4 +1,5 @@
 import React from 'react';
+import GlassCard from '../GlassCard/GlassCard';
 import './StatsSummaryCard.css';
 
 /**
@@ -25,7 +26,7 @@ const StatsSummaryCard = ({
     sum + (player.IP === 'DNP' ? 0 : (Number(player.IP) || 0)), 0);
 
   return (
-    <div className="card stats-summary-card">
+    <GlassCard className="stats-summary-card" variant="default">
       <h3>Daily Statistics</h3>
       <div className="stats-grid">
         <div className="stat-item">
@@ -53,7 +54,7 @@ const StatsSummaryCard = ({
           <span className="stat-label">Innings Pitched</span>
         </div>
       </div>
-    </div>
+    </GlassCard>
   );
 };
 

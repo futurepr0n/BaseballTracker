@@ -1,5 +1,8 @@
 /* Main Application Styling */
 
+/* Import Glass Card Performance Optimizations */
+@import './components/cards/GlassCardOptimizations.css';
+
 * {
     box-sizing: border-box;
     margin: 0;

@@ -63,48 +63,51 @@ const TopHittersCard = ({
 
   return (
     <div className="card top-hitters-card">
-      <h3>🎯 Top Hitters ({timePeriodText})</h3>
-      
-      {/* Enhanced subtitle with team context */}
-      {teamContext && (
-        <div className="card-subtitle team-context">
-          {teamContext.includeMatchup && teamContext.matchupName 
-            ? `${teamContext.teamName} vs ${teamContext.matchupName} hitting performance`
-            : `${teamContext.teamName} hitting performance`
-          }
-          <br />
-          <span className="context-details">
-            {teamContext.showing} of {teamContext.totalHitters} team hitters
-          </span>
-        </div>
-      )}
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>🎯 Top Hitters ({timePeriodText})</h3>
+          
+          {/* Enhanced subtitle with team context */}
+          {teamContext && (
+            <div className="card-subtitle team-context">
+              {teamContext.includeMatchup && teamContext.matchupName 
+                ? `${teamContext.teamName} vs ${teamContext.matchupName} hitting performance`
+                : `${teamContext.teamName} hitting performance`
+              }
+              <br />
+              <span className="context-details">
+                {teamContext.showing} of {teamContext.totalHitters} team hitters
+              </span>
+            </div>
+          )}
 
-      {/* Team hitting summary when filtering */}
-      {teamSummary && (
-        <div className="team-hitting-summary">
-          <div className="summary-stats">
-            <div className="summary-stat">
-              <span className="stat-value">{teamSummary.totalHits}</span>
-              <span className="stat-label">Total Hits</span>
-            </div>
-            <div className="summary-stat">
-              <span className="stat-value">{teamSummary.playersWithHits}</span>
-              <span className="stat-label">Players with Hits</span>
-            </div>
-            {teamSummary.topHitter && (
-              <div className="summary-stat">
-                <span className="stat-value">{teamSummary.topHitter.hits}</span>
-                <span className="stat-label">Team Leader ({teamSummary.topHitter.name})</span>
+          {/* Team hitting summary when filtering */}
+          {teamSummary && (
+            <div className="team-hitting-summary">
+              <div className="summary-stats">
+                <div className="summary-stat">
+                  <span className="stat-value">{teamSummary.totalHits}</span>
+                  <span className="stat-label">Total Hits</span>
+                </div>
+                <div className="summary-stat">
+                  <span className="stat-value">{teamSummary.playersWithHits}</span>
+                  <span className="stat-label">Players with Hits</span>
+                </div>
+                {teamSummary.topHitter && (
+                  <div className="summary-stat">
+                    <span className="stat-value">{teamSummary.topHitter.hits}</span>
+                    <span className="stat-label">Team Leader ({teamSummary.topHitter.name})</span>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
-      )}
-      
-      {isLoading ? (
-        <div className="loading-indicator">Loading hitting stats...</div>
-      ) : displayHitters.length > 0 ? (
-        <div className="scrollable-container">
+        
+        {isLoading ? (
+          <div className="loading-indicator">Loading hitting stats...</div>
+        ) : displayHitters.length > 0 ? (
+          <div className="scrollable-container">
           <ul className="player-list">
             {displayHitters.map((player, index) => {
               // Get team logo URL if teams data is available
@@ -174,15 +177,16 @@ const TopHittersCard = ({
               Showing top {teamContext.showing} of {teamContext.totalHitters} {teamContext.teamName} hitters
             </div>
           )}
-        </div>
-      ) : (
-        <p className="no-data">
-          {isFiltering 
-            ? `No hitting data available for ${teamContext?.teamName || 'selected team'}`
-            : 'No hitting data available for this period'
-          }
-        </p>
-      )}
+          </div>
+        ) : (
+          <p className="no-data">
+            {isFiltering 
+              ? `No hitting data available for ${teamContext?.teamName || 'selected team'}`
+              : 'No hitting data available for this period'
+            }
+          </p>
+        )}
+      </div>
     </div>
   );
 };

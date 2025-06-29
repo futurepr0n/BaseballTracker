@@ -1,6 +1,7 @@
-/* ImprovedRateCard.css - Glass Effect */
+/* HitDroughtBounceBackCard.css - Glass Effect Emerald Theme */
 
-.improved-rate-card {
+/* ========== HIT DROUGHT BOUNCE BACK (Emerald Theme) ========== */
+.hit-drought-bounce-back-card {
   grid-column: span 1;
   background: rgba(16, 185, 129, 0.05);
   border: 1px solid rgba(16, 185, 129, 0.2);
@@ -13,18 +14,19 @@
   padding: 0;
   box-shadow: 
     0 8px 32px rgba(16, 185, 129, 0.08),
-    0 2px 8px rgba(16, 185, 129, 0.03);
+    0 2px 8px rgba(16, 185, 129, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 /* Glass card container for proper layering */
-.improved-rate-card .glass-card-container {
+.hit-drought-bounce-back-card .glass-card-container {
   position: relative;
   height: 100%;
   min-height: 420px;
 }
 
 /* Glass header that content scrolls behind */
-.improved-rate-card .glass-header {
+.hit-drought-bounce-back-card .glass-header {
   position: absolute;
   top: 0;
   left: 0;
@@ -39,16 +41,22 @@
   box-shadow: 0 4px 16px rgba(16, 185, 129, 0.05);
 }
 
-.improved-rate-card .glass-header h3 {
+.hit-drought-bounce-back-card .glass-header h3 {
   margin: 0;
   color: #333;
   font-size: 1.1rem;
   font-weight: 600;
 }
 
+.hit-drought-bounce-back-card .card-subtitle {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 5px;
+}
+
 /* Glass Effect Scrollable Container */
-.improved-rate-card .scrollable-container {
-  background: rgba(236, 252, 243, 0.4);
+.hit-drought-bounce-back-card .scrollable-container {
+  background: rgba(209, 250, 229, 0.4);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-radius: 0 0 12px 12px;
@@ -60,20 +68,20 @@
   left: 0;
   right: 0;
   bottom: 0;
-  padding-top: 100px; /* Space for header */
+  padding-top: 80px;
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 20px;
 }
 
 /* Player list styling */
-.improved-rate-card .player-list {
+.hit-drought-bounce-back-card .player-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.improved-rate-card .player-item {
+.hit-drought-bounce-back-card .player-item {
   display: flex;
   align-items: center;
   padding: 12px;
@@ -81,134 +89,150 @@
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 8px;
   transition: all 0.2s ease;
   position: relative;
+  overflow: hidden;
 }
 
-.improved-rate-card .player-item:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
-  border-color: rgba(16, 185, 129, 0.2);
-}
-
-.improved-rate-card .player-item:last-child {
+.hit-drought-bounce-back-card .player-item:last-child {
   margin-bottom: 0;
 }
 
-/* Glass Effect Scrollbar */
-.improved-rate-card .scrollable-container::-webkit-scrollbar {
+.hit-drought-bounce-back-card .player-item:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Glass Effect Scrollbars */
+.hit-drought-bounce-back-card .scrollable-container::-webkit-scrollbar {
   width: 6px;
 }
 
-.improved-rate-card .scrollable-container::-webkit-scrollbar-track {
+.hit-drought-bounce-back-card .scrollable-container::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
 }
 
-.improved-rate-card .scrollable-container::-webkit-scrollbar-thumb {
+.hit-drought-bounce-back-card .scrollable-container::-webkit-scrollbar-thumb {
   background: rgba(16, 185, 129, 0.4);
   border-radius: 3px;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
 }
 
-.improved-rate-card .scrollable-container::-webkit-scrollbar-thumb:hover {
+.hit-drought-bounce-back-card .scrollable-container::-webkit-scrollbar-thumb:hover {
   background: rgba(16, 185, 129, 0.6);
 }
 
-/* Player rank styling */
-.improved-rate-card .player-rank {
+/* Player Rank Styling */
+.hit-drought-bounce-back-card .player-rank {
   width: 48px;
   height: 48px;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #10b981; /* Emerald green for improved rate */
-  color: white;
   border-radius: 50%;
   font-weight: bold;
   margin-right: 16px;
-  position: relative;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
 }
 
-.improved-rate-card .player-rank .rank-logo {
+.hit-drought-bounce-back-card .player-rank .rank-logo {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  padding: 0;
   object-fit: cover;
   opacity: 0.7;
 }
 
-.improved-rate-card .player-rank .rank-overlay {
+.hit-drought-bounce-back-card .player-rank .rank-overlay {
   position: absolute;
   inset: 0;
   background-color: currentColor;
   opacity: 0.3;
 }
 
-.improved-rate-card .player-rank .rank-number {
+.hit-drought-bounce-back-card .player-rank .rank-number {
   position: relative;
   z-index: 10;
   color: white;
   font-size: 1.125rem;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  line-height: 1;
 }
 
-/* Player info styling */
-.improved-rate-card .player-info {
+/* Player Info Styling */
+.hit-drought-bounce-back-card .player-info {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   margin-right: 10px;
 }
 
-.improved-rate-card .player-name {
+.hit-drought-bounce-back-card .player-name {
   font-weight: 500;
   color: #333;
   font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.improved-rate-card .player-team {
+.hit-drought-bounce-back-card .player-team {
   font-size: 0.85rem;
   color: #666;
   font-weight: 600;
 }
 
-/* Player stats styling */
-.improved-rate-card .player-stat {
+/* Drought Indicator */
+.hit-drought-bounce-back-card .drought-indicator {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Player Stats Styling */
+.hit-drought-bounce-back-card .player-stat {
   display: flex;
   flex-direction: column;
   min-width: 120px;
   align-items: flex-end;
-  line-height: 1.3;
   text-align: right;
+  flex-shrink: 0;
 }
 
-.improved-rate-card .stat-highlight {
+.hit-drought-bounce-back-card .stat-highlight {
   font-weight: 700;
   font-size: 1.1rem;
   color: #10b981;
+  margin-bottom: 2px;
 }
 
-.improved-rate-card small {
+.hit-drought-bounce-back-card .stat-note {
   display: block;
   font-size: 0.75rem;
   font-weight: normal;
   color: #666;
   line-height: 1.4;
-  text-align: right;
-  margin-top: 2px;
 }
 
-/* Enhanced background logo */
-.improved-rate-card .player-item .team-logo-bg {
+/* Team logo background effect */
+.hit-drought-bounce-back-card .player-item .team-logo-bg {
   position: absolute;
   right: 0;
   top: 0;
@@ -223,80 +247,78 @@
   object-position: center;
 }
 
-.improved-rate-card .player-item:hover .team-logo-bg {
+.hit-drought-bounce-back-card .player-item:hover .team-logo-bg {
   opacity: 0.1;
 }
 
-/* Special highlighting for top performers */
-.improved-rate-card .player-item:first-child .stat-highlight {
-  font-size: 1.3rem;
-  text-shadow: 0 1px 2px rgba(16, 185, 129, 0.3);
-}
-
-.improved-rate-card .player-item:nth-child(2) .stat-highlight {
-  font-size: 1.2rem;
-}
-
-.improved-rate-card .player-item:nth-child(3) .stat-highlight {
-  font-size: 1.15rem;
-}
-
-/* Loading and no data states */
-.improved-rate-card .loading-indicator {
+/* Loading & No Data States */
+.hit-drought-bounce-back-card .loading-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
+  padding: 20px;
   color: #666;
   font-style: italic;
+  height: 100%;
+  min-height: 420px;
+  flex-direction: column;
 }
 
-.improved-rate-card .no-data {
+.hit-drought-bounce-back-card .no-data {
   color: #888;
   text-align: center;
-  padding: 40px 20px;
+  padding: 20px 0;
   font-style: italic;
+  height: 100%;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
-/* Responsive adjustments */
+/* Mobile Responsive */
 @media (max-width: 768px) {
-  .improved-rate-card {
+  .hit-drought-bounce-back-card {
     grid-column: 1 / -1;
   }
   
-  /* Remove footer space in mobile */
-  .improved-rate-card .glass-card-container {
+  .hit-drought-bounce-back-card .glass-card-container {
     min-height: auto;
     height: auto;
   }
   
-  .improved-rate-card .scrollable-container {
+  .hit-drought-bounce-back-card .scrollable-container {
     position: relative;
     height: auto;
     max-height: 60vh;
     padding-bottom: 10px;
-    padding-top: 80px; /* Less top padding on mobile */
   }
   
-  .improved-rate-card .player-item {
+  .hit-drought-bounce-back-card .player-item {
     padding: 10px 6px;
   }
   
-  .improved-rate-card .player-rank {
+  .hit-drought-bounce-back-card .player-rank {
     width: 40px;
     height: 40px;
     margin-right: 12px;
   }
   
-  .improved-rate-card .player-rank .rank-number {
+  .hit-drought-bounce-back-card .player-rank .rank-number {
     font-size: 1rem;
   }
   
-  .improved-rate-card .player-stat {
+  .hit-drought-bounce-back-card .player-name {
+    font-size: 0.9rem;
+  }
+  
+  .hit-drought-bounce-back-card .player-stat {
     min-width: 100px;
   }
   
-  .improved-rate-card .stat-highlight {
-    font-size: 1rem !important;
+  .hit-drought-bounce-back-card .drought-indicator {
+    font-size: 0.7rem;
+    padding: 1px 4px;
   }
 }

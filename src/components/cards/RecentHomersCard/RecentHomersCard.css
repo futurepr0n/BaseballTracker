@@ -1,8 +1,76 @@
-/* RecentHomersCard.css */
+/* RecentHomersCard.css - Glass Effect */
 
 .recent-homers-card {
   grid-column: span 1;
-  background-color: white;
+  background: rgba(230, 57, 70, 0.05);
+  border: 1px solid rgba(230, 57, 70, 0.2);
+  border-left: 4px solid #e63946;
+  border-radius: 12px;
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  box-shadow: 
+    0 8px 32px rgba(230, 57, 70, 0.08),
+    0 2px 8px rgba(230, 57, 70, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Glass card container for proper layering */
+.recent-homers-card .glass-card-container {
+  position: relative;
+  height: 100%;
+  min-height: 420px;
+}
+
+/* Glass header that content scrolls behind */
+.recent-homers-card .glass-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: rgba(230, 57, 70, 0.08);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(230, 57, 70, 0.15);
+  padding: 20px;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(230, 57, 70, 0.05);
+}
+
+.recent-homers-card .glass-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.recent-homers-card .card-subtitle {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 5px;
+}
+
+/* Glass Effect Scrollable Container */
+.recent-homers-card .scrollable-container {
+  background: rgba(255, 235, 238, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 100px; /* Extra space for header with subtitle */
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
 }
 
 /* Player list styling */
@@ -15,20 +83,47 @@
 .recent-homers-card .player-item {
   display: flex;
   align-items: center;
-  padding: 12px 8px;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(230, 57, 70, 0.12);
+  border-radius: 8px;
   transition: all 0.2s ease;
   position: relative;
-  overflow: hidden;
 }
 
 .recent-homers-card .player-item:hover {
-  background-color: rgba(230, 57, 70, 0.05);
-  transform: translateX(2px);
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.08);
+  border-color: rgba(230, 57, 70, 0.2);
 }
 
 .recent-homers-card .player-item:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
+}
+
+/* Glass Effect Scrollbar */
+.recent-homers-card .scrollable-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.recent-homers-card .scrollable-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.recent-homers-card .scrollable-container::-webkit-scrollbar-thumb {
+  background: rgba(230, 57, 70, 0.4);
+  border-radius: 3px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.recent-homers-card .scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(230, 57, 70, 0.6);
 }
 
 /* Player rank styling */
@@ -373,5 +468,24 @@
   
   .recent-homers-card .player-item:hover {
     background-color: rgba(230, 57, 70, 0.1);
+  }
+}
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .recent-homers-card {
+    grid-column: 1 / -1;
+  }
+  
+  /* Remove footer space in mobile */
+  .recent-homers-card .glass-card-container {
+    min-height: auto;
+    height: auto;
+  }
+  
+  .recent-homers-card .scrollable-container {
+    position: relative;
+    height: auto;
+    max-height: 60vh;
+    padding-bottom: 10px;
   }
 }

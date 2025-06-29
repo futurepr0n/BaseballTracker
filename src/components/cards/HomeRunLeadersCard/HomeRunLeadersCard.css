@@ -1,8 +1,81 @@
-/* HomeRunLeadersCard.css */
+/* HomeRunLeadersCard.css - Glass Effect */
 
 .hr-leaders-card {
   grid-column: span 1;
-  background-color: white;
+  background: rgba(230, 57, 70, 0.05);
+  border: 1px solid rgba(230, 57, 70, 0.2);
+  border-left: 4px solid #e63946;
+  border-radius: 12px;
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  box-shadow: 
+    0 8px 32px rgba(230, 57, 70, 0.08),
+    0 2px 8px rgba(230, 57, 70, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Glass card container for proper layering */
+.hr-leaders-card .glass-card-container {
+  position: relative;
+  height: 100%;
+  min-height: 420px;
+}
+
+/* Glass header that content scrolls behind */
+.hr-leaders-card .glass-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: rgba(230, 57, 70, 0.08);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(230, 57, 70, 0.15);
+  padding: 20px;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(230, 57, 70, 0.05);
+}
+
+.hr-leaders-card .glass-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.hr-leaders-card .card-subtitle {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 5px;
+}
+
+.hr-leaders-card .team-hr-summary {
+  margin-top: 10px;
+  font-size: 0.8rem;
+}
+
+/* Glass Effect Scrollable Container */
+.hr-leaders-card .scrollable-container {
+  background: rgba(255, 235, 238, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 140px; /* Extra space for complex header with team summary */
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
 }
 
 /* Player list styling */
@@ -15,20 +88,47 @@
 .hr-leaders-card .player-item {
   display: flex;
   align-items: center;
-  padding: 12px 8px;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(230, 57, 70, 0.12);
+  border-radius: 8px;
   transition: all 0.2s ease;
   position: relative;
-  overflow: hidden;
 }
 
 .hr-leaders-card .player-item:hover {
-  background-color: rgba(230, 57, 70, 0.05);
-  transform: translateX(2px);
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.08);
+  border-color: rgba(230, 57, 70, 0.2);
 }
 
 .hr-leaders-card .player-item:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
+}
+
+/* Glass Effect Scrollbar */
+.hr-leaders-card .scrollable-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.hr-leaders-card .scrollable-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.hr-leaders-card .scrollable-container::-webkit-scrollbar-thumb {
+  background: rgba(230, 57, 70, 0.4);
+  border-radius: 3px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.hr-leaders-card .scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(230, 57, 70, 0.6);
 }
 
 /* Player rank styling */
@@ -472,5 +572,24 @@
   
   .hr-leaders-card .context-details {
     color: #f87171;
+  }
+}
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .hr-leaders-card {
+    grid-column: 1 / -1;
+  }
+  
+  /* Remove footer space in mobile */
+  .hr-leaders-card .glass-card-container {
+    min-height: auto;
+    height: auto;
+  }
+  
+  .hr-leaders-card .scrollable-container {
+    position: relative;
+    height: auto;
+    max-height: 60vh;
+    padding-bottom: 10px;
   }
 }

@@ -43,11 +43,14 @@ const LikelyToHitCard = ({
 
   return (
     <div className="card likely-to-hit-card">
-      <h3>Players Due for a Hit</h3>
-      {isLoading ? (
-        <div className="loading-indicator">Loading stats...</div>
-      ) : hitStreakData.likelyToGetHit && hitStreakData.likelyToGetHit.length > 0 ? (
-        <div className="scrollable-container">
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>Players Due for a Hit</h3>
+        </div>
+        {isLoading ? (
+          <div className="loading-indicator">Loading stats...</div>
+        ) : hitStreakData.likelyToGetHit && hitStreakData.likelyToGetHit.length > 0 ? (
+          <div className="scrollable-container">
           <ul className="player-list">
             {hitStreakData.likelyToGetHit.slice(0, 10).map((player, index) => {
               const safeId = createSafeId(player.name, player.team);
@@ -119,10 +122,11 @@ const LikelyToHitCard = ({
               );
             })}
           </ul>
-        </div>
-      ) : (
-        <p className="no-data">No players currently predicted for hits</p>
-      )}
+          </div>
+        ) : (
+          <p className="no-data">No players currently predicted for hits</p>
+        )}
+      </div>
 
       {/* Tooltips rendered outside card to avoid clipping - keep as is */}
       {activeTooltip && activeTooltip.startsWith('likely_hit_') && (

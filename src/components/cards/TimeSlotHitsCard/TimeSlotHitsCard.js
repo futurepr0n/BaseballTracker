@@ -8,6 +8,7 @@ import {
   findPlayersInTimeSlot,
   getCurrentTimeSlot
 } from '../../../services/dataService';
+import './TimeSlotHitsCard.css';
 
 
 const TimeSlotHitsCard = ({ gameData, currentDate, teams }) => {
@@ -134,35 +135,46 @@ const TimeSlotHitsCard = ({ gameData, currentDate, teams }) => {
 
   if (loading) {
     return (
-      <div className="card">
-        <h3>⏰ Hits by Time Slot</h3>
-        <div className="loading-indicator">Analyzing time slot patterns...</div>
+      <div className="card time-slot-hits-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>⏰ Hits by Time Slot</h3>
+          </div>
+          <div className="loading-indicator">Analyzing time slot patterns...</div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="card">
-        <h3>⏰ Hits by Time Slot</h3>
-        <div className="no-data">Error: {error}</div>
+      <div className="card time-slot-hits-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>⏰ Hits by Time Slot</h3>
+          </div>
+          <div className="no-data">Error: {error}</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="card">
-      <h3>⏰ Hits by Time Slot</h3>
-      <p className="card-subtitle">
-        Best performers in {currentTimeSlot} (min. 3 games)
-      </p>
-      
-      {timeSlotData.length === 0 ? (
-        <div className="no-data">
-          No sufficient time slot history for today's players
+    <div className="card time-slot-hits-card">
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>⏰ Hits by Time Slot</h3>
+          <p className="card-subtitle">
+            Best performers in {currentTimeSlot} (min. 3 games)
+          </p>
         </div>
-      ) : (
-        <div className="scrollable-container">
+        
+        {timeSlotData.length === 0 ? (
+          <div className="no-data">
+            No sufficient time slot history for today's players
+          </div>
+        ) : (
+          <div className="scrollable-container">
           <ul className="player-list">
             {timeSlotData.map((player, index) => {
               const teamInfo = getTeamInfo(player.team);
@@ -212,8 +224,9 @@ const TimeSlotHitsCard = ({ gameData, currentDate, teams }) => {
               );
             })}
           </ul>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -342,42 +355,52 @@ const TimeSlotHRCard = ({ gameData, currentDate, teams }) => {
 
   if (loading) {
     return (
-      <div className="card">
-        <h3>⏰ HRs by Time Slot</h3>
-        <div className="loading-indicator">Analyzing time slot HR patterns...</div>
+      <div className="card time-slot-hr-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>⏰ HRs by Time Slot</h3>
+          </div>
+          <div className="loading-indicator">Analyzing time slot HR patterns...</div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="card">
-        <h3>⏰ HRs by Time Slot</h3>
-        <div className="no-data">Error: {error}</div>
+      <div className="card time-slot-hr-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>⏰ HRs by Time Slot</h3>
+          </div>
+          <div className="no-data">Error: {error}</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="card">
-      <h3>⏰ HRs by Time Slot</h3>
-      <p className="card-subtitle">
-        Best HR performers in their specific game time slots (min. 3 games)
-      </p>
-      
-      {timeSlotData.length === 0 ? (
-        <div className="no-data">
-          No sufficient HR history for today's players in their time slots
+    <div className="card time-slot-hr-card">
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>⏰ HRs by Time Slot</h3>
+          <p className="card-subtitle">
+            Best HR performers in {currentTimeSlot} (min. 3 games)
+          </p>
         </div>
-      ) : (
-        <div className="scrollable-container">
+        
+        {timeSlotData.length === 0 ? (
+          <div className="no-data">
+            No sufficient HR history for today's players in their time slots
+          </div>
+        ) : (
+          <div className="scrollable-container">
           <ul className="player-list">
             {timeSlotData.map((player, index) => {
               const teamInfo = getTeamInfo(player.team);
               
               return (
                 <li key={`${player.name}_${player.team}`} className="player-item">
-                  {/* Team logo background */}
                   {teamInfo.logoUrl && (
                     <img 
                       src={teamInfo.logoUrl} 
@@ -386,7 +409,7 @@ const TimeSlotHRCard = ({ gameData, currentDate, teams }) => {
                     />
                   )}
                   
-                  <div className="player-rank" style={{ backgroundColor: '#e63946' }}>
+                  <div className="player-rank" style={{ backgroundColor: '#06b6d4' }}>
                     {teamInfo.logoUrl && (
                       <>
                         <img 
@@ -408,7 +431,7 @@ const TimeSlotHRCard = ({ gameData, currentDate, teams }) => {
                   </div>
                   
                   <div className="player-stat">
-                    <span className="stat-highlight" style={{ color: '#e63946' }}>
+                    <span className="stat-highlight" style={{ color: '#06b6d4' }}>
                       {player.hrsPerGame} HR/G
                     </span>
                     <small className="stat-note">
@@ -421,8 +444,9 @@ const TimeSlotHRCard = ({ gameData, currentDate, teams }) => {
               );
             })}
           </ul>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

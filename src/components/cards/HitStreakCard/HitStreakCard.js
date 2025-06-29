@@ -33,23 +33,26 @@ const HitStreakCard = ({
 
   return (
     <div className="card hit-streak-card">
-      <h3>Current Hit Streaks</h3>
-      {isLoading ? (
-        <div className="loading-indicator">Loading stats...</div>
-      ) : hitStreakData.hitStreaks && hitStreakData.hitStreaks.length > 0 ? (
-        <div className="scrollable-container">
-          <ul className="player-list">
-            {hitStreakData.hitStreaks.slice(0, 10).map((player, index) => {
-              const safeId = createSafeId(player.name, player.team);
-              const tooltipId = `streak_hit_${safeId}`;
-              
-              // Get team logo URL if teams data is available
-              const teamAbbr = player.team;
-              const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
-              const logoUrl = teamData ? teamData.logoUrl : null;
-              
-              return (
-                <li key={index} className="player-item streak-item">
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>Current Hit Streaks</h3>
+        </div>
+        {isLoading ? (
+          <div className="loading-indicator">Loading stats...</div>
+        ) : hitStreakData.hitStreaks && hitStreakData.hitStreaks.length > 0 ? (
+          <div className="scrollable-container">
+            <ul className="player-list">
+              {hitStreakData.hitStreaks.slice(0, 10).map((player, index) => {
+                const safeId = createSafeId(player.name, player.team);
+                const tooltipId = `streak_hit_${safeId}`;
+                
+                // Get team logo URL if teams data is available
+                const teamAbbr = player.team;
+                const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
+                const logoUrl = teamData ? teamData.logoUrl : null;
+                
+                return (
+                  <li key={index} className="player-item">
                   <div className="player-rank">
                     {logoUrl && (
                       <>
@@ -90,25 +93,25 @@ const HitStreakCard = ({
                     <small>Continue: {(player.continuationProbability * 100).toFixed(1)}%</small>
                   </div>
                   
-                  {/* Enhanced background logo */}
-                  {logoUrl && (
-                    <img 
-                      src={logoUrl} 
-                      alt="" 
-                      className="team-logo-bg" 
-                      loading="lazy"
-                      aria-hidden="true"
-                    />
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ) : (
-        <p className="no-data">No active hitting streaks</p>
-      )}
-
+                    {/* Enhanced background logo */}
+                    {logoUrl && (
+                      <img 
+                        src={logoUrl} 
+                        alt="" 
+                        className="team-logo-bg" 
+                        loading="lazy"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ) : (
+          <p className="no-data">No active hitting streaks</p>
+        )}
+      </div>
     </div>
   );
 };

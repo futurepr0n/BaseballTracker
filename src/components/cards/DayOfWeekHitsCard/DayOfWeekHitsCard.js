@@ -34,11 +34,14 @@ const DayOfWeekHitsCard = ({
 
   return (
     <div className="card day-of-week-hits-card">
-      <h3>{dayOfWeekHits.dayOfWeek} Hit Leaders</h3>
-      {isLoading ? (
-        <div className="loading-indicator">Loading stats...</div>
-      ) : dayOfWeekHits.topHitsByTotal && dayOfWeekHits.topHitsByTotal.length > 0 ? (
-        <div className="scrollable-container">
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>{dayOfWeekHits.dayOfWeek} Hit Leaders</h3>
+        </div>
+        {isLoading ? (
+          <div className="loading-indicator">Loading stats...</div>
+        ) : dayOfWeekHits.topHitsByTotal && dayOfWeekHits.topHitsByTotal.length > 0 ? (
+          <div className="scrollable-container">
           <ul className="player-list">
             {dayOfWeekHits.topHitsByTotal.slice(0, 10).map((player, index) => {
               const safeId = createSafeId(player.name, player.team);
@@ -94,11 +97,11 @@ const DayOfWeekHitsCard = ({
               );
             })}
           </ul>
-        </div>
-      ) : (
-        <p className="no-data">No {dayOfWeekHits.dayOfWeek} hit data available</p>
-      )}
-
+          </div>
+        ) : (
+          <p className="no-data">No {dayOfWeekHits.dayOfWeek} hit data available</p>
+        )}
+      </div>
     </div>
   );
 };

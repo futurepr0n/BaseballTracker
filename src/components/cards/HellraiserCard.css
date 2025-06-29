@@ -1,29 +1,49 @@
 .hellraiser-card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  grid-column: span 1;
+  background: rgba(211, 47, 47, 0.05);
+  border: 1px solid rgba(211, 47, 47, 0.2);
+  border-left: 4px solid #d32f2f;
+  border-radius: 12px;
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
   overflow: hidden;
-  min-height: 500px;
-  height: auto;
-  max-height: 600px;
-  display: flex;
-  flex-direction: column;
+  position: relative;
+  padding: 0;
+  box-shadow: 
+    0 8px 32px rgba(211, 47, 47, 0.12),
+    0 2px 8px rgba(211, 47, 47, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-.hellraiser-card .card-header {
-  background: linear-gradient(135deg, #d32f2f 0%, #f57c00 100%);
-  color: white;
-  padding: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
+/* Glass card container for proper layering */
+.hellraiser-card .glass-card-container {
+  position: relative;
+  height: 100%;
+  min-height: 420px;
 }
 
-.hellraiser-card .card-header h3 {
-  margin: 0;
+/* Glass header with fire gradient that content scrolls behind */
+.hellraiser-card .glass-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: linear-gradient(135deg, rgba(211, 47, 47, 0.25) 0%, rgba(245, 124, 0, 0.20) 100%);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(211, 47, 47, 0.15);
+  padding: 20px;
+  color: #333;
+  pointer-events: auto; /* Allow interaction with filters */
+  box-shadow: 0 4px 16px rgba(211, 47, 47, 0.05);
+}
+
+.hellraiser-card .glass-header h3 {
+  margin: 0 0 15px 0;
   font-size: 18px;
   font-weight: 600;
+  color: #333;
 }
 
 .hellraiser-card .header-stats {
@@ -42,10 +62,56 @@
   font-weight: 700;
 }
 
+/* Glass Effect Scrollable Container */
+.hellraiser-card .scrollable-container {
+  background: rgba(255, 245, 238, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 180px; /* Space for header with filters */
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
+
+/* Glass Effect Scrollbar */
+.hellraiser-card .scrollable-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.hellraiser-card .scrollable-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.hellraiser-card .scrollable-container::-webkit-scrollbar-thumb {
+  background: rgba(211, 47, 47, 0.4);
+  border-radius: 3px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.hellraiser-card .scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(211, 47, 47, 0.6);
+}
+
+/* Compact filters within glass header */
 .hellraiser-card .compact-filters {
-  background: #f8f9fa;
-  border-bottom: 1px solid #ddd;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(211, 47, 47, 0.2);
+  border-radius: 8px;
   padding: 8px 12px;
+  margin-top: 10px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .hellraiser-card .filter-row {
@@ -68,26 +134,28 @@
 
 .hellraiser-card .filter-row button {
   padding: 2px 8px;
-  border: 1px solid #ddd;
+  border: 1px solid rgba(211, 47, 47, 0.3);
   border-radius: 12px;
-  background: white;
+  background: rgba(255, 255, 255, 0.3);
   color: #666;
   font-size: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
 .hellraiser-card .filter-row button:hover {
-  background: #f0f0f0;
-  border-color: #bbb;
+  background: rgba(255, 255, 255, 0.5);
+  border-color: rgba(211, 47, 47, 0.4);
 }
 
 .hellraiser-card .filter-row button.active {
-  background: #1976d2;
+  background: #d32f2f;
   color: white;
-  border-color: #1976d2;
-  font-weight: 500;
+  border-color: #d32f2f;
+  font-weight: 600;
 }
 
 .hellraiser-card .pathway-filters button {
@@ -133,9 +201,10 @@
   line-height: 1.4;
 }
 
-.hellraiser-card .picks-container {
-  flex: 1;
-  overflow-y: auto;
+/* Picks list styling */
+.hellraiser-card .picks-list {
+  padding: 0;
+  margin: 0;
 }
 
 .hellraiser-card .loading-state,
@@ -145,8 +214,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 200px;
+  height: 100%;
   color: #666;
+  padding: 20px;
 }
 
 .hellraiser-card .loading-spinner {
@@ -179,21 +249,23 @@
   background: #b71c1c;
 }
 
-.hellraiser-card .picks-list {
-  padding: 8px;
-}
 
 .hellraiser-card .pick-item {
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(211, 47, 47, 0.12);
+  border-radius: 8px;
+  margin: 0 12px 8px 12px;
   overflow: hidden;
   transition: all 0.2s ease;
 }
 
 .hellraiser-card .pick-item:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  border-color: #d32f2f;
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.1);
+  border-color: rgba(211, 47, 47, 0.2);
 }
 
 .hellraiser-card .pick-header {
@@ -364,28 +436,25 @@
   color: #666;
 }
 
-.hellraiser-card .card-footer {
-  border-top: 1px solid #e0e0e0;
-  padding: 8px 16px;
-  background: #f8f9fa;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.hellraiser-card .methodology-info small,
-.hellraiser-card .last-updated small {
-  font-size: 10px;
-  color: #666;
-}
+/* Footer removed - no longer needed */
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
-  .hellraiser-card .card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+  .hellraiser-card {
+    grid-column: 1 / -1;
+  }
+  
+  /* Remove footer space in mobile */
+  .hellraiser-card .glass-card-container {
+    min-height: auto;
+    height: auto;
+  }
+  
+  .hellraiser-card .scrollable-container {
+    position: relative;
+    height: auto;
+    max-height: 60vh;
+    padding-bottom: 10px;
   }
   
   .hellraiser-card .header-stats {
@@ -410,23 +479,7 @@
   }
 }
 
-/* Scrollbar styling */
-.hellraiser-card .picks-container::-webkit-scrollbar {
-  width: 6px;
-}
-
-.hellraiser-card .picks-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-.hellraiser-card .picks-container::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
-
-.hellraiser-card .picks-container::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
-}
+/* Remove old scrollbar styling - now handled in scrollable-container */
 
 /* Value Reasoning Styles */
 .hellraiser-card .value-reasoning {

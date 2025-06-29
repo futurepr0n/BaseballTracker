@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import hellraiserAnalysisService from '../../services/hellraiserAnalysisService';
 import { useTeamFilter } from '../TeamFilterContext';
+import GlassCard, { GlassScrollableContainer } from './GlassCard/GlassCard';
 import './BarrelMatchupCard.css';
 
 const BarrelMatchupCard = ({ currentDate }) => {
@@ -250,7 +251,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
 
   if (loading) {
     return (
-      <div className="barrel-matchup-card">
+      <GlassCard className="barrel-matchup-card" variant="default">
         <div className="card-header">
           <h3>🎯 Barrel Matchup Analysis</h3>
         </div>
@@ -258,13 +259,13 @@ const BarrelMatchupCard = ({ currentDate }) => {
           <div className="loading-spinner"></div>
           <p>Analyzing barrel matchups...</p>
         </div>
-      </div>
+      </GlassCard>
     );
   }
 
   if (error) {
     return (
-      <div className="barrel-matchup-card">
+      <GlassCard className="barrel-matchup-card" variant="default">
         <div className="card-header">
           <h3>🎯 Barrel Matchup Analysis</h3>
         </div>
@@ -274,33 +275,33 @@ const BarrelMatchupCard = ({ currentDate }) => {
             Retry Analysis
           </button>
         </div>
-      </div>
+      </GlassCard>
     );
   }
 
   if (!analysisData || !analysisData.picks || analysisData.picks.length === 0) {
     return (
-      <div className="barrel-matchup-card">
+      <GlassCard className="barrel-matchup-card" variant="default">
         <div className="card-header">
           <h3>🎯 Barrel Matchup Analysis</h3>
         </div>
         <div className="no-data">
           <p>No barrel matchup data available</p>
         </div>
-      </div>
+      </GlassCard>
     );
   }
 
   const sortedPicks = sortData(analysisData.picks);
 
   return (
-    <div className="barrel-matchup-card">
+    <GlassCard className="barrel-matchup-card" variant="default">
       <div className="card-header">
         <h3>🎯 Barrel Matchup Analysis</h3>
         <span className="card-subtitle">Click column headers to sort</span>
       </div>
 
-      <div className="table-container">
+      <GlassScrollableContainer className="table-container">
         <table className="matchup-table">
           <thead>
             <tr>
@@ -454,7 +455,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
             ))}
           </tbody>
         </table>
-      </div>
+      </GlassScrollableContainer>
 
       <div className="card-footer">
         <div className="legend">
@@ -471,7 +472,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
           </small>
         </div>
       </div>
-    </div>
+    </GlassCard>
   );
 };
 

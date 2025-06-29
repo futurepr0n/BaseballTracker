@@ -34,12 +34,15 @@ const ContinueStreakCard = ({
   
   return (
     <div className="card continue-streak-card">
-      <h3>Streaks Likely to Continue</h3>
-      {isLoading ? (
-        <div className="loading-indicator">Loading stats...</div>
-      ) : hitStreakData.likelyToContinueStreak && hitStreakData.likelyToContinueStreak.length > 0 ? (
-        <div className="scrollable-container">
-          <ul className="player-list">
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>Streaks Likely to Continue</h3>
+        </div>
+        {isLoading ? (
+          <div className="loading-indicator">Loading stats...</div>
+        ) : hitStreakData.likelyToContinueStreak && hitStreakData.likelyToContinueStreak.length > 0 ? (
+          <div className="scrollable-container">
+            <ul className="player-list">
             {hitStreakData.likelyToContinueStreak.slice(0, 10).map((player, index) => {
               const safeId = createSafeId(player.name, player.team);
               const tooltipId = `continue_streak_${safeId}`;
@@ -107,9 +110,10 @@ const ContinueStreakCard = ({
             })}
           </ul>
         </div>
-      ) : (
-        <p className="no-data">No notable streaks likely to continue</p>
-      )}
+        ) : (
+          <p className="no-data">No notable streaks likely to continue</p>
+        )}
+      </div>
     </div>
   );
 };

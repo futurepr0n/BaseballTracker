@@ -1,37 +1,184 @@
-/* HRPredictionCard.css - Enhanced with odds display */
+/* HRPredictionCard.css - Glass Effect with Odds Display (Based on RecentHomersCard) */
 
 .hr-prediction {
-  /* Inherits base card styles from Dashboard.css */
+  grid-column: span 1;
+  background: rgba(230, 57, 70, 0.05);
+  border: 1px solid rgba(230, 57, 70, 0.2);
+  border-left: 4px solid #e63946;
+  border-radius: 12px;
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  box-shadow: 
+    0 8px 32px rgba(230, 57, 70, 0.08),
+    0 2px 8px rgba(230, 57, 70, 0.03);
 }
 
-.hr-prediction .card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+/* Glass card container for proper layering */
+.hr-prediction .glass-card-container {
+  position: relative;
+  height: 100%;
+  min-height: 420px;
 }
 
-.hr-prediction .card-header h3 {
+/* Glass header that content scrolls behind - NO BORDER RADIUS */
+.hr-prediction .glass-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: rgba(230, 57, 70, 0.08);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(230, 57, 70, 0.15);
+  padding: 20px;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(230, 57, 70, 0.05);
+}
+
+.hr-prediction .glass-header h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.hr-prediction .card-subtitle {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 5px;
+}
+
+/* Glass Effect Scrollable Container */
+.hr-prediction .scrollable-container {
+  background: rgba(255, 235, 238, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 100px; /* Space for header with odds info */
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
+
+/* Player list styling */
+.hr-prediction .player-list {
+  list-style: none;
+  padding: 0;
   margin: 0;
 }
 
-/* Odds loading and status indicators */
-.odds-loading {
-  font-size: 0.8rem;
-  color: #666;
-  font-style: italic;
+.hr-prediction .player-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(230, 57, 70, 0.12);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
-.odds-error {
-  font-size: 0.8rem;
-  color: #d32f2f;
-  font-weight: 500;
+.hr-prediction .player-item:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.08);
+  border-color: rgba(230, 57, 70, 0.2);
 }
 
-.odds-info {
-  font-size: 0.8rem;
-  color: #2e7d32;
+.hr-prediction .player-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Glass Effect Scrollbar */
+.hr-prediction .scrollable-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.hr-prediction .scrollable-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.hr-prediction .scrollable-container::-webkit-scrollbar-thumb {
+  background: rgba(230, 57, 70, 0.4);
+  border-radius: 3px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.hr-prediction .scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(230, 57, 70, 0.6);
+}
+
+/* Player rank styling */
+.hr-prediction .player-rank {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e63946; /* Red for HR predictions */
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 16px;
+  position: relative;
+  overflow: hidden;
+  /*box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);*/
+  flex-shrink: 0;
+}
+
+.hr-prediction .player-rank .rank-logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.7;
+}
+
+.hr-prediction .player-rank .rank-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0.3;
+}
+
+.hr-prediction .player-rank .rank-number {
+  position: relative;
+  z-index: 10;
+  color: white;
+  font-size: 1.125rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Player info styling */
+.hr-prediction .player-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  margin-right: 10px;
+}
+
+.hr-prediction .player-name {
   font-weight: 500;
+  color: #333;
+  font-size: 0.95rem;
 }
 
 /* Enhanced player team and odds container */
@@ -77,7 +224,7 @@
 .hr-prediction .player-stat {
   display: flex;
   flex-direction: column;
-  min-width: 200px;
+  min-width: 160px;
   align-items: flex-end;
   line-height: 1.3;
   text-align: right;
@@ -113,15 +260,46 @@
   border-left: 3px solid #e63946;
 }
 
-/* Enhanced rank indicator for HR predictions */
-.hr-prediction .player-rank {
-  position: relative;
-  overflow: hidden;
-  background-color: #e63946; /* Default red for HR predictions */
+/* Enhanced background logo */
+.hr-prediction .player-item .team-logo-bg {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 66%;
+  opacity: 0.05;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  transform: translate(20%, -10%) scale(2.2);
+  object-fit: cover;
+  object-position: center;
 }
 
-.hr-prediction .rank-overlay {
-  opacity: 0.3;
+.hr-prediction .player-item:hover .team-logo-bg {
+  opacity: 0.1;
+}
+
+/* Odds loading and status indicators */
+.odds-loading {
+  font-size: 0.8rem;
+  color: #666;
+  font-style: italic;
+  pointer-events: auto;
+}
+
+.odds-error {
+  font-size: 0.8rem;
+  color: #d32f2f;
+  font-weight: 500;
+  pointer-events: auto;
+}
+
+.odds-info {
+  font-size: 0.8rem;
+  color: #2e7d32;
+  font-weight: 500;
+  pointer-events: auto;
 }
 
 /* Odds footer */
@@ -137,8 +315,56 @@
   font-size: 0.75rem;
 }
 
+/* Loading and no data states */
+.hr-prediction .loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.hr-prediction .no-data {
+  color: #888;
+  text-align: center;
+  padding: 40px 20px;
+  font-style: italic;
+}
+
+/* Special highlighting for top performers */
+.hr-prediction .player-item:first-child .hr-deficit {
+  font-size: 1.1rem;
+  text-shadow: 0 1px 2px rgba(230, 57, 70, 0.3);
+}
+
+.hr-prediction .player-item:nth-child(2) .hr-deficit {
+  font-size: 1.05rem;
+}
+
+.hr-prediction .player-item:nth-child(3) .hr-deficit {
+  font-size: 1.02rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .hr-prediction {
+    grid-column: 1 / -1;
+  }
+  
+  /* Remove footer space in mobile */
+  .hr-prediction .glass-card-container {
+    min-height: auto;
+    height: auto;
+  }
+  
+  .hr-prediction .scrollable-container {
+    position: relative;
+    height: auto;
+    max-height: 60vh;
+    padding-bottom: 10px;
+  }
+  
   /* Much more compact rows on mobile */
   .hr-prediction .player-item {
     padding: 6px 12px; /* Even tighter padding */
@@ -232,26 +458,6 @@
     font-size: 0.6rem; /* Even smaller for days since */
   }
   
-  /* Tighter card spacing */
-  .hr-prediction .card-header {
-    margin-bottom: 12px; /* Less margin */
-  }
-  
-  .hr-prediction h3 {
-    font-size: 1.1rem; /* Smaller title */
-    margin-bottom: 0;
-  }
-  
-  /* Compact scrollable container */
-  .hr-prediction .scrollable-container {
-    max-height: 280px; /* Shorter container */
-  }
-  
-  /* Remove any extra spacing from player list */
-  .hr-prediction .player-list {
-    gap: 0; /* No gap between list items */
-  }
-  
   /* Smaller status indicators */
   .hr-prediction .odds-loading,
   .hr-prediction .odds-error,
@@ -317,4 +523,21 @@
   color: #2e7d32;
   background-color: rgba(46, 125, 50, 0.1);
   border-left-color: #2e7d32;
+}
+
+/* Animation for team context elements */
+.hr-prediction .team-context,
+.hr-prediction .team-filter-summary {
+  animation: slideInTeamContext 0.3s ease-out;
+}
+
+@keyframes slideInTeamContext {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

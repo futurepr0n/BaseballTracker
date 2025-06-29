@@ -173,23 +173,26 @@ const MostHomeRunsAtHomeCard = ({
 
   return (
     <div className="card most-home-runs-at-home-card">
-      <h3>{getCardTitle()}</h3>
-      {getCardSubtitle() && (
-        <div className="card-subtitle" style={{ 
-          fontSize: '0.85rem', 
-          color: '#666', 
-          marginBottom: '15px', 
-          textAlign: 'center',
-          fontStyle: 'italic' 
-        }}>
-          {getCardSubtitle()}
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>{getCardTitle()}</h3>
+          {getCardSubtitle() && (
+            <div className="card-subtitle" style={{ 
+              fontSize: '0.85rem', 
+              color: '#666', 
+              marginTop: '5px',
+              textAlign: 'center',
+              fontStyle: 'italic' 
+            }}>
+              {getCardSubtitle()}
+            </div>
+          )}
         </div>
-      )}
-      
-      {isLoading ? (
-        <div className="loading-indicator">Loading stadium data...</div>
-      ) : filteredStadiumData && filteredStadiumData.summary && filteredStadiumData.summary.topStadiumsByTotalHRs ? (
-        <div className="scrollable-container">
+        
+        {isLoading ? (
+          <div className="loading-indicator">Loading stadium data...</div>
+        ) : filteredStadiumData && filteredStadiumData.summary && filteredStadiumData.summary.topStadiumsByTotalHRs ? (
+          <div className="scrollable-container">
           <div className="stadium-summary">
             <div className="summary-stats">
               <div className="stat-item">
@@ -287,10 +290,11 @@ const MostHomeRunsAtHomeCard = ({
               </div>
             </div>
           )}
-        </div>
-      ) : (
-        <p className="no-data">No stadium home run data available</p>
-      )}
+          </div>
+        ) : (
+          <p className="no-data">No stadium home run data available</p>
+        )}
+      </div>
     </div>
   );
 };

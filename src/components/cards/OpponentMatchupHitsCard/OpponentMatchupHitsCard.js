@@ -90,13 +90,17 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
   if (loading) {
     return (
       <div className="card opponent-matchup-hits-card">
-        <h3>🎯 Hits vs Current Opponent</h3>
-        <div className="loading-indicator">
-          Analyzing opponent matchups...
-          <br />
-          <small style={{ fontSize: '0.8em', color: '#666' }}>
-            {debugInfo}
-          </small>
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>🎯 Hits vs Current Opponent</h3>
+          </div>
+          <div className="loading-indicator">
+            Analyzing opponent matchups...
+            <br />
+            <small style={{ fontSize: '0.8em', color: '#666' }}>
+              {debugInfo}
+            </small>
+          </div>
         </div>
       </div>
     );
@@ -105,13 +109,17 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
   if (error) {
     return (
       <div className="card opponent-matchup-hits-card">
-        <h3>🎯 Hits vs Current Opponent</h3>
-        <div className="no-data">
-          Error: {error}
-          <br />
-          <small style={{ fontSize: '0.8em', color: '#666' }}>
-            {debugInfo}
-          </small>
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>🎯 Hits vs Current Opponent</h3>
+          </div>
+          <div className="no-data">
+            Error: {error}
+            <br />
+            <small style={{ fontSize: '0.8em', color: '#666' }}>
+              {debugInfo}
+            </small>
+          </div>
         </div>
       </div>
     );
@@ -119,21 +127,24 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
 
   return (
     <div className="card opponent-matchup-hits-card">
-      <h3>🎯 Hits vs Current Opponent</h3>
-      <p className="card-subtitle">
-        Players with best performance vs today's opponent (min. 3 games)
-      </p>
-      
-      {matchupData.length === 0 ? (
-        <div className="no-data">
-          No sufficient matchup history available for today's games
-          <br />
-          <small style={{ fontSize: '0.8em', color: '#999' }}>
-            {debugInfo}
-          </small>
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>🎯 Hits vs Current Opponent</h3>
+          <p className="card-subtitle">
+            Players with best performance vs today's opponent (min. 3 games)
+          </p>
         </div>
-      ) : (
-        <div className="scrollable-container">
+        
+        {matchupData.length === 0 ? (
+          <div className="no-data">
+            No sufficient matchup history available for today's games
+            <br />
+            <small style={{ fontSize: '0.8em', color: '#999' }}>
+              {debugInfo}
+            </small>
+          </div>
+        ) : (
+          <div className="scrollable-container">
           <ul className="player-list">
             {matchupData.map((player, index) => {
               const teamInfo = getTeamInfo(player.playerTeam);
@@ -192,22 +203,23 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
               );
             })}
           </ul>
-        </div>
-      )}
-      
-      {/* Debug info when in development */}
-      {process.env.NODE_ENV === 'development' && (
-        <div style={{ 
-          fontSize: '0.7em', 
-          color: '#999', 
-          marginTop: '10px', 
-          padding: '10px', 
-          backgroundColor: '#f5f5f5', 
-          borderRadius: '4px' 
-        }}>
-          <strong>Debug:</strong> {debugInfo}
-        </div>
-      )}
+          </div>
+        )}
+        
+        {/* Debug info when in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <div style={{ 
+            fontSize: '0.7em', 
+            color: '#999', 
+            marginTop: '10px', 
+            padding: '10px', 
+            backgroundColor: '#f5f5f5', 
+            borderRadius: '4px' 
+          }}>
+            <strong>Debug:</strong> {debugInfo}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -274,14 +286,18 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
 
   if (loading) {
     return (
-      <div className="card">
-        <h3>💥 HRs vs Current Opponent</h3>
-        <div className="loading-indicator">
-          Analyzing opponent matchups...
-          <br />
-          <small style={{ fontSize: '0.8em', color: '#666' }}>
-            {debugInfo}
-          </small>
+      <div className="card opponent-matchup-hr-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>💥 HRs vs Current Opponent</h3>
+          </div>
+          <div className="loading-indicator">
+            Analyzing opponent matchups...
+            <br />
+            <small style={{ fontSize: '0.8em', color: '#666' }}>
+              {debugInfo}
+            </small>
+          </div>
         </div>
       </div>
     );
@@ -289,36 +305,43 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
 
   if (error) {
     return (
-      <div className="card">
-        <h3>💥 HRs vs Current Opponent</h3>
-        <div className="no-data">
-          Error: {error}
-          <br />
-          <small style={{ fontSize: '0.8em', color: '#666' }}>
-            {debugInfo}
-          </small>
+      <div className="card opponent-matchup-hr-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>💥 HRs vs Current Opponent</h3>
+          </div>
+          <div className="no-data">
+            Error: {error}
+            <br />
+            <small style={{ fontSize: '0.8em', color: '#666' }}>
+              {debugInfo}
+            </small>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="card">
-      <h3>💥 HRs vs Current Opponent</h3>
-      <p className="card-subtitle">
-        Home run performance vs today's opponent (min. 3 games)
-      </p>
-      
-      {matchupData.length === 0 ? (
-        <div className="no-data">
-          No sufficient HR matchup history for today's games
-          <br />
-          <small style={{ fontSize: '0.8em', color: '#999' }}>
-            {debugInfo}
-          </small>
+    <div className="card opponent-matchup-hr-card">
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>💥 HRs vs Current Opponent</h3>
+          <p className="card-subtitle">
+            Home run performance vs today's opponent (min. 3 games)
+          </p>
         </div>
-      ) : (
-        <div className="scrollable-container">
+        
+        {matchupData.length === 0 ? (
+          <div className="no-data">
+            No sufficient HR matchup history for today's games
+            <br />
+            <small style={{ fontSize: '0.8em', color: '#999' }}>
+              {debugInfo}
+            </small>
+          </div>
+        ) : (
+          <div className="scrollable-container">
           <ul className="player-list">
             {matchupData.map((player, index) => {
               const teamInfo = getTeamInfo(player.playerTeam);
@@ -376,22 +399,23 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
               );
             })}
           </ul>
-        </div>
-      )}
-      
-      {/* Debug info when in development */}
-      {process.env.NODE_ENV === 'development' && (
-        <div style={{ 
-          fontSize: '0.7em', 
-          color: '#999', 
-          marginTop: '10px', 
-          padding: '10px', 
-          backgroundColor: '#f5f5f5', 
-          borderRadius: '4px' 
-        }}>
-          <strong>Debug:</strong> {debugInfo}
-        </div>
-      )}
+          </div>
+        )}
+        
+        {/* Debug info when in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <div style={{ 
+            fontSize: '0.7em', 
+            color: '#999', 
+            marginTop: '10px', 
+            padding: '10px', 
+            backgroundColor: '#f5f5f5', 
+            borderRadius: '4px' 
+          }}>
+            <strong>Debug:</strong> {debugInfo}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

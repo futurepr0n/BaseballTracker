@@ -1385,12 +1385,12 @@ const noFilteredData = isFiltering &&
             teams={teamData}
           />
 
-          <MultiHitDashboardCard />
+          <MultiHitDashboardCard teams={teamData} />
 
-          {/* Over-Performing Players Card */}
+          {/* Top Under-Performing Players Card */}
           <PerformanceCard 
-  teamData={teamData}
-  currentDate={currentDate}
+            teamData={teamData}
+            currentDate={currentDate}
           />
           
           {/* Under-Performing Players Card */}
@@ -1427,6 +1427,7 @@ const noFilteredData = isFiltering &&
             pitcherMatchups={pitcherMatchups}
             isLoading={matchupsLoading}
             currentDate={currentDate}
+            teams={teamData}
           />
           
           
