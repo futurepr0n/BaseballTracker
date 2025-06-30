@@ -39,6 +39,7 @@ import PitcherHitsAllowedCard from './cards/PitcherHitsAllowedCard/PitcherHitsAl
 import SlotMachineCard from './cards/SlotMachineCard/SlotMachineCard';
 import HellraiserCard from './cards/HellraiserCard';
 import BarrelMatchupCard from './cards/BarrelMatchupCard';
+import LaunchAngleMastersCard from './cards/LaunchAngleMastersCard';
 
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
 import MLBWeatherCard from './cards/MLBWeatherCard/MLBWeatherCard';
@@ -1276,6 +1277,9 @@ const noFilteredData = isFiltering &&
           <div style={{ gridColumn: '1 / -1' }}>
             <BarrelMatchupCard currentDate={currentDate} />
           </div>
+
+          {/* Launch Angle Masters Card */}
+          <LaunchAngleMastersCard currentDate={currentDate} />
           
           {/* Row 4: Top Hitters, HR Leaders, Recent Homers */}
           <TopHittersCard 
