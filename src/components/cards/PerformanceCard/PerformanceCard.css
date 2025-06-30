@@ -1,82 +1,189 @@
-/* PerformanceCard.css */
+/* PerformanceCard.css - Glass Effect with Purple Theme */
 
-.over-performing-card,
 .under-performing-card {
   grid-column: span 1;
-  background-color: white;
+  background: rgba(156, 39, 176, 0.05);
+  border: 1px solid rgba(156, 39, 176, 0.2);
+  border-left: 4px solid #9C27B0;
+  border-radius: 12px;
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  box-shadow: 
+    0 8px 32px rgba(156, 39, 176, 0.08),
+    0 2px 8px rgba(156, 39, 176, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-/* Player Item Styling */
-.over-performing-card .player-item,
+/* Glass card container for proper layering */
+.under-performing-card .glass-card-container {
+  position: relative;
+  height: 100%;
+  min-height: 420px;
+}
+
+/* Glass header that content scrolls behind */
+.under-performing-card .glass-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: rgba(156, 39, 176, 0.08);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(156, 39, 176, 0.15);
+  padding: 20px;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(156, 39, 176, 0.05);
+}
+
+.under-performing-card .glass-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Glass Effect Scrollable Container */
+.under-performing-card .scrollable-container {
+  background: rgba(248, 245, 250, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 100px; /* Space for header */
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
+
+/* Glass Effect Scrollbar */
+.under-performing-card .scrollable-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.under-performing-card .scrollable-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.under-performing-card .scrollable-container::-webkit-scrollbar-thumb {
+  background: rgba(156, 39, 176, 0.4);
+  border-radius: 3px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.under-performing-card .scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 39, 176, 0.6);
+}
+
+/* Player list styling */
+.under-performing-card .player-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
 .under-performing-card .player-item {
-  padding: 12px 0;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.over-performing-card .player-item:last-child,
-.under-performing-card .player-item:last-child {
-  border-bottom: none;
-}
-
-.over-performing-card .player-item:hover {
-  background-color: rgba(33, 150, 243, 0.05);
+  padding: 12px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(156, 39, 176, 0.12);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .under-performing-card .player-item:hover {
-  background-color: rgba(156, 39, 176, 0.05);
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(156, 39, 176, 0.08);
+  border-color: rgba(156, 39, 176, 0.2);
 }
 
-/* Player Rank Styling */
-.over-performing-card .player-rank {
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #2196F3; /* Blue for over-performing */
-  color: white;
-  border-radius: 50%;
-  font-weight: bold;
-  margin-right: 15px;
+.under-performing-card .player-item:last-child {
+  margin-bottom: 0;
 }
 
+/* Player rank styling */
 .under-performing-card .player-rank {
-  width: 30px;
-  height: 30px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #9C27B0; /* Purple for under-performing */
+  background-color: #9C27B0;
   color: white;
   border-radius: 50%;
   font-weight: bold;
-  margin-right: 15px;
+  margin-right: 16px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
-/* Player Info Styling */
-.over-performing-card .player-info,
+.under-performing-card .player-rank .rank-logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.7;
+}
+
+.under-performing-card .player-rank .rank-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0.3;
+}
+
+.under-performing-card .player-rank .rank-number {
+  position: relative;
+  z-index: 10;
+  color: white;
+  font-size: 1.125rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Player info styling */
 .under-performing-card .player-info {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  margin-right: 10px;
 }
 
-.over-performing-card .player-name,
 .under-performing-card .player-name {
   font-weight: 500;
   color: #333;
+  font-size: 0.95rem;
 }
 
-.over-performing-card .player-team,
 .under-performing-card .player-team {
   font-size: 0.85rem;
   color: #666;
+  font-weight: 600;
 }
 
-/* Player Stats Styling */
-.over-performing-card .player-stat,
+/* Player stats styling */
 .under-performing-card .player-stat {
   display: flex;
   flex-direction: column;
@@ -85,55 +192,132 @@
   line-height: 1.2;
 }
 
-.over-performing-card .stat-highlight {
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: #2196F3;
-}
-
 .under-performing-card .stat-highlight {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   color: #9C27B0;
+  line-height: 1;
 }
 
-.over-performing-card small,
 .under-performing-card small {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: normal;
   color: #666;
   line-height: 1.4;
   text-align: right;
+  margin-top: 2px;
 }
 
 /* Highlight extremes */
-.over-performing-card .player-item:nth-child(1) .stat-highlight,
-.over-performing-card .player-item:nth-child(2) .stat-highlight {
-  color: #1565C0; /* Deeper blue for most over-performing */
-  font-size: 1.15rem;
-}
-
 .under-performing-card .player-item:nth-child(1) .stat-highlight,
 .under-performing-card .player-item:nth-child(2) .stat-highlight {
   color: #7B1FA2; /* Deeper purple for most under-performing */
-  font-size: 1.15rem;
+  font-size: 1.4rem;
 }
 
-/* Loading & No Data States */
-.over-performing-card .loading-indicator,
+/* Enhanced background logo */
+.under-performing-card .team-logo-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 800px;
+  height: 800px;
+  opacity: 0.06;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+}
+
+.under-performing-card .player-item:hover .team-logo-bg {
+  opacity: 0.1;
+}
+
+/* Card subtitle styling */
+.under-performing-card .card-subtitle {
+  font-size: 0.8rem;
+  color: #9C27B0;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+/* Loading and no data states */
 .under-performing-card .loading-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 40px 20px;
   color: #666;
   font-style: italic;
 }
 
-.over-performing-card .no-data,
 .under-performing-card .no-data {
   color: #888;
   text-align: center;
-  padding: 20px 0;
+  padding: 40px 20px;
+  font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .under-performing-card {
+    grid-column: 1 / -1;
+  }
+  
+  .under-performing-card .glass-card-container {
+    min-height: auto;
+    height: auto;
+  }
+  
+  .under-performing-card .scrollable-container {
+    position: relative;
+    height: auto;
+    max-height: 60vh;
+    padding-bottom: 10px;
+    padding-top: 80px;
+  }
+  
+  .under-performing-card .player-item {
+    padding: 10px 6px;
+  }
+  
+  .under-performing-card .player-stat {
+    min-width: 100px;
+  }
+  
+  .under-performing-card .stat-highlight {
+    font-size: 1.1rem;
+  }
+  
+  .under-performing-card .player-rank {
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
+  }
+  
+  .under-performing-card .player-rank .rank-number {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .under-performing-card .player-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  .under-performing-card .player-rank {
+    align-self: flex-start;
+    width: 32px;
+    height: 32px;
+    margin-right: 0;
+  }
+  
+  .under-performing-card .player-stat {
+    align-items: flex-start;
+    min-width: unset;
+  }
 }

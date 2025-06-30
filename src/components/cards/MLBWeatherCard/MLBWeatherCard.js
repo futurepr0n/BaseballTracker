@@ -194,38 +194,40 @@ const MLBWeatherCard = ({ teams }) => {
 
   return (
     <div className="card mlb-weather-card">
-      <div className="card-header">
-        <h2>⛅ Today's Game Weather</h2>
-        <p className="card-subtitle">Weather conditions affecting today's MLB games</p>
-      </div>
-      
-      <div className="card-body">
-        {loading && (
-          <div className="loading-state">
-            <div className="loading-spinner"></div>
-            <p>Loading weather data...</p>
-          </div>
-        )}
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>⛅ Today's Game Weather</h3>
+          <p className="card-subtitle">Weather conditions affecting today's MLB games</p>
+        </div>
         
-        {error && (
-          <div className="error-state">
-            <p className="error-message">{error}</p>
-          </div>
-        )}
-        
-        {!loading && !error && filteredGames.length === 0 && (
-          <div className="empty-state">
-            <p>{selectedTeam ? 'No games for selected team(s) today' : 'No games scheduled for today'}</p>
-          </div>
-        )}
-        
-        {!loading && !error && filteredGames.length > 0 && (
-          <div className="weather-cards-scroll-container">
-            {filteredGames.map(game => (
-              <MiniGameWeatherCard key={game.id} game={game} />
-            ))}
-          </div>
-        )}
+        <div className="scrollable-container">
+          {loading && (
+            <div className="loading-state">
+              <div className="loading-spinner"></div>
+              <p>Loading weather data...</p>
+            </div>
+          )}
+          
+          {error && (
+            <div className="error-state">
+              <p className="error-message">{error}</p>
+            </div>
+          )}
+          
+          {!loading && !error && filteredGames.length === 0 && (
+            <div className="empty-state">
+              <p>{selectedTeam ? 'No games for selected team(s) today' : 'No games scheduled for today'}</p>
+            </div>
+          )}
+          
+          {!loading && !error && filteredGames.length > 0 && (
+            <div className="weather-cards-scroll-container">
+              {filteredGames.map(game => (
+                <MiniGameWeatherCard key={game.id} game={game} />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,7 +1,26 @@
 /* Main Application Styling */
 
+/* Import Glass Card Performance Optimizations */
+@import './components/cards/GlassCardOptimizations.css';
+
+/* Import Mobile Overflow Fix */
+@import './components/MobileOverflowFix.css';
+
+/* Import Final Card Responsive Fix */
+@import './components/cards/CardResponsiveFix.css';
+
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  html {
+    width: 100%;
+  }
+  
+  body {
+    width: 100%;
     margin: 0;
     padding: 0;
   }
@@ -17,6 +36,7 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    width: 100%;
   }
   
   /* Header */
@@ -27,186 +47,59 @@
   }
   
   .app-header h1 {
-    font-size: 1.8rem;
     color: #0056b3;
     margin-bottom: 15px;
-  }
-  
-  /* Date selector */
-  .date-selector {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-top: 20px;
-  }
-  
-  .date-selector button {
-    background-color: #0056b3;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
-  }
-  
-  .date-selector button:hover {
-    background-color: #004494;
-  }
-  
-  .current-date {
-    font-weight: 500;
-    color: #333;
-    flex-grow: 1;
-    text-align: center;
-  }
-  
-  /* Main content */
-  .app-content {
-    flex: 1;
-    padding: 0 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-  }
-  
-  /* Footer */
-  .app-footer {
-    background-color: #333;
-    color: white;
-    padding: 20px;
-    text-align: center;
-    margin-top: 40px;
-  }
-  
-  .app-footer p {
-    font-size: 0.9rem;
-    opacity: 0.8;
-  }
-  
-  /* Loading indicator */
-  .loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 300px;
-    font-size: 1.2rem;
-    color: #666;
-  }
-  
-  .loading::after {
-    content: "...";
-    animation: dots 1.5s steps(4, end) infinite;
-  }
-  
-  @keyframes dots {
-    0%, 20% {
-      content: ".";
-    }
-    40% {
-      content: "..";
-    }
-    60% {
-      content: "...";
-    }
-    80%, 100% {
-      content: "";
-    }
-  }
-  
-  /* Error message */
-  .error {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 20px;
-    border-radius: 4px;
-    margin: 30px 0;
-    text-align: center;
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .app-header {
-      padding: 15px;
-    }
-    
-    .app-header h1 {
-      font-size: 1.5rem;
-    }
-    
-    .date-selector {
-      flex-direction: column;
-      gap: 10px;
-      align-items: stretch;
-    }
-    
-    .current-date {
-      order: -1;
-      margin-bottom: 10px;
-    }
-  }
-
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-  
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    background-color: #f5f5f7;
-    color: #333;
-    line-height: 1.6;
-  }
-  
-  .app {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-  
-  /* Header */
-  .app-header {
-    background-color: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-  }
-  
- .app-header h1 {
-    color: #0056b3;
-    margin-bottom: 15px;
-    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-font-weight: 800;
-
-    /* === OPTION 3: Bebas Neue (All Caps by design, Very Snazzy & Strong) === */
-    
+    text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
+    font-weight: 800;
     font-family: 'Bebas Neue', cursive; 
     font-size: 3.5rem; 
     letter-spacing: 2px;
-      margin: 0; /* Remove default h1 margin to not interfere with flex alignment */
-
-    
-    /* === OPTION 4: Poppins (SemiBold/Bold, Title Case or All Lowercase - Modern & Clean) === */
-    /*
-    font-family: 'Poppins', sans-serif;
-    font-size: 2.5rem;
-    font-weight: 700; 
-    */
-    /* To make Poppins all lowercase (can be stylish): */
-    /* text-transform: lowercase; */
-    /* letter-spacing: 0.5px; */
-
+    margin: 0;
   }
 
-  .header-top-row { /* This is key for same-line layout */
-  display: flex;
-  justify-content: space-between; /* Pushes title to left, icons to right */
-  align-items: center; /* Vertically aligns title and icons */
-  margin-bottom: 15px; /* Space before the Navigation component */
-}
+  .header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
 
+  .header-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .theme-toggle-header {
+    /* Specific styling for header theme toggle */
+  }
+
+  .social-icons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .social-icons a {
+    display: flex;
+    align-items: center;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+  }
+
+  .social-icons a:hover {
+    opacity: 1;
+  }
+
+  .social-icons a img {
+    height: 28px;
+    width: 28px;
+    transition: transform 0.2s ease;
+  }
+
+  .social-icons a:hover img {
+    transform: scale(1.1);
+  }
 
   /* Date selector */
   .date-selector {
@@ -245,6 +138,7 @@ font-weight: 800;
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
+    box-sizing: border-box;
   }
   
   /* Footer */
@@ -308,7 +202,11 @@ font-weight: 800;
     }
     
     .app-header h1 {
-      font-size: 2rem; /* Adjusted for smaller screens, still larger than original mobile size */
+      font-size: 2rem;
+    }
+    
+    .app-content {
+      padding: 0 10px;
     }
     
     .date-selector {
@@ -321,14 +219,60 @@ font-weight: 800;
       order: -1;
       margin-bottom: 10px;
     }
-  }
-
-
-      .social-icons {
-      gap: 10px; /* Smaller gap on mobile */
+    
+    .header-controls {
+      gap: 12px;
+    }
+    
+    .social-icons {
+      gap: 8px;
     }
 
     .social-icons a img {
-      height: 24px; /* Slightly smaller icons on mobile */
+      height: 24px;
       width: 24px;
     }
+    
+    .theme-toggle-header {
+      transform: scale(0.9);
+    }
+  }
+
+/* Theme-aware global styling */
+.theme-glass .app {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  transition: background 0.3s ease;
+}
+
+.theme-classic .app {
+  background: #f5f5f7;
+  transition: background 0.3s ease;
+}
+
+/* Theme-aware header styling */
+.theme-glass .app-header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.theme-classic .app-header {
+  background: white;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Add transition classes for smooth theme switching */
+.theme-transition .app,
+.theme-transition .app-header,
+.theme-transition .card,
+.theme-transition .glass-card-container {
+  transition: 
+    background-color 0.3s ease,
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    backdrop-filter 0.3s ease !important;
+}

@@ -67,36 +67,38 @@ const HomeRunLeadersCard = ({
 
   return (
     <div className="card hr-leaders-card">
-      <h3>💥 Home Run Leaders ({timePeriodText})</h3>
-      
-      {/* Enhanced subtitle with team context */}
-      {teamContext && (
-        <div className="card-subtitle team-context">
-          {teamContext.includeMatchup && teamContext.matchupName 
-            ? `${teamContext.teamName} vs ${teamContext.matchupName} power hitting`
-            : `${teamContext.teamName} power hitting performance`
-          }
-          <br />
-          <span className="context-details">
-            {teamContext.showing} of {teamContext.totalHomers} team players with home runs
-          </span>
-        </div>
-      )}
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>💥 Home Run Leaders ({timePeriodText})</h3>
+          
+          {/* Enhanced subtitle with team context */}
+          {teamContext && (
+            <div className="card-subtitle team-context">
+              {teamContext.includeMatchup && teamContext.matchupName 
+                ? `${teamContext.teamName} vs ${teamContext.matchupName} power hitting`
+                : `${teamContext.teamName} power hitting performance`
+              }
+              <br />
+              <span className="context-details">
+                {teamContext.showing} of {teamContext.totalHomers} team players with home runs
+              </span>
+            </div>
+          )}
 
-      {/* Team HR summary when filtering */}
-      {teamHRSummary && (
-        <div className="team-hr-summary">
-          <div className="summary-stats">
-            <div className="summary-stat">
-              <span className="stat-value">{teamHRSummary.totalHRs}</span>
-              <span className="stat-label">Total HRs</span>
-            </div>
-            <div className="summary-stat">
-              <span className="stat-value">{teamHRSummary.playersWithHRs}</span>
-              <span className="stat-label">Players with HRs</span>
-            </div>
-            <div className="summary-stat">
-              <span className="stat-value">{teamHRSummary.avgHRsPerPlayer}</span>
+          {/* Team HR summary when filtering */}
+          {teamHRSummary && (
+            <div className="team-hr-summary">
+              <div className="summary-stats">
+                <div className="summary-stat">
+                  <span className="stat-value">{teamHRSummary.totalHRs}</span>
+                  <span className="stat-label">Total HRs</span>
+                </div>
+                <div className="summary-stat">
+                  <span className="stat-value">{teamHRSummary.playersWithHRs}</span>
+                  <span className="stat-label">Players with HRs</span>
+                </div>
+                <div className="summary-stat">
+                  <span className="stat-value">{teamHRSummary.avgHRsPerPlayer}</span>
               <span className="stat-label">Avg per Player</span>
             </div>
             {teamHRSummary.topHRHitter && (
@@ -106,13 +108,14 @@ const HomeRunLeadersCard = ({
               </div>
             )}
           </div>
+          </div>
+        )}
         </div>
-      )}
-      
-      {isLoading ? (
-        <div className="loading-indicator">Loading home run stats...</div>
-      ) : displayHomers.length > 0 ? (
-        <div className="scrollable-container">
+        
+        {isLoading ? (
+          <div className="loading-indicator">Loading home run stats...</div>
+        ) : displayHomers.length > 0 ? (
+          <div className="scrollable-container">
           <ul className="player-list">
             {displayHomers.map((player, index) => {
               // Get team logo URL if teams data is available
@@ -182,15 +185,16 @@ const HomeRunLeadersCard = ({
               Showing top {teamContext.showing} of {teamContext.totalHomers} {teamContext.teamName} players with home runs
             </div>
           )}
-        </div>
-      ) : (
-        <p className="no-data">
-          {isFiltering 
-            ? `No home run data available for ${teamContext?.teamName || 'selected team'}`
-            : 'No home run data available for this period'
-          }
-        </p>
-      )}
+          </div>
+        ) : (
+          <p className="no-data">
+            {isFiltering 
+              ? `No home run data available for ${teamContext?.teamName || 'selected team'}`
+              : 'No home run data available for this period'
+            }
+          </p>
+        )}
+      </div>
     </div>
   );
 };

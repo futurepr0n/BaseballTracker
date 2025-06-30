@@ -1,0 +1,224 @@
+/* Glass Card Performance Optimizations - Simplified Glass Effects */
+
+/* APPROACH: Replace heavy backdrop-filter with optimized alternatives */
+
+/* Optimized Scrollable Containers - Remove backdrop-filter */
+.continue-streak-card .scrollable-container,
+.top-hitters-card .scrollable-container,
+.hellraiser-card .scrollable-container,
+.hr-prediction .scrollable-container,
+.mlb-weather-card .scrollable-container,
+.likely-to-hit-card .scrollable-container,
+.hit-streak-card .scrollable-container,
+.day-of-week-hits-card .scrollable-container,
+.hr-leaders-card .scrollable-container,
+.recent-homers-card .scrollable-container {
+  /* Remove the heavy backdrop-filter */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  
+  /* Use semi-transparent background instead */
+  background: rgba(248, 250, 252, 0.85) !important;
+}
+
+/* Card-specific optimized backgrounds */
+.continue-streak-card .scrollable-container {
+  background: rgba(255, 243, 224, 0.85) !important;
+}
+
+.top-hitters-card .scrollable-container {
+  background: rgba(230, 242, 255, 0.85) !important;
+}
+
+.hellraiser-card .scrollable-container {
+  background: rgba(255, 245, 238, 0.85) !important;
+}
+
+.hr-prediction .scrollable-container {
+  background: rgba(255, 235, 238, 0.85) !important;
+}
+
+.likely-to-hit-card .scrollable-container {
+  background: rgba(236, 252, 243, 0.85) !important;
+}
+
+.hit-streak-card .scrollable-container {
+  background: rgba(230, 244, 255, 0.85) !important;
+}
+
+.day-of-week-hits-card .scrollable-container {
+  background: rgba(255, 252, 230, 0.85) !important;
+}
+
+.hr-leaders-card .scrollable-container,
+.recent-homers-card .scrollable-container {
+  background: rgba(255, 235, 238, 0.85) !important;
+}
+
+/* Optimize Player Items - Remove individual backdrop-filters */
+.continue-streak-card .player-item,
+.top-hitters-card .player-item,
+.hellraiser-card .pick-item,
+.hr-prediction .player-item,
+.mlb-weather-card .mini-weather-card,
+.likely-to-hit-card .player-item,
+.hit-streak-card .player-item,
+.day-of-week-hits-card .player-item,
+.hr-leaders-card .player-item,
+.recent-homers-card .player-item {
+  /* Remove backdrop-filter from items */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  
+  /* Use solid background with higher opacity */
+  background: rgba(255, 255, 255, 0.5) !important;
+  
+  /* Add subtle box shadow for depth */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Keep the glass header blur since it doesn't scroll */
+.glass-header {
+  /* Headers can keep blur - they don't affect scroll performance */
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+}
+
+/* CRITICAL FIX: Remove padding from all glass cards to prevent header gaps */
+.card.continue-streak-card,
+.card.top-hitters-card,
+.card.hellraiser-card,
+.card.hr-prediction,
+.card.mlb-weather-card,
+.card.likely-to-hit-card,
+.card.hit-streak-card,
+.card.day-of-week-hits-card,
+.card.hr-leaders-card,
+.card.recent-homers-card,
+.card.hr-rate-card,
+.card.improved-rate-card,
+.card.last-result-card,
+.card.poor-performance-card,
+.card.positive-momentum-card {
+  padding: 0 !important;
+  /* Ensure glass containers fill the entire card */
+  overflow: hidden !important;
+}
+
+/* Fix for HRPredictionCard - Use same simple positioning as working cards */
+.hr-prediction .glass-header {
+  /* Use simple positioning like working cards - NO negative values */
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  /* Remove any border radius like working cards */
+  border-radius: 0 !important;
+  /* Reset any aggressive overrides */
+  margin: 0 !important;
+  width: auto !important;
+  /* Use standard padding like working cards */
+  padding: 20px !important;
+  /* Ensure proper box sizing */
+  box-sizing: border-box !important;
+  /* Standard z-index */
+  z-index: 20 !important;
+}
+
+/* Special fix for HR prediction card background bleeding */
+.card.hr-prediction {
+  /* Ensure the background extends properly */
+  background-clip: padding-box !important;
+  /* Remove any potential background bleed from borders */
+  background-origin: border-box !important;
+}
+
+/* Ensure all glass card containers fill the entire parent card */
+.continue-streak-card .glass-card-container,
+.top-hitters-card .glass-card-container,
+.hellraiser-card .glass-card-container,
+.hr-prediction .glass-card-container,
+.mlb-weather-card .glass-card-container,
+.likely-to-hit-card .glass-card-container,
+.hit-streak-card .glass-card-container,
+.day-of-week-hits-card .glass-card-container,
+.hr-leaders-card .glass-card-container,
+.recent-homers-card .glass-card-container {
+  margin: 0 !important;
+  padding: 0 !important;
+  /* Keep relative positioning but remove any default margins/padding */
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 420px !important;
+  border-radius: 12px !important;
+  /* Remove any potential box-sizing issues */
+  box-sizing: border-box !important;
+}
+
+/* Specific fix for HR prediction glass container positioning */
+.hr-prediction .glass-card-container {
+  /* Force the glass container to start at the absolute top */
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  /* Remove any inherited spacing that might push it down */
+  transform: none !important;
+  /* Ensure it starts flush with parent */
+  vertical-align: top !important;
+}
+
+/* Override Dashboard.css card h3 styles that might affect glass headers */
+.card.hr-prediction h3,
+.card.hr-prediction .glass-header h3 {
+  margin: 0 !important;
+  padding: 0 !important;
+  border-bottom: none !important;
+  /* Remove any inherited spacing from Dashboard.css */
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Enhanced hover effects to compensate for removed blur */
+.player-item:hover,
+.pick-item:hover {
+  background: rgba(255, 255, 255, 0.7) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Alternative: CSS-only frosted glass effect using gradients */
+.scrollable-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Ensure content is above the gradient */
+.scrollable-container > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Smooth scroll without performance impact */
+.scrollable-container {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  
+  /* Optimize scrolling */
+  will-change: scroll-position;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}

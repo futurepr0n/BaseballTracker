@@ -114,9 +114,13 @@ const PositiveMomentumCard = ({ currentDate, teams, maxItems = 25 }) => {
   if (isLoading) {
     return (
       <div className="card positive-momentum-card">
-        <h3>🚀 Positive Momentum Players</h3>
-        <div className="loading-indicator">
-          Loading momentum analysis...
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>🚀 Positive Momentum Players</h3>
+          </div>
+          <div className="loading-indicator">
+            Loading momentum analysis...
+          </div>
         </div>
       </div>
     );
@@ -125,9 +129,13 @@ const PositiveMomentumCard = ({ currentDate, teams, maxItems = 25 }) => {
   if (displayData.length === 0) {
     return (
       <div className="card positive-momentum-card">
-        <h3>🚀 Positive Momentum Players</h3>
-        <div className="no-data">
-          No positive momentum players found for the selected teams.
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>🚀 Positive Momentum Players</h3>
+          </div>
+          <div className="no-data">
+            No positive momentum players found for the selected teams.
+          </div>
         </div>
       </div>
     );
@@ -135,14 +143,17 @@ const PositiveMomentumCard = ({ currentDate, teams, maxItems = 25 }) => {
 
   return (
     <div className="card positive-momentum-card">
-      <h3>🚀 Positive Momentum Players</h3>
-      {lastUpdated && (
-        <div className="card-subtitle">
-          {formatLastUpdated()}
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>🚀 Positive Momentum Players</h3>
+          {lastUpdated && (
+            <div className="card-subtitle">
+              {formatLastUpdated()}
+            </div>
+          )}
         </div>
-      )}
-      
-      <div className="scrollable-container">
+        
+        <div className="scrollable-container">
         <ul className="player-list">
           {displayData.map((player, index) => {
             const playerKey = `${player.playerName}_${player.team}`;
@@ -221,6 +232,7 @@ const PositiveMomentumCard = ({ currentDate, teams, maxItems = 25 }) => {
             );
           })}
         </ul>
+        </div>
       </div>
     </div>
   );

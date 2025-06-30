@@ -1,10 +1,38 @@
-/* TeamLastResultCards.css */
+/* TeamLastResultCards.css - Glass Effect */
 
+/* Base card styling */
 .last-result-card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
   overflow: hidden;
+  position: relative;
+  padding: 0;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+/* Win card - Light green theme */
+.last-result-card.win-card {
+  background: rgba(34, 197, 94, 0.05);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-left: 4px solid #22c55e;
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  box-shadow: 
+    0 8px 32px rgba(34, 197, 94, 0.08),
+    0 2px 8px rgba(34, 197, 94, 0.03);
+}
+
+/* Loss card - Light red theme */
+.last-result-card.loss-card {
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-left: 4px solid #ef4444;
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  box-shadow: 
+    0 8px 32px rgba(239, 68, 68, 0.08),
+    0 2px 8px rgba(239, 68, 68, 0.03);
 }
 
 /* Full width cards - span entire grid width */
@@ -12,59 +40,188 @@
   grid-column: 1 / -1;
 }
 
-.last-result-card .card-header {
+/* Glass card container for proper layering */
+.last-result-card .glass-card-container {
+  position: relative;
+  height: 100%;
+  min-height: 420px;
+}
+
+/* Glass header that content scrolls behind */
+.last-result-card .glass-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 20px;
+  pointer-events: none;
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 20px 15px 20px;
-  border-bottom: 1px solid #f0f0f0;
-  margin-bottom: 0;
 }
 
-.last-result-card .card-header h3 {
+/* Win card glass header */
+.last-result-card.win-card .glass-header {
+  background: rgba(34, 197, 94, 0.08);
+  border-bottom: 1px solid rgba(34, 197, 94, 0.15);
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.05);
+}
+
+/* Loss card glass header */
+.last-result-card.loss-card .glass-header {
+  background: rgba(239, 68, 68, 0.08);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.15);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.05);
+}
+
+.last-result-card .glass-header h3 {
   margin: 0;
+  color: #333;
   font-size: 1.2rem;
   font-weight: 600;
 }
 
-.win-card .card-header h3 {
-  color: #28a745;
-}
-
-.loss-card .card-header h3 {
-  color: #dc3545;
-}
-
-.team-count {
+.last-result-card .team-count {
   font-size: 0.9rem;
   color: #666;
-  background: #f8f9fa;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 4px 8px;
   border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.teams-list {
-  padding: 0;
-}
-
-/* Make teams list scrollable with consistent height */
-.teams-list.scrollable-container {
-  max-height: 400px;
+/* Glass Effect Scrollable Container */
+.last-result-card .scrollable-container {
+  border-radius: 0 0 12px 12px;
+  height: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 100px; /* Space for header */
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
+/* Win card scrollable container */
+.last-result-card.win-card .scrollable-container {
+  background: rgba(240, 253, 244, 0.4);
+}
+
+/* Loss card scrollable container */
+.last-result-card.loss-card .scrollable-container {
+  background: rgba(254, 242, 242, 0.4);
+}
+
+/* Glass Effect Scrollbar */
+.last-result-card .scrollable-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.last-result-card .scrollable-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+/* Win card scrollbar */
+.last-result-card.win-card .scrollable-container::-webkit-scrollbar-thumb {
+  background: rgba(34, 197, 94, 0.4);
+  border-radius: 3px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.last-result-card.win-card .scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 197, 94, 0.6);
+}
+
+/* Loss card scrollbar */
+.last-result-card.loss-card .scrollable-container::-webkit-scrollbar-thumb {
+  background: rgba(239, 68, 68, 0.4);
+  border-radius: 3px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.last-result-card.loss-card .scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(239, 68, 68, 0.6);
+}
+
+/* Team result items */
 .team-result-item {
   padding: 20px;
-  border-bottom: 1px solid #f0f0f0;
-  transition: background-color 0.2s ease;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden; /* Prevent logo overflow */
 }
 
-.team-result-item:hover {
-  background-color: #f8f9fa;
+/* Team logo background - oversized and centered */
+.team-result-item .team-logo-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 800px;
+  height: 800px;
+  opacity: 0.06;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
 }
+
+/* Win card team items */
+.last-result-card.win-card .team-result-item {
+  border: 1px solid rgba(34, 197, 94, 0.12);
+}
+
+.last-result-card.win-card .team-result-item:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.08);
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.last-result-card.win-card .team-result-item:hover .team-logo-bg {
+  opacity: 0.1;
+}
+
+/* Loss card team items */
+.last-result-card.loss-card .team-result-item {
+  border: 1px solid rgba(239, 68, 68, 0.12);
+}
+
+.last-result-card.loss-card .team-result-item:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.last-result-card.loss-card .team-result-item:hover .team-logo-bg {
+  opacity: 0.1;
+}
+
 
 .team-result-item:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
 }
 
 .team-header {
@@ -88,6 +245,33 @@
   font-weight: bold;
   font-size: 0.9rem;
   flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.team-logo-circle .team-logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.7;
+}
+
+.team-logo-circle .team-logo-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0.3;
+}
+
+.team-logo-circle .team-code {
+  position: relative;
+  z-index: 10;
+  color: white;
+  font-size: 0.9rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .team-info h4 {
@@ -117,11 +301,11 @@
 }
 
 .result-badge.win {
-  background-color: #28a745;
+  background-color: #22c55e;
 }
 
 .result-badge.loss {
-  background-color: #dc3545;
+  background-color: #ef4444;
 }
 
 .score {
@@ -136,13 +320,19 @@
 .game-stats {
   display: grid;
   gap: 15px;
+  position: relative;
+  background: transparent;
 }
+
 
 .hitting-stats,
 .pitching-stats {
-  background-color: #f8f9fa;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   border-radius: 6px;
   padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .hitting-stats h5,
@@ -170,8 +360,17 @@
   display: block;
   font-size: 1.4rem;
   font-weight: 700;
-  color: #0056b3;
   line-height: 1;
+}
+
+/* Win card stat values */
+.last-result-card.win-card .stat-value {
+  color: #16a34a;
+}
+
+/* Loss card stat values */
+.last-result-card.loss-card .stat-value {
+  color: #dc2626;
 }
 
 .stat-label {
@@ -199,21 +398,40 @@
   margin-right: 8px;
   margin-bottom: 4px;
   padding: 2px 6px;
-  background-color: #e3f2fd;
   border-radius: 4px;
-  color: #1976d2;
   font-weight: 500;
 }
 
-/* Different colors for different types of highlights */
-.player-highlight.home-run {
-  background-color: #ffecb3;
-  color: #f57f17;
+/* Win card player highlights */
+.last-result-card.win-card .player-highlight {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
 }
 
-.player-highlight.multi-hit {
-  background-color: #e8f5e8;
-  color: #2e7d32;
+.last-result-card.win-card .player-highlight.home-run {
+  background-color: rgba(251, 191, 36, 0.15);
+  color: #d97706;
+}
+
+.last-result-card.win-card .player-highlight.multi-hit {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: #15803d;
+}
+
+/* Loss card player highlights */
+.last-result-card.loss-card .player-highlight {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+}
+
+.last-result-card.loss-card .player-highlight.home-run {
+  background-color: rgba(251, 191, 36, 0.15);
+  color: #d97706;
+}
+
+.last-result-card.loss-card .player-highlight.multi-hit {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #b91c1c;
 }
 
 .pitcher-line {
@@ -232,13 +450,34 @@
   font-size: 0.85rem;
 }
 
+/* Loading and no data states */
+.last-result-card .loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.last-result-card .no-data {
+  color: #888;
+  text-align: center;
+  padding: 40px 20px;
+  font-style: italic;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
-  .last-result-card .card-header {
+  .last-result-card .glass-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
     padding: 15px;
+  }
+  
+  .last-result-card .scrollable-container {
+    padding-top: 80px; /* Less top padding on mobile */
   }
   
   .team-identity {
@@ -251,6 +490,10 @@
     width: 40px;
     height: 40px;
     font-size: 0.8rem;
+  }
+  
+  .team-logo-circle .team-code {
+    font-size: 0.75rem;
   }
   
   .stats-grid {
@@ -270,8 +513,15 @@
     padding: 15px;
   }
 
-  .teams-list.scrollable-container {
+  .last-result-card .scrollable-container {
     max-height: 350px;
+  }
+  
+  /* Adjust team logo background for mobile - still oversized and centered */
+  .team-result-item .team-logo-bg {
+    width: 600px;
+    height: 600px;
+    transform: translate(-50%, -50%);
   }
 }
 
@@ -294,98 +544,7 @@
     padding: 1px 4px;
   }
 
-  .teams-list.scrollable-container {
+  .last-result-card .scrollable-container {
     max-height: 300px;
-  }
-}
-
-/* Scrollbar styling for teams list */
-.teams-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.teams-list::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.teams-list::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
-
-.teams-list::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .last-result-card {
-    background: #1e1e1e;
-    color: #e0e0e0;
-  }
-  
-  .last-result-card .card-header {
-    border-bottom-color: #333;
-  }
-  
-  .team-result-item {
-    border-bottom-color: #333;
-  }
-  
-  .team-result-item:hover {
-    background-color: #2a2a2a;
-  }
-  
-  .team-info h4 {
-    color: #e0e0e0;
-  }
-  
-  .score {
-    color: #e0e0e0;
-  }
-  
-  .vs {
-    color: #aaa;
-  }
-  
-  .hitting-stats,
-  .pitching-stats {
-    background-color: #2a2a2a;
-  }
-  
-  .hitting-stats h5,
-  .pitching-stats h5 {
-    color: #ccc;
-  }
-  
-  .stat-value {
-    color: #60a5fa;
-  }
-  
-  .stat-label {
-    color: #aaa;
-  }
-  
-  .standout-players strong {
-    color: #e0e0e0;
-  }
-  
-  .player-highlight {
-    background-color: #1e3a8a;
-    color: #bfdbfe;
-  }
-  
-  .pitcher-line strong {
-    color: #e0e0e0;
-  }
-  
-  .pitcher-line span {
-    color: #aaa;
-  }
-  
-  .team-count {
-    background: #333;
-    color: #ccc;
   }
 }

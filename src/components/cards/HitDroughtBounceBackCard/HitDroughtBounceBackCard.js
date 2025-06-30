@@ -4,6 +4,8 @@ import {
   fetchPlayerDataForDateRange, 
   fetchRosterData 
 } from '../../../services/dataService';
+import { getPlayerDisplayName, getTeamDisplayName } from '../../../utils/playerNameUtils';
+import './HitDroughtBounceBackCard.css';
 
 const HitDroughtBounceBackCard = ({ gameData, currentDate, teams }) => {
   const [bounceBackData, setBounceBackData] = useState([]);
@@ -183,96 +185,106 @@ const HitDroughtBounceBackCard = ({ gameData, currentDate, teams }) => {
 
   if (loading) {
     return (
-      <div className="card">
-        <h3>🔄 Hit Expected After Drought</h3>
-        <div className="loading-indicator">Analyzing bounce back patterns...</div>
+      <div className="card hit-drought-bounce-back-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>🔄 Hit Expected After Drought</h3>
+          </div>
+          <div className="loading-indicator">Analyzing bounce back patterns...</div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="card">
-        <h3>🔄 Hit Expected After Drought</h3>
-        <div className="no-data">Error: {error}</div>
+      <div className="card hit-drought-bounce-back-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>🔄 Hit Expected After Drought</h3>
+          </div>
+          <div className="no-data">Error: {error}</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="card">
-      <h3>🔄 Hit Expected After Drought</h3>
-      <p className="card-subtitle">
-        Players most likely to bounce back quickly after hitless games
-      </p>
-      
-      {bounceBackData.length === 0 ? (
-        <div className="no-data">
-          No sufficient bounce back data available for today's players
+    <div className="card hit-drought-bounce-back-card">
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>🔄 Hit Expected After Drought</h3>
+          <p className="card-subtitle">
+            Players most likely to bounce back quickly after hitless games
+          </p>
         </div>
-      ) : (
-        <div className="scrollable-container">
-          <ul className="player-list">
-            {bounceBackData.map((player, index) => {
-              const teamInfo = getTeamInfo(player.team);
-              
-              return (
-                <li key={`${player.name}_${player.team}`} className="player-item">
-                  {/* Team logo background */}
-                  {teamInfo.logoUrl && (
-                    <img 
-                      src={teamInfo.logoUrl} 
-                      alt={`${teamInfo.name} logo`}
-                      className="team-logo-bg"
-                    />
-                  )}
-                  
-                  <div className="player-rank" style={{ backgroundColor: '#4CAF50' }}>
+        
+        {bounceBackData.length === 0 ? (
+          <div className="no-data">
+            No sufficient bounce back data available for today's players
+          </div>
+        ) : (
+          <div className="scrollable-container">
+            <ul className="player-list">
+              {bounceBackData.map((player, index) => {
+                const teamInfo = getTeamInfo(player.team);
+                
+                return (
+                  <li key={`${player.name}_${player.team}`} className="player-item">
+                    {/* Team logo background */}
                     {teamInfo.logoUrl && (
-                      <>
-                        <img 
-                          src={teamInfo.logoUrl} 
-                          alt="" 
-                          className="rank-logo"
-                          loading="lazy"
-                          aria-hidden="true"
-                        />
-                        <div className="rank-overlay"></div>
-                      </>
+                      <img 
+                        src={teamInfo.logoUrl} 
+                        alt={`${teamInfo.name} logo`}
+                        className="team-logo-bg"
+                      />
                     )}
-                    <span className="rank-number">{index + 1}</span>
-                  </div>
-                  
-                  <div className="player-info">
-                    <div className="player-name">
-                      {player.name}
-                      {player.isCurrentlyInDrought && (
-                        <span className="drought-indicator" title={`Currently ${player.currentDrought} games without a hit`}>
-                          🔥{player.currentDrought}
-                        </span>
+                    
+                    <div className="player-rank" style={{ backgroundColor: '#10b981' }}>
+                      {teamInfo.logoUrl && (
+                        <>
+                          <img 
+                            src={teamInfo.logoUrl} 
+                            alt="" 
+                            className="rank-logo"
+                            loading="lazy"
+                            aria-hidden="true"
+                          />
+                          <div className="rank-overlay"></div>
+                        </>
                       )}
+                      <span className="rank-number">{index + 1}</span>
                     </div>
-                    <div className="player-team">{teamInfo.name}</div>
-                  </div>
-                  
-                  <div className="player-stat">
-                    <span className="stat-highlight" style={{ color: '#4CAF50' }}>
-                      {player.avgGamesToBounceBack} Avg Games
-                    </span>
-                    <small className="stat-note">
-                      1G: {player.oneGameBounceBackPct}% | 
-                      2G: {player.twoGameBounceBackPct}% | 
-                      3G: {player.threeGameBounceBackPct}%
-                      <br />
-                      ({player.totalDroughts} droughts analyzed)
-                    </small>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
+                    
+                    <div className="player-info">
+                      <div className="player-name">
+                        {getPlayerDisplayName(player)}
+                        {player.isCurrentlyInDrought && (
+                          <span className="drought-indicator" title={`Currently ${player.currentDrought} games without a hit`}>
+                            🔥{player.currentDrought}
+                          </span>
+                        )}
+                      </div>
+                      <div className="player-team">{getTeamDisplayName(player)}</div>
+                    </div>
+                    
+                    <div className="player-stat">
+                      <span className="stat-highlight" style={{ color: '#10b981' }}>
+                        {player.avgGamesToBounceBack} Avg Games
+                      </span>
+                      <small className="stat-note">
+                        Next Game: {player.oneGameBounceBackPct}%
+                        <br />
+                        {player.totalDroughts} droughts analyzed
+                      </small>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

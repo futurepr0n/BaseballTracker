@@ -226,8 +226,12 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
   if (isLoading) {
     return (
       <div className="card hr-prediction">
-        <h3>⏳Players Due for A Home Run</h3>
-        <div className="loading-indicator">Loading predictions...</div>
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>⏳Players Due for A Home Run</h3>
+          </div>
+          <div className="loading-indicator">Loading predictions...</div>
+        </div>
       </div>
     );
   }
@@ -235,28 +239,33 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
   if (!playersWithHomeRunPrediction || playersWithHomeRunPrediction.length === 0) {
     return (
       <div className="card hr-prediction">
-        <h3>⏳Players Due for A Home Run</h3>
-        <div className="no-data">No HR prediction data available</div>
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>⏳Players Due for A Home Run</h3>
+          </div>
+          <div className="no-data">No HR prediction data available</div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="card hr-prediction">
-      <div className="card-header">
-        <h3>⏳Players Due for A Home Run</h3>
-        {oddsLoading && (
-          <div className="odds-loading">Loading odds...</div>
-        )}
-        {oddsError && (
-          <div className="odds-error">⚠️ {oddsError}</div>
-        )}
-        {!oddsLoading && !oddsError && oddsData.size > 0 && (
-          <div className="odds-info">📊 Live odds included</div>
-        )}
-      </div>
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>⏳Players Due for A Home Run</h3>
+          {oddsLoading && (
+            <div className="odds-loading">Loading odds...</div>
+          )}
+          {oddsError && (
+            <div className="odds-error">⚠️ {oddsError}</div>
+          )}
+          {!oddsLoading && !oddsError && oddsData.size > 0 && (
+            <div className="odds-info">📊 Live odds included</div>
+          )}
+        </div>
 
-<div className="scrollable-container">
+        <div className="scrollable-container">
   <ul className="player-list">
     {playersWithHomeRunPrediction
       .filter(player => getPlayerOdds(player.name) !== null) // Filter out players without odds
@@ -332,19 +341,20 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
         );
       })}
   </ul>
-</div>
-
-      {oddsData.size > 0 && (
-        <div className="odds-footer">
-          <small>
-            Odds provided by DraftKings • Last updated: {
-              Array.from(oddsData.values())[0]?.lastUpdated ? 
-                new Date(Array.from(oddsData.values())[0].lastUpdated).toLocaleTimeString() : 
-                'Unknown'
-            }
-          </small>
         </div>
-      )}
+
+        {oddsData.size > 0 && (
+          <div className="odds-footer">
+            <small>
+              Odds provided by DraftKings • Last updated: {
+                Array.from(oddsData.values())[0]?.lastUpdated ? 
+                  new Date(Array.from(oddsData.values())[0].lastUpdated).toLocaleTimeString() : 
+                  'Unknown'
+              }
+            </small>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

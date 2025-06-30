@@ -18,6 +18,7 @@ import CapSheet from './components/CapSheet';
 import MatchupAnalyzer from './components/MatchupAnalyzer';
 import Navigation from './components/Navigation';
 import { TeamFilterProvider } from './components/TeamFilterContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { 
   fetchPlayerData, 
   fetchTeamData, 
@@ -30,6 +31,8 @@ import HRMatchupHub from './components/HRMatchupHub/HRMatchupHub';
 import CSSFixesTest from './components/test/CSSFixesTest';
 
 import './App.css';
+import './styles/theme-variables.css';
+import './styles/classic-mode.css';
 
 function App() {
   const [playerData, setPlayerData] = useState([]);
@@ -78,22 +81,25 @@ function App() {
   if (error) return <div className="error">{error}</div>;
 
   return (
-    <Router>
-      <div className="app">
-        <header className="app-header">
-         <div className="header-top-row">
-            <h1>
-              Capping.Pro
-            </h1>
-            <div className="social-icons">
-              <a href="https://x.com/capping_pro" target="_blank" rel="noopener noreferrer" aria-label="Capping.Pro on X">
-                <img src="/data/logos/x_logo_icon.svg" alt="X (formerly Twitter) Logo" />
-              </a>
-              <a href="https://discord.gg/K3djWdDU" target="_blank" rel="noopener noreferrer" aria-label="Capping.Pro Discord Server">
-                <img src="/data/logos/discord_icon.svg" alt="Discord Logo" />
-              </a>
+    <ThemeProvider>
+      <Router>
+        <div className="app">
+          <header className="app-header">
+           <div className="header-top-row">
+              <h1>
+                Capping.Pro
+              </h1>
+              <div className="header-controls">
+                <div className="social-icons">
+                  <a href="https://x.com/capping_pro" target="_blank" rel="noopener noreferrer" aria-label="Capping.Pro on X">
+                    <img src="/data/logos/x_logo_icon.svg" alt="X (formerly Twitter) Logo" />
+                  </a>
+                  <a href="https://discord.gg/K3djWdDU" target="_blank" rel="noopener noreferrer" aria-label="Capping.Pro Discord Server">
+                    <img src="/data/logos/discord_icon.svg" alt="Discord Logo" />
+                  </a>
+                </div>
+              </div>
             </div>
-          </div>
           <Navigation />
           
           <div className="date-selector">
@@ -195,6 +201,7 @@ function App() {
         </footer>
       </div>
     </Router>
+    </ThemeProvider>
   );
 }
 

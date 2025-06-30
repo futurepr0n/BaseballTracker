@@ -5,6 +5,20 @@
   position: relative;
 }
 
+/* Enhanced styling for current day full-width layout */
+.live-scores-card.current-day-featured {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border: 2px solid #0056b3;
+  box-shadow: 0 4px 20px rgba(0, 86, 179, 0.1);
+  margin-bottom: 10px;
+}
+
+.live-scores-card.current-day-featured .card-header h3 {
+  color: #0056b3;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;

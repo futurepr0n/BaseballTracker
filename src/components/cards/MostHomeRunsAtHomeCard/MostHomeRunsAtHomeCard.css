@@ -1,66 +1,145 @@
-/* src/components/cards/MostHomeRunsAtHome/MostHomeRunsAtHome.css */
+/* MostHomeRunsAtHomeCard.css - Glass Effect */
 
 .most-home-runs-at-home-card {
   grid-column: span 1;
-  background-color: white;
+  background: rgba(147, 51, 234, 0.05);
+  border: 1px solid rgba(147, 51, 234, 0.2);
+  border-left: 4px solid #9333ea;
+  border-radius: 12px;
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  box-shadow: 
+    0 8px 32px rgba(147, 51, 234, 0.08),
+    0 2px 8px rgba(147, 51, 234, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Glass card container for proper layering */
+.most-home-runs-at-home-card .glass-card-container {
+  position: relative;
+  height: 100%;
+  min-height: 420px;
+}
+
+/* Glass header that content scrolls behind */
+.most-home-runs-at-home-card .glass-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: rgba(147, 51, 234, 0.08);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(147, 51, 234, 0.15);
+  padding: 20px;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(147, 51, 234, 0.05);
+}
+
+.most-home-runs-at-home-card .glass-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.most-home-runs-at-home-card .card-subtitle {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 5px;
+}
+
+/* Glass Effect Scrollable Container */
+.most-home-runs-at-home-card .scrollable-container {
+  background: rgba(236, 221, 255, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 80px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
 }
 
 /* Stadium Summary Stats */
-.stadium-summary {
+.most-home-runs-at-home-card .stadium-summary {
   margin-bottom: 20px;
   padding: 15px;
-  background-color: #f8f9fa;
-  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(147, 51, 234, 0.12);
+  border-radius: 8px;
 }
 
-.summary-stats {
+.most-home-runs-at-home-card .summary-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 15px;
   text-align: center;
 }
 
-.summary-stats .stat-item {
+.most-home-runs-at-home-card .summary-stats .stat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.summary-stats .stat-value {
+.most-home-runs-at-home-card .summary-stats .stat-value {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #0056b3;
+  color: #9333ea;
 }
 
-.summary-stats .stat-label {
+.most-home-runs-at-home-card .summary-stats .stat-label {
   font-size: 0.8rem;
   color: #666;
   margin-top: 2px;
 }
 
 /* Stadium List Styling */
-.stadium-list {
+.most-home-runs-at-home-card .stadium-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.stadium-item {
-  padding: 12px 0;
+.most-home-runs-at-home-card .stadium-item {
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(147, 51, 234, 0.12);
+  border-radius: 8px;
+  transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
-  transition: background-color 0.2s ease;
 }
 
-.stadium-item:last-child {
-  border-bottom: none;
+.most-home-runs-at-home-card .stadium-item:last-child {
+  margin-bottom: 0;
 }
 
-.stadium-item:hover {
-  background-color: rgba(0, 0, 0, 0.02);
+.most-home-runs-at-home-card .stadium-item:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.08);
+  border-color: rgba(147, 51, 234, 0.2);
 }
 
 /* Stadium Rank Styling */
@@ -136,10 +215,10 @@
   flex-shrink: 0;
 }
 
-.stadium-stats .stat-highlight {
+.most-home-runs-at-home-card .stadium-stats .stat-highlight {
   font-weight: 700;
   font-size: 1.1rem;
-  color: #0056b3;
+  color: #9333ea;
   margin-bottom: 2px;
 }
 
@@ -171,12 +250,36 @@
   opacity: 0.1;
 }
 
+/* Glass Effect Scrollbar */
+.most-home-runs-at-home-card .scrollable-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.most-home-runs-at-home-card .scrollable-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.most-home-runs-at-home-card .scrollable-container::-webkit-scrollbar-thumb {
+  background: rgba(147, 51, 234, 0.4);
+  border-radius: 3px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.most-home-runs-at-home-card .scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(147, 51, 234, 0.6);
+}
+
 /* Home vs Away Analysis */
-.home-away-analysis {
+.most-home-runs-at-home-card .home-away-analysis {
   margin-top: 20px;
   padding: 15px;
-  background-color: #f8f9fa;
-  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(147, 51, 234, 0.12);
+  border-radius: 8px;
 }
 
 .home-away-analysis h4 {
@@ -239,48 +342,72 @@
   padding: 20px;
   color: #666;
   font-style: italic;
+  height: 100%;
+  min-height: 420px;
 }
 
 .most-home-runs-at-home-card .no-data {
   color: #888;
   text-align: center;
   padding: 20px 0;
+  font-style: italic;
+  height: 100%;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
-  .summary-stats {
+  .most-home-runs-at-home-card {
+    grid-column: 1 / -1;
+  }
+  
+  .most-home-runs-at-home-card .glass-card-container {
+    min-height: auto;
+    height: auto;
+  }
+  
+  .most-home-runs-at-home-card .scrollable-container {
+    position: relative;
+    height: auto;
+    max-height: 60vh;
+    padding-bottom: 10px;
+  }
+  
+  .most-home-runs-at-home-card .summary-stats {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
   
-  .summary-stats .stat-value {
+  .most-home-runs-at-home-card .summary-stats .stat-value {
     font-size: 1.3rem;
   }
   
-  .stadium-item {
-    padding: 10px 5px;
+  .most-home-runs-at-home-card .stadium-item {
+    padding: 10px 6px;
   }
   
-  .stadium-rank {
+  .most-home-runs-at-home-card .stadium-rank {
     width: 40px;
     height: 40px;
     margin-right: 12px;
   }
   
-  .stadium-rank .rank-number {
+  .most-home-runs-at-home-card .stadium-rank .rank-number {
     font-size: 1rem;
   }
   
-  .stadium-name {
+  .most-home-runs-at-home-card .stadium-name {
     font-size: 0.9rem;
   }
   
-  .stadium-stats {
+  .most-home-runs-at-home-card .stadium-stats {
     min-width: 100px;
   }
   
-  .analysis-stats {
+  .most-home-runs-at-home-card .analysis-stats {
     font-size: 0.85rem;
   }
 }

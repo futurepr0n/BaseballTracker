@@ -1,0 +1,169 @@
+/* theme-variables.css - CSS Custom Properties for Theme System */
+
+:root {
+  /* Glass Mode Variables */
+  --glass-bg-primary: rgba(255, 255, 255, 0.15);
+  --glass-bg-secondary: rgba(255, 255, 255, 0.05);
+  --glass-bg-tertiary: rgba(255, 255, 255, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-border-accent: rgba(255, 255, 255, 0.3);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --glass-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+  --glass-blur: blur(35px);
+  --glass-blur-light: blur(8px);
+  --glass-blur-header: blur(30px);
+  
+  /* Classic Mode Variables */
+  --classic-bg-primary: rgba(255, 255, 255, 0.95);
+  --classic-bg-secondary: rgba(248, 250, 252, 0.9);
+  --classic-bg-tertiary: rgba(255, 255, 255, 1);
+  --classic-border: rgba(0, 0, 0, 0.1);
+  --classic-border-accent: rgba(0, 0, 0, 0.15);
+  --classic-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --classic-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --classic-blur: none;
+  --classic-blur-light: none;
+  --classic-blur-header: none;
+  
+  /* Common Variables */
+  --text-primary: #333;
+  --text-secondary: #666;
+  --text-muted: #888;
+  --border-radius: 12px;
+  --border-radius-small: 8px;
+  --border-radius-large: 16px;
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* Glass Mode Theme Class */
+.theme-glass {
+  --card-bg-primary: var(--glass-bg-primary);
+  --card-bg-secondary: var(--glass-bg-secondary);
+  --card-bg-tertiary: var(--glass-bg-tertiary);
+  --card-border: var(--glass-border);
+  --card-border-accent: var(--glass-border-accent);
+  --card-shadow: var(--glass-shadow);
+  --card-shadow-hover: var(--glass-shadow-hover);
+  --card-blur: var(--glass-blur);
+  --card-blur-light: var(--glass-blur-light);
+  --card-blur-header: var(--glass-blur-header);
+  --backdrop-filter: var(--glass-blur);
+  --backdrop-filter-light: var(--glass-blur-light);
+  --backdrop-filter-header: var(--glass-blur-header);
+}
+
+/* Classic Mode Theme Class */
+.theme-classic {
+  --card-bg-primary: var(--classic-bg-primary);
+  --card-bg-secondary: var(--classic-bg-secondary);
+  --card-bg-tertiary: var(--classic-bg-tertiary);
+  --card-border: var(--classic-border);
+  --card-border-accent: var(--classic-border-accent);
+  --card-shadow: var(--classic-shadow);
+  --card-shadow-hover: var(--classic-shadow-hover);
+  --card-blur: var(--classic-blur);
+  --card-blur-light: var(--classic-blur-light);
+  --card-blur-header: var(--classic-blur-header);
+  --backdrop-filter: var(--classic-blur);
+  --backdrop-filter-light: var(--classic-blur-light);
+  --backdrop-filter-header: var(--classic-blur-header);
+}
+
+/* Component-specific theme variables */
+.theme-glass {
+  --scrollbar-track: rgba(255, 255, 255, 0.1);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.3);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.5);
+  --header-bg: rgba(255, 255, 255, 0.08);
+  --footer-bg: rgba(255, 255, 255, 0.05);
+}
+
+.theme-classic {
+  --scrollbar-track: rgba(0, 0, 0, 0.05);
+  --scrollbar-thumb: rgba(0, 0, 0, 0.2);
+  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.3);
+  --header-bg: rgba(248, 250, 252, 0.95);
+  --footer-bg: rgba(248, 250, 252, 0.9);
+}
+
+/* Color-specific theme variables for different card types */
+.theme-glass {
+  --purple-glass-bg: rgba(156, 39, 176, 0.05);
+  --purple-glass-border: rgba(156, 39, 176, 0.2);
+  --purple-glass-header: rgba(156, 39, 176, 0.08);
+  
+  --teal-glass-bg: rgba(47, 79, 79, 0.05);
+  --teal-glass-border: rgba(47, 79, 79, 0.2);
+  --teal-glass-header: rgba(47, 79, 79, 0.08);
+  
+  --red-glass-bg: rgba(220, 38, 38, 0.05);
+  --red-glass-border: rgba(220, 38, 38, 0.2);
+  --red-glass-header: rgba(220, 38, 38, 0.08);
+  
+  --grey-glass-bg: rgba(31, 41, 55, 0.05);
+  --grey-glass-border: rgba(31, 41, 55, 0.2);
+  --grey-glass-header: rgba(31, 41, 55, 0.08);
+}
+
+.theme-classic {
+  --purple-classic-bg: rgba(156, 39, 176, 0.08);
+  --purple-classic-border: rgba(156, 39, 176, 0.15);
+  --purple-classic-header: rgba(156, 39, 176, 0.05);
+  
+  --teal-classic-bg: rgba(47, 79, 79, 0.08);
+  --teal-classic-border: rgba(47, 79, 79, 0.15);
+  --teal-classic-header: rgba(47, 79, 79, 0.05);
+  
+  --red-classic-bg: rgba(220, 38, 38, 0.08);
+  --red-classic-border: rgba(220, 38, 38, 0.15);
+  --red-classic-header: rgba(220, 38, 38, 0.05);
+  
+  --grey-classic-bg: rgba(31, 41, 55, 0.08);
+  --grey-classic-border: rgba(31, 41, 55, 0.15);
+  --grey-classic-header: rgba(31, 41, 55, 0.05);
+}
+
+/* CRITICAL: Force remove ALL glass effects in classic mode */
+.theme-classic *,
+.theme-classic *::before,
+.theme-classic *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Ensure no element can have backdrop-filter */
+.theme-classic [class*="glass"],
+.theme-classic [class*="card"],
+.theme-classic [class*="container"],
+.theme-classic [class*="header"],
+.theme-classic [class*="scrollable"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Override any inline styles */
+.theme-classic [style*="backdrop-filter"],
+.theme-classic [style*="blur"],
+.theme-classic [style*="filter"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* Transition classes for smooth theme switching */
+.theme-transition {
+  transition: 
+    background-color var(--transition-medium),
+    border-color var(--transition-medium),
+    box-shadow var(--transition-medium) !important;
+}
+
+.theme-transition * {
+  transition: 
+    background-color var(--transition-medium),
+    border-color var(--transition-medium),
+    backdrop-filter var(--transition-medium) !important;
+}

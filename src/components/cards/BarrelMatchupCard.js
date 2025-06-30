@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import hellraiserAnalysisService from '../../services/hellraiserAnalysisService';
 import { useTeamFilter } from '../TeamFilterContext';
+import GlassCard, { GlassScrollableContainer } from './GlassCard/GlassCard';
+import { getPlayerDisplayName, getTeamDisplayName } from '../../utils/playerNameUtils';
 import './BarrelMatchupCard.css';
 
 const BarrelMatchupCard = ({ currentDate }) => {
@@ -250,7 +252,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
 
   if (loading) {
     return (
-      <div className="barrel-matchup-card">
+      <GlassCard className="barrel-matchup-card" variant="default">
         <div className="card-header">
           <h3>🎯 Barrel Matchup Analysis</h3>
         </div>
@@ -258,13 +260,13 @@ const BarrelMatchupCard = ({ currentDate }) => {
           <div className="loading-spinner"></div>
           <p>Analyzing barrel matchups...</p>
         </div>
-      </div>
+      </GlassCard>
     );
   }
 
   if (error) {
     return (
-      <div className="barrel-matchup-card">
+      <GlassCard className="barrel-matchup-card" variant="default">
         <div className="card-header">
           <h3>🎯 Barrel Matchup Analysis</h3>
         </div>
@@ -274,58 +276,61 @@ const BarrelMatchupCard = ({ currentDate }) => {
             Retry Analysis
           </button>
         </div>
-      </div>
+      </GlassCard>
     );
   }
 
   if (!analysisData || !analysisData.picks || analysisData.picks.length === 0) {
     return (
-      <div className="barrel-matchup-card">
+      <GlassCard className="barrel-matchup-card" variant="default">
         <div className="card-header">
           <h3>🎯 Barrel Matchup Analysis</h3>
         </div>
         <div className="no-data">
           <p>No barrel matchup data available</p>
         </div>
-      </div>
+      </GlassCard>
     );
   }
 
   const sortedPicks = sortData(analysisData.picks);
 
   return (
-    <div className="barrel-matchup-card">
-      <div className="card-header">
+    <GlassCard className="barrel-matchup-card" variant="default">
+      <div className="glass-header">
         <h3>🎯 Barrel Matchup Analysis</h3>
-        <span className="card-subtitle">Click column headers to sort</span>
+        <span className="card-subtitle">Click column headers to sort • Click rows to expand</span>
       </div>
 
-      <div className="table-container">
-        <table className="matchup-table">
+      <GlassScrollableContainer className="table-container">
+        <div className="desktop-view">
+          <table className="matchup-table">
           <thead>
             <tr>
               <th className="player-col">Player</th>
               <th className="sortable" onClick={() => handleSort('pitcherContactAllowed')}>
-                Pitcher Contact {getSortIndicator('pitcherContactAllowed')}
-                <span className="header-subtitle">Exit Velo Allowed</span>
+                Pitch Contact {getSortIndicator('pitcherContactAllowed')}
+                <span className="header-subtitle">Exit Velo</span>
               </th>
               <th className="sortable" onClick={() => handleSort('pitcherBarrelVulnerable')}>
-                Pitcher Barrels {getSortIndicator('pitcherBarrelVulnerable')}
-                <span className="header-subtitle">Barrel % Allowed</span>
+                Pitch Barrels {getSortIndicator('pitcherBarrelVulnerable')}
+                <span className="header-subtitle">% Allowed</span>
               </th>
               <th className="sortable" onClick={() => handleSort('playerExitVelocity')}>
-                Player Exit Velo {getSortIndicator('playerExitVelocity')}
+                Exit Velo {getSortIndicator('playerExitVelocity')}
+                <span className="header-subtitle">Player</span>
               </th>
               <th className="sortable" onClick={() => handleSort('playerBarrelRate')}>
-                Player Barrels {getSortIndicator('playerBarrelRate')}
+                Barrel Rate {getSortIndicator('playerBarrelRate')}
+                <span className="header-subtitle">Player %</span>
               </th>
               <th className="sortable" onClick={() => handleSort('playerHardContact')}>
-                Player Hard Contact {getSortIndicator('playerHardContact')}
-                <span className="header-subtitle">Hard Contact %</span>
+                Hard Contact {getSortIndicator('playerHardContact')}
+                <span className="header-subtitle">Player %</span>
               </th>
               <th className="sortable" onClick={() => handleSort('pitcherHardContact')}>
-                Pitcher Hard Contact {getSortIndicator('pitcherHardContact')}
-                <span className="header-subtitle">Exit Velo Allowed</span>
+                Hard Allowed {getSortIndicator('pitcherHardContact')}
+                <span className="header-subtitle">Pitcher</span>
               </th>
               <th className="sortable" onClick={() => handleSort('confidenceScore')}>
                 Confidence {getSortIndicator('confidenceScore')}
@@ -334,7 +339,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
                 Market Edge {getSortIndicator('marketEdge')}
               </th>
               <th className="sortable" onClick={() => handleSort('matchupScore')}>
-                Matchup Score {getSortIndicator('matchupScore')}
+                Score {getSortIndicator('matchupScore')}
               </th>
             </tr>
           </thead>
@@ -344,8 +349,8 @@ const BarrelMatchupCard = ({ currentDate }) => {
                 <tr className="data-row" onClick={() => toggleRowExpansion(index)}>
                   <td className="player-cell">
                     <div className="player-info">
-                      <span className="player-name">{pick.playerName}</span>
-                      <span className="team-info">{pick.team} vs {pick.pitcher}</span>
+                      <span className="player-name">{getPlayerDisplayName(pick)}</span>
+                      <span className="team-info">{getTeamDisplayName(pick)} vs {pick.pitcher}</span>
                     </div>
                   </td>
                   <td 
@@ -453,8 +458,144 @@ const BarrelMatchupCard = ({ currentDate }) => {
               </React.Fragment>
             ))}
           </tbody>
-        </table>
-      </div>
+          </table>
+        </div>
+        
+        {/* Mobile View */}
+        <div className="mobile-view">
+          <div className="mobile-cards">
+            {sortedPicks.map((pick, index) => (
+              <div key={index} className={`mobile-card ${expandedRows[index] ? 'expanded' : ''}`}>
+                <div className="mobile-card-header" onClick={() => toggleRowExpansion(index)}>
+                  <div className="player-rank">
+                    <span className="rank-number">{index + 1}</span>
+                  </div>
+                  <div className="player-info">
+                    <div className="player-name">{pick.playerName}</div>
+                    <div className="team-info">{pick.team} vs {pick.pitcher}</div>
+                  </div>
+                  <div className="matchup-score-mobile">
+                    <div className="score-value" style={{ '--score': pick.matchupScore }}>
+                      {pick.matchupScore}
+                    </div>
+                    <div className="expand-icon">
+                      {expandedRows[index] ? '▼' : '▶'}
+                    </div>
+                  </div>
+                </div>
+                
+                {expandedRows[index] && (
+                  <div className="mobile-card-content">
+                    <div className="metrics-grid">
+                      <div className="metric-item">
+                        <span className="metric-label">Pitcher Contact</span>
+                        <span 
+                          className="metric-value"
+                          style={{ backgroundColor: getValueColor(pick.pitcherContactAllowed, 'pitcherContact') + '20' }}
+                        >
+                          {pick.pitcherContactAllowed > 0 ? `${pick.pitcherContactAllowed.toFixed(1)} mph` : '-'}
+                        </span>
+                      </div>
+                      <div className="metric-item">
+                        <span className="metric-label">Pitcher Barrels</span>
+                        <span 
+                          className="metric-value"
+                          style={{ backgroundColor: getValueColor(pick.pitcherBarrelVulnerable, 'pitcherBarrel') + '20' }}
+                        >
+                          {pick.pitcherBarrelVulnerable > 0 ? `${pick.pitcherBarrelVulnerable.toFixed(1)}%` : '-'}
+                        </span>
+                      </div>
+                      <div className="metric-item">
+                        <span className="metric-label">Player Exit Velo</span>
+                        <span 
+                          className="metric-value"
+                          style={{ backgroundColor: getValueColor(pick.playerExitVelocity, 'playerExitVelo') + '20' }}
+                        >
+                          {pick.playerExitVelocity > 0 ? `${pick.playerExitVelocity.toFixed(1)} mph` : '-'}
+                        </span>
+                      </div>
+                      <div className="metric-item">
+                        <span className="metric-label">Player Barrels</span>
+                        <span 
+                          className="metric-value"
+                          style={{ backgroundColor: getValueColor(pick.playerBarrelRate, 'playerBarrel') + '20' }}
+                        >
+                          {pick.playerBarrelRate > 0 ? `${pick.playerBarrelRate.toFixed(1)}%` : '-'}
+                        </span>
+                      </div>
+                      <div className="metric-item">
+                        <span className="metric-label">Player Hard Contact</span>
+                        <span 
+                          className="metric-value"
+                          style={{ backgroundColor: getValueColor(pick.playerHardContact, 'playerHardContact') + '20' }}
+                        >
+                          {pick.playerHardContact > 0 ? `${pick.playerHardContact.toFixed(1)}%` : '-'}
+                        </span>
+                      </div>
+                      <div className="metric-item">
+                        <span className="metric-label">Pitcher Hard Contact</span>
+                        <span 
+                          className="metric-value"
+                          style={{ backgroundColor: getValueColor(pick.pitcherHardContact, 'pitcherHardContact') + '20' }}
+                        >
+                          {pick.pitcherHardContact > 0 ? `${pick.pitcherHardContact.toFixed(1)} mph` : '-'}
+                        </span>
+                      </div>
+                      <div className="metric-item">
+                        <span className="metric-label">Confidence</span>
+                        <span 
+                          className="metric-value"
+                          style={{ backgroundColor: getValueColor(pick.confidenceScore, 'confidence') + '20' }}
+                        >
+                          {pick.confidenceScore}
+                        </span>
+                      </div>
+                      <div className="metric-item">
+                        <span className="metric-label">Market Edge</span>
+                        <span 
+                          className="metric-value"
+                          style={{ backgroundColor: getValueColor(pick.marketEdge, 'marketEdge') + '20' }}
+                        >
+                          {pick.marketEdge ? `${(pick.marketEdge * 100).toFixed(1)}%` : '-'}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="mobile-analysis">
+                      <div className="analysis-section">
+                        <h5>Analysis:</h5>
+                        <p>{pick.reasoning}</p>
+                      </div>
+                      <div className="details-row">
+                        <span className="label">Classification:</span>
+                        <span className="value">{pick.classification}</span>
+                      </div>
+                      <div className="details-row">
+                        <span className="label">Pathway:</span>
+                        <span className="value">{pick.pathway}</span>
+                      </div>
+                      <div className="details-row">
+                        <span className="label">Odds:</span>
+                        <span className="value">{pick.odds?.american || '-'}</span>
+                      </div>
+                      {pick.riskFactors && pick.riskFactors.length > 0 && (
+                        <div className="risk-section">
+                          <h5>Risk Factors:</h5>
+                          <ul>
+                            {pick.riskFactors.map((risk, i) => (
+                              <li key={i}>{risk}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </GlassScrollableContainer>
 
       <div className="card-footer">
         <div className="legend">
@@ -471,7 +612,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
           </small>
         </div>
       </div>
-    </div>
+    </GlassCard>
   );
 };
 

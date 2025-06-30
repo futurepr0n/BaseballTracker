@@ -1,0 +1,256 @@
+/* CardResponsiveFix.css - Final mobile card sizing fix */
+
+/* Override all problematic min-widths on mobile */
+@media (max-width: 768px) {
+  /* Force all cards to fit viewport with margins - EXCEPT barrel matchup card */
+  .card:not(.barrel-matchup-card),
+  .glass-card:not(.barrel-matchup-card),
+  .glass-card-container:not(.barrel-matchup-card),
+  [class*="-card"]:not(.barrel-matchup-card) {
+    width: 100% !important;
+    max-width: calc(100vw - 20px) !important;
+    min-width: 0 !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Special handling for barrel matchup card - preserve its responsive behavior */
+  .barrel-matchup-card {
+    width: 100% !important;
+    max-width: calc(100vw - 20px) !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+    /* Let the card's own CSS handle height and view switching */
+  }
+  
+  /* Reset all table min-widths that cause overflow - EXCEPT barrel matchup table */
+  table:not(.barrel-matchup-card .matchup-table),
+  .table-container:not(.barrel-matchup-card .table-container) {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+  
+  /* Barrel matchup table - preserve responsive behavior */
+  .barrel-matchup-card .table-container {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .barrel-matchup-card .matchup-table {
+    width: 100% !important;
+    /* Don't override min-width for this table - it has special responsive handling */
+  }
+  
+  /* Reset table cell min-widths - EXCEPT barrel matchup cells */
+  table:not(.barrel-matchup-card .matchup-table) th,
+  table:not(.barrel-matchup-card .matchup-table) td {
+    min-width: 0 !important;
+    max-width: none !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Barrel matchup card cells - preserve responsive behavior */
+  .barrel-matchup-card .matchup-table th,
+  .barrel-matchup-card .matchup-table td {
+    /* Don't override - let the card's CSS handle these */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Ensure clickable elements remain clickable */
+  .sortable,
+  .toggle-button,
+  button,
+  [role="button"],
+  .clickable {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+  }
+  
+  /* Reset all player stats min-widths */
+  .player-stat,
+  .hitting-stats,
+  .hr-stats,
+  .recent-hr-stats {
+    min-width: 0 !important;
+    flex-shrink: 1 !important;
+  }
+  
+  /* Fix player rank circles for all screen sizes */
+  .player-rank {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    max-width: 36px !important;
+    max-height: 36px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    margin-right: 12px !important;
+  }
+  
+  .player-rank .rank-number {
+    font-size: 0.85rem !important;
+    line-height: 1 !important;
+    text-align: center !important;
+  }
+  
+  /* Reset grid min-widths */
+  .summary-stats {
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)) !important;
+  }
+  
+  /* Special handling for player items */
+  .player-item {
+    padding: 8px 6px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .player-info {
+    flex: 1 !important;
+    min-width: 0 !important;
+    margin-right: 8px !important;
+  }
+  
+  .player-name {
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+  
+  /* Team filter responsive */
+  .team-filter {
+    width: 100% !important;
+    max-width: calc(100vw - 20px) !important;
+    box-sizing: border-box !important;
+  }
+  
+  .filter-section {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+  
+  /* Allow scrolling for wide content inside cards */
+  .table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  /* Ensure buttons and controls fit and remain clickable */
+  button,
+  select,
+  input {
+    max-width: 100% !important;
+    pointer-events: auto !important;
+  }
+  
+  /* Glass headers should allow interaction with their content */
+  .glass-header {
+    pointer-events: auto !important;
+  }
+  
+  /* Interactive elements inside glass headers */
+  .glass-header button,
+  .glass-header .toggle-button,
+  .glass-header .sortable {
+    pointer-events: auto !important;
+    z-index: 25 !important;
+    position: relative !important;
+  }
+  
+  /* Protect barrel matchup card responsive views */
+  .barrel-matchup-card .desktop-view,
+  .barrel-matchup-card .mobile-view {
+    /* Don't override display properties - let the card's CSS handle view switching */
+  }
+  
+  .barrel-matchup-card .mobile-cards {
+    /* Preserve mobile card container behavior */
+    padding: 10px !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .card:not(.barrel-matchup-card),
+  .glass-card:not(.barrel-matchup-card),
+  .glass-card-container:not(.barrel-matchup-card),
+  [class*="-card"]:not(.barrel-matchup-card) {
+    max-width: calc(100vw - 10px) !important;
+    padding: 10px !important;
+  }
+  
+  .barrel-matchup-card {
+    max-width: calc(100vw - 10px) !important;
+    /* Let the card handle its own padding */
+  }
+  
+  .player-item {
+    padding: 6px 4px !important;
+  }
+  
+  .player-rank {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    max-width: 32px !important;
+    max-height: 32px !important;
+    margin-right: 8px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  .player-rank .rank-number {
+    font-size: 0.8rem !important;
+    line-height: 1 !important;
+  }
+}
+
+/* Ensure text content is readable */
+@media (max-width: 768px) {
+  /* Reduce font sizes slightly for better fit - EXCEPT barrel matchup */
+  table:not(.barrel-matchup-card .matchup-table) {
+    font-size: 10px !important;
+  }
+  
+  /* Barrel matchup table - preserve its own font sizing */
+  .barrel-matchup-card .matchup-table {
+    /* Let the card handle its own font sizes for responsive behavior */
+  }
+  
+  .player-name {
+    font-size: 0.85rem !important;
+  }
+  
+  .player-team {
+    font-size: 0.75rem !important;
+  }
+  
+  .stat-highlight {
+    font-size: 0.9rem !important;
+  }
+  
+  /* Adjust card headers for mobile */
+  .glass-header h3,
+  .card h3 {
+    font-size: 1rem !important;
+  }
+}

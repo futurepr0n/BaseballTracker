@@ -233,9 +233,13 @@ const PitcherHitsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
   if (isLoading) {
     return (
       <div className="card pitcher-hits-allowed-card">
-        <h3>📈 Most Hits Allowed (Pitchers)</h3>
-        <div className="loading-indicator">
-          Loading pitcher hits analysis...
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>📈 Most Hits Allowed (Pitchers)</h3>
+          </div>
+          <div className="loading-indicator">
+            Loading pitcher hits analysis...
+          </div>
         </div>
       </div>
     );
@@ -244,9 +248,13 @@ const PitcherHitsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
   if (displayData.length === 0) {
     return (
       <div className="card pitcher-hits-allowed-card">
-        <h3>📈 Most Hits Allowed (Pitchers)</h3>
-        <div className="no-data">
-          No pitcher hits data available for the selected period.
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>📈 Most Hits Allowed (Pitchers)</h3>
+          </div>
+          <div className="no-data">
+            No pitcher hits data available for the selected period.
+          </div>
         </div>
       </div>
     );
@@ -254,76 +262,80 @@ const PitcherHitsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
 
   return (
     <div className="card pitcher-hits-allowed-card">
-      <h3>📈 Most Hits Allowed (Pitchers)</h3>
-      {dataRange.startDate && (
-        <div className="card-subtitle">
-          {formatDateRange()}
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>📈 Most Hits Allowed (Pitchers)</h3>
+          {dataRange.startDate && (
+            <p className="card-subtitle">
+              {formatDateRange()}
+            </p>
+          )}
         </div>
-      )}
-      
-      <div className="scrollable-container">
-        <ul className="player-list">
-          {displayData.map((pitcher, index) => {
-            const pitcherKey = `${pitcher.name}_${pitcher.team}`;
-            // Use same approach as working DayOfWeekHitsCard
-            const teamData = teams && pitcher.team ? teams[pitcher.team] : null;
-            const logoUrl = teamData ? teamData.logoUrl : null;
-            
-            return (
-              <li key={pitcherKey} className="player-item pitcher-hits-item">
-                <div className="player-rank" style={{ backgroundColor: teams[pitcher.team]?.colors?.primary || '#333' }}>
-                  {logoUrl && (
-                    <>
-                      <img 
-                        src={logoUrl} 
-                        alt="" 
-                        className="rank-logo"
-                        loading="lazy"
-                        aria-hidden="true"
-                      />
-                      <div className="rank-overlay"></div>
-                    </>
-                  )}
-                  <span className="rank-number">{index + 1}</span>
-                </div>
-                
-                <div className="player-info" onClick={(e) => handlePitcherClick(pitcher, e)}>
-                  <div className="player-name">{pitcher.name}</div>
-                  <div className="player-team">{pitcher.team}</div>
-                </div>
-                
-                <div className="player-stat pitcher-hits-stats">
-                  <div className="total-hits">
-                    <span className="stat-value">{pitcher.totalHitsAllowed}</span>
-                    <span className="stat-label">Total Hits</span>
+        
+        <div className="scrollable-container">
+          <ul className="player-list">
+            {displayData.map((pitcher, index) => {
+              const pitcherKey = `${pitcher.name}_${pitcher.team}`;
+              // Use same approach as working DayOfWeekHitsCard
+              const teamData = teams && pitcher.team ? teams[pitcher.team] : null;
+              const logoUrl = teamData ? teamData.logoUrl : null;
+              
+              return (
+                <li key={pitcherKey} className="player-item pitcher-hits-item">
+                  <div className="player-rank" style={{ backgroundColor: '#8b5cf6' }}>
+                    {logoUrl && (
+                      <>
+                        <img 
+                          src={logoUrl} 
+                          alt="" 
+                          className="rank-logo"
+                          loading="lazy"
+                          aria-hidden="true"
+                        />
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
+                    <span className="rank-number">{index + 1}</span>
                   </div>
-                  <div className="hits-rate">
-                    <span className="stat-detail">{pitcher.hitsPerInning}/IP</span>
+                  
+                  <div className="player-info" onClick={(e) => handlePitcherClick(pitcher, e)}>
+                    <div className="player-name">{pitcher.name}</div>
+                    <div className="player-team">{pitcher.team}</div>
                   </div>
-                </div>
+                  
+                  <div className="player-stat pitcher-hits-stats">
+                    <div className="total-hits">
+                      <span className="stat-value" style={{ color: '#8b5cf6' }}>{pitcher.totalHitsAllowed}</span>
+                      <span className="stat-label">Total Hits</span>
+                    </div>
+                    <div className="hits-rate">
+                      <span className="stat-detail">{pitcher.hitsPerInning}/IP</span>
+                    </div>
+                  </div>
 
-                <button 
-                  className="expand-toggle tooltip-trigger"
-                  onClick={(e) => handlePitcherClick(pitcher, e)}
-                  aria-label="View detailed statistics"
-                >
-                  ℹ️
-                </button>
-                
-                {/* Enhanced background logo */}
-                {logoUrl && (
-                  <img 
-                    src={logoUrl} 
-                    alt="" 
-                    className="team-logo-bg" 
-                    loading="lazy"
-                    aria-hidden="true"
-                  />
-                )}
-              </li>
-            );
-          })}
-        </ul>
+                  <button 
+                    className="expand-toggle tooltip-trigger"
+                    onClick={(e) => handlePitcherClick(pitcher, e)}
+                    aria-label="View detailed statistics"
+                  >
+                    ℹ️
+                  </button>
+                  
+                  {/* Enhanced background logo */}
+                  {logoUrl && (
+                    <img 
+                      src={logoUrl} 
+                      alt="" 
+                      className="team-logo-bg" 
+                      loading="lazy"
+                      aria-hidden="true"
+                    />
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
     </div>
   );

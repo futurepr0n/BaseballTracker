@@ -3,7 +3,7 @@ import './PitcherMatchupCard.css';
 import { createSafeId } from '../../utils/tooltipUtils';
 import { useTeamFilter } from '../../TeamFilterContext';
 import { useTooltip } from '../../utils/TooltipContext';
-import PitcherArsenalDisplay from '../PitcherArsenalDisplay/PitcherArsenalDisplay';
+import arsenalDataService from '../../../services/arsenalDataService';
 
 /**
  * PitcherMatchupCard - Displays pitcher matchup analysis with arsenal details
@@ -11,7 +11,8 @@ import PitcherArsenalDisplay from '../PitcherArsenalDisplay/PitcherArsenalDispla
 const PitcherMatchupCard = ({ 
   pitcherMatchups,
   isLoading,
-  currentDate 
+  currentDate,
+  teams = {}
 }) => {
 
   // Get team filter context
@@ -32,7 +33,6 @@ const PitcherMatchupCard = ({
   const [pitcherSortMethod, setPitcherSortMethod] = useState('sameHanded');
   const [hiddenPitchers, setHiddenPitchers] = useState(new Set());
   const [previousFilterState, setPreviousFilterState] = useState({ isFiltering, selectedTeam });
-  const [expandedPitchers, setExpandedPitchers] = useState(new Set()); // New state for arsenal expansion
 
   // Handle team filter changes
   useEffect(() => {
@@ -53,7 +53,7 @@ const PitcherMatchupCard = ({
         setSelectedPitcherTeam('ALL');
       }
     }
-  }, [isFiltering, selectedTeam, previousFilterState]);
+  }, [isFiltering, selectedTeam]); // Removed previousFilterState to prevent infinite loop
 
   // Set up teams list
   useEffect(() => {
@@ -157,6 +157,12 @@ const PitcherMatchupCard = ({
     }
   };
 
+  // Get team logo function
+  const getTeamLogo = (teamCode) => {
+    if (!teams[teamCode]) return null;
+    return teams[teamCode].logoUrl || `/data/logos/${teamCode.toLowerCase()}_logo.png`;
+  };
+
   // Team selection handler
   const handleTeamChange = useCallback((team) => {
     if (!isFiltering) {
@@ -179,18 +185,6 @@ const PitcherMatchupCard = ({
     setHiddenPitchers(new Set());
   }, []);
 
-  // Toggle pitcher arsenal expansion
-  const togglePitcherExpanded = useCallback((pitcherId) => {
-    setExpandedPitchers(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(pitcherId)) {
-        newSet.delete(pitcherId);
-      } else {
-        newSet.add(pitcherId);
-      }
-      return newSet;
-    });
-  }, []);
 
   // Tooltip handler using GlobalTooltip system
   const handleBatterGroupClick = useCallback((event, pitcher, handType) => {
@@ -204,22 +198,109 @@ const PitcherMatchupCard = ({
     });
   }, [openTooltip]);
 
+  // New comprehensive pitcher info tooltip handler
+  const handlePitcherInfoClick = useCallback(async (event, pitcher) => {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const safeId = createSafeId(pitcher.name, pitcher.team);
+    const tooltipId = `pitcher_comprehensive_${safeId}`;
+    
+    try {
+      // Load comprehensive arsenal data
+      const arsenalData = await arsenalDataService.getPitcherArsenalForTooltip(
+        pitcher.fullName || pitcher.name,
+        pitcher.team,
+        pitcher.opposingBattersList || []
+      );
+      
+      openTooltip(tooltipId, event.currentTarget, {
+        type: 'pitcher_comprehensive',
+        pitcher: {
+          name: pitcher.name,
+          fullName: pitcher.fullName || pitcher.name,
+          team: pitcher.team,
+          hand: pitcher.pitchingHand || pitcher.hand,
+          opposingTeam: pitcher.opposingTeam,
+          sameHandednessPercentage: pitcher.sameHandednessPercentage,
+          oppositeHandednessPercentage: pitcher.oppositeHandednessPercentage,
+          estimated: pitcher.estimated || pitcher.isEstimated
+        },
+        sameHandBatters: pitcher.sameHandedBattersList || [],
+        oppositeHandBatters: pitcher.oppositeHandedBattersList || [],
+        arsenal: pitcher.pitches || [], // Fallback basic arsenal
+        comprehensiveArsenal: arsenalData, // Rich arsenal data with stats
+        opposingBattersList: pitcher.opposingBattersList || [],
+        pitches: pitcher.pitches || []
+      });
+    } catch (error) {
+      console.error('Error loading pitcher arsenal data:', error);
+      // Show tooltip with basic data if comprehensive loading fails
+      openTooltip(tooltipId, event.currentTarget, {
+        type: 'pitcher_comprehensive',
+        pitcher: {
+          name: pitcher.name,
+          fullName: pitcher.fullName || pitcher.name,
+          team: pitcher.team,
+          hand: pitcher.pitchingHand || pitcher.hand,
+          opposingTeam: pitcher.opposingTeam,
+          sameHandednessPercentage: pitcher.sameHandednessPercentage,
+          oppositeHandednessPercentage: pitcher.oppositeHandednessPercentage,
+          estimated: pitcher.estimated || pitcher.isEstimated
+        },
+        sameHandBatters: pitcher.sameHandedBattersList || [],
+        oppositeHandBatters: pitcher.oppositeHandedBattersList || [],
+        arsenal: pitcher.pitches || [],
+        comprehensiveArsenal: null, // Will fallback to basic display
+        opposingBattersList: pitcher.opposingBattersList || [],
+        pitches: pitcher.pitches || []
+      });
+    }
+  }, [openTooltip]);
+
   // Loading state
   if (isLoading) {
     return (
       <div className="pitcher-matchup-card">
-        <h2 className="card-title">Pitcher Matchup Analysis</h2>
-        <p>Loading pitcher matchup data...</p>
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h2 className="card-title">Pitcher Matchup Analysis</h2>
+          </div>
+          <div className="scrollable-container">
+            <div className="loading-indicator">
+              <div className="flex items-center gap-3">
+                <div className="animate-spin h-8 w-8 border-4 border-gray-300 border-t-gray-600 rounded-full"></div>
+                <p className="text-gray-600">Loading pitcher matchup data...</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="pitcher-matchup-card">
-      <h2 className="card-title">Pitcher Matchup Analysis</h2>
-      
-      {filteredPitchers && filteredPitchers.length > 0 ? (
-        <>
+      <div className="glass-card-container">
+        {/* Glass Header */}
+        <div className="glass-header">
+          <div className="dashboard-header">
+            <div className="header-content">
+              <div className="header-icon">
+                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <div className="header-text">
+                <h2 className="text-xl font-bold text-gray-900">Pitcher Matchup Analysis</h2>
+                <p className="text-sm text-gray-600">
+                  Arsenal analysis and handedness advantages
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Team Selector */}
           <div className="team-selector">
             {allTeams.map(team => (
               <div 
@@ -232,6 +313,7 @@ const PitcherMatchupCard = ({
             ))}
           </div>
           
+          {/* Matchup Actions */}
           <div className="matchup-actions">
             <div className="sort-toggle">
               <span>Sort by: </span>
@@ -239,157 +321,144 @@ const PitcherMatchupCard = ({
                 className={`sort-button ${pitcherSortMethod === 'sameHanded' ? 'active' : ''}`} 
                 onClick={() => toggleSortMethod('sameHanded')}
               >
-                Favorable Matchups [Pitchers Advantage (Same Hand)]
+                Favorable Matchups
               </button>
               <button 
                 className={`sort-button ${pitcherSortMethod === 'oppositeHanded' ? 'active' : ''}`} 
                 onClick={() => toggleSortMethod('oppositeHanded')}
               >
-                Tough Matchups [Hitters Advantage (Opposite Hand)]
+                Tough Matchups
               </button>
             </div>
             
             {hiddenPitchers.size > 0 && (
               <button className="restore-button" onClick={restoreAllPitchers}>
-                Restore All Pitchers ({hiddenPitchers.size})
+                Restore All ({hiddenPitchers.size})
               </button>
             )}
           </div>
           
+          {/* Pitchers Count */}
           <div className="pitchers-count">
             Showing {filteredPitchers.length} pitchers
             {selectedPitcherTeam !== 'ALL' ? ` for ${selectedPitcherTeam}` : ''}
             {hiddenPitchers.size > 0 ? ` (${hiddenPitchers.size} hidden)` : ''}
           </div>
-          
-          <div className="scrollable-container">
-            <ul className="player-list">
-              {filteredPitchers.map((pitcher, index) => {
-                const safeId = createSafeId(pitcher.name, pitcher.team);
-                const isExpanded = expandedPitchers.has(safeId);
-                
-                return (
-                  <li key={safeId} className={`player-item pitcher-matchup-item ${isExpanded ? 'expanded' : ''}`}>
-                    <div className="pitcher-main-row">
-                      <div className={`player-rank ${getMatchupClass(pitcher)}`}>
-                        {index + 1}
-                      </div>
-                      
-                      <div className="player-info">
-                        <div className="player-name-container">
-                          <span className="player-name">{pitcher.name}</span>
-                          <span className="player-team">{pitcher.team}</span>
-                          {pitcher.estimated && <span className="estimated-badge">EST</span>}
-                          <button
-                            className="hide-pitcher-button"
-                            onClick={() => hidePitcher(safeId)}
-                            title="Hide this pitcher"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                        
-                        <div className="pitcher-details">
-                          <span className="handedness-badge">{pitcher.hand}</span>
-                          {pitcher.pitches && pitcher.pitches.length > 0 && (
-                            <span className="pitch-count">{pitcher.pitches.length} pitches</span>
-                          )}
-                          <button
-                            className="arsenal-toggle-btn"
-                            onClick={() => togglePitcherExpanded(safeId)}
-                            aria-label={isExpanded ? 'Hide arsenal' : 'Show arsenal'}
-                          >
-                            {isExpanded ? '▼' : '▶'} Arsenal
-                          </button>
-                        </div>
-                        
-                        <span className="opposing-team">vs {pitcher.opposingTeam}</span>
-                      </div>
-                      
-                      <div className="matchup-stats">
-                        <div 
-                          className={`matchup-stat ${pitcher.sameHandednessPercentage > 60 ? 'favorable' : ''}`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            console.log('SAME HAND CLICKED:', pitcher.name, 'Event:', e);
-                            handleBatterGroupClick(e, pitcher, 'same');
-                          }}
-                          style={{ 
-                            cursor: 'pointer',
-                            zIndex: 10,
-                            pointerEvents: 'auto',
-                            position: 'relative'
-                          }}
-                        >
-                          <span className="matchup-value">{Math.round(pitcher.sameHandednessPercentage * 100)}%</span>
-                          <span className="matchup-label">same hand</span>
-                        </div>
-                        
-                        <div 
-                          className={`matchup-stat ${pitcher.oppositeHandednessPercentage > 60 ? 'tough' : ''}`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            console.log('OPPOSITE HAND CLICKED:', pitcher.name, 'Event:', e);
-                            handleBatterGroupClick(e, pitcher, 'opposite');
-                          }}
-                          style={{ 
-                            cursor: 'pointer',
-                            zIndex: 10,
-                            pointerEvents: 'auto',
-                            position: 'relative'
-                          }}
-                        >
-                          <span className="matchup-value">{Math.round(pitcher.oppositeHandednessPercentage * 100)}%</span>
-                          <span className="matchup-label">opposite hand</span>
-                        </div>
-                      </div>
-                    </div>
+        </div>
+
+        {filteredPitchers && filteredPitchers.length > 0 ? (
+          <>
+            {/* Scrollable Container */}
+            <div className="scrollable-container">
+                <ul className="player-list">
+                  {filteredPitchers.map((pitcher, index) => {
+                    const safeId = createSafeId(pitcher.name, pitcher.team);
                     
-                    {/* Arsenal display when expanded */}
-                    {isExpanded && (
-                      <div className="pitcher-arsenal-container">
-                        <PitcherArsenalDisplay
-                          pitcher={{
-                            name: pitcher.name,
-                            fullName: pitcher.fullName || pitcher.name,
-                            team: pitcher.team,
-                            pitches: pitcher.pitches
-                          }}
-                          opponentBatters={pitcher.opposingBattersList || []}
-                        />
-                      </div>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
+                    return (
+                      <li key={safeId} className={`player-item pitcher-matchup-item`}>
+                        <div className="pitcher-main-row">
+                          <div className={`player-rank ${getMatchupClass(pitcher)}`}>
+                            {getTeamLogo(pitcher.team) && (
+                              <>
+                                <img 
+                                  src={getTeamLogo(pitcher.team)} 
+                                  alt="" 
+                                  className="rank-logo"
+                                  loading="lazy"
+                                  aria-hidden="true"
+                                />
+                                <div className="rank-overlay"></div>
+                              </>
+                            )}
+                            <span className="rank-number">{index + 1}</span>
+                          </div>
+                          
+                          <div className="player-info">
+                            <div className="player-name-container">
+                              <span className="player-name">{pitcher.name}</span>
+                              <span className="player-team">{pitcher.team}</span>
+                              {pitcher.estimated && <span className="estimated-badge">EST</span>}
+                              <button
+                                className="hide-pitcher-button"
+                                onClick={() => hidePitcher(safeId)}
+                                title="Hide this pitcher"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                            
+                            <div className="pitcher-details">
+                              <span className="handedness-badge">{pitcher.hand}</span>
+                              {pitcher.pitches && pitcher.pitches.length > 0 && (
+                                <span className="pitch-count">{pitcher.pitches.length} pitches</span>
+                              )}
+                            </div>
+                            
+                            <span className="opposing-team">vs {pitcher.opposingTeam}</span>
+                          </div>
+                          
+                          <div className="matchup-stats">
+                            <div className={`matchup-stat ${pitcher.sameHandednessPercentage > 60 ? 'favorable' : ''}`}>
+                              <span className="matchup-value">{Math.round(pitcher.sameHandednessPercentage * 100)}%</span>
+                              <span className="matchup-label">same hand</span>
+                            </div>
+                            
+                            <div className={`matchup-stat ${pitcher.oppositeHandednessPercentage > 60 ? 'tough' : ''}`}>
+                              <span className="matchup-value">{Math.round(pitcher.oppositeHandednessPercentage * 100)}%</span>
+                              <span className="matchup-label">opposite hand</span>
+                            </div>
+                          </div>
+                          
+                          {/* Info button similar to Most Hits Allowed card */}
+                          <button 
+                            className="expand-toggle tooltip-trigger" 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handlePitcherInfoClick(e, pitcher);
+                            }}
+                            aria-label="View detailed statistics"
+                            title="View pitcher matchup details"
+                          >
+                            ℹ️
+                          </button>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+              
+              {/* Footer */}
+              <div className="dashboard-footer">
+                <div className="footer-content">
+                  <div className="footer-legend">
+                    <div className="legend-item">
+                      <div className="legend-color tough"></div>
+                      <span>Tough matchup (opposite-handed batters)</span>
+                    </div>
+                    <div className="legend-item">
+                      <div className="legend-color favorable"></div>
+                      <span>Favorable matchup (same-handed batters)</span>
+                    </div>
+                    <div className="legend-item">
+                      <div className="legend-icon">👆</div>
+                      <span>Click percentages to see specific batters</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </>
+        ) : (
+        <div className="scrollable-container">
+          <div className="no-data">
+            {hiddenPitchers.size > 0 
+              ? `All pitchers are hidden. Click "Restore All Pitchers" to show them.` 
+              : `No pitcher matchup data available`}
           </div>
-          
-          
-          <div className="matchup-legend">
-            <div className="legend-item">
-              <div className="legend-color tough"></div>
-              <span>Tough matchup (opposite-handed batters)</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color favorable"></div>
-              <span>Favorable matchup (same-handed batters)</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-icon">👆</div>
-              <span>Click percentages to see specific batters</span>
-            </div>
-          </div>
-        </>
-      ) : (
-        <p className="no-data">
-          {hiddenPitchers.size > 0 
-            ? `All pitchers are hidden. Click "Restore All Pitchers" to show them.` 
-            : `No pitcher matchup data available`}
-        </p>
+        </div>
       )}
+      </div>
     </div>
   );
 };

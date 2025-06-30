@@ -42,19 +42,22 @@ const RecentHomersCard = ({
 
   return (
     <div className="card recent-homers-card">
-      <h3>⚾ Most Recent Home Runs</h3>
-      
-      {/* Enhanced subtitle with team context */}
-      {teamContext && (
-        <div className="card-subtitle team-context">
-          Showing {teamContext.showing} of {teamContext.playerCount} {teamContext.teamName} players with home runs
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>⚾ Most Recent Home Runs</h3>
+          
+          {/* Enhanced subtitle with team context */}
+          {teamContext && (
+            <div className="card-subtitle team-context">
+              Showing {teamContext.showing} of {teamContext.playerCount} {teamContext.teamName} players with home runs
+            </div>
+          )}
         </div>
-      )}
-      
-      {isLoading ? (
-        <div className="loading-indicator">Loading recent home run data...</div>
-      ) : displayPlayers.length > 0 ? (
-        <div className="scrollable-container">
+        
+        {isLoading ? (
+          <div className="loading-indicator">Loading recent home run data...</div>
+        ) : displayPlayers.length > 0 ? (
+          <div className="scrollable-container">
           <ul className="player-list">
             {displayPlayers.map((player, index) => {
               // Get team logo URL if teams data is available
@@ -135,15 +138,16 @@ const RecentHomersCard = ({
               Showing top {teamContext.showing} of {teamContext.playerCount} {teamContext.teamName} players with home runs
             </div>
           )}
-        </div>
-      ) : (
-        <p className="no-data">
-          {isFiltering 
-            ? `No home run data available for ${teamContext?.teamName || 'selected team'}`
-            : 'No recent home run data available'
-          }
-        </p>
-      )}
+          </div>
+        ) : (
+          <p className="no-data">
+            {isFiltering 
+              ? `No home run data available for ${teamContext?.teamName || 'selected team'}`
+              : 'No recent home run data available'
+            }
+          </p>
+        )}
+      </div>
     </div>
   );
 };

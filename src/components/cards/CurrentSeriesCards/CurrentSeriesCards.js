@@ -6,6 +6,7 @@ import {
   fetchRosterData,
   fetchGameData
 } from '../../../services/dataService';
+import './CurrentSeriesCards.css';
 
 /**
  * Find current series statistics for a team vs opponent
@@ -294,14 +295,18 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
 
   if (loading) {
     return (
-      <div className="card">
-        <h3>📊 Current Series Hits</h3>
-        <div className="loading-indicator">
-          Analyzing current series performance...
-          <br />
-          <small style={{ fontSize: '0.8em', color: '#666', marginTop: '5px' }}>
-            {debugInfo}
-          </small>
+      <div className="card current-series-hits-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>📊 Current Series Hits</h3>
+          </div>
+          <div className="loading-indicator">
+            Analyzing current series performance...
+            <br />
+            <small style={{ fontSize: '0.8em', color: '#666', marginTop: '5px' }}>
+              {debugInfo}
+            </small>
+          </div>
         </div>
       </div>
     );
@@ -309,39 +314,46 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
 
   if (error) {
     return (
-      <div className="card">
-        <h3>📊 Current Series Hits</h3>
-        <div className="no-data">
-          Error: {error}
-          <br />
-          <small style={{ fontSize: '0.8em', color: '#666' }}>
-            Debug: {debugInfo}
-          </small>
+      <div className="card current-series-hits-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>📊 Current Series Hits</h3>
+          </div>
+          <div className="no-data">
+            Error: {error}
+            <br />
+            <small style={{ fontSize: '0.8em', color: '#666' }}>
+              Debug: {debugInfo}
+            </small>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="card">
-      <h3>📊 Current Series Hits</h3>
-      <p className="card-subtitle">
-        Best hitters in current series vs opponent
-        {seriesInfo.seriesDateRange && (
-          <span className="series-info"> ({seriesInfo.seriesDateRange})</span>
-        )}
-      </p>
-      
-      {seriesData.length === 0 ? (
-        <div className="no-data">
-          No current series data available
-          <br />
-          <small style={{ fontSize: '0.8em', color: '#999' }}>
-            Debug: {debugInfo}
-          </small>
+    <div className="card current-series-hits-card">
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>📊 Current Series Hits</h3>
+          <p className="card-subtitle">
+            Best hitters in current series vs opponent
+            {seriesInfo.seriesDateRange && (
+              <span className="series-info"> ({seriesInfo.seriesDateRange})</span>
+            )}
+          </p>
         </div>
-      ) : (
-        <div className="scrollable-container">
+        
+        {seriesData.length === 0 ? (
+          <div className="no-data">
+            No current series data available
+            <br />
+            <small style={{ fontSize: '0.8em', color: '#999' }}>
+              Debug: {debugInfo}
+            </small>
+          </div>
+        ) : (
+          <div className="scrollable-container">
           <ul className="player-list">
             {seriesData.map((player, index) => {
               const teamInfo = getTeamInfo(player.team);
@@ -371,7 +383,7 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
                   <div className="player-info">
                     <div className="player-name">{player.name}</div>
                     <div className="player-team">
-                      {teamInfo.name} vs {opponentInfo.abbreviation || opponentInfo.name}
+                      vs {opponentInfo.abbreviation || opponentInfo.name}
                     </div>
                   </div>
                   
@@ -398,15 +410,16 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
               );
             })}
           </ul>
-        </div>
-      )}
-      
-      {/* Debug info at bottom when no data */}
-      {seriesData.length === 0 && (
-        <div style={{ fontSize: '0.7em', color: '#999', marginTop: '10px', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
-          <strong>Debug Info:</strong> {debugInfo}
-        </div>
-      )}
+          </div>
+        )}
+        
+        {/* Debug info at bottom when no data */}
+        {seriesData.length === 0 && (
+          <div style={{ fontSize: '0.7em', color: '#999', marginTop: '10px', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
+            <strong>Debug Info:</strong> {debugInfo}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -517,14 +530,18 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
 
   if (loading) {
     return (
-      <div className="card">
-        <h3>🚀 Current Series HRs</h3>
-        <div className="loading-indicator">
-          Analyzing current series HR performance...
-          <br />
-          <small style={{ fontSize: '0.8em', color: '#666', marginTop: '5px' }}>
-            {debugInfo}
-          </small>
+      <div className="card current-series-hr-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>🚀 Current Series HRs</h3>
+          </div>
+          <div className="loading-indicator">
+            Analyzing current series HR performance...
+            <br />
+            <small style={{ fontSize: '0.8em', color: '#666', marginTop: '5px' }}>
+              {debugInfo}
+            </small>
+          </div>
         </div>
       </div>
     );
@@ -532,41 +549,48 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
 
   if (error) {
     return (
-      <div className="card">
-        <h3>🚀 Current Series HRs</h3>
-        <div className="no-data">
-          Error: {error}
-          <br />
-          <small style={{ fontSize: '0.8em', color: '#666' }}>
-            Debug: {debugInfo}
-          </small>
+      <div className="card current-series-hr-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>🚀 Current Series HRs</h3>
+          </div>
+          <div className="no-data">
+            Error: {error}
+            <br />
+            <small style={{ fontSize: '0.8em', color: '#666' }}>
+              Debug: {debugInfo}
+            </small>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="card">
-      <h3>🚀 Current Series HRs</h3>
-      <p className="card-subtitle">
-        Home run leaders in current series vs opponent
-        {seriesInfo.seriesDateRange && (
-          <span className="series-info"> ({seriesInfo.seriesDateRange})</span>
-        )}
-      </p>
-      
-      {seriesData.length === 0 ? (
-        <div className="no-data">
-          No home runs hit in current series yet
-          <br />
-          <small style={{ fontSize: '0.8em', color: '#999' }}>
-            Debug: {debugInfo}
-            <br />
-            Check browser console for detailed logs
-          </small>
+    <div className="card current-series-hr-card">
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>🚀 Current Series HRs</h3>
+          <p className="card-subtitle">
+            Home run leaders in current series vs opponent
+            {seriesInfo.seriesDateRange && (
+              <span className="series-info"> ({seriesInfo.seriesDateRange})</span>
+            )}
+          </p>
         </div>
-      ) : (
-        <div className="scrollable-container">
+        
+        {seriesData.length === 0 ? (
+          <div className="no-data">
+            No home runs hit in current series yet
+            <br />
+            <small style={{ fontSize: '0.8em', color: '#999' }}>
+              Debug: {debugInfo}
+              <br />
+              Check browser console for detailed logs
+            </small>
+          </div>
+        ) : (
+          <div className="scrollable-container">
           <ul className="player-list">
             {seriesData.map((player, index) => {
               const teamInfo = getTeamInfo(player.team);
@@ -596,7 +620,7 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
                   <div className="player-info">
                     <div className="player-name">{player.name}</div>
                     <div className="player-team">
-                      {teamInfo.name} vs {opponentInfo.abbreviation || opponentInfo.name}
+                      vs {opponentInfo.abbreviation || opponentInfo.name}
                     </div>
                   </div>
                   
@@ -623,15 +647,16 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
               );
             })}
           </ul>
-        </div>
-      )}
-      
-      {/* Debug info */}
-      {seriesData.length === 0 && (
-        <div style={{ fontSize: '0.7em', color: '#999', marginTop: '10px', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
-          <strong>Debug Info:</strong> {debugInfo}
-        </div>
-      )}
+          </div>
+        )}
+        
+        {/* Debug info */}
+        {seriesData.length === 0 && (
+          <div style={{ fontSize: '0.7em', color: '#999', marginTop: '10px', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
+            <strong>Debug Info:</strong> {debugInfo}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

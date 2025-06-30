@@ -41,7 +41,9 @@
   transition: all 0.2s ease;
   min-height: var(--player-item-min-height);
   background-color: transparent;
-  overflow: visible; /* Allow logos to extend beyond bounds */
+  overflow: hidden; /* Contain content within bounds */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .player-item:hover {
@@ -63,15 +65,15 @@
   right: 0;
   top: 50%;
   transform: translateY(-50%);
-  height: 160%; /* Back to more visible size */
+  height: 160%;
   width: auto;
-  max-width: 200px;
+  max-width: 50%; /* Limit to half the item width */
   opacity: var(--logo-opacity);
   z-index: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;
   object-fit: contain;
-  /* More subtle mask for better visibility */
+  /* Subtle fade mask */
   mask-image: linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0) 100%);
   -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0) 100%);
 }
@@ -180,7 +182,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  min-width: 100px;
+  min-width: 80px;
 }
 
 .stat-highlight {
@@ -244,11 +246,16 @@
   .player-item {
     padding: var(--player-item-padding-mobile);
     min-height: var(--player-item-min-height-mobile);
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
   }
   
   .player-item .team-logo-bg {
     height: 120%;
-    max-width: 140px;
+    max-width: 40%; /* Even more limited on mobile */
+    right: 0;
+    opacity: 0.06; /* Even more subtle on mobile */
   }
   
   .player-rank {
@@ -265,6 +272,10 @@
   
   .player-name {
     font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 60%; /* Prevent overlap with stats */
   }
   
   .player-team {
@@ -272,7 +283,9 @@
   }
   
   .player-stat {
-    min-width: 80px;
+    min-width: 60px;
+    flex-shrink: 0;
+    margin-left: auto; /* Push to right edge */
   }
   
   .stat-highlight {

@@ -1,9 +1,70 @@
-/* LikelyToHitCard.css */
+/* LikelyToHitCard.css - Glass Effect */
 
 .likely-to-hit-card {
   grid-column: span 1;
-  background-color: #f0f9eb;
+  background: rgba(82, 196, 26, 0.05);
+  border: 1px solid rgba(82, 196, 26, 0.2);
   border-left: 4px solid #52c41a;
+  border-radius: 12px;
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  box-shadow: 
+    0 8px 32px rgba(82, 196, 26, 0.08),
+    0 2px 8px rgba(82, 196, 26, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Glass card container for proper layering */
+.likely-to-hit-card .glass-card-container {
+  position: relative;
+  height: 100%;
+  min-height: 420px;
+}
+
+/* Glass header that content scrolls behind */
+.likely-to-hit-card .glass-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: rgba(82, 196, 26, 0.08);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(82, 196, 26, 0.15);
+  padding: 20px;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(82, 196, 26, 0.05);
+}
+
+.likely-to-hit-card .glass-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Glass Effect Scrollable Container */
+.likely-to-hit-card .scrollable-container {
+  background: rgba(236, 252, 243, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 80px; /* Space for header */
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
 }
 
 /* Player list styling */
@@ -16,17 +77,47 @@
 .likely-to-hit-card .player-item {
   display: flex;
   align-items: center;
-  padding: 10px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  transition: background-color 0.2s ease;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(82, 196, 26, 0.12);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
 .likely-to-hit-card .player-item:hover {
-  background-color: rgba(82, 196, 26, 0.05);
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(82, 196, 26, 0.08);
+  border-color: rgba(82, 196, 26, 0.2);
 }
 
 .likely-to-hit-card .player-item:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
+}
+
+/* Glass Effect Scrollbar */
+.likely-to-hit-card .scrollable-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.likely-to-hit-card .scrollable-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.likely-to-hit-card .scrollable-container::-webkit-scrollbar-thumb {
+  background: rgba(82, 196, 26, 0.4);
+  border-radius: 3px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.likely-to-hit-card .scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(82, 196, 26, 0.6);
 }
 
 /* Player rank styling */
@@ -146,5 +237,18 @@
 @media (max-width: 768px) {
   .likely-to-hit-card {
     grid-column: 1 / -1;
+  }
+  
+  /* Remove footer space in mobile */
+  .likely-to-hit-card .glass-card-container {
+    min-height: auto;
+    height: auto;
+  }
+  
+  .likely-to-hit-card .scrollable-container {
+    position: relative;
+    height: auto;
+    max-height: 60vh;
+    padding-bottom: 10px;
   }
 }

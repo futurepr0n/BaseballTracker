@@ -1,0 +1,431 @@
+/* TimeSlotHitsCard.css - Glass Effect for Both Cards */
+
+/* ========== TIME SLOT HITS (Lime Theme) ========== */
+.time-slot-hits-card {
+  grid-column: span 1;
+  background: rgba(132, 204, 22, 0.05);
+  border: 1px solid rgba(132, 204, 22, 0.2);
+  border-left: 4px solid #84cc16;
+  border-radius: 12px;
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  box-shadow: 
+    0 8px 32px rgba(132, 204, 22, 0.08),
+    0 2px 8px rgba(132, 204, 22, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Glass card container for proper layering */
+.time-slot-hits-card .glass-card-container {
+  position: relative;
+  height: 100%;
+  min-height: 420px;
+}
+
+/* Glass header that content scrolls behind */
+.time-slot-hits-card .glass-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: rgba(132, 204, 22, 0.08);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(132, 204, 22, 0.15);
+  padding: 20px;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(132, 204, 22, 0.05);
+}
+
+.time-slot-hits-card .glass-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.time-slot-hits-card .card-subtitle {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 5px;
+}
+
+/* Glass Effect Scrollable Container */
+.time-slot-hits-card .scrollable-container {
+  background: rgba(220, 252, 231, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 80px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
+
+/* ========== TIME SLOT HRS (Cyan Theme) ========== */
+.time-slot-hr-card {
+  grid-column: span 1;
+  background: rgba(6, 182, 212, 0.05);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-left: 4px solid #06b6d4;
+  border-radius: 12px;
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  box-shadow: 
+    0 8px 32px rgba(6, 182, 212, 0.08),
+    0 2px 8px rgba(6, 182, 212, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Glass card container for proper layering */
+.time-slot-hr-card .glass-card-container {
+  position: relative;
+  height: 100%;
+  min-height: 420px;
+}
+
+/* Glass header that content scrolls behind */
+.time-slot-hr-card .glass-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: rgba(6, 182, 212, 0.08);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(6, 182, 212, 0.15);
+  padding: 20px;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(6, 182, 212, 0.05);
+}
+
+.time-slot-hr-card .glass-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.time-slot-hr-card .card-subtitle {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 5px;
+}
+
+/* Glass Effect Scrollable Container */
+.time-slot-hr-card .scrollable-container {
+  background: rgba(207, 250, 254, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 80px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
+
+/* ========== SHARED STYLES FOR BOTH CARDS ========== */
+
+/* Player list styling */
+.time-slot-hits-card .player-list,
+.time-slot-hr-card .player-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.time-slot-hits-card .player-item,
+.time-slot-hr-card .player-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.time-slot-hits-card .player-item:last-child,
+.time-slot-hr-card .player-item:last-child {
+  margin-bottom: 0;
+}
+
+.time-slot-hits-card .player-item:hover,
+.time-slot-hr-card .player-item:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Glass Effect Scrollbars - Lime theme */
+.time-slot-hits-card .scrollable-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.time-slot-hits-card .scrollable-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.time-slot-hits-card .scrollable-container::-webkit-scrollbar-thumb {
+  background: rgba(132, 204, 22, 0.4);
+  border-radius: 3px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.time-slot-hits-card .scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(132, 204, 22, 0.6);
+}
+
+/* Glass Effect Scrollbars - Cyan theme */
+.time-slot-hr-card .scrollable-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.time-slot-hr-card .scrollable-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.time-slot-hr-card .scrollable-container::-webkit-scrollbar-thumb {
+  background: rgba(6, 182, 212, 0.4);
+  border-radius: 3px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.time-slot-hr-card .scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.6);
+}
+
+/* Player Rank Styling */
+.time-slot-hits-card .player-rank,
+.time-slot-hr-card .player-rank {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.time-slot-hits-card .player-rank .rank-logo,
+.time-slot-hr-card .player-rank .rank-logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  object-fit: cover;
+  opacity: 0.7;
+}
+
+.time-slot-hits-card .player-rank .rank-overlay,
+.time-slot-hr-card .player-rank .rank-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0.3;
+}
+
+.time-slot-hits-card .player-rank .rank-number,
+.time-slot-hr-card .player-rank .rank-number {
+  position: relative;
+  z-index: 10;
+  color: white;
+  font-size: 1.125rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  line-height: 1;
+}
+
+/* Player Info Styling */
+.time-slot-hits-card .player-info,
+.time-slot-hr-card .player-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  margin-right: 10px;
+}
+
+.time-slot-hits-card .player-name,
+.time-slot-hr-card .player-name {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.time-slot-hits-card .player-team,
+.time-slot-hr-card .player-team {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+}
+
+/* Player Stats Styling with theme colors */
+.time-slot-hits-card .player-stat,
+.time-slot-hr-card .player-stat {
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+  align-items: flex-end;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.time-slot-hits-card .stat-highlight {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #84cc16;
+  margin-bottom: 2px;
+}
+
+.time-slot-hr-card .stat-highlight {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #06b6d4;
+  margin-bottom: 2px;
+}
+
+.time-slot-hits-card .stat-note,
+.time-slot-hr-card .stat-note {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Team logo background effect */
+.time-slot-hits-card .player-item .team-logo-bg,
+.time-slot-hr-card .player-item .team-logo-bg {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 66%;
+  opacity: 0.05;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  transform: translate(20%, -10%) scale(2.2);
+  object-fit: cover;
+  object-position: center;
+}
+
+.time-slot-hits-card .player-item:hover .team-logo-bg,
+.time-slot-hr-card .player-item:hover .team-logo-bg {
+  opacity: 0.1;
+}
+
+/* Loading & No Data States */
+.time-slot-hits-card .loading-indicator,
+.time-slot-hr-card .loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+  height: 100%;
+  min-height: 420px;
+  flex-direction: column;
+}
+
+.time-slot-hits-card .no-data,
+.time-slot-hr-card .no-data {
+  color: #888;
+  text-align: center;
+  padding: 20px 0;
+  font-style: italic;
+  height: 100%;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .time-slot-hits-card,
+  .time-slot-hr-card {
+    grid-column: 1 / -1;
+  }
+  
+  .time-slot-hits-card .glass-card-container,
+  .time-slot-hr-card .glass-card-container {
+    min-height: auto;
+    height: auto;
+  }
+  
+  .time-slot-hits-card .scrollable-container,
+  .time-slot-hr-card .scrollable-container {
+    position: relative;
+    height: auto;
+    max-height: 60vh;
+    padding-bottom: 10px;
+  }
+  
+  .time-slot-hits-card .player-item,
+  .time-slot-hr-card .player-item {
+    padding: 10px 6px;
+  }
+  
+  .time-slot-hits-card .player-rank,
+  .time-slot-hr-card .player-rank {
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
+  }
+  
+  .time-slot-hits-card .player-rank .rank-number,
+  .time-slot-hr-card .player-rank .rank-number {
+    font-size: 1rem;
+  }
+  
+  .time-slot-hits-card .player-name,
+  .time-slot-hr-card .player-name {
+    font-size: 0.9rem;
+  }
+  
+  .time-slot-hits-card .player-stat,
+  .time-slot-hr-card .player-stat {
+    min-width: 100px;
+  }
+}

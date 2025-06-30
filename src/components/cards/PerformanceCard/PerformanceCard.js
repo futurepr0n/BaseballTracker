@@ -2,34 +2,100 @@ import React from 'react';
 import './PerformanceCard.css';
 
 /**
- * PerformanceCard - Shows over or under performing players
- * Enhanced with integrated team logos
+ * PerformanceCard - Shows over or under performing players with glass aesthetic
+ * Enhanced with integrated team logos and glass morphism
  */
 const PerformanceCard = ({ 
-  performingPlayers,
-  isLoading,
-  type, // 'over' or 'under'
-  teams
+  teamData,
+  currentDate
 }) => {
-  const isOver = type === 'over';
+  const [performanceData, setPerformanceData] = React.useState({
+    overPerforming: [],
+    underPerforming: []
+  });
+  const [isLoading, setIsLoading] = React.useState(true);
+  
+  // Load performance data
+  React.useEffect(() => {
+    const loadPerformanceData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/data/player_performance_latest.json');
+        if (response.ok) {
+          const data = await response.json();
+          setPerformanceData({
+            overPerforming: data.overPerforming || [],
+            underPerforming: data.underPerforming || []
+          });
+        }
+      } catch (error) {
+        console.error('Error loading performance data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadPerformanceData();
+  }, [currentDate]);
+  
+  const getTeamLogo = (teamCode) => {
+    if (!teamData[teamCode]) return null;
+    return teamData[teamCode].logoUrl || `/data/logos/${teamCode.toLowerCase()}_logo.png`;
+  };
+  
+  if (isLoading) {
+    return (
+      <div className="card under-performing-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>📉 Top Under-Performing Players</h3>
+          </div>
+          <div className="scrollable-container">
+            <div className="loading-indicator">Loading performance data...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  const displayData = performanceData.underPerforming.slice(0, 15);
+  
+  if (displayData.length === 0) {
+    return (
+      <div className="card under-performing-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>📉 Top Under-Performing Players</h3>
+          </div>
+          <div className="scrollable-container">
+            <div className="no-data">No under-performing player data available</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   
   return (
-    <div className={`card ${isOver ? 'over-performing-card' : 'under-performing-card'}`}>
-      <h3>{isOver ? 'Top Over-Performing Players' : 'Top Under-Performing Players'}</h3>
-      {isLoading ? (
-        <div className="loading-indicator">Loading stats...</div>
-      ) : performingPlayers && performingPlayers.length > 0 ? (
+    <div className="card under-performing-card">
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>📉 Top Under-Performing Players</h3>
+          <div className="card-subtitle">
+            {displayData.length} players performing below expected levels
+          </div>
+        </div>
+        
         <div className="scrollable-container">
           <ul className="player-list">
-            {performingPlayers.map((player, index) => {
+            {displayData.map((player, index) => {
               // Get team logo URL if teams data is available
               const teamAbbr = player.team;
-              const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
-              const logoUrl = teamData ? teamData.logoUrl : null;
+              const teamInfo = teamData && teamAbbr ? teamData[teamAbbr] : null;
+              const logoUrl = teamInfo ? teamInfo.logoUrl : null;
               
               return (
                 <li key={index} className="player-item">
-                  <div className="player-rank">
+                  <div className="player-rank" style={{ backgroundColor: teamInfo?.colors?.primary || '#9C27B0' }}>
                     {logoUrl && (
                       <>
                         <img 
@@ -45,12 +111,12 @@ const PerformanceCard = ({
                     <span className="rank-number">{index + 1}</span>
                   </div>
                   <div className="player-info">
-                    <span className="player-name">{player.fullName || player.name}</span>
-                    <span className="player-team">{player.team}</span>
+                    <div className="player-name">{player.fullName || player.name}</div>
+                    <div className="player-team">{player.team}</div>
                   </div>
                   <div className="player-stat">
                     <div className="stat-highlight">
-                      {isOver ? '+' : ''}{player.performanceIndicator.toFixed(1)}%
+                      {player.performanceIndicator.toFixed(1)}%
                     </div>
                     <small>Actual: {player.homeRunsThisSeason} HR</small>
                     <small>Expected: {player.expectedHRs.toFixed(1)} HR</small>
@@ -71,9 +137,7 @@ const PerformanceCard = ({
             })}
           </ul>
         </div>
-      ) : (
-        <p className="no-data">No {isOver ? 'over' : 'under'}-performing player data available</p>
-      )}
+      </div>
     </div>
   );
 };

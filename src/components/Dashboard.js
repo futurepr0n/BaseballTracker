@@ -6,6 +6,10 @@ import TeamFilter from './TeamFilter';
 import FilterIndicator from './FilterIndicator';
 import { useTeamFilter } from './TeamFilterContext';
 
+// Import theme context for Dashboard-specific theming
+import { useTheme } from '../contexts/ThemeContext';
+import ThemeToggle from './ThemeToggle';
+
 // Import tooltip system
 import { TooltipProvider } from './utils/TooltipContext';
 import GlobalTooltip from './utils/GlobalTooltip';
@@ -72,6 +76,9 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     isFiltering,
     getTeamName
   } = useTeamFilter();
+  
+  // Get theme context for Dashboard-specific styling
+  const { themeMode } = useTheme();
   
   // State for core data
   const [playersWithHomeRunPrediction, setPlayersWithHomeRunPrediction] = useState([]);
@@ -1053,6 +1060,16 @@ const generateTeamSpecificStats = (playerData, selectedTeam, includeMatchup, mat
   };
 };
 
+// Utility function to determine if we're viewing the current day
+const isCurrentDay = () => {
+  const today = new Date();
+  const currentDateStr = currentDate.toDateString();
+  const todayStr = today.toDateString();
+  
+  // Simply check if we're viewing today's date, regardless of dateStatus
+  return currentDateStr === todayStr;
+};
+
 const getTimePeriodText = () => {
   switch(rollingStatsType) {
     case 'season':
@@ -1162,29 +1179,34 @@ const noFilteredData = isFiltering &&
   
   return (
     <TooltipProvider>
-      <div className="dashboard">
+      <div className={`dashboard theme-${themeMode}`}>
       <header className="dashboard-header">
-        <h2> <img
-              src='data/logos/Major_League_Baseball_logo.svg'
-              style={{
-                height: '1.2em',
-                verticalAlign: 'middle'
-              }}
-              alt="MLB Logo"
-            />MLB Statistics Dashboard</h2>
-        <p className="date">
-          {formattedDate}
-          {dateStatus === 'previous' && (
-            <span className="date-note">
-              (Showing data from {formattedDataDate})
-            </span>
-          )}
-          {dateStatus === 'historical' && (
-            <span className="date-note">
-              (Showing 7-day rolling data)
-            </span>
-          )}
-        </p>
+        <div className="dashboard-header-content">
+          <div className="dashboard-title">
+            <h2> <img
+                  src='data/logos/Major_League_Baseball_logo.svg'
+                  style={{
+                    height: '1.2em',
+                    verticalAlign: 'middle'
+                  }}
+                  alt="MLB Logo"
+                />MLB Statistics Dashboard</h2>
+            <p className="date">
+              {formattedDate}
+              {dateStatus === 'previous' && (
+                <span className="date-note">
+                  (Showing data from {formattedDataDate})
+                </span>
+              )}
+              {dateStatus === 'historical' && (
+                <span className="date-note">
+                  (Showing 7-day rolling data)
+                </span>
+              )}
+            </p>
+          </div>
+          <ThemeToggle className="dashboard-theme-toggle" />
+        </div>
       </header>
       
       {/* Add Team Filter Component */}
@@ -1219,31 +1241,43 @@ const noFilteredData = isFiltering &&
                 <div className="stats-controls" style={{ gridColumn: '1 / -1' }}>
         <StatsTimePeriodSelector />
       </div>
-          {/* Statistics Summary Card */}
-          <StatsSummaryCard 
-            batterData={filteredBatterData}
-            pitcherData={filteredPitcherData}
-          />
+          
+          {/* Live Scores - Full width on current day, normal width on other days */}
+          {isCurrentDay() ? (
+            <div style={{ gridColumn: '1 / -1' }}>
+              <div className="current-day-featured-container">
+                <LiveScoresCard teams={teamData} />
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Historical Day - Include Statistics Summary and normal width Live Scores */}
+              <StatsSummaryCard 
+                batterData={filteredBatterData}
+                pitcherData={filteredPitcherData}
+              />
+              <LiveScoresCard teams={teamData} />
+            </>
+          )}
 
-          <LiveScoresCard teams={teamData} />
+          {/* Rest of layout - Same for both current and historical days */}
+          {/* Row 2: Weather, Pinheads HR Picks */}
           <MLBWeatherCard teams={teamData} />
-          
-          {/* Hellraiser HR Analysis Card */}
           <HellraiserCard currentDate={currentDate} />
-          
-          {/* Barrel Matchup Analysis Card */}
-          <div style={{ gridColumn: '1 / -1' }}>
-            <BarrelMatchupCard currentDate={currentDate} />
-          </div>
-          
-          {/* HR Prediction Card */}
+
+          {/* Players due for Home Run - Above Barrel Matchups as requested */}
           <HRPredictionCard 
             playersWithHomeRunPrediction={playersWithHomeRunPrediction}
             isLoading={predictionLoading}
             teams={teamData} 
           />
+
+          {/* Barrel Matchup Analysis Card - Full width */}
+          <div style={{ gridColumn: '1 / -1' }}>
+            <BarrelMatchupCard currentDate={currentDate} />
+          </div>
           
-          {/* Top Hitters Card */}
+          {/* Row 4: Top Hitters, HR Leaders, Recent Homers */}
           <TopHittersCard 
             hitters={rollingStats.hitters}
             isLoading={statsLoading}
@@ -1251,7 +1285,6 @@ const noFilteredData = isFiltering &&
             teams={teamData} 
           />
           
-          {/* Home Run Leaders Card */}
           <HomeRunLeadersCard 
             homers={rollingStats.homers}
             isLoading={statsLoading}
@@ -1259,28 +1292,13 @@ const noFilteredData = isFiltering &&
             teams={teamData} 
           />
           
-          {/* HR Rate Card */}
-          <HRRateCard 
-            topHRRatePlayers={topPerformers.hrRate}
-            isLoading={!playerPerformance}
-            teams={teamData} 
-          />
-          
-          {/* Improved Rate Card */}
-          <ImprovedRateCard 
-            improvedPlayers={topPerformers.improved}
-            isLoading={!playerPerformance}
-            teams={teamData} 
-          />
-          
-          {/* Recent Homers Card */}
           <RecentHomersCard 
             recentHRPlayers={topPerformers.recent}
             isLoading={!playerPerformance}
             teams={teamData} 
           />
 
-          {/* Hit Streak Card */}
+          {/* Row 5: Hit Streak, Continue Streak, Day of Week Hits */}
           <HitStreakCard 
             hitStreakData={hitStreakData}
             isLoading={additionalStatsLoading}
@@ -1288,7 +1306,6 @@ const noFilteredData = isFiltering &&
             teams={teamData} 
           />
 
-          {/* Continue Streak Card */}
           <ContinueStreakCard
             hitStreakData={hitStreakData}
             isLoading={additionalStatsLoading}
@@ -1296,17 +1313,28 @@ const noFilteredData = isFiltering &&
             teams={teamData} 
           />
           
-          {/* Likely to Hit Card */}
-          <LikelyToHitCard 
-            hitStreakData={hitStreakData}
+          <DayOfWeekHitsCard 
+            dayOfWeekHits={dayOfWeekHits}
             isLoading={additionalStatsLoading}
             currentDate={currentDate}
             teams={teamData} 
           />
+
+          {/* Row 6: HR Rate, Improved Rate, Likely to Hit */}
+          <HRRateCard 
+            topHRRatePlayers={topPerformers.hrRate}
+            isLoading={!playerPerformance}
+            teams={teamData} 
+          />
           
-          {/* Day of Week Hits Card */}
-          <DayOfWeekHitsCard 
-            dayOfWeekHits={dayOfWeekHits}
+          <ImprovedRateCard 
+            improvedPlayers={topPerformers.improved}
+            isLoading={!playerPerformance}
+            teams={teamData} 
+          />
+          
+          <LikelyToHitCard 
+            hitStreakData={hitStreakData}
             isLoading={additionalStatsLoading}
             currentDate={currentDate}
             teams={teamData} 
@@ -1369,12 +1397,12 @@ const noFilteredData = isFiltering &&
             teams={teamData}
           />
 
-          <MultiHitDashboardCard />
+          <MultiHitDashboardCard teams={teamData} />
 
-          {/* Over-Performing Players Card */}
+          {/* Top Under-Performing Players Card */}
           <PerformanceCard 
-  teamData={teamData}
-  currentDate={currentDate}
+            teamData={teamData}
+            currentDate={currentDate}
           />
           
           {/* Under-Performing Players Card */}
@@ -1411,6 +1439,7 @@ const noFilteredData = isFiltering &&
             pitcherMatchups={pitcherMatchups}
             isLoading={matchupsLoading}
             currentDate={currentDate}
+            teams={teamData}
           />
           
           

@@ -1,6 +1,7 @@
 // Enhanced LiveScoresCard.js with comprehensive game information
 import React, { useState } from 'react';
 import { useLiveScores } from '../../hooks/useLiveScores';
+import GlassCard, { GlassScrollableContainer } from '../GlassCard/GlassCard';
 import './LiveScoresCard.css';
 
 const LiveScoresCard = ({ teams }) => {
@@ -248,7 +249,7 @@ const LiveScoresCard = ({ teams }) => {
   const totalCount = scores.length;
 
   return (
-    <div className="card live-scores-card">
+    <GlassCard className="live-scores-card" variant="default">
       <div className="card-header">
         <h3>
           Live Scores 
@@ -308,7 +309,7 @@ const LiveScoresCard = ({ teams }) => {
           )}
         </div>
       ) : (
-        <div className="scores-container">
+        <GlassScrollableContainer className="scores-container">
           {Object.entries(gameGroups).map(([dateGroup, games]) => (
             <div key={dateGroup} className="date-group">
               {Object.keys(gameGroups).length > 1 && (
@@ -401,9 +402,9 @@ const LiveScoresCard = ({ teams }) => {
               })}
             </div>
           ))}
-        </div>
+        </GlassScrollableContainer>
       )}
-    </div>
+    </GlassCard>
   );
 };
 

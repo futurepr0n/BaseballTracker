@@ -57,8 +57,12 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
   if (isLoading) {
     return (
       <div className="card poor-performance-card">
-        <h3>⚠️ Poor Performance Risks</h3>
-        <div className="loading-indicator">Loading performance risk analysis...</div>
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>⚠️ Poor Performance Risks</h3>
+          </div>
+          <div className="loading-indicator">Loading performance risk analysis...</div>
+        </div>
       </div>
     );
   }
@@ -66,8 +70,12 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
   if (error) {
     return (
       <div className="card poor-performance-card">
-        <h3>⚠️ Poor Performance Risks</h3>
-        <div className="error-message">Error: {error}</div>
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>⚠️ Poor Performance Risks</h3>
+          </div>
+          <div className="error-message">Error: {error}</div>
+        </div>
       </div>
     );
   }
@@ -77,20 +85,27 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
   if (displayData.length === 0) {
     return (
       <div className="card poor-performance-card">
-        <h3>⚠️ Poor Performance Risks</h3>
-        <div className="no-data">No significant performance risks identified for the selected teams.</div>
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>⚠️ Poor Performance Risks</h3>
+          </div>
+          <div className="no-data">No significant performance risks identified for the selected teams.</div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="card poor-performance-card">
-      <h3>⚠️ Poor Performance Risks</h3>
-      <div className="card-subtitle">
-        {displayData.filter(p => p.riskLevel === 'HIGH').length} High Risk, {displayData.filter(p => p.riskLevel === 'MEDIUM').length} Medium Risk
-      </div>
-      
-      <div className="scrollable-container">
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>⚠️ Poor Performance Risks</h3>
+          <div className="card-subtitle">
+            {displayData.filter(p => p.riskLevel === 'HIGH').length} High Risk, {displayData.filter(p => p.riskLevel === 'MEDIUM').length} Medium Risk
+          </div>
+        </div>
+        
+        <div className="scrollable-container">
         <ul className="player-list">
           {displayData.map((prediction, index) => {
             const playerKey = `${prediction.playerName}_${prediction.team}`;
@@ -169,6 +184,7 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
             );
           })}
         </ul>
+        </div>
       </div>
     </div>
   );

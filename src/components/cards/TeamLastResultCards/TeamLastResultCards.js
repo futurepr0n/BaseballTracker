@@ -274,12 +274,14 @@ const TeamComingOffWinCard = ({ teamData, currentDate }) => {
 
   if (loading) {
     return (
-      <div className="card last-result-card">
-        <div className="card-header">
-          <h3>🟢 Teams Coming Off Win</h3>
-        </div>
-        <div className="loading-indicator">
-          Loading recent game results...
+      <div className="card last-result-card win-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>🟢 Teams Coming Off Win</h3>
+          </div>
+          <div className="loading-indicator">
+            Loading recent game results...
+          </div>
         </div>
       </div>
     );
@@ -287,14 +289,16 @@ const TeamComingOffWinCard = ({ teamData, currentDate }) => {
 
   if (filteredWinTeams.length === 0) {
     return (
-      <div className="card last-result-card">
-        <div className="card-header">
-          <h3>🟢 Teams Coming Off Win</h3>
-        </div>
-        <div className="no-data">
-          {selectedTeam ? 'No filtered teams coming off a win' : 'No teams coming off a win'}
-          <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '8px' }}>
-            Debug: Found {winTeams.length} total win teams, {filteredWinTeams.length} after filtering
+      <div className="card last-result-card win-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>🟢 Teams Coming Off Win</h3>
+          </div>
+          <div className="no-data">
+            {selectedTeam ? 'No filtered teams coming off a win' : 'No teams coming off a win'}
+            <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '8px' }}>
+              Debug: Found {winTeams.length} total win teams, {filteredWinTeams.length} after filtering
+            </div>
           </div>
         </div>
       </div>
@@ -303,21 +307,43 @@ const TeamComingOffWinCard = ({ teamData, currentDate }) => {
 
   return (
     <div className="card last-result-card win-card full-width-card">
-      <div className="card-header">
-        <h3>🟢 Teams Coming Off Win</h3>
-        <span className="team-count">{filteredWinTeams.length} team(s)</span>
-      </div>
-      
-      <div className="teams-list scrollable-container">
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>🟢 Teams Coming Off Win</h3>
+          <span className="team-count">{filteredWinTeams.length} team(s)</span>
+        </div>
+        
+        <div className="scrollable-container">
         {filteredWinTeams.map(team => (
           <div key={team.teamCode} className="team-result-item">
+            {/* Team logo background */}
+            {teamData[team.teamCode]?.logoUrl && (
+              <img 
+                src={teamData[team.teamCode].logoUrl} 
+                alt={teamData[team.teamCode].name} 
+                className="team-logo-bg"
+              />
+            )}
+            
             <div className="team-header">
               <div className="team-identity">
                 <div 
                   className="team-logo-circle"
                   style={{ backgroundColor: team.teamColor }}
                 >
-                  {team.teamCode}
+                  {teamData[team.teamCode]?.logoUrl && (
+                    <>
+                      <img 
+                        src={teamData[team.teamCode].logoUrl} 
+                        alt="" 
+                        className="team-logo" 
+                        loading="lazy"
+                        aria-hidden="true"
+                      />
+                      <div className="team-logo-overlay" style={{ backgroundColor: team.teamColor }}></div>
+                    </>
+                  )}
+                  <span className="team-code">{team.teamCode}</span>
                 </div>
                 <div className="team-info">
                   <h4>{team.teamName}</h4>
@@ -394,6 +420,7 @@ const TeamComingOffWinCard = ({ teamData, currentDate }) => {
             </div>
           </div>
         ))}
+        </div>
       </div>
     </div>
   );
@@ -476,12 +503,14 @@ const TeamComingOffLossCard = ({ teamData, currentDate }) => {
 
   if (loading) {
     return (
-      <div className="card last-result-card">
-        <div className="card-header">
-          <h3>🔴 Teams Coming Off Loss</h3>
-        </div>
-        <div className="loading-indicator">
-          Loading recent game results...
+      <div className="card last-result-card loss-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>🔴 Teams Coming Off Loss</h3>
+          </div>
+          <div className="loading-indicator">
+            Loading recent game results...
+          </div>
         </div>
       </div>
     );
@@ -489,14 +518,16 @@ const TeamComingOffLossCard = ({ teamData, currentDate }) => {
 
   if (filteredLossTeams.length === 0) {
     return (
-      <div className="card last-result-card">
-        <div className="card-header">
-          <h3>🔴 Teams Coming Off Loss</h3>
-        </div>
-        <div className="no-data">
-          {selectedTeam ? 'No filtered teams coming off a loss' : 'No teams coming off a loss'}
-          <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '8px' }}>
-            Debug: Found {lossTeams.length} total loss teams, {filteredLossTeams.length} after filtering
+      <div className="card last-result-card loss-card">
+        <div className="glass-card-container">
+          <div className="glass-header">
+            <h3>🔴 Teams Coming Off Loss</h3>
+          </div>
+          <div className="no-data">
+            {selectedTeam ? 'No filtered teams coming off a loss' : 'No teams coming off a loss'}
+            <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '8px' }}>
+              Debug: Found {lossTeams.length} total loss teams, {filteredLossTeams.length} after filtering
+            </div>
           </div>
         </div>
       </div>
@@ -505,21 +536,43 @@ const TeamComingOffLossCard = ({ teamData, currentDate }) => {
 
   return (
     <div className="card last-result-card loss-card full-width-card">
-      <div className="card-header">
-        <h3>🔴 Teams Coming Off Loss</h3>
-        <span className="team-count">{filteredLossTeams.length} team(s)</span>
-      </div>
-      
-      <div className="teams-list scrollable-container">
+      <div className="glass-card-container">
+        <div className="glass-header">
+          <h3>🔴 Teams Coming Off Loss</h3>
+          <span className="team-count">{filteredLossTeams.length} team(s)</span>
+        </div>
+        
+        <div className="scrollable-container">
         {filteredLossTeams.map(team => (
           <div key={team.teamCode} className="team-result-item">
+            {/* Team logo background */}
+            {teamData[team.teamCode]?.logoUrl && (
+              <img 
+                src={teamData[team.teamCode].logoUrl} 
+                alt={teamData[team.teamCode].name} 
+                className="team-logo-bg"
+              />
+            )}
+            
             <div className="team-header">
               <div className="team-identity">
                 <div 
                   className="team-logo-circle"
                   style={{ backgroundColor: team.teamColor }}
                 >
-                  {team.teamCode}
+                  {teamData[team.teamCode]?.logoUrl && (
+                    <>
+                      <img 
+                        src={teamData[team.teamCode].logoUrl} 
+                        alt="" 
+                        className="team-logo" 
+                        loading="lazy"
+                        aria-hidden="true"
+                      />
+                      <div className="team-logo-overlay" style={{ backgroundColor: team.teamColor }}></div>
+                    </>
+                  )}
+                  <span className="team-code">{team.teamCode}</span>
                 </div>
                 <div className="team-info">
                   <h4>{team.teamName}</h4>
@@ -596,6 +649,7 @@ const TeamComingOffLossCard = ({ teamData, currentDate }) => {
             </div>
           </div>
         ))}
+        </div>
       </div>
     </div>
   );

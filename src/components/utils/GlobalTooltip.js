@@ -902,6 +902,294 @@ const GlobalTooltip = () => {
       );
     }
 
+    if (type === 'pitcher_comprehensive' && tooltipData?.pitcher) {
+      const { pitcher, sameHandBatters, oppositeHandBatters, arsenal, comprehensiveArsenal, opposingBattersList, pitches } = tooltipData;
+      const sameHandPercentage = Math.round((pitcher.sameHandednessPercentage || 0) * 100);
+      const oppositeHandPercentage = Math.round((pitcher.oppositeHandednessPercentage || 0) * 100);
+      
+      return (
+        <div className="tooltip-content">
+          <div className="pitcher-comprehensive-details">
+            <h4>{pitcher.name} ({pitcher.team}) vs {pitcher.opposingTeam}</h4>
+            
+            <div className="pitcher-overview">
+              <div className="pitcher-info">
+                <span className="pitcher-hand">Pitcher Hand: {pitcher.hand}</span>
+                {pitcher.estimated && <span className="estimated-indicator">(Estimated)</span>}
+              </div>
+              <div className="matchup-percentages">
+                <div className="percentage-stat">
+                  <span className="percentage-value">{sameHandPercentage}%</span>
+                  <span className="percentage-label">Same Hand</span>
+                </div>
+                <div className="percentage-stat">
+                  <span className="percentage-value">{oppositeHandPercentage}%</span>
+                  <span className="percentage-label">Opposite Hand</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Same-Hand Batters Table */}
+            {sameHandBatters && sameHandBatters.length > 0 && (
+              <div className="batters-section">
+                <h5>Same-Handed Batters ({sameHandBatters.length})</h5>
+                <div className="batters-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Player</th>
+                        <th>Team</th>
+                        <th>Hand</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sameHandBatters.slice(0, 10).map((batter, index) => (
+                        <tr key={index}>
+                          <td className="batter-name">{batter.name}</td>
+                          <td className="batter-team">{batter.team}</td>
+                          <td className="batter-hand">{batter.hand}{batter.isSwitch ? ' (S)' : ''}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {sameHandBatters.length > 10 && (
+                    <div className="more-batters">+{sameHandBatters.length - 10} more</div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Opposite-Hand Batters Table */}
+            {oppositeHandBatters && oppositeHandBatters.length > 0 && (
+              <div className="batters-section">
+                <h5>Opposite-Handed Batters ({oppositeHandBatters.length})</h5>
+                <div className="batters-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Player</th>
+                        <th>Team</th>
+                        <th>Hand</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {oppositeHandBatters.slice(0, 10).map((batter, index) => (
+                        <tr key={index}>
+                          <td className="batter-name">{batter.name}</td>
+                          <td className="batter-team">{batter.team}</td>
+                          <td className="batter-hand">{batter.hand}{batter.isSwitch ? ' (S)' : ''}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {oppositeHandBatters.length > 10 && (
+                    <div className="more-batters">+{oppositeHandBatters.length - 10} more</div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Comprehensive Arsenal Information */}
+            {comprehensiveArsenal ? (
+              <div className="arsenal-section">
+                <h5>⚾ Arsenal Breakdown ({comprehensiveArsenal.pitches.length} pitches)</h5>
+                
+                {/* Comprehensive Pitch Display */}
+                <div className="comprehensive-pitch-display">
+                  {comprehensiveArsenal.pitches.map((pitch, index) => {
+                    // Pitch type configuration with colors and names
+                    const pitchConfig = {
+                      'FF': { name: '4-Seam Fastball', emoji: '🔥', color: '#ff4444' },
+                      'SI': { name: 'Sinker', emoji: '📉', color: '#ff6644' },
+                      'FC': { name: 'Cutter', emoji: '✂️', color: '#ff8844' },
+                      'SL': { name: 'Slider', emoji: '↗️', color: '#4488ff' },
+                      'CU': { name: 'Curveball', emoji: '🌙', color: '#44aaff' },
+                      'CH': { name: 'Changeup', emoji: '🎭', color: '#44ff88' },
+                      'FS': { name: 'Splitter', emoji: '🔻', color: '#88ff44' },
+                      'KC': { name: 'Knuckle Curve', emoji: '🌀', color: '#8844ff' },
+                      'KN': { name: 'Knuckleball', emoji: '🦋', color: '#ff44ff' },
+                      'ST': { name: 'Sweeper', emoji: '💫', color: '#6644ff' },
+                      'SV': { name: 'Slurve', emoji: '🌪️', color: '#4466ff' }
+                    };
+                    
+                    const config = pitchConfig[pitch.pitch_type] || { 
+                      name: pitch.pitch_name || pitch.pitch_type, 
+                      emoji: '⚾', 
+                      color: '#666666' 
+                    };
+                    
+                    return (
+                      <div key={index} className="comprehensive-pitch-card" style={{ borderLeftColor: config.color }}>
+                        <div className="pitch-card-header">
+                          <div className="pitch-info">
+                            <span className="pitch-emoji">{config.emoji}</span>
+                            <div className="pitch-details">
+                              <div className="pitch-name-display">{pitch.pitch_name || config.name}</div>
+                              <div className="pitch-usage-info">
+                                {pitch.pitch_usage.toFixed(1)}% usage ({pitch.pitches} thrown)
+                              </div>
+                            </div>
+                          </div>
+                          <div 
+                            className="effectiveness-badge"
+                            style={{ 
+                              backgroundColor: pitch.effectiveness.color + '20', 
+                              color: pitch.effectiveness.color 
+                            }}
+                          >
+                            {pitch.effectiveness.rating}
+                          </div>
+                        </div>
+                        
+                        {/* Key Stats */}
+                        <div className="pitch-stats-grid">
+                          <div className="stat-item">
+                            <div className="stat-label">Whiff%</div>
+                            <div className="stat-value">{pitch.whiff_percent.toFixed(1)}%</div>
+                          </div>
+                          <div className="stat-item">
+                            <div className="stat-label">K%</div>
+                            <div className="stat-value">{pitch.k_percent.toFixed(1)}%</div>
+                          </div>
+                          <div className="stat-item">
+                            <div className="stat-label">Hard Hit%</div>
+                            <div className="stat-value">{pitch.hard_hit_percent.toFixed(1)}%</div>
+                          </div>
+                          <div className="stat-item">
+                            <div className="stat-label">BA Against</div>
+                            <div className="stat-value">{pitch.ba.toFixed(3)}</div>
+                          </div>
+                          <div className="stat-item">
+                            <div className="stat-label">SLG Against</div>
+                            <div className="stat-value">{pitch.slg.toFixed(3)}</div>
+                          </div>
+                          <div className="stat-item">
+                            <div className="stat-label">wOBA</div>
+                            <div className="stat-value">{pitch.woba.toFixed(3)}</div>
+                          </div>
+                        </div>
+                        
+                        {/* Run Value */}
+                        <div className="run-value-display">
+                          <span className="rv-label">Run Value/100:</span>
+                          <span className={`rv-value ${pitch.run_value_per_100 < 0 ? 'positive' : 'negative'}`}>
+                            {pitch.run_value_per_100.toFixed(1)}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                {/* Arsenal Summary */}
+                <div className="comprehensive-arsenal-summary">
+                  <div className="summary-title">📊 Arsenal Summary</div>
+                  <div className="summary-grid">
+                    <div className="summary-stat">
+                      <span className="summary-label">Avg Whiff%:</span>
+                      <span className="summary-value">{comprehensiveArsenal.summary.avgWhiffPercent.toFixed(1)}%</span>
+                    </div>
+                    <div className="summary-stat">
+                      <span className="summary-label">Avg K%:</span>
+                      <span className="summary-value">{comprehensiveArsenal.summary.avgKPercent.toFixed(1)}%</span>
+                    </div>
+                    <div className="summary-stat">
+                      <span className="summary-label">Primary Pitch:</span>
+                      <span className="summary-value">
+                        {comprehensiveArsenal.summary.primaryPitch.pitch_name} ({comprehensiveArsenal.summary.primaryPitch.pitch_usage.toFixed(0)}%)
+                      </span>
+                    </div>
+                    <div className="summary-stat">
+                      <span className="summary-label">Total Pitches:</span>
+                      <span className="summary-value">{comprehensiveArsenal.summary.totalPitchesThrown}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Classification Badge */}
+                  <div className="arsenal-classification">
+                    <div className={`classification-badge ${comprehensiveArsenal.classification.type}`}>
+                      {comprehensiveArsenal.classification.label} ({comprehensiveArsenal.classification.description})
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (arsenal && arsenal.length > 0) || (pitches && pitches.length > 0) ? (
+              /* Fallback Basic Arsenal Display */
+              <div className="arsenal-section">
+                <h5>⚾ Arsenal Breakdown ({(arsenal || pitches || []).length} pitches)</h5>
+                
+                {/* Basic Pitch Mix Display */}
+                <div className="pitch-mix-display">
+                  {(arsenal || pitches || []).map((pitch, index) => {
+                    const pitchType = typeof pitch === 'string' ? pitch : (pitch.pitch_type || pitch.name);
+                    const pitchConfig = {
+                      'FF': { name: '4-Seam Fastball', emoji: '🔥', color: '#ff4444' },
+                      'SI': { name: 'Sinker', emoji: '📉', color: '#ff6644' },
+                      'FC': { name: 'Cutter', emoji: '✂️', color: '#ff8844' },
+                      'SL': { name: 'Slider', emoji: '↗️', color: '#4488ff' },
+                      'CU': { name: 'Curveball', emoji: '🌙', color: '#44aaff' },
+                      'CH': { name: 'Changeup', emoji: '🎭', color: '#44ff88' },
+                      'FS': { name: 'Splitter', emoji: '🔻', color: '#88ff44' },
+                      'KC': { name: 'Knuckle Curve', emoji: '🌀', color: '#8844ff' },
+                      'KN': { name: 'Knuckleball', emoji: '🦋', color: '#ff44ff' }
+                    };
+                    
+                    const config = pitchConfig[pitchType] || { 
+                      name: pitchType || 'Unknown Pitch', 
+                      emoji: '⚾', 
+                      color: '#666666' 
+                    };
+                    
+                    return (
+                      <div key={index} className="pitch-display-card" style={{ borderLeftColor: config.color }}>
+                        <div className="pitch-header-info">
+                          <span className="pitch-emoji">{config.emoji}</span>
+                          <div className="pitch-details">
+                            <div className="pitch-name-display">{config.name}</div>
+                            <div className="pitch-type-abbr">({pitchType})</div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
+
+            {/* All Opposing Batters */}
+            {opposingBattersList && opposingBattersList.length > 0 && !sameHandBatters && !oppositeHandBatters && (
+              <div className="batters-section">
+                <h5>Opposing Batters ({opposingBattersList.length})</h5>
+                <div className="batters-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Player</th>
+                        <th>Team</th>
+                        <th>Hand</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {opposingBattersList.slice(0, 10).map((batter, index) => (
+                        <tr key={index}>
+                          <td className="batter-name">{batter.name}</td>
+                          <td className="batter-team">{batter.team}</td>
+                          <td className="batter-hand">{batter.hand}{batter.isSwitch ? ' (S)' : ''}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {opposingBattersList.length > 10 && (
+                    <div className="more-batters">+{opposingBattersList.length - 10} more</div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
     if (type === 'pitcher_matchup' && tooltipData?.pitcher && tooltipData?.handType) {
       const { pitcher, handType } = tooltipData;
       const battersData = handType === 'same' ? pitcher.sameHandedBattersList : pitcher.oppositeHandedBattersList;

@@ -1,156 +1,312 @@
-/* PitcherMatchupCard.css - RESPONSIVE DESKTOP/MOBILE FIX */
+/* PitcherMatchupCard.css - Glass Effect Black/Smoke Theme */
 
+/* ========== PITCHER MATCHUP ANALYSIS (Black/Smoke Theme) ========== */
 .pitcher-matchup-card {
-  background-color: #fff;
-  border-radius: 8px;
+  grid-column: 1 / -1;
+  background: rgba(31, 41, 55, 0.05);
+  border: 1px solid rgba(31, 41, 55, 0.2);
+  border-left: 4px solid #374151;
+  border-radius: 12px;
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  box-shadow: 
+    0 8px 32px rgba(31, 41, 55, 0.08),
+    0 2px 8px rgba(31, 41, 55, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  
+  /* FULL WIDTH */
+  width: 100%;
+  
+  /* FIXED HEIGHT */
+  height: 600px;
+}
+
+/* Glass card container for proper layering */
+.pitcher-matchup-card .glass-card-container {
+  position: relative;
+  height: 100%;
+  min-height: 600px !important;
+  max-height: none !important;
+}
+
+/* Glass header that content scrolls behind */
+.pitcher-matchup-card .glass-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: rgba(31, 41, 55, 0.08);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(31, 41, 55, 0.15);
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+  pointer-events: auto; /* Allow interactions with header elements */
+  box-shadow: 0 4px 16px rgba(31, 41, 55, 0.05);
+}
+
+/* Glass Effect Scrollable Container */
+.pitcher-matchup-card .scrollable-container {
+  background: rgba(249, 250, 251, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+  height: 100%;
+  max-height: none !important;
+  min-height: 300px !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 280px; /* Larger padding for dashboard header + controls */
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 0;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  min-height: 400px;
-  
-  /* DESKTOP: Full width like SlotMachineCard */
-  grid-column: 1 / -1;
-  width: 100%;
 }
 
-.pitcher-matchup-card .card-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 16px;
-  color: #333;
+/* Header - COMPACT */
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(31, 41, 55, 0.15);
+  flex-shrink: 0;
 }
 
-/* Team Selector - SCOPED */
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-icon {
+  padding: 4px;
+  background: #374151;
+  border-radius: 4px;
+}
+
+.header-icon svg {
+  width: 12px;
+  height: 12px;
+  color: white;
+}
+
+.header-text h2 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.header-text p {
+  font-size: 10px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Team Selector - HORIZONTAL SLIDER */
 .pitcher-matchup-card .team-selector {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 6px;
+  margin-bottom: 8px;
   overflow-x: auto;
+  overflow-y: hidden;
   white-space: nowrap;
-  padding-bottom: 5px;
+  padding: 8px 0;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+  /* Show scrollbar for better UX */
+  -ms-overflow-style: auto;
+  scrollbar-width: thin;
+}
+
+.pitcher-matchup-card .team-selector::-webkit-scrollbar {
+  height: 4px;
+  background: rgba(31, 41, 55, 0.1);
+  border-radius: 2px;
+}
+
+.pitcher-matchup-card .team-selector::-webkit-scrollbar-thumb {
+  background: rgba(31, 41, 55, 0.3);
+  border-radius: 2px;
+}
+
+.pitcher-matchup-card .team-selector::-webkit-scrollbar-thumb:hover {
+  background: rgba(31, 41, 55, 0.5);
 }
 
 .pitcher-matchup-card .team-item {
-  padding: 6px 12px;
-  border-radius: 20px;
-  background-color: #f0f0f0;
+  padding: 4px 8px;
+  border-radius: 50px;
+  background-color: rgba(255, 255, 255, 0.1);
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 0.85rem;
+  font-size: 9px;
+  font-weight: 600;
   white-space: nowrap;
   user-select: none;
+  border: 1px solid rgba(31, 41, 55, 0.2);
+  pointer-events: auto; /* Ensure team items are clickable */
+  z-index: 25; /* Higher than header */
+  position: relative;
+  flex-shrink: 0;
+  color: #374151;
+  min-width: 32px;
+  width: auto;
+  text-align: center;
 }
 
 .pitcher-matchup-card .team-item:hover {
-  background-color: #e0e0e0;
+  background-color: rgba(31, 41, 55, 0.15);
+  border-color: rgba(31, 41, 55, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .pitcher-matchup-card .team-item.active {
-  background-color: #1890ff;
+  background-color: #374151;
   color: white;
+  border-color: #374151;
+  box-shadow: 0 2px 8px rgba(55, 65, 81, 0.3);
+  transform: translateY(-1px);
 }
 
 .pitcher-matchup-card .team-item.disabled {
   cursor: not-allowed;
   opacity: 0.6;
+  background-color: rgba(31, 41, 55, 0.05);
+  border-color: rgba(31, 41, 55, 0.1);
 }
 
-.pitcher-matchup-card .team-item.disabled:hover {
-  background-color: #f0f0f0;
-}
-
-/* Matchup Actions - SCOPED */
+/* Matchup Actions - COMPACT */
 .pitcher-matchup-card .matchup-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  gap: 16px;
+  margin-bottom: 8px;
+  gap: 8px;
 }
 
 .pitcher-matchup-card .sort-toggle {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   flex-wrap: wrap;
 }
 
 .pitcher-matchup-card .sort-toggle span {
-  font-size: 0.85rem;
-  color: #666;
+  font-size: 9px;
+  color: #6b7280;
 }
 
 .pitcher-matchup-card .sort-button {
-  padding: 6px 12px;
-  border: 1px solid #d9d9d9;
-  background-color: white;
+  padding: 3px 8px;
+  border: 1px solid rgba(31, 41, 55, 0.2);
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 8px;
   transition: all 0.2s ease;
+  color: #374151;
+  pointer-events: auto; /* Ensure sort buttons are clickable */
+  z-index: 25; /* Higher than header */
+  position: relative;
 }
 
 .pitcher-matchup-card .sort-button:hover {
-  border-color: #1890ff;
-  color: #1890ff;
+  border-color: #374151;
+  background-color: rgba(31, 41, 55, 0.1);
 }
 
 .pitcher-matchup-card .sort-button.active {
-  background-color: #1890ff;
+  background-color: #374151;
   color: white;
-  border-color: #1890ff;
+  border-color: #374151;
 }
 
 .pitcher-matchup-card .restore-button {
-  padding: 6px 12px;
-  background-color: #52c41a;
+  padding: 3px 8px;
+  background-color: #10b981;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 8px;
   transition: all 0.2s ease;
+  pointer-events: auto; /* Ensure restore button is clickable */
+  z-index: 25; /* Higher than header */
+  position: relative;
 }
 
 .pitcher-matchup-card .restore-button:hover {
-  background-color: #389e0d;
+  background-color: #059669;
 }
 
-/* Pitchers Count - SCOPED */
+/* Pitchers Count - COMPACT */
 .pitcher-matchup-card .pitchers-count {
-  font-size: 0.85rem;
-  color: #666;
-  margin-bottom: 12px;
+  font-size: 9px;
+  color: #6b7280;
+  margin-bottom: 8px;
   font-style: italic;
 }
 
-/* Scrollable Container - SCOPED */
-.pitcher-matchup-card .scrollable-container {
-  flex: 1;
-  overflow-y: auto;
-  max-height: 600px;
-  border: 1px solid #f0f0f0;
-  border-radius: 4px;
+/* Glass Effect Scrollbars */
+.pitcher-matchup-card .scrollable-container::-webkit-scrollbar {
+  width: 6px;
 }
 
-/* Player List - SCOPED */
+.pitcher-matchup-card .scrollable-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.pitcher-matchup-card .scrollable-container::-webkit-scrollbar-thumb {
+  background: rgba(31, 41, 55, 0.4);
+  border-radius: 3px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.pitcher-matchup-card .scrollable-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(31, 41, 55, 0.6);
+}
+
+/* Player List - MAXIMUM SPACE */
 .pitcher-matchup-card .player-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  flex: 1 1 auto;
 }
 
 .pitcher-matchup-card .player-item {
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid rgba(31, 41, 55, 0.1);
   transition: background-color 0.2s ease;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(31, 41, 55, 0.05);
+  border-radius: 6px;
+  margin-bottom: 4px;
+  position: relative;
+  overflow: hidden;
 }
 
 .pitcher-matchup-card .player-item:hover {
-  background-color: #fafafa;
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(31, 41, 55, 0.1);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .pitcher-matchup-card .player-item:last-child {
@@ -158,19 +314,19 @@
 }
 
 .pitcher-matchup-card .player-item.expanded {
-  background-color: #f5f5f5;
+  background: rgba(255, 255, 255, 0.25);
 }
 
-/* DESKTOP: Pitcher Main Row - Horizontal Layout */
+/* Pitcher Main Row - Horizontal Layout */
 .pitcher-matchup-card .pitcher-main-row {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
-  gap: 16px;
+  padding: 8px 12px;
+  gap: 12px;
   flex-wrap: nowrap;
 }
 
-/* Player Rank - SCOPED */
+/* Player Rank */
 .pitcher-matchup-card .player-rank {
   width: 32px;
   height: 32px;
@@ -182,9 +338,41 @@
   font-size: 0.9rem;
   color: white;
   flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Player Info - SCOPED */
+.pitcher-matchup-card .player-rank .rank-logo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  object-fit: cover;
+  opacity: 0.7;
+  overflow: hidden;
+}
+
+.pitcher-matchup-card .player-rank .rank-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0.3;
+  overflow: hidden;
+}
+
+.pitcher-matchup-card .player-rank .rank-number {
+  position: relative;
+  z-index: 10;
+  color: white;
+  font-size: 0.9rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  line-height: 1;
+  overflow: hidden;
+}
+
+/* Player Info */
 .pitcher-matchup-card .player-info {
   flex: 1;
   display: flex;
@@ -201,112 +389,94 @@
 
 .pitcher-matchup-card .player-name {
   font-weight: 600;
-  font-size: 1rem;
-  color: #333;
+  font-size: 12px;
+  color: #111827;
 }
 
 .pitcher-matchup-card .player-team {
-  font-size: 0.85rem;
-  color: #666;
-  padding: 2px 6px;
-  background-color: #f0f0f0;
-  border-radius: 4px;
+  font-size: 9px;
+  color: #6b7280;
+  padding: 1px 4px;
+  background-color: rgba(31, 41, 55, 0.1);
+  border-radius: 3px;
 }
 
-/* Hide Pitcher Button - SCOPED */
+/* Hide Pitcher Button */
 .pitcher-matchup-card .hide-pitcher-button {
-  width: 24px;
-  height: 24px;
-  font-size: 0.8rem;
+  width: 20px;
+  height: 20px;
+  font-size: 0.7rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f0f0f0;
-  color: #999;
+  background-color: rgba(31, 41, 55, 0.1);
+  color: #6b7280;
   border: none;
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-left: 8px;
+  margin-left: 6px;
   opacity: 1;
 }
 
 .pitcher-matchup-card .hide-pitcher-button:hover {
-  background-color: #ff4d4f;
+  background-color: #ef4444;
   color: white;
 }
 
-/* Player Rank Styles - SCOPED */
+/* Player Rank Styles */
 .pitcher-matchup-card .player-rank.tough {
-  background-color: #ff4d4f;
+  background-color: #ef4444;
 }
 
 .pitcher-matchup-card .player-rank.favorable {
-  background-color: #52c41a;
+  background-color: #10b981;
 }
 
 .pitcher-matchup-card .player-rank.neutral {
-  background-color: #1890ff;
+  background-color: #374151;
 }
 
-/* Pitcher Details - SCOPED */
+/* Pitcher Details */
 .pitcher-matchup-card .pitcher-details {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin-top: 2px;
 }
 
 .pitcher-matchup-card .handedness-badge, 
 .pitcher-matchup-card .estimated-badge {
   display: inline-block;
-  padding: 1px 5px;
-  font-size: 0.7rem;
+  padding: 1px 4px;
+  font-size: 8px;
   font-weight: bold;
   border-radius: 3px;
 }
 
 .pitcher-matchup-card .handedness-badge {
-  background-color: #f0f0f0;
-  color: #666;
+  background-color: rgba(31, 41, 55, 0.1);
+  color: #6b7280;
 }
 
 .pitcher-matchup-card .estimated-badge {
-  background-color: #ffe58f;
-  color: #ad6800;
+  background-color: #fbbf24;
+  color: #92400e;
 }
 
 .pitcher-matchup-card .pitch-count {
-  font-size: 0.75rem;
-  color: #666;
+  font-size: 8px;
+  color: #6b7280;
 }
 
-/* Arsenal Toggle Button - SCOPED */
-.pitcher-matchup-card .arsenal-toggle-btn {
-  padding: 2px 8px;
-  background-color: #6366f1;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.75rem;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
 
-.pitcher-matchup-card .arsenal-toggle-btn:hover {
-  background-color: #4f46e5;
-}
-
-/* DESKTOP: Matchup Stats - Horizontal Layout */
+/* Matchup Stats - Horizontal Layout */
 .pitcher-matchup-card .matchup-stats {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 5px;
-  min-width: 140px;
+  gap: 4px;
+  min-width: 100px;
   flex-shrink: 0;
 }
 
@@ -317,575 +487,391 @@
   line-height: 1.2;
   cursor: pointer;
   position: relative;
-  padding: 3px 6px;
-  border-radius: 4px;
+  padding: 2px 4px;
+  border-radius: 3px;
   transition: background-color 0.2s ease;
 }
 
 .pitcher-matchup-card .matchup-stat:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(31, 41, 55, 0.1);
 }
 
 .pitcher-matchup-card .matchup-value {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 12px;
 }
 
 .pitcher-matchup-card .matchup-label {
-  font-size: 0.75rem;
+  font-size: 8px;
   font-weight: normal;
-  color: #666;
+  color: #6b7280;
 }
 
 .pitcher-matchup-card .matchup-stat.tough .matchup-value {
-  color: #ff4d4f;
+  color: #ef4444;
 }
 
 .pitcher-matchup-card .matchup-stat.favorable .matchup-value {
-  color: #52c41a;
+  color: #10b981;
 }
 
 .pitcher-matchup-card .opposing-team {
-  font-size: 0.75rem;
-  color: #666;
-  margin-top: 5px;
+  font-size: 8px;
+  color: #6b7280;
+  margin-top: 3px;
 }
 
-/* Arsenal Container - SCOPED */
-.pitcher-matchup-card .pitcher-arsenal-container {
-  padding: 16px;
-  background-color: #f8f9fa;
-  border-top: 1px solid #e5e7eb;
-  animation: slideDown 0.3s ease-out;
+
+/* Footer - MINIMAL SPACE ONLY */
+.pitcher-matchup-card .dashboard-footer {
+  margin-top: 6px;
+  padding: 4px 0;
+  border-top: 1px solid rgba(31, 41, 55, 0.15);
+  flex-shrink: 0;
+  flex-grow: 0;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    max-height: 0;
-  }
-  to {
-    opacity: 1;
-    max-height: 800px;
-  }
-}
-
-/* Tooltip Styles - SCOPED TO COMPONENT */
-.pitcher-matchup-card .batter-tooltip {
-  position: fixed;
-  z-index: 1500;
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  max-width: 400px;
-  max-height: 600px;
-  overflow-y: auto;
-  pointer-events: auto;
-  opacity: 1;
-  visibility: visible;
-}
-
-.pitcher-matchup-card .tooltip-header {
-  background-color: #f5f5f5;
-  padding: 12px 16px;
-  border-bottom: 1px solid #ddd;
-  font-weight: bold;
-  font-size: 0.9rem;
-  color: #333;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.pitcher-matchup-card .batter-item {
+.pitcher-matchup-card .footer-content {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: 8px 16px;
-  border-bottom: 1px solid #f0f0f0;
-  font-size: 0.85rem;
+  font-size: 9px;
+  color: #6b7280;
 }
 
-/* Additional Arsenal-specific styles for PitcherArsenalDisplay integration - SCOPED */
-.pitcher-matchup-card .pitcher-arsenal-display {
-  margin-top: 8px;
-}
-
-.pitcher-matchup-card .pitcher-arsenal-display .pitch-usage-bar {
-  margin-bottom: 16px;
-}
-
-.pitcher-matchup-card .pitcher-arsenal-display .pitch-card {
-  background-color: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  padding: 12px;
-  margin-bottom: 8px;
-}
-
-.pitcher-matchup-card .pitcher-arsenal-display .pitch-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* DESKTOP: Arsenal Display Styles */
-.pitcher-matchup-card .pitcher-arsenal-display .pitch-header {
+.pitcher-matchup-card .footer-legend {
   display: flex;
-  justify-content: space-between;
+  gap: 12px;
   align-items: center;
-  margin-bottom: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.pitcher-matchup-card .pitcher-arsenal-display .pitch-name {
-  font-weight: 600;
-  font-size: 1rem;
-  color: #333;
+.pitcher-matchup-card .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 8px;
 }
 
-.pitcher-matchup-card .pitcher-arsenal-display .pitch-usage {
-  font-size: 0.85rem;
-  color: #666;
-  font-weight: 500;
+.pitcher-matchup-card .legend-color {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
 }
 
-.pitcher-matchup-card .pitcher-arsenal-display .pitch-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-top: 8px;
+.pitcher-matchup-card .legend-color.tough {
+  background-color: #ef4444;
 }
 
-.pitcher-matchup-card .pitcher-arsenal-display .stat-item {
+.pitcher-matchup-card .legend-color.favorable {
+  background-color: #10b981;
+}
+
+.pitcher-matchup-card .legend-icon {
+  font-size: 10px;
+}
+
+/* Loading & No Data States */
+.pitcher-matchup-card .loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #6b7280;
+  font-style: italic;
+  height: 100%;
+  min-height: 200px;
+  flex-direction: column;
+}
+
+.pitcher-matchup-card .no-data {
+  color: #6b7280;
   text-align: center;
-  padding: 8px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
+  padding: 40px 20px;
+  font-style: italic;
+  height: 100%;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 
-.pitcher-matchup-card .pitcher-arsenal-display .stat-label {
-  font-size: 0.7rem;
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 2px;
-}
-
-.pitcher-matchup-card .pitcher-arsenal-display .stat-value {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #333;
-}
-
-/* MOBILE: Compact Arsenal Display */
+/* MOBILE RESPONSIVE - Same layout as desktop, just responsive adjustments */
 @media (max-width: 768px) {
-  .pitcher-matchup-card .pitcher-arsenal-container {
-    padding: 8px;
-    margin-top: 6px;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-display {
-    margin-top: 4px;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-display .pitch-card {
-    padding: 8px;
-    margin-bottom: 6px;
-    border-radius: 4px;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-display .pitch-header {
-    flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: 6px;
-    gap: 2px;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-display .pitch-name {
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-display .pitch-usage {
-    font-size: 0.75rem;
-    color: #888;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-display .pitch-stats {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-    margin-top: 6px;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-display .stat-item {
-    padding: 4px 2px;
-    background-color: #f8f9fa;
-    border-radius: 3px;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-display .stat-label {
-    font-size: 0.6rem;
-    margin-bottom: 1px;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-display .stat-value {
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-  
-  /* Compact pitch usage bar */
-  .pitcher-matchup-card .pitcher-arsenal-display .pitch-usage-bar {
-    margin-bottom: 8px;
-    height: 4px;
-    background-color: #e5e7eb;
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-display .usage-fill {
-    height: 100%;
-    background-color: #3b82f6;
-    transition: width 0.3s ease;
-  }
-  
-  /* Ensure no horizontal overflow */
-  .pitcher-matchup-card .pitcher-arsenal-display * {
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-}
-
-/* Very small screens - even more compact */
-@media (max-width: 480px) {
-  .pitcher-matchup-card .pitcher-arsenal-container {
-    padding: 6px;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-display .pitch-card {
-    padding: 6px;
-    margin-bottom: 4px;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-display .pitch-name {
-    font-size: 0.8rem;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-display .pitch-usage {
-    font-size: 0.7rem;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-display .stat-item {
-    padding: 3px 1px;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-display .stat-label {
-    font-size: 0.55rem;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-display .stat-value {
-    font-size: 0.7rem;
-  }
-}
-
-/* ===== MOBILE RESPONSIVE LAYOUT (Following SlotMachineCard Pattern) ===== */
-@media (max-width: 768px) {
-  /* Card stays single column on mobile */
   .pitcher-matchup-card {
     grid-column: 1 / -1;
-    min-height: 350px;
-    padding: 15px;
+    height: 640px;
+    min-height: 640px;
+    max-height: 640px;
+    padding: 8px;
   }
   
-  .pitcher-matchup-card .card-title {
-    font-size: 1.1rem;
-    margin-bottom: 12px;
+  .pitcher-matchup-card .glass-card-container {
+    min-height: 640px;
+    height: 640px;
+    max-height: 640px;
   }
   
-  /* Team selector becomes more compact */
+  .pitcher-matchup-card .scrollable-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    max-height: none;
+    padding-top: 160px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  
+  .pitcher-matchup-card .glass-header {
+    position: absolute;
+    padding: 8px 12px;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 160px;
+    overflow: visible;
+  }
+  
+  .dashboard-header {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  
+  /* Hide header icon in mobile */
+  .pitcher-matchup-card .header-icon {
+    display: none;
+  }
+  
+  .pitcher-matchup-card .header-text h2 {
+    font-size: 14px;
+    margin: 0;
+  }
+  
+  .pitcher-matchup-card .header-text p {
+    font-size: 10px;
+    margin: 0;
+  }
+  
   .pitcher-matchup-card .team-selector {
-    gap: 6px;
-    margin-bottom: 12px;
+    gap: 3px;
+    margin-bottom: 6px;
+    padding: 2px 0;
+    overflow-x: auto;
+    overflow-y: visible;
+    flex-wrap: nowrap;
   }
   
   .pitcher-matchup-card .team-item {
-    padding: 4px 8px;
-    font-size: 0.8rem;
+    padding: 3px 6px;
+    font-size: 8px;
+    font-weight: 700;
+    min-width: 28px;
+    border-radius: 50px;
+    flex-shrink: 0;
+    text-transform: uppercase;
   }
   
-  /* Actions become stacked */
   .pitcher-matchup-card .matchup-actions {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-    margin-bottom: 12px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
   }
   
   .pitcher-matchup-card .sort-toggle {
-    justify-content: center;
+    justify-content: flex-start;
     gap: 6px;
+    flex-wrap: wrap;
   }
   
   .pitcher-matchup-card .sort-button {
-    padding: 4px 8px;
-    font-size: 0.75rem;
+    padding: 6px 8px;
+    font-size: 10px;
   }
   
-  /* MOBILE: Pitcher Main Row - VERTICAL STACK */
+  /* Make player items larger and consistent */
+  .pitcher-matchup-card .player-item {
+    margin-bottom: 4px;
+    padding: 0;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-height: 60px; /* Larger height for mobile */
+  }
+  
   .pitcher-matchup-card .pitcher-main-row {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 12px;
-    gap: 12px;
-  }
-  
-  /* Top section: Player info + rank in horizontal layout */
-  .pitcher-matchup-card .pitcher-main-row .player-info {
-    order: 1;
     display: flex;
     flex-direction: row;
     align-items: center;
+    padding: 12px 10px; /* Increased padding for larger height */
     gap: 12px;
-    margin-bottom: 0;
+    flex-wrap: nowrap;
+    min-height: 60px;
   }
   
-  .pitcher-matchup-card .pitcher-main-row .player-rank {
-    order: 0;
-    width: 40px;
-    height: 40px;
+  /* Slightly larger rank */
+  .pitcher-matchup-card .player-rank {
+    width: 32px;
+    height: 32px;
     margin-right: 0;
     flex-shrink: 0;
+    font-size: 0.85rem;
+    border-radius: 50%;
+    overflow: hidden;
   }
   
-  .pitcher-matchup-card .player-name-container {
+  .pitcher-matchup-card .player-rank .rank-number {
+    font-size: 0.85rem;
+    font-weight: 700;
+    overflow: hidden;
+  }
+  
+  /* Simplified player info for mobile - name only */
+  .pitcher-matchup-card .player-info {
     flex: 1;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+    display: flex;
+    align-items: center;
+    min-width: 0;
   }
   
+  /* Show only player name in mobile */
   .pitcher-matchup-card .player-name {
-    font-size: 0.95rem;
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827 !important;
+    text-align: left;
+    flex: 1;
   }
   
+  /* Hide team badge in mobile (redundant with logo) */
   .pitcher-matchup-card .player-team {
-    font-size: 0.8rem;
+    display: none !important;
   }
   
-  /* Pitcher details below player info */
+  /* Hide pitcher details completely in mobile */
   .pitcher-matchup-card .pitcher-details {
-    order: 2;
-    flex-wrap: wrap;
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid #e5e7eb;
+    display: none !important;
   }
   
-  /* MOBILE: Stats section below everything */
+  /* Hide opposing team in mobile */
+  .pitcher-matchup-card .opposing-team {
+    display: none !important;
+  }
+  
+  /* Hide matchup stats completely in mobile */
   .pitcher-matchup-card .matchup-stats {
-    order: 3;
-    flex-direction: row;
+    display: none;
+  }
+  
+  /* Clean player-name-container for mobile - just name and buttons */
+  .pitcher-matchup-card .player-name-container {
+    display: flex;
     align-items: center;
-    justify-content: space-around;
-    min-width: unset;
-    width: 100%;
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid #e5e7eb;
+    gap: 8px;
+    flex: 1;
   }
   
-  .pitcher-matchup-card .matchup-stat {
-    align-items: center;
-    text-align: center;
-  }
-  
-  .pitcher-matchup-card .matchup-value {
-    font-size: 1rem;
-  }
-  
-  .pitcher-matchup-card .matchup-label {
-    font-size: 0.7rem;
-  }
-  
-  /* Hide pitcher button repositioning */
+  /* Ensure hide button is visible and properly spaced */
   .pitcher-matchup-card .hide-pitcher-button {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 20px;
-    height: 20px;
-    font-size: 0.7rem;
-    margin-left: 0;
+    width: 24px;
+    height: 24px;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 50%;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: auto;
   }
   
-  /* MOBILE: Arsenal container below (not beside) */
-  .pitcher-matchup-card .pitcher-arsenal-container {
-    padding: 8px;
-    margin-top: 6px;
-    background-color: #f8f9fa;
-    border-top: 1px solid #e5e7eb;
-    border-radius: 4px;
-    max-height: 300px;
-    overflow-y: auto;
+  /* Info button styling - larger and more visible for mobile */
+  .pitcher-matchup-card .expand-toggle.tooltip-trigger {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(59, 130, 246, 0.15);
+    border: 2px solid rgba(59, 130, 246, 0.4);
+    color: #3b82f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    margin-left: 6px;
+    overflow: hidden;
   }
   
-  /* Scrollable container more compact */
-  .pitcher-matchup-card .scrollable-container {
-    max-height: 350px;
-  }
-  
-  /* Tooltips become mobile-friendly */
-  .pitcher-matchup-card .batter-tooltip {
-    width: 90vw;
-    max-width: 350px;
-    max-height: 60vh;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  .pitcher-matchup-card .expand-toggle.tooltip-trigger:hover {
+    background: rgba(59, 130, 246, 0.25);
+    border-color: rgba(59, 130, 246, 0.6);
+    transform: scale(1.05);
   }
 }
 
 /* Very small screens */
 @media (max-width: 480px) {
   .pitcher-matchup-card {
-    padding: 10px;
-    min-height: 280px;
-    overflow: hidden;
+    padding: 6px;
+    height: 620px; /* Slightly smaller for very small screens */
+    min-height: 620px;
+    max-height: 620px;
   }
   
-  .pitcher-matchup-card .card-title {
-    font-size: 1rem;
+  .pitcher-matchup-card .glass-card-container {
+    min-height: 620px;
+    height: 620px;
+    max-height: 620px;
+  }
+  
+  .pitcher-matchup-card .header-text h2 {
+    font-size: 12px;
   }
   
   .pitcher-matchup-card .player-name {
-    font-size: 0.85rem;
+    font-size: 11px;
   }
   
   .pitcher-matchup-card .matchup-value {
-    font-size: 0.85rem;
+    font-size: 11px;
   }
   
-  .pitcher-matchup-card .matchup-label {
-    font-size: 0.6rem;
-  }
-  
-  /* Very compact arsenal on very small screens */
   .pitcher-matchup-card .pitcher-arsenal-container {
-    padding: 6px;
-    max-height: 250px;
-  }
-  
-  /* Ensure all content fits within viewport */
-  .pitcher-matchup-card .scrollable-container {
-    max-height: 280px;
+    padding: 4px;
+    max-height: 150px;
   }
 }
 
-/* Prevent horizontal overflow on all mobile sizes */
+/* Ensure no horizontal scroll */
+.pitcher-matchup-card * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 @media (max-width: 768px) {
   .pitcher-matchup-card,
   .pitcher-matchup-card * {
-    box-sizing: border-box;
+    width: 100%;
     max-width: 100%;
-  }
-  
-  .pitcher-matchup-card {
     overflow-x: hidden;
-    width: 100%;
-  }
-  
-  .pitcher-matchup-card .pitcher-main-row {
-    width: 100%;
-    overflow-x: hidden;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-container {
-    width: 100%;
-    overflow-x: hidden;
-  }
-}
-
-/* Dark mode support - SCOPED */
-@media (prefers-color-scheme: dark) {
-  .pitcher-matchup-card .pitcher-matchup-card {
-    background-color: #1f2937;
-    color: #f3f4f6;
-  }
-  
-  .pitcher-matchup-card .card-title {
-    color: #f3f4f6;
-  }
-  
-  .pitcher-matchup-card .team-item {
-    background-color: #374151;
-    color: #f3f4f6;
-  }
-  
-  .pitcher-matchup-card .team-item:hover {
-    background-color: #4b5563;
-  }
-  
-  .pitcher-matchup-card .team-item.active {
-    background-color: #3b82f6;
-  }
-  
-  .pitcher-matchup-card .sort-button {
-    background-color: #374151;
-    border-color: #4b5563;
-    color: #f3f4f6;
-  }
-  
-  .pitcher-matchup-card .sort-button:hover {
-    border-color: #3b82f6;
-    color: #3b82f6;
-  }
-  
-  .pitcher-matchup-card .sort-button.active {
-    background-color: #3b82f6;
-    border-color: #3b82f6;
-  }
-  
-  .pitcher-matchup-card .scrollable-container {
-    border-color: #374151;
-  }
-  
-  .pitcher-matchup-card .player-item {
-    border-color: #374151;
-  }
-  
-  .pitcher-matchup-card .player-item:hover {
-    background-color: #111827;
-  }
-  
-  .pitcher-matchup-card .player-item.expanded {
-    background-color: #1f2937;
-  }
-  
-  .pitcher-matchup-card .player-name {
-    color: #f3f4f6;
-  }
-  
-  .pitcher-matchup-card .player-team {
-    background-color: #374151;
-    color: #d1d5db;
-  }
-  
-  .pitcher-matchup-card .batter-tooltip {
-    background-color: #1f2937;
-    border-color: #374151;
-  }
-  
-  .pitcher-matchup-card .tooltip-header {
-    background-color: #111827;
-    border-color: #374151;
-  }
-  
-  .pitcher-matchup-card .batter-item {
-    border-color: #374151;
-  }
-  
-  .pitcher-matchup-card .pitcher-arsenal-container {
-    background-color: #111827;
-    border-color: #374151;
   }
 }

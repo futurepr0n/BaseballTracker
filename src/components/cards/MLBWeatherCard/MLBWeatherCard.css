@@ -2,23 +2,52 @@
 
 /* Main Weather Card Container */
 .mlb-weather-card {
-  /* Card will inherit base styles from parent .card class */
-  min-height: 400px;
-  max-height: 600px;
-  display: flex;
-  flex-direction: column;
-}
-
-.mlb-weather-card .card-header {
-  flex-shrink: 0;
-}
-
-.mlb-weather-card .card-body {
-  flex: 1;
+  grid-column: span 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(200, 200, 200, 0.2);
+  border-left: 4px solid #6b7280;
+  border-radius: 12px;
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  position: relative;
   padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.05),
+    0 2px 8px rgba(0, 0, 0, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Glass card container for proper layering */
+.mlb-weather-card .glass-card-container {
+  position: relative;
+  height: 100%;
+  min-height: 420px;
+}
+
+/* Glass header that content scrolls behind */
+.mlb-weather-card .glass-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(200, 200, 200, 0.15);
+  padding: 20px;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
+.mlb-weather-card .glass-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 .card-subtitle {
@@ -27,15 +56,34 @@
   margin-top: 4px;
 }
 
-/* Scrollable Container */
-.weather-cards-scroll-container {
-  flex: 1;
+/* Glass Effect Scrollable Container */
+.mlb-weather-card .scrollable-container {
+  background: rgba(248, 250, 252, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 15px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 140px; /* Space for header */
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Weather cards scroll container within scrollable container */
+.weather-cards-scroll-container {
   display: flex;
   flex-direction: column;
   gap: 15px;
+  padding: 0;
 }
 
 /* Custom scrollbar for webkit browsers */
@@ -246,6 +294,23 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .mlb-weather-card {
+    grid-column: 1 / -1;
+  }
+  
+  /* Remove footer space in mobile */
+  .mlb-weather-card .glass-card-container {
+    min-height: auto;
+    height: auto;
+  }
+  
+  .mlb-weather-card .scrollable-container {
+    position: relative;
+    height: auto;
+    max-height: 60vh;
+    padding-bottom: 10px;
+  }
+  
   .mini-hourly-forecast {
     flex-wrap: wrap;
   }
