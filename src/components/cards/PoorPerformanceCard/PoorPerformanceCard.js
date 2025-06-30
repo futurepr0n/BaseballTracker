@@ -43,6 +43,7 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
     const safeId = createSafeId(player.playerName, player.team);
     const tooltipId = `poor_performance_${safeId}`;
     
+    
     openTooltip(tooltipId, event.currentTarget, {
       type: 'poor_performance',
       player: player

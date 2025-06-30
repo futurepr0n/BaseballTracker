@@ -598,10 +598,15 @@ const GlobalTooltip = () => {
                           ${isPowerGame ? 'power-game' : ''}
                         `}>
                           <td>
-                            {new Date(game.date).toLocaleDateString('en-US', { 
-                              month: 'short', 
-                              day: 'numeric' 
-                            })}
+                            {(() => {
+                              // Parse date safely to avoid timezone issues
+                              const [year, month, day] = game.date.split('-');
+                              const gameDate = new Date(year, month - 1, day); // month is 0-indexed
+                              return gameDate.toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric' 
+                              });
+                            })()}
                             {isRestDay && <span className="rest-indicator" title="Rest day before this game"> 💤</span>}
                           </td>
                           <td>{game.atBats || game.abs || 0}</td>

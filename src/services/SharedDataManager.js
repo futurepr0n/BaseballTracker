@@ -48,8 +48,9 @@ class SharedDataManager {
     if (date < seasonStart || date > seasonEnd) return false;
     
     // Skip weekends (games are less common, reduces requests by ~28%)
-    const dayOfWeek = date.getDay();
-    if (dayOfWeek === 0 || dayOfWeek === 6) return false;
+    // DISABLED for full season data - pitcher cards need complete statistics
+    // const dayOfWeek = date.getDay();
+    // if (dayOfWeek === 0 || dayOfWeek === 6) return false;
     
     return true;
   }
@@ -62,7 +63,7 @@ class SharedDataManager {
     const validDates = [];
     const start = new Date(startDate);
     
-    for (let daysBack = 0; daysBack < maxDays && validDates.length < 50; daysBack++) {
+    for (let daysBack = 0; daysBack < maxDays && validDates.length < 500; daysBack++) {
       const searchDate = new Date(start);
       searchDate.setDate(searchDate.getDate() - daysBack);
       const dateStr = formatDateString(searchDate);
@@ -80,7 +81,7 @@ class SharedDataManager {
    * Get date range data with request deduplication
    * This replaces the problematic fetchPlayerDataForDateRange calls
    */
-  async getDateRangeData(startDate, maxDays = 180) {
+  async getDateRangeData(startDate, maxDays = 365) {
     this.requestStats.totalRequests++;
     
     // Generate cache key

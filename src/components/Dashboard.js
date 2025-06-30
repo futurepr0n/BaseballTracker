@@ -216,12 +216,24 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
       const day = String(currentDate.getDate()).padStart(2, '0');
       const dateStr = `${year}-${month}-${day}`;
       
-      // Try to load the specific date file first
-      let response = await fetch(`/data/predictions/poor_performance_predictions_${dateStr}.json`);
+      // Try to load the specific date file first (new Python-generated files)
+      let response = await fetch(`/data/predictions/poor_performance_risks_${dateStr}.json`, {
+        cache: 'no-cache',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       
       // If not found, try to load the latest predictions
       if (!response.ok) {
-        response = await fetch('/data/predictions/poor_performance_predictions_latest.json');
+        response = await fetch(`/data/predictions/poor_performance_risks_latest.json`, {
+          cache: 'no-cache',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
       }
       
       if (!response.ok) {
