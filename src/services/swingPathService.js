@@ -54,6 +54,7 @@ class SwingPathService {
   }
 
   async loadCSVData(filepath) {
+    console.log(`🔄 Loading CSV data from: ${filepath}`);
     return new Promise((resolve, reject) => {
       Papa.parse(filepath, {
         download: true,
@@ -63,9 +64,12 @@ class SwingPathService {
           if (results.errors.length > 0) {
             console.error('CSV parsing errors:', results.errors);
           }
+          console.log(`✅ CSV loaded: ${results.data.length} rows from ${filepath}`);
+          console.log('Sample row:', results.data[0]);
           resolve(results.data);
         },
         error: (error) => {
+          console.error(`❌ CSV loading error for ${filepath}:`, error);
           reject(error);
         }
       });
@@ -73,14 +77,23 @@ class SwingPathService {
   }
 
   processSwingData(data, handedness) {
+    console.log(`🔄 Processing ${data.length} swing path records for ${handedness}`);
     const playerMap = new Map();
 
-    data.forEach(row => {
+    data.forEach((row, index) => {
       if (!row.name || !row.id) return;
+
+      // Convert "Lastname, Firstname" to "Firstname Lastname" for matching
+      const convertedName = this.convertNameFormat(row.name);
+      
+      if (index < 3) { // Log first 3 for debugging
+        console.log(`Name conversion: "${row.name}" → "${convertedName}"`);
+      }
 
       const playerData = {
         id: row.id,
-        name: row.name,
+        name: convertedName,
+        originalName: row.name, // Keep original for reference
         side: row.side,
         avgBatSpeed: parseFloat(row.avg_bat_speed) || 0,
         swingTilt: parseFloat(row.swing_tilt) || 0,
@@ -97,14 +110,27 @@ class SwingPathService {
         swingOptimizationScore: 0 // Will be calculated
       };
 
-      playerMap.set(row.name, playerData);
+      // Store with converted name for matching
+      playerMap.set(convertedName, playerData);
     });
 
     // Calculate percentiles and scores
     this.calculatePercentiles(playerMap);
     this.calculateOptimizationScores(playerMap);
 
+    console.log(`✅ Processed ${playerMap.size} players for ${handedness}`);
+    console.log('Sample players:', Array.from(playerMap.keys()).slice(0, 5));
+
     return playerMap;
+  }
+
+  convertNameFormat(csvName) {
+    // Convert "Lastname, Firstname" to "Firstname Lastname"
+    if (csvName.includes(',')) {
+      const [lastname, firstname] = csvName.split(',').map(part => part.trim());
+      return `${firstname} ${lastname}`;
+    }
+    return csvName; // Return as-is if no comma found
   }
 
   categorizePullTendency(attackDirection) {
@@ -194,28 +220,96 @@ class SwingPathService {
   }
 
   getPlayerSwingData(playerName, handedness = 'BOTH') {
+    console.log(`🔍 Looking up swing data for: "${playerName}" (${handedness})`);
+    
     const dataMap = handedness === 'RHP' ? this.cache.rhp :
                     handedness === 'LHP' ? this.cache.lhp :
                     this.cache.combined;
     
-    if (!dataMap) return null;
+    if (!dataMap) {
+      console.log(`❌ No data map available for ${handedness}`);
+      return null;
+    }
+
+    console.log(`📊 Data map has ${dataMap.size} players`);
 
     // Try exact match first
     let playerData = dataMap.get(playerName);
+    if (playerData) {
+      console.log(`✅ Found exact match for "${playerName}"`);
+      return playerData;
+    }
     
-    // If not found, try fuzzy matching
+    // If not found, try different name formats and fuzzy matching
     if (!playerData) {
-      const normalizedSearch = playerName.toLowerCase().replace(/[^a-z]/g, '');
+      // Try converting the search name to CSV format ("Firstname Lastname" to "Lastname, Firstname")
+      const csvFormatName = this.convertToCsvFormat(playerName);
+      
+      // Search through all entries with multiple strategies
       for (const [name, data] of dataMap.entries()) {
-        const normalizedName = name.toLowerCase().replace(/[^a-z]/g, '');
-        if (normalizedName.includes(normalizedSearch) || normalizedSearch.includes(normalizedName)) {
+        // Strategy 1: Check original CSV name (stored in originalName)
+        if (data.originalName && this.namesMatch(data.originalName, csvFormatName)) {
+          playerData = data;
+          break;
+        }
+        
+        // Strategy 2: Fuzzy matching on converted names
+        if (this.namesMatch(name, playerName)) {
+          playerData = data;
+          break;
+        }
+        
+        // Strategy 3: Partial name matching (for nicknames, abbreviations)
+        if (this.partialNameMatch(name, playerName)) {
           playerData = data;
           break;
         }
       }
     }
 
+    if (playerData) {
+      console.log(`✅ Found match for "${playerName}" via fuzzy matching`);
+    } else {
+      console.log(`❌ No match found for "${playerName}"`);
+    }
+
     return playerData;
+  }
+
+  convertToCsvFormat(playerName) {
+    // Convert "Firstname Lastname" to "Lastname, Firstname"
+    const parts = playerName.trim().split(' ');
+    if (parts.length >= 2) {
+      const firstname = parts.slice(0, -1).join(' '); // Handle middle names
+      const lastname = parts[parts.length - 1];
+      return `${lastname}, ${firstname}`;
+    }
+    return playerName;
+  }
+
+  namesMatch(name1, name2) {
+    if (!name1 || !name2) return false;
+    
+    const normalize = (name) => name.toLowerCase()
+      .replace(/[^a-z\s]/g, '') // Remove non-alphabetic except spaces
+      .replace(/\s+/g, ' ')     // Normalize spaces
+      .trim();
+    
+    const normalized1 = normalize(name1);
+    const normalized2 = normalize(name2);
+    
+    return normalized1 === normalized2;
+  }
+
+  partialNameMatch(name1, name2) {
+    if (!name1 || !name2) return false;
+    
+    const normalize = (name) => name.toLowerCase().replace(/[^a-z]/g, '');
+    const normalized1 = normalize(name1);
+    const normalized2 = normalize(name2);
+    
+    // Check if either name is contained in the other (for nicknames/abbreviations)
+    return normalized1.includes(normalized2) || normalized2.includes(normalized1);
   }
 
   analyzePullTendencyWithPark(attackDirection, ballpark) {
