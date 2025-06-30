@@ -16,10 +16,6 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
   const [showSplits, setShowSplits] = useState(false);
   const { selectedTeam, includeMatchup, matchupTeam } = useTeamFilter();
 
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
@@ -56,6 +52,10 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
       setLoading(false);
     }
   }, [handedness, selectedTeam, includeMatchup, currentDate, showSplits]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const enhanceTodaysPlayers = (players, swingData) => {
     if (!players || !swingData) return [];

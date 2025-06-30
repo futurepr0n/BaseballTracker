@@ -18,11 +18,6 @@ const BarrelMatchupCard = ({ currentDate }) => {
   const [showSplits, setShowSplits] = useState(false);
   const { selectedTeam, includeMatchup, matchupTeam } = useTeamFilter();
 
-  useEffect(() => {
-    loadBarrelAnalysis();
-    loadSwingPathData();
-  }, [loadBarrelAnalysis, loadSwingPathData]);
-
   const loadBarrelAnalysis = useCallback(async () => {
     try {
       setLoading(true);
@@ -71,6 +66,11 @@ const BarrelMatchupCard = ({ currentDate }) => {
       // Don't set error state as this is supplementary data
     }
   }, [handedness]);
+
+  useEffect(() => {
+    loadBarrelAnalysis();
+    loadSwingPathData();
+  }, [loadBarrelAnalysis, loadSwingPathData]);
 
   const processAnalysisData = (analysis) => {
     // Extract pitcher metrics from reasoning field
