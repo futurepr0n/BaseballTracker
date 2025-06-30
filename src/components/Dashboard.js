@@ -6,6 +6,10 @@ import TeamFilter from './TeamFilter';
 import FilterIndicator from './FilterIndicator';
 import { useTeamFilter } from './TeamFilterContext';
 
+// Import theme context for Dashboard-specific theming
+import { useTheme } from '../contexts/ThemeContext';
+import ThemeToggle from './ThemeToggle';
+
 // Import tooltip system
 import { TooltipProvider } from './utils/TooltipContext';
 import GlobalTooltip from './utils/GlobalTooltip';
@@ -72,6 +76,9 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     isFiltering,
     getTeamName
   } = useTeamFilter();
+  
+  // Get theme context for Dashboard-specific styling
+  const { themeMode } = useTheme();
   
   // State for core data
   const [playersWithHomeRunPrediction, setPlayersWithHomeRunPrediction] = useState([]);
@@ -1172,29 +1179,34 @@ const noFilteredData = isFiltering &&
   
   return (
     <TooltipProvider>
-      <div className="dashboard">
+      <div className={`dashboard theme-${themeMode}`}>
       <header className="dashboard-header">
-        <h2> <img
-              src='data/logos/Major_League_Baseball_logo.svg'
-              style={{
-                height: '1.2em',
-                verticalAlign: 'middle'
-              }}
-              alt="MLB Logo"
-            />MLB Statistics Dashboard</h2>
-        <p className="date">
-          {formattedDate}
-          {dateStatus === 'previous' && (
-            <span className="date-note">
-              (Showing data from {formattedDataDate})
-            </span>
-          )}
-          {dateStatus === 'historical' && (
-            <span className="date-note">
-              (Showing 7-day rolling data)
-            </span>
-          )}
-        </p>
+        <div className="dashboard-header-content">
+          <div className="dashboard-title">
+            <h2> <img
+                  src='data/logos/Major_League_Baseball_logo.svg'
+                  style={{
+                    height: '1.2em',
+                    verticalAlign: 'middle'
+                  }}
+                  alt="MLB Logo"
+                />MLB Statistics Dashboard</h2>
+            <p className="date">
+              {formattedDate}
+              {dateStatus === 'previous' && (
+                <span className="date-note">
+                  (Showing data from {formattedDataDate})
+                </span>
+              )}
+              {dateStatus === 'historical' && (
+                <span className="date-note">
+                  (Showing 7-day rolling data)
+                </span>
+              )}
+            </p>
+          </div>
+          <ThemeToggle className="dashboard-theme-toggle" />
+        </div>
       </header>
       
       {/* Add Team Filter Component */}

@@ -19,7 +19,6 @@ import MatchupAnalyzer from './components/MatchupAnalyzer';
 import Navigation from './components/Navigation';
 import { TeamFilterProvider } from './components/TeamFilterContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import ThemeToggle from './components/ThemeToggle';
 import { 
   fetchPlayerData, 
   fetchTeamData, 
@@ -91,7 +90,6 @@ function App() {
                 Capping.Pro
               </h1>
               <div className="header-controls">
-                <ThemeToggle className="theme-toggle-header" />
                 <div className="social-icons">
                   <a href="https://x.com/capping_pro" target="_blank" rel="noopener noreferrer" aria-label="Capping.Pro on X">
                     <img src="/data/logos/x_logo_icon.svg" alt="X (formerly Twitter) Logo" />

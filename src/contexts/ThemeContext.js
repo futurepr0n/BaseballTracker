@@ -26,21 +26,18 @@ export const ThemeProvider = ({ children }) => {
     }
   }, []);
 
-  // Apply theme class to document body and save to localStorage
+  // Save theme preference to localStorage (but don't apply globally)
   useEffect(() => {
     try {
-      // Remove existing theme classes
+      // Remove any existing global theme classes from body
       document.body.classList.remove('theme-glass', 'theme-classic');
-      
-      // Add current theme class
-      document.body.classList.add(`theme-${themeMode}`);
       
       // Save to localStorage
       localStorage.setItem('baseball-tracker-theme', themeMode);
       
-      console.log(`[ThemeContext] Applied theme: ${themeMode}`);
+      console.log(`[ThemeContext] Saved theme preference: ${themeMode}`);
     } catch (error) {
-      console.warn('Failed to apply theme or save to localStorage:', error);
+      console.warn('Failed to save theme preference to localStorage:', error);
     }
   }, [themeMode]);
 
