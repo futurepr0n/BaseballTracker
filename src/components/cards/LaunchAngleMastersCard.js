@@ -18,6 +18,7 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
 
   const loadData = useCallback(async () => {
     try {
+      console.log('🚀 LaunchAngleMastersCard: Starting data load...');
       setLoading(true);
       setError(null);
 
@@ -43,6 +44,7 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
 
       // Filter and enhance today's players with swing path data
       const enhanced = enhanceTodaysPlayers(playersData || [], swingData);
+      console.log(`🚀 LaunchAngleMastersCard: Enhanced ${enhanced.length} players with swing data`);
       setFilteredPlayers(enhanced);
 
     } catch (err) {

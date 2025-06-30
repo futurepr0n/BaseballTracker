@@ -42,7 +42,7 @@ import BarrelMatchupCard from './cards/BarrelMatchupCard';
 import LaunchAngleMastersCard from './cards/LaunchAngleMastersCard';
 
 // Temporary debug import  
-// import swingPathService from '../services/swingPathService';
+import swingPathService from '../services/swingPathService';
 
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
 import MLBWeatherCard from './cards/MLBWeatherCard/MLBWeatherCard';
@@ -174,23 +174,33 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     }
     
     // Temporary: Debug swing path data loading
-    // Uncomment the import above and this code to debug CSV loading
-    /*
     if (dayOfWeekHits) {
       console.log('🧪 Testing CSV file accessibility...');
       fetch('/data/stats/bat-tracking-swing-path-RHP.csv')
         .then(response => {
-          console.log('✅ RHP CSV accessible:', response.status);
+          console.log('✅ RHP CSV accessible:', response.status, response.statusText);
+          console.log('✅ Response headers:', response.headers.get('content-type'));
+          return response.text();
+        })
+        .then(text => {
+          console.log('📄 RHP CSV content length:', text.length);
+          console.log('📄 First 200 chars:', text.substring(0, 200));
+          if (text.includes('<!DOCTYPE')) {
+            console.error('❌ Got HTML instead of CSV!');
+            return;
+          }
           return swingPathService.loadSwingPathData('RHP');
         })
         .then(data => {
-          console.log('✅ Swing path data loaded:', data.size, 'players');
-          const testResult = swingPathService.getPlayerSwingData('Aaron Judge', 'RHP');
-          console.log('Test lookup result for Aaron Judge:', testResult);
+          if (data) {
+            console.log('✅ Swing path data loaded:', data.size, 'players');
+            console.log('Sample players:', Array.from(data.keys()).slice(0, 5));
+            const testResult = swingPathService.getPlayerSwingData('Aaron Judge', 'RHP');
+            console.log('Test lookup result for Aaron Judge:', testResult);
+          }
         })
         .catch(error => console.error('❌ Test failed:', error));
     }
-    */
   }, [dayOfWeekHits]);
 
   // Helper function to generate comprehensive team-specific stats

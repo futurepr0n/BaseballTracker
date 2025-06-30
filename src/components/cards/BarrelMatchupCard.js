@@ -16,6 +16,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
   const [expandedRows, setExpandedRows] = useState({});
   const [handedness, setHandedness] = useState('BOTH');
   const [showSplits, setShowSplits] = useState(false);
+  const [swingPathReady, setSwingPathReady] = useState(false);
   const { selectedTeam, includeMatchup, matchupTeam } = useTeamFilter();
 
   const loadBarrelAnalysis = useCallback(async () => {
@@ -58,19 +59,42 @@ const BarrelMatchupCard = ({ currentDate }) => {
 
   const loadSwingPathData = useCallback(async () => {
     try {
+      console.log(`🎯 BarrelMatchupCard: Loading swing path data for ${handedness}...`);
+      setSwingPathReady(false);
       const data = await swingPathService.loadSwingPathData(handedness);
       setSwingPathData(data);
-      console.log(`🎯 Loaded swing path data (${handedness}) for`, data.size, 'players');
+      setSwingPathReady(true);
+      console.log(`🎯 BarrelMatchupCard: Loaded swing path data (${handedness}) for`, data.size, 'players');
+      console.log(`🎯 Sample players from BarrelMatchupCard:`, Array.from(data.keys()).slice(0, 3));
     } catch (error) {
-      console.error('Error loading swing path data:', error);
+      console.error('❌ BarrelMatchupCard: Error loading swing path data:', error);
+      setSwingPathReady(false);
       // Don't set error state as this is supplementary data
     }
   }, [handedness]);
 
   useEffect(() => {
-    loadBarrelAnalysis();
-    loadSwingPathData();
+    const loadData = async () => {
+      console.log('🔄 BarrelMatchupCard: Starting data load sequence...');
+      
+      // Load swing path data first, then barrel analysis
+      await loadSwingPathData();
+      await loadBarrelAnalysis();
+      
+      console.log('✅ BarrelMatchupCard: Data load sequence complete');
+    };
+    
+    loadData();
   }, [loadBarrelAnalysis, loadSwingPathData]);
+
+  // Re-process analysis data when swing path data becomes ready
+  useEffect(() => {
+    if (swingPathReady && analysisData) {
+      console.log('🔄 Re-processing analysis data with swing path data...');
+      const originalAnalysis = { ...analysisData };
+      setAnalysisData(processAnalysisData(originalAnalysis));
+    }
+  }, [swingPathReady, swingPathData]); // Note: not including analysisData to avoid infinite loop
 
   const processAnalysisData = (analysis) => {
     // Extract pitcher metrics from reasoning field
@@ -110,13 +134,22 @@ const BarrelMatchupCard = ({ currentDate }) => {
       
       // Get swing path data for this player
       let swingPath = null;
-      if (swingPathData) {
+      if (swingPathData && swingPathReady) {
+        console.log(`🔍 BarrelMatchupCard: Looking up swing data for "${pick.playerName}"`);
         swingPath = swingPathService.getPlayerSwingData(pick.playerName, handedness);
+        
+        if (swingPath) {
+          console.log(`✅ Found swing data for ${pick.playerName}:`, swingPath.avgBatSpeed, 'mph');
+        } else {
+          console.log(`❌ No swing data found for ${pick.playerName}`);
+        }
         
         // If we're showing splits and have combined data, get the split details
         if (showSplits && handedness === 'BOTH' && swingPath?.splits) {
           swingPath.showSplits = true;
         }
+      } else {
+        console.log(`❌ BarrelMatchupCard: Swing path data not ready yet (ready: ${swingPathReady}, data: ${!!swingPathData})`);
       }
       
       return {

@@ -9,17 +9,27 @@ class SwingPathService {
       combined: null,
       lastUpdate: null
     };
-    this.cacheTimeout = 30 * 60 * 1000; // 30 minutes
+    this.cacheTimeout = 60 * 60 * 1000; // 1 hour - prevent re-loading
   }
 
   async loadSwingPathData(handedness = 'BOTH') {
     const now = Date.now();
     
-    // Check cache validity
+    // Check cache validity - be more aggressive about using cache
     if (this.cache.lastUpdate && (now - this.cache.lastUpdate) < this.cacheTimeout) {
-      if (handedness === 'RHP' && this.cache.rhp) return this.cache.rhp;
-      if (handedness === 'LHP' && this.cache.lhp) return this.cache.lhp;
-      if (handedness === 'BOTH' && this.cache.combined) return this.cache.combined;
+      console.log(`📋 Using cached swing path data for ${handedness}`);
+      if (handedness === 'RHP' && this.cache.rhp) {
+        console.log(`✅ Returning cached RHP data: ${this.cache.rhp.size} players`);
+        return this.cache.rhp;
+      }
+      if (handedness === 'LHP' && this.cache.lhp) {
+        console.log(`✅ Returning cached LHP data: ${this.cache.lhp.size} players`);
+        return this.cache.lhp;
+      }
+      if (handedness === 'BOTH' && this.cache.combined) {
+        console.log(`✅ Returning cached BOTH data: ${this.cache.combined.size} players`);
+        return this.cache.combined;
+      }
     }
 
     try {
@@ -65,7 +75,14 @@ class SwingPathService {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
-      const csvText = await response.text();
+      let csvText = await response.text();
+      
+      // Remove BOM if present
+      if (csvText.charCodeAt(0) === 0xFEFF) {
+        csvText = csvText.slice(1);
+        console.log(`🧹 Removed BOM from CSV`);
+      }
+      
       console.log(`📄 CSV text length: ${csvText.length} characters`);
       console.log(`📄 First 200 chars: ${csvText.substring(0, 200)}`);
       
