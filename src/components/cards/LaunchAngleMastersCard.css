@@ -1,237 +1,332 @@
+/* Launch Angle Masters Card Styles */
 .launch-angle-masters-card {
-  min-height: 400px;
+  width: 100%;
+  margin-bottom: 20px;
 }
 
-.launch-angle-masters-card .card-header {
+.launch-angle-masters-card .glass-header {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.launch-angle-masters-card h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.2em;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .launch-angle-masters-card .card-subtitle {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin-top: -0.5rem;
+  font-size: 0.85em;
+  color: var(--text-secondary);
+  margin-top: 4px;
 }
 
+/* Table Styles */
 .masters-container {
-  max-height: 500px;
+  padding: 0;
+  max-height: 600px;
   overflow-y: auto;
 }
 
-.masters-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
-  padding: 0.5rem;
+.masters-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
 }
 
-.master-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 1rem;
-  position: relative;
-  transition: all 0.2s ease;
-}
-
-.master-card:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-}
-
-.master-rank {
-  position: absolute;
-  top: -8px;
-  left: -8px;
-  background: var(--primary-color, #4CAF50);
-  color: white;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: bold;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.master-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-}
-
-.master-header .player-name {
+.masters-table th {
+  background: var(--surface-hover);
+  padding: 12px 8px;
+  text-align: left;
   font-weight: 600;
-  color: white;
-  font-size: 1rem;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.master-header .player-team {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
+.masters-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.masters-table th.sortable:hover {
+  background: var(--surface-active);
+}
+
+.masters-table .header-subtitle {
+  display: block;
+  font-size: 0.75em;
+  color: var(--text-secondary);
+  font-weight: 400;
   margin-top: 2px;
 }
 
-.master-badge {
-  font-size: 1.25rem;
+.masters-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: middle;
+}
+
+.master-row:hover {
+  background: var(--surface-hover);
+}
+
+/* Column Widths */
+.rank-col {
+  width: 80px;
+}
+
+.player-col {
+  width: 200px;
+  min-width: 180px;
+}
+
+.metric-cell,
+.score-cell {
+  width: 100px;
+  text-align: center;
+  font-weight: 500;
+  border-radius: 4px;
+  margin: 2px;
+}
+
+/* Player Info Styles */
+.rank-cell {
+  text-align: center;
+}
+
+.rank-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.rank-number {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9em;
+}
+
+.player-badge {
+  font-size: 1.1em;
   cursor: help;
 }
 
-.swing-metrics {
+.player-info {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 2px;
 }
 
-.primary-score {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  justify-content: center;
-  margin-bottom: 0.5rem;
+.player-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95em;
 }
 
-.score-circle {
+.team-info {
+  font-size: 0.8em;
+  color: var(--text-secondary);
+}
+
+.classification {
+  font-size: 0.75em;
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+/* Score Circle */
+.master-score-circle {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: var(--score-color);
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0 auto;
+  background: var(--score-color);
+  color: white;
   font-weight: bold;
-  font-size: 1.125rem;
-  color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  font-size: 0.9em;
+  border: 2px solid var(--score-color);
 }
 
-.score-label {
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
-}
-
-.metrics-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
-
-.metric {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  padding: 0.75rem;
-  text-align: center;
-}
-
-.metric-value {
-  font-size: 1.125rem;
+.confidence-cell {
   font-weight: 600;
+}
+
+/* Mobile View */
+.mobile-view {
+  display: none;
+}
+
+.mobile-masters {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-master-card {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+.mobile-master-card:hover {
+  background: var(--surface-hover);
+  border-color: var(--accent-color);
+}
+
+.mobile-master-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.rank-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 40px;
+}
+
+.mobile-rank {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9em;
+}
+
+.mobile-badge {
+  font-size: 1.2em;
+  cursor: help;
+}
+
+.mobile-player-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobile-player-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1em;
+}
+
+.mobile-team-info {
+  font-size: 0.85em;
+  color: var(--text-secondary);
+}
+
+.mobile-classification {
+  font-size: 0.8em;
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.mobile-master-score {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--score-color);
   color: white;
-  line-height: 1;
+  font-weight: bold;
+  font-size: 1.1em;
+  border: 2px solid var(--score-color);
 }
 
-.metric-label {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin-top: 2px;
+.mobile-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
 }
 
-.metric-unit {
-  font-size: 0.625rem;
-  color: rgba(255, 255, 255, 0.5);
-  margin-top: 1px;
-}
-
-.splits-section {
-  background: rgba(255, 255, 255, 0.03);
+.mobile-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  background: var(--surface-secondary);
   border-radius: 6px;
-  padding: 0.75rem;
-  margin-top: 0.5rem;
 }
 
-.splits-header {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  text-align: center;
-}
-
-.splits-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.75rem;
-  margin-bottom: 0.25rem;
-}
-
-.splits-row:last-child {
-  margin-bottom: 0;
-}
-
-.splits-row span:first-child {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.splits-row span:last-child {
-  color: white;
+.mobile-metric-label {
+  font-size: 0.8em;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
+.mobile-metric-value {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* Card Footer */
 .card-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-light);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .legend {
   display: flex;
-  gap: 1rem;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
 .legend-item {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8em;
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 4px;
 }
 
-.showing-count {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.6);
+.last-updated small {
+  font-size: 0.75em;
+  color: var(--text-secondary);
 }
 
+/* Loading and Error States */
 .loading-state,
 .error-state,
 .no-data {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
+  padding: 40px 20px;
   text-align: center;
+  color: var(--text-secondary);
 }
 
 .loading-spinner {
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top: 2px solid var(--primary-color, #4CAF50);
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--border-color);
+  border-top: 3px solid var(--accent-color);
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
+  margin: 0 auto 12px;
 }
 
 @keyframes spin {
@@ -240,68 +335,124 @@
 }
 
 .retry-button {
-  background: var(--primary-color, #4CAF50);
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: var(--accent-color);
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
-  margin-top: 1rem;
   transition: background-color 0.2s ease;
 }
 
 .retry-button:hover {
-  background: var(--primary-color-dark, #45a049);
+  background: var(--accent-hover);
 }
 
-/* Mobile responsiveness */
+/* Glass Mode Specific Styles */
+.launch-angle-masters-card.glass {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.launch-angle-masters-card.glass .masters-table th {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+}
+
+.launch-angle-masters-card.glass .master-row:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.launch-angle-masters-card.glass .mobile-master-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.launch-angle-masters-card.glass .mobile-master-card:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.launch-angle-masters-card.glass .mobile-metric {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-  .masters-grid {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
+  .desktop-view {
+    display: none;
   }
   
-  .master-card {
-    padding: 0.75rem;
-  }
-  
-  .metrics-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-  }
-  
-  .primary-score {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .score-circle {
-    width: 40px;
-    height: 40px;
-    font-size: 1rem;
-  }
-  
-  .legend {
-    flex-direction: column;
-    gap: 0.5rem;
+  .mobile-view {
+    display: block;
   }
   
   .card-footer {
     flex-direction: column;
-    gap: 1rem;
     align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .legend {
+    gap: 12px;
+  }
+  
+  .mobile-metrics-grid {
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 480px) {
-  .master-header {
+  .legend {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
+    gap: 6px;
   }
   
-  .master-badge {
-    align-self: flex-end;
-    margin-top: -1.5rem;
+  .legend-item {
+    font-size: 0.75em;
+  }
+  
+  .mobile-master-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+  }
+  
+  .mobile-master-score {
+    width: 50px;
+    height: 50px;
+    font-size: 1em;
+  }
+}
+
+/* Theme-specific adjustments */
+@media (prefers-color-scheme: dark) {
+  .launch-angle-masters-card:not(.glass) {
+    --surface-primary: #1a1a1a;
+    --surface-secondary: #2a2a2a;
+    --surface-hover: #333333;
+    --surface-active: #404040;
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --border-color: #444444;
+    --border-light: #333333;
+    --accent-color: #4CAF50;
+    --accent-hover: #45a049;
+  }
+}
+
+/* High contrast support */
+@media (prefers-contrast: high) {
+  .masters-table th,
+  .masters-table td {
+    border-color: var(--text-primary);
+  }
+  
+  .master-score-circle,
+  .mobile-master-score {
+    border-width: 3px;
   }
 }

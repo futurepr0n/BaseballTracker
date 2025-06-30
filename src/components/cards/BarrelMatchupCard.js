@@ -1,22 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import hellraiserAnalysisService from '../../services/hellraiserAnalysisService';
-import swingPathService from '../../services/swingPathService';
 import { useTeamFilter } from '../TeamFilterContext';
 import GlassCard, { GlassScrollableContainer } from './GlassCard/GlassCard';
 import { getPlayerDisplayName, getTeamDisplayName } from '../../utils/playerNameUtils';
-import HandednessToggle from '../HandednessToggle';
 import './BarrelMatchupCard.css';
 
 const BarrelMatchupCard = ({ currentDate }) => {
   const [analysisData, setAnalysisData] = useState(null);
-  const [swingPathData, setSwingPathData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'pitcherContactAllowed', direction: 'desc' });
   const [expandedRows, setExpandedRows] = useState({});
-  const [handedness, setHandedness] = useState('BOTH');
-  const [showSplits, setShowSplits] = useState(false);
-  const [swingPathReady, setSwingPathReady] = useState(false);
   const { selectedTeam, includeMatchup, matchupTeam } = useTeamFilter();
 
   const loadBarrelAnalysis = useCallback(async () => {
@@ -57,44 +51,9 @@ const BarrelMatchupCard = ({ currentDate }) => {
     }
   }, [currentDate, selectedTeam, includeMatchup, matchupTeam]);
 
-  const loadSwingPathData = useCallback(async () => {
-    try {
-      console.log(`🎯 BarrelMatchupCard: Loading swing path data for ${handedness}...`);
-      setSwingPathReady(false);
-      const data = await swingPathService.loadSwingPathData(handedness);
-      setSwingPathData(data);
-      setSwingPathReady(true);
-      console.log(`🎯 BarrelMatchupCard: Loaded swing path data (${handedness}) for`, data.size, 'players');
-      console.log(`🎯 Sample players from BarrelMatchupCard:`, Array.from(data.keys()).slice(0, 3));
-    } catch (error) {
-      console.error('❌ BarrelMatchupCard: Error loading swing path data:', error);
-      setSwingPathReady(false);
-      // Don't set error state as this is supplementary data
-    }
-  }, [handedness]);
-
   useEffect(() => {
-    const loadData = async () => {
-      console.log('🔄 BarrelMatchupCard: Starting data load sequence...');
-      
-      // Load swing path data first, then barrel analysis
-      await loadSwingPathData();
-      await loadBarrelAnalysis();
-      
-      console.log('✅ BarrelMatchupCard: Data load sequence complete');
-    };
-    
-    loadData();
-  }, [loadBarrelAnalysis, loadSwingPathData]);
-
-  // Re-process analysis data when swing path data becomes ready
-  useEffect(() => {
-    if (swingPathReady && analysisData) {
-      console.log('🔄 Re-processing analysis data with swing path data...');
-      const originalAnalysis = { ...analysisData };
-      setAnalysisData(processAnalysisData(originalAnalysis));
-    }
-  }, [swingPathReady, swingPathData]); // Note: not including analysisData to avoid infinite loop
+    loadBarrelAnalysis();
+  }, [loadBarrelAnalysis]);
 
   const processAnalysisData = (analysis) => {
     // Extract pitcher metrics from reasoning field
@@ -132,25 +91,13 @@ const BarrelMatchupCard = ({ currentDate }) => {
       // Calculate market edge value for sorting
       const marketEdge = pick.marketEfficiency?.edge || 0;
       
-      // Get swing path data for this player
-      let swingPath = null;
-      if (swingPathData && swingPathReady) {
-        console.log(`🔍 BarrelMatchupCard: Looking up swing data for "${pick.playerName}"`);
-        swingPath = swingPathService.getPlayerSwingData(pick.playerName, handedness);
-        
-        if (swingPath) {
-          console.log(`✅ Found swing data for ${pick.playerName}:`, swingPath.avgBatSpeed, 'mph');
-        } else {
-          console.log(`❌ No swing data found for ${pick.playerName}`);
-        }
-        
-        // If we're showing splits and have combined data, get the split details
-        if (showSplits && handedness === 'BOTH' && swingPath?.splits) {
-          swingPath.showSplits = true;
-        }
-      } else {
-        console.log(`❌ BarrelMatchupCard: Swing path data not ready yet (ready: ${swingPathReady}, data: ${!!swingPathData})`);
-      }
+      // Swing path data should come from the hellraiser analysis JSON
+      const swingPath = {
+        avgBatSpeed: pick.swing_bat_speed || null,
+        attackAngle: pick.swing_attack_angle || null,
+        swingOptimizationScore: pick.swing_optimization_score || null,
+        idealAttackAngleRate: pick.swing_ideal_rate || null
+      };
       
       return {
         ...pick,
@@ -204,12 +151,12 @@ const BarrelMatchupCard = ({ currentDate }) => {
       score += 8;
     }
     
-    // Swing path bonus (new)
-    if (swingPath) {
+    // Swing path bonus (from hellraiser analysis)
+    if (swingPath && swingPath.avgBatSpeed) {
       // Bat speed bonus
-      if (swingPath.batSpeedPercentile > 80) {
+      if (swingPath.avgBatSpeed > 75) {
         score += 10;
-      } else if (swingPath.batSpeedPercentile > 60) {
+      } else if (swingPath.avgBatSpeed > 72) {
         score += 5;
       }
       
@@ -218,6 +165,13 @@ const BarrelMatchupCard = ({ currentDate }) => {
         score += 8;
       } else if (swingPath.idealAttackAngleRate > 0.3) {
         score += 4;
+      }
+      
+      // Swing optimization score bonus
+      if (swingPath.swingOptimizationScore > 80) {
+        score += 12;
+      } else if (swingPath.swingOptimizationScore > 70) {
+        score += 6;
       }
     }
     
@@ -407,12 +361,6 @@ const BarrelMatchupCard = ({ currentDate }) => {
       <div className="glass-header">
         <h3>🎯 Barrel Matchup Analysis</h3>
         <span className="card-subtitle">Click column headers to sort • Click rows to expand</span>
-        <HandednessToggle 
-          value={handedness}
-          onChange={setHandedness}
-          showSplits={showSplits}
-          onSplitsToggle={setShowSplits}
-        />
       </div>
 
       <GlassScrollableContainer className="table-container">
