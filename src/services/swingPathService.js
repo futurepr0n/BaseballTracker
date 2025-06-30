@@ -55,25 +55,44 @@ class SwingPathService {
 
   async loadCSVData(filepath) {
     console.log(`🔄 Loading CSV data from: ${filepath}`);
-    return new Promise((resolve, reject) => {
-      Papa.parse(filepath, {
-        download: true,
-        header: true,
-        dynamicTyping: true,
-        complete: (results) => {
-          if (results.errors.length > 0) {
-            console.error('CSV parsing errors:', results.errors);
+    
+    try {
+      // First, try to fetch the file to check if it exists
+      const response = await fetch(filepath);
+      console.log(`📡 Fetch response status: ${response.status} for ${filepath}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const csvText = await response.text();
+      console.log(`📄 CSV text length: ${csvText.length} characters`);
+      console.log(`📄 First 200 chars: ${csvText.substring(0, 200)}`);
+      
+      // Now parse with Papa Parse
+      return new Promise((resolve, reject) => {
+        Papa.parse(csvText, {
+          header: true,
+          dynamicTyping: true,
+          complete: (results) => {
+            if (results.errors.length > 0) {
+              console.error('CSV parsing errors:', results.errors);
+            }
+            console.log(`✅ CSV parsed: ${results.data.length} rows from ${filepath}`);
+            console.log('Sample row:', results.data[0]);
+            resolve(results.data);
+          },
+          error: (error) => {
+            console.error(`❌ CSV parsing error for ${filepath}:`, error);
+            reject(error);
           }
-          console.log(`✅ CSV loaded: ${results.data.length} rows from ${filepath}`);
-          console.log('Sample row:', results.data[0]);
-          resolve(results.data);
-        },
-        error: (error) => {
-          console.error(`❌ CSV loading error for ${filepath}:`, error);
-          reject(error);
-        }
+        });
       });
-    });
+      
+    } catch (error) {
+      console.error(`❌ CSV loading error for ${filepath}:`, error);
+      throw error;
+    }
   }
 
   processSwingData(data, handedness) {

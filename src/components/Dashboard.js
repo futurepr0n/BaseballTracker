@@ -41,6 +41,9 @@ import HellraiserCard from './cards/HellraiserCard';
 import BarrelMatchupCard from './cards/BarrelMatchupCard';
 import LaunchAngleMastersCard from './cards/LaunchAngleMastersCard';
 
+// Temporary debug import  
+import swingPathService from '../services/swingPathService';
+
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
 import MLBWeatherCard from './cards/MLBWeatherCard/MLBWeatherCard';
 
@@ -168,6 +171,21 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     // Only populate if we have the required data
     if (dayOfWeekHits) {
       populateSlotMachineData();
+    }
+    
+    // Temporary: Test swing path service
+    if (dayOfWeekHits) {
+      console.log('🧪 Testing swing path service directly...');
+      swingPathService.loadSwingPathData('BOTH').then(data => {
+        console.log('✅ Swing path data loaded:', data.size, 'players');
+        console.log('Sample players:', Array.from(data.keys()).slice(0, 5));
+        
+        // Test a lookup
+        const testResult = swingPathService.getPlayerSwingData('Aaron Judge', 'BOTH');
+        console.log('Test lookup result for Aaron Judge:', testResult);
+      }).catch(error => {
+        console.error('❌ Swing path loading failed:', error);
+      });
     }
   }, [dayOfWeekHits]);
 
