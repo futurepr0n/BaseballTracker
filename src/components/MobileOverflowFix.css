@@ -1,0 +1,212 @@
+/* MobileOverflowFix.css - Comprehensive mobile viewport fix */
+
+/* Root level viewport control */
+@media (max-width: 768px) {
+  /* Prevent horizontal scroll at the document level */
+  html {
+    overflow-x: hidden;
+    width: 100%;
+  }
+  
+  body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Main app container */
+  .app {
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
+  /* Content wrapper with proper padding */
+  .app-content {
+    width: 100%;
+    padding: 0 10px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+  
+  /* Dashboard specific fixes */
+  .dashboard {
+    width: 100%;
+    padding: 15px 5px;
+    box-sizing: border-box;
+  }
+  
+  .dashboard-container {
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
+  /* Grid system - single column with proper spacing */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* All card types - ensure they respect container width */
+  .card,
+  .glass-card,
+  .glass-card-container,
+  [class*="-card"] {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Inner card content should not overflow */
+  .card > *,
+  .glass-card > *,
+  .glass-card-container > * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* Tables need special handling */
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  table {
+    width: 100%;
+    min-width: auto;
+    font-size: 12px;
+  }
+  
+  /* Table cells should not have excessive min-widths */
+  table th,
+  table td {
+    min-width: auto !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Player items should fit properly */
+  .player-item {
+    width: 100%;
+    padding: 10px 8px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  
+  .player-info {
+    flex: 1;
+    min-width: 0;
+    margin-right: 10px;
+  }
+  
+  .player-name {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .player-stat {
+    flex-shrink: 0;
+    min-width: auto;
+    margin-left: auto;
+  }
+  
+  /* Team filter specific */
+  .team-filter {
+    width: 100%;
+    padding: 12px 10px;
+    box-sizing: border-box;
+  }
+  
+  .filter-section {
+    width: 100%;
+    min-width: 0;
+  }
+  
+  /* Prevent any absolute positioned elements from causing overflow */
+  .team-logo-bg,
+  .absolute-positioned {
+    max-width: 50%;
+  }
+  
+  /* Specific fixes for common overflow culprits */
+  .team-logo-bg {
+    max-width: 40%;
+    right: 0;
+  }
+  
+  /* Ensure modals and tooltips don't cause overflow */
+  .tooltip,
+  .modal {
+    max-width: calc(100vw - 20px);
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .app-content {
+    padding: 0 5px;
+  }
+  
+  .dashboard {
+    padding: 10px 3px;
+  }
+  
+  .card {
+    padding: 12px;
+  }
+  
+  .dashboard-grid {
+    gap: 10px;
+  }
+}
+
+/* Force cards to fit viewport with proper margins */
+@media (max-width: 768px) {
+  /* Override any problematic min-widths on mobile */
+  .card *[style*="min-width"],
+  .glass-card *[style*="min-width"],
+  .table-container *[style*="min-width"] {
+    min-width: auto !important;
+  }
+  
+  /* Ensure grid containers don't overflow */
+  [class*="grid"] {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Make sure no element can exceed viewport */
+  .card > *,
+  .glass-card > *,
+  .glass-card-container > * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Special handling for wide tables */
+  .table-container {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  table {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: auto !important;
+  }
+  
+  /* Override any fixed pixel widths */
+  *[style*="width:"] {
+    width: auto !important;
+    max-width: 100% !important;
+  }
+}

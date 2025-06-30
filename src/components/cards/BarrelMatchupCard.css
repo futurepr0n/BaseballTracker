@@ -96,7 +96,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
-  table-layout: fixed;
+  table-layout: auto; /* Changed from fixed to auto for better responsive behavior */
 }
 
 .barrel-matchup-card .matchup-table thead {
@@ -161,7 +161,13 @@
 
 /* Player Cell */
 .barrel-matchup-card .player-cell {
-  min-width: 180px;
+  min-width: 120px;
+}
+
+@media (max-width: 768px) {
+  .barrel-matchup-card .player-cell {
+    min-width: 100px;
+  }
 }
 
 .barrel-matchup-card .player-info {
@@ -184,14 +190,26 @@
 .barrel-matchup-card .metric-cell {
   text-align: center;
   font-weight: 500;
-  min-width: 80px;
+  min-width: 60px;
   transition: background-color 0.3s;
   border-radius: 4px;
 }
 
+@media (max-width: 768px) {
+  .barrel-matchup-card .metric-cell {
+    min-width: 50px;
+  }
+}
+
 .barrel-matchup-card .score-cell {
   text-align: center;
-  min-width: 90px;
+  min-width: 70px;
+}
+
+@media (max-width: 768px) {
+  .barrel-matchup-card .score-cell {
+    min-width: 60px;
+  }
 }
 
 .barrel-matchup-card .matchup-score {
@@ -574,61 +592,83 @@
   padding-left: 16px;
 }
 
-/* Column specific widths for desktop */
+/* Column specific widths for desktop - responsive without fixed min-widths */
 .barrel-matchup-card .player-col {
-  width: 200px;
+  width: 25%;
+  min-width: 120px;
 }
 
+@media (max-width: 768px) {
+  .barrel-matchup-card .player-col {
+    min-width: 100px;
+  }
+}
+
+/* Pitch Contact */
 .barrel-matchup-card .matchup-table th:nth-child(2),
 .barrel-matchup-card .matchup-table td:nth-child(2) {
-  width: 110px;
+  width: 10%;
 }
 
+/* Pitch Barrels */
 .barrel-matchup-card .matchup-table th:nth-child(3),
 .barrel-matchup-card .matchup-table td:nth-child(3) {
-  width: 110px;
+  width: 10%;
 }
 
+/* Exit Velo */
 .barrel-matchup-card .matchup-table th:nth-child(4),
 .barrel-matchup-card .matchup-table td:nth-child(4) {
-  width: 110px;
+  width: 9%;
 }
 
+/* Barrel Rate */
 .barrel-matchup-card .matchup-table th:nth-child(5),
 .barrel-matchup-card .matchup-table td:nth-child(5) {
-  width: 110px;
+  width: 10%;
 }
 
+/* Hard Contact */
 .barrel-matchup-card .matchup-table th:nth-child(6),
 .barrel-matchup-card .matchup-table td:nth-child(6) {
-  width: 130px;
+  width: 11%;
 }
 
+/* Hard Allowed */
 .barrel-matchup-card .matchup-table th:nth-child(7),
 .barrel-matchup-card .matchup-table td:nth-child(7) {
-  width: 130px;
+  width: 11%;
 }
 
+/* Confidence */
 .barrel-matchup-card .matchup-table th:nth-child(8),
 .barrel-matchup-card .matchup-table td:nth-child(8) {
-  width: 90px;
+  width: 9%;
 }
 
+/* Market Edge */
 .barrel-matchup-card .matchup-table th:nth-child(9),
 .barrel-matchup-card .matchup-table td:nth-child(9) {
-  width: 100px;
+  width: 10%;
 }
 
+/* Score */
 .barrel-matchup-card .matchup-table th:nth-child(10),
 .barrel-matchup-card .matchup-table td:nth-child(10) {
-  width: 110px;
+  width: 8%;
 }
 
 /* Responsive Design */
 @media (max-width: 1200px) {
+  .barrel-matchup-card {
+    width: 100%;
+    margin: 0;
+  }
+  
   .barrel-matchup-card .table-container {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    width: 100%;
   }
   
   .barrel-matchup-card .card-footer {
@@ -648,6 +688,8 @@
     height: 720px;
     min-height: 720px;
     max-height: 720px;
+    width: 100%;
+    margin: 0;
   }
   
   .barrel-matchup-card .desktop-view {

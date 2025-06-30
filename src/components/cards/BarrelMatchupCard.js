@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import hellraiserAnalysisService from '../../services/hellraiserAnalysisService';
 import { useTeamFilter } from '../TeamFilterContext';
 import GlassCard, { GlassScrollableContainer } from './GlassCard/GlassCard';
+import { getPlayerDisplayName, getTeamDisplayName } from '../../utils/playerNameUtils';
 import './BarrelMatchupCard.css';
 
 const BarrelMatchupCard = ({ currentDate }) => {
@@ -308,26 +309,28 @@ const BarrelMatchupCard = ({ currentDate }) => {
             <tr>
               <th className="player-col">Player</th>
               <th className="sortable" onClick={() => handleSort('pitcherContactAllowed')}>
-                Pitcher Contact {getSortIndicator('pitcherContactAllowed')}
-                <span className="header-subtitle">Exit Velo Allowed</span>
+                Pitch Contact {getSortIndicator('pitcherContactAllowed')}
+                <span className="header-subtitle">Exit Velo</span>
               </th>
               <th className="sortable" onClick={() => handleSort('pitcherBarrelVulnerable')}>
-                Pitcher Barrels {getSortIndicator('pitcherBarrelVulnerable')}
-                <span className="header-subtitle">Barrel % Allowed</span>
+                Pitch Barrels {getSortIndicator('pitcherBarrelVulnerable')}
+                <span className="header-subtitle">% Allowed</span>
               </th>
               <th className="sortable" onClick={() => handleSort('playerExitVelocity')}>
-                Player Exit Velo {getSortIndicator('playerExitVelocity')}
+                Exit Velo {getSortIndicator('playerExitVelocity')}
+                <span className="header-subtitle">Player</span>
               </th>
               <th className="sortable" onClick={() => handleSort('playerBarrelRate')}>
-                Player Barrels {getSortIndicator('playerBarrelRate')}
+                Barrel Rate {getSortIndicator('playerBarrelRate')}
+                <span className="header-subtitle">Player %</span>
               </th>
               <th className="sortable" onClick={() => handleSort('playerHardContact')}>
-                Player Hard Contact {getSortIndicator('playerHardContact')}
-                <span className="header-subtitle">Hard Contact %</span>
+                Hard Contact {getSortIndicator('playerHardContact')}
+                <span className="header-subtitle">Player %</span>
               </th>
               <th className="sortable" onClick={() => handleSort('pitcherHardContact')}>
-                Pitcher Hard Contact {getSortIndicator('pitcherHardContact')}
-                <span className="header-subtitle">Exit Velo Allowed</span>
+                Hard Allowed {getSortIndicator('pitcherHardContact')}
+                <span className="header-subtitle">Pitcher</span>
               </th>
               <th className="sortable" onClick={() => handleSort('confidenceScore')}>
                 Confidence {getSortIndicator('confidenceScore')}
@@ -336,7 +339,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
                 Market Edge {getSortIndicator('marketEdge')}
               </th>
               <th className="sortable" onClick={() => handleSort('matchupScore')}>
-                Matchup Score {getSortIndicator('matchupScore')}
+                Score {getSortIndicator('matchupScore')}
               </th>
             </tr>
           </thead>
@@ -346,8 +349,8 @@ const BarrelMatchupCard = ({ currentDate }) => {
                 <tr className="data-row" onClick={() => toggleRowExpansion(index)}>
                   <td className="player-cell">
                     <div className="player-info">
-                      <span className="player-name">{pick.playerName}</span>
-                      <span className="team-info">{pick.team} vs {pick.pitcher}</span>
+                      <span className="player-name">{getPlayerDisplayName(pick)}</span>
+                      <span className="team-info">{getTeamDisplayName(pick)} vs {pick.pitcher}</span>
                     </div>
                   </td>
                   <td 

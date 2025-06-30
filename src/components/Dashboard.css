@@ -133,8 +133,25 @@
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 20px;
+  width: 100%;
+  padding: 0;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-grid {
+    gap: 10px;
+  }
 }
 
 /* Current day featured container */
@@ -158,6 +175,8 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   padding: 20px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .card:hover {
@@ -261,9 +280,15 @@
 .hr-prediction .player-stat {
   display: flex;
   flex-direction: column;
-  min-width: 180px;
+  min-width: 100px;
   align-items: flex-end;
   line-height: 1.2;
+}
+
+@media (max-width: 768px) {
+  .hr-prediction .player-stat {
+    min-width: 80px;
+  }
 }
 
 .hr-deficit {
@@ -416,14 +441,163 @@
   color: #333;
 }
 
+/* Global box sizing */
+html, body {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Dashboard container controls */
+.dashboard {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.dashboard-container {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Ensure all cards and their children are properly contained */
+.card,
+.glass-card,
+.glass-card-container,
+[class*="-card"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Allow tables to scroll horizontally if needed */
+.card .table-container,
+.glass-card .table-container,
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/* Ensure proper text wrapping */
+.card p,
+.card span,
+.card div {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 0;
   }
   
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  
+  /* Ensure dashboard has proper mobile padding */
+  .dashboard {
+    padding: 15px 10px;
+  }
+  
+  /* Ensure all cards fit within viewport with padding */
+  .card,
+  .glass-card,
+  .glass-card-container,
+  [class*="-card"] {
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Allow horizontal scroll for wide tables */
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Adjust table font size for better mobile viewing */
+  .matchup-table,
+  table {
+    font-size: 11px;
+  }
+  
+  /* Ensure filter section doesn't overflow */
+  .filter-section,
+  .team-filter {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* Fix player item layouts for mobile */
+  .player-item {
+    flex-wrap: wrap;
+    min-height: auto;
+    padding: 10px 8px;
+  }
+  
+  .player-info {
+    flex: 1;
+    min-width: 0; /* Allow text truncation */
+    overflow: hidden;
+  }
+  
+  .player-name {
+    font-size: 0.9rem;
+    line-height: 1.2;
+    word-break: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .player-team {
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+  
+  .player-stat {
+    text-align: right;
+    min-width: 80px;
+    flex-shrink: 0;
+  }
+  
+  .stat-note {
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
+  
+  /* Ensure tables don't cause horizontal overflow */
+  .matchup-table {
+    font-size: 11px;
+  }
+  
+  /* Fix glass card containers in mobile */
+  .glass-card-container {
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+  }
+  
+  .glass-header {
+    padding: 12px 16px;
+  }
+  
+  .glass-header h3 {
+    font-size: 1.1rem;
+  }
+  
+  .scrollable-container {
+    padding: 8px;
   }
 }
 
@@ -1006,7 +1180,15 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 6px;
-  min-width: 120px;
+  min-width: 80px;
+}
+
+@media (max-width: 768px) {
+  .hitting-stats,
+  .hr-stats,
+  .recent-hr-stats {
+    min-width: 60px;
+  }
 }
 
 .primary-stat {

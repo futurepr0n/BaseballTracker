@@ -6,6 +6,7 @@ import {
   generateMatchupAnalysis 
 } from '../../../services/dataService';
 import { debugLog } from '../../../utils/debugConfig';
+import { getPlayerDisplayName, getTeamDisplayName } from '../../../utils/playerNameUtils';
 import './OpponentMatchupHitsCard.css';
 
 const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
@@ -172,8 +173,8 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
                   </div>
                   
                   <div className="player-info">
-                    <div className="player-name">{player.playerName}</div>
-                    <div className="player-team">{player.playerTeam}</div>
+                    <div className="player-name">{getPlayerDisplayName(player)}</div>
+                    <div className="player-team">vs Opponent</div>
                   </div>
                   
                   <div className="player-stat">
@@ -369,8 +370,8 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
                   </div>
                   
                   <div className="player-info">
-                    <div className="player-name">{player.playerName}</div>
-                    <div className="player-team">{player.playerTeam}</div>
+                    <div className="player-name">{getPlayerDisplayName(player)}</div>
+                    <div className="player-team">vs Opponent</div>
                   </div>
                   
                   <div className="player-stat">

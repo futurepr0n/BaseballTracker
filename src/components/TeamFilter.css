@@ -17,7 +17,9 @@
   align-items: center;
   gap: 12px;
   flex: 1;
-  min-width: 250px;
+  min-width: 0; /* Remove fixed min-width to prevent overflow */
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .filter-section label {
@@ -143,22 +145,42 @@
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
+    overflow-x: hidden;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   
   .filter-section {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
   }
   
   .matchup-toggle {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+    max-width: 100%;
   }
   
   .reset-filters {
     align-self: flex-start;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .select-wrapper {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .select-wrapper select {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 }
 
@@ -196,7 +218,7 @@
 
 .summary-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
   gap: 15px;
   text-align: center;
 }
@@ -384,7 +406,7 @@
   .hitting-stats,
   .hr-stats,
   .recent-hr-stats {
-    min-width: 100px;
+    min-width: 70px;
   }
   
   .primary-stat .stat-value {

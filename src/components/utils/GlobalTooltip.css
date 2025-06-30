@@ -3,6 +3,703 @@
  * Single source of truth for tooltip styling with proper z-index management
  */
 
+/* Comprehensive Pitcher Tooltip Styles */
+.pitcher-comprehensive-details {
+  padding: 16px;
+  min-width: 400px;
+  max-width: 500px;
+}
+
+.pitcher-comprehensive-details h4 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 8px;
+}
+
+.pitcher-comprehensive-details h5 {
+  margin: 16px 0 8px 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.pitcher-overview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: #f9fafb;
+  border-radius: 6px;
+}
+
+.pitcher-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pitcher-hand {
+  font-weight: 500;
+  color: #374151;
+}
+
+.estimated-indicator {
+  font-size: 0.8rem;
+  color: #92400e;
+  background-color: #fbbf24;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.matchup-percentages {
+  display: flex;
+  gap: 16px;
+}
+
+.percentage-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.percentage-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.percentage-label {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.batters-section {
+  margin-bottom: 16px;
+}
+
+.batters-table {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+
+.batters-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.batters-table th,
+.batters-table td {
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.batters-table th {
+  background-color: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.batters-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.batter-name {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.batter-team {
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+.batter-hand {
+  color: #374151;
+  font-weight: 500;
+}
+
+.more-batters {
+  padding: 8px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-style: italic;
+  background-color: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+}
+
+.arsenal-section {
+  margin-bottom: 16px;
+}
+
+/* Enhanced Pitch Mix Display */
+.pitch-mix-display {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  margin-bottom: 16px;
+}
+
+.pitch-display-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #666666; /* Default color, overridden by style attribute */
+  transition: all 0.2s ease;
+}
+
+.pitch-display-card:hover {
+  background-color: #f3f4f6;
+  transform: translateX(2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pitch-header-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pitch-emoji {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.pitch-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pitch-name-display {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+
+.pitch-type-abbr {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.pitch-metrics {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.pitch-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.metric-label {
+  font-size: 0.7rem;
+  color: #6b7280;
+  margin-bottom: 2px;
+}
+
+.metric-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* Arsenal Summary in Tooltip */
+.arsenal-summary-tooltip {
+  background-color: #f3f4f6;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.summary-row:last-child {
+  margin-bottom: 0;
+}
+
+.summary-label {
+  font-size: 0.85rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+.summary-value {
+  font-size: 0.85rem;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+/* Arsenal Classification Badges */
+.arsenal-classification {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.classification-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.classification-badge.versatile {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.classification-badge.balanced {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+.classification-badge.standard {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fed7aa;
+}
+
+.classification-badge.limited {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+/* Legacy styles for backward compatibility */
+.arsenal-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.pitch-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #f3f4f6;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  min-width: 80px;
+}
+
+.pitch-name {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.85rem;
+}
+
+.pitch-usage {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.pitch-velocity {
+  font-size: 0.75rem;
+  color: #374151;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* Comprehensive Arsenal Display Styles */
+.comprehensive-pitch-display {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+  margin-bottom: 16px;
+}
+
+.comprehensive-pitch-card {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #666666; /* Default color, overridden by style attribute */
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+.comprehensive-pitch-card:hover {
+  background-color: #f3f4f6;
+  transform: translateX(2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pitch-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.pitch-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.pitch-emoji {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.pitch-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pitch-name-display {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+.pitch-usage-info {
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.effectiveness-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  border: 1px solid currentColor;
+  opacity: 0.9;
+}
+
+.pitch-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.pitch-stats-grid .stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 6px;
+  background-color: #f3f4f6;
+  border-radius: 4px;
+}
+
+.pitch-stats-grid .stat-label {
+  font-size: 0.7rem;
+  color: #6b7280;
+  margin-bottom: 2px;
+  font-weight: 500;
+}
+
+.pitch-stats-grid .stat-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.run-value-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  background-color: #f3f4f6;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.rv-label {
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.rv-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.rv-value.positive {
+  color: #10b981; /* Green for negative run value (good for pitcher) */
+}
+
+.rv-value.negative {
+  color: #ef4444; /* Red for positive run value (bad for pitcher) */
+}
+
+/* Comprehensive Arsenal Summary */
+.comprehensive-arsenal-summary {
+  background-color: #f3f4f6;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  margin-top: 16px;
+}
+
+.comprehensive-arsenal-summary .summary-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.comprehensive-arsenal-summary .summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.comprehensive-arsenal-summary .summary-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  background-color: white;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+}
+
+.comprehensive-arsenal-summary .summary-label {
+  font-size: 0.8rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+.comprehensive-arsenal-summary .summary-value {
+  font-size: 0.8rem;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+/* Mobile responsive for comprehensive pitcher tooltip */
+@media (max-width: 768px) {
+  .pitcher-comprehensive-details {
+    min-width: 320px;
+    max-width: 90vw;
+    padding: 12px;
+  }
+  
+  .pitcher-overview {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+  
+  .matchup-percentages {
+    justify-content: center;
+  }
+  
+  .batters-table {
+    max-height: 150px;
+  }
+  
+  .arsenal-list {
+    justify-content: center;
+  }
+  
+  .pitch-item {
+    min-width: 70px;
+    padding: 6px 8px;
+  }
+  
+  /* Enhanced arsenal display mobile styles */
+  .pitch-mix-display {
+    gap: 6px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+  }
+  
+  .pitch-display-card {
+    padding: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .pitch-header-info {
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .pitch-name-display {
+    font-size: 0.8rem;
+  }
+  
+  .pitch-type-abbr {
+    font-size: 0.7rem;
+  }
+  
+  .pitch-metrics {
+    gap: 8px;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .metric-label {
+    font-size: 0.65rem;
+  }
+  
+  .metric-value {
+    font-size: 0.75rem;
+  }
+  
+  .arsenal-summary-tooltip {
+    padding: 8px;
+  }
+  
+  .summary-row {
+    margin-bottom: 6px;
+  }
+  
+  .summary-label {
+    font-size: 0.8rem;
+  }
+  
+  .summary-value {
+    font-size: 0.8rem;
+  }
+  
+  .classification-badge {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+  }
+  
+  /* Comprehensive arsenal mobile styles */
+  .comprehensive-pitch-display {
+    gap: 8px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+  }
+  
+  .comprehensive-pitch-card {
+    padding: 8px;
+  }
+  
+  .pitch-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .pitch-info {
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .pitch-name-display {
+    font-size: 0.85rem;
+  }
+  
+  .pitch-usage-info {
+    font-size: 0.75rem;
+  }
+  
+  .effectiveness-badge {
+    padding: 3px 6px;
+    font-size: 0.7rem;
+    align-self: flex-start;
+  }
+  
+  .pitch-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  
+  .pitch-stats-grid .stat-item {
+    padding: 4px;
+  }
+  
+  .pitch-stats-grid .stat-label {
+    font-size: 0.65rem;
+  }
+  
+  .pitch-stats-grid .stat-value {
+    font-size: 0.8rem;
+  }
+  
+  .run-value-display {
+    padding: 4px 6px;
+    margin-top: 6px;
+  }
+  
+  .rv-label {
+    font-size: 0.75rem;
+  }
+  
+  .rv-value {
+    font-size: 0.8rem;
+  }
+  
+  .comprehensive-arsenal-summary {
+    padding: 12px;
+  }
+  
+  .comprehensive-arsenal-summary .summary-title {
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+  }
+  
+  .comprehensive-arsenal-summary .summary-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  
+  .comprehensive-arsenal-summary .summary-stat {
+    padding: 4px 6px;
+  }
+  
+  .comprehensive-arsenal-summary .summary-label {
+    font-size: 0.75rem;
+  }
+  
+  .comprehensive-arsenal-summary .summary-value {
+    font-size: 0.75rem;
+  }
+}
+
 .global-tooltip {
   position: fixed;
   z-index: 9999; /* Highest z-index to ensure tooltips are always on top */

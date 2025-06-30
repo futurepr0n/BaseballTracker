@@ -383,7 +383,7 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
                   <div className="player-info">
                     <div className="player-name">{player.name}</div>
                     <div className="player-team">
-                      {teamInfo.name} vs {opponentInfo.abbreviation || opponentInfo.name}
+                      vs {opponentInfo.abbreviation || opponentInfo.name}
                     </div>
                   </div>
                   
@@ -620,7 +620,7 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
                   <div className="player-info">
                     <div className="player-name">{player.name}</div>
                     <div className="player-team">
-                      {teamInfo.name} vs {opponentInfo.abbreviation || opponentInfo.name}
+                      vs {opponentInfo.abbreviation || opponentInfo.name}
                     </div>
                   </div>
                   

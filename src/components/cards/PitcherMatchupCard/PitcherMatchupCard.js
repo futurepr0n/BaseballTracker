@@ -3,7 +3,7 @@ import './PitcherMatchupCard.css';
 import { createSafeId } from '../../utils/tooltipUtils';
 import { useTeamFilter } from '../../TeamFilterContext';
 import { useTooltip } from '../../utils/TooltipContext';
-import PitcherArsenalDisplay from '../PitcherArsenalDisplay/PitcherArsenalDisplay';
+import arsenalDataService from '../../../services/arsenalDataService';
 
 /**
  * PitcherMatchupCard - Displays pitcher matchup analysis with arsenal details
@@ -33,7 +33,6 @@ const PitcherMatchupCard = ({
   const [pitcherSortMethod, setPitcherSortMethod] = useState('sameHanded');
   const [hiddenPitchers, setHiddenPitchers] = useState(new Set());
   const [previousFilterState, setPreviousFilterState] = useState({ isFiltering, selectedTeam });
-  const [expandedPitchers, setExpandedPitchers] = useState(new Set()); // New state for arsenal expansion
 
   // Handle team filter changes
   useEffect(() => {
@@ -54,7 +53,7 @@ const PitcherMatchupCard = ({
         setSelectedPitcherTeam('ALL');
       }
     }
-  }, [isFiltering, selectedTeam, previousFilterState]);
+  }, [isFiltering, selectedTeam]); // Removed previousFilterState to prevent infinite loop
 
   // Set up teams list
   useEffect(() => {
@@ -186,18 +185,6 @@ const PitcherMatchupCard = ({
     setHiddenPitchers(new Set());
   }, []);
 
-  // Toggle pitcher arsenal expansion
-  const togglePitcherExpanded = useCallback((pitcherId) => {
-    setExpandedPitchers(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(pitcherId)) {
-        newSet.delete(pitcherId);
-      } else {
-        newSet.add(pitcherId);
-      }
-      return newSet;
-    });
-  }, []);
 
   // Tooltip handler using GlobalTooltip system
   const handleBatterGroupClick = useCallback((event, pitcher, handType) => {
@@ -209,6 +196,66 @@ const PitcherMatchupCard = ({
       pitcher: pitcher,
       handType: handType
     });
+  }, [openTooltip]);
+
+  // New comprehensive pitcher info tooltip handler
+  const handlePitcherInfoClick = useCallback(async (event, pitcher) => {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const safeId = createSafeId(pitcher.name, pitcher.team);
+    const tooltipId = `pitcher_comprehensive_${safeId}`;
+    
+    try {
+      // Load comprehensive arsenal data
+      const arsenalData = await arsenalDataService.getPitcherArsenalForTooltip(
+        pitcher.fullName || pitcher.name,
+        pitcher.team,
+        pitcher.opposingBattersList || []
+      );
+      
+      openTooltip(tooltipId, event.currentTarget, {
+        type: 'pitcher_comprehensive',
+        pitcher: {
+          name: pitcher.name,
+          fullName: pitcher.fullName || pitcher.name,
+          team: pitcher.team,
+          hand: pitcher.pitchingHand || pitcher.hand,
+          opposingTeam: pitcher.opposingTeam,
+          sameHandednessPercentage: pitcher.sameHandednessPercentage,
+          oppositeHandednessPercentage: pitcher.oppositeHandednessPercentage,
+          estimated: pitcher.estimated || pitcher.isEstimated
+        },
+        sameHandBatters: pitcher.sameHandedBattersList || [],
+        oppositeHandBatters: pitcher.oppositeHandedBattersList || [],
+        arsenal: pitcher.pitches || [], // Fallback basic arsenal
+        comprehensiveArsenal: arsenalData, // Rich arsenal data with stats
+        opposingBattersList: pitcher.opposingBattersList || [],
+        pitches: pitcher.pitches || []
+      });
+    } catch (error) {
+      console.error('Error loading pitcher arsenal data:', error);
+      // Show tooltip with basic data if comprehensive loading fails
+      openTooltip(tooltipId, event.currentTarget, {
+        type: 'pitcher_comprehensive',
+        pitcher: {
+          name: pitcher.name,
+          fullName: pitcher.fullName || pitcher.name,
+          team: pitcher.team,
+          hand: pitcher.pitchingHand || pitcher.hand,
+          opposingTeam: pitcher.opposingTeam,
+          sameHandednessPercentage: pitcher.sameHandednessPercentage,
+          oppositeHandednessPercentage: pitcher.oppositeHandednessPercentage,
+          estimated: pitcher.estimated || pitcher.isEstimated
+        },
+        sameHandBatters: pitcher.sameHandedBattersList || [],
+        oppositeHandBatters: pitcher.oppositeHandedBattersList || [],
+        arsenal: pitcher.pitches || [],
+        comprehensiveArsenal: null, // Will fallback to basic display
+        opposingBattersList: pitcher.opposingBattersList || [],
+        pitches: pitcher.pitches || []
+      });
+    }
   }, [openTooltip]);
 
   // Loading state
@@ -306,10 +353,9 @@ const PitcherMatchupCard = ({
                 <ul className="player-list">
                   {filteredPitchers.map((pitcher, index) => {
                     const safeId = createSafeId(pitcher.name, pitcher.team);
-                    const isExpanded = expandedPitchers.has(safeId);
                     
                     return (
-                      <li key={safeId} className={`player-item pitcher-matchup-item ${isExpanded ? 'expanded' : ''}`}>
+                      <li key={safeId} className={`player-item pitcher-matchup-item`}>
                         <div className="pitcher-main-row">
                           <div className={`player-rank ${getMatchupClass(pitcher)}`}>
                             {getTeamLogo(pitcher.team) && (
@@ -346,73 +392,37 @@ const PitcherMatchupCard = ({
                               {pitcher.pitches && pitcher.pitches.length > 0 && (
                                 <span className="pitch-count">{pitcher.pitches.length} pitches</span>
                               )}
-                              <button
-                                className="arsenal-toggle-btn"
-                                onClick={() => togglePitcherExpanded(safeId)}
-                                aria-label={isExpanded ? 'Hide arsenal' : 'Show arsenal'}
-                              >
-                                {isExpanded ? '▼' : '▶'} Arsenal
-                              </button>
                             </div>
                             
                             <span className="opposing-team">vs {pitcher.opposingTeam}</span>
                           </div>
                           
                           <div className="matchup-stats">
-                            <div 
-                              className={`matchup-stat ${pitcher.sameHandednessPercentage > 60 ? 'favorable' : ''}`}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                console.log('SAME HAND CLICKED:', pitcher.name, 'Event:', e);
-                                handleBatterGroupClick(e, pitcher, 'same');
-                              }}
-                              style={{ 
-                                cursor: 'pointer',
-                                zIndex: 10,
-                                pointerEvents: 'auto',
-                                position: 'relative'
-                              }}
-                            >
+                            <div className={`matchup-stat ${pitcher.sameHandednessPercentage > 60 ? 'favorable' : ''}`}>
                               <span className="matchup-value">{Math.round(pitcher.sameHandednessPercentage * 100)}%</span>
                               <span className="matchup-label">same hand</span>
                             </div>
                             
-                            <div 
-                              className={`matchup-stat ${pitcher.oppositeHandednessPercentage > 60 ? 'tough' : ''}`}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                console.log('OPPOSITE HAND CLICKED:', pitcher.name, 'Event:', e);
-                                handleBatterGroupClick(e, pitcher, 'opposite');
-                              }}
-                              style={{ 
-                                cursor: 'pointer',
-                                zIndex: 10,
-                                pointerEvents: 'auto',
-                                position: 'relative'
-                              }}
-                            >
+                            <div className={`matchup-stat ${pitcher.oppositeHandednessPercentage > 60 ? 'tough' : ''}`}>
                               <span className="matchup-value">{Math.round(pitcher.oppositeHandednessPercentage * 100)}%</span>
                               <span className="matchup-label">opposite hand</span>
                             </div>
                           </div>
+                          
+                          {/* Info button similar to Most Hits Allowed card */}
+                          <button 
+                            className="expand-toggle tooltip-trigger" 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handlePitcherInfoClick(e, pitcher);
+                            }}
+                            aria-label="View detailed statistics"
+                            title="View pitcher matchup details"
+                          >
+                            ℹ️
+                          </button>
                         </div>
-                        
-                        {/* Arsenal display when expanded */}
-                        {isExpanded && (
-                          <div className="pitcher-arsenal-container">
-                            <PitcherArsenalDisplay
-                              pitcher={{
-                                name: pitcher.name,
-                                fullName: pitcher.fullName || pitcher.name,
-                                team: pitcher.team,
-                                pitches: pitcher.pitches
-                              }}
-                              opponentBatters={pitcher.opposingBattersList || []}
-                            />
-                          </div>
-                        )}
                       </li>
                     );
                   })}

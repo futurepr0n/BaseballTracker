@@ -4,6 +4,7 @@ import {
   fetchPlayerDataForDateRange, 
   fetchRosterData 
 } from '../../../services/dataService';
+import { getPlayerDisplayName, getTeamDisplayName } from '../../../utils/playerNameUtils';
 import './HitDroughtBounceBackCard.css';
 
 const HitDroughtBounceBackCard = ({ gameData, currentDate, teams }) => {
@@ -257,14 +258,14 @@ const HitDroughtBounceBackCard = ({ gameData, currentDate, teams }) => {
                     
                     <div className="player-info">
                       <div className="player-name">
-                        {player.name}
+                        {getPlayerDisplayName(player)}
                         {player.isCurrentlyInDrought && (
                           <span className="drought-indicator" title={`Currently ${player.currentDrought} games without a hit`}>
                             🔥{player.currentDrought}
                           </span>
                         )}
                       </div>
-                      <div className="player-team">{teamInfo.name}</div>
+                      <div className="player-team">{getTeamDisplayName(player)}</div>
                     </div>
                     
                     <div className="player-stat">
@@ -272,11 +273,9 @@ const HitDroughtBounceBackCard = ({ gameData, currentDate, teams }) => {
                         {player.avgGamesToBounceBack} Avg Games
                       </span>
                       <small className="stat-note">
-                        1G: {player.oneGameBounceBackPct}% | 
-                        2G: {player.twoGameBounceBackPct}% | 
-                        3G: {player.threeGameBounceBackPct}%
+                        Next Game: {player.oneGameBounceBackPct}%
                         <br />
-                        ({player.totalDroughts} droughts analyzed)
+                        {player.totalDroughts} droughts analyzed
                       </small>
                     </div>
                   </li>

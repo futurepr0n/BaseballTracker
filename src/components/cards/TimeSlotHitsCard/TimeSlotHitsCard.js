@@ -8,6 +8,7 @@ import {
   findPlayersInTimeSlot,
   getCurrentTimeSlot
 } from '../../../services/dataService';
+import { getPlayerDisplayName, getTeamDisplayName } from '../../../utils/playerNameUtils';
 import './TimeSlotHitsCard.css';
 
 
@@ -206,8 +207,8 @@ const TimeSlotHitsCard = ({ gameData, currentDate, teams }) => {
                   </div>
                   
                   <div className="player-info">
-                    <div className="player-name">{player.name}</div>
-                    <div className="player-team">{teamInfo.name}</div>
+                    <div className="player-name">{getPlayerDisplayName(player)}</div>
+                    <div className="player-team">{getTeamDisplayName(player)}</div>
                   </div>
                   
                   <div className="player-stat">
@@ -426,8 +427,8 @@ const TimeSlotHRCard = ({ gameData, currentDate, teams }) => {
                   </div>
                   
                   <div className="player-info">
-                    <div className="player-name">{player.name}</div>
-                    <div className="player-team">{teamInfo.name}</div>
+                    <div className="player-name">{getPlayerDisplayName(player)}</div>
+                    <div className="player-team">{getTeamDisplayName(player)}</div>
                   </div>
                   
                   <div className="player-stat">

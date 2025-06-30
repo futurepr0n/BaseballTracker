@@ -45,7 +45,7 @@
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(31, 41, 55, 0.15);
   padding: 20px;
-  pointer-events: none;
+  pointer-events: auto; /* Enable pointer events for interactive elements */
   box-shadow: 0 4px 16px rgba(31, 41, 55, 0.05);
 }
 
@@ -122,6 +122,9 @@
   background: rgba(31, 41, 55, 0.1);
   border-radius: 6px;
   padding: 2px;
+  pointer-events: auto;
+  z-index: 30;
+  position: relative;
 }
 
 .toggle-button {
@@ -136,6 +139,9 @@
   cursor: pointer;
   background: transparent;
   color: #6b7280;
+  pointer-events: auto; /* Ensure buttons are clickable */
+  z-index: 30; /* Higher than header */
+  position: relative;
 }
 
 .toggle-button.active {
