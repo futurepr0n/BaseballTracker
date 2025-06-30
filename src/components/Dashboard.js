@@ -42,7 +42,7 @@ import BarrelMatchupCard from './cards/BarrelMatchupCard';
 import LaunchAngleMastersCard from './cards/LaunchAngleMastersCard';
 
 // Temporary debug import  
-import swingPathService from '../services/swingPathService';
+// import swingPathService from '../services/swingPathService';
 
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
 import MLBWeatherCard from './cards/MLBWeatherCard/MLBWeatherCard';
@@ -173,20 +173,24 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
       populateSlotMachineData();
     }
     
-    // Temporary: Test swing path service
+    // Temporary: Debug swing path data loading
+    // Uncomment the import above and this code to debug CSV loading
+    /*
     if (dayOfWeekHits) {
-      console.log('🧪 Testing swing path service directly...');
-      swingPathService.loadSwingPathData('BOTH').then(data => {
-        console.log('✅ Swing path data loaded:', data.size, 'players');
-        console.log('Sample players:', Array.from(data.keys()).slice(0, 5));
-        
-        // Test a lookup
-        const testResult = swingPathService.getPlayerSwingData('Aaron Judge', 'BOTH');
-        console.log('Test lookup result for Aaron Judge:', testResult);
-      }).catch(error => {
-        console.error('❌ Swing path loading failed:', error);
-      });
+      console.log('🧪 Testing CSV file accessibility...');
+      fetch('/data/stats/bat-tracking-swing-path-RHP.csv')
+        .then(response => {
+          console.log('✅ RHP CSV accessible:', response.status);
+          return swingPathService.loadSwingPathData('RHP');
+        })
+        .then(data => {
+          console.log('✅ Swing path data loaded:', data.size, 'players');
+          const testResult = swingPathService.getPlayerSwingData('Aaron Judge', 'RHP');
+          console.log('Test lookup result for Aaron Judge:', testResult);
+        })
+        .catch(error => console.error('❌ Test failed:', error));
     }
+    */
   }, [dayOfWeekHits]);
 
   // Helper function to generate comprehensive team-specific stats
