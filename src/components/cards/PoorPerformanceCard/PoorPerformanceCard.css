@@ -1,5 +1,10 @@
 /* PoorPerformanceCard.css - Glass Effect with Enhanced Red/Orange Theme */
 
+.poor-performance-card,
+.poor-performance-card * {
+  box-sizing: border-box;
+}
+
 .poor-performance-card {
   grid-column: span 1;
   background: rgba(220, 38, 38, 0.05);
@@ -15,6 +20,8 @@
     0 8px 32px rgba(220, 38, 38, 0.08),
     0 2px 8px rgba(220, 38, 38, 0.03),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 /* Glass card container for proper layering */
@@ -96,10 +103,9 @@
 }
 
 .poor-performance-card .risk-item {
-  display: grid;
-  grid-template-columns: 60px 1fr auto auto auto;
-  gap: 12px;
+  display: flex;
   align-items: center;
+  gap: 12px;
   padding: 12px;
   margin-bottom: 8px;
   background: rgba(255, 255, 255, 0.15);
@@ -109,7 +115,9 @@
   border-radius: 8px;
   transition: all 0.2s ease;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  max-width: 100%;
+  width: 100%;
 }
 
 .poor-performance-card .risk-item:hover {
@@ -171,7 +179,7 @@
   transition: all 0.2s ease;
   padding: 4px;
   border-radius: 4px;
-  flex-grow: 1;
+  flex: 1;
   display: flex;
   flex-direction: column;
   margin-right: 10px;
@@ -193,73 +201,76 @@
   font-weight: 600;
 }
 
-/* Risk stats styling */
-.poor-performance-card .risk-stats {
+/* Clean layout with risk details section */
+.poor-performance-card .risk-details {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 4px;
-  min-width: 90px;
+  flex: 1;
+  margin-left: 8px;
 }
 
-.poor-performance-card .risk-score {
+.poor-performance-card .risk-score-compact {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  align-items: baseline;
+  gap: 3px;
 }
 
-.poor-performance-card .risk-score .stat-value {
-  font-size: 1.3rem;
+.poor-performance-card .score-value {
+  font-size: 1.1rem;
   font-weight: 700;
   line-height: 1;
 }
 
-.poor-performance-card .risk-score .stat-label {
-  font-size: 0.7rem;
+.poor-performance-card .score-label {
+  font-size: 0.65rem;
   color: #666;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-top: 2px;
 }
 
-.poor-performance-card .risk-level {
-  margin-top: 4px;
+.poor-performance-card .factor-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* Risk badge overlay positioned in top-right */
+.poor-performance-card .risk-badge-overlay {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 10;
 }
 
 .poor-performance-card .risk-badge {
-  font-size: 0.8rem;
+  font-size: 0.65rem;
   font-weight: 600;
   padding: 2px 6px;
-  border-radius: 12px;
-  background-color: rgba(220, 38, 38, 0.1);
-  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: 10px;
+  background-color: rgba(220, 38, 38, 0.15);
+  border: 1px solid rgba(220, 38, 38, 0.4);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
 }
 
-/* Risk factors styling */
-.poor-performance-card .risk-factors {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  min-width: 120px;
-  font-size: 0.85rem;
-}
-
+/* Factor info styling */
 .poor-performance-card .factor-count {
   color: #dc3545;
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
 .poor-performance-card .top-factor {
   color: #666;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   text-transform: capitalize;
   line-height: 1.2;
-  max-width: 120px;
+  max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -286,9 +297,9 @@
 
 /* Tooltip trigger button */
 .poor-performance-card .tooltip-trigger {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  border: none;
-  border-radius: 50%;
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 6px;
   width: 32px;
   height: 32px;
   display: flex;
@@ -297,13 +308,16 @@
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  position: relative;
+  z-index: 15;
+  flex-shrink: 0;
 }
 
 .poor-performance-card .tooltip-trigger:hover {
+  background: rgba(220, 38, 38, 0.2);
   transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
-  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
 }
 
 /* Card subtitle styling */
@@ -338,6 +352,28 @@
   font-style: italic;
 }
 
+/* Compact layout for medium screens */
+@media (max-width: 1024px) {
+  .poor-performance-card .risk-factors {
+    max-width: 70px;
+    min-width: 60px;
+  }
+  
+  .poor-performance-card .risk-stats {
+    max-width: 70px;
+    min-width: 60px;
+  }
+  
+  .poor-performance-card .top-factor {
+    max-width: 65px;
+    font-size: 0.65rem;
+  }
+  
+  .poor-performance-card .risk-item {
+    gap: 6px;
+  }
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .poor-performance-card {
@@ -358,7 +394,6 @@
   }
   
   .poor-performance-card .risk-item {
-    grid-template-columns: 50px 1fr auto auto;
     gap: 8px;
     padding: 10px 6px;
   }
@@ -368,7 +403,8 @@
   }
   
   .poor-performance-card .risk-stats {
-    min-width: 70px;
+    min-width: 60px;
+    max-width: 70px;
   }
   
   .poor-performance-card .risk-score .stat-value {
@@ -393,11 +429,14 @@
 
 @media (max-width: 480px) {
   .poor-performance-card .risk-item {
-    grid-template-columns: 40px 1fr auto;
     gap: 6px;
   }
   
   .poor-performance-card .risk-level {
+    display: none;
+  }
+  
+  .poor-performance-card .risk-factors {
     display: none;
   }
 }

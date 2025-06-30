@@ -40,6 +40,7 @@ import SlotMachineCard from './cards/SlotMachineCard/SlotMachineCard';
 import HellraiserCard from './cards/HellraiserCard';
 import BarrelMatchupCard from './cards/BarrelMatchupCard';
 import LaunchAngleMastersCard from './cards/LaunchAngleMastersCard';
+import StrategicIntelligenceCard from './cards/StrategicIntelligenceCard';
 
 
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
@@ -1283,6 +1284,20 @@ const noFilteredData = isFiltering &&
           {/* Launch Angle Masters Card - Full width */}
           <div style={{ gridColumn: '1 / -1' }}>
             <LaunchAngleMastersCard currentDate={currentDate} />
+          </div>
+
+          {/* Strategic Intelligence Card - Full width */}
+          <div style={{ gridColumn: '1 / -1' }}>
+            <StrategicIntelligenceCard 
+              currentDate={currentDate}
+              playerData={playersWithHomeRunPrediction}
+              gameData={gameData}
+              teamData={teamData}
+              rollingStats={rollingStats}
+              topPerformers={topPerformers}
+              poorPerformancePredictions={poorPerformancePredictions}
+              positiveMomentumPredictions={positiveMomentumPredictions}
+            />
           </div>
           
           {/* Row 4: Top Hitters, HR Leaders, Recent Homers */}

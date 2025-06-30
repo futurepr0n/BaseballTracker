@@ -186,27 +186,18 @@ const PositiveMomentumCard = ({ currentDate, teams, maxItems = 25 }) => {
                   <div className="player-team">{player.team}</div>
                 </div>
                 
-                <div className="player-stat momentum-stats">
-                  <div className="momentum-score">
-                    <span className="stat-value">{player.totalPositiveScore}</span>
-                    <span className="stat-label">Momentum Pts</span>
+                <div className="momentum-details">
+                  <div className="momentum-score-compact">
+                    <span className="score-value" style={{ color: momentumColor }}>{player.totalPositiveScore}</span>
+                    <span className="score-label">pts</span>
                   </div>
-                  <div className="momentum-level">
-                    <span 
-                      className="momentum-badge"
-                      style={{ color: momentumColor }}
-                    >
-                      {momentumIcon} {player.momentumLevel}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="momentum-factors">
-                  <div className="factor-count">
-                    {player.positiveFactors.length} factor{player.positiveFactors.length !== 1 ? 's' : ''}
-                  </div>
-                  <div className="top-factor">
-                    {player.positiveFactors[0]?.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  <div className="factor-info">
+                    <div className="factor-count">
+                      {player.positiveFactors.length} factor{player.positiveFactors.length !== 1 ? 's' : ''}
+                    </div>
+                    <div className="top-factor">
+                      {player.positiveFactors[0]?.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    </div>
                   </div>
                 </div>
 
@@ -217,6 +208,16 @@ const PositiveMomentumCard = ({ currentDate, teams, maxItems = 25 }) => {
                 >
                   ℹ️
                 </button>
+                
+                {/* Momentum badge positioned in top-right corner */}
+                <div className="momentum-badge-overlay">
+                  <span 
+                    className="momentum-badge"
+                    style={{ color: momentumColor }}
+                  >
+                    {momentumIcon} {player.momentumLevel}
+                  </span>
+                </div>
                 
                 {/* Enhanced background logo */}
                 {logoUrl && (

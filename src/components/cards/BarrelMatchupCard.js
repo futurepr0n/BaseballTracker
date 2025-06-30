@@ -535,11 +535,11 @@ const BarrelMatchupCard = ({ currentDate }) => {
                             <>
                               <div className="detail-item">
                                 <span className="label">Bat Speed Percentile:</span>
-                                <span className="value">{pick.swingPath.batSpeedPercentile.toFixed(0)}%</span>
+                                <span className="value">{pick.swingPath.batSpeedPercentile ? `${pick.swingPath.batSpeedPercentile.toFixed(0)}%` : 'N/A'}</span>
                               </div>
                               <div className="detail-item">
                                 <span className="label">Ideal Attack Angle Rate:</span>
-                                <span className="value">{(pick.swingPath.idealAttackAngleRate * 100).toFixed(1)}%</span>
+                                <span className="value">{pick.swingPath.idealAttackAngleRate ? `${(pick.swingPath.idealAttackAngleRate * 100).toFixed(1)}%` : 'N/A'}</span>
                               </div>
                               <div className="detail-item">
                                 <span className="label">Swing Optimization Score:</span>
@@ -556,15 +556,15 @@ const BarrelMatchupCard = ({ currentDate }) => {
                                   </div>
                                   <div className="detail-item">
                                     <span className="label">Bat Speed Diff (RHP - LHP):</span>
-                                    <span className="value">{pick.swingPath.splits.differential.batSpeed.toFixed(1)} mph</span>
+                                    <span className="value">{pick.swingPath.splits?.differential?.batSpeed ? `${pick.swingPath.splits.differential.batSpeed.toFixed(1)} mph` : 'N/A'}</span>
                                   </div>
                                   <div className="detail-item">
                                     <span className="label">Attack Angle Diff:</span>
-                                    <span className="value">{pick.swingPath.splits.differential.attackAngle.toFixed(1)}°</span>
+                                    <span className="value">{pick.swingPath.splits?.differential?.attackAngle ? `${pick.swingPath.splits.differential.attackAngle.toFixed(1)}°` : 'N/A'}</span>
                                   </div>
                                   <div className="detail-item">
                                     <span className="label">Ideal Rate Diff:</span>
-                                    <span className="value">{(pick.swingPath.splits.differential.idealRate * 100).toFixed(1)}%</span>
+                                    <span className="value">{pick.swingPath.splits?.differential?.idealRate ? `${(pick.swingPath.splits.differential.idealRate * 100).toFixed(1)}%` : 'N/A'}</span>
                                   </div>
                                 </>
                               )}
@@ -697,7 +697,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
                               className="metric-value"
                               style={{ backgroundColor: getValueColor(pick.swingPath.avgBatSpeed, 'batSpeed') + '20' }}
                             >
-                              {pick.swingPath.avgBatSpeed.toFixed(1)} mph
+                              {pick.swingPath.avgBatSpeed ? `${pick.swingPath.avgBatSpeed.toFixed(1)} mph` : 'N/A'}
                             </span>
                           </div>
                           <div className="metric-item">
@@ -706,7 +706,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
                               className="metric-value"
                               style={{ backgroundColor: getValueColor(pick.swingPath.attackAngle, 'attackAngle') + '20' }}
                             >
-                              {pick.swingPath.attackAngle.toFixed(1)}°
+                              {pick.swingPath.attackAngle ? `${pick.swingPath.attackAngle.toFixed(1)}°` : 'N/A'}
                             </span>
                           </div>
                         </>
