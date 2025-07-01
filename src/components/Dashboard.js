@@ -41,6 +41,7 @@ import SlotMachineCard from './cards/SlotMachineCard/SlotMachineCard';
 import HellraiserCard from './cards/HellraiserCard';
 import BarrelMatchupCard from './cards/BarrelMatchupCard';
 import LaunchAngleMastersCard from './cards/LaunchAngleMastersCard';
+import MilestoneTrackingCard from './cards/MilestoneTrackingCard';
 import StrategicIntelligenceCard from './cards/StrategicIntelligenceCard';
 
 
@@ -1301,6 +1302,11 @@ const noFilteredData = isFiltering &&
               <LaunchAngleMastersCard currentDate={currentDate} />
             </div>
           </HandednessProvider>
+
+          {/* Milestone Tracking Card - Full width */}
+          <div style={{ gridColumn: '1 / -1' }}>
+            <MilestoneTrackingCard currentDate={currentDate} />
+          </div>
 
           {/* Strategic Intelligence Card - Full width */}
           <div style={{ gridColumn: '1 / -1' }}>

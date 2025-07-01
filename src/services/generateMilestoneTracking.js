@@ -32,11 +32,11 @@ class MilestoneTracker {
   }
 
   async processAllDailyFiles() {
-    const dataDir = path.join(__dirname, '../../public/data/2025');
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
+    const dataDir = path.join(__dirname, `../../public/data/${currentYear}`);
     
-    console.log('🔍 Scanning all 2025 season data...');
+    console.log(`🔍 Scanning all ${currentYear} season data...`);
     
     // Process each month directory
     for (const month of Object.keys(MONTHS)) {
@@ -66,12 +66,17 @@ class MilestoneTracker {
       const data = JSON.parse(await fs.readFile(filePath, 'utf8'));
       const gameDate = data.date;
       
-      // Process players from this day
-      if (data.players) {
-        for (const player of data.players) {
-          if (player.playerType === 'hitter') {
-            this.updatePlayerStats(player, gameDate);
-          }
+      // Process players from this day - handle both 'players' array and direct structure
+      let players = [];
+      if (data.players && Array.isArray(data.players)) {
+        players = data.players;
+      } else if (Array.isArray(data)) {
+        players = data;
+      }
+      
+      for (const player of players) {
+        if (player.playerType === 'hitter' && player.name && player.team) {
+          this.updatePlayerStats(player, gameDate);
         }
       }
     } catch (error) {
@@ -96,23 +101,28 @@ class MilestoneTracker {
     
     const playerData = this.playerStats.get(key);
     
-    // Update cumulative stats
-    playerData.cumulative.R += parseInt(player.R) || 0;
-    playerData.cumulative.H += parseInt(player.H) || 0;
-    playerData.cumulative.RBI += parseInt(player.RBI) || 0;
-    playerData.cumulative.HR += parseInt(player.HR) || 0;
-    playerData.cumulative.AB += parseInt(player.AB) || 0;
+    // Update cumulative stats with safe parsing
+    const safeParseInt = (value) => {
+      const parsed = parseInt(value);
+      return isNaN(parsed) ? 0 : parsed;
+    };
+    
+    playerData.cumulative.R += safeParseInt(player.R);
+    playerData.cumulative.H += safeParseInt(player.H);
+    playerData.cumulative.RBI += safeParseInt(player.RBI);
+    playerData.cumulative.HR += safeParseInt(player.HR);
+    playerData.cumulative.AB += safeParseInt(player.AB);
     playerData.cumulative.games += 1;
     playerData.lastGame = gameDate;
     
     // Keep recent game history (last 10 games)
     playerData.recentGames.push({
       date: gameDate,
-      R: parseInt(player.R) || 0,
-      H: parseInt(player.H) || 0,
-      RBI: parseInt(player.RBI) || 0,
-      HR: parseInt(player.HR) || 0,
-      AB: parseInt(player.AB) || 0
+      R: safeParseInt(player.R),
+      H: safeParseInt(player.H),
+      RBI: safeParseInt(player.RBI),
+      HR: safeParseInt(player.HR),
+      AB: safeParseInt(player.AB)
     });
     
     if (playerData.recentGames.length > 10) {

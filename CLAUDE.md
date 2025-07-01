@@ -68,11 +68,30 @@ npm run convert-handedness
 
 **Milestone tracking generation:**
 ```bash
-# Generate milestone tracking data (scans all 2025 season files)
+# Generate milestone tracking data (scans all current year season files)
 npm run generate-milestones
 
 # Creates milestone_tracking_YYYY-MM-DD.json and milestone_tracking_latest.json
 # Run this daily after processing new game data
+# Automatically detects current year and handles missing data gracefully
+```
+
+**Daily Milestone Tracking Workflow:**
+```bash
+# 1. After daily game data is processed, generate milestones
+npm run generate-milestones
+
+# 2. The system will:
+#    - Scan all files for current year (auto-detects 2025, 2026, etc.)
+#    - Calculate 692+ milestone candidates with heat levels
+#    - Generate timeline predictions based on season vs recent pace
+#    - Create "Tonight's Watch List" for immediate opportunities
+#    - Handle missing stats and corrupted files gracefully
+
+# 3. View results on Dashboard in "🎯 Milestone Tracking" card
+#    - Heat levels: 🔥 Warm (3 away) → 🔥🔥 Hot (2 away) → 🔥🔥🔥 Blazing (1 away)
+#    - Categories: HR milestones every 5, H/RBI/R milestones every 10
+#    - Filters: Heat level, stat category, sort by urgency/timeline/player
 ```
 
 **Rolling stats generation:**
