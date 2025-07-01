@@ -46,18 +46,24 @@ node scripts/convertHandednessData.js
 ```
 
 **Required CSV Files for Handedness System:**
+The following files must be present in `public/data/stats/`:
 - `bat-tracking-swing-path-RHP.csv` - Right-handed pitcher data
 - `bat-tracking-swing-path-LHP.csv` - Left-handed pitcher data  
 - `bat-tracking-swing-path-all.csv` - Combined/weighted data
 
 **Daily Handedness Data Update:**
 ```bash
-# If you have new CSV files, convert them:
+# After getting fresh CSV files in public/data/stats/, convert them:
 node scripts/convertHandednessData.js
 
 # The system automatically loads JSON files for real-time switching
 # No server restart needed after conversion
 ```
+
+**File Locations:**
+- **Input**: CSV files are read from `public/data/stats/`
+- **Output**: JSON files are created in `public/data/handedness/`
+- **Never place CSV files in project root** - they belong in the stats directory
 
 **Rolling stats generation:**
 ```bash
