@@ -37,7 +37,7 @@ node src/services/generatePitcherMatchups.js
 ```bash
 # Convert handedness CSV files to JSON for real-time performance
 # Run this whenever you get new bat-tracking CSV files
-node scripts/convertHandednessData.js
+npm run convert-handedness
 
 # This creates/updates:
 # - public/data/handedness/rhp.json
@@ -54,7 +54,7 @@ The following files must be present in `public/data/stats/`:
 **Daily Handedness Data Update:**
 ```bash
 # After getting fresh CSV files in public/data/stats/, convert them:
-node scripts/convertHandednessData.js
+npm run convert-handedness
 
 # The system automatically loads JSON files for real-time switching
 # No server restart needed after conversion
