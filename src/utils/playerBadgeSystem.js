@@ -47,6 +47,34 @@ export const BADGE_TYPES = {
     confidenceBoost: 10,
     priority: 2
   },
+  ELITE_SWING_PATH: {
+    emoji: '🚀',
+    label: 'Elite Swing Path',
+    description: 'Top 10% swing path optimization score (85+)',
+    confidenceBoost: 12,
+    priority: 1
+  },
+  LAUNCH_ANGLE_MASTER: {
+    emoji: '⚡',
+    label: 'Launch Angle Master',
+    description: 'Consistently achieves ideal attack angle (60%+ rate)',
+    confidenceBoost: 10,
+    priority: 2
+  },
+  POWER_SPEED: {
+    emoji: '💪',
+    label: 'Power Speed',
+    description: 'Elite bat speed (80th percentile+)',
+    confidenceBoost: 8,
+    priority: 3
+  },
+  SWING_OPTIMIZER: {
+    emoji: '🎯',
+    label: 'Swing Optimizer',
+    description: 'Good swing path optimization (70+ score)',
+    confidenceBoost: 6,
+    priority: 4
+  },
   RISK: {
     emoji: '⚠️',
     label: 'Risk',

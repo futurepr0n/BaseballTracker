@@ -466,46 +466,47 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
   };
 
   return (
-    <div className="batter-matchup-table">
-      <div className="table-header">
-        <h3>Player Matchup Analysis</h3>
-        <div className="table-info">
-          <span>{players.length} players analyzed</span>
+    <div className="hr-matchup-hub">
+      <div className="batter-matchup-table">
+        <div className="table-header">
+          <h3>Player Matchup Analysis</h3>
+          <div className="table-info">
+            <span>{players.length} players analyzed</span>
+          </div>
         </div>
+
+      {/* Detached Header */}
+      <div className="detached-header">
+        <div onClick={() => handleSort('playerName')} className="header-cell sortable">
+          Player {getSortIcon('playerName')}
+        </div>
+        <div onClick={() => handleSort('team')} className="header-cell sortable">
+          Team {getSortIcon('team')}
+        </div>
+        <div onClick={() => handleSort('totalScore')} className="header-cell sortable">
+          Score {getSortIcon('totalScore')}
+        </div>
+        <div onClick={() => handleSort('basePerformance')} className="header-cell sortable">
+          Base {getSortIcon('basePerformance')}
+        </div>
+        <div onClick={() => handleSort('venueImpact')} className="header-cell sortable">
+          Venue {getSortIcon('venueImpact')}
+        </div>
+        <div onClick={() => handleSort('travelImpact')} className="header-cell sortable">
+          Travel {getSortIcon('travelImpact')}
+        </div>
+        <div onClick={() => handleSort('contextualBonus')} className="header-cell sortable">
+          Context {getSortIcon('contextualBonus')}
+        </div>
+        <div onClick={() => handleSort('confidence')} className="header-cell sortable">
+          Conf {getSortIcon('confidence')}
+        </div>
+        <div className="header-cell">Rec</div>
+        <div className="header-cell">▶</div>
       </div>
 
       <div className="table-container">
         <table className="matchup-table">
-          <thead>
-            <tr>
-              <th onClick={() => handleSort('playerName')} className="sortable" title="Player Name">
-                Player {getSortIcon('playerName')}
-              </th>
-              <th onClick={() => handleSort('team')} className="sortable" title="Team">
-                Team {getSortIcon('team')}
-              </th>
-              <th onClick={() => handleSort('totalScore')} className="sortable" title="Total Score">
-                Score {getSortIcon('totalScore')}
-              </th>
-              <th onClick={() => handleSort('basePerformance')} className="sortable" title="Base Performance Score">
-                Base {getSortIcon('basePerformance')}
-              </th>
-              <th onClick={() => handleSort('venueImpact')} className="sortable" title="Venue Impact Adjustment">
-                Venue {getSortIcon('venueImpact')}
-              </th>
-              <th onClick={() => handleSort('travelImpact')} className="sortable" title="Travel Impact Adjustment">
-                Travel {getSortIcon('travelImpact')}
-              </th>
-              <th onClick={() => handleSort('contextualBonus')} className="sortable" title="Contextual Bonus Points">
-                Context {getSortIcon('contextualBonus')}
-              </th>
-              <th onClick={() => handleSort('confidence')} className="sortable" title="Confidence Level">
-                Conf {getSortIcon('confidence')}
-              </th>
-              <th title="Recommendation">Rec</th>
-              <th title="Expand Details">▶</th>
-            </tr>
-          </thead>
           <tbody>
             {players.map((player, index) => (
               <React.Fragment key={`${player.playerName}_${player.team}_${index}`}>
@@ -589,6 +590,7 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
           {players.map((player, index) => renderMobileCard(player, index))}
         </div>
       </div>
+    </div>
     </div>
   );
 };

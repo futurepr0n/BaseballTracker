@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import hellraiserAnalysisService from '../../services/hellraiserAnalysisService';
 import { useTeamFilter } from '../TeamFilterContext';
+import { useHandedness } from '../../contexts/HandednessContext';
 import GlassCard, { GlassScrollableContainer } from './GlassCard/GlassCard';
 import { getPlayerDisplayName, getTeamDisplayName } from '../../utils/playerNameUtils';
 import './BarrelMatchupCard.css';
@@ -12,12 +13,9 @@ const BarrelMatchupCard = ({ currentDate }) => {
   const [sortConfig, setSortConfig] = useState({ key: 'pitcherContactAllowed', direction: 'desc' });
   const [expandedRows, setExpandedRows] = useState({});
   const { selectedTeam, includeMatchup, matchupTeam } = useTeamFilter();
+  const { selectedHandedness, getPlayerHandednessData, loadHandednessDatasets } = useHandedness();
 
-  useEffect(() => {
-    loadBarrelAnalysis();
-  }, [currentDate, selectedTeam, includeMatchup]);
-
-  const loadBarrelAnalysis = async () => {
+  const loadBarrelAnalysis = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -53,7 +51,15 @@ const BarrelMatchupCard = ({ currentDate }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentDate, selectedTeam, includeMatchup, matchupTeam, selectedHandedness]);
+
+  useEffect(() => {
+    loadHandednessDatasets();
+  }, [loadHandednessDatasets]);
+
+  useEffect(() => {
+    loadBarrelAnalysis();
+  }, [loadBarrelAnalysis, selectedHandedness]);
 
   const processAnalysisData = (analysis) => {
     // Extract pitcher metrics from reasoning field
@@ -91,6 +97,20 @@ const BarrelMatchupCard = ({ currentDate }) => {
       // Calculate market edge value for sorting
       const marketEdge = pick.marketEfficiency?.edge || 0;
       
+      // Get handedness-specific swing data if available, otherwise fallback to hellraiser data
+      const playerName = pick.player_name || pick.playerName || '';
+      const handednessData = getPlayerHandednessData(playerName);
+      
+      const swingPath = {
+        avgBatSpeed: handednessData ? handednessData.avg_bat_speed : (pick.swing_bat_speed || null),
+        attackAngle: handednessData ? handednessData.attack_angle : (pick.swing_attack_angle || null),
+        swingOptimizationScore: handednessData ? 
+          Math.round(((handednessData.ideal_attack_angle_rate || 0) * 100) * 10) / 10 : // Round to 1 decimal
+          (pick.swing_optimization_score || null),
+        idealAttackAngleRate: handednessData ? handednessData.ideal_attack_angle_rate : (pick.swing_ideal_rate || null),
+        dataSource: handednessData ? `handedness_${selectedHandedness}` : 'hellraiser'
+      };
+      
       return {
         ...pick,
         pitcherContactAllowed,
@@ -101,7 +121,8 @@ const BarrelMatchupCard = ({ currentDate }) => {
         pitcherHardContact,
         pitcherHRRate,
         marketEdge,
-        matchupScore: calculateMatchupScore(playerBarrelRate, pitcherBarrelVulnerable, playerExitVelocity, pitcherContactAllowed, playerHardContact, pitcherHardContact)
+        swingPath,
+        matchupScore: calculateMatchupScore(playerBarrelRate, pitcherBarrelVulnerable, playerExitVelocity, pitcherContactAllowed, playerHardContact, pitcherHardContact, swingPath)
       };
     });
     
@@ -111,7 +132,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
     };
   };
 
-  const calculateMatchupScore = (playerBarrelRate, pitcherBarrelVulnerable, playerExitVelocity, pitcherContactAllowed, playerHardContact, pitcherHardContact) => {
+  const calculateMatchupScore = (playerBarrelRate, pitcherBarrelVulnerable, playerExitVelocity, pitcherContactAllowed, playerHardContact, pitcherHardContact, swingPath) => {
     // Higher score = better matchup for the hitter
     let score = 0;
     
@@ -142,6 +163,30 @@ const BarrelMatchupCard = ({ currentDate }) => {
       score += 8;
     }
     
+    // Swing path bonus (from hellraiser analysis)
+    if (swingPath && swingPath.avgBatSpeed) {
+      // Bat speed bonus
+      if (swingPath.avgBatSpeed > 75) {
+        score += 10;
+      } else if (swingPath.avgBatSpeed > 72) {
+        score += 5;
+      }
+      
+      // Attack angle optimization bonus
+      if (swingPath.idealAttackAngleRate > 0.4) {
+        score += 8;
+      } else if (swingPath.idealAttackAngleRate > 0.3) {
+        score += 4;
+      }
+      
+      // Swing optimization score bonus
+      if (swingPath.swingOptimizationScore > 80) {
+        score += 12;
+      } else if (swingPath.swingOptimizationScore > 70) {
+        score += 6;
+      }
+    }
+    
     // Bonus for extreme vulnerabilities
     if (pitcherBarrelVulnerable > 15) score += 15;
     if (pitcherContactAllowed > 92) score += 15;
@@ -169,6 +214,13 @@ const BarrelMatchupCard = ({ currentDate }) => {
       if (sortConfig.key === 'marketEdge') {
         aValue = a.marketEfficiency?.edge || 0;
         bValue = b.marketEfficiency?.edge || 0;
+      }
+      
+      // Handle nested swing path properties
+      if (sortConfig.key.startsWith('swingPath.')) {
+        const prop = sortConfig.key.split('.')[1];
+        aValue = a.swingPath?.[prop] || 0;
+        bValue = b.swingPath?.[prop] || 0;
       }
       
       if (aValue === bValue) return 0;
@@ -244,6 +296,27 @@ const BarrelMatchupCard = ({ currentDate }) => {
         if (value >= 0) return '#66BB6A';
         if (value >= -0.1) return '#FFC107';
         return '#F44336';
+      
+      case 'batSpeed':
+        if (value >= 73) return '#4CAF50';  // Elite
+        if (value >= 71) return '#66BB6A';  // Above average
+        if (value >= 69) return '#81C784';  // Average
+        if (value >= 67) return '#ffaa44';  // Below average
+        return '#F44336';  // Poor
+      
+      case 'attackAngle':
+        // Ideal range is 5-20 degrees
+        if (value >= 5 && value <= 20) return '#4CAF50';  // Ideal
+        if (value >= 3 && value <= 25) return '#66BB6A';  // Good
+        if (value >= 0 && value <= 30) return '#81C784';  // Acceptable
+        return '#F44336';  // Poor
+      
+      case 'swingScore':
+        if (value >= 80) return '#4CAF50';  // Elite
+        if (value >= 70) return '#66BB6A';  // Above average
+        if (value >= 60) return '#81C784';  // Average
+        if (value >= 50) return '#ffaa44';  // Below average
+        return '#F44336';  // Poor
       
       default:
         return '#666';
@@ -332,6 +405,18 @@ const BarrelMatchupCard = ({ currentDate }) => {
                 Hard Allowed {getSortIndicator('pitcherHardContact')}
                 <span className="header-subtitle">Pitcher</span>
               </th>
+              <th className="sortable" onClick={() => handleSort('swingPath.avgBatSpeed')}>
+                Bat Speed {getSortIndicator('swingPath.avgBatSpeed')}
+                <span className="header-subtitle">mph</span>
+              </th>
+              <th className="sortable" onClick={() => handleSort('swingPath.attackAngle')}>
+                Attack Angle {getSortIndicator('swingPath.attackAngle')}
+                <span className="header-subtitle">degrees</span>
+              </th>
+              <th className="sortable" onClick={() => handleSort('swingPath.swingOptimizationScore')}>
+                Swing Path {getSortIndicator('swingPath.swingOptimizationScore')}
+                <span className="header-subtitle">Score</span>
+              </th>
               <th className="sortable" onClick={() => handleSort('confidenceScore')}>
                 Confidence {getSortIndicator('confidenceScore')}
               </th>
@@ -391,6 +476,24 @@ const BarrelMatchupCard = ({ currentDate }) => {
                   </td>
                   <td 
                     className="metric-cell"
+                    style={{ backgroundColor: getValueColor(pick.swingPath?.avgBatSpeed, 'batSpeed') + '20' }}
+                  >
+                    {pick.swingPath?.avgBatSpeed ? `${pick.swingPath.avgBatSpeed.toFixed(1)}` : '-'}
+                  </td>
+                  <td 
+                    className="metric-cell"
+                    style={{ backgroundColor: getValueColor(pick.swingPath?.attackAngle, 'attackAngle') + '20' }}
+                  >
+                    {pick.swingPath?.attackAngle ? `${pick.swingPath.attackAngle.toFixed(1)}°` : '-'}
+                  </td>
+                  <td 
+                    className="metric-cell swing-path-score"
+                    style={{ backgroundColor: getValueColor(pick.swingPath?.swingOptimizationScore, 'swingScore') + '20' }}
+                  >
+                    {pick.swingPath?.swingOptimizationScore || '-'}
+                  </td>
+                  <td 
+                    className="metric-cell"
                     style={{ backgroundColor: getValueColor(pick.confidenceScore, 'confidence') + '20' }}
                   >
                     {pick.confidenceScore}
@@ -409,7 +512,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
                 </tr>
                 {expandedRows[index] && (
                   <tr className="expanded-row">
-                    <td colSpan="10">
+                    <td colSpan="13">
                       <div className="expanded-content">
                         <div className="analysis-section">
                           <h5>Full Analysis:</h5>
@@ -440,6 +543,45 @@ const BarrelMatchupCard = ({ currentDate }) => {
                             <span className="label">HR Rate Allowed:</span>
                             <span className="value">{pick.pitcherHRRate > 0 ? `${pick.pitcherHRRate.toFixed(2)}/game` : '-'}</span>
                           </div>
+                          {pick.swingPath && (
+                            <>
+                              <div className="detail-item">
+                                <span className="label">Bat Speed Percentile:</span>
+                                <span className="value">{pick.swingPath.batSpeedPercentile ? `${pick.swingPath.batSpeedPercentile.toFixed(0)}%` : 'N/A'}</span>
+                              </div>
+                              <div className="detail-item">
+                                <span className="label">Ideal Attack Angle Rate:</span>
+                                <span className="value">{pick.swingPath.idealAttackAngleRate ? `${(pick.swingPath.idealAttackAngleRate * 100).toFixed(1)}%` : 'N/A'}</span>
+                              </div>
+                              <div className="detail-item">
+                                <span className="label">Swing Optimization Score:</span>
+                                <span className="value">{pick.swingPath.swingOptimizationScore}</span>
+                              </div>
+                              <div className="detail-item">
+                                <span className="label">Pull Tendency:</span>
+                                <span className="value">{pick.swingPath.pullTendency?.replace('_', ' ') || 'N/A'}</span>
+                              </div>
+                              {pick.swingPath.showSplits && pick.swingPath.splits && (
+                                <>
+                                  <div className="splits-header">
+                                    <h6>Splits vs RHP/LHP:</h6>
+                                  </div>
+                                  <div className="detail-item">
+                                    <span className="label">Bat Speed Diff (RHP - LHP):</span>
+                                    <span className="value">{pick.swingPath.splits?.differential?.batSpeed ? `${pick.swingPath.splits.differential.batSpeed.toFixed(1)} mph` : 'N/A'}</span>
+                                  </div>
+                                  <div className="detail-item">
+                                    <span className="label">Attack Angle Diff:</span>
+                                    <span className="value">{pick.swingPath.splits?.differential?.attackAngle ? `${pick.swingPath.splits.differential.attackAngle.toFixed(1)}°` : 'N/A'}</span>
+                                  </div>
+                                  <div className="detail-item">
+                                    <span className="label">Ideal Rate Diff:</span>
+                                    <span className="value">{pick.swingPath.splits?.differential?.idealRate ? `${(pick.swingPath.splits.differential.idealRate * 100).toFixed(1)}%` : 'N/A'}</span>
+                                  </div>
+                                </>
+                              )}
+                            </>
+                          )}
                         </div>
                         {pick.riskFactors && pick.riskFactors.length > 0 && (
                           <div className="risk-section">
@@ -559,6 +701,28 @@ const BarrelMatchupCard = ({ currentDate }) => {
                           {pick.marketEdge ? `${(pick.marketEdge * 100).toFixed(1)}%` : '-'}
                         </span>
                       </div>
+                      {pick.swingPath && (
+                        <>
+                          <div className="metric-item">
+                            <span className="metric-label">Bat Speed</span>
+                            <span 
+                              className="metric-value"
+                              style={{ backgroundColor: getValueColor(pick.swingPath.avgBatSpeed, 'batSpeed') + '20' }}
+                            >
+                              {pick.swingPath.avgBatSpeed ? `${pick.swingPath.avgBatSpeed.toFixed(1)} mph` : 'N/A'}
+                            </span>
+                          </div>
+                          <div className="metric-item">
+                            <span className="metric-label">Attack Angle</span>
+                            <span 
+                              className="metric-value"
+                              style={{ backgroundColor: getValueColor(pick.swingPath.attackAngle, 'attackAngle') + '20' }}
+                            >
+                              {pick.swingPath.attackAngle ? `${pick.swingPath.attackAngle.toFixed(1)}°` : 'N/A'}
+                            </span>
+                          </div>
+                        </>
+                      )}
                     </div>
                     
                     <div className="mobile-analysis">

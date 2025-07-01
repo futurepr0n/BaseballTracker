@@ -43,6 +43,7 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
     const safeId = createSafeId(player.playerName, player.team);
     const tooltipId = `poor_performance_${safeId}`;
     
+    
     openTooltip(tooltipId, event.currentTarget, {
       type: 'poor_performance',
       player: player
@@ -138,27 +139,18 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
                   <div className="player-team">{prediction.team}</div>
                 </div>
                 
-                <div className="player-stat risk-stats">
-                  <div className="risk-score">
-                    <span className="stat-value" style={{ color: riskColor }}>{prediction.totalRiskScore}</span>
-                    <span className="stat-label">Risk Pts</span>
+                <div className="risk-details">
+                  <div className="risk-score-compact">
+                    <span className="score-value" style={{ color: riskColor }}>{prediction.totalRiskScore}</span>
+                    <span className="score-label">pts</span>
                   </div>
-                  <div className="risk-level">
-                    <span 
-                      className="risk-badge"
-                      style={{ color: riskColor }}
-                    >
-                      {riskIcon} {prediction.riskLevel}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="risk-factors">
-                  <div className="factor-count">
-                    {prediction.riskFactors.length} factor{prediction.riskFactors.length !== 1 ? 's' : ''}
-                  </div>
-                  <div className="top-factor">
-                    {prediction.riskFactors[0]?.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                  <div className="factor-info">
+                    <div className="factor-count">
+                      {prediction.riskFactors.length} factor{prediction.riskFactors.length !== 1 ? 's' : ''}
+                    </div>
+                    <div className="top-factor">
+                      {prediction.riskFactors[0]?.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    </div>
                   </div>
                 </div>
 
@@ -169,6 +161,16 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
                 >
                   ℹ️
                 </button>
+                
+                {/* Risk badge positioned in top-right corner */}
+                <div className="risk-badge-overlay">
+                  <span 
+                    className="risk-badge"
+                    style={{ color: riskColor }}
+                  >
+                    {riskIcon} {prediction.riskLevel}
+                  </span>
+                </div>
                 
                 {/* Enhanced background logo */}
                 {logoUrl && (

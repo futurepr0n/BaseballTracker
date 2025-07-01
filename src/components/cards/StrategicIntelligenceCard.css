@@ -1,0 +1,608 @@
+/* Strategic Intelligence Card Styles */
+.strategic-intelligence-card {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.strategic-intelligence-card .glass-header {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.strategic-intelligence-card h3 {
+  margin: 0 0 4px 0;
+  font-size: 1.2em;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.strategic-intelligence-card .card-subtitle {
+  font-size: 0.85em;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+/* View Controls */
+.view-controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.view-button {
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  background: var(--surface-secondary);
+  color: var(--text-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8em;
+  transition: all 0.2s ease;
+}
+
+.view-button:hover {
+  background: var(--surface-hover);
+  border-color: var(--accent-color);
+}
+
+.view-button.active {
+  background: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+/* Table Styles */
+.intelligence-container {
+  padding: 0;
+  max-height: 700px;
+  overflow-y: auto;
+}
+
+.intelligence-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85em;
+}
+
+.intelligence-table th {
+  background: var(--surface-hover);
+  padding: 12px 8px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.intelligence-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.intelligence-table th.sortable:hover {
+  background: var(--surface-active);
+}
+
+.intelligence-table .header-subtitle {
+  display: block;
+  font-size: 0.75em;
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.intelligence-table td {
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: top;
+}
+
+.intelligence-row:hover {
+  background: var(--surface-hover);
+}
+
+/* Column Widths */
+.rank-col {
+  width: 60px;
+}
+
+.player-col {
+  width: 180px;
+  min-width: 160px;
+}
+
+.assessment-col {
+  width: 120px;
+}
+
+.details-col {
+  width: 300px;
+  min-width: 250px;
+}
+
+/* Cell Styles */
+.rank-cell {
+  text-align: center;
+}
+
+.rank-number {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9em;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.player-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95em;
+}
+
+.team-info {
+  font-size: 0.8em;
+  color: var(--text-secondary);
+}
+
+/* Score Breakdown */
+.score-cell {
+  text-align: center;
+}
+
+.net-score-breakdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.net-score {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.score-breakdown {
+  display: flex;
+  gap: 6px;
+  font-size: 0.75em;
+}
+
+.opp-score {
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.risk-score {
+  color: #F44336;
+  font-weight: 500;
+}
+
+/* Factors */
+.factors-cell {
+  text-align: center;
+}
+
+.factors-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.total-factors {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.factors-breakdown {
+  display: flex;
+  gap: 8px;
+  font-size: 0.75em;
+}
+
+.opp-factors {
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.risk-factors {
+  color: #F44336;
+  font-weight: 500;
+}
+
+.confidence-cell {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Assessment Badge */
+.assessment-cell {
+  text-align: center;
+}
+
+.assessment-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* Key Factors */
+.key-factors {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.factor-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8em;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.factor-item.opportunity {
+  color: var(--text-primary);
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.factor-item.risk {
+  color: var(--text-primary);
+  background: rgba(244, 67, 54, 0.1);
+}
+
+.factor-item.toggle {
+  cursor: pointer;
+  color: var(--text-secondary);
+  background: var(--surface-secondary);
+  font-style: italic;
+  justify-content: center;
+  padding: 4px 8px;
+  margin-top: 4px;
+}
+
+.factor-item.toggle:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.factor-icon {
+  font-size: 0.7em;
+  min-width: 12px;
+}
+
+.factor-text {
+  font-weight: 500;
+  flex: 1;
+  cursor: help;
+}
+
+.factor-impact {
+  font-size: 0.7em;
+  padding: 1px 4px;
+  border-radius: 2px;
+  background: var(--surface-secondary);
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.toggle-text {
+  font-size: 0.75em;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Mobile View */
+.mobile-view {
+  display: none;
+}
+
+.mobile-intelligence {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mobile-intelligence-card {
+  background: var(--surface-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+.mobile-intelligence-card:hover {
+  background: var(--surface-hover);
+  border-color: var(--accent-color);
+}
+
+.mobile-intelligence-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.mobile-rank {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9em;
+  min-width: 30px;
+}
+
+.mobile-player-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobile-player-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1em;
+}
+
+.mobile-team-info {
+  font-size: 0.85em;
+  color: var(--text-secondary);
+}
+
+.mobile-assessment {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-weight: 600;
+  text-align: center;
+  min-width: 80px;
+}
+
+/* Mobile Scores */
+.mobile-scores {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: var(--surface-secondary);
+  border-radius: 6px;
+}
+
+.mobile-score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.mobile-score-label {
+  font-size: 0.75em;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.mobile-score-value {
+  font-size: 1em;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+/* Mobile Factors */
+.mobile-factors {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-factors-section h5 {
+  margin: 0 0 8px 0;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.mobile-factor-item {
+  padding: 8px;
+  background: var(--surface-secondary);
+  border-radius: 4px;
+  font-size: 0.8em;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+.mobile-factor-item strong {
+  color: var(--text-primary);
+}
+
+/* Card Footer */
+.card-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.summary-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  font-size: 0.8em;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.last-updated small {
+  font-size: 0.75em;
+  color: var(--text-secondary);
+}
+
+/* Loading and Error States */
+.loading-state,
+.error-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.loading-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--border-color);
+  border-top: 3px solid var(--accent-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 12px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.retry-button {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.retry-button:hover {
+  background: var(--accent-hover);
+}
+
+/* Glass Mode Specific Styles */
+.strategic-intelligence-card.glass {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.strategic-intelligence-card.glass .intelligence-table th {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+}
+
+.strategic-intelligence-card.glass .intelligence-row:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.strategic-intelligence-card.glass .view-button {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+}
+
+.strategic-intelligence-card.glass .mobile-intelligence-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.strategic-intelligence-card.glass .mobile-scores,
+.strategic-intelligence-card.glass .mobile-factor-item {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .desktop-view {
+    display: none;
+  }
+  
+  .mobile-view {
+    display: block;
+  }
+  
+  .view-controls {
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .view-button {
+    font-size: 0.75em;
+  }
+  
+  .card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .summary-stats {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobile-scores {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .mobile-intelligence-header {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  
+  .mobile-assessment {
+    align-self: center;
+    margin-top: 8px;
+  }
+}
+
+/* Theme-specific adjustments */
+@media (prefers-color-scheme: dark) {
+  .strategic-intelligence-card:not(.glass) {
+    --surface-primary: #1a1a1a;
+    --surface-secondary: #2a2a2a;
+    --surface-hover: #333333;
+    --surface-active: #404040;
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --border-color: #444444;
+    --border-light: #333333;
+    --accent-color: #4CAF50;
+    --accent-hover: #45a049;
+  }
+}
+
+/* High contrast support */
+@media (prefers-contrast: high) {
+  .intelligence-table th,
+  .intelligence-table td {
+    border-color: var(--text-primary);
+  }
+  
+  .assessment-badge {
+    border: 2px solid currentColor;
+  }
+}

@@ -1,5 +1,10 @@
 /* PositiveMomentumCard.css - Glass Effect with Green Theme */
 
+.positive-momentum-card,
+.positive-momentum-card * {
+  box-sizing: border-box;
+}
+
 .positive-momentum-card {
   grid-column: span 1;
   background: rgba(34, 197, 94, 0.05);
@@ -14,6 +19,8 @@
   box-shadow: 
     0 8px 32px rgba(34, 197, 94, 0.08),
     0 2px 8px rgba(34, 197, 94, 0.03);
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 /* Glass card container for proper layering */
@@ -95,10 +102,9 @@
 }
 
 .positive-momentum-card .momentum-item {
-  display: grid;
-  grid-template-columns: 60px 1fr auto auto auto;
-  gap: 12px;
+  display: flex;
   align-items: center;
+  gap: 8px;
   padding: 12px;
   margin-bottom: 8px;
   background: rgba(255, 255, 255, 0.15);
@@ -109,6 +115,8 @@
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+  max-width: 100%;
+  width: 100%;
 }
 
 .positive-momentum-card .momentum-item:hover {
@@ -170,7 +178,7 @@
   transition: all 0.2s ease;
   padding: 4px;
   border-radius: 4px;
-  flex-grow: 1;
+  flex: 1;
   display: flex;
   flex-direction: column;
   margin-right: 10px;
@@ -192,74 +200,76 @@
   font-weight: 600;
 }
 
-/* Momentum stats styling */
-.positive-momentum-card .momentum-stats {
+/* Clean layout with momentum details section */
+.positive-momentum-card .momentum-details {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 4px;
-  min-width: 90px;
+  flex: 1;
+  margin-left: 8px;
 }
 
-.positive-momentum-card .momentum-score {
+.positive-momentum-card .momentum-score-compact {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  align-items: baseline;
+  gap: 3px;
 }
 
-.positive-momentum-card .momentum-score .stat-value {
-  font-size: 1.3rem;
+.positive-momentum-card .score-value {
+  font-size: 1.1rem;
   font-weight: 700;
-  color: #16a34a;
   line-height: 1;
 }
 
-.positive-momentum-card .momentum-score .stat-label {
-  font-size: 0.7rem;
+.positive-momentum-card .score-label {
+  font-size: 0.65rem;
   color: #666;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-top: 2px;
 }
 
-.positive-momentum-card .momentum-level {
-  margin-top: 4px;
+.positive-momentum-card .factor-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* Momentum badge overlay positioned in top-right */
+.positive-momentum-card .momentum-badge-overlay {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 10;
 }
 
 .positive-momentum-card .momentum-badge {
-  font-size: 0.8rem;
+  font-size: 0.65rem;
   font-weight: 600;
   padding: 2px 6px;
-  border-radius: 12px;
-  background-color: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 10px;
+  background-color: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.4);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 2px 4px rgba(34, 197, 94, 0.2);
 }
 
-/* Momentum factors styling */
-.positive-momentum-card .momentum-factors {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  min-width: 120px;
-  font-size: 0.85rem;
-}
-
+/* Factor info styling */
 .positive-momentum-card .factor-count {
   color: #16a34a;
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
 .positive-momentum-card .top-factor {
   color: #666;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   text-transform: capitalize;
   line-height: 1.2;
-  max-width: 120px;
+  max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -286,9 +296,9 @@
 
 /* Tooltip trigger button */
 .positive-momentum-card .tooltip-trigger {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-  border: none;
-  border-radius: 50%;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 6px;
   width: 32px;
   height: 32px;
   display: flex;
@@ -297,13 +307,16 @@
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(34, 197, 94, 0.2);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  position: relative;
+  z-index: 15;
+  flex-shrink: 0;
 }
 
 .positive-momentum-card .tooltip-trigger:hover {
+  background: rgba(34, 197, 94, 0.2);
   transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(34, 197, 94, 0.3);
-  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
 }
 
 /* Card subtitle styling */
@@ -331,6 +344,28 @@
   font-style: italic;
 }
 
+/* Compact layout for medium screens */
+@media (max-width: 1024px) {
+  .positive-momentum-card .factor-info {
+    max-width: 70px;
+    min-width: 60px;
+  }
+  
+  .positive-momentum-card .momentum-details {
+    max-width: 70px;
+    min-width: 60px;
+  }
+  
+  .positive-momentum-card .top-factor {
+    max-width: 65px;
+    font-size: 0.65rem;
+  }
+  
+  .positive-momentum-card .momentum-item {
+    gap: 6px;
+  }
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .positive-momentum-card {
@@ -351,20 +386,20 @@
   }
   
   .positive-momentum-card .momentum-item {
-    grid-template-columns: 50px 1fr auto auto;
     gap: 8px;
     padding: 10px 6px;
   }
   
-  .positive-momentum-card .momentum-factors {
+  .positive-momentum-card .factor-info {
     display: none;
   }
   
-  .positive-momentum-card .momentum-stats {
-    min-width: 70px;
+  .positive-momentum-card .momentum-details {
+    min-width: 60px;
+    max-width: 70px;
   }
   
-  .positive-momentum-card .momentum-score .stat-value {
+  .positive-momentum-card .score-value {
     font-size: 1.1rem;
   }
   
@@ -386,11 +421,14 @@
 
 @media (max-width: 480px) {
   .positive-momentum-card .momentum-item {
-    grid-template-columns: 40px 1fr auto;
     gap: 6px;
   }
   
-  .positive-momentum-card .momentum-level {
+  .positive-momentum-card .momentum-badge-overlay {
+    display: none;
+  }
+  
+  .positive-momentum-card .factor-info {
     display: none;
   }
 }

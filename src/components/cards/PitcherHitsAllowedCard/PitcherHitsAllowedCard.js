@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import useTeamFilteredData from '../../useTeamFilter';
-import { fetchPlayerDataForDateRange, fetchGameData } from '../../../services/dataService';
+import { fetchPlayerData, fetchGameData } from '../../../services/dataService';
 import { useTooltip } from '../../utils/TooltipContext';
 import { createSafeId } from '../../utils/tooltipUtils';
 import { debugLog } from '../../../utils/debugConfig';
@@ -26,12 +26,33 @@ const PitcherHitsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
       try {
         debugLog.log('CARDS', '[PitcherHitsAllowedCard] Starting pitcher hits analysis...');
         
-        // Fetch historical data for last 90 days
-        const startDate = new Date(currentDate);
-        const daysToLookBack = 90;
+        // Load ALL season data by manually iterating through all available dates
+        const seasonData = {};
+        const months = ['march', 'april', 'may', 'june'];
         
-        const dateRangeData = await fetchPlayerDataForDateRange(startDate, daysToLookBack);
-        const dateKeys = Object.keys(dateRangeData).sort();
+        for (const month of months) {
+          // Try to load all days from each month
+          for (let day = 1; day <= 31; day++) {
+            try {
+              const testDate = new Date(2025, months.indexOf(month) + 2, day); // +2 because march=2
+              if (testDate.getMonth() !== months.indexOf(month) + 2) continue; // Invalid date
+              if (testDate >= new Date(currentDate)) break; // Don't load future dates
+              
+              const dateStr = testDate.toISOString().split('T')[0];
+              const playerData = await fetchPlayerData(dateStr);
+              
+              if (playerData && playerData.length > 0) {
+                seasonData[dateStr] = { players: playerData, date: dateStr };
+                debugLog.log('CARDS', `[PitcherHitsAllowedCard] Loaded data for ${dateStr}`);
+              }
+            } catch (error) {
+              // Date doesn't exist, continue
+            }
+          }
+        }
+        
+        const dateKeys = Object.keys(seasonData).sort();
+        debugLog.log('CARDS', `[PitcherHitsAllowedCard] Loaded complete season data: ${dateKeys.length} dates from ${dateKeys[0]} to ${dateKeys[dateKeys.length - 1]}`);
         
         if (dateKeys.length === 0) {
           console.warn('[PitcherHitsAllowedCard] No historical data found');
@@ -56,7 +77,7 @@ const PitcherHitsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
         
         // Process each date
         for (const dateKey of dateKeys) {
-          const playersForDate = dateRangeData[dateKey];
+          const playersForDate = seasonData[dateKey].players;
           
           // Get game data for this date to determine home/away
           let gameDataForDate = [];

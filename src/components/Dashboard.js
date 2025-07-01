@@ -8,6 +8,7 @@ import { useTeamFilter } from './TeamFilterContext';
 
 // Import theme context for Dashboard-specific theming
 import { useTheme } from '../contexts/ThemeContext';
+import { HandednessProvider } from '../contexts/HandednessContext';
 import ThemeToggle from './ThemeToggle';
 
 // Import tooltip system
@@ -39,6 +40,9 @@ import PitcherHitsAllowedCard from './cards/PitcherHitsAllowedCard/PitcherHitsAl
 import SlotMachineCard from './cards/SlotMachineCard/SlotMachineCard';
 import HellraiserCard from './cards/HellraiserCard';
 import BarrelMatchupCard from './cards/BarrelMatchupCard';
+import LaunchAngleMastersCard from './cards/LaunchAngleMastersCard';
+import StrategicIntelligenceCard from './cards/StrategicIntelligenceCard';
+
 
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
 import MLBWeatherCard from './cards/MLBWeatherCard/MLBWeatherCard';
@@ -168,6 +172,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     if (dayOfWeekHits) {
       populateSlotMachineData();
     }
+    
   }, [dayOfWeekHits]);
 
   // Helper function to generate comprehensive team-specific stats
@@ -212,12 +217,24 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
       const day = String(currentDate.getDate()).padStart(2, '0');
       const dateStr = `${year}-${month}-${day}`;
       
-      // Try to load the specific date file first
-      let response = await fetch(`/data/predictions/poor_performance_predictions_${dateStr}.json`);
+      // Try to load the specific date file first (new Python-generated files)
+      let response = await fetch(`/data/predictions/poor_performance_risks_${dateStr}.json`, {
+        cache: 'no-cache',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       
       // If not found, try to load the latest predictions
       if (!response.ok) {
-        response = await fetch('/data/predictions/poor_performance_predictions_latest.json');
+        response = await fetch(`/data/predictions/poor_performance_risks_latest.json`, {
+          cache: 'no-cache',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        });
       }
       
       if (!response.ok) {
@@ -1272,9 +1289,31 @@ const noFilteredData = isFiltering &&
             teams={teamData} 
           />
 
-          {/* Barrel Matchup Analysis Card - Full width */}
+          {/* Handedness-shared Analysis Cards - Full width */}
+          <HandednessProvider>
+            {/* Barrel Matchup Analysis Card - Full width */}
+            <div style={{ gridColumn: '1 / -1' }}>
+              <BarrelMatchupCard currentDate={currentDate} />
+            </div>
+
+            {/* Launch Angle Masters Card - Full width */}
+            <div style={{ gridColumn: '1 / -1' }}>
+              <LaunchAngleMastersCard currentDate={currentDate} />
+            </div>
+          </HandednessProvider>
+
+          {/* Strategic Intelligence Card - Full width */}
           <div style={{ gridColumn: '1 / -1' }}>
-            <BarrelMatchupCard currentDate={currentDate} />
+            <StrategicIntelligenceCard 
+              currentDate={currentDate}
+              playerData={playersWithHomeRunPrediction}
+              gameData={gameData}
+              teamData={teamData}
+              rollingStats={rollingStats}
+              topPerformers={topPerformers}
+              poorPerformancePredictions={poorPerformancePredictions}
+              positiveMomentumPredictions={positiveMomentumPredictions}
+            />
           </div>
           
           {/* Row 4: Top Hitters, HR Leaders, Recent Homers */}
