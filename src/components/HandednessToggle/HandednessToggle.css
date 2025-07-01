@@ -1,0 +1,110 @@
+.handedness-toggle {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toggle-label {
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.toggle-options {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.25rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toggle-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #b0b8c4;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-width: 80px;
+  justify-content: center;
+}
+
+.toggle-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.toggle-option.active {
+  background: #f7931e;
+  color: #000000;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(247, 147, 30, 0.3);
+}
+
+.toggle-option.active:hover {
+  background: #ff9d33;
+  color: #000000;
+}
+
+.option-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.option-label {
+  font-size: 0.85rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .handedness-toggle {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0.5rem;
+  }
+  
+  .toggle-label {
+    text-align: center;
+    font-size: 0.85rem;
+  }
+  
+  .toggle-options {
+    justify-content: center;
+  }
+  
+  .toggle-option {
+    flex: 1;
+    min-width: 70px;
+    padding: 0.6rem 0.5rem;
+  }
+  
+  .option-label {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .toggle-option {
+    padding: 0.5rem 0.25rem;
+    min-width: 60px;
+  }
+  
+  .option-label {
+    font-size: 0.75rem;
+  }
+}

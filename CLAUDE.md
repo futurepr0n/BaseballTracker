@@ -33,6 +33,32 @@ node src/services/generatePitcherMatchups.js
 ./daily_update.sh [YYYY-MM-DD]
 ```
 
+**Handedness Data Setup (One-time or when CSV files updated):**
+```bash
+# Convert handedness CSV files to JSON for real-time performance
+# Run this whenever you get new bat-tracking CSV files
+node scripts/convertHandednessData.js
+
+# This creates/updates:
+# - public/data/handedness/rhp.json
+# - public/data/handedness/lhp.json  
+# - public/data/handedness/all.json (weighted averages)
+```
+
+**Required CSV Files for Handedness System:**
+- `bat-tracking-swing-path-RHP.csv` - Right-handed pitcher data
+- `bat-tracking-swing-path-LHP.csv` - Left-handed pitcher data  
+- `bat-tracking-swing-path-all.csv` - Combined/weighted data
+
+**Daily Handedness Data Update:**
+```bash
+# If you have new CSV files, convert them:
+node scripts/convertHandednessData.js
+
+# The system automatically loads JSON files for real-time switching
+# No server restart needed after conversion
+```
+
 **Rolling stats generation:**
 ```bash
 ./generate_rolling_stats.sh
@@ -89,6 +115,16 @@ node src/services/generatePitcherMatchups.js
 - **Team Performance Metrics**: Runs/game, hits/game, HRs/game, momentum analysis, hot/cold players, key trends identification
 - **Strategic Intelligence**: Target scoring with confidence levels, risk assessment, pitcher vulnerability analysis with explanatory context
 - **Data Integration**: Uses `fetchPlayerData()` from dataService for historical game analysis across multiple dates
+
+**Handedness Analysis System (Launch Angle Masters & Barrel Analysis):**
+- **Real-time Handedness Toggle**: Switch between ALL/RHP/LHP data instantly without page reload
+- **Shared Context**: Launch Angle Masters and Barrel Analysis cards synchronize handedness selection
+- **Enhanced Swing Metrics**: Attack angle, bat speed, swing path optimization specific to pitcher handedness
+- **Weighted Averages**: ALL combines RHP/LHP data using competitive swing counts as weights
+- **Data Sources**: CSV conversion to JSON for optimal performance (`convertHandednessData.js`)
+- **Player Name Matching**: Intelligent matching between "Cal Raleigh" and "Raleigh, Cal" formats
+- **SwingScore Precision**: Rounded to 1 decimal place for readability
+- **Performance Context**: Shows data source (handedness type + swing count) for transparency
 
 **Enhanced Tooltip System (Updated):**
 - **Poor Performance Card**: Updated tooltip to match PositiveMomentumCard style with enhanced game-by-game table

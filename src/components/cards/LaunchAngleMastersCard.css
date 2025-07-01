@@ -6,9 +6,28 @@
 
 .launch-angle-masters-card .glass-header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
   padding: 16px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 20px;
+}
+
+.launch-angle-masters-card .header-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.launch-angle-masters-card .masters-handedness-toggle {
+  flex-shrink: 0;
+}
+
+.launch-angle-masters-card .data-source {
+  font-size: 0.75em;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  display: block;
 }
 
 .launch-angle-masters-card h3 {
@@ -456,3 +475,20 @@
     border-width: 3px;
   }
 }
+
+/* Handedness toggle mobile adjustments */
+@media (max-width: 768px) {
+  .launch-angle-masters-card .glass-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .launch-angle-masters-card .masters-handedness-toggle {
+    width: 100%;
+  }
+  
+  .launch-angle-masters-card .card-subtitle {
+    font-size: 0.75em;
+  }
+}
+

@@ -8,6 +8,7 @@ import { useTeamFilter } from './TeamFilterContext';
 
 // Import theme context for Dashboard-specific theming
 import { useTheme } from '../contexts/ThemeContext';
+import { HandednessProvider } from '../contexts/HandednessContext';
 import ThemeToggle from './ThemeToggle';
 
 // Import tooltip system
@@ -1288,15 +1289,18 @@ const noFilteredData = isFiltering &&
             teams={teamData} 
           />
 
-          {/* Barrel Matchup Analysis Card - Full width */}
-          <div style={{ gridColumn: '1 / -1' }}>
-            <BarrelMatchupCard currentDate={currentDate} />
-          </div>
+          {/* Handedness-shared Analysis Cards - Full width */}
+          <HandednessProvider>
+            {/* Barrel Matchup Analysis Card - Full width */}
+            <div style={{ gridColumn: '1 / -1' }}>
+              <BarrelMatchupCard currentDate={currentDate} />
+            </div>
 
-          {/* Launch Angle Masters Card - Full width */}
-          <div style={{ gridColumn: '1 / -1' }}>
-            <LaunchAngleMastersCard currentDate={currentDate} />
-          </div>
+            {/* Launch Angle Masters Card - Full width */}
+            <div style={{ gridColumn: '1 / -1' }}>
+              <LaunchAngleMastersCard currentDate={currentDate} />
+            </div>
+          </HandednessProvider>
 
           {/* Strategic Intelligence Card - Full width */}
           <div style={{ gridColumn: '1 / -1' }}>

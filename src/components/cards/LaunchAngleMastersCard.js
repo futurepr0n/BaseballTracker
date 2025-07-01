@@ -2,8 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import hellraiserAnalysisService from '../../services/hellraiserAnalysisService';
 import { useTeamFilter } from '../TeamFilterContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useHandedness } from '../../contexts/HandednessContext';
 import GlassCard, { GlassScrollableContainer } from './GlassCard/GlassCard';
 import { getPlayerDisplayName, getTeamDisplayName } from '../../utils/playerNameUtils';
+import HandednessToggle from '../HandednessToggle/HandednessToggle';
 import './LaunchAngleMastersCard.css';
 
 const LaunchAngleMastersCard = ({ currentDate }) => {
@@ -15,6 +17,7 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
   
   const { selectedTeam, includeMatchup, matchupTeam } = useTeamFilter();
   const { themeMode } = useTheme();
+  const { selectedHandedness, setSelectedHandedness, getPlayerHandednessData, loadHandednessDatasets } = useHandedness();
 
   const loadLaunchAngleMasters = useCallback(async () => {
     try {
@@ -56,24 +59,42 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
     } finally {
       setLoading(false);
     }
-  }, [currentDate, selectedTeam, includeMatchup, matchupTeam]);
+  }, [currentDate, selectedTeam, includeMatchup, matchupTeam, selectedHandedness]);
+
+  useEffect(() => {
+    loadHandednessDatasets();
+  }, [loadHandednessDatasets]);
 
   useEffect(() => {
     loadLaunchAngleMasters();
-  }, [loadLaunchAngleMasters]);
+  }, [loadLaunchAngleMasters, selectedHandedness]);
 
   const processLaunchAngleMasters = (picks) => {
     if (!picks || !Array.isArray(picks)) return [];
 
-    // Filter picks that have swing path data
-    const playersWithSwingData = picks.filter(pick => 
-      pick.swing_bat_speed && 
-      pick.swing_attack_angle !== undefined && 
-      pick.swing_optimization_score !== undefined
-    );
+    // Filter picks that have swing path data OR handedness data
+    const playersWithSwingData = picks.filter(pick => {
+      // First check hellraiser swing data
+      if (pick.swing_bat_speed && 
+          pick.swing_attack_angle !== undefined && 
+          pick.swing_optimization_score !== undefined) {
+        return true;
+      }
+      
+      // Then check if player has handedness data
+      const playerName = pick.player_name || pick.playerName || '';
+      const handednessData = getPlayerHandednessData(playerName);
+      return !!handednessData;
+      
+      return false;
+    });
 
     // Calculate comprehensive master score for each player
     const mastersData = playersWithSwingData.map(pick => {
+      // Get handedness-specific data if available
+      const playerName = pick.player_name || pick.playerName || '';
+      const handednessData = getPlayerHandednessData(playerName);
+
       // Extract metrics from reasoning for barrel/exit velocity analysis
       const reasoning = pick.reasoning || '';
       
@@ -178,12 +199,24 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
       // Total: Attack Angle (35%) + Swing Path (25%) + Bat Speed (20%) + Exit Velo (10%) + Barrel Rate (10%) = 100%
       let masterScore = 0;
       
+      // Use handedness data if available, otherwise fallback to hellraiser data
+      let swingScore, attackAngle, batSpeed;
+      if (handednessData) {
+        // Use handedness-specific CSV data
+        swingScore = (handednessData.ideal_attack_angle_rate || 0) * 100; // Convert to 0-100 scale
+        attackAngle = handednessData.attack_angle || 0;
+        batSpeed = handednessData.avg_bat_speed || 0;
+      } else {
+        // Fallback to hellraiser data
+        swingScore = pick.swing_optimization_score || 0;
+        attackAngle = pick.swing_attack_angle || 0;
+        batSpeed = pick.swing_bat_speed || 0;
+      }
+      
       // Swing Path Optimization (25% weight) - supporting factor
-      const swingScore = pick.swing_optimization_score || 0;
       masterScore += (swingScore * 0.25);
       
       // Attack Angle Optimization (35% weight) - PRIMARY FACTOR for Launch Angle Masters
-      const attackAngle = pick.swing_attack_angle || 0;
       let angleScore = 0;
       if (attackAngle >= 8 && attackAngle <= 17) {
         angleScore = 100; // Sweet spot - optimal home run range
@@ -201,7 +234,7 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
       masterScore += (angleScore * 0.35);
       
       // Bat Speed Quality (20% weight) - Important for launch angle success
-      const batSpeed = pick.swing_bat_speed || 0;
+      // batSpeed is already defined above based on handedness data or hellraiser fallback
       let speedScore = 0;
       if (batSpeed >= 75) speedScore = 100; // Elite
       else if (batSpeed >= 72) speedScore = 85; // Strong
@@ -257,16 +290,18 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
         classification,
         badge,
         metrics: {
-          swingOptimization: swingScore,
+          swingOptimization: Math.round(swingScore * 10) / 10, // Round to 1 decimal
           attackAngle: attackAngle,
           batSpeed: batSpeed,
-          idealRate: pick.swing_ideal_rate || 0,
+          idealRate: handednessData ? (handednessData.ideal_attack_angle_rate || 0) : (pick.swing_ideal_rate || 0),
           playerExitVelocity,
           playerBarrelRate,
           playerHardContact,
           pitcherContactAllowed,
           pitcherBarrelVulnerable
-        }
+        },
+        dataSource: handednessData ? `handedness_${selectedHandedness}` : 'hellraiser',
+        competitiveSwings: handednessData ? handednessData.competitive_swings : null
       };
     });
 
@@ -439,8 +474,19 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
       variant={themeMode === 'glass' ? 'glass' : 'default'}
     >
       <div className="glass-header">
-        <h3>🚀 Launch Angle Masters</h3>
-        <span className="card-subtitle">Top 25 optimal swing path combinations • Click headers to sort</span>
+        <div className="header-content">
+          <h3>🚀 Launch Angle Masters</h3>
+          <span className="card-subtitle">
+            Top 25 optimal swing path combinations 
+            {selectedHandedness === 'ALL' ? ' • Combined data' : ` • vs ${selectedHandedness} data`}
+            • Click headers to sort
+          </span>
+        </div>
+        <HandednessToggle 
+          selectedHandedness={selectedHandedness}
+          onHandednessChange={setSelectedHandedness}
+          className="masters-handedness-toggle"
+        />
       </div>
 
       <GlassScrollableContainer className="masters-container">
@@ -495,6 +541,12 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
                       <span className="player-name">{getPlayerDisplayName(player)}</span>
                       <span className="team-info">{getTeamDisplayName(player)} vs {player.pitcher}</span>
                       <span className="classification">{player.classification}</span>
+                      <span className="data-source" title={`Data source: ${player.dataSource}`}>
+                        {player.dataSource.startsWith('handedness') ? 
+                          `⚾ ${selectedHandedness}${player.competitiveSwings ? ` (${player.competitiveSwings} swings)` : ''}` : 
+                          '📊 Hellraiser'
+                        }
+                      </span>
                     </div>
                   </td>
                   <td 

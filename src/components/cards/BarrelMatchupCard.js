@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import hellraiserAnalysisService from '../../services/hellraiserAnalysisService';
 import { useTeamFilter } from '../TeamFilterContext';
+import { useHandedness } from '../../contexts/HandednessContext';
 import GlassCard, { GlassScrollableContainer } from './GlassCard/GlassCard';
 import { getPlayerDisplayName, getTeamDisplayName } from '../../utils/playerNameUtils';
 import './BarrelMatchupCard.css';
@@ -12,6 +13,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
   const [sortConfig, setSortConfig] = useState({ key: 'pitcherContactAllowed', direction: 'desc' });
   const [expandedRows, setExpandedRows] = useState({});
   const { selectedTeam, includeMatchup, matchupTeam } = useTeamFilter();
+  const { selectedHandedness, getPlayerHandednessData, loadHandednessDatasets } = useHandedness();
 
   const loadBarrelAnalysis = useCallback(async () => {
     try {
@@ -49,11 +51,15 @@ const BarrelMatchupCard = ({ currentDate }) => {
     } finally {
       setLoading(false);
     }
-  }, [currentDate, selectedTeam, includeMatchup, matchupTeam]);
+  }, [currentDate, selectedTeam, includeMatchup, matchupTeam, selectedHandedness]);
+
+  useEffect(() => {
+    loadHandednessDatasets();
+  }, [loadHandednessDatasets]);
 
   useEffect(() => {
     loadBarrelAnalysis();
-  }, [loadBarrelAnalysis]);
+  }, [loadBarrelAnalysis, selectedHandedness]);
 
   const processAnalysisData = (analysis) => {
     // Extract pitcher metrics from reasoning field
@@ -91,12 +97,18 @@ const BarrelMatchupCard = ({ currentDate }) => {
       // Calculate market edge value for sorting
       const marketEdge = pick.marketEfficiency?.edge || 0;
       
-      // Swing path data should come from the hellraiser analysis JSON
+      // Get handedness-specific swing data if available, otherwise fallback to hellraiser data
+      const playerName = pick.player_name || pick.playerName || '';
+      const handednessData = getPlayerHandednessData(playerName);
+      
       const swingPath = {
-        avgBatSpeed: pick.swing_bat_speed || null,
-        attackAngle: pick.swing_attack_angle || null,
-        swingOptimizationScore: pick.swing_optimization_score || null,
-        idealAttackAngleRate: pick.swing_ideal_rate || null
+        avgBatSpeed: handednessData ? handednessData.avg_bat_speed : (pick.swing_bat_speed || null),
+        attackAngle: handednessData ? handednessData.attack_angle : (pick.swing_attack_angle || null),
+        swingOptimizationScore: handednessData ? 
+          Math.round(((handednessData.ideal_attack_angle_rate || 0) * 100) * 10) / 10 : // Round to 1 decimal
+          (pick.swing_optimization_score || null),
+        idealAttackAngleRate: handednessData ? handednessData.ideal_attack_angle_rate : (pick.swing_ideal_rate || null),
+        dataSource: handednessData ? `handedness_${selectedHandedness}` : 'hellraiser'
       };
       
       return {
