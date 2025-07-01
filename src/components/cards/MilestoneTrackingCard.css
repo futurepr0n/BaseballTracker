@@ -1,0 +1,420 @@
+.milestone-tracking-card {
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.milestone-tracking-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--border-color, #eee);
+}
+
+.milestone-tracking-card .card-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text-primary, #333);
+}
+
+.header-stats {
+  display: flex;
+  gap: 12px;
+}
+
+.stat-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.stat-badge.blazing {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef5350;
+}
+
+.stat-badge.hot {
+  background: #fff3e0;
+  color: #e65100;
+  border: 1px solid #ff9800;
+}
+
+.stat-badge.warm {
+  background: #fff8e1;
+  color: #f57f17;
+  border: 1px solid #ffc107;
+}
+
+.filters-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-group label {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #666);
+  font-weight: 600;
+}
+
+.filter-group select {
+  padding: 6px 12px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 6px;
+  background: var(--input-bg, #fff);
+  color: var(--text-primary, #333);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.tonight-watch {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffebee 100%);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid #ff9800;
+}
+
+.tonight-watch h4 {
+  margin: 0 0 12px 0;
+  color: #e65100;
+  font-size: 1.1rem;
+}
+
+.tonight-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tonight-player {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  color: #333;
+  border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.more-count {
+  background: rgba(255, 152, 0, 0.2);
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  color: #e65100;
+  font-weight: 600;
+}
+
+.milestones-container {
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.milestones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.milestone-item {
+  background: var(--item-bg, #f8f9fa);
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  transition: all 0.2s ease;
+}
+
+.milestone-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.milestone-item.heat-blazing {
+  background: linear-gradient(135deg, #ffebee 0%, #fff5f5 100%);
+  border-color: #ef5350;
+}
+
+.milestone-item.heat-hot {
+  background: linear-gradient(135deg, #fff3e0 0%, #fff8f1 100%);
+  border-color: #ff9800;
+}
+
+.milestone-item.heat-warm {
+  background: linear-gradient(135deg, #fff8e1 0%, #fffbf0 100%);
+  border-color: #ffc107;
+}
+
+.milestone-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.heat-emoji {
+  font-size: 1.2rem;
+}
+
+.player-name {
+  font-weight: 700;
+  color: var(--text-primary, #333);
+  font-size: 1rem;
+}
+
+.team {
+  color: var(--text-secondary, #666);
+  font-size: 0.875rem;
+}
+
+.milestone-target {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.milestone-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.timeline-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.timeline-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #666);
+}
+
+.timeline-value {
+  font-weight: 600;
+  color: var(--text-primary, #333);
+}
+
+.confidence {
+  margin-left: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #666);
+  font-weight: normal;
+}
+
+.timeline-comparison {
+  display: flex;
+  gap: 20px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 6px;
+}
+
+.pace-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pace-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #666);
+}
+
+.pace-value {
+  font-weight: 600;
+  color: var(--text-primary, #333);
+  font-size: 0.875rem;
+}
+
+.trend {
+  margin-left: 6px;
+  font-size: 0.8rem;
+}
+
+.milestone-alerts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.alert-badge {
+  background: rgba(33, 150, 243, 0.1);
+  color: #1565c0;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(33, 150, 243, 0.2);
+}
+
+.milestone-momentum {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #666);
+}
+
+.momentum-indicator {
+  font-weight: 600;
+  color: #4caf50;
+}
+
+.recent-performance {
+  font-weight: 500;
+}
+
+.more-milestones {
+  text-align: center;
+  padding: 16px;
+  color: var(--text-secondary, #666);
+  font-style: italic;
+}
+
+.hottest-players {
+  margin-top: 20px;
+  padding: 16px;
+  background: var(--item-bg, #f8f9fa);
+  border-radius: 8px;
+}
+
+.hottest-players h4 {
+  margin: 0 0 12px 0;
+  color: var(--text-primary, #333);
+  font-size: 1rem;
+}
+
+.hot-players-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hot-player {
+  background: linear-gradient(135deg, #ffebee 0%, #fff3e0 100%);
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #d84315;
+  border: 1px solid #ff7043;
+}
+
+.card-footer {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color, #eee);
+  text-align: right;
+  color: var(--text-secondary, #666);
+}
+
+.loading-state,
+.error-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary, #666);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-color, #eee);
+  border-top: 3px solid var(--primary-color, #2196f3);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .milestone-tracking-card {
+    padding: 16px;
+  }
+  
+  .filters-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+  
+  .filter-group select {
+    width: 100%;
+  }
+  
+  .milestone-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .timeline-comparison {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .milestone-momentum {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .milestone-tracking-card {
+    background: #1e1e1e;
+    color: #e0e0e0;
+  }
+  
+  .filter-group select {
+    background: #2a2a2a;
+    border-color: #444;
+    color: #e0e0e0;
+  }
+  
+  .milestone-item {
+    background: #2a2a2a;
+    border-color: #444;
+  }
+  
+  .milestone-item.heat-blazing {
+    background: linear-gradient(135deg, rgba(255, 235, 238, 0.1) 0%, rgba(255, 245, 245, 0.05) 100%);
+  }
+  
+  .milestone-item.heat-hot {
+    background: linear-gradient(135deg, rgba(255, 243, 224, 0.1) 0%, rgba(255, 248, 241, 0.05) 100%);
+  }
+  
+  .milestone-item.heat-warm {
+    background: linear-gradient(135deg, rgba(255, 248, 225, 0.1) 0%, rgba(255, 251, 240, 0.05) 100%);
+  }
+}
