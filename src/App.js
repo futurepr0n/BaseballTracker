@@ -94,7 +94,7 @@ function App() {
                   <a href="https://x.com/capping_pro" target="_blank" rel="noopener noreferrer" aria-label="Capping.Pro on X">
                     <img src="/data/logos/x_logo_icon.svg" alt="X (formerly Twitter) Logo" />
                   </a>
-                  <a href="https://discord.gg/K3djWdDU" target="_blank" rel="noopener noreferrer" aria-label="Capping.Pro Discord Server">
+                  <a href="https://discord.gg/YYSWGcWnZm" target="_blank" rel="noopener noreferrer" aria-label="Capping.Pro Discord Server">
                     <img src="/data/logos/discord_icon.svg" alt="Discord Logo" />
                   </a>
                 </div>

@@ -30,7 +30,8 @@
         "test": "react-scripts test",
         "eject": "react-scripts eject",
         "generate-schedule": "node src/services/scheduleGenerator.js",
-        "convert-handedness": "node scripts/convertHandednessData.js"
+        "convert-handedness": "node scripts/convertHandednessData.js",
+        "generate-milestones": "node src/services/generateMilestoneTracking.js"
     },
     "eslintConfig": {
         "extends": [

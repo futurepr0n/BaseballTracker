@@ -28,6 +28,7 @@ node src/services/scheduleGenerator.js
 # 3. Generate additional analysis files
 node src/services/generateAdditionalStats.js
 node src/services/generatePitcherMatchups.js
+npm run generate-milestones
 
 # 4. Run daily update (generates predictions)
 ./daily_update.sh [YYYY-MM-DD]
@@ -64,6 +65,15 @@ npm run convert-handedness
 - **Input**: CSV files are read from `public/data/stats/`
 - **Output**: JSON files are created in `public/data/handedness/`
 - **Never place CSV files in project root** - they belong in the stats directory
+
+**Milestone tracking generation:**
+```bash
+# Generate milestone tracking data (scans all 2025 season files)
+npm run generate-milestones
+
+# Creates milestone_tracking_YYYY-MM-DD.json and milestone_tracking_latest.json
+# Run this daily after processing new game data
+```
 
 **Rolling stats generation:**
 ```bash
@@ -131,6 +141,15 @@ npm run convert-handedness
 - **Player Name Matching**: Intelligent matching between "Cal Raleigh" and "Raleigh, Cal" formats
 - **SwingScore Precision**: Rounded to 1 decimal place for readability
 - **Performance Context**: Shows data source (handedness type + swing count) for transparency
+
+**Milestone Tracking System (Seasonal Achievement Alerts):**
+- **Heat Level Detection**: X7/X8/X9 proximity alerts with escalating urgency (🔥 Warm → 🔥🔥 Hot → 🔥🔥🔥 Blazing)
+- **Multi-Category Tracking**: HR milestones every 5, H/RBI/R milestones every 10 (5→10→15 for HRs, 10→20→30 for others)
+- **Dual Timeline Analysis**: Season pace vs recent 3-game form with confidence scoring
+- **Smart Alerts**: "Tonight's the Night" predictions, weekend potential, momentum indicators
+- **Strategic Intelligence**: 692 milestone candidates tracked with urgency scoring and best-estimate timelines
+- **Dynamic Filtering**: Filter by heat level, stat category, and sort by urgency/timeline/player name
+- **Performance Momentum**: Percentage above season average and recent form trends (🚀 SURGING, 📈 RISING, ❄️ COLD)
 
 **Enhanced Tooltip System (Updated):**
 - **Poor Performance Card**: Updated tooltip to match PositiveMomentumCard style with enhanced game-by-game table
