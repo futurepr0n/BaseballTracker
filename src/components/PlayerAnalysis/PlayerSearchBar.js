@@ -56,30 +56,65 @@ const PlayerSearchBar = ({ onPlayerSelect, currentDate }) => {
         console.log(`✅ Loaded rolling stats with ${rollingData.totalPlayers} players`);
         
         if (rollingData.allHitters && rollingData.allHitters.length > 0) {
-          const playersList = rollingData.allHitters.map(player => ({
-            name: player.name,
-            team: player.team,
-            lastSeen: currentDateStr, // Current as of rolling stats generation
-            position: 'OF', // Rolling stats don't include position
-            recentStats: {
-              AVG: player.avg || player.battingAvg || '.000',
-              HR: player.HR || player.totalHRs || 0,
-              RBI: player.RBI || player.totalRBIs || 0
-            },
-            // Store full season stats for display
-            seasonStats: {
-              H: player.H || player.totalHits || 0,
-              AB: player.AB || player.totalABs || 0,
-              games: player.games || player.gamesPlayed || 0,
-              R: player.R || player.totalRuns || 0,
-              HR: player.HR || player.totalHRs || 0,
-              RBI: player.RBI || player.totalRBIs || 0,
-              AVG: player.avg || player.battingAvg || '.000',
-              OBP: player.obp || '.000',
-              SLG: player.slg || '.000',
-              OPS: player.ops || '.000'
+          // Helper function to merge player data from multiple sections
+          const mergePlayerData = (hitterData) => {
+            let mergedStats = { ...hitterData };
+            
+            // Merge HR data from allHRLeaders section
+            if (rollingData.allHRLeaders) {
+              const hrData = rollingData.allHRLeaders.find(p => 
+                p.name === hitterData.name && p.team === hitterData.team
+              );
+              if (hrData) {
+                mergedStats.HR = hrData.HR;
+                mergedStats.hrsPerGame = hrData.hrsPerGame;
+              }
             }
-          })).sort((a, b) => a.name.localeCompare(b.name));
+            
+            // Merge additional stats from allPlayerStats if available
+            if (rollingData.allPlayerStats) {
+              const playerData = rollingData.allPlayerStats.find(p =>
+                p.name === hitterData.name && p.team === hitterData.team
+              );
+              if (playerData) {
+                mergedStats.totalHRs = playerData.totalHRs;
+                mergedStats.totalHits = playerData.totalHits;
+                mergedStats.totalRBIs = playerData.totalRBIs;
+              }
+            }
+            
+            return mergedStats;
+          };
+
+          const playersList = rollingData.allHitters.map(player => {
+            const mergedPlayer = mergePlayerData(player);
+            
+            return {
+              name: mergedPlayer.name,
+              team: mergedPlayer.team,
+              lastSeen: currentDateStr, // Current as of rolling stats generation
+              position: 'OF', // Rolling stats don't include position
+              recentStats: {
+                AVG: mergedPlayer.avg || mergedPlayer.battingAvg || '.000',
+                HR: mergedPlayer.HR || mergedPlayer.totalHRs || 0,
+                RBI: mergedPlayer.RBI || mergedPlayer.totalRBIs || 0,
+                H: mergedPlayer.H || mergedPlayer.totalHits || 0
+              },
+              // Store full season stats for display
+              seasonStats: {
+                H: mergedPlayer.H || mergedPlayer.totalHits || 0,
+                AB: mergedPlayer.AB || mergedPlayer.totalABs || 0,
+                games: mergedPlayer.games || mergedPlayer.gamesPlayed || 0,
+                R: mergedPlayer.R || mergedPlayer.totalRuns || 0,
+                HR: mergedPlayer.HR || mergedPlayer.totalHRs || 0,
+                RBI: mergedPlayer.RBI || mergedPlayer.totalRBIs || 0,
+                AVG: mergedPlayer.avg || mergedPlayer.battingAvg || '.000',
+                OBP: mergedPlayer.obp || '.000',
+                SLG: mergedPlayer.slg || '.000',
+                OPS: mergedPlayer.ops || '.000'
+              }
+            };
+          }).sort((a, b) => a.name.localeCompare(b.name));
           
           setAllPlayers(playersList);
           setDaysWithData(rollingData.totalPlayers > 0 ? 84 : 0); // Approximate season games
@@ -278,6 +313,7 @@ const PlayerSearchBar = ({ onPlayerSelect, currentDate }) => {
                     <span className="position">{player.position}</span>
                     <span className="recent-stats">
                       AVG: {player.recentStats.AVG} | 
+                      H: {player.recentStats.H} | 
                       HR: {player.recentStats.HR} | 
                       RBI: {player.recentStats.RBI}
                     </span>
