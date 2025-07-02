@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { fetchPlayerData, fetchPlayerDataForDateRange } from '../services/dataService';
+import { fetchPlayerData, fetchPlayerDataForDateRange, fetchFullSeasonPlayerData } from '../services/dataService';
 import { 
   calculatePropAnalysis, 
+  calculateEnhancedPropAnalysis,
   calculateAdvancedMetrics, 
   calculateMatchupStatistics,
   calculateTeamContext,
@@ -9,6 +10,7 @@ import {
   findPitcherMatchup
 } from '../services/playerAnalysisService';
 import { getPlayerRollingStats, getPlayerLastSeen, getPlayer2024Stats } from '../services/rollingStatsService';
+import { loadHandednessData } from '../services/handednessService';
 import PlayerSearchBar from './PlayerAnalysis/PlayerSearchBar';
 import PlayerProfileHeader from './PlayerAnalysis/PlayerProfileHeader';
 import MatchupAnalysis from './PlayerAnalysis/MatchupAnalysis';
@@ -63,13 +65,35 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
       console.log('✅ Loaded rolling stats for', player.name, rollingStats.season);
       
       // Load 2024 stats from roster.json
+      console.log(`🔍 Loading 2024 stats for: "${player.name}" team: "${player.team}"`);
       const stats2024 = await getPlayer2024Stats(player.name, player.team);
-      setPreviousSeasonStats(stats2024);
-      console.log('📊 2024 stats:', stats2024);
       
-      // Also load recent game history for advanced analysis (last 30 games)
+      if (stats2024) {
+        console.log('✅ 2024 stats loaded successfully:', { 
+          games: stats2024.games, 
+          hits: stats2024.H, 
+          HR: stats2024.HR,
+          fullName: stats2024.fullName 
+        });
+      } else {
+        console.error('❌ Failed to load 2024 stats for:', player.name, player.team);
+      }
+      
+      setPreviousSeasonStats(stats2024);
+      console.log('📊 2024 stats set in state:', stats2024);
+      
+      // Load full season game history for comprehensive analysis
       const endDate = currentDate instanceof Date ? currentDate : new Date(currentDate);
-      const dateRangeData = await fetchPlayerDataForDateRange(endDate, 45, 45); // Last 45 days for recent games
+      
+      // Calculate days since season start (typically late March)
+      const currentYear = endDate.getFullYear();
+      const seasonStart = new Date(currentYear, 2, 28); // March 28th (typical season start)
+      const daysSinceSeasonStart = Math.ceil((endDate - seasonStart) / (1000 * 60 * 60 * 24));
+      const daysToLoad = Math.max(45, Math.min(daysSinceSeasonStart, 120)); // Full season up to 120 days max
+      
+      console.log(`📅 Loading ${daysToLoad} days of FULL SEASON data (since ${seasonStart.toISOString().split('T')[0]})`);
+      console.log(`🚫 BYPASSING SharedDataManager 30-date limit for Enhanced Player Analysis`);
+      const dateRangeData = await fetchFullSeasonPlayerData(endDate, daysToLoad);
       
       // Convert the returned data to an array of player games for recent analysis
       const history = [];
@@ -109,10 +133,10 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
       }
       
       try {
-        await generatePropAnalysis(player, playerHistory);
-        console.log('✓ Prop analysis completed');
+        await generatePropAnalysis(player, playerHistory, stats2024);
+        console.log('✓ Enhanced prop analysis completed');
       } catch (error) {
-        console.error('Error in prop analysis:', error);
+        console.error('Error in enhanced prop analysis:', error);
       }
       
       try {
@@ -146,8 +170,8 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
 
   const generateSplitAnalysis = async (player, history, rollingStats) => {
     try {
-      // Load real handedness data
-      const handednessData = await loadHandednessData(player.name);
+      // Load real handedness data using consolidated service
+      const handednessData = await loadHandednessData(player.name, player.team);
       
       // Use accurate rolling stats for season data
       const seasonStats = rollingStats.season ? {
@@ -228,22 +252,35 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
     }
   };
 
-  const generatePropAnalysis = async (player, history) => {
+  const generatePropAnalysis = async (player, history, roster2024Stats = null) => {
     try {
-      // Use real prop analysis from actual game data
-      console.log(`Generating prop analysis for ${history.length} games`);
-      const realPropAnalysis = calculatePropAnalysis(history);
-      console.log('Prop analysis result:', realPropAnalysis);
-      setPropAnalysis(realPropAnalysis);
+      // Use enhanced prop analysis with 2024 roster data integration
+      console.log(`Generating enhanced prop analysis for ${history.length} games`);
+      console.log('2024 roster stats available:', !!roster2024Stats);
+      
+      const enhancedPropAnalysis = calculateEnhancedPropAnalysis(history, roster2024Stats);
+      console.log('Enhanced prop analysis result:', enhancedPropAnalysis);
+      setPropAnalysis(enhancedPropAnalysis);
     } catch (error) {
-      console.error('Error generating prop analysis:', error);
-      // Set fallback prop analysis
-      setPropAnalysis({
-        homeRuns: { over05: { success: 0, total: 0, percentage: '0.0' } },
-        hits: { over15: { success: 0, total: 0, percentage: '0.0' } },
-        rbi: { over05: { success: 0, total: 0, percentage: '0.0' } },
-        runs: { over05: { success: 0, total: 0, percentage: '0.0' } }
-      });
+      console.error('Error generating enhanced prop analysis:', error);
+      // Fallback to basic prop analysis if enhanced version fails
+      try {
+        const basicPropAnalysis = calculatePropAnalysis(history);
+        console.log('Using fallback basic prop analysis');
+        setPropAnalysis(basicPropAnalysis);
+      } catch (fallbackError) {
+        console.error('Fallback prop analysis also failed:', fallbackError);
+        // Set minimal fallback prop analysis
+        setPropAnalysis({
+          season2025: {
+            homeRuns: { over05: { success: 0, total: 0, percentage: '0.0' } },
+            hits: { over15: { success: 0, total: 0, percentage: '0.0' } },
+            rbi: { over05: { success: 0, total: 0, percentage: '0.0' } },
+            runs: { over05: { success: 0, total: 0, percentage: '0.0' } }
+          },
+          metadata: { has2024Data: false, totalGames2025: 0 }
+        });
+      }
     }
   };
 
@@ -382,79 +419,7 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
   // Removed - now using real calculateVsOpponentStats from playerAnalysisService
 
   // Removed - now using calculatePropAnalysis from playerAnalysisService
-
-  // Load real handedness data for player
-  const loadHandednessData = async (playerName) => {
-    try {
-      console.log('🔍 Loading handedness data for:', playerName);
-      
-      // First, get the full name from rosters.json
-      let fullName = null;
-      try {
-        const rosterResponse = await fetch('/data/rosters.json');
-        if (rosterResponse.ok) {
-          const rosterData = await rosterResponse.json();
-          // Find player by abbreviated name
-          const playerRoster = rosterData.find(p => p.name === playerName);
-          if (playerRoster && playerRoster.fullName) {
-            fullName = playerRoster.fullName;
-            console.log('🔍 Found full name in roster:', fullName);
-          }
-        }
-      } catch (rosterError) {
-        console.log('Could not load roster data');
-      }
-      
-      // Load handedness datasets
-      const [rhpResponse, lhpResponse] = await Promise.all([
-        fetch('/data/handedness/rhp.json'),
-        fetch('/data/handedness/lhp.json')
-      ]);
-
-      if (rhpResponse.ok && lhpResponse.ok) {
-        const [rhpData, lhpData] = await Promise.all([
-          rhpResponse.json(),
-          lhpResponse.json()
-        ]);
-
-        let searchKey = null;
-        
-        if (fullName) {
-          // Use full name to create proper search key: "lastname, firstname"
-          const nameParts = fullName.split(' ');
-          const lastName = nameParts[nameParts.length - 1];
-          const firstName = nameParts.slice(0, -1).join(' ');
-          searchKey = `${lastName}, ${firstName}`; // Keep original case
-        } else {
-          // Fallback to abbreviated name format
-          const nameParts = playerName.split(' ');
-          const lastName = nameParts[nameParts.length - 1];
-          const firstName = nameParts.slice(0, -1).join(' ');
-          searchKey = `${lastName}, ${firstName}`; // Keep original case
-        }
-        
-        console.log('🔍 Using search key:', searchKey);
-        
-        const rhpResult = rhpData[searchKey];
-        const lhpResult = lhpData[searchKey];
-        
-        console.log('🔍 Handedness lookup results:', { 
-          searchKey,
-          found: !!(rhpResult || lhpResult), 
-          rhp: !!rhpResult, 
-          lhp: !!lhpResult 
-        });
-
-        return {
-          rhp: rhpResult,
-          lhp: lhpResult
-        };
-      }
-    } catch (error) {
-      console.error('Error loading handedness data for', playerName, error);
-    }
-    return null;
-  };
+  // Removed - now using loadHandednessData from handednessService
 
   // Helper functions for advanced calculations
   const calculateOBP = (totals) => {

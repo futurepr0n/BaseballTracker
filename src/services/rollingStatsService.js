@@ -324,6 +324,9 @@ export const getPlayer2024Stats = async (playerName, playerTeam) => {
       console.log(`✅ Found 2024 stats for ${playerName}:`, player.stats);
       
       // Convert 2024_X format to cleaner format
+      // Note: 2024_RBI not available in roster data, estimate if needed
+      const estimatedRBI = player.stats['2024_HR'] ? Math.round(player.stats['2024_HR'] * 1.8) : 0;
+      
       return {
         games: player.stats['2024_Games'] || 0,
         AB: player.stats['2024_AB'] || 0,
@@ -332,6 +335,7 @@ export const getPlayer2024Stats = async (playerName, playerTeam) => {
         doubles: player.stats['2024_2B'] || 0,
         triples: player.stats['2024_3B'] || 0,
         HR: player.stats['2024_HR'] || 0,
+        RBI: player.stats['2024_RBI'] || estimatedRBI, // Estimate if not available
         SB: player.stats['2024_SB'] || 0,
         BB: player.stats['2024_BB'] || 0,
         SO: player.stats['2024_SO'] || 0,

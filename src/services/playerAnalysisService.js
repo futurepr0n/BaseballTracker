@@ -55,6 +55,168 @@ export const calculatePropAnalysis = (playerHistory) => {
 };
 
 /**
+ * Enhanced Prop Analysis with 2024 Roster Data Integration
+ * 
+ * Provides comprehensive prop analysis across multiple timeframes:
+ * - 2024 Season (from roster summary when available)
+ * - 2025 Season (from complete game history)
+ * - Last 15, 10, 5 games (recent performance)
+ */
+export const calculateEnhancedPropAnalysis = (playerHistory, roster2024Stats) => {
+  if (!playerHistory.length && !roster2024Stats) return null;
+
+  // Helper function to calculate prop success from game data
+  const calculateRecentProps = (gameHistory, gameCount = null) => {
+    if (!gameHistory.length) return null;
+    
+    const games = gameCount ? gameHistory.slice(0, gameCount) : gameHistory;
+    if (!games.length) return null;
+
+    const calculatePropSuccess = (stat, threshold) => {
+      const successes = games.filter(game => 
+        (parseFloat(game[stat]) || 0) > threshold
+      ).length;
+      
+      return {
+        success: successes,
+        total: games.length,
+        rate: games.length > 0 ? successes / games.length : 0,
+        percentage: games.length > 0 ? ((successes / games.length) * 100).toFixed(1) : '0.0'
+      };
+    };
+
+    return {
+      homeRuns: {
+        over05: calculatePropSuccess('HR', 0.5)
+      },
+      hits: {
+        over05: calculatePropSuccess('H', 0.5),
+        over15: calculatePropSuccess('H', 1.5),
+        over25: calculatePropSuccess('H', 2.5),
+        over35: calculatePropSuccess('H', 3.5)
+      },
+      rbi: {
+        over05: calculatePropSuccess('RBI', 0.5),
+        over15: calculatePropSuccess('RBI', 1.5),
+        over25: calculatePropSuccess('RBI', 2.5)
+      },
+      runs: {
+        over05: calculatePropSuccess('R', 0.5),
+        over15: calculatePropSuccess('R', 1.5),
+        over25: calculatePropSuccess('R', 2.5)
+      },
+      strikeouts: {
+        over15: calculatePropSuccess('K', 1.5),
+        over25: calculatePropSuccess('K', 2.5),
+        under15: {
+          success: games.filter(game => (parseFloat(game.K) || 0) < 1.5).length,
+          total: games.length,
+          rate: games.length > 0 ? games.filter(game => (parseFloat(game.K) || 0) < 1.5).length / games.length : 0,
+          percentage: games.length > 0 ? ((games.filter(game => (parseFloat(game.K) || 0) < 1.5).length / games.length) * 100).toFixed(1) : '0.0'
+        }
+      }
+    };
+  };
+
+  // Helper function to calculate props from 2024 roster summary
+  const calculateRosterProps = (roster2024) => {
+    if (!roster2024 || !roster2024.games) return null;
+
+    const games = roster2024.games;
+    const hrs = roster2024.HR || 0;
+    const hits = roster2024.H || 0;
+    const rbis = roster2024.RBI || 0;
+    const runs = roster2024.R || 0;
+    const strikeouts = roster2024.SO || 0;
+
+    const calculateSeasonProp = (total, threshold) => {
+      // Estimate games where player exceeded threshold
+      // For season totals, we estimate based on rate per game
+      const ratePerGame = total / games;
+      const estimatedSuccesses = Math.round(games * (ratePerGame > threshold ? 0.6 : ratePerGame * 0.4));
+      
+      return {
+        success: estimatedSuccesses,
+        total: games,
+        rate: estimatedSuccesses / games,
+        percentage: ((estimatedSuccesses / games) * 100).toFixed(1),
+        note: 'Estimated from season totals'
+      };
+    };
+
+    return {
+      homeRuns: {
+        over05: calculateSeasonProp(hrs, 0.5)
+      },
+      hits: {
+        over05: calculateSeasonProp(hits, 0.5),
+        over15: calculateSeasonProp(hits, 1.5),
+        over25: calculateSeasonProp(hits, 2.5),
+        over35: calculateSeasonProp(hits, 3.5)
+      },
+      rbi: {
+        over05: calculateSeasonProp(rbis, 0.5),
+        over15: calculateSeasonProp(rbis, 1.5),
+        over25: calculateSeasonProp(rbis, 2.5)
+      },
+      runs: {
+        over05: calculateSeasonProp(runs, 0.5),
+        over15: calculateSeasonProp(runs, 1.5),
+        over25: calculateSeasonProp(runs, 2.5)
+      },
+      strikeouts: {
+        over15: calculateSeasonProp(strikeouts, 1.5),
+        over25: calculateSeasonProp(strikeouts, 2.5),
+        under15: {
+          success: Math.round(games * 0.4), // Rough estimate for under 1.5 K
+          total: games,
+          rate: 0.4,
+          percentage: '40.0',
+          note: 'Estimated from season totals'
+        }
+      },
+      seasonTotals: {
+        games,
+        hrs,
+        hits,
+        rbis,
+        runs,
+        strikeouts,
+        avg: roster2024.AVG || 0,
+        obp: roster2024.OBP || 0,
+        slg: roster2024.SLG || 0
+      }
+    };
+  };
+
+  // Build comprehensive prop analysis object
+  const enhancedProps = {
+    // 2024 season data (when available)
+    season2024: roster2024Stats ? calculateRosterProps(roster2024Stats) : null,
+    
+    // 2025 season data (from complete game history)
+    season2025: playerHistory.length > 0 ? calculateRecentProps(playerHistory) : null,
+    
+    // Recent performance breakdowns
+    last15: playerHistory.length >= 15 ? calculateRecentProps(playerHistory, 15) : null,
+    last10: playerHistory.length >= 10 ? calculateRecentProps(playerHistory, 10) : null,
+    last5: playerHistory.length >= 5 ? calculateRecentProps(playerHistory, 5) : null
+  };
+
+  // Add metadata
+  enhancedProps.metadata = {
+    has2024Data: !!roster2024Stats,
+    totalGames2025: playerHistory.length,
+    availableTimeframes: Object.keys(enhancedProps).filter(key => 
+      key !== 'metadata' && enhancedProps[key] !== null
+    ),
+    generatedAt: new Date().toISOString()
+  };
+
+  return enhancedProps;
+};
+
+/**
  * Calculate real advanced metrics from game data and external sources
  */
 export const calculateAdvancedMetrics = async (player, playerHistory) => {
@@ -124,6 +286,9 @@ export const calculateAdvancedMetrics = async (player, playerHistory) => {
  * Calculate real matchup statistics using handedness data and historical performance
  */
 export const calculateMatchupStatistics = async (player, playerHistory, handednessData) => {
+  // Import handedness functions from consolidated service
+  const { formatHandednessSplits, generateEstimatedSplits } = await import('./handednessService');
+  
   if (!playerHistory.length) return null;
 
   // Calculate season totals
@@ -133,26 +298,11 @@ export const calculateMatchupStatistics = async (player, playerHistory, handedne
   const recentGames = playerHistory.slice(0, 15);
   const recentStats = calculateSeasonTotals(recentGames);
 
-  // Use real handedness data if available
-  const vsRHP = handednessData?.rhp ? {
-    hab: `${Math.round(handednessData.rhp.swing_count * 0.3)}/${handednessData.rhp.swing_count}`,
-    ba: calculateHandednessBA(handednessData.rhp),
-    slg: calculateHandednessSLG(handednessData.rhp),
-    iso: calculateHandednessISO(handednessData.rhp),
-    woba: calculateHandednessWOBA(handednessData.rhp),
-    k_rate: `${(25 - handednessData.rhp.swing_optimization_score * 0.3).toFixed(1)}%`,
-    bb_rate: `${(8 + handednessData.rhp.swing_optimization_score * 0.1).toFixed(1)}%`
-  } : generateEstimatedSplits(seasonStats, 'RHP');
-
-  const vsLHP = handednessData?.lhp ? {
-    hab: `${Math.round(handednessData.lhp.swing_count * 0.3)}/${handednessData.lhp.swing_count}`,
-    ba: calculateHandednessBA(handednessData.lhp),
-    slg: calculateHandednessSLG(handednessData.lhp),
-    iso: calculateHandednessISO(handednessData.lhp),
-    woba: calculateHandednessWOBA(handednessData.lhp),
-    k_rate: `${(25 - handednessData.lhp.swing_optimization_score * 0.3).toFixed(1)}%`,
-    bb_rate: `${(8 + handednessData.lhp.swing_optimization_score * 0.1).toFixed(1)}%`
-  } : generateEstimatedSplits(seasonStats, 'LHP');
+  // Use consolidated handedness formatting
+  const formattedSplits = handednessData ? formatHandednessSplits(handednessData) : null;
+  
+  const vsRHP = formattedSplits?.vsRHP || generateEstimatedSplits(seasonStats, 'RHP');
+  const vsLHP = formattedSplits?.vsLHP || generateEstimatedSplits(seasonStats, 'LHP');
 
   return {
     season: {
@@ -298,63 +448,8 @@ const calculateWOBA = (totals) => {
   return plateAppearances > 0 ? (weightedTotal / plateAppearances).toFixed(3) : '.000';
 };
 
-const calculateHandednessBA = (handednessData) => {
-  // Estimate BA based on swing optimization score
-  const baseBA = 0.240;
-  const bonus = (handednessData.swing_optimization_score - 50) * 0.004;
-  return Math.max(0.180, Math.min(0.350, baseBA + bonus)).toFixed(3);
-};
-
-const calculateHandednessSLG = (handednessData) => {
-  // Estimate SLG based on attack angle and bat speed
-  const baseSLG = 0.400;
-  const angleBonus = (handednessData.attack_angle - 15) * 0.008;
-  const speedBonus = (handednessData.bat_speed - 70) * 0.005;
-  return Math.max(0.300, Math.min(0.600, baseSLG + angleBonus + speedBonus)).toFixed(3);
-};
-
-const calculateHandednessISO = (handednessData) => {
-  const slg = parseFloat(calculateHandednessSLG(handednessData));
-  const ba = parseFloat(calculateHandednessBA(handednessData));
-  return (slg - ba).toFixed(3);
-};
-
-const calculateHandednessWOBA = (handednessData) => {
-  // Estimate wOBA based on optimization score
-  const baseWOBA = 0.320;
-  const bonus = (handednessData.swing_optimization_score - 50) * 0.003;
-  return Math.max(0.280, Math.min(0.400, baseWOBA + bonus)).toFixed(3);
-};
-
-const generateEstimatedSplits = (seasonStats, splitType) => {
-  // Generate realistic estimates based on season performance
-  let modifier = 1.0;
-  
-  switch (splitType) {
-    case 'LHP':
-      modifier = 1.05; // Slight advantage vs LHP
-      break;
-    case 'RHP':
-      modifier = 0.98; // Slight disadvantage vs RHP
-      break;
-    case 'RP':
-      modifier = 0.92; // Tougher vs relievers
-      break;
-    default:
-      modifier = 1.0; // No modifier for unknown types
-      break;
-  }
-
-  return {
-    hab: `${Math.round(seasonStats.H * 0.6)}/${Math.round(seasonStats.AB * 0.6)}`,
-    ba: (parseFloat(seasonStats.AVG) * modifier).toFixed(3),
-    slg: (parseFloat(seasonStats.SLG) * modifier).toFixed(3),
-    iso: (parseFloat(seasonStats.ISO) * modifier).toFixed(3),
-    woba: (parseFloat(seasonStats.wOBA) * modifier).toFixed(3),
-    k_rate: `${(25 * (2 - modifier)).toFixed(1)}%`,
-    bb_rate: `${(8 * modifier).toFixed(1)}%`
-  };
-};
+// Handedness calculation functions moved to handednessService.js
+// Import from './handednessService' when needed
 
 const calculatePercentiles = (metrics) => {
   // Calculate percentiles based on typical MLB distributions
