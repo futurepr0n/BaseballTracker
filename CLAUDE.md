@@ -30,8 +30,9 @@ node src/services/generateAdditionalStats.js
 node src/services/generatePitcherMatchups.js
 npm run generate-milestones
 
-# 4. Run daily update (generates predictions)
+# 4. Run daily update (generates predictions and team stats)
 ./daily_update.sh [YYYY-MM-DD]
+# Now includes team statistics generation for Enhanced Player Analysis
 ```
 
 **Handedness Data Setup (One-time or when CSV files updated):**
@@ -96,7 +97,12 @@ npm run generate-milestones
 
 **Rolling stats generation:**
 ```bash
-./generate_rolling_stats.sh
+./generate_rolling_stats.sh [YYYY-MM-DD]
+
+# Enhanced rolling stats generation includes:
+# - Season, last_30, last_7, and current period statistics
+# - Team statistics generation from rolling stats data
+# - File verification and summary reporting
 ```
 
 ## Architecture Overview
@@ -105,6 +111,7 @@ npm run generate-milestones
 - **React Router SPA** with main routes: `/` (Dashboard), `/players`, `/teams`, `/games`, `/capsheet`, `/matchup-analyzer`, `/pinheads-playhouse`
 - **Data Service Layer** (`src/services/dataService.js`) - Centralized data loading with caching for JSON files
 - **Team Filter Context** - Global state for filtering players/games by team with matchup analysis
+- **Enhanced Player Analysis System** (`/players` route) - Comprehensive player performance analysis with real data integration
 
 ### Data Flow Architecture
 1. **Raw Data Sources**: 
@@ -114,6 +121,8 @@ npm run generate-milestones
 
 2. **Processing Pipeline**:
    - CSV files (from external BaseballScraper) → `statLoader.js` → Daily JSON
+   - Daily JSON → `generateRollingStats.js` → Rolling statistics files
+   - Rolling stats → `generateTeamStats.js` → Team performance data
    - Daily JSON → Prediction services → Analysis JSON files
    - Historical data aggregation via `fetchPlayerDataForDateRange()`
 
@@ -170,6 +179,17 @@ npm run generate-milestones
 - **Dynamic Filtering**: Filter by heat level, stat category, and sort by urgency/timeline/player name
 - **Performance Momentum**: Percentage above season average and recent form trends (🚀 SURGING, 📈 RISING, ❄️ COLD)
 
+**Enhanced Player Analysis System (New Feature - /players route):**
+- **Comprehensive Player Search**: Real-time search through all season players with accurate statistics
+- **Performance Visualization**: Prop analysis including HR, hits (Over 0.5, 1.5, 2.5, 3.5), RBI, runs, and strikeouts
+- **Team Context Integration**: Real team statistics with recent form analysis, rankings, and performance trends
+- **Advanced Metrics**: Custom analysis combining multiple data sources for player evaluation
+- **Matchup Analysis**: Historical pitcher vs batter performance with lineup integration
+- **Split Analysis Tables**: Detailed breakdowns of performance across different situations
+- **Real Data Integration**: NO mock data - all calculations from actual rolling stats and historical data
+- **2024 vs 2025 Comparison**: Season comparison using roster.json historical data
+- **Professional UI**: Newspaper-style layout with responsive design and modern styling
+
 **Enhanced Tooltip System (Updated):**
 - **Poor Performance Card**: Updated tooltip to match PositiveMomentumCard style with enhanced game-by-game table
 - **Detailed Game Table**: 10-game performance history with AB, H, HR, RBI, K, AVG columns and visual indicators
@@ -190,6 +210,9 @@ npm run generate-milestones
 - `generateAdditionalStats.js` - Player performance metrics
 - `generatePitcherMatchups.js` - Pitcher vs batter analysis
 - `generateRollingStats.js` - Rolling statistical windows (7/30/season)
+- `generateTeamStats.js` - Team performance aggregation from rolling stats
+- `rollingStatsService.js` - Rolling statistics integration with data merging
+- `playerAnalysisService.js` - Enhanced player analysis calculations
 
 **Data Service Import Pattern (CRITICAL):**
 - **dataService.js uses named exports only** - no default export available
@@ -219,10 +242,14 @@ npm run generate-milestones
 ### File Organization
 - `src/components/cards/` - Dashboard card components
 - `src/components/BatchSummarySection.js/.css` - Strategic intelligence dashboard component
+- `src/components/EnhancedPlayerAnalysis.js/.css` - Main enhanced player analysis component
+- `src/components/PlayerAnalysis/` - Player analysis sub-components (TeamContext, PerformanceVisualization, etc.)
 - `src/services/` - Data processing and analysis services
 - `src/utils/playerBadgeSystem.js` - Badge classification and confidence boost system
 - `public/data/` - JSON data files organized by year/month
 - `public/data/predictions/` - Generated analysis files
+- `public/data/rolling_stats/` - Rolling statistics files (season, last_30, last_7, current)
+- `public/data/team_stats/` - Team performance statistics generated from rolling stats
 - `public/data/stadium/` - Stadium HR analysis data with park factors
 - `public/data/multi_hit_stats/` - Multi-hit performance tracking data
 - `public/data/logos/` - Team and application logos
@@ -918,14 +945,148 @@ const analysis = await comprehensiveAnalysis({
 
 This architectural foundation ensures that future enhancements maintain analytical rigor while avoiding the pitfalls of oversimplified positive expectation systems.
 
+## Enhanced Player Analysis System (/players route)
+
+### Overview
+The Enhanced Player Analysis system provides comprehensive player performance analysis with real data integration, replacing all mock data with actual calculations from rolling statistics and historical game data.
+
+### Core Components
+
+**EnhancedPlayerAnalysis.js** - Main component integrating all analysis modules:
+- **PlayerSearchBar**: Real-time search through all season players with accurate statistics
+- **PlayerProfileHeader**: Player overview with 2024 vs 2025 season comparison
+- **PerformanceVisualization**: Prop analysis cards for HR, hits, RBI, runs, strikeouts
+- **TeamContext**: Real team statistics with recent form and MLB rankings
+- **AdvancedMetrics**: Custom analysis combining multiple data sources
+- **MatchupAnalysis**: Historical pitcher vs batter performance with lineup integration
+- **SplitAnalysisTables**: Detailed performance breakdowns across situations
+
+### Data Sources and Integration
+
+**Rolling Stats Integration** (`rollingStatsService.js`):
+- **Multi-Section Merging**: Combines data from `allHitters`, `allHRLeaders`, `allRBILeaders`, etc.
+- **Complete Player Stats**: Merges HR data (missing from allHitters) with batting stats
+- **Season vs Historical**: Loads both current season and 2024 comparison data
+- **Case-Sensitive Lookup**: Handles player name variations and team changes
+- **Full Season Coverage**: Calculates proper date ranges from season start to current
+
+**Team Statistics Generation** (`generateTeamStats.js`):
+- **Rolling Stats Aggregation**: Combines all player data by team for comprehensive metrics
+- **MLB Rankings**: Ranks teams across batting average, runs, home runs, OBP, overall offense
+- **Performance Calculations**: Team BA, OPS, runs/game, HR/game, estimated records
+- **Automated Updates**: Integrates with daily update and rolling stats generation scripts
+
+**Real Data Processing** (`playerAnalysisService.js`):
+- **NO Mock Data**: All calculations from actual rolling stats and historical game files
+- **Team Performance Loading**: Uses `fetchPlayerDataForDateRange` for multi-game analysis
+- **Prop Analysis**: Over/under calculations for hits (0.5, 1.5, 2.5, 3.5), HR, RBI, runs, strikeouts
+- **Recent vs Season**: Weighted analysis comparing recent form to season averages
+- **Confidence Scoring**: Data quality assessment based on sample size and recency
+
+### File Structure and Data Flow
+
+**Component Structure:**
+```
+src/components/PlayerAnalysis/
+├── AdvancedMetrics.js/.css          # Custom analysis metrics
+├── MatchupAnalysis.js/.css          # Pitcher vs batter historical analysis  
+├── PerformanceVisualization.js/.css # Prop analysis cards with Over 0.5 Hits
+├── PlayerProfileHeader.js/.css      # Player overview with season comparison
+├── PlayerSearchBar.js/.css          # Real-time player search interface
+├── SplitAnalysisTables.js/.css      # Detailed situation breakdowns
+└── TeamContext.js/.css              # Team statistics and recent form
+```
+
+**Data Pipeline:**
+1. **Rolling Stats Generation**: `./generate_rolling_stats.sh` creates comprehensive player statistics
+2. **Team Stats Creation**: `generateTeamStats.js` aggregates team performance from rolling stats
+3. **Enhanced Analysis**: Components load real data via `rollingStatsService` and `playerAnalysisService`
+4. **Daily Updates**: `./daily_update.sh` includes team stats generation for fresh data
+
+**Key Data Files:**
+- `public/data/rolling_stats/rolling_stats_season_latest.json` - Current season player statistics
+- `public/data/team_stats/team_stats_latest.json` - Team performance and rankings
+- `public/data/rosters/2024_roster.json` - Historical season comparison data
+- `public/data/handedness/` - Pitcher handedness splits for matchup analysis
+
+### Usage and Integration
+
+**Route Integration:**
+- Enhanced Player Analysis is integrated into the `/players` route via App.js
+- Replaces basic player list with comprehensive analysis interface
+- Uses React Router for navigation with currentDate prop passing
+
+**Data Loading Pattern:**
+```javascript
+// Rolling stats service usage
+import { getPlayerRollingStats, getTeamRollingStats, getPlayer2024Stats } from '../services/rollingStatsService';
+
+// Load comprehensive player data
+const rollingStats = await getPlayerRollingStats(playerName, playerTeam, currentDate);
+const teamStats = await getTeamRollingStats(playerTeam, currentDate);
+const stats2024 = await getPlayer2024Stats(playerName, playerTeam);
+```
+
+**Performance Optimizations:**
+- **Comprehensive Caching**: Service-level caching for rolling stats and team data
+- **Lazy Loading**: Components load data only when selected/displayed
+- **Batch Operations**: Team stats generated once and shared across all player analyses
+- **Fallback Mechanisms**: Graceful handling of missing data with closest date resolution
+
+### Enhanced Features
+
+**Real Team Context:**
+- **Recent Form Analysis**: Last 10 games with trending indicators (🔥 Hot, ❄️ Cold, ➡️ Stable)
+- **MLB Rankings**: Live rankings across offensive categories with color-coded performance
+- **Home/Away Splits**: Detailed performance breakdowns with venue-specific statistics
+- **Strategic Insights**: Contextual analysis combining team performance with player opportunities
+
+**Advanced Prop Analysis:**
+- **Over 0.5 Hits**: New prop analysis category for hit probability assessment
+- **Multi-Category Tracking**: HR, hits (0.5, 1.5, 2.5, 3.5), RBI, runs, strikeouts
+- **Success Rate Calculations**: Historical performance in similar situations
+- **Confidence Scoring**: Data quality and sample size considerations
+
+**Professional UI/UX:**
+- **Newspaper Layout**: Grid-based responsive design with professional styling
+- **Real-Time Updates**: Dynamic data loading without page refreshes
+- **Enhanced Tooltips**: Detailed explanations and context for all metrics
+- **Mobile Responsive**: Touch-friendly interface with optimized scrolling
+
+### Script Integration
+
+**Daily Update Enhancement** (`daily_update.sh`):
+```bash
+# Enhanced daily update now includes team stats generation
+echo "Generating team statistics..."
+node src/services/generateTeamStats.js $DATE
+
+# Team stats are generated after rolling stats for consistency
+# Provides fresh team context for Enhanced Player Analysis
+```
+
+**Rolling Stats Enhancement** (`generate_rolling_stats.sh`):
+```bash
+# Rolling stats generation now includes team statistics
+echo "Generating team statistics from rolling stats..."
+TARGET_DATE=$DATE
+node src/services/generateTeamStats.js $TARGET_DATE
+
+# Ensures team stats are available whenever rolling stats are updated
+```
+
+This comprehensive integration ensures the Enhanced Player Analysis system provides accurate, real-time player evaluation without any mock data, leveraging the full depth of the application's statistical infrastructure.
+
 ### Data Dependencies
 This application requires:
 1. **BaseballScraper** CSV files in `../BaseballScraper/` directory
 2. **BaseballAPI** running on localhost:8000 for advanced analysis features
 3. MLB schedule data (generated by scheduleGenerator.js)
 4. Daily statistics JSON files in the date-based directory structure
-5. Prediction files must be generated before dashboard displays complete data
-6. **Stadium HR analysis data** in `public/data/stadium/` for park factor calculations
-7. **Multi-hit statistics** in `public/data/multi_hit_stats/` for context enhancement
+5. **Rolling statistics files** in `public/data/rolling_stats/` for Enhanced Player Analysis
+6. **Team statistics files** in `public/data/team_stats/` for team context analysis
+7. Prediction files must be generated before dashboard displays complete data
+8. **Stadium HR analysis data** in `public/data/stadium/` for park factor calculations
+9. **Multi-hit statistics** in `public/data/multi_hit_stats/` for context enhancement
 
 The application handles missing data gracefully and will find the closest available date when specific data is not available.
