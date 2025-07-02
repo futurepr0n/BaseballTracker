@@ -22,14 +22,47 @@ const PlayerSearchBar = ({ onPlayerSelect, currentDate }) => {
     loadAvailablePlayers();
   }, []); // Remove currentDate dependency - we want ALL players regardless of selected date
 
-  // Search functionality
+  // Search functionality - enhanced with full name search
   useEffect(() => {
     if (searchTerm.length >= 2) {
-      const filtered = allPlayers.filter(player =>
-        player.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        player.team.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setSearchResults(filtered.slice(0, 10)); // Limit to 10 results
+      const searchLower = searchTerm.toLowerCase();
+      const filtered = allPlayers.filter(player => {
+        // Search in abbreviated name
+        if (player.name.toLowerCase().includes(searchLower)) return true;
+        
+        // Search in team abbreviation
+        if (player.team.toLowerCase().includes(searchLower)) return true;
+        
+        // Search in full name (if available)
+        if (player.fullName && player.fullName.toLowerCase().includes(searchLower)) return true;
+        
+        // Special handling for common searches like "Judge" finding "A. Judge"
+        const lastName = player.name.split(' ').pop(); // Get last part of abbreviated name
+        if (lastName && lastName.toLowerCase().includes(searchLower)) return true;
+        
+        return false;
+      });
+      
+      // Sort results to prioritize exact matches and start-of-name matches
+      const sortedResults = filtered.sort((a, b) => {
+        const aFullLower = (a.fullName || a.name).toLowerCase();
+        const aNameLower = a.name.toLowerCase();
+        const bFullLower = (b.fullName || b.name).toLowerCase();
+        const bNameLower = b.name.toLowerCase();
+        
+        // Exact matches first
+        if (aFullLower === searchLower || aNameLower === searchLower) return -1;
+        if (bFullLower === searchLower || bNameLower === searchLower) return 1;
+        
+        // Then start-of-name matches
+        if (aFullLower.startsWith(searchLower) || aNameLower.startsWith(searchLower)) return -1;
+        if (bFullLower.startsWith(searchLower) || bNameLower.startsWith(searchLower)) return 1;
+        
+        // Otherwise alphabetical
+        return a.name.localeCompare(b.name);
+      });
+      
+      setSearchResults(sortedResults.slice(0, 10)); // Limit to 10 results
       setSelectedIndex(-1);
     } else {
       setSearchResults([]);
@@ -42,6 +75,24 @@ const PlayerSearchBar = ({ onPlayerSelect, currentDate }) => {
       setLoading(true);
       
       console.log('🔍 Loading players from rolling stats...');
+      
+      // Load roster data for full names
+      let rosterMap = new Map();
+      try {
+        const rosterResponse = await fetch('/data/rosters.json');
+        if (rosterResponse.ok) {
+          const rosterData = await rosterResponse.json();
+          // Create map for quick lookup by abbreviated name
+          rosterData.forEach(player => {
+            if (player.fullName) {
+              rosterMap.set(`${player.name}_${player.team}`, player.fullName);
+            }
+          });
+          console.log(`✅ Loaded ${rosterMap.size} full names from roster`);
+        }
+      } catch (rosterError) {
+        console.log('Could not load roster data for full names');
+      }
       
       // Load from rolling stats - much more efficient and accurate
       const currentDateStr = new Date().toISOString().split('T')[0];
@@ -56,30 +107,69 @@ const PlayerSearchBar = ({ onPlayerSelect, currentDate }) => {
         console.log(`✅ Loaded rolling stats with ${rollingData.totalPlayers} players`);
         
         if (rollingData.allHitters && rollingData.allHitters.length > 0) {
-          const playersList = rollingData.allHitters.map(player => ({
-            name: player.name,
-            team: player.team,
-            lastSeen: currentDateStr, // Current as of rolling stats generation
-            position: 'OF', // Rolling stats don't include position
-            recentStats: {
-              AVG: player.avg || player.battingAvg || '.000',
-              HR: player.HR || player.totalHRs || 0,
-              RBI: player.RBI || player.totalRBIs || 0
-            },
-            // Store full season stats for display
-            seasonStats: {
-              H: player.H || player.totalHits || 0,
-              AB: player.AB || player.totalABs || 0,
-              games: player.games || player.gamesPlayed || 0,
-              R: player.R || player.totalRuns || 0,
-              HR: player.HR || player.totalHRs || 0,
-              RBI: player.RBI || player.totalRBIs || 0,
-              AVG: player.avg || player.battingAvg || '.000',
-              OBP: player.obp || '.000',
-              SLG: player.slg || '.000',
-              OPS: player.ops || '.000'
+          // Helper function to merge player data from multiple sections
+          const mergePlayerData = (hitterData) => {
+            let mergedStats = { ...hitterData };
+            
+            // Merge HR data from allHRLeaders section
+            if (rollingData.allHRLeaders) {
+              const hrData = rollingData.allHRLeaders.find(p => 
+                p.name === hitterData.name && p.team === hitterData.team
+              );
+              if (hrData) {
+                mergedStats.HR = hrData.HR;
+                mergedStats.hrsPerGame = hrData.hrsPerGame;
+              }
             }
-          })).sort((a, b) => a.name.localeCompare(b.name));
+            
+            // Merge additional stats from allPlayerStats if available
+            if (rollingData.allPlayerStats) {
+              const playerData = rollingData.allPlayerStats.find(p =>
+                p.name === hitterData.name && p.team === hitterData.team
+              );
+              if (playerData) {
+                mergedStats.totalHRs = playerData.totalHRs;
+                mergedStats.totalHits = playerData.totalHits;
+                mergedStats.totalRBIs = playerData.totalRBIs;
+              }
+            }
+            
+            return mergedStats;
+          };
+
+          const playersList = rollingData.allHitters.map(player => {
+            const mergedPlayer = mergePlayerData(player);
+            
+            // Look up full name from roster
+            const fullName = rosterMap.get(`${mergedPlayer.name}_${mergedPlayer.team}`) || '';
+            
+            return {
+              name: mergedPlayer.name,
+              team: mergedPlayer.team,
+              fullName: fullName,
+              lastSeen: currentDateStr, // Current as of rolling stats generation
+              position: 'OF', // Rolling stats don't include position
+              recentStats: {
+                AVG: mergedPlayer.avg || mergedPlayer.battingAvg || '.000',
+                HR: mergedPlayer.HR || mergedPlayer.totalHRs || 0,
+                RBI: mergedPlayer.RBI || mergedPlayer.totalRBIs || 0,
+                H: mergedPlayer.H || mergedPlayer.totalHits || 0
+              },
+              // Store full season stats for display
+              seasonStats: {
+                H: mergedPlayer.H || mergedPlayer.totalHits || 0,
+                AB: mergedPlayer.AB || mergedPlayer.totalABs || 0,
+                games: mergedPlayer.games || mergedPlayer.gamesPlayed || 0,
+                R: mergedPlayer.R || mergedPlayer.totalRuns || 0,
+                HR: mergedPlayer.HR || mergedPlayer.totalHRs || 0,
+                RBI: mergedPlayer.RBI || mergedPlayer.totalRBIs || 0,
+                AVG: mergedPlayer.avg || mergedPlayer.battingAvg || '.000',
+                OBP: mergedPlayer.obp || '.000',
+                SLG: mergedPlayer.slg || '.000',
+                OPS: mergedPlayer.ops || '.000'
+              }
+            };
+          }).sort((a, b) => a.name.localeCompare(b.name));
           
           setAllPlayers(playersList);
           setDaysWithData(rollingData.totalPlayers > 0 ? 84 : 0); // Approximate season games
@@ -239,7 +329,7 @@ const PlayerSearchBar = ({ onPlayerSelect, currentDate }) => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Search by player name or team..."
+            placeholder="Search by player name (full or abbreviated) or team..."
             className="player-search-input"
             autoFocus
           />
@@ -266,7 +356,12 @@ const PlayerSearchBar = ({ onPlayerSelect, currentDate }) => {
               >
                 <div className="player-info">
                   <div className="player-header">
-                    <span className="player-name">{player.name}</span>
+                    <span className="player-name">
+                      {player.fullName || player.name}
+                      {player.fullName && player.fullName !== player.name && (
+                        <span className="abbreviated-name"> ({player.name})</span>
+                      )}
+                    </span>
                     <span 
                       className="player-team"
                       style={{ color: getTeamColor(player.team) }}
@@ -278,6 +373,7 @@ const PlayerSearchBar = ({ onPlayerSelect, currentDate }) => {
                     <span className="position">{player.position}</span>
                     <span className="recent-stats">
                       AVG: {player.recentStats.AVG} | 
+                      H: {player.recentStats.H} | 
                       HR: {player.recentStats.HR} | 
                       RBI: {player.recentStats.RBI}
                     </span>

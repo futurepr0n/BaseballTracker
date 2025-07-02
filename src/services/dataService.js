@@ -240,6 +240,90 @@ export const fetchPlayerDataForDateRange = async (startDate, initialDaysToLookBa
 };
 
 /**
+ * Enhanced Player Analysis - Fetch FULL season data without 30-date limit
+ * Special function for Enhanced Player Analysis that bypasses SharedDataManager's
+ * 30-date performance optimization to get complete season data.
+ * 
+ * @param {Date} startDate - The starting date
+ * @param {number} maxDaysToLookBack - Maximum days to look back for full season
+ * @returns {Promise<Object>} Map of date -> player data arrays (FULL SEASON)
+ */
+export const fetchFullSeasonPlayerData = async (startDate, maxDaysToLookBack = 120) => {
+  debugLog.dataService(`🏟️ FULL SEASON FETCH: ${formatDateString(startDate)}, max ${maxDaysToLookBack} days`);
+  
+  const result = {};
+  const start = new Date(startDate);
+  
+  // Generate all valid MLB game dates
+  const validDates = [];
+  for (let daysBack = 0; daysBack < maxDaysToLookBack; daysBack++) {
+    const searchDate = new Date(start);
+    searchDate.setDate(searchDate.getDate() - daysBack);
+    const dateStr = formatDateString(searchDate);
+    
+    // Check if it's a valid MLB game date (in season, not future)
+    if (isValidMLBGameDate(dateStr)) {
+      validDates.push(dateStr);
+    }
+  }
+  
+  debugLog.dataService(`🏟️ Generated ${validDates.length} valid game dates for full season fetch`);
+  
+  // Batch process to avoid overwhelming browser (larger batches for player analysis)
+  const batchSize = 15;
+  let successCount = 0;
+  
+  for (let i = 0; i < validDates.length; i += batchSize) {
+    const batch = validDates.slice(i, i + batchSize);
+    
+    const batchPromises = batch.map(async (dateStr) => {
+      try {
+        const data = await fetchPlayerData(dateStr);
+        return { dateStr, data };
+      } catch (error) {
+        // Silent failure for missing dates
+        return { dateStr, data: null };
+      }
+    });
+    
+    const batchResults = await Promise.allSettled(batchPromises);
+    
+    // Process results
+    batchResults.forEach((batchResult) => {
+      if (batchResult.status === 'fulfilled' && batchResult.value.data && batchResult.value.data.length > 0) {
+        result[batchResult.value.dateStr] = batchResult.value.data;
+        successCount++;
+      }
+    });
+    
+    // NO EARLY TERMINATION - we want the full season!
+    debugLog.dataService(`🏟️ Batch ${Math.floor(i/batchSize) + 1}: ${successCount} dates with data so far`);
+  }
+  
+  debugLog.dataService(`🏟️ FULL SEASON COMPLETE: ${successCount} dates with data from ${validDates.length} checked`);
+  return result;
+};
+
+/**
+ * Check if a date is a valid MLB game date (helper for full season fetch)
+ */
+const isValidMLBGameDate = (dateStr) => {
+  const date = new Date(dateStr);
+  const now = new Date();
+  
+  // Don't request future dates
+  if (date > now) return false;
+  
+  // MLB season roughly runs March 20 - October 31
+  const year = date.getFullYear();
+  const seasonStart = year === 2025 ? new Date('2025-03-18') : new Date(`${year}-03-20`);
+  const seasonEnd = new Date(`${year}-10-31`);
+  
+  // Don't request off-season dates
+  return date >= seasonStart && date <= seasonEnd;
+};
+
+/**
  * Find most recent stats for a specific player (Enhanced with team change support)
  * @param {Object} dateRangeData - Map of date -> player data arrays
  * @param {string} playerName - Player name

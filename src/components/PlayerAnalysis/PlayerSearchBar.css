@@ -125,6 +125,14 @@
   color: var(--text-primary, #333);
 }
 
+.abbreviated-name {
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+  font-style: italic;
+  margin-left: 4px;
+}
+
 .player-team {
   font-weight: 600;
   font-size: 0.9rem;

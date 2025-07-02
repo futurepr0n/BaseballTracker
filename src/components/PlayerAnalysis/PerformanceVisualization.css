@@ -367,3 +367,32 @@
     color: #93c5fd;
   }
 }
+
+/* Unavailable data styling */
+.bar-container.unavailable {
+  background: transparent;
+  border: 1px dashed #dee2e6;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.unavailable-data {
+  font-size: 0.8rem;
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  padding: 8px 12px;
+}
+
+.period-note {
+  margin-left: 4px;
+  color: #6c757d;
+  font-size: 0.7rem;
+  cursor: help;
+}
+
+.period-note:hover {
+  color: #495057;
+}

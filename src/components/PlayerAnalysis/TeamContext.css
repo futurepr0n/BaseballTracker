@@ -51,6 +51,7 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   margin-bottom: 24px;
+  align-items: stretch;
 }
 
 .team-overview,
@@ -61,6 +62,12 @@
   border-radius: 12px;
   padding: 16px;
   border: 1px solid #e9ecef;
+  overflow: visible;
+  position: relative;
+  height: 100%;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
 }
 
 .team-overview h4,
@@ -80,6 +87,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex: 1;
 }
 
 .stat-row {
@@ -110,14 +118,19 @@
 .splits-comparison {
   display: flex;
   gap: 16px;
+  flex: 1;
+  align-items: stretch;
 }
 
 .split-item {
   flex: 1;
   text-align: center;
-  padding: 16px;
+  padding: 12px;
   border-radius: 8px;
   border: 2px solid transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .split-item.home {
@@ -174,6 +187,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 8px;
+  flex: 1;
 }
 
 .ranking-item {
@@ -202,15 +216,22 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
+  overflow: visible;
+  align-items: center;
+  flex: 1;
 }
 
 .form-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
+  padding: 8px 12px;
   border-bottom: 1px solid #e9ecef;
   min-height: 24px;
+  width: 100%;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .form-item:last-child {
@@ -222,7 +243,9 @@
   color: var(--text-secondary, #666);
   font-weight: 500;
   white-space: nowrap;
-  min-width: 80px;
+  text-align: left;
+  flex: 0 0 auto;
+  min-width: 70px;
 }
 
 .form-value {
@@ -232,6 +255,8 @@
   font-family: 'Courier New', monospace;
   white-space: nowrap;
   text-align: right;
+  flex: 1 1 auto;
+  overflow: visible;
 }
 
 .form-value.trend-up {
@@ -244,6 +269,13 @@
 
 .form-value.trend-stable {
   color: #ff9800;
+}
+
+/* Specific fix for Recent Performance overflow issue */
+.recent-form {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
 }
 
 .context-insights {

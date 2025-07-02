@@ -25,13 +25,13 @@ const PerformanceVisualization = ({ propAnalysis, player }) => {
     );
   }
 
-  // Define prop betting scenarios to analyze
+  // Define prop betting scenarios to analyze (using 2025 season as primary display)
   const propScenarios = [
     {
       id: 'hr_05',
       title: 'Over 0.5 Home Runs',
       subtitle: 'Home Run Probability',
-      data: propAnalysis.homeRuns?.over05,
+      data: propAnalysis.season2025?.homeRuns?.over05 || propAnalysis.homeRuns?.over05,
       color: '#ff6b35',
       icon: '⚾'
     },
@@ -39,7 +39,7 @@ const PerformanceVisualization = ({ propAnalysis, player }) => {
       id: 'hits_05',
       title: 'Over 0.5 Hits',
       subtitle: 'Hit Probability',
-      data: propAnalysis.hits?.over05,
+      data: propAnalysis.season2025?.hits?.over05 || propAnalysis.hits?.over05,
       color: '#4caf50',
       icon: '🎯'
     },
@@ -47,7 +47,7 @@ const PerformanceVisualization = ({ propAnalysis, player }) => {
       id: 'hits_15',
       title: 'Over 1.5 Hits',
       subtitle: 'Multi-Hit Performance',
-      data: propAnalysis.hits?.over15,
+      data: propAnalysis.season2025?.hits?.over15 || propAnalysis.hits?.over15,
       color: '#66bb6a',
       icon: '📈'
     },
@@ -55,7 +55,7 @@ const PerformanceVisualization = ({ propAnalysis, player }) => {
       id: 'rbi_05',
       title: 'Over 0.5 RBI',
       subtitle: 'RBI Production',
-      data: propAnalysis.rbi?.over05,
+      data: propAnalysis.season2025?.rbi?.over05 || propAnalysis.rbi?.over05,
       color: '#2196f3',
       icon: '🎯'
     },
@@ -63,18 +63,19 @@ const PerformanceVisualization = ({ propAnalysis, player }) => {
       id: 'runs_05',
       title: 'Over 0.5 Runs',
       subtitle: 'Scoring Ability',
-      data: propAnalysis.runs?.over05,
+      data: propAnalysis.season2025?.runs?.over05 || propAnalysis.runs?.over05,
       color: '#9c27b0',
       icon: '🏃'
     }
   ];
 
-  // Time period definitions for historical analysis
+  // Time period definitions for enhanced analysis
   const timePeriods = [
-    { key: 'season', label: '2024', description: 'Season' },
-    { key: 'recent', label: 'L15', description: 'Last 15 Games' },
-    { key: 'short', label: 'L10', description: 'Last 10 Games' },
-    { key: 'immediate', label: 'L5', description: 'Last 5 Games' }
+    { key: 'season2024', label: '2024', description: '2024 Season' },
+    { key: 'season2025', label: '2025', description: '2025 Season' },
+    { key: 'last15', label: 'L15', description: 'Last 15 Games' },
+    { key: 'last10', label: 'L10', description: 'Last 10 Games' },
+    { key: 'last5', label: 'L5', description: 'Last 5 Games' }
   ];
 
   const getSuccessColor = (percentage) => {
@@ -120,35 +121,64 @@ const PerformanceVisualization = ({ propAnalysis, player }) => {
 
         <div className="prop-bars">
           {timePeriods.map((period) => {
-            // For now, use the same data for all periods
-            // In a real implementation, you'd have different data for each period
-            const periodSuccess = success;
-            const periodTotal = Math.max(1, Math.floor(total * (period.key === 'season' ? 1 : 0.3)));
-            const periodPercentage = ((periodSuccess / total) * 100);
-            const adjustedPercentage = Math.min(100, periodPercentage + (Math.random() * 20 - 10)); // Add some variation
+            // Get real data for this time period and prop type
+            const periodData = propAnalysis[period.key];
+            const propType = scenario.id.includes('hr') ? 'homeRuns' : 
+                            scenario.id.includes('rbi') ? 'rbi' :
+                            scenario.id.includes('runs') ? 'runs' : 'hits';
+            const propThreshold = scenario.id.includes('15') ? 'over15' : 'over05';
+            
+            const realPeriodData = periodData?.[propType]?.[propThreshold];
+            
+            // Handle unavailable data gracefully
+            if (!realPeriodData) {
+              return (
+                <div key={period.key} className="period-bar">
+                  <div className="period-label">
+                    <span className="period-name">{period.label}</span>
+                    <span className="period-description">{period.description}</span>
+                  </div>
+                  <div className="bar-container unavailable">
+                    <div className="unavailable-data">
+                      {period.key === 'season2024' ? '2024 Data Unavailable' : 'Insufficient Data'}
+                    </div>
+                  </div>
+                  <div className="period-stats">
+                    <span className="period-record">--/--</span>
+                  </div>
+                </div>
+              );
+            }
+
+            const periodSuccess = realPeriodData.success || 0;
+            const periodTotal = realPeriodData.total || 0;
+            const periodPercentage = parseFloat(realPeriodData.percentage) || 0;
 
             return (
               <div key={period.key} className="period-bar">
                 <div className="period-label">
                   <span className="period-name">{period.label}</span>
                   <span className="period-description">{period.description}</span>
+                  {realPeriodData.note && (
+                    <span className="period-note" title={realPeriodData.note}>ⓘ</span>
+                  )}
                 </div>
                 <div className="bar-container">
                   <div 
                     className="success-bar"
                     style={{
-                      width: `${Math.max(5, adjustedPercentage)}%`,
-                      backgroundColor: getSuccessColor(adjustedPercentage)
+                      width: `${Math.max(5, periodPercentage)}%`,
+                      backgroundColor: getSuccessColor(periodPercentage)
                     }}
                   >
                     <span className="bar-percentage">
-                      {adjustedPercentage.toFixed(0)}%
+                      {periodPercentage.toFixed(0)}%
                     </span>
                   </div>
                 </div>
                 <div className="period-stats">
                   <span className="period-record">
-                    {Math.floor(periodTotal * adjustedPercentage / 100)}/{periodTotal}
+                    {periodSuccess}/{periodTotal}
                   </span>
                 </div>
               </div>
