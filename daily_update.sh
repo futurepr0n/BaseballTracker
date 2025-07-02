@@ -28,6 +28,18 @@ fi
 echo "Data generation completed successfully!"
 echo "====================================="
 
+# 2. Generate team statistics
+echo "Generating team statistics..."
+node src/services/generateTeamStats.js $DATE
+
+if [ $? -ne 0 ]; then
+  echo "WARNING: Failed to generate team stats (non-critical)"
+else
+  echo "✓ Team stats generated successfully"
+fi
+
+echo "====================================="
+
 # 2. Verify files were created
 HR_PRED_FILE="public/data/predictions/hr_predictions_${DATE}.json"
 PERF_FILE="public/data/predictions/player_performance_${DATE}.json"

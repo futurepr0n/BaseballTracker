@@ -76,6 +76,20 @@ if [ -f "${ROLLING_DIR}/rolling_stats_season_latest.json" ]; then
 fi
 
 echo "====================================="
+
+# 4. Generate team statistics based on rolling stats
+echo "Generating team statistics from rolling stats..."
+TARGET_DATE=$DATE
+node src/services/generateTeamStats.js $TARGET_DATE
+
+if [ $? -eq 0 ]; then
+  echo "✅ Team stats generated successfully!"
+  echo "📁 Team stats available at: public/data/team_stats/"
+else
+  echo "⚠️  Warning: Team stats generation failed (non-critical)"
+fi
+
+echo "====================================="
 echo "Rolling statistics generation completed at $(date)"
 echo "Files are ready for the dashboard"
 echo "====================================="

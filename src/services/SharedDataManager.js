@@ -40,8 +40,9 @@ class SharedDataManager {
     if (date > now) return false;
     
     // MLB season roughly runs March 20 - October 31
+    // For 2025, we have data starting from March 18
     const year = date.getFullYear();
-    const seasonStart = new Date(`${year}-03-20`);
+    const seasonStart = year === 2025 ? new Date('2025-03-18') : new Date(`${year}-03-20`);
     const seasonEnd = new Date(`${year}-10-31`);
     
     // Don't request off-season dates
