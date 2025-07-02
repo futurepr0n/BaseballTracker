@@ -1,0 +1,287 @@
+.split-analysis-tables {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color, #eee);
+}
+
+.tables-header {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.tables-header h3 {
+  margin: 0 0 8px 0;
+  color: var(--text-primary, #333);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.tables-header p {
+  margin: 0;
+  color: var(--text-secondary, #666);
+  font-size: 0.9rem;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 40px 20px;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-color, #eee);
+  border-top: 3px solid var(--primary-color, #2196f3);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.tables-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.split-table-container {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e9ecef;
+}
+
+.split-table-container h4 {
+  margin: 0 0 16px 0;
+  color: var(--text-primary, #333);
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.split-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.split-table th {
+  background: #343a40;
+  color: white;
+  padding: 12px 8px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.split-table td {
+  padding: 10px 8px;
+  text-align: center;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #f1f3f4;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: var(--text-primary, #333);
+}
+
+.split-table tr:nth-child(even) {
+  background: #f8f9fa;
+}
+
+.split-table tr:hover {
+  background: #e3f2fd;
+}
+
+.split-table td:first-child {
+  font-family: inherit;
+  font-weight: 700;
+  text-align: left;
+  color: var(--text-primary, #333);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.season-total {
+  border-top: 2px solid var(--primary-color, #2196f3);
+  font-weight: 700;
+}
+
+.season-total td {
+  background: rgba(33, 150, 243, 0.1) !important;
+  font-weight: 700;
+}
+
+.analysis-summary {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 2px solid #e9ecef;
+}
+
+.summary-insights {
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+  padding: 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 8px;
+}
+
+.insight-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.insight-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #666);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.insight-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-color, #2196f3);
+}
+
+/* Performance color coding */
+.split-table td[data-performance="excellent"] {
+  background: rgba(76, 175, 80, 0.1);
+  color: #2e7d32;
+}
+
+.split-table td[data-performance="good"] {
+  background: rgba(255, 152, 0, 0.1);
+  color: #ef6c00;
+}
+
+.split-table td[data-performance="poor"] {
+  background: rgba(244, 67, 54, 0.1);
+  color: #c62828;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .split-analysis-tables {
+    padding: 16px;
+  }
+  
+  .tables-grid {
+    gap: 20px;
+  }
+  
+  .split-table {
+    font-size: 0.8rem;
+  }
+  
+  .split-table th,
+  .split-table td {
+    padding: 8px 4px;
+  }
+  
+  .summary-insights {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .insight-item {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .split-table {
+    font-size: 0.7rem;
+  }
+  
+  .split-table th,
+  .split-table td {
+    padding: 6px 2px;
+  }
+  
+  .split-table-container {
+    padding: 12px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .split-analysis-tables {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+  
+  .split-table-container {
+    break-inside: avoid;
+  }
+  
+  .split-table tr:hover {
+    background: inherit !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .split-analysis-tables {
+    background: #2a2a2a;
+    border-color: #444;
+  }
+  
+  .split-table-container {
+    background: #333;
+    border-color: #444;
+  }
+  
+  .split-table {
+    background: #2a2a2a;
+  }
+  
+  .split-table th {
+    background: #1a1a1a;
+  }
+  
+  .split-table td {
+    border-color: #444;
+    color: #e0e0e0;
+  }
+  
+  .split-table tr:nth-child(even) {
+    background: #333;
+  }
+  
+  .split-table tr:hover {
+    background: #404040;
+  }
+  
+  .split-table td:first-child {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  .season-total td {
+    background: rgba(33, 150, 243, 0.2) !important;
+  }
+  
+  .summary-insights {
+    background: linear-gradient(135deg, #333 0%, #2a2a2a 100%);
+  }
+}

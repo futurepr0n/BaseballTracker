@@ -8,9 +8,10 @@ import {
 
 // Import debug control for immediate availability in console
 import './utils/debugControl';
-// Import console quiet mode for emergency spam control
-import './utils/consoleQuiet';
+// Console quiet mode disabled for Enhanced Player Analysis debugging
+// import './utils/consoleQuiet';
 import PlayerStats from './components/PlayerStats';
+import EnhancedPlayerAnalysis from './components/EnhancedPlayerAnalysis';
 import TeamStats from './components/TeamStats';
 import GameResults from './components/GameResults';
 import Dashboard from './components/Dashboard';
@@ -145,7 +146,11 @@ function App() {
                 currentDate={currentDate}
               />} />
               
-              <Route path="/players" element={<PlayerStats 
+              <Route path="/players" element={<EnhancedPlayerAnalysis 
+                currentDate={currentDate}
+              />} />
+              
+              <Route path="/player-stats" element={<PlayerStats 
                 playerData={playerData} 
                 currentDate={currentDate}
               />} />
