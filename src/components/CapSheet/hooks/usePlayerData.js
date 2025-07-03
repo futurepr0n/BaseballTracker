@@ -85,10 +85,18 @@ useEffect(() => {
 // Clear CapSheet cache when date changes to prevent stale data
 useEffect(() => {
   clearCapSheetCache();
+  
+  // EMERGENCY: Clear corrupted local cache from async/await bug
+  playerDataCacheRef.current = {
+    hitters: {},
+    pitchers: {}
+  };
+  
   console.log(`[usePlayerData] === DATE SETUP ===`);
   console.log(`[usePlayerData] Current date: ${formatDateString(currentDate)}`);
   console.log(`[usePlayerData] Current date object:`, currentDate);
   console.log(`[usePlayerData] Cleared cache for date change: ${formatDateString(currentDate)}`);
+  console.log(`[usePlayerData] Emergency cleared local cache to fix corrupted data`);
 }, [currentDate]);
 
 
@@ -141,9 +149,10 @@ useEffect(() => {
       console.log(`[usePlayerData] Using cached data for ${player.name} with ${playerCache.maxGamesHistory} max games`);
       console.log(`[usePlayerData] Cached data structure:`, {
         maxGamesHistory: playerCache.maxGamesHistory,
-        gamesCount: playerCache.games?.length,
-        firstGame: playerCache.games?.[0],
-        gamesSample: playerCache.games?.slice(0, 3)
+        gamesType: typeof playerCache.games,
+        gamesLength: Array.isArray(playerCache.games) ? playerCache.games.length : 'NOT ARRAY',
+        gamesValue: playerCache.games,
+        firstGame: Array.isArray(playerCache.games) ? playerCache.games[0] : 'NOT ARRAY'
       });
       
       // We have complete cached data, just need to create a subset with the requested history count
@@ -171,6 +180,13 @@ useEffect(() => {
       
       // Add game data for the requested history count
       console.log(`[usePlayerData] CACHED GAME SETTING: About to set ${historyCount} games for ${player.name}`);
+      
+      // Safety check: Ensure games is an array
+      if (!Array.isArray(playerCache.games)) {
+        console.error(`[usePlayerData] ERROR: playerCache.games is not an array for ${player.name}:`, typeof playerCache.games, playerCache.games);
+        return player; // Return original player if cache is corrupted
+      }
+      
       console.log(`[usePlayerData] Available games in cache: ${playerCache.games.length}`);
       
       for (let i = 0; i < historyCount && i < playerCache.games.length; i++) {
@@ -227,6 +243,12 @@ useEffect(() => {
       console.log(`[usePlayerData] Found ${games.length} games for ${player.name}`);
       console.log(`[usePlayerData] Games data structure:`, games);
       console.log(`[usePlayerData] Date data keys:`, Object.keys(dateData));
+      
+      // Validate games is an array before caching
+      if (!Array.isArray(games)) {
+        console.error(`[usePlayerData] ERROR: games is not an array for ${player.name}:`, typeof games, games);
+        return player; // Don't cache invalid data
+      }
       
       // Store the complete data in the cache
       if (isHitter) {
