@@ -1,0 +1,889 @@
+/* Completely isolated CSS for Enhanced Live Scores Card - No conflicts with existing styles */
+
+/* Override any inherited styles and ensure complete isolation */
+.live-scores-isolated-wrapper {
+  all: initial;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+  color: #333 !important;
+  background: white !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.live-scores-isolated-wrapper * {
+  box-sizing: border-box;
+}
+
+.live-scores-isolated-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 30px !important;
+  padding: 25px 25px 20px 25px !important;
+  border-bottom: 3px solid #0d2b56 !important;
+  background: white !important;
+}
+
+.live-scores-isolated-header h3 {
+  margin: 0 !important;
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  color: #0d2b56 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.live-scores-isolated-live-indicator {
+  background: #dc3545 !important;
+  color: white !important;
+  padding: 4px 12px !important;
+  border-radius: 12px !important;
+  font-size: 0.85rem !important;
+  animation: live-scores-isolated-pulse 2s infinite !important;
+  font-weight: 500 !important;
+}
+
+@keyframes live-scores-isolated-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.live-scores-isolated-refresh-controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: 15px !important;
+}
+
+.live-scores-isolated-filter-controls {
+  display: flex !important;
+  gap: 5px !important;
+}
+
+.live-scores-isolated-filter-btn {
+  background: #f8f9fa !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 4px !important;
+  padding: 4px 10px !important;
+  font-size: 0.8rem !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  color: #333 !important;
+  font-family: inherit !important;
+}
+
+.live-scores-isolated-filter-btn:hover:not(:disabled) {
+  background-color: #e9ecef !important;
+}
+
+.live-scores-isolated-filter-btn.active {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: white !important;
+}
+
+.live-scores-isolated-filter-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.live-scores-isolated-refresh-btn {
+  background: #007bff !important;
+  color: white !important;
+  border: none !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  font-size: 0.9rem !important;
+  font-family: inherit !important;
+  transition: all 0.2s ease !important;
+}
+
+.live-scores-isolated-refresh-btn:hover {
+  background: #0056b3 !important;
+}
+
+.live-scores-isolated-refresh-btn:disabled {
+  background: #6c757d !important;
+  cursor: not-allowed !important;
+}
+
+.live-scores-isolated-last-updated {
+  font-size: 0.8rem !important;
+  color: #666 !important;
+}
+
+.live-scores-isolated-content {
+  padding: 0 25px 25px 25px !important;
+  background: white !important;
+}
+
+.live-scores-isolated-games-container {
+  display: grid !important;
+  gap: 20px !important;
+  max-height: 600px !important;
+  overflow-y: auto !important;
+  padding-right: 5px !important;
+}
+
+/* Custom scrollbar styling for games container */
+.live-scores-isolated-games-container::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+.live-scores-isolated-games-container::-webkit-scrollbar-track {
+  background: #f1f1f1 !important;
+  border-radius: 3px !important;
+}
+
+.live-scores-isolated-games-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1 !important;
+  border-radius: 3px !important;
+}
+
+.live-scores-isolated-games-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8 !important;
+}
+
+.live-scores-isolated-game-card {
+  border: 2px solid #e0e6ed !important;
+  border-radius: 12px !important;
+  background: white !important;
+  overflow: hidden !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s ease !important;
+}
+
+.live-scores-isolated-game-card.live {
+  border-color: #dc3545 !important;
+  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.2) !important;
+}
+
+.live-scores-isolated-game-summary {
+  padding: 20px !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s !important;
+  background: white !important;
+}
+
+.live-scores-isolated-game-summary:hover {
+  background-color: #f8f9fa !important;
+}
+
+.live-scores-isolated-game-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 15px !important;
+}
+
+.live-scores-isolated-teams-display {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex: 1 !important;
+}
+
+.live-scores-isolated-team {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-width: 150px !important;
+}
+
+.live-scores-isolated-team-logo {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  border: 2px solid #e9ecef !important;
+  object-fit: contain !important;
+}
+
+.live-scores-isolated-team-info {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.live-scores-isolated-team-name {
+  font-weight: 600 !important;
+  font-size: 1.1rem !important;
+  color: #333 !important;
+  margin: 0 !important;
+}
+
+.live-scores-isolated-team-record {
+  font-size: 0.85rem !important;
+  color: #666 !important;
+}
+
+.live-scores-isolated-team-score {
+  font-size: 2rem !important;
+  font-weight: bold !important;
+  color: #0d2b56 !important;
+  min-width: 50px !important;
+  text-align: center !important;
+}
+
+.live-scores-isolated-team-score.winning {
+  color: #28a745 !important;
+}
+
+.live-scores-isolated-vs-divider {
+  font-size: 1.2rem !important;
+  color: #666 !important;
+  margin: 0 15px !important;
+}
+
+.live-scores-isolated-game-status {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 8px !important;
+}
+
+.live-scores-isolated-status-badge {
+  background: #28a745 !important;
+  color: white !important;
+  padding: 6px 12px !important;
+  border-radius: 15px !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+}
+
+.live-scores-isolated-status-badge.live {
+  background: #dc3545 !important;
+  animation: live-scores-isolated-pulse 2s infinite !important;
+}
+
+.live-scores-isolated-status-badge.final {
+  background: #6c757d !important;
+}
+
+.live-scores-isolated-status-badge.scheduled {
+  background: #007bff !important;
+}
+
+.live-scores-isolated-live-details {
+  font-size: 0.85rem !important;
+  color: #666 !important;
+  text-align: right !important;
+}
+
+.live-scores-isolated-expand-indicator {
+  font-size: 1.2rem !important;
+  color: #666 !important;
+  margin-left: 15px !important;
+  transition: transform 0.3s !important;
+}
+
+.live-scores-isolated-game-card.expanded .live-scores-isolated-expand-indicator {
+  transform: rotate(90deg) !important;
+}
+
+.live-scores-isolated-game-details {
+  display: none !important;
+  padding: 20px !important;
+  border-top: 1px solid #e9ecef !important;
+  background: #f8f9fa !important;
+}
+
+.live-scores-isolated-game-details.show {
+  display: block !important;
+  animation: live-scores-isolated-slideDown 0.3s ease !important;
+}
+
+@keyframes live-scores-isolated-slideDown {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 500px; }
+}
+
+.live-scores-isolated-details-tabs {
+  display: flex !important;
+  margin-bottom: 20px !important;
+  border-bottom: 2px solid #dee2e6 !important;
+  overflow-x: auto !important;
+}
+
+.live-scores-isolated-tab-btn {
+  background: none !important;
+  border: none !important;
+  padding: 12px 20px !important;
+  cursor: pointer !important;
+  font-weight: 500 !important;
+  color: #6b7280 !important;
+  border-bottom: 2px solid transparent !important;
+  transition: all 0.3s !important;
+  white-space: nowrap !important;
+  font-family: inherit !important;
+  font-size: 0.9rem !important;
+}
+
+.live-scores-isolated-tab-btn.active {
+  color: #0d2b56 !important;
+  border-bottom-color: #0d2b56 !important;
+  font-weight: 600 !important;
+}
+
+.live-scores-isolated-tab-btn:hover:not(.active) {
+  color: #495057 !important;
+  background-color: rgba(0, 123, 255, 0.05) !important;
+}
+
+.live-scores-isolated-tab-content {
+  display: none !important;
+}
+
+.live-scores-isolated-tab-content.active {
+  display: block !important;
+  animation: live-scores-isolated-fadeIn 0.3s ease !important;
+}
+
+@keyframes live-scores-isolated-fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.live-scores-isolated-live-situation {
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7) !important;
+  border: 2px solid #ffc107 !important;
+  border-radius: 8px !important;
+  padding: 15px !important;
+  margin-bottom: 15px !important;
+}
+
+.live-scores-isolated-situation-grid {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important;
+  gap: 20px !important;
+  align-items: center !important;
+}
+
+.live-scores-isolated-count-display {
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
+  color: #856404 !important;
+}
+
+.live-scores-isolated-base-runners {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.live-scores-isolated-diamond {
+  position: relative !important;
+  width: 60px !important;
+  height: 60px !important;
+  transform: rotate(45deg) !important;
+}
+
+.live-scores-isolated-base {
+  position: absolute !important;
+  width: 8px !important;
+  height: 8px !important;
+  background: #ddd !important;
+  border-radius: 2px !important;
+  transition: all 0.3s !important;
+}
+
+.live-scores-isolated-base.occupied {
+  background: #28a745 !important;
+  box-shadow: 0 0 8px rgba(40, 167, 69, 0.6) !important;
+}
+
+.live-scores-isolated-base.first { bottom: 15px !important; right: 26px !important; }
+.live-scores-isolated-base.second { top: 15px !important; right: 26px !important; }
+.live-scores-isolated-base.third { bottom: 15px !important; left: 26px !important; }
+.live-scores-isolated-base.home { bottom: 8px !important; right: 26px !important; background: #333 !important; border-radius: 50% !important; }
+
+.live-scores-isolated-due-up-section {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  gap: 15px !important;
+}
+
+.live-scores-isolated-due-up-player {
+  background: white !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  transition: all 0.3s ease !important;
+}
+
+.live-scores-isolated-due-up-player:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.live-scores-isolated-player-photo {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  background: #e9ecef !important;
+  background-size: cover !important;
+  background-position: center !important;
+  flex-shrink: 0 !important;
+}
+
+.live-scores-isolated-player-info {
+  flex: 1 !important;
+}
+
+.live-scores-isolated-player-name {
+  font-weight: 600 !important;
+  margin-bottom: 2px !important;
+  color: #333 !important;
+  font-size: 0.9rem !important;
+}
+
+.live-scores-isolated-player-stats {
+  font-size: 0.85rem !important;
+  color: #666 !important;
+}
+
+.live-scores-isolated-leaders-section {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+  gap: 15px !important;
+}
+
+.live-scores-isolated-leader-card {
+  background: #f8fafc !important;
+  border-radius: 8px !important;
+  padding: 15px !important;
+  border-left: 4px solid #3b82f6 !important;
+}
+
+.live-scores-isolated-stat-category {
+  font-weight: bold !important;
+  color: #0d2b56 !important;
+  margin-bottom: 8px !important;
+  font-size: 0.9rem !important;
+}
+
+.live-scores-isolated-leader-info {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.live-scores-isolated-leader-headshot {
+  width: 35px !important;
+  height: 35px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+}
+
+.live-scores-isolated-play-by-play-section {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+.live-scores-isolated-plays-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.live-scores-isolated-play-item {
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 6px !important;
+  padding: 12px !important;
+  transition: all 0.3s ease !important;
+}
+
+.live-scores-isolated-play-item.latest-play {
+  border-color: #3b82f6 !important;
+  background: #f0f9ff !important;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1) !important;
+}
+
+.live-scores-isolated-play-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 6px !important;
+  font-size: 0.85rem !important;
+  color: #666 !important;
+}
+
+.live-scores-isolated-play-time {
+  font-weight: 500 !important;
+}
+
+.live-scores-isolated-play-inning {
+  background: #f3f4f6 !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  font-size: 0.8rem !important;
+}
+
+.live-scores-isolated-play-description {
+  font-size: 0.9rem !important;
+  color: #333 !important;
+  line-height: 1.4 !important;
+}
+
+.live-scores-isolated-loading {
+  text-align: center !important;
+  padding: 40px !important;
+  color: #666 !important;
+  font-size: 1.1rem !important;
+}
+
+.live-scores-isolated-error {
+  background: #f8d7da !important;
+  color: #721c24 !important;
+  padding: 15px !important;
+  border-radius: 6px !important;
+  margin: 15px 0 !important;
+}
+
+.live-scores-isolated-retry-btn {
+  background: #dc3545 !important;
+  color: white !important;
+  border: none !important;
+  padding: 8px 16px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  margin-top: 10px !important;
+  font-family: inherit !important;
+}
+
+.live-scores-isolated-no-games {
+  text-align: center !important;
+  color: #666 !important;
+  font-style: italic !important;
+  padding: 30px 20px !important;
+}
+
+.live-scores-isolated-no-games p {
+  margin: 0 0 8px 0 !important;
+  font-size: 1.1rem !important;
+}
+
+.live-scores-isolated-no-games small {
+  display: block !important;
+  font-size: 0.9rem !important;
+  opacity: 0.8 !important;
+}
+
+/* Additional h4 styling for section headers */
+.live-scores-isolated-tab-content h4 {
+  margin: 0 0 12px 0 !important;
+  color: #495057 !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
+/* Ensure divs inside tab content maintain proper styling */
+.live-scores-isolated-tab-content > div {
+  color: #333 !important;
+  font-size: 0.9rem !important;
+  line-height: 1.5 !important;
+}
+
+.live-scores-isolated-tab-content > div strong {
+  font-weight: 600 !important;
+  color: #333 !important;
+}
+
+/* Hide mobile status row on desktop */
+.live-scores-isolated-mobile-status-row {
+  display: none !important;
+}
+
+/* Show mobile status row and hide desktop elements on mobile */
+@media (max-width: 768px) {
+  .live-scores-isolated-desktop-status,
+  .live-scores-isolated-desktop-expand {
+    display: none !important;
+  }
+  
+  .live-scores-isolated-mobile-status-row {
+    display: flex !important;
+  }
+  .live-scores-isolated-wrapper {
+    margin: 0 -5px !important;
+  }
+  
+  .live-scores-isolated-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 15px !important;
+    padding: 20px 15px 15px 15px !important;
+  }
+  
+  .live-scores-isolated-header h3 {
+    justify-content: center !important;
+    font-size: 1.3rem !important;
+  }
+  
+  .live-scores-isolated-refresh-controls {
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+  
+  .live-scores-isolated-content {
+    padding: 0 15px 20px 15px !important;
+  }
+  
+  .live-scores-isolated-game-summary {
+    padding: 12px !important;
+  }
+  
+  .live-scores-isolated-game-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .live-scores-isolated-teams-display {
+    width: 100% !important;
+    gap: 8px !important;
+  }
+  
+  .live-scores-isolated-team {
+    gap: 8px !important;
+    min-width: 0 !important;
+    flex: 1 !important;
+  }
+  
+  .live-scores-isolated-team-logo {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  
+  .live-scores-isolated-team-info {
+    min-width: 0 !important;
+    flex: 1 !important;
+  }
+  
+  .live-scores-isolated-team-name {
+    font-size: 0.95rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  
+  .live-scores-isolated-team-record {
+    font-size: 0.75rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  
+  .live-scores-isolated-team-score {
+    font-size: 1.6rem !important;
+    min-width: 40px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .live-scores-isolated-vs-divider {
+    font-size: 1rem !important;
+    margin: 0 8px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  /* Mobile game status row */
+  .live-scores-isolated-mobile-status-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin-top: 8px !important;
+    padding-top: 8px !important;
+    border-top: 1px solid #e9ecef !important;
+  }
+  
+  .live-scores-isolated-game-status {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex: 1 !important;
+  }
+  
+  .live-scores-isolated-status-badge {
+    font-size: 0.8rem !important;
+    padding: 4px 8px !important;
+    white-space: nowrap !important;
+  }
+  
+  /* Ensure status colors are preserved on mobile */
+  .live-scores-isolated-status-badge.live {
+    background: #dc3545 !important;
+    animation: live-scores-isolated-pulse 2s infinite !important;
+  }
+  
+  .live-scores-isolated-status-badge.final {
+    background: #6c757d !important;
+  }
+  
+  .live-scores-isolated-status-badge.scheduled {
+    background: #007bff !important;
+  }
+  
+  .live-scores-isolated-live-details {
+    font-size: 0.75rem !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+  }
+  
+  .live-scores-isolated-expand-indicator {
+    font-size: 1rem !important;
+    margin-left: 8px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  /* Mobile tabs adjustment */
+  .live-scores-isolated-details-tabs {
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  
+  .live-scores-isolated-details-tabs::-webkit-scrollbar {
+    display: none !important;
+  }
+  
+  .live-scores-isolated-tab-btn {
+    padding: 10px 16px !important;
+    font-size: 0.85rem !important;
+    min-width: auto !important;
+  }
+  
+  /* Mobile content adjustments */
+  .live-scores-isolated-game-details {
+    padding: 15px !important;
+  }
+  
+  .live-scores-isolated-live-situation {
+    padding: 12px !important;
+  }
+  
+  .live-scores-isolated-situation-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  
+  .live-scores-isolated-base-runners {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  
+  .live-scores-isolated-diamond {
+    width: 50px !important;
+    height: 50px !important;
+  }
+  
+  .live-scores-isolated-base {
+    width: 6px !important;
+    height: 6px !important;
+  }
+  
+  .live-scores-isolated-base.first { bottom: 12px !important; right: 22px !important; }
+  .live-scores-isolated-base.second { top: 12px !important; right: 22px !important; }
+  .live-scores-isolated-base.third { bottom: 12px !important; left: 22px !important; }
+  .live-scores-isolated-base.home { bottom: 6px !important; right: 22px !important; }
+  
+  .live-scores-isolated-due-up-section {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .live-scores-isolated-due-up-player {
+    padding: 10px !important;
+  }
+  
+  .live-scores-isolated-player-photo {
+    width: 35px !important;
+    height: 35px !important;
+  }
+  
+  .live-scores-isolated-leaders-section {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .live-scores-isolated-leader-card {
+    padding: 12px !important;
+  }
+  
+  .live-scores-isolated-leader-headshot {
+    width: 30px !important;
+    height: 30px !important;
+  }
+  
+  .live-scores-isolated-play-item {
+    padding: 10px !important;
+  }
+  
+  .live-scores-isolated-play-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px !important;
+  }
+  
+  .live-scores-isolated-play-description {
+    font-size: 0.85rem !important;
+  }
+}
+
+/* Extra small screens (iPhone SE, etc.) */
+@media (max-width: 480px) {
+  .live-scores-isolated-header {
+    padding: 15px 10px 12px 10px !important;
+  }
+  
+  .live-scores-isolated-content {
+    padding: 0 10px 15px 10px !important;
+  }
+  
+  .live-scores-isolated-game-summary {
+    padding: 10px !important;
+  }
+  
+  .live-scores-isolated-team {
+    gap: 6px !important;
+  }
+  
+  .live-scores-isolated-team-logo {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  
+  .live-scores-isolated-team-name {
+    font-size: 0.85rem !important;
+  }
+  
+  .live-scores-isolated-team-record {
+    font-size: 0.7rem !important;
+  }
+  
+  .live-scores-isolated-team-score {
+    font-size: 1.4rem !important;
+    min-width: 35px !important;
+  }
+  
+  .live-scores-isolated-vs-divider {
+    margin: 0 6px !important;
+  }
+  
+  .live-scores-isolated-status-badge {
+    font-size: 0.75rem !important;
+    padding: 3px 6px !important;
+  }
+  
+  .live-scores-isolated-live-details {
+    font-size: 0.7rem !important;
+  }
+}

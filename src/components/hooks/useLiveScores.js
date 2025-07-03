@@ -6,17 +6,29 @@ export const useLiveScores = (refreshInterval = 30000) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const maxRetries = 3;
 
-  const fetchScores = useCallback(async () => {
+  const fetchScores = useCallback(async (isRetry = false) => {
     try {
+      if (!isRetry) {
+        setRetryCount(0);
+      }
       setError(null);
       
-      console.log('🔄 Fetching live scores from ESPN API...');
+      console.log(`🔄 Fetching live scores from ESPN API... ${isRetry ? `(Retry ${retryCount + 1}/${maxRetries})` : ''}`);
       
-      const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch('https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/scoreboard', {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
       const data = await response.json();
@@ -200,13 +212,28 @@ export const useLiveScores = (refreshInterval = 30000) => {
       setScores(sortedGames);
       setLastUpdated(new Date());
       setLoading(false);
+      setRetryCount(0);
       
     } catch (err) {
       console.error('❌ Error fetching live scores:', err);
-      setError(err.message);
-      setLoading(false);
+      
+      if (retryCount < maxRetries && !isRetry) {
+        // Retry with exponential backoff
+        const retryDelay = Math.pow(2, retryCount) * 1000;
+        console.log(`⏰ Retrying in ${retryDelay}ms...`);
+        
+        setRetryCount(prev => prev + 1);
+        setError(`Connection issue. Retrying... (${retryCount + 1}/${maxRetries})`);
+        
+        setTimeout(() => {
+          fetchScores(true);
+        }, retryDelay);
+      } else {
+        setError(err.name === 'AbortError' ? 'Request timeout - will retry on next refresh' : err.message);
+        setLoading(false);
+      }
     }
-  }, []);
+  }, [retryCount, maxRetries]);
 
   // Initial fetch
   useEffect(() => {

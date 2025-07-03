@@ -863,6 +863,384 @@
   }
 }
 
+/* Enhanced Game Details Styles */
+.enhanced-game-details {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.live-situation {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border: 2px solid #ffc107;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 16px;
+}
+
+.situation-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.count-display {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #856404;
+}
+
+.base-runners {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.diamond {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  transform: rotate(45deg);
+}
+
+.base {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #ddd;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.base.occupied {
+  background: #28a745;
+  box-shadow: 0 0 8px rgba(40, 167, 69, 0.6);
+  animation: glow 2s infinite;
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(40, 167, 69, 0.4); }
+  50% { box-shadow: 0 0 12px rgba(40, 167, 69, 0.8); }
+}
+
+.base.first { bottom: 12px; right: 21px; }
+.base.second { top: 12px; right: 21px; }
+.base.third { bottom: 12px; left: 21px; }
+.base.home { bottom: 8px; right: 21px; background: #333; border-radius: 50%; }
+
+.runner-name {
+  font-size: 0.85rem;
+  color: #495057;
+  font-weight: 500;
+}
+
+.last-play {
+  background: #e9ecef;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #495057;
+  border-left: 3px solid #007bff;
+}
+
+.details-tabs {
+  display: flex;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #dee2e6;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.tab-btn.active {
+  color: #007bff;
+  border-bottom-color: #007bff;
+  font-weight: 600;
+}
+
+.tab-btn:hover:not(.active) {
+  color: #495057;
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.live-tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.game-situation {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.game-situation h4 {
+  margin: 0 0 12px 0;
+  color: #495057;
+  font-size: 1rem;
+}
+
+.game-situation div {
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.due-up-section h4 {
+  margin: 0 0 12px 0;
+  color: #495057;
+  font-size: 1rem;
+}
+
+.due-up-players {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.due-up-player {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+}
+
+.due-up-player:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.batting-order {
+  background: #007bff;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.mini-photo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e9ecef;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.mini-player-info {
+  flex: 1;
+}
+
+.mini-player-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.mini-player-stats {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.no-players {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+  .enhanced-game-details {
+    padding: 12px;
+  }
+  
+  .live-situation {
+    padding: 12px;
+  }
+  
+  .situation-content {
+    gap: 8px;
+  }
+  
+  .base-runners {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .diamond {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .base {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .base.first { bottom: 10px; right: 17px; }
+  .base.second { top: 10px; right: 17px; }
+  .base.third { bottom: 10px; left: 17px; }
+  .base.home { bottom: 6px; right: 17px; }
+  
+  .due-up-players {
+    grid-template-columns: 1fr;
+  }
+  
+  .tab-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Leaders Section Styling */
+.leaders-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.leader-card {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 15px;
+  border-left: 4px solid #3b82f6;
+}
+
+.stat-category {
+  font-weight: bold;
+  color: #0d2b56;
+  margin-bottom: 8px;
+}
+
+.leader-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.leader-headshot {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}
+
+/* Play-by-Play Section Styling */
+.play-by-play-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.plays-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.play-item {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 12px;
+  transition: all 0.3s ease;
+}
+
+.play-item.latest-play {
+  border-color: #3b82f6;
+  background: #f0f9ff;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+}
+
+.play-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.play-time {
+  font-weight: 500;
+}
+
+.play-inning {
+  background: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.play-description {
+  font-size: 0.9rem;
+  color: #333;
+  line-height: 1.4;
+}
+
+/* Situation Grid Enhancement */
+.situation-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: center;
+}
+
+/* Enhanced Game Header */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.teams-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+}
+
 /* Extra small screens */
 @media (max-width: 480px) {
   .game-score {
@@ -891,53 +1269,59 @@
     padding: 1px 4px;
   }
   
-  .diamond {
-    width: 18px;
-    height: 18px;
-  }
-  
-  .base.home {
-    bottom: -2px;
-    left: 6px;
-  }
-
-  .base.first {
-    right: -2px;
-    bottom: 6px;
-  }
-
-  .base.second {
-    top: -2px;
-    left: 6px;
-  }
-
-  .base.third {
-    left: -2px;
-    bottom: 6px;
-  }
-  
-  .live-game-details {
+  .enhanced-game-details {
     padding: 8px;
   }
   
-  .count-and-bases {
-    padding: 6px;
+  .live-situation {
+    padding: 10px;
   }
   
-  .current-players {
-    padding: 6px;
+  .count-display {
+    font-size: 1rem;
+  }
+  
+  .due-up-player {
+    padding: 8px;
+  }
+  
+  .mini-photo {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .batting-order {
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+  }
+
+  /* Mobile Leaders Section */
+  .leaders-section {
+    grid-template-columns: 1fr;
+  }
+
+  .leader-card {
+    padding: 12px;
+  }
+
+  .leader-headshot {
+    width: 30px;
+    height: 30px;
+  }
+
+  /* Mobile Play-by-Play */
+  .play-item {
+    padding: 10px;
+  }
+
+  .play-header {
+    flex-direction: column;
+    align-items: flex-start;
     gap: 4px;
   }
-  
-  .player-name {
-    font-size: 0.75rem;
-  }
-  
-  .play-text {
-    font-size: 0.75rem;
-  }
-  
-  .game-details {
-    gap: 8px;
+
+  .play-description {
+    font-size: 0.85rem;
   }
 }
