@@ -32,13 +32,37 @@ const OverlayPerformanceChart = ({
 }) => {
   // Logging to help debug when this component renders
   useEffect(() => {
+    console.log(`[OverlayChart] === DEBUGGING ${hitter.name} ===`);
+    console.log(`[OverlayChart] Full hitter object:`, hitter);
+    
+    const hitterGames = getAvailableHitterGames();
     console.log(`[OverlayChart] Rendering chart for ${hitter.name} with data:`, {
-      hitterGames: getAvailableHitterGames().length,
+      hitterGames: hitterGames.length,
+      hitterGamesData: hitterGames,
       pitcherOverlay: showPitcherOverlay,
       secondPitcherOverlay: showSecondPitcherOverlay,
       isLoadingHitter: isLoadingHitter
     });
-  }, [hitter.name, isLoadingHitter]);
+    
+    // DEBUG: Show what game properties are available on hitter object
+    const gameProps = Object.keys(hitter).filter(key => key.startsWith('game'));
+    console.log(`[OverlayChart] Game properties available on ${hitter.name}:`, gameProps);
+    
+    // Show specific game data
+    for (let i = 1; i <= 3; i++) {
+      if (hitter[`game${i}Date`]) {
+        console.log(`[OverlayChart] Game ${i}: Date=${hitter[`game${i}Date`]}, AB=${hitter[`game${i}AB`]}, H=${hitter[`game${i}H`]}, HR=${hitter[`game${i}HR`]}`);
+      } else {
+        console.log(`[OverlayChart] Game ${i} missing: game${i}Date = ${hitter[`game${i}Date`]}`);
+      }
+    }
+    
+    // Check if we're missing data and why
+    if (hitterGames.length === 0) {
+      console.log(`[OverlayChart] ❌ NO HITTER GAMES FOUND for ${hitter.name}`);
+      console.log(`[OverlayChart] Checking properties: game1Date=${hitter.game1Date}, game2Date=${hitter.game2Date}, game3Date=${hitter.game3Date}`);
+    }
+  }, [hitter, isLoadingHitter]);
 
   // Visual constants - use percentage-based width
   const padding = { top: 15, right: 20, bottom: 35, left: 30 };

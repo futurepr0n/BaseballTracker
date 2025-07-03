@@ -13,11 +13,13 @@ export const exportToCSV = (selectedPlayers, handicappers = []) => {
   // Hitters
   if (selectedPlayers.hitters && selectedPlayers.hitters.length > 0) {
     csvContent += "HITTERS\n";
-    // Make sure header count matches data columns
-    csvContent += "Player,Team,Last HR,Last AB,Last H,Game 1 Date,Game 1 HR,Game 1 AB,Game 1 H,Game 2 Date,Game 2 HR,Game 2 AB,Game 2 H,Game 3 Date,Game 3 HR,Game 3 AB,Game 3 H,Pitcher,Pitcher ID,Opponent Team,Throws,Exp SO,Stadium,Game O/U,Bet H,Bet HR,Bet B\n";
+    // Enhanced header to include handedness data
+    csvContent += "Player,Team,Bats,Full Name,Last HR,Last AB,Last H,Game 1 Date,Game 1 HR,Game 1 AB,Game 1 H,Game 2 Date,Game 2 HR,Game 2 AB,Game 2 H,Game 3 Date,Game 3 HR,Game 3 AB,Game 3 H,Pitcher,Pitcher ID,Opponent Team,Throws,Exp SO,Stadium,Game O/U,Bet H,Bet HR,Bet B\n";
     selectedPlayers.hitters.forEach(p => {
       const row = [
         `"${p.name?.replace(/"/g, '""') || ''}"`, p.team || '', 
+        p.bats || '', // Include handedness data
+        `"${p.fullName?.replace(/"/g, '""') || p.name || ''}"`, // Include full name
         p.prevGameHR || '', p.prevGameAB || '', p.prevGameH || '',
         p.game1Date || '', p.game1HR || '', p.game1AB || '', p.game1H || '',
         p.game2Date || '', p.game2HR || '', p.game2AB || '', p.game2H || '',
@@ -37,11 +39,13 @@ export const exportToCSV = (selectedPlayers, handicappers = []) => {
   // Pitchers
   if (selectedPlayers.pitchers && selectedPlayers.pitchers.length > 0) {
     csvContent += "PITCHERS\n";
-    // Make sure header count matches data columns
-    csvContent += "Player,Team,Last IP,Last K,Last ER,Game 1 Date,Game 1 IP,Game 1 K,Game 1 ER,Game 2 Date,Game 2 IP,Game 2 K,Game 2 ER,Game 3 Date,Game 3 IP,Game 3 K,Game 3 ER,Opponent,Pitch Count,Exp K,Stadium,Game O/U,Bet K,Bet O/U\n";
+    // Enhanced header to include handedness data
+    csvContent += "Player,Team,Throws,Full Name,Last IP,Last K,Last ER,Game 1 Date,Game 1 IP,Game 1 K,Game 1 ER,Game 2 Date,Game 2 IP,Game 2 K,Game 2 ER,Game 3 Date,Game 3 IP,Game 3 K,Game 3 ER,Opponent,Pitch Count,Exp K,Stadium,Game O/U,Bet K,Bet O/U\n";
     selectedPlayers.pitchers.forEach(p => {
       const row = [
         `"${p.name?.replace(/"/g, '""') || ''}"`, p.team || '', 
+        p.throwingArm || '', // Include handedness data
+        `"${p.fullName?.replace(/"/g, '""') || p.name || ''}"`, // Include full name
         p.prevGameIP || '', p.prevGameK || '', p.prevGameER || '',
         p.game1Date || '', p.game1IP || '', p.game1K || '', p.game1ER || '',
         p.game2Date || '', p.game2IP || '', p.game2K || '', p.game2ER || '',
@@ -135,10 +139,12 @@ export const exportToCSV = (selectedPlayers, handicappers = []) => {
 
 /**
  * Parse CSV content from imported file with improved error handling and CSV parsing
+ * Enhanced with roster data integration to preserve handedness information
  * @param {string} content - CSV file content
+ * @param {Array} rosterData - Optional roster data for player enhancement
  * @returns {Object|null} Parsed player data or null if error
  */
-export const parseImportedCSV = (content) => {
+export const parseImportedCSV = async (content, rosterData = []) => {
   try {
     console.log("[Import] Starting CSV parsing");
     
@@ -289,8 +295,10 @@ export const parseImportedCSV = (content) => {
             handicapperPicks: {}
           };
           
-          // Map all possible fields from CSV
+          // Map all possible fields from CSV including handedness
           const fieldMappings = {
+            'Bats': 'bats', // Handedness data
+            'Full Name': 'fullName', // Full name data
             'Last HR': 'prevGameHR',
             'Last AB': 'prevGameAB', 
             'Last H': 'prevGameH',
@@ -321,7 +329,7 @@ export const parseImportedCSV = (content) => {
               const value = values[headerMap[csvField]];
               if (value !== undefined) {
                 // Special handling for text fields with quotes
-                if (csvField === 'Pitcher' || csvField === 'Stadium') {
+                if (csvField === 'Pitcher' || csvField === 'Stadium' || csvField === 'Full Name') {
                   hitter[objectField] = value.replace(/^"|"$/g, '') || '';
                 } else {
                   hitter[objectField] = value || '';
@@ -363,8 +371,10 @@ export const parseImportedCSV = (content) => {
             handicapperPicks: {}
           };
           
-          // Map fields from CSV
+          // Map fields from CSV including handedness
           const fieldMappings = {
+            'Throws': 'throwingArm', // Handedness data
+            'Full Name': 'fullName', // Full name data
             'Last IP': 'prevGameIP',
             'Last K': 'prevGameK', 
             'Last ER': 'prevGameER',
@@ -393,7 +403,7 @@ export const parseImportedCSV = (content) => {
               const value = values[headerMap[csvField]];
               if (value !== undefined) {
                 // Special handling for text fields with quotes
-                if (csvField === 'Opponent' || csvField === 'Stadium') {
+                if (csvField === 'Opponent' || csvField === 'Stadium' || csvField === 'Full Name') {
                   pitcher[objectField] = value.replace(/^"|"$/g, '') || '';
                 } else {
                   pitcher[objectField] = value || '';
@@ -511,10 +521,17 @@ export const parseImportedCSV = (content) => {
     
     console.log(`[Import] Parsed ${importedHitters.length} hitters, ${importedPitchers.length} pitchers, ${extractedHandicappers.length} handicappers`);
     
-    // Return the parsed data
+    // PHASE 3 ENHANCEMENT: Enhance players with roster data to preserve handedness
+    console.log(`[Import] Enhancing players with roster data (${rosterData.length} roster entries available)`);
+    const enhancedHitters = await enhancePlayersWithRosterData(importedHitters, rosterData, 'hitter');
+    const enhancedPitchers = await enhancePlayersWithRosterData(importedPitchers, rosterData, 'pitcher');
+    
+    console.log(`[Import] Enhanced ${enhancedHitters.length} hitters and ${enhancedPitchers.length} pitchers with roster data`);
+    
+    // Return the enhanced data
     return {
-      hitters: importedHitters,
-      pitchers: importedPitchers,
+      hitters: enhancedHitters,
+      pitchers: enhancedPitchers,
       handicappers: extractedHandicappers,
       exportInfo
     };
@@ -523,4 +540,63 @@ export const parseImportedCSV = (content) => {
     console.error('[Import] Error parsing imported CSV:', error);
     return null;
   }
+};
+
+/**
+ * Enhance imported players with roster data to preserve handedness information
+ * @param {Array} players - Array of imported player objects
+ * @param {Array} rosterData - Array of roster data objects
+ * @param {string} playerType - 'hitter' or 'pitcher'
+ * @returns {Array} Enhanced player objects
+ */
+const enhancePlayersWithRosterData = async (players, rosterData, playerType) => {
+  if (!rosterData || rosterData.length === 0) {
+    console.log(`[Import] No roster data available for ${playerType} enhancement`);
+    return players;
+  }
+  
+  return players.map(player => {
+    // Find matching player in roster data
+    const rosterMatch = rosterData.find(r => 
+      r.name === player.name && 
+      r.team === player.team &&
+      r.type === playerType
+    );
+    
+    if (rosterMatch) {
+      console.log(`[Import] Enhanced ${player.name} (${player.team}) with roster data`);
+      
+      // Create enhanced player object
+      const enhancedPlayer = {
+        ...player, // Keep all imported data (picks, game history, etc.)
+        
+        // Add/preserve handedness and roster data
+        bats: player.bats || rosterMatch.bats || (playerType === 'hitter' ? 'R' : undefined),
+        throwingArm: player.throwingArm || rosterMatch.throwingArm || rosterMatch.ph || (playerType === 'pitcher' ? 'R' : undefined),
+        fullName: player.fullName || rosterMatch.fullName || player.name,
+        
+        // Add any other roster data that might be useful
+        position: rosterMatch.position || player.position,
+        pitches: rosterMatch.pitches || player.pitches || [],
+        
+        // Mark as enhanced for debugging
+        _enhanced: true,
+        _rosterMatch: true
+      };
+      
+      return enhancedPlayer;
+    } else {
+      console.log(`[Import] No roster match found for ${player.name} (${player.team}), using CSV data only`);
+      
+      // No roster match - preserve CSV data but add defaults if missing
+      return {
+        ...player,
+        bats: player.bats || (playerType === 'hitter' ? 'R' : undefined),
+        throwingArm: player.throwingArm || (playerType === 'pitcher' ? 'R' : undefined),
+        fullName: player.fullName || player.name,
+        _enhanced: false,
+        _rosterMatch: false
+      };
+    }
+  });
 };

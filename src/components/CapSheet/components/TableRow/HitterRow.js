@@ -381,10 +381,10 @@ const HitterRow = ({
         </td>
         
         {/* Primary Pitcher Stats */}
-        <td className="pitcher-stat">{primaryPitcherStats.IP}</td>
-        <td className="pitcher-stat">{primaryPitcherStats.PC_ST}</td>
-        <td className="pitcher-stat">{primaryPitcherStats.K}</td>
-        <td className="pitcher-stat">{primaryPitcherStats.HR}</td>
+        <td className="capsheet-hitters-pitcher-stat">{primaryPitcherStats.IP}</td>
+        <td className="capsheet-hitters-pitcher-stat">{primaryPitcherStats.PC_ST}</td>
+        <td className="capsheet-hitters-pitcher-stat">{primaryPitcherStats.K}</td>
+        <td className="capsheet-hitters-pitcher-stat">{primaryPitcherStats.HR}</td>
         
         {/* Primary Pitcher Throws */}
         <td className="throws-cell">
@@ -457,10 +457,10 @@ const HitterRow = ({
         {/* Second Pitcher Stats - Always render cells if any row has second pitcher */}
         {hasAnySecondPitcher && (
           <>
-            <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.IP : ''}</td>
-            <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.PC_ST : ''}</td>
-            <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.K : ''}</td>
-            <td className="pitcher-stat">{hasSecondPitcher ? secondPitcherStats.HR : ''}</td>
+            <td className="capsheet-hitters-pitcher-stat second-pitcher-stat">{hasSecondPitcher ? secondPitcherStats.IP : ''}</td>
+            <td className="capsheet-hitters-pitcher-stat second-pitcher-stat">{hasSecondPitcher ? secondPitcherStats.PC_ST : ''}</td>
+            <td className="capsheet-hitters-pitcher-stat second-pitcher-stat">{hasSecondPitcher ? secondPitcherStats.K : ''}</td>
+            <td className="capsheet-hitters-pitcher-stat second-pitcher-stat">{hasSecondPitcher ? secondPitcherStats.HR : ''}</td>
             <td className="throws-cell">
               {hasSecondPitcher && selectedSecondPitcher && selectedSecondPitcher.throwingArm ? (
                 <div className="throws-info">

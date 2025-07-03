@@ -18,6 +18,7 @@ import GameHistoryLegend from './components/GameHistoryLegend';
 import AddHandicapperModal from './modals/AddHandicapperModal';
 import SaveSlipModal from './modals/SaveSlipModal';
 import SlipGalleryModal from './modals/SlipGalleryModal';
+import ShareModal from './modals/ShareModal';
 
 // Import hooks
 import usePlayerData from './hooks/usePlayerData';
@@ -29,16 +30,27 @@ import useCalculations from './hooks/useCalculations';
 import { exportToCSV, parseImportedCSV } from './utils/exportImport';
 import { saveHandicapper } from '../../services/handicapperService';
 
+// Import data service utilities  
+import { fetchRosterData } from './services/capSheetDataService';
 
-// Scan Results Notification Component
+// PHASE 5: Import sharing service
+import { createShareableLink, loadSharedCapSheet, loadBase64CapSheet, isValidShareId } from '../../services/capSheetSharingService';
+
+
+// PHASE 4 ENHANCED: Scan Results Notification Component with Validation Display
 const ScanResultsNotification = ({ results, onDismiss }) => {
   if (!results) return null;
   
   const matchStats = results.matchStats || { 
     matched: 0, 
     added: results.player_data?.length || 0, 
-    total: results.player_data?.length || 0 
+    total: results.player_data?.length || 0,
+    validated: 0,
+    invalid: 0
   };
+  
+  const validationSummary = results.validationSummary;
+  const hasValidation = validationSummary && validationSummary.total > 0;
   
   return (
     <div className="scan-results-notification">
@@ -47,14 +59,59 @@ const ScanResultsNotification = ({ results, onDismiss }) => {
           <p className="scan-result-title">
             <span role="img" aria-label="Success">✅</span> Bet Slip Scan Complete
           </p>
-          <p className="scan-result-stats">
-            Added {matchStats.added} players to CapSheet
-            {matchStats.matched > 0 && 
-              <span className="stat-detail">
-                ({matchStats.matched} matched with roster)
-              </span>
-            }
-          </p>
+          
+          {hasValidation ? (
+            <>
+              <p className="scan-result-stats">
+                <strong>Validation Results:</strong> {validationSummary.valid} valid players, {validationSummary.invalid} invalid entries
+              </p>
+              <p className="scan-result-stats">
+                Added {matchStats.added} validated players to CapSheet
+                {matchStats.matched > 0 && 
+                  <span className="stat-detail">
+                    ({matchStats.matched} matched with roster)
+                  </span>
+                }
+              </p>
+              
+              {/* Show invalid entries if any */}
+              {results.invalidEntries && results.invalidEntries.length > 0 && (
+                <div className="invalid-entries-summary">
+                  <p className="validation-warning">
+                    ⚠️ {results.invalidEntries.length} entries were rejected (not found in roster)
+                  </p>
+                  <details className="invalid-details">
+                    <summary>View rejected entries</summary>
+                    <ul className="invalid-list">
+                      {results.invalidEntries.map((entry, idx) => (
+                        <li key={idx} className="invalid-item">
+                          "{entry.originalText}" - {entry.reason}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                </div>
+              )}
+              
+              {/* Show warnings if any */}
+              {results.warnings && results.warnings.length > 0 && (
+                <div className="scan-warnings-summary">
+                  <p className="validation-warning">
+                    ⚠️ {results.warnings.length} parsing warnings
+                  </p>
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="scan-result-stats">
+              Added {matchStats.added} players to CapSheet
+              {matchStats.matched > 0 && 
+                <span className="stat-detail">
+                  ({matchStats.matched} matched with roster)
+                </span>
+              }
+            </p>
+          )}
         </div>
         <button onClick={onDismiss}>Dismiss</button>
       </div>
@@ -167,6 +224,207 @@ function CapSheet({ playerData, gameData, currentDate }) {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [scanResults, setScanResults] = useState(null);
 
+  // PHASE 5: State for sharing functionality
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareResult, setShareResult] = useState(null);
+  const [isGeneratingShare, setIsGeneratingShare] = useState(false);
+  const [shareNotification, setShareNotification] = useState(null);
+
+
+  // PHASE 4 ENHANCEMENT: Validate scanned players against roster data
+  const validateScannedPlayers = async (scannedPlayers, rosterData) => {
+    const validPlayers = [];
+    const invalidEntries = [];
+    const warnings = [];
+    
+    for (const scannedPlayer of scannedPlayers) {
+      const processed = processPlayerLine(scannedPlayer);
+      
+      if (processed) {
+        // Validate against roster
+        const rosterMatch = findPlayerInRoster(processed.name, rosterData);
+        
+        if (rosterMatch) {
+          console.log(`[Phase 4] ✅ Validated: ${processed.name} (${rosterMatch.team}) - ${processed.prop_type}`);
+          validPlayers.push({
+            ...processed,
+            ...rosterMatch,
+            validated: true,
+            _rosterMatch: true
+          });
+        } else {
+          console.log(`[Phase 4] ❌ Invalid: ${processed.name} - not found in roster`);
+          invalidEntries.push({
+            originalText: `${scannedPlayer.name} - ${scannedPlayer.prop_type}`,
+            extractedName: processed.name,
+            reason: 'Player not found in roster',
+            scannedData: scannedPlayer
+          });
+        }
+      } else {
+        console.log(`[Phase 4] ⚠️ Warning: Could not parse scanned player data`);
+        warnings.push(`Could not parse: ${JSON.stringify(scannedPlayer)}`);
+      }
+    }
+    
+    return {
+      validPlayers,
+      invalidEntries, 
+      warnings,
+      summary: {
+        total: scannedPlayers.length,
+        valid: validPlayers.length,
+        invalid: invalidEntries.length,
+        warnings: warnings.length
+      }
+    };
+  };
+
+  const processPlayerLine = (scannedPlayer) => {
+    // Extract player information from scanned data
+    if (!scannedPlayer || !scannedPlayer.name) {
+      return null;
+    }
+    
+    return {
+      name: scannedPlayer.name,
+      team: scannedPlayer.team || '',
+      prop_type: scannedPlayer.prop_type || '',
+      line: scannedPlayer.line || '',
+      odds: scannedPlayer.odds || ''
+    };
+  };
+
+  const findPlayerInRoster = (playerName, rosterData) => {
+    if (!playerName || !rosterData) return null;
+    
+    // Filter out obvious non-players
+    const nonPlayerPatterns = [
+      'profit boost', 'bonus', 'parlay', 'bet', 'odds', 'line', 'promo'
+    ];
+    
+    const normalizedInput = playerName.toLowerCase().trim();
+    
+    // Check if this looks like a non-player entry
+    if (nonPlayerPatterns.some(pattern => normalizedInput.includes(pattern))) {
+      console.log(`[Phase 4] Filtering out non-player entry: "${playerName}"`);
+      return null;
+    }
+    
+    // Clean the input - remove common prefixes
+    let cleanedInput = normalizedInput;
+    const prefixPatterns = [
+      /^a\s+/,           // "a Riley Greene" → "Riley Greene"
+      /^ro\s+/,          // "Ro Seiya Suzuki" → "Seiya Suzuki"  
+      /^the\s+/,         // "the Player" → "Player"
+      /^\w{1,2}\s+/      // Any 1-2 character prefix + space
+    ];
+    
+    for (const pattern of prefixPatterns) {
+      const cleaned = normalizedInput.replace(pattern, '');
+      if (cleaned.length > 0 && cleaned !== normalizedInput) {
+        cleanedInput = cleaned;
+        console.log(`[Phase 4] Cleaned "${normalizedInput}" → "${cleanedInput}"`);
+        break;
+      }
+    }
+    
+    // Strategy 1: Exact match on name field (short format like "C. Seager")
+    let match = rosterData.find(p => 
+      p.name && p.name.toLowerCase() === cleanedInput
+    );
+    if (match) {
+      console.log(`[Phase 4] ✅ Exact name match: "${cleanedInput}" → "${match.name}"`);
+      return match;
+    }
+    
+    // Strategy 2: Exact match on fullName field (full format like "Corey Seager")
+    match = rosterData.find(p => 
+      p.fullName && p.fullName.toLowerCase() === cleanedInput
+    );
+    if (match) {
+      console.log(`[Phase 4] ✅ Exact fullName match: "${cleanedInput}" → "${match.fullName}"`);
+      return match;
+    }
+    
+    const inputParts = cleanedInput.split(' ').filter(part => part.length > 0);
+    
+    // Strategy 3: Match "Firstname Lastname" against fullName field
+    if (inputParts.length === 2) {
+      const [firstName, lastName] = inputParts;
+      
+      match = rosterData.find(p => {
+        if (!p.fullName) return false;
+        const fullNameParts = p.fullName.toLowerCase().split(' ');
+        if (fullNameParts.length >= 2) {
+          const rosterFirst = fullNameParts[0];
+          const rosterLast = fullNameParts[fullNameParts.length - 1];
+          return rosterFirst === firstName && rosterLast === lastName;
+        }
+        return false;
+      });
+      
+      if (match) {
+        console.log(`[Phase 4] ✅ First+Last name match: "${firstName} ${lastName}" → "${match.fullName}"`);
+        return match;
+      }
+    }
+    
+    // Strategy 4: Match against abbreviated name format (First initial + Last name)
+    if (inputParts.length === 2) {
+      const [firstName, lastName] = inputParts;
+      const firstInitial = firstName.charAt(0);
+      
+      match = rosterData.find(p => {
+        if (!p.name) return false;
+        const nameParts = p.name.toLowerCase().split(' ');
+        if (nameParts.length >= 2) {
+          const rosterInitial = nameParts[0].replace('.', '').charAt(0);
+          const rosterLast = nameParts[nameParts.length - 1];
+          return rosterInitial === firstInitial && rosterLast === lastName;
+        }
+        return false;
+      });
+      
+      if (match) {
+        console.log(`[Phase 4] ✅ Initial+Last match: "${firstInitial}. ${lastName}" → "${match.name}"`);
+        return match;
+      }
+    }
+    
+    // Strategy 5: Last name only match
+    if (inputParts.length === 1 || inputParts.length === 2) {
+      const lastName = inputParts[inputParts.length - 1];
+      
+      // Check fullName field
+      match = rosterData.find(p => {
+        if (!p.fullName) return false;
+        const fullNameParts = p.fullName.toLowerCase().split(' ');
+        return fullNameParts[fullNameParts.length - 1] === lastName;
+      });
+      
+      if (match) {
+        console.log(`[Phase 4] ✅ Last name match: "${lastName}" → "${match.fullName}"`);
+        return match;
+      }
+      
+      // Check name field
+      match = rosterData.find(p => {
+        if (!p.name) return false;
+        const nameParts = p.name.toLowerCase().split(' ');
+        return nameParts[nameParts.length - 1] === lastName;
+      });
+      
+      if (match) {
+        console.log(`[Phase 4] ✅ Last name match: "${lastName}" → "${match.name}"`);
+        return match;
+      }
+    }
+    
+    console.log(`[Phase 4] ❌ No match found for: "${playerName}" (cleaned: "${cleanedInput}")`);
+    return null;
+  };
+
   // Handle scan completion
   const handleScanComplete = async (results) => {
   console.log("Scan complete, processing results:", results);
@@ -175,12 +433,38 @@ function CapSheet({ playerData, gameData, currentDate }) {
   if (results.player_data && results.player_data.length > 0) {
     console.log(`Processing ${results.player_data.length} players from scan results`);
     
-    const matchResults = { matched: 0, added: 0, total: results.player_data.length };
+    // PHASE 4 ENHANCEMENT: Add roster validation to scan results
+    console.log(`[Phase 4] Fetching roster data for scan validation...`);
+    const rosterData = await fetchRosterData();
+    console.log(`[Phase 4] Loaded ${rosterData.length} roster entries for validation`);
+    
+    const validatedResults = await validateScannedPlayers(results.player_data, rosterData);
+    console.log(`[Phase 4] Validation complete: ${validatedResults.validPlayers.length} valid, ${validatedResults.invalidEntries.length} invalid`);
+    
+    // Update scan results with validation information
+    const enhancedResults = {
+      ...results,
+      validationSummary: validatedResults.summary,
+      validPlayers: validatedResults.validPlayers,
+      invalidEntries: validatedResults.invalidEntries,
+      warnings: validatedResults.warnings
+    };
+    setScanResults(enhancedResults);
+    
+    const matchResults = { 
+      matched: 0, 
+      added: 0, 
+      total: results.player_data.length,
+      validated: validatedResults.validPlayers.length,
+      invalid: validatedResults.invalidEntries.length
+    };
     const pendingBetTypeUpdates = []; // Track updates to make after all players are added
     
-    // Process each scanned player
-    for (const scannedPlayer of results.player_data) {
-      console.log(`Processing scanned player: ${scannedPlayer.name}, prop type: ${scannedPlayer.prop_type}`);
+    // PHASE 4 ENHANCEMENT: Process only validated players
+    console.log(`[Phase 4] Processing ${validatedResults.validPlayers.length} validated players (skipping ${validatedResults.invalidEntries.length} invalid entries)`);
+    
+    for (const scannedPlayer of validatedResults.validPlayers) {
+      console.log(`Processing validated player: ${scannedPlayer.name}, prop type: ${scannedPlayer.prop_type}`);
       
       // Use your existing player matching logic
       const findBestPlayerMatch = (scannedName, scannedTeam) => {
@@ -499,6 +783,266 @@ function CapSheet({ playerData, gameData, currentDate }) {
     }
   }, [isRefreshingPitchers, refreshPitchersData]);
 
+  // PHASE 5: Sharing functionality handlers
+  const handleShareCapSheet = async () => {
+    try {
+      console.log('[CapSheet] Starting share process...');
+      setIsGeneratingShare(true);
+      setShowShareModal(true);
+      setShareResult(null);
+      
+      // Prepare CapSheet data for sharing
+      const shareData = {
+        hitters: selectedPlayers.hitters,
+        pitchers: selectedPlayers.pitchers,
+        handicappers: {
+          hitters: hitterHandicappers,
+          pitchers: pitcherHandicappers
+        },
+        settings: {
+          hitterGamesHistory,
+          pitcherGamesHistory,
+          currentDate: formattedDate
+        }
+      };
+      
+      console.log('[CapSheet] Generating share link...', {
+        hitters: shareData.hitters.length,
+        pitchers: shareData.pitchers.length,
+        hitterHandicappers: shareData.handicappers.hitters.length,
+        pitcherHandicappers: shareData.handicappers.pitchers.length
+      });
+      
+      // Create shareable link
+      const result = await createShareableLink(shareData);
+      
+      console.log('[CapSheet] Share link created successfully:', result);
+      setShareResult(result);
+      
+      // Show success notification
+      setShareNotification({
+        type: 'success',
+        message: 'Share link created successfully!'
+      });
+      
+      // Auto-copy to clipboard
+      if (navigator.clipboard && result.url) {
+        try {
+          await navigator.clipboard.writeText(result.url);
+          console.log('[CapSheet] URL copied to clipboard automatically');
+        } catch (copyError) {
+          console.log('[CapSheet] Auto-copy failed:', copyError);
+        }
+      }
+      
+    } catch (error) {
+      console.error('[CapSheet] Error creating share link:', error);
+      setShareResult(null);
+      setShareNotification({
+        type: 'error',
+        message: `Failed to create share link: ${error.message}`
+      });
+    } finally {
+      setIsGeneratingShare(false);
+    }
+  };
+
+  const handleCloseShareModal = () => {
+    setShowShareModal(false);
+    // Don't clear shareResult immediately to allow for reopening
+    setTimeout(() => {
+      if (!showShareModal) {
+        setShareResult(null);
+        setShareNotification(null);
+      }
+    }, 300);
+  };
+
+  // Load shared CapSheet from URL parameters (GitHub Gist or Base64)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareId = urlParams.get('share');
+    const encodedData = urlParams.get('data');
+    
+    if (shareId && isValidShareId(shareId)) {
+      console.log('[CapSheet] Loading shared CapSheet from GitHub:', shareId);
+      loadSharedDataFromGitHub(shareId);
+    } else if (encodedData) {
+      console.log('[CapSheet] Loading shared CapSheet from Base64...');
+      loadSharedDataFromBase64(encodedData);
+    }
+  }, [setSelectedPlayers, setHitterGamesHistory, setPitcherGamesHistory, setHitterHandicappers, setPitcherHandicappers]);
+
+  const loadSharedDataFromGitHub = async (shareId) => {
+    try {
+      setShareNotification({
+        type: 'info',
+        message: 'Loading shared CapSheet from GitHub...'
+      });
+      
+      const sharedData = await loadSharedCapSheet(shareId);
+      await applySharedData(sharedData, 'GitHub Gist');
+      
+    } catch (error) {
+      console.error('[CapSheet] Error loading GitHub CapSheet:', error);
+      setShareNotification({
+        type: 'error',
+        message: `Failed to load shared CapSheet: ${error.message}`
+      });
+    }
+  };
+
+  const loadSharedDataFromBase64 = async (encodedData) => {
+    try {
+      setShareNotification({
+        type: 'info',
+        message: 'Loading shared CapSheet...'
+      });
+      
+      const sharedData = await loadBase64CapSheet(encodedData);
+      await applySharedData(sharedData, 'URL');
+      
+    } catch (error) {
+      console.error('[CapSheet] Error loading Base64 CapSheet:', error);
+      setShareNotification({
+        type: 'error',
+        message: `Failed to load shared CapSheet: ${error.message}`
+      });
+    }
+  };
+
+  const applySharedData = async (sharedData, source) => {
+    console.log('[CapSheet] Shared data loaded:', sharedData._shareMetadata);
+    
+    // Apply settings first to ensure correct history counts are available
+    if (sharedData.settings) {
+      if (sharedData.settings.hitterGamesHistory) {
+        setHitterGamesHistory(sharedData.settings.hitterGamesHistory);
+      }
+      if (sharedData.settings.pitcherGamesHistory) {
+        setPitcherGamesHistory(sharedData.settings.pitcherGamesHistory);
+      }
+    }
+    
+    // Apply handicappers if available
+    if (sharedData.handicappers) {
+      if (sharedData.handicappers.hitters) {
+        setHitterHandicappers(sharedData.handicappers.hitters);
+      }
+      if (sharedData.handicappers.pitchers) {
+        setPitcherHandicappers(sharedData.handicappers.pitchers);
+      }
+    }
+    
+    // CRITICAL FIX: Enrich shared players with game history and stats like manually added players
+    console.log('[CapSheet] Enriching shared players with game history and stats...');
+    
+    try {
+      // Process hitters with full data enrichment
+      if (sharedData.hitters && sharedData.hitters.length > 0) {
+        console.log(`[CapSheet] Enriching ${sharedData.hitters.length} shared hitters...`);
+        
+        const enrichedHitters = await Promise.all(
+          sharedData.hitters.map(async (hitter) => {
+            console.log(`[CapSheet] Enriching hitter: ${hitter.name} (${hitter.team})`);
+            
+            // Use fetchHitterById to get full player data like manual selection
+            const enrichedHitter = await fetchHitterById(`${hitter.name}-${hitter.team}`);
+            
+            if (enrichedHitter) {
+              // Preserve any additional shared data properties
+              return {
+                ...enrichedHitter,
+                ...hitter,  // Overlay shared data properties
+                // Ensure enriched data takes precedence for stats
+                id: enrichedHitter.id || hitter.id,
+                name: enrichedHitter.name || hitter.name,
+                team: enrichedHitter.team || hitter.team,
+                playerType: 'hitter'
+              };
+            } else {
+              console.warn(`[CapSheet] Could not enrich hitter ${hitter.name}, using shared data only`);
+              return hitter;
+            }
+          })
+        );
+        
+        setSelectedPlayers(prev => ({
+          ...prev,
+          hitters: enrichedHitters
+        }));
+      }
+      
+      // Process pitchers with full data enrichment
+      if (sharedData.pitchers && sharedData.pitchers.length > 0) {
+        console.log(`[CapSheet] Enriching ${sharedData.pitchers.length} shared pitchers...`);
+        
+        const enrichedPitchers = await Promise.all(
+          sharedData.pitchers.map(async (pitcher) => {
+            console.log(`[CapSheet] Enriching pitcher: ${pitcher.name} (${pitcher.team})`);
+            
+            // Use fetchPitcherById to get full player data like manual selection
+            const enrichedPitcher = await fetchPitcherById(`${pitcher.name}-${pitcher.team}`);
+            
+            if (enrichedPitcher) {
+              // Preserve any additional shared data properties
+              return {
+                ...enrichedPitcher,
+                ...pitcher,  // Overlay shared data properties
+                // Ensure enriched data takes precedence for stats
+                id: enrichedPitcher.id || pitcher.id,
+                name: enrichedPitcher.name || pitcher.name,
+                team: enrichedPitcher.team || pitcher.team,
+                playerType: 'pitcher'
+              };
+            } else {
+              console.warn(`[CapSheet] Could not enrich pitcher ${pitcher.name}, using shared data only`);
+              return pitcher;
+            }
+          })
+        );
+        
+        setSelectedPlayers(prev => ({
+          ...prev,
+          pitchers: enrichedPitchers
+        }));
+      }
+      
+      setShareNotification({
+        type: 'success',
+        message: `Loaded and enriched shared CapSheet from ${source} - ${sharedData.hitters?.length || 0} hitters, ${sharedData.pitchers?.length || 0} pitchers with full stats`
+      });
+      
+    } catch (error) {
+      console.error('[CapSheet] Error enriching shared players:', error);
+      
+      // Fallback to original behavior if enrichment fails
+      if (sharedData.hitters) {
+        setSelectedPlayers(prev => ({
+          ...prev,
+          hitters: sharedData.hitters
+        }));
+      }
+      
+      if (sharedData.pitchers) {
+        setSelectedPlayers(prev => ({
+          ...prev,
+          pitchers: sharedData.pitchers
+        }));
+      }
+      
+      setShareNotification({
+        type: 'warning',
+        message: `Loaded shared CapSheet from ${source} - ${sharedData.hitters?.length || 0} hitters, ${sharedData.pitchers?.length || 0} pitchers (stats enrichment failed)`
+      });
+    }
+    
+    // Auto-dismiss notification
+    setTimeout(() => {
+      setShareNotification(null);
+    }, 5000);
+  };
+
   // Handler for hitter handicapper changes
   const handleAddHitterHandicapperWithUpdate = (playerType) => {
     const newHandicapper = handleAddHandicapper(playerType);
@@ -725,7 +1269,7 @@ const handlePitcherGamesHistoryChange = (newValue) => {
     console.log(`[Import] Processing file: ${file.name}, size: ${file.size} bytes`);
     
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const content = e.target.result;
         
@@ -736,8 +1280,12 @@ const handlePitcherGamesHistoryChange = (newValue) => {
         console.log(`[Import] File loaded, content length: ${content.length} bytes`);
         console.log(`[Import] Content preview: ${content.substring(0, 100)}...`);
         
-        // Parse the CSV content
-        const parsedData = parseImportedCSV(content);
+        // PHASE 3 ENHANCEMENT: Parse the CSV content with roster data for handedness preservation
+        console.log(`[Import] Fetching roster data for handedness enhancement...`);
+        const rosterData = await fetchRosterData();
+        console.log(`[Import] Loaded ${rosterData.length} roster entries for enhancement`);
+        
+        const parsedData = await parseImportedCSV(content, rosterData);
         
         if (!parsedData) {
           throw new Error('Failed to parse CSV data');
@@ -889,6 +1437,25 @@ const handlePitcherGamesHistoryChange = (newValue) => {
     }}
   >
           <span className="action-icon">📷</span> Scan Bet Slip
+        </button>
+        
+        {/* PHASE 5: Share CapSheet button */}
+        <button 
+          className="action-btn share-btn" 
+          onClick={handleShareCapSheet}
+          disabled={selectedPlayers.hitters.length === 0 && selectedPlayers.pitchers.length === 0}
+          style={{
+            backgroundColor: '#667eea', 
+            marginLeft: '10px',
+            opacity: (selectedPlayers.hitters.length === 0 && selectedPlayers.pitchers.length === 0) ? 0.5 : 1
+          }}
+          title={
+            (selectedPlayers.hitters.length === 0 && selectedPlayers.pitchers.length === 0) 
+              ? "Add some players to share your CapSheet" 
+              : "Share your CapSheet via URL"
+          }
+        >
+          <span className="action-icon">🔗</span> Share CapSheet
         </button>
       </div>
       
@@ -1133,12 +1700,40 @@ const handlePitcherGamesHistoryChange = (newValue) => {
         context="capsheet"  // Tell scanner this is for CapSheet
       />
       
+      {/* PHASE 5: Share Modal */}
+      <ShareModal 
+        show={showShareModal}
+        onClose={handleCloseShareModal}
+        shareResult={shareResult}
+        isGenerating={isGeneratingShare}
+      />
+      
       {/* If we have scan results, show a notification */}
       {scanResults && (
         <ScanResultsNotification 
           results={scanResults} 
           onDismiss={() => setScanResults(null)} 
         />
+      )}
+      
+      {/* PHASE 5: Share notifications */}
+      {shareNotification && (
+        <div className={`share-notification ${shareNotification.type}`}>
+          <div className="notification-content">
+            <span className="notification-icon">
+              {shareNotification.type === 'success' && '✅'}
+              {shareNotification.type === 'error' && '❌'}
+              {shareNotification.type === 'info' && 'ℹ️'}
+            </span>
+            <span className="notification-message">{shareNotification.message}</span>
+            <button 
+              className="notification-close"
+              onClick={() => setShareNotification(null)}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

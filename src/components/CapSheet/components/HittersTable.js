@@ -2,6 +2,7 @@ import React from 'react';
 import HitterRow from './TableRow/HitterRow';
 import PlayerSelector from './PlayerSelector';
 import './HitterPerformanceLineChart.css';
+import '../styles/CapSheetTable.css';
 
 /**
  * Component for displaying the hitters table section
@@ -97,24 +98,24 @@ const HittersTable = ({
         {isLoadingPlayers && hitters.length === 0 ? (
           <div className="loading-indicator">Loading player data...</div>
         ) : (
-          <table className="capsheet-table">
+          <table className="capsheet-hitters-table">
             <thead>
               <tr>
                 <th>Player</th>
                 <th>Team</th>
-                <th className="stat-header">HR Last</th>
-                <th className="stat-header">AB Last</th>
-                <th className="stat-header">H Last</th>
+                <th className="capsheet-hitters-stat-header">HR Last</th>
+                <th className="capsheet-hitters-stat-header">AB Last</th>
+                <th className="capsheet-hitters-stat-header">H Last</th>
                 
                 {/* Performance Chart */}
                 <th className="avg-header">Performance Trend</th>
                 
                 {/* Primary Pitcher */}
                 <th>Primary Pitcher</th>
-                <th className="stat-header">Last IP</th>
-                <th className="stat-header">PC_ST</th>
-                <th className="stat-header">K</th>
-                <th className="stat-header">HR</th>
+                <th className="capsheet-hitters-stat-header">Last IP</th>
+                <th className="capsheet-hitters-stat-header">PC_ST</th>
+                <th className="capsheet-hitters-stat-header">K</th>
+                <th className="capsheet-hitters-stat-header">HR</th>
                 <th className="throws-header">Throws</th>
                 
                 {/* Second Pitcher - Only show if needed */}
@@ -123,10 +124,10 @@ const HittersTable = ({
                 {/* Dynamic second pitcher columns */}
                 {hasAnySecondPitcher ? (
                   <>
-                    <th className="stat-header second-pitcher-header">Last IP</th>
-                    <th className="stat-header second-pitcher-header">PC_ST</th>
-                    <th className="stat-header second-pitcher-header">K</th>
-                    <th className="stat-header second-pitcher-header">HR</th>
+                    <th className="capsheet-hitters-stat-header second-pitcher-header">Last IP</th>
+                    <th className="capsheet-hitters-stat-header second-pitcher-header">PC_ST</th>
+                    <th className="capsheet-hitters-stat-header second-pitcher-header">K</th>
+                    <th className="capsheet-hitters-stat-header second-pitcher-header">HR</th>
                     <th className="throws-header second-pitcher-header">Throws</th>
                   </>
                 ) : null}
