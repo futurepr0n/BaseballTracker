@@ -79,6 +79,20 @@
 .capsheet-hitters-table th:nth-child(12) { width: 80px; } /* Throws */
 .capsheet-hitters-table th:nth-child(13) { width: 120px; } /* Second Pitcher */
 
+/* Set minimum width for all remaining columns to prevent squishing */
+.capsheet-hitters-table th:nth-child(n+14),
+.capsheet-hitters-table td:nth-child(n+14) {
+  min-width: 60px;
+  width: auto;
+}
+
+/* Specific widths for key columns */
+.capsheet-hitters-table th:nth-child(14),
+.capsheet-hitters-table td:nth-child(14) { width: 80px; }  /* Exp SO or Second IP */
+
+.capsheet-hitters-table th:nth-child(15),
+.capsheet-hitters-table td:nth-child(15) { width: 100px; } /* Stadium or Second PC_ST */
+
 /* Dynamic second pitcher columns - ensure proper alignment when present */
 .capsheet-hitters-table th.second-pitcher-header,
 .capsheet-hitters-table td.second-pitcher-stat {
