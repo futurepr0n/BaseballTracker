@@ -31,8 +31,8 @@ import PinheadsPlayhouse from './components/PinheadsPlayhouse/PinheadsPlayhouse'
 import HRMatchupHub from './components/HRMatchupHub/HRMatchupHub';
 import CSSFixesTest from './components/test/CSSFixesTest';
 
+import './styles/theme-variables.css'; // Import theme variables FIRST
 import './App.css';
-import './styles/theme-variables.css';
 import './styles/classic-mode.css';
 
 function App() {

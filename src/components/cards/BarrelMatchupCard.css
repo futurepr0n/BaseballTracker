@@ -178,7 +178,7 @@
 
 .barrel-matchup-card .player-name {
   font-weight: 600;
-  color: #212529;
+  color: var(--text-primary, #1a202c);
 }
 
 .barrel-matchup-card .team-info {
@@ -466,7 +466,7 @@
 
 .barrel-matchup-card .mobile-card .player-name {
   font-weight: 600;
-  color: #212529;
+  color: var(--text-primary, #1a202c);
   font-size: 0.95rem;
 }
 
