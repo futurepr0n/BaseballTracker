@@ -33,15 +33,20 @@ import { saveHandicapper } from '../../services/handicapperService';
 import { testPlayerValidation, getCapSheetCacheStats, fetchRosterData } from './services/capSheetDataService';
 
 
-// Scan Results Notification Component
+// PHASE 4 ENHANCED: Scan Results Notification Component with Validation Display
 const ScanResultsNotification = ({ results, onDismiss }) => {
   if (!results) return null;
   
   const matchStats = results.matchStats || { 
     matched: 0, 
     added: results.player_data?.length || 0, 
-    total: results.player_data?.length || 0 
+    total: results.player_data?.length || 0,
+    validated: 0,
+    invalid: 0
   };
+  
+  const validationSummary = results.validationSummary;
+  const hasValidation = validationSummary && validationSummary.total > 0;
   
   return (
     <div className="scan-results-notification">
@@ -50,14 +55,59 @@ const ScanResultsNotification = ({ results, onDismiss }) => {
           <p className="scan-result-title">
             <span role="img" aria-label="Success">✅</span> Bet Slip Scan Complete
           </p>
-          <p className="scan-result-stats">
-            Added {matchStats.added} players to CapSheet
-            {matchStats.matched > 0 && 
-              <span className="stat-detail">
-                ({matchStats.matched} matched with roster)
-              </span>
-            }
-          </p>
+          
+          {hasValidation ? (
+            <>
+              <p className="scan-result-stats">
+                <strong>Validation Results:</strong> {validationSummary.valid} valid players, {validationSummary.invalid} invalid entries
+              </p>
+              <p className="scan-result-stats">
+                Added {matchStats.added} validated players to CapSheet
+                {matchStats.matched > 0 && 
+                  <span className="stat-detail">
+                    ({matchStats.matched} matched with roster)
+                  </span>
+                }
+              </p>
+              
+              {/* Show invalid entries if any */}
+              {results.invalidEntries && results.invalidEntries.length > 0 && (
+                <div className="invalid-entries-summary">
+                  <p className="validation-warning">
+                    ⚠️ {results.invalidEntries.length} entries were rejected (not found in roster)
+                  </p>
+                  <details className="invalid-details">
+                    <summary>View rejected entries</summary>
+                    <ul className="invalid-list">
+                      {results.invalidEntries.map((entry, idx) => (
+                        <li key={idx} className="invalid-item">
+                          "{entry.originalText}" - {entry.reason}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                </div>
+              )}
+              
+              {/* Show warnings if any */}
+              {results.warnings && results.warnings.length > 0 && (
+                <div className="scan-warnings-summary">
+                  <p className="validation-warning">
+                    ⚠️ {results.warnings.length} parsing warnings
+                  </p>
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="scan-result-stats">
+              Added {matchStats.added} players to CapSheet
+              {matchStats.matched > 0 && 
+                <span className="stat-detail">
+                  ({matchStats.matched} matched with roster)
+                </span>
+              }
+            </p>
+          )}
         </div>
         <button onClick={onDismiss}>Dismiss</button>
       </div>
@@ -195,6 +245,200 @@ function CapSheet({ playerData, gameData, currentDate }) {
     }
   }, []);
 
+  // PHASE 4 ENHANCEMENT: Validate scanned players against roster data
+  const validateScannedPlayers = async (scannedPlayers, rosterData) => {
+    const validPlayers = [];
+    const invalidEntries = [];
+    const warnings = [];
+    
+    for (const scannedPlayer of scannedPlayers) {
+      const processed = processPlayerLine(scannedPlayer);
+      
+      if (processed) {
+        // Validate against roster
+        const rosterMatch = findPlayerInRoster(processed.name, rosterData);
+        
+        if (rosterMatch) {
+          console.log(`[Phase 4] ✅ Validated: ${processed.name} (${rosterMatch.team}) - ${processed.prop_type}`);
+          validPlayers.push({
+            ...processed,
+            ...rosterMatch,
+            validated: true,
+            _rosterMatch: true
+          });
+        } else {
+          console.log(`[Phase 4] ❌ Invalid: ${processed.name} - not found in roster`);
+          invalidEntries.push({
+            originalText: `${scannedPlayer.name} - ${scannedPlayer.prop_type}`,
+            extractedName: processed.name,
+            reason: 'Player not found in roster',
+            scannedData: scannedPlayer
+          });
+        }
+      } else {
+        console.log(`[Phase 4] ⚠️ Warning: Could not parse scanned player data`);
+        warnings.push(`Could not parse: ${JSON.stringify(scannedPlayer)}`);
+      }
+    }
+    
+    return {
+      validPlayers,
+      invalidEntries, 
+      warnings,
+      summary: {
+        total: scannedPlayers.length,
+        valid: validPlayers.length,
+        invalid: invalidEntries.length,
+        warnings: warnings.length
+      }
+    };
+  };
+
+  const processPlayerLine = (scannedPlayer) => {
+    // Extract player information from scanned data
+    if (!scannedPlayer || !scannedPlayer.name) {
+      return null;
+    }
+    
+    return {
+      name: scannedPlayer.name,
+      team: scannedPlayer.team || '',
+      prop_type: scannedPlayer.prop_type || '',
+      line: scannedPlayer.line || '',
+      odds: scannedPlayer.odds || ''
+    };
+  };
+
+  const findPlayerInRoster = (playerName, rosterData) => {
+    if (!playerName || !rosterData) return null;
+    
+    // Filter out obvious non-players
+    const nonPlayerPatterns = [
+      'profit boost', 'bonus', 'parlay', 'bet', 'odds', 'line', 'promo'
+    ];
+    
+    const normalizedInput = playerName.toLowerCase().trim();
+    
+    // Check if this looks like a non-player entry
+    if (nonPlayerPatterns.some(pattern => normalizedInput.includes(pattern))) {
+      console.log(`[Phase 4] Filtering out non-player entry: "${playerName}"`);
+      return null;
+    }
+    
+    // Clean the input - remove common prefixes
+    let cleanedInput = normalizedInput;
+    const prefixPatterns = [
+      /^a\s+/,           // "a Riley Greene" → "Riley Greene"
+      /^ro\s+/,          // "Ro Seiya Suzuki" → "Seiya Suzuki"  
+      /^the\s+/,         // "the Player" → "Player"
+      /^\w{1,2}\s+/      // Any 1-2 character prefix + space
+    ];
+    
+    for (const pattern of prefixPatterns) {
+      const cleaned = normalizedInput.replace(pattern, '');
+      if (cleaned.length > 0 && cleaned !== normalizedInput) {
+        cleanedInput = cleaned;
+        console.log(`[Phase 4] Cleaned "${normalizedInput}" → "${cleanedInput}"`);
+        break;
+      }
+    }
+    
+    // Strategy 1: Exact match on name field (short format like "C. Seager")
+    let match = rosterData.find(p => 
+      p.name && p.name.toLowerCase() === cleanedInput
+    );
+    if (match) {
+      console.log(`[Phase 4] ✅ Exact name match: "${cleanedInput}" → "${match.name}"`);
+      return match;
+    }
+    
+    // Strategy 2: Exact match on fullName field (full format like "Corey Seager")
+    match = rosterData.find(p => 
+      p.fullName && p.fullName.toLowerCase() === cleanedInput
+    );
+    if (match) {
+      console.log(`[Phase 4] ✅ Exact fullName match: "${cleanedInput}" → "${match.fullName}"`);
+      return match;
+    }
+    
+    const inputParts = cleanedInput.split(' ').filter(part => part.length > 0);
+    
+    // Strategy 3: Match "Firstname Lastname" against fullName field
+    if (inputParts.length === 2) {
+      const [firstName, lastName] = inputParts;
+      
+      match = rosterData.find(p => {
+        if (!p.fullName) return false;
+        const fullNameParts = p.fullName.toLowerCase().split(' ');
+        if (fullNameParts.length >= 2) {
+          const rosterFirst = fullNameParts[0];
+          const rosterLast = fullNameParts[fullNameParts.length - 1];
+          return rosterFirst === firstName && rosterLast === lastName;
+        }
+        return false;
+      });
+      
+      if (match) {
+        console.log(`[Phase 4] ✅ First+Last name match: "${firstName} ${lastName}" → "${match.fullName}"`);
+        return match;
+      }
+    }
+    
+    // Strategy 4: Match against abbreviated name format (First initial + Last name)
+    if (inputParts.length === 2) {
+      const [firstName, lastName] = inputParts;
+      const firstInitial = firstName.charAt(0);
+      
+      match = rosterData.find(p => {
+        if (!p.name) return false;
+        const nameParts = p.name.toLowerCase().split(' ');
+        if (nameParts.length >= 2) {
+          const rosterInitial = nameParts[0].replace('.', '').charAt(0);
+          const rosterLast = nameParts[nameParts.length - 1];
+          return rosterInitial === firstInitial && rosterLast === lastName;
+        }
+        return false;
+      });
+      
+      if (match) {
+        console.log(`[Phase 4] ✅ Initial+Last match: "${firstInitial}. ${lastName}" → "${match.name}"`);
+        return match;
+      }
+    }
+    
+    // Strategy 5: Last name only match
+    if (inputParts.length === 1 || inputParts.length === 2) {
+      const lastName = inputParts[inputParts.length - 1];
+      
+      // Check fullName field
+      match = rosterData.find(p => {
+        if (!p.fullName) return false;
+        const fullNameParts = p.fullName.toLowerCase().split(' ');
+        return fullNameParts[fullNameParts.length - 1] === lastName;
+      });
+      
+      if (match) {
+        console.log(`[Phase 4] ✅ Last name match: "${lastName}" → "${match.fullName}"`);
+        return match;
+      }
+      
+      // Check name field
+      match = rosterData.find(p => {
+        if (!p.name) return false;
+        const nameParts = p.name.toLowerCase().split(' ');
+        return nameParts[nameParts.length - 1] === lastName;
+      });
+      
+      if (match) {
+        console.log(`[Phase 4] ✅ Last name match: "${lastName}" → "${match.name}"`);
+        return match;
+      }
+    }
+    
+    console.log(`[Phase 4] ❌ No match found for: "${playerName}" (cleaned: "${cleanedInput}")`);
+    return null;
+  };
+
   // Handle scan completion
   const handleScanComplete = async (results) => {
   console.log("Scan complete, processing results:", results);
@@ -203,12 +447,38 @@ function CapSheet({ playerData, gameData, currentDate }) {
   if (results.player_data && results.player_data.length > 0) {
     console.log(`Processing ${results.player_data.length} players from scan results`);
     
-    const matchResults = { matched: 0, added: 0, total: results.player_data.length };
+    // PHASE 4 ENHANCEMENT: Add roster validation to scan results
+    console.log(`[Phase 4] Fetching roster data for scan validation...`);
+    const rosterData = await fetchRosterData();
+    console.log(`[Phase 4] Loaded ${rosterData.length} roster entries for validation`);
+    
+    const validatedResults = await validateScannedPlayers(results.player_data, rosterData);
+    console.log(`[Phase 4] Validation complete: ${validatedResults.validPlayers.length} valid, ${validatedResults.invalidEntries.length} invalid`);
+    
+    // Update scan results with validation information
+    const enhancedResults = {
+      ...results,
+      validationSummary: validatedResults.summary,
+      validPlayers: validatedResults.validPlayers,
+      invalidEntries: validatedResults.invalidEntries,
+      warnings: validatedResults.warnings
+    };
+    setScanResults(enhancedResults);
+    
+    const matchResults = { 
+      matched: 0, 
+      added: 0, 
+      total: results.player_data.length,
+      validated: validatedResults.validPlayers.length,
+      invalid: validatedResults.invalidEntries.length
+    };
     const pendingBetTypeUpdates = []; // Track updates to make after all players are added
     
-    // Process each scanned player
-    for (const scannedPlayer of results.player_data) {
-      console.log(`Processing scanned player: ${scannedPlayer.name}, prop type: ${scannedPlayer.prop_type}`);
+    // PHASE 4 ENHANCEMENT: Process only validated players
+    console.log(`[Phase 4] Processing ${validatedResults.validPlayers.length} validated players (skipping ${validatedResults.invalidEntries.length} invalid entries)`);
+    
+    for (const scannedPlayer of validatedResults.validPlayers) {
+      console.log(`Processing validated player: ${scannedPlayer.name}, prop type: ${scannedPlayer.prop_type}`);
       
       // Use your existing player matching logic
       const findBestPlayerMatch = (scannedName, scannedTeam) => {

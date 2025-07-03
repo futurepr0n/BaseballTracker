@@ -1795,3 +1795,103 @@ tr:has(.player-attribute-badge.batter-hand:contains("B")) .player-attribute-badg
   font-size: 0.6rem;
   padding: 1px 2px;
 }
+
+/* PHASE 4: Scan Results Validation Styling */
+.scan-results-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 400px;
+}
+
+.notification-content {
+  background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%);
+  border: 2px solid #28a745;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.scan-result-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #155724;
+  margin: 0 0 8px 0;
+}
+
+.scan-result-stats {
+  margin: 4px 0;
+  color: #155724;
+  font-size: 0.95rem;
+}
+
+.stat-detail {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.validation-warning {
+  color: #856404;
+  font-weight: 500;
+  margin: 8px 0 4px 0;
+  font-size: 0.9rem;
+}
+
+.invalid-entries-summary {
+  margin-top: 12px;
+  padding: 8px;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 4px;
+}
+
+.invalid-details {
+  margin-top: 8px;
+}
+
+.invalid-details summary {
+  cursor: pointer;
+  color: #495057;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.invalid-details summary:hover {
+  color: #007bff;
+}
+
+.invalid-list {
+  margin: 4px 0;
+  padding-left: 20px;
+  font-size: 0.85rem;
+}
+
+.invalid-item {
+  margin: 2px 0;
+  color: #721c24;
+}
+
+.scan-warnings-summary {
+  margin-top: 8px;
+  padding: 6px 8px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+}
+
+.notification-content button {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 12px;
+  float: right;
+}
+
+.notification-content button:hover {
+  background: #218838;
+}
