@@ -7,7 +7,7 @@
   border-collapse: separate;
   table-layout: fixed;  /* Ensures consistent column widths */
   font-size: 0.9rem;
-  min-width: 1400px;    /* Accommodate all columns */
+  min-width: 1800px;    /* Accommodate all columns including dynamic second pitcher and handicappers */
   border-spacing: 0;
 }
 
@@ -79,19 +79,47 @@
 .capsheet-hitters-table th:nth-child(12) { width: 80px; } /* Throws */
 .capsheet-hitters-table th:nth-child(13) { width: 120px; } /* Second Pitcher */
 
-/* Set minimum width for all remaining columns to prevent squishing */
-.capsheet-hitters-table th:nth-child(n+14),
-.capsheet-hitters-table td:nth-child(n+14) {
-  min-width: 60px;
-  width: auto;
-}
-
-/* Specific widths for key columns */
+/* Specific widths for remaining static columns */
 .capsheet-hitters-table th:nth-child(14),
-.capsheet-hitters-table td:nth-child(14) { width: 80px; }  /* Exp SO or Second IP */
+.capsheet-hitters-table td:nth-child(14) { width: 80px; }  /* Second Pitcher Last IP (when dynamic) */
 
 .capsheet-hitters-table th:nth-child(15),
-.capsheet-hitters-table td:nth-child(15) { width: 100px; } /* Stadium or Second PC_ST */
+.capsheet-hitters-table td:nth-child(15) { width: 80px; } /* Second Pitcher PC_ST (when dynamic) */
+
+.capsheet-hitters-table th:nth-child(16),
+.capsheet-hitters-table td:nth-child(16) { width: 60px; }  /* Second Pitcher K (when dynamic) */
+
+.capsheet-hitters-table th:nth-child(17),
+.capsheet-hitters-table td:nth-child(17) { width: 60px; }  /* Second Pitcher HR (when dynamic) */
+
+.capsheet-hitters-table th:nth-child(18),
+.capsheet-hitters-table td:nth-child(18) { width: 80px; }  /* Second Pitcher Throws (when dynamic) */
+
+/* Static columns after second pitcher (adjust based on whether second pitcher is present) */
+.capsheet-hitters-table th:nth-child(19),
+.capsheet-hitters-table td:nth-child(19) { width: 80px; }  /* Exp SO */
+
+.capsheet-hitters-table th:nth-child(20),
+.capsheet-hitters-table td:nth-child(20) { width: 100px; } /* Stadium */
+
+.capsheet-hitters-table th:nth-child(21),
+.capsheet-hitters-table td:nth-child(21) { width: 80px; }  /* Game O/U */
+
+.capsheet-hitters-table th:nth-child(22),
+.capsheet-hitters-table td:nth-child(22) { width: 60px; }  /* H */
+
+.capsheet-hitters-table th:nth-child(23),
+.capsheet-hitters-table td:nth-child(23) { width: 60px; }  /* HR */
+
+.capsheet-hitters-table th:nth-child(24),
+.capsheet-hitters-table td:nth-child(24) { width: 50px; }  /* B */
+
+/* Handicapper columns and Actions - ensure proper minimum width */
+.capsheet-hitters-table th:nth-child(n+25),
+.capsheet-hitters-table td:nth-child(n+25) {
+  min-width: 100px; /* Increased for handicapper names and actions */
+  width: 100px;
+}
 
 /* Dynamic second pitcher columns - ensure proper alignment when present */
 .capsheet-hitters-table th.second-pitcher-header,
@@ -168,9 +196,9 @@
 }
 
 /* Responsive behavior - maintain horizontal scroll */
-@media (max-width: 1400px) {
+@media (max-width: 1800px) {
   .capsheet-hitters-table {
-    min-width: 1400px; /* Force horizontal scroll on smaller screens */
+    min-width: 1800px; /* Force horizontal scroll on smaller screens */
   }
 }
 

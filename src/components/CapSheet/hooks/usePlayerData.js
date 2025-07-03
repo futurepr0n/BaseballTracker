@@ -85,6 +85,9 @@ useEffect(() => {
 // Clear CapSheet cache when date changes to prevent stale data
 useEffect(() => {
   clearCapSheetCache();
+  console.log(`[usePlayerData] === DATE SETUP ===`);
+  console.log(`[usePlayerData] Current date: ${formatDateString(currentDate)}`);
+  console.log(`[usePlayerData] Current date object:`, currentDate);
   console.log(`[usePlayerData] Cleared cache for date change: ${formatDateString(currentDate)}`);
 }, [currentDate]);
 
@@ -203,7 +206,7 @@ useEffect(() => {
       console.log(`[usePlayerData] Fetching game history for ${player.name} from date range data`);
       
       // Find game history for this player - always try to get MAX_GAMES_HISTORY
-      const games = findMultiGamePlayerStats(
+      const games = await findMultiGamePlayerStats(
         dateData,
         player.name,
         player.team,
@@ -211,6 +214,8 @@ useEffect(() => {
       );
       
       console.log(`[usePlayerData] Found ${games.length} games for ${player.name}`);
+      console.log(`[usePlayerData] Games data structure:`, games);
+      console.log(`[usePlayerData] Date data keys:`, Object.keys(dateData));
       
       // Store the complete data in the cache
       if (isHitter) {
@@ -256,11 +261,14 @@ useEffect(() => {
         
         if (isHitter) {
           console.log(`[usePlayerData] Setting game${gameNum} data for ${player.name} to date ${gameDate}`);
+          console.log(`[usePlayerData] Game data available:`, gameData);
           
           updatedPlayer[`game${gameNum}Date`] = gameDate;
           updatedPlayer[`game${gameNum}HR`] = gameData.HR || '0';
           updatedPlayer[`game${gameNum}AB`] = gameData.AB || '0';
           updatedPlayer[`game${gameNum}H`] = gameData.H || '0';
+          
+          console.log(`[usePlayerData] Set game${gameNum}: Date=${gameDate}, AB=${gameData.AB}, H=${gameData.H}, HR=${gameData.HR}`);
         } else {
           updatedPlayer[`game${gameNum}Date`] = gameDate;
           updatedPlayer[`game${gameNum}IP`] = gameData.IP || '0';
@@ -275,6 +283,12 @@ useEffect(() => {
       }
       
       console.log(`[usePlayerData] Successfully updated ${player.name} with ${historyCount} games history`);
+      
+      // DEBUG: Show what game properties are actually set
+      const gameProps = Object.keys(updatedPlayer).filter(key => key.startsWith('game'));
+      console.log(`[usePlayerData] Game properties set on ${player.name}:`, gameProps);
+      console.log(`[usePlayerData] Final player object:`, updatedPlayer);
+      
       return updatedPlayer;
     } catch (error) {
       console.error(`[usePlayerData] Error fetching game history for ${player.name}:`, error);
@@ -911,11 +925,13 @@ const fetchPitcherById = async (pitcherId) => {
         
         console.log(`[usePlayerData] Roster contains ${hitters.length} hitters and ${pitchers.length} pitchers`);
         
-        // 3. Fetch player data for the past 30 days (expanded to ensure we have enough history)
-        console.log("[usePlayerData] Fetching player data for date range (30 days)");
-        const dateRangeData = await fetchPlayerDataForDateRange(currentDate, 30);
+        // 3. Fetch player data for the past 45 days (expanded to ensure we have enough history even with missing recent data)
+        console.log(`[usePlayerData] === FETCHING DATE RANGE DATA ===`);
+        console.log(`[usePlayerData] Fetching player data for date range from ${formatDateString(currentDate)} (45 days back)`);
+        const dateRangeData = await fetchPlayerDataForDateRange(currentDate, 45);
         const datesWithData = Object.keys(dateRangeData);
         console.log(`[usePlayerData] Found data for ${datesWithData.length} days`);
+        console.log(`[usePlayerData] Date range keys:`, datesWithData.slice(0, 10)); // First 10 dates
         
         // 4. Keep track of player game history
         const newPlayerStatsHistory = {};

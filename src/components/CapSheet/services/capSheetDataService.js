@@ -56,6 +56,15 @@ export const clearCapSheetCache = () => {
 export const findValidatedMultiGamePlayerStats = async (dateRangeData, playerName, teamAbbr, numGames = 3) => {
   const cacheKey = `${playerName}-${teamAbbr}-${numGames}`;
   
+  console.log(`[CapSheetData] findValidatedMultiGamePlayerStats called for ${playerName} (${teamAbbr}), requesting ${numGames} games`);
+  console.log(`[CapSheetData] Date range data available:`, Object.keys(dateRangeData).length, 'dates');
+  console.log(`[CapSheetData] Date range data keys:`, Object.keys(dateRangeData));
+  console.log(`[CapSheetData] First few dates sample:`, Object.keys(dateRangeData).slice(0, 5).map(date => ({
+    date,
+    playerCount: dateRangeData[date]?.length || 0,
+    hasTarget: dateRangeData[date]?.some(p => p.name === playerName && p.team === teamAbbr)
+  })));
+  
   // Check CapSheet-specific cache with TTL
   if (isCacheValid(cacheKey) && capSheetDataCache.playerHistory[cacheKey]) {
     console.log(`[CapSheetData] Using cached data for ${playerName}`);
@@ -86,6 +95,15 @@ export const findValidatedMultiGamePlayerStats = async (dateRangeData, playerNam
       // TODO: Re-enable validation after fixing the validation logic
       const gameValidation = { isValid: true, reason: 'Validation temporarily disabled' };
       
+      console.log(`[CapSheetData] ✅ Found ${playerName} on ${dateStr}:`, {
+        name: playerData.name,
+        team: playerData.team,
+        stats: playerData.stats || playerData,
+        AB: playerData.AB || playerData.stats?.AB,
+        H: playerData.H || playerData.stats?.H,
+        HR: playerData.HR || playerData.stats?.HR
+      });
+      
       validatedGames.push({
         data: playerData,
         date: dateStr,
@@ -93,6 +111,10 @@ export const findValidatedMultiGamePlayerStats = async (dateRangeData, playerNam
       });
       
       console.log(`[CapSheetData] ✅ Game data for ${playerName} on ${dateStr} (validation disabled)`);
+    } else {
+      // Debug why player wasn't found
+      const availableNames = playersForDate.slice(0, 3).map(p => `${p.name} (${p.team})`);
+      console.log(`[CapSheetData] ❌ ${playerName} (${teamAbbr}) not found on ${dateStr}. Available players sample:`, availableNames);
     }
   }
   
@@ -202,8 +224,13 @@ export const fetchValidatedPlayerDataForDateRange = async (startDate, initialDay
   // Log data quality for monitoring
   const dateCount = Object.keys(rawData).length;
   const totalPlayers = Object.values(rawData).reduce((sum, players) => sum + (players?.length || 0), 0);
+  const datesWithPlayers = Object.keys(rawData).filter(date => rawData[date]?.length > 0);
   
+  console.log(`[CapSheetData] === DATA QUALITY ANALYSIS ===`);
   console.log(`[CapSheetData] Loaded ${dateCount} dates with ${totalPlayers} total player entries`);
+  console.log(`[CapSheetData] Dates with actual players: ${datesWithPlayers.length}`);
+  console.log(`[CapSheetData] Recent dates with players:`, datesWithPlayers.slice(-10));
+  console.log(`[CapSheetData] Sample empty dates:`, Object.keys(rawData).filter(date => rawData[date]?.length === 0).slice(-5));
   
   return rawData;
 };
