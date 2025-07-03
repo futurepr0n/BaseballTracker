@@ -18,6 +18,7 @@ import GameHistoryLegend from './components/GameHistoryLegend';
 import AddHandicapperModal from './modals/AddHandicapperModal';
 import SaveSlipModal from './modals/SaveSlipModal';
 import SlipGalleryModal from './modals/SlipGalleryModal';
+import ShareModal from './modals/ShareModal';
 
 // Import hooks
 import usePlayerData from './hooks/usePlayerData';
@@ -31,6 +32,9 @@ import { saveHandicapper } from '../../services/handicapperService';
 
 // Import data service utilities  
 import { fetchRosterData } from './services/capSheetDataService';
+
+// PHASE 5: Import sharing service
+import { createShareableLink, loadSharedCapSheet, loadBase64CapSheet, isValidShareId } from '../../services/capSheetSharingService';
 
 
 // PHASE 4 ENHANCED: Scan Results Notification Component with Validation Display
@@ -219,6 +223,12 @@ function CapSheet({ playerData, gameData, currentDate }) {
   // New state for the scanner modal
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [scanResults, setScanResults] = useState(null);
+
+  // PHASE 5: State for sharing functionality
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareResult, setShareResult] = useState(null);
+  const [isGeneratingShare, setIsGeneratingShare] = useState(false);
+  const [shareNotification, setShareNotification] = useState(null);
 
 
   // PHASE 4 ENHANCEMENT: Validate scanned players against roster data
@@ -773,6 +783,266 @@ function CapSheet({ playerData, gameData, currentDate }) {
     }
   }, [isRefreshingPitchers, refreshPitchersData]);
 
+  // PHASE 5: Sharing functionality handlers
+  const handleShareCapSheet = async () => {
+    try {
+      console.log('[CapSheet] Starting share process...');
+      setIsGeneratingShare(true);
+      setShowShareModal(true);
+      setShareResult(null);
+      
+      // Prepare CapSheet data for sharing
+      const shareData = {
+        hitters: selectedPlayers.hitters,
+        pitchers: selectedPlayers.pitchers,
+        handicappers: {
+          hitters: hitterHandicappers,
+          pitchers: pitcherHandicappers
+        },
+        settings: {
+          hitterGamesHistory,
+          pitcherGamesHistory,
+          currentDate: formattedDate
+        }
+      };
+      
+      console.log('[CapSheet] Generating share link...', {
+        hitters: shareData.hitters.length,
+        pitchers: shareData.pitchers.length,
+        hitterHandicappers: shareData.handicappers.hitters.length,
+        pitcherHandicappers: shareData.handicappers.pitchers.length
+      });
+      
+      // Create shareable link
+      const result = await createShareableLink(shareData);
+      
+      console.log('[CapSheet] Share link created successfully:', result);
+      setShareResult(result);
+      
+      // Show success notification
+      setShareNotification({
+        type: 'success',
+        message: 'Share link created successfully!'
+      });
+      
+      // Auto-copy to clipboard
+      if (navigator.clipboard && result.url) {
+        try {
+          await navigator.clipboard.writeText(result.url);
+          console.log('[CapSheet] URL copied to clipboard automatically');
+        } catch (copyError) {
+          console.log('[CapSheet] Auto-copy failed:', copyError);
+        }
+      }
+      
+    } catch (error) {
+      console.error('[CapSheet] Error creating share link:', error);
+      setShareResult(null);
+      setShareNotification({
+        type: 'error',
+        message: `Failed to create share link: ${error.message}`
+      });
+    } finally {
+      setIsGeneratingShare(false);
+    }
+  };
+
+  const handleCloseShareModal = () => {
+    setShowShareModal(false);
+    // Don't clear shareResult immediately to allow for reopening
+    setTimeout(() => {
+      if (!showShareModal) {
+        setShareResult(null);
+        setShareNotification(null);
+      }
+    }, 300);
+  };
+
+  // Load shared CapSheet from URL parameters (GitHub Gist or Base64)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareId = urlParams.get('share');
+    const encodedData = urlParams.get('data');
+    
+    if (shareId && isValidShareId(shareId)) {
+      console.log('[CapSheet] Loading shared CapSheet from GitHub:', shareId);
+      loadSharedDataFromGitHub(shareId);
+    } else if (encodedData) {
+      console.log('[CapSheet] Loading shared CapSheet from Base64...');
+      loadSharedDataFromBase64(encodedData);
+    }
+  }, [setSelectedPlayers, setHitterGamesHistory, setPitcherGamesHistory, setHitterHandicappers, setPitcherHandicappers]);
+
+  const loadSharedDataFromGitHub = async (shareId) => {
+    try {
+      setShareNotification({
+        type: 'info',
+        message: 'Loading shared CapSheet from GitHub...'
+      });
+      
+      const sharedData = await loadSharedCapSheet(shareId);
+      await applySharedData(sharedData, 'GitHub Gist');
+      
+    } catch (error) {
+      console.error('[CapSheet] Error loading GitHub CapSheet:', error);
+      setShareNotification({
+        type: 'error',
+        message: `Failed to load shared CapSheet: ${error.message}`
+      });
+    }
+  };
+
+  const loadSharedDataFromBase64 = async (encodedData) => {
+    try {
+      setShareNotification({
+        type: 'info',
+        message: 'Loading shared CapSheet...'
+      });
+      
+      const sharedData = await loadBase64CapSheet(encodedData);
+      await applySharedData(sharedData, 'URL');
+      
+    } catch (error) {
+      console.error('[CapSheet] Error loading Base64 CapSheet:', error);
+      setShareNotification({
+        type: 'error',
+        message: `Failed to load shared CapSheet: ${error.message}`
+      });
+    }
+  };
+
+  const applySharedData = async (sharedData, source) => {
+    console.log('[CapSheet] Shared data loaded:', sharedData._shareMetadata);
+    
+    // Apply settings first to ensure correct history counts are available
+    if (sharedData.settings) {
+      if (sharedData.settings.hitterGamesHistory) {
+        setHitterGamesHistory(sharedData.settings.hitterGamesHistory);
+      }
+      if (sharedData.settings.pitcherGamesHistory) {
+        setPitcherGamesHistory(sharedData.settings.pitcherGamesHistory);
+      }
+    }
+    
+    // Apply handicappers if available
+    if (sharedData.handicappers) {
+      if (sharedData.handicappers.hitters) {
+        setHitterHandicappers(sharedData.handicappers.hitters);
+      }
+      if (sharedData.handicappers.pitchers) {
+        setPitcherHandicappers(sharedData.handicappers.pitchers);
+      }
+    }
+    
+    // CRITICAL FIX: Enrich shared players with game history and stats like manually added players
+    console.log('[CapSheet] Enriching shared players with game history and stats...');
+    
+    try {
+      // Process hitters with full data enrichment
+      if (sharedData.hitters && sharedData.hitters.length > 0) {
+        console.log(`[CapSheet] Enriching ${sharedData.hitters.length} shared hitters...`);
+        
+        const enrichedHitters = await Promise.all(
+          sharedData.hitters.map(async (hitter) => {
+            console.log(`[CapSheet] Enriching hitter: ${hitter.name} (${hitter.team})`);
+            
+            // Use fetchHitterById to get full player data like manual selection
+            const enrichedHitter = await fetchHitterById(`${hitter.name}-${hitter.team}`);
+            
+            if (enrichedHitter) {
+              // Preserve any additional shared data properties
+              return {
+                ...enrichedHitter,
+                ...hitter,  // Overlay shared data properties
+                // Ensure enriched data takes precedence for stats
+                id: enrichedHitter.id || hitter.id,
+                name: enrichedHitter.name || hitter.name,
+                team: enrichedHitter.team || hitter.team,
+                playerType: 'hitter'
+              };
+            } else {
+              console.warn(`[CapSheet] Could not enrich hitter ${hitter.name}, using shared data only`);
+              return hitter;
+            }
+          })
+        );
+        
+        setSelectedPlayers(prev => ({
+          ...prev,
+          hitters: enrichedHitters
+        }));
+      }
+      
+      // Process pitchers with full data enrichment
+      if (sharedData.pitchers && sharedData.pitchers.length > 0) {
+        console.log(`[CapSheet] Enriching ${sharedData.pitchers.length} shared pitchers...`);
+        
+        const enrichedPitchers = await Promise.all(
+          sharedData.pitchers.map(async (pitcher) => {
+            console.log(`[CapSheet] Enriching pitcher: ${pitcher.name} (${pitcher.team})`);
+            
+            // Use fetchPitcherById to get full player data like manual selection
+            const enrichedPitcher = await fetchPitcherById(`${pitcher.name}-${pitcher.team}`);
+            
+            if (enrichedPitcher) {
+              // Preserve any additional shared data properties
+              return {
+                ...enrichedPitcher,
+                ...pitcher,  // Overlay shared data properties
+                // Ensure enriched data takes precedence for stats
+                id: enrichedPitcher.id || pitcher.id,
+                name: enrichedPitcher.name || pitcher.name,
+                team: enrichedPitcher.team || pitcher.team,
+                playerType: 'pitcher'
+              };
+            } else {
+              console.warn(`[CapSheet] Could not enrich pitcher ${pitcher.name}, using shared data only`);
+              return pitcher;
+            }
+          })
+        );
+        
+        setSelectedPlayers(prev => ({
+          ...prev,
+          pitchers: enrichedPitchers
+        }));
+      }
+      
+      setShareNotification({
+        type: 'success',
+        message: `Loaded and enriched shared CapSheet from ${source} - ${sharedData.hitters?.length || 0} hitters, ${sharedData.pitchers?.length || 0} pitchers with full stats`
+      });
+      
+    } catch (error) {
+      console.error('[CapSheet] Error enriching shared players:', error);
+      
+      // Fallback to original behavior if enrichment fails
+      if (sharedData.hitters) {
+        setSelectedPlayers(prev => ({
+          ...prev,
+          hitters: sharedData.hitters
+        }));
+      }
+      
+      if (sharedData.pitchers) {
+        setSelectedPlayers(prev => ({
+          ...prev,
+          pitchers: sharedData.pitchers
+        }));
+      }
+      
+      setShareNotification({
+        type: 'warning',
+        message: `Loaded shared CapSheet from ${source} - ${sharedData.hitters?.length || 0} hitters, ${sharedData.pitchers?.length || 0} pitchers (stats enrichment failed)`
+      });
+    }
+    
+    // Auto-dismiss notification
+    setTimeout(() => {
+      setShareNotification(null);
+    }, 5000);
+  };
+
   // Handler for hitter handicapper changes
   const handleAddHitterHandicapperWithUpdate = (playerType) => {
     const newHandicapper = handleAddHandicapper(playerType);
@@ -1168,6 +1438,25 @@ const handlePitcherGamesHistoryChange = (newValue) => {
   >
           <span className="action-icon">📷</span> Scan Bet Slip
         </button>
+        
+        {/* PHASE 5: Share CapSheet button */}
+        <button 
+          className="action-btn share-btn" 
+          onClick={handleShareCapSheet}
+          disabled={selectedPlayers.hitters.length === 0 && selectedPlayers.pitchers.length === 0}
+          style={{
+            backgroundColor: '#667eea', 
+            marginLeft: '10px',
+            opacity: (selectedPlayers.hitters.length === 0 && selectedPlayers.pitchers.length === 0) ? 0.5 : 1
+          }}
+          title={
+            (selectedPlayers.hitters.length === 0 && selectedPlayers.pitchers.length === 0) 
+              ? "Add some players to share your CapSheet" 
+              : "Share your CapSheet via URL"
+          }
+        >
+          <span className="action-icon">🔗</span> Share CapSheet
+        </button>
       </div>
       
       {/* Loading state during data refresh */}
@@ -1411,12 +1700,40 @@ const handlePitcherGamesHistoryChange = (newValue) => {
         context="capsheet"  // Tell scanner this is for CapSheet
       />
       
+      {/* PHASE 5: Share Modal */}
+      <ShareModal 
+        show={showShareModal}
+        onClose={handleCloseShareModal}
+        shareResult={shareResult}
+        isGenerating={isGeneratingShare}
+      />
+      
       {/* If we have scan results, show a notification */}
       {scanResults && (
         <ScanResultsNotification 
           results={scanResults} 
           onDismiss={() => setScanResults(null)} 
         />
+      )}
+      
+      {/* PHASE 5: Share notifications */}
+      {shareNotification && (
+        <div className={`share-notification ${shareNotification.type}`}>
+          <div className="notification-content">
+            <span className="notification-icon">
+              {shareNotification.type === 'success' && '✅'}
+              {shareNotification.type === 'error' && '❌'}
+              {shareNotification.type === 'info' && 'ℹ️'}
+            </span>
+            <span className="notification-message">{shareNotification.message}</span>
+            <button 
+              className="notification-close"
+              onClick={() => setShareNotification(null)}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

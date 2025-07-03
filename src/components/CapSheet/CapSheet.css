@@ -1895,3 +1895,86 @@ tr:has(.player-attribute-badge.batter-hand:contains("B")) .player-attribute-badg
 .notification-content button:hover {
   background: #218838;
 }
+
+/* PHASE 5: Share Notification Styling */
+.share-notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001;
+  max-width: 500px;
+  width: 90%;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideInFromTop 0.3s ease-out;
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.share-notification.success {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border: 2px solid #28a745;
+  color: #155724;
+}
+
+.share-notification.error {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  border: 2px solid #dc3545;
+  color: #721c24;
+}
+
+.share-notification.info {
+  background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+  border: 2px solid #17a2b8;
+  color: #0c5460;
+}
+
+.share-notification .notification-content {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: none;
+}
+
+.share-notification .notification-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.share-notification .notification-message {
+  flex: 1;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.share-notification .notification-close {
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  color: inherit;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  flex-shrink: 0;
+}
+
+.share-notification .notification-close:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
