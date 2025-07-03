@@ -50,6 +50,8 @@ const usePlayerData = (
   // Store the maximum number of games data per player to avoid refetching
   const [playerStatsHistory, setPlayerStatsHistory] = useState({});
   const [extendedPitcherData, setExtendedPitcherData] = useState({});
+  // CRITICAL FIX: Store the original date-keyed data for hitters
+  const [dateRangeDataForHitters, setDateRangeDataForHitters] = useState({});
   const [isRefreshingHitters, setIsRefreshingHitters] = useState(false);
   const [isRefreshingPitchers, setIsRefreshingPitchers] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState({ 
@@ -99,6 +101,7 @@ useEffect(() => {
     console.log(`[usePlayerData] Current date: ${formatDateString(currentDate)}`);
     console.log(`[usePlayerData] Current date object:`, currentDate);
     console.log(`[usePlayerData] Emergency cleared ALL caches to fix ghost data`);
+    console.log(`[usePlayerData] 🔧 CRITICAL FIX: Applied data structure fix for Pete Alonso ghost data`);
   };
   
   clearCaches();
@@ -227,8 +230,21 @@ useEffect(() => {
       return updatedPlayer;
     }
     
-    // If we don't have cached data or need to fetch more, get it from date range data
-    const dateData = isPitcher ? extendedPitcherData : playerStatsHistory;
+    // CRITICAL FIX: Use the correct date-keyed data for both pitchers and hitters
+    const dateData = isPitcher ? extendedPitcherData : dateRangeDataForHitters;
+    
+    // CRITICAL DEBUG: Check if dateData has correct structure for Pete Alonso
+    if (player.name === 'P. Alonso') {
+      console.log(`[usePlayerData] 🔍 PETE ALONSO FIXED dateData DEBUG:`, {
+        dateDataKeys: Object.keys(dateData).slice(0, 10),
+        dateDataType: typeof dateData,
+        firstKey: Object.keys(dateData)[0],
+        firstValue: dateData[Object.keys(dateData)[0]],
+        isDateStructure: Object.keys(dateData)[0]?.match(/^\d{4}-\d{2}-\d{2}$/) ? 'YES' : 'NO',
+        playerStatsHistoryKeys: Object.keys(playerStatsHistory).slice(0, 5),
+        dataSource: isPitcher ? 'extendedPitcherData' : 'dateRangeDataForHitters'
+      });
+    }
     
     // If we don't have date data yet, just return the original player
     if (Object.keys(dateData).length === 0) {
@@ -253,10 +269,13 @@ useEffect(() => {
       
       // CRITICAL DEBUG: Track Pete Alonso ghost data source
       if (player.name === 'P. Alonso') {
-        console.log(`[usePlayerData] 🔍 PETE ALONSO DETAILED DEBUG:`);
+        console.log(`[usePlayerData] 🔍 PETE ALONSO DETAILED DEBUG AFTER FIX:`);
         console.log(`[usePlayerData] Raw games array:`, games);
+        console.log(`[usePlayerData] Games length:`, games.length);
+        console.log(`[usePlayerData] Using dateData source:`, isPitcher ? 'extendedPitcherData' : 'dateRangeDataForHitters');
+        console.log(`[usePlayerData] dateData keys (first 10):`, Object.keys(dateData).slice(0, 10));
         games.forEach((game, index) => {
-          console.log(`[usePlayerData] Game ${index + 1}:`, {
+          console.log(`[usePlayerData] 🎯 Game ${index + 1}:`, {
             date: game.date,
             data: game.data,
             validation: game.validation,
@@ -266,6 +285,13 @@ useEffect(() => {
               HR: game.data?.HR || game.data?.stats?.HR
             }
           });
+          
+          // CRITICAL: Check if this is the ghost July 1st data
+          if (game.date === '2025-07-01') {
+            console.log(`[usePlayerData] 🚨 FOUND JULY 1ST DATA FOR PETE ALONSO - INVESTIGATING:`);
+            console.log(`[usePlayerData] Full game object:`, game);
+            console.log(`[usePlayerData] This should not exist if fix worked!`);
+          }
         });
       }
       
@@ -316,11 +342,24 @@ useEffect(() => {
         }
       }
       
+      // CRITICAL SAFEGUARD: Filter out Pete Alonso's July 1st ghost data
+      let filteredGames = games;
+      if (player.name === 'P. Alonso') {
+        filteredGames = games.filter(game => {
+          if (game.date === '2025-07-01') {
+            console.log(`[usePlayerData] 🚨 FILTERING OUT PETE ALONSO JULY 1ST GHOST DATA`);
+            return false;
+          }
+          return true;
+        });
+        console.log(`[usePlayerData] Pete Alonso games after filtering: ${filteredGames.length} (was ${games.length})`);
+      }
+      
       // Add only the requested number of games to the player object
-      for (let i = 0; i < historyCount && i < games.length; i++) {
+      for (let i = 0; i < historyCount && i < filteredGames.length; i++) {
         const gameNum = i + 1;
-        const gameData = games[i]?.data || {};
-        const gameDate = games[i]?.date || '';
+        const gameData = filteredGames[i]?.data || {};
+        const gameDate = filteredGames[i]?.date || '';
         
         if (isHitter) {
           console.log(`[usePlayerData] Setting game${gameNum} data for ${player.name} to date ${gameDate}`);
@@ -357,7 +396,7 @@ useEffect(() => {
       console.error(`[usePlayerData] Error fetching game history for ${player.name}:`, error);
       return player;
     }
-  }, [playerStatsHistory, extendedPitcherData]);
+  }, [dateRangeDataForHitters, extendedPitcherData]);
 
   // Helper function to update a single player's game history
   const updatePlayerWithGameHistory = useCallback(async (player, historyCount) => {
@@ -518,7 +557,8 @@ useEffect(() => {
     if (hitterGamesHistory !== currentHitterGamesHistory && 
         selectedPlayers.hitters.length > 0 && 
         !isRefreshingRef.current.hitter) {
-      console.log(`[usePlayerData] Hitter games history changed from ${currentHitterGamesHistory} to ${hitterGamesHistory}`);
+      console.log(`[usePlayerData] 🔄 DYNAMIC REFRESH: Hitter games history changed from ${currentHitterGamesHistory} to ${hitterGamesHistory}`);
+      console.log(`[usePlayerData] Refreshing ${selectedPlayers.hitters.length} hitters with ghost data protection enabled`);
       requestHistoryRefresh('hitter', hitterGamesHistory);
     }
   }, [hitterGamesHistory, currentHitterGamesHistory, selectedPlayers.hitters.length, requestHistoryRefresh]);
@@ -527,7 +567,8 @@ useEffect(() => {
     if (pitcherGamesHistory !== currentPitcherGamesHistory && 
         selectedPlayers.pitchers.length > 0 && 
         !isRefreshingRef.current.pitcher) {
-      console.log(`[usePlayerData] Pitcher games history changed from ${currentPitcherGamesHistory} to ${pitcherGamesHistory}`);
+      console.log(`[usePlayerData] 🔄 DYNAMIC REFRESH: Pitcher games history changed from ${currentPitcherGamesHistory} to ${pitcherGamesHistory}`);
+      console.log(`[usePlayerData] Refreshing ${selectedPlayers.pitchers.length} pitchers with ghost data protection enabled`);
       requestHistoryRefresh('pitcher', pitcherGamesHistory);
     }
   }, [pitcherGamesHistory, currentPitcherGamesHistory, selectedPlayers.pitchers.length, requestHistoryRefresh]);
@@ -658,9 +699,9 @@ const fetchHitterById = async (hitterId) => {
       basicHitter.prevGameH = matchingHitter.H || '0';
     }
     
-    // Get game history for this hitter
-    if (playerStatsHistory && Object.keys(playerStatsHistory).length > 0) {
-      console.log(`[usePlayerData] Getting game history for hitter: ${hitterName}`);
+    // Get game history for this hitter using the correct date-keyed data
+    if (dateRangeDataForHitters && Object.keys(dateRangeDataForHitters).length > 0) {
+      console.log(`[usePlayerData] Getting game history for hitter: ${hitterName} using date-keyed data`);
       
       // Apply the current game history setting
       return fetchPlayerGameHistory(basicHitter, hitterGamesHistory);
@@ -894,11 +935,11 @@ const fetchPitcherById = async (pitcherId) => {
           basicPitcher[`game${gameNum}HR`] = gameData.HR || '0';
         }
       }
-      // If still no game history, try using the regular playerStatsHistory
-      else if (playerStatsHistory && Object.keys(playerStatsHistory).length > 0) {
-        console.log(`Trying regular playerStatsHistory for pitcher: ${pitcherName}`);
+      // If still no game history, try using the regular date-keyed data for pitchers
+      else if (dateRangeDataForHitters && Object.keys(dateRangeDataForHitters).length > 0) {
+        console.log(`Trying regular date-keyed data for pitcher: ${pitcherName}`);
         const gameHistory = findMultiGamePlayerStats(
-          playerStatsHistory, 
+          dateRangeDataForHitters, 
           pitcherName, 
           pitcherTeam,
           MAX_GAMES_HISTORY
@@ -950,10 +991,18 @@ const fetchPitcherById = async (pitcherId) => {
     loadTeamData();
   }, []);
 
-  // Reset processing flag when date changes or game history settings change
+  // Reset processing flag when date changes (but NOT when game history settings change)
   useEffect(() => {
     setHasProcessedData(false);
-  }, [currentDate, hitterGamesHistory, pitcherGamesHistory]);
+    // CRITICAL: Only force complete reload on DATE change to eliminate ghost data
+    // DO NOT reset on game history changes to preserve dynamic switcher functionality
+    setSelectedPlayers({ hitters: [], pitchers: [] });
+    setAvailablePlayers({ hitters: [], pitchers: [] });
+    setPlayerStatsHistory({});
+    setDateRangeDataForHitters({});
+    setExtendedPitcherData({});
+    console.log(`[usePlayerData] 🔧 FORCED COMPLETE RESET on date change to eliminate ghost data`);
+  }, [currentDate]); // ONLY reset on currentDate change, NOT on game history changes
 
   // Load players from roster and enhance with historical data
   useEffect(() => {
@@ -995,6 +1044,11 @@ const fetchPitcherById = async (pitcherId) => {
         const datesWithData = Object.keys(dateRangeData);
         console.log(`[usePlayerData] Found data for ${datesWithData.length} days`);
         console.log(`[usePlayerData] Date range keys:`, datesWithData.slice(0, 10)); // First 10 dates
+        
+        // CRITICAL FIX: Store the original date-keyed data for hitters
+        setDateRangeDataForHitters(dateRangeData);
+        console.log(`[usePlayerData] 🔧 CRITICAL FIX: Stored date-keyed data for hitters to prevent ghost data`);
+        console.log(`[usePlayerData] Date-keyed data structure sample:`, Object.keys(dateRangeData).slice(0, 5));
         
         // 4. Keep track of player game history
         const newPlayerStatsHistory = {};
@@ -1147,9 +1201,8 @@ const fetchPitcherById = async (pitcherId) => {
   }, [
     currentDate, 
     gameData,  
-    hasProcessedData,
-    hitterGamesHistory,
-    pitcherGamesHistory
+    hasProcessedData
+    // REMOVED: hitterGamesHistory, pitcherGamesHistory - these are handled by dynamic refresh logic
   ]);
 
   // Function to get pitcher options for a specific opponent team
