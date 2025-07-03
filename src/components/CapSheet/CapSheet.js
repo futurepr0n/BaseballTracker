@@ -30,7 +30,7 @@ import { exportToCSV, parseImportedCSV } from './utils/exportImport';
 import { saveHandicapper } from '../../services/handicapperService';
 
 // Import testing utilities for data validation
-import { testPlayerValidation, getCapSheetCacheStats } from './services/capSheetDataService';
+import { testPlayerValidation, getCapSheetCacheStats, fetchRosterData } from './services/capSheetDataService';
 
 
 // Scan Results Notification Component
@@ -753,7 +753,7 @@ const handlePitcherGamesHistoryChange = (newValue) => {
     console.log(`[Import] Processing file: ${file.name}, size: ${file.size} bytes`);
     
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const content = e.target.result;
         
@@ -764,8 +764,12 @@ const handlePitcherGamesHistoryChange = (newValue) => {
         console.log(`[Import] File loaded, content length: ${content.length} bytes`);
         console.log(`[Import] Content preview: ${content.substring(0, 100)}...`);
         
-        // Parse the CSV content
-        const parsedData = parseImportedCSV(content);
+        // PHASE 3 ENHANCEMENT: Parse the CSV content with roster data for handedness preservation
+        console.log(`[Import] Fetching roster data for handedness enhancement...`);
+        const rosterData = await fetchRosterData();
+        console.log(`[Import] Loaded ${rosterData.length} roster entries for enhancement`);
+        
+        const parsedData = await parseImportedCSV(content, rosterData);
         
         if (!parsedData) {
           throw new Error('Failed to parse CSV data');
