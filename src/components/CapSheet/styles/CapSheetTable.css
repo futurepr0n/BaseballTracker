@@ -1,0 +1,173 @@
+/* CapSheet Isolated Table Styling */
+/* This file provides unique CSS classes for CapSheet tables to prevent conflicts with other components */
+
+/* Unique table class for HittersTable */
+.capsheet-hitters-table {
+  width: 100%;
+  border-collapse: separate;
+  table-layout: fixed;  /* Ensures consistent column widths */
+  font-size: 0.9rem;
+  min-width: 1400px;    /* Accommodate all columns */
+  border-spacing: 0;
+}
+
+/* Header styling unique to HittersTable */
+.capsheet-hitters-table th {
+  background-color: #f8f8f8;
+  font-weight: 600;
+  border-bottom: 2px solid #ddd;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Data cell styling */
+.capsheet-hitters-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* Sticky first column (player name) */
+.capsheet-hitters-table th:first-child,
+.capsheet-hitters-table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background-color: inherit;
+  box-shadow: 1px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Fixed widths for pitcher stat columns to ensure proper alignment */
+.capsheet-hitters-stat-header {
+  background-color: #f0f0f0 !important;
+  border-bottom-color: #ddd !important;
+  font-weight: 600;
+  text-align: center;
+  width: 80px;
+  max-width: 80px;
+}
+
+.capsheet-hitters-pitcher-stat {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-primary, #1a202c);
+  width: 80px;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Specific column width assignments for consistent alignment */
+.capsheet-hitters-table th:nth-child(1) { width: 140px; } /* Player */
+.capsheet-hitters-table th:nth-child(2) { width: 60px; }  /* Team */
+.capsheet-hitters-table th:nth-child(3) { width: 80px; }  /* HR Last */
+.capsheet-hitters-table th:nth-child(4) { width: 80px; }  /* AB Last */
+.capsheet-hitters-table th:nth-child(5) { width: 80px; }  /* H Last */
+.capsheet-hitters-table th:nth-child(6) { width: 150px; } /* Performance Chart */
+.capsheet-hitters-table th:nth-child(7) { width: 120px; } /* Primary Pitcher */
+.capsheet-hitters-table th:nth-child(8) { width: 80px; }  /* Last IP */
+.capsheet-hitters-table th:nth-child(9) { width: 80px; }  /* PC_ST */
+.capsheet-hitters-table th:nth-child(10) { width: 60px; } /* K */
+.capsheet-hitters-table th:nth-child(11) { width: 60px; } /* HR */
+.capsheet-hitters-table th:nth-child(12) { width: 80px; } /* Throws */
+.capsheet-hitters-table th:nth-child(13) { width: 120px; } /* Second Pitcher */
+
+/* Dynamic second pitcher columns - ensure proper alignment when present */
+.capsheet-hitters-table th.second-pitcher-header,
+.capsheet-hitters-table td.second-pitcher-stat {
+  width: 80px;
+  max-width: 80px;
+  text-align: center;
+}
+
+.capsheet-hitters-table th.second-pitcher-header {
+  background-color: #e8f4f8 !important;
+  border-bottom-color: #bde0f0 !important;
+}
+
+/* Ensure throws columns have consistent width */
+.capsheet-hitters-table th.throws-header,
+.capsheet-hitters-table td.throws-cell {
+  width: 80px;
+  max-width: 80px;
+  text-align: center;
+}
+
+/* Performance chart cell specific styling */
+.capsheet-hitters-table .performance-chart-cell {
+  width: 150px;
+  max-width: 150px;
+  padding: 5px;
+}
+
+/* Average header styling */
+.capsheet-hitters-table .avg-header {
+  background-color: #e8f4f8 !important;
+  border-bottom-color: #bde0f0 !important;
+}
+
+.capsheet-hitters-table .avg-cell {
+  background-color: #f5fbfd;
+  font-weight: 500;
+  color: #0056b3;
+}
+
+/* Row hover effects */
+.capsheet-hitters-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.capsheet-hitters-table tbody tr:hover .avg-cell {
+  background-color: #e8f4f8;
+}
+
+/* Player name styling */
+.capsheet-hitters-table .player-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+  display: block;
+  color: var(--text-primary, #1a202c);
+  font-weight: 500;
+}
+
+/* No data row */
+.capsheet-hitters-table .no-data {
+  text-align: center;
+  color: #888;
+  padding: 30px !important;
+  white-space: normal;
+}
+
+/* Loading row indicator */
+.capsheet-hitters-table .loading-row {
+  opacity: 0.6;
+  background-color: #f0f0f0;
+}
+
+/* Responsive behavior - maintain horizontal scroll */
+@media (max-width: 1400px) {
+  .capsheet-hitters-table {
+    min-width: 1400px; /* Force horizontal scroll on smaller screens */
+  }
+}
+
+/* Print styles */
+@media print {
+  .capsheet-hitters-table {
+    font-size: 0.8rem;
+  }
+  
+  .capsheet-hitters-table th,
+  .capsheet-hitters-table td {
+    padding: 6px 8px;
+  }
+}
