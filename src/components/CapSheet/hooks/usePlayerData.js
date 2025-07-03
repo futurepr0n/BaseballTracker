@@ -139,6 +139,12 @@ useEffect(() => {
     
     if (playerCache && playerCache.maxGamesHistory >= MAX_GAMES_HISTORY) {
       console.log(`[usePlayerData] Using cached data for ${player.name} with ${playerCache.maxGamesHistory} max games`);
+      console.log(`[usePlayerData] Cached data structure:`, {
+        maxGamesHistory: playerCache.maxGamesHistory,
+        gamesCount: playerCache.games?.length,
+        firstGame: playerCache.games?.[0],
+        gamesSample: playerCache.games?.slice(0, 3)
+      });
       
       // We have complete cached data, just need to create a subset with the requested history count
       const updatedPlayer = { ...player };
@@ -164,10 +170,15 @@ useEffect(() => {
       }
       
       // Add game data for the requested history count
+      console.log(`[usePlayerData] CACHED GAME SETTING: About to set ${historyCount} games for ${player.name}`);
+      console.log(`[usePlayerData] Available games in cache: ${playerCache.games.length}`);
+      
       for (let i = 0; i < historyCount && i < playerCache.games.length; i++) {
         const gameNum = i + 1;
         const gameData = playerCache.games[i]?.data || {};
         const gameDate = playerCache.games[i]?.date || '';
+        
+        console.log(`[usePlayerData] Processing game ${gameNum} for ${player.name}: date=${gameDate}, gameData=`, gameData);
         
         if (isHitter) {
           console.log(`[usePlayerData] Setting game${gameNum} data for ${player.name} to date ${gameDate}`);
