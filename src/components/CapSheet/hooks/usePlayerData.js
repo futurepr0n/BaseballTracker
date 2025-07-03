@@ -3,10 +3,11 @@ import {
   fetchTeamData, 
   fetchRosterData, 
   formatDateString,
-  findMultiGamePlayerStats,
+  findValidatedMultiGamePlayerStats as findMultiGamePlayerStats,
   formatDateForDisplay,
-  fetchPlayerDataForDateRange
-} from '../../../services/dataService';
+  fetchValidatedPlayerDataForDateRange as fetchPlayerDataForDateRange,
+  clearCapSheetCache
+} from '../services/capSheetDataService';
 
 // Import our enhanced player history function
 import { createPlayerWithGameHistory } from './playerHistoryUtils';
@@ -80,6 +81,12 @@ const usePlayerData = (
 useEffect(() => {
   loadRosterData();
 }, [loadRosterData]);
+
+// Clear CapSheet cache when date changes to prevent stale data
+useEffect(() => {
+  clearCapSheetCache();
+  console.log(`[usePlayerData] Cleared cache for date change: ${formatDateString(currentDate)}`);
+}, [currentDate]);
 
 
   // Use a ref to track ongoing refreshes and prevent multiple simultaneous refreshes

@@ -29,6 +29,9 @@ import useCalculations from './hooks/useCalculations';
 import { exportToCSV, parseImportedCSV } from './utils/exportImport';
 import { saveHandicapper } from '../../services/handicapperService';
 
+// Import testing utilities for data validation
+import { testPlayerValidation, getCapSheetCacheStats } from './services/capSheetDataService';
+
 
 // Scan Results Notification Component
 const ScanResultsNotification = ({ results, onDismiss }) => {
@@ -166,6 +169,31 @@ function CapSheet({ playerData, gameData, currentDate }) {
   // New state for the scanner modal
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [scanResults, setScanResults] = useState(null);
+
+  // Test function to verify Pete Alonso data validation fix
+  const testDataValidation = useCallback(async () => {
+    console.log('[CapSheet] Testing Pete Alonso data validation...');
+    
+    try {
+      // Test the specific case that was problematic
+      const testResult = await testPlayerValidation('P. Alonso', 'NYM', '2025-07-01');
+      console.log('[CapSheet] Pete Alonso test result:', testResult);
+      
+      // Test a known valid case for comparison  
+      const validTest = await testPlayerValidation('Vladimir Guerrero Jr.', 'TOR', '2025-07-01');
+      console.log('[CapSheet] Valid player test result:', validTest);
+      
+      // Show cache stats
+      const cacheStats = getCapSheetCacheStats();
+      console.log('[CapSheet] Cache statistics:', cacheStats);
+      
+      alert(`Data validation test complete. Check console for results.\n\nPete Alonso on 07/01: ${testResult.isValid ? 'VALID' : 'INVALID'}\nReason: ${testResult.reason}`);
+      
+    } catch (error) {
+      console.error('[CapSheet] Test failed:', error);
+      alert(`Test failed: ${error.message}`);
+    }
+  }, []);
 
   // Handle scan completion
   const handleScanComplete = async (results) => {
@@ -890,6 +918,21 @@ const handlePitcherGamesHistoryChange = (newValue) => {
   >
           <span className="action-icon">📷</span> Scan Bet Slip
         </button>
+        
+        {/* Test button for data validation - Development only */}
+        {process.env.NODE_ENV === 'development' && (
+          <button 
+            className="action-btn test-btn" 
+            onClick={testDataValidation}
+            style={{
+              backgroundColor: '#f59e0b', 
+              marginLeft: '10px'
+            }}
+            title="Test Pete Alonso data validation fix"
+          >
+            <span className="action-icon">🧪</span> Test Validation
+          </button>
+        )}
       </div>
       
       {/* Loading state during data refresh */}
