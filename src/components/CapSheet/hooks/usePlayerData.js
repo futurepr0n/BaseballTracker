@@ -6,7 +6,8 @@ import {
   findValidatedMultiGamePlayerStats as findMultiGamePlayerStats,
   formatDateForDisplay,
   fetchValidatedPlayerDataForDateRange as fetchPlayerDataForDateRange,
-  clearCapSheetCache
+  clearCapSheetCache,
+  clearAllCaches
 } from '../services/capSheetDataService';
 
 // Import our enhanced player history function
@@ -84,19 +85,23 @@ useEffect(() => {
 
 // Clear CapSheet cache when date changes to prevent stale data
 useEffect(() => {
-  clearCapSheetCache();
-  
-  // EMERGENCY: Clear corrupted local cache from async/await bug
-  playerDataCacheRef.current = {
-    hitters: {},
-    pitchers: {}
+  // EMERGENCY: Clear ALL caches to fix Pete Alonso ghost data
+  const clearCaches = async () => {
+    await clearAllCaches();
+    
+    // Also clear corrupted local cache
+    playerDataCacheRef.current = {
+      hitters: {},
+      pitchers: {}
+    };
+    
+    console.log(`[usePlayerData] === DATE SETUP ===`);
+    console.log(`[usePlayerData] Current date: ${formatDateString(currentDate)}`);
+    console.log(`[usePlayerData] Current date object:`, currentDate);
+    console.log(`[usePlayerData] Emergency cleared ALL caches to fix ghost data`);
   };
   
-  console.log(`[usePlayerData] === DATE SETUP ===`);
-  console.log(`[usePlayerData] Current date: ${formatDateString(currentDate)}`);
-  console.log(`[usePlayerData] Current date object:`, currentDate);
-  console.log(`[usePlayerData] Cleared cache for date change: ${formatDateString(currentDate)}`);
-  console.log(`[usePlayerData] Emergency cleared local cache to fix corrupted data`);
+  clearCaches();
 }, [currentDate]);
 
 

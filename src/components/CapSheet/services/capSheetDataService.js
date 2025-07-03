@@ -44,6 +44,39 @@ export const clearCapSheetCache = () => {
 };
 
 /**
+ * Emergency function to clear ALL caches including dataService cache
+ * Use this to resolve ghost data issues
+ */
+export const clearAllCaches = async () => {
+  console.log('[CapSheetData] 🚨 EMERGENCY: Clearing ALL caches to fix ghost data');
+  
+  // Clear CapSheet cache
+  clearCapSheetCache();
+  
+  // Clear dataService cache by importing and clearing it
+  try {
+    const { clearDataServiceCache } = await import('../../../services/dataService');
+    if (clearDataServiceCache) {
+      clearDataServiceCache();
+      console.log('[CapSheetData] Cleared dataService cache');
+    }
+  } catch (error) {
+    console.warn('[CapSheetData] Could not clear dataService cache:', error);
+  }
+  
+  // Force browser cache invalidation for Pete Alonso ghost data
+  if (typeof window !== 'undefined' && window.caches) {
+    try {
+      const cacheNames = await window.caches.keys();
+      await Promise.all(cacheNames.map(name => window.caches.delete(name)));
+      console.log('[CapSheetData] Cleared browser caches');
+    } catch (error) {
+      console.warn('[CapSheetData] Could not clear browser caches:', error);
+    }
+  }
+};
+
+/**
  * Enhanced function to find validated multi-game player stats
  * This prevents issues like Pete Alonso showing HRs on dates he didn't play
  * 
@@ -94,6 +127,15 @@ export const findValidatedMultiGamePlayerStats = async (dateRangeData, playerNam
       // TEMPORARY: Disable strict validation while we fix table layout
       // TODO: Re-enable validation after fixing the validation logic
       const gameValidation = { isValid: true, reason: 'Validation temporarily disabled' };
+      
+      // CRITICAL DEBUG: Track ghost data for Pete Alonso
+      if (playerName === 'P. Alonso') {
+        console.log(`[CapSheetData] 🔍 PETE ALONSO GHOST DEBUG on ${dateStr}:`);
+        console.log(`[CapSheetData] Full player object:`, playerData);
+        console.log(`[CapSheetData] Players array length for ${dateStr}:`, playersForDate.length);
+        console.log(`[CapSheetData] First 3 players on ${dateStr}:`, playersForDate.slice(0, 3).map(p => `${p.name} (${p.team})`));
+        console.log(`[CapSheetData] All NYM players on ${dateStr}:`, playersForDate.filter(p => p.team === 'NYM').map(p => p.name));
+      }
       
       console.log(`[CapSheetData] ✅ Found ${playerName} on ${dateStr}:`, {
         name: playerData.name,
