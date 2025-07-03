@@ -1264,7 +1264,7 @@ const noFilteredData = isFiltering &&
           {isCurrentDay() ? (
             <div style={{ gridColumn: '1 / -1' }}>
               <div className="current-day-featured-container">
-                <LiveScoresCard teams={teamData} />
+                <LiveScoresCard />
               </div>
             </div>
           ) : (
@@ -1274,7 +1274,7 @@ const noFilteredData = isFiltering &&
                 batterData={filteredBatterData}
                 pitcherData={filteredPitcherData}
               />
-              <LiveScoresCard teams={teamData} />
+              <LiveScoresCard />
             </>
           )}
 
