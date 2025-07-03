@@ -35,7 +35,7 @@
 
 .stats-summary-card .stat-label {
   margin-top: 5px;
-  color: #666;
+  color: var(--text-secondary, #4a5568);  /* Enhanced readability */
 }
 
 /* Custom stat item styling */

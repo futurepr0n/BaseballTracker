@@ -110,7 +110,7 @@
 
 .header-text p {
   font-size: 10px;
-  color: #6b7280;
+  color: var(--text-secondary, #4a5568);
   margin: 0;
 }
 
@@ -206,7 +206,7 @@
 
 .pitcher-matchup-card .sort-toggle span {
   font-size: 9px;
-  color: #6b7280;
+  color: var(--text-secondary, #4a5568);
 }
 
 .pitcher-matchup-card .sort-button {
@@ -255,7 +255,7 @@
 /* Pitchers Count - COMPACT */
 .pitcher-matchup-card .pitchers-count {
   font-size: 9px;
-  color: #6b7280;
+  color: var(--text-secondary, #4a5568);
   margin-bottom: 8px;
   font-style: italic;
 }
@@ -395,7 +395,7 @@
 
 .pitcher-matchup-card .player-team {
   font-size: 9px;
-  color: #6b7280;
+  color: var(--text-secondary, #4a5568);
   padding: 1px 4px;
   background-color: rgba(31, 41, 55, 0.1);
   border-radius: 3px;
@@ -410,7 +410,7 @@
   align-items: center;
   justify-content: center;
   background-color: rgba(31, 41, 55, 0.1);
-  color: #6b7280;
+  color: var(--text-secondary, #4a5568);
   border: none;
   border-radius: 50%;
   cursor: pointer;
@@ -456,7 +456,7 @@
 
 .pitcher-matchup-card .handedness-badge {
   background-color: rgba(31, 41, 55, 0.1);
-  color: #6b7280;
+  color: var(--text-secondary, #4a5568);
 }
 
 .pitcher-matchup-card .estimated-badge {
@@ -466,7 +466,7 @@
 
 .pitcher-matchup-card .pitch-count {
   font-size: 8px;
-  color: #6b7280;
+  color: var(--text-secondary, #4a5568);
 }
 
 
@@ -504,7 +504,7 @@
 .pitcher-matchup-card .matchup-label {
   font-size: 8px;
   font-weight: normal;
-  color: #6b7280;
+  color: var(--text-secondary, #4a5568);
 }
 
 .pitcher-matchup-card .matchup-stat.tough .matchup-value {
@@ -517,7 +517,7 @@
 
 .pitcher-matchup-card .opposing-team {
   font-size: 8px;
-  color: #6b7280;
+  color: var(--text-secondary, #4a5568);
   margin-top: 3px;
 }
 
@@ -539,7 +539,7 @@
   justify-content: center;
   align-items: center;
   font-size: 9px;
-  color: #6b7280;
+  color: var(--text-secondary, #4a5568);
 }
 
 .pitcher-matchup-card .footer-legend {
@@ -581,7 +581,7 @@
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  color: #6b7280;
+  color: var(--text-secondary, #4a5568);
   font-style: italic;
   height: 100%;
   min-height: 200px;
@@ -589,7 +589,7 @@
 }
 
 .pitcher-matchup-card .no-data {
-  color: #6b7280;
+  color: var(--text-secondary, #4a5568);
   text-align: center;
   padding: 40px 20px;
   font-style: italic;

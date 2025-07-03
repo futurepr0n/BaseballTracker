@@ -106,7 +106,7 @@
 .header-text h2 {
   font-size: 14px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary, #1a202c);
   margin: 0;
 }
 
@@ -207,7 +207,7 @@
 .summary-value {
   font-size: 10px;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary, #1a202c);
 }
 
 /* Rankings Container - MAXIMUM SPACE */
@@ -404,7 +404,7 @@
 .player-name {
   font-size: 12px;
   font-weight: 600;
-  color: #111827;
+  color: var(--text-primary, #1a202c);
   margin: 0 0 1px 0;
   white-space: nowrap;
   overflow: hidden;
@@ -426,7 +426,7 @@
 .multi-games-count {
   font-size: 14px;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary, #1a202c);
   display: block;
 }
 

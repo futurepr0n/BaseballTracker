@@ -28,7 +28,7 @@
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     background-color: #f5f5f7;
-    color: #333;
+    color: var(--text-primary, #1a202c);  /* Enhanced readability */
     line-height: 1.6;
   }
   
@@ -126,7 +126,7 @@
   
   .current-date {
     font-weight: 500;
-    color: #333;
+    color: var(--text-primary, #1a202c);  /* Enhanced readability */
     flex-grow: 1;
     text-align: center;
   }
@@ -162,7 +162,7 @@
     align-items: center;
     height: 300px;
     font-size: 1.2rem;
-    color: #666;
+    color: var(--text-secondary, #4a5568);  /* Enhanced readability */
   }
   
   .loading::after {
@@ -275,4 +275,28 @@
     border-color 0.3s ease,
     box-shadow 0.3s ease,
     backdrop-filter 0.3s ease !important;
+}
+
+/* CRITICAL: Force all player names to use enhanced readability colors */
+.player-name {
+  color: var(--text-primary, #1a202c) !important;
+  font-weight: 500; /* Reduced from 600 to avoid heavy shadow effect */
+  font-size: 0.9rem;
+}
+
+/* Team labels with badge styling like HellraiserCard */
+.player-team {
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+/* Fix any player info containers */
+.player-info {
+  color: var(--text-primary, #1a202c);
 }

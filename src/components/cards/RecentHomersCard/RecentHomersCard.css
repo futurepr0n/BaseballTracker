@@ -178,7 +178,7 @@
 
 .recent-homers-card .player-name {
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   font-size: 0.95rem;
 }
 

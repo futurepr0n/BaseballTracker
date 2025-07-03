@@ -43,7 +43,7 @@
   margin: 0 0 15px 0;
   font-size: 18px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #1a202c);
 }
 
 .hellraiser-card .header-stats {
@@ -288,7 +288,7 @@
 .hellraiser-card .player-name {
   font-weight: 600;
   font-size: 13px;
-  color: #333;
+  color: var(--text-primary, #1a202c);
 }
 
 .hellraiser-card .team {

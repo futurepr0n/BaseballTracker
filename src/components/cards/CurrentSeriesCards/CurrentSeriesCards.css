@@ -43,7 +43,7 @@
 
 .current-series-hits-card .glass-header h3 {
   margin: 0;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   font-size: 1.1rem;
   font-weight: 600;
 }
@@ -117,7 +117,7 @@
 
 .current-series-hr-card .glass-header h3 {
   margin: 0;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   font-size: 1.1rem;
   font-weight: 600;
 }
@@ -286,7 +286,7 @@
 .current-series-hits-card .player-name,
 .current-series-hr-card .player-name {
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   font-size: 0.95rem;
 }
 

@@ -505,7 +505,7 @@
 .player-name {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   flex: 1;
 }
 
@@ -1072,7 +1072,7 @@
 .mini-player-name {
   font-weight: 600;
   font-size: 0.9rem;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   margin-bottom: 2px;
 }
 

@@ -48,7 +48,7 @@
 
 .hr-prediction .card-subtitle {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   margin-top: 5px;
 }
 
@@ -177,7 +177,7 @@
 
 .hr-prediction .player-name {
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   font-size: 0.95rem;
 }
 
@@ -191,13 +191,13 @@
 
 .player-team {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   font-weight: 500;
   white-space: nowrap; /* Prevent team name from wrapping */
 }
 
 .odds-separator {
-  color: #ccc;
+  color: var(--text-muted, #68778d);
   font-size: 0.7rem;
   flex-shrink: 0; /* Prevent separator from shrinking */
 }
@@ -321,12 +321,12 @@
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   font-style: italic;
 }
 
 .hr-prediction .no-data {
-  color: #888;
+  color: var(--text-muted, #68778d);
   text-align: center;
   padding: 40px 20px;
   font-style: italic;
