@@ -145,12 +145,14 @@ useEffect(() => {
     
     console.log(`[usePlayerData] fetchPlayerGameHistory for ${player.name} (${isHitter ? 'hitter' : 'pitcher'}) with ${historyCount} games`);
     
-    // Check if we already have cached data for this player with the max history
-    const playerCache = isHitter 
-      ? playerDataCacheRef.current.hitters[playerId]
-      : playerDataCacheRef.current.pitchers[playerId];
+    // EMERGENCY: DISABLE CACHE to eliminate Pete Alonso ghost data
+    // The cache contains corrupted Promise data causing phantom July 1st stats
+    console.log(`[usePlayerData] 🚨 CACHE DISABLED for ${player.name} to fix ghost data`);
     
-    if (playerCache && playerCache.maxGamesHistory >= MAX_GAMES_HISTORY) {
+    // Skip cache entirely and always fetch fresh data
+    const playerCache = null;
+    
+    if (false) { // Disabled cache logic
       console.log(`[usePlayerData] Using cached data for ${player.name} with ${playerCache.maxGamesHistory} max games`);
       console.log(`[usePlayerData] Cached data structure:`, {
         maxGamesHistory: playerCache.maxGamesHistory,
@@ -249,13 +251,35 @@ useEffect(() => {
       console.log(`[usePlayerData] Games data structure:`, games);
       console.log(`[usePlayerData] Date data keys:`, Object.keys(dateData));
       
+      // CRITICAL DEBUG: Track Pete Alonso ghost data source
+      if (player.name === 'P. Alonso') {
+        console.log(`[usePlayerData] 🔍 PETE ALONSO DETAILED DEBUG:`);
+        console.log(`[usePlayerData] Raw games array:`, games);
+        games.forEach((game, index) => {
+          console.log(`[usePlayerData] Game ${index + 1}:`, {
+            date: game.date,
+            data: game.data,
+            validation: game.validation,
+            stats: {
+              AB: game.data?.AB || game.data?.stats?.AB,
+              H: game.data?.H || game.data?.stats?.H,
+              HR: game.data?.HR || game.data?.stats?.HR
+            }
+          });
+        });
+      }
+      
       // Validate games is an array before caching
       if (!Array.isArray(games)) {
         console.error(`[usePlayerData] ERROR: games is not an array for ${player.name}:`, typeof games, games);
         return player; // Don't cache invalid data
       }
       
-      // Store the complete data in the cache
+      // DISABLED: Don't store in cache to prevent ghost data corruption
+      console.log(`[usePlayerData] 🚨 CACHE STORAGE DISABLED for ${player.name} - not storing corrupted data`);
+      
+      // Skip cache storage entirely
+      /*
       if (isHitter) {
         playerDataCacheRef.current.hitters[playerId] = {
           maxGamesHistory: MAX_GAMES_HISTORY,
@@ -267,6 +291,7 @@ useEffect(() => {
           games: games
         };
       }
+      */
       
       // Make a copy of the player to update
       const updatedPlayer = { ...player };

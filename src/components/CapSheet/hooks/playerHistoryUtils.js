@@ -98,8 +98,9 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
         };
         return acc;
       }, {}),
-      // Store the full game history in a hidden property for later refresh
-      _fullGameHistory: gameHistory
+      // DISABLED: Don't store _fullGameHistory to prevent Pete Alonso ghost data
+      // _fullGameHistory: gameHistory
+      _fullGameHistory: [] // Empty array to prevent phantom data
     };
     
     // Dynamically add game data based on numGames
@@ -148,8 +149,9 @@ export const createPlayerWithGameHistory = (player, dateRangeData, handicappers 
         };
         return acc;
       }, {}),
-      // Store the full game history in a hidden property for later refresh
-      _fullGameHistory: gameHistory
+      // DISABLED: Don't store _fullGameHistory to prevent Pete Alonso ghost data
+      // _fullGameHistory: gameHistory
+      _fullGameHistory: [] // Empty array to prevent phantom data
     };
     
     // Dynamically add game data based on numGames
