@@ -92,9 +92,9 @@ function main() {
   console.log('🔄 Converting handedness CSV files to JSON...\n');
   
   const conversions = [
-    { file: 'bat-tracking-swing-path-RHP.csv', handedness: 'RHP' },
-    { file: 'bat-tracking-swing-path-LHP.csv', handedness: 'LHP' },
-    { file: 'bat-tracking-swing-path-all.csv', handedness: 'ALL' }
+    { file: 'batters-swing-path-RHP.csv', handedness: 'RHP' },
+    { file: 'batters-swing-path-LHP.csv', handedness: 'LHP' },
+    { file: 'batters-swing-path-all.csv', handedness: 'ALL' }
   ];
   
   let totalConverted = 0;
