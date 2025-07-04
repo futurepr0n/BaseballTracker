@@ -247,20 +247,19 @@ export const calculateAdvancedMetrics = async (player, playerHistory) => {
     (25 + (battingAvg - 0.280) * 100).toFixed(1) : 
     (15 + battingAvg * 35).toFixed(1);
 
-  // Try to get real exit velocity data from BaseballAPI or use estimates
-  let exitVelocity = { season: 87.5, recent: 87.5 }; // Default estimates
-  let barrelRate = { season: 8.5, recent: 8.5 }; // Default estimates
-
-  try {
-    // Check if we can get real data from BaseballAPI
-    const apiData = await fetchAdvancedMetricsFromAPI(player.name, player.team);
-    if (apiData) {
-      exitVelocity = apiData.exitVelocity || exitVelocity;
-      barrelRate = apiData.barrelRate || barrelRate;
-    }
-  } catch (error) {
-    console.log('Using estimated metrics for', player.name);
-  }
+  // Use performance-based estimates for exit velocity and barrel rate
+  // Estimate based on power metrics (HR rate and batting performance) - reuse existing powerRate
+  const baseExitVelocity = 85 + (powerRate * 40) + (battingAvg * 15); // Scale with performance
+  const exitVelocity = { 
+    season: Math.min(95, Math.max(80, baseExitVelocity)), 
+    recent: Math.min(95, Math.max(80, baseExitVelocity + (Math.random() * 4 - 2))) // Add slight variation
+  };
+  
+  const baseBarrelRate = 4 + (powerRate * 20) + (battingAvg * 8); // Scale with performance
+  const barrelRate = { 
+    season: Math.min(15, Math.max(2, baseBarrelRate)),
+    recent: Math.min(15, Math.max(2, baseBarrelRate + (Math.random() * 2 - 1))) // Add slight variation
+  };
 
   return {
     exitVelocity,
@@ -333,41 +332,75 @@ export const calculateTeamContext = async (player, teamAbbr, currentDate) => {
     
     // First try to load from pre-generated team stats file
     try {
+      // Always try latest file first (most reliable)
+      console.log(`🔍 Trying latest team stats file first...`);
+      const latestResponse = await fetch('/data/team_stats/team_stats_latest.json');
+      if (latestResponse.ok) {
+        const teamStatsData = await latestResponse.json();
+        if (teamStatsData.teams && teamStatsData.teams[teamAbbr]) {
+          const stats = teamStatsData.teams[teamAbbr];
+          console.log(`✅ Loaded team stats from LATEST file for ${teamAbbr}:`, {
+            record: stats.actualRecord,
+            runsPerGame: stats.runsPerGame,
+            teamBA: stats.teamBA
+          });
+          
+          return {
+            overall: {
+              record: stats.actualRecord,
+              runsPerGame: stats.runsPerGame,
+              teamBA: stats.teamBA,
+              teamOPS: stats.teamOPS,
+              homeRecord: stats.homeRecord,
+              awayRecord: stats.awayRecord
+            },
+            rankings: stats.rankings || generateEstimatedRankings(
+              parseFloat(stats.teamBA),
+              parseFloat(stats.runsPerGame),
+              parseFloat(stats.teamOPS)
+            ),
+            recent: {
+              last10: '5-5', // Would need recent game data
+              runsLast10: stats.runsPerGame,
+              trending: 'stable'
+            }
+          };
+        }
+      }
+      
+      // Fallback to date-specific file
+      console.log(`🔍 Trying date-specific team stats file: team_stats_${dateStr}.json`);
       const teamStatsResponse = await fetch(`/data/team_stats/team_stats_${dateStr}.json`);
-      if (!teamStatsResponse.ok) {
-        // Try latest file
-        const latestResponse = await fetch('/data/team_stats/team_stats_latest.json');
-        if (latestResponse.ok) {
-          const teamStatsData = await latestResponse.json();
-          if (teamStatsData.teams && teamStatsData.teams[teamAbbr]) {
-            const stats = teamStatsData.teams[teamAbbr];
-            console.log(`✅ Loaded team stats from file for ${teamAbbr}`);
-            
-            return {
-              overall: {
-                record: stats.estimatedRecord,
-                runsPerGame: stats.runsPerGame,
-                teamBA: stats.teamBA,
-                teamOPS: stats.teamOPS,
-                homeRecord: stats.estimatedHomeRecord,
-                awayRecord: stats.estimatedAwayRecord
-              },
-              rankings: stats.rankings || generateEstimatedRankings(
-                parseFloat(stats.teamBA),
-                parseFloat(stats.runsPerGame),
-                parseFloat(stats.teamOPS)
-              ),
-              recent: {
-                last10: '5-5', // Would need recent game data
-                runsLast10: stats.runsPerGame,
-                trending: 'stable'
-              }
-            };
-          }
+      if (teamStatsResponse.ok) {
+        const teamStatsData = await teamStatsResponse.json();
+        if (teamStatsData.teams && teamStatsData.teams[teamAbbr]) {
+          const stats = teamStatsData.teams[teamAbbr];
+          console.log(`✅ Loaded team stats from DATE file for ${teamAbbr}`);
+          
+          return {
+            overall: {
+              record: stats.actualRecord,
+              runsPerGame: stats.runsPerGame,
+              teamBA: stats.teamBA,
+              teamOPS: stats.teamOPS,
+              homeRecord: stats.homeRecord,
+              awayRecord: stats.awayRecord
+            },
+            rankings: stats.rankings || generateEstimatedRankings(
+              parseFloat(stats.teamBA),
+              parseFloat(stats.runsPerGame),
+              parseFloat(stats.teamOPS)
+            ),
+            recent: {
+              last10: '5-5',
+              runsLast10: stats.runsPerGame,
+              trending: 'stable'
+            }
+          };
         }
       }
     } catch (fileError) {
-      console.log('Team stats file not available, falling back to rolling stats');
+      console.warn('Team stats file loading failed:', fileError.message);
     }
     
     // Fallback to rolling stats calculation
@@ -388,14 +421,31 @@ export const calculateTeamContext = async (player, teamAbbr, currentDate) => {
       parseFloat(teamData.teamOPS || '0.750')
     );
     
+    // Generate more realistic record estimates based on team performance
+    const runsPerGameFloat = parseFloat(teamData.runsPerGame) || 4.5;
+    const teamBAFloat = parseFloat(teamData.teamBA) || 0.250;
+    const teamOPSFloat = parseFloat(teamData.teamOPS) || 0.750;
+    
+    // Estimate win percentage based on performance (teams with better stats should have better records)
+    let estimatedWinPct = 0.500; // baseline
+    if (runsPerGameFloat >= 5.5 && teamBAFloat >= 0.270) estimatedWinPct = 0.600;
+    else if (runsPerGameFloat >= 5.0 && teamBAFloat >= 0.250) estimatedWinPct = 0.550;
+    else if (runsPerGameFloat <= 4.0 || teamBAFloat <= 0.230) estimatedWinPct = 0.400;
+    
+    const totalGames = teamData.totalGames || 80;
+    const estimatedWins = Math.round(totalGames * estimatedWinPct);
+    const estimatedLosses = totalGames - estimatedWins;
+    
+    console.warn(`⚠️ Using ESTIMATED record for ${teamAbbr}: ${estimatedWins}-${estimatedLosses} (based on performance)`);
+    
     return {
       overall: {
-        record: `${Math.round(teamData.totalGames * 0.5)}-${Math.round(teamData.totalGames * 0.5)}`,
+        record: `${estimatedWins}-${estimatedLosses} (est.)`,
         runsPerGame: teamData.runsPerGame,
         teamBA: teamData.teamBA,
         teamOPS: teamData.teamOPS || '0.750',
-        homeRecord: `${Math.round(teamData.totalGames * 0.27)}-${Math.round(teamData.totalGames * 0.23)}`,
-        awayRecord: `${Math.round(teamData.totalGames * 0.23)}-${Math.round(teamData.totalGames * 0.27)}`
+        homeRecord: `${Math.round(estimatedWins * 0.55)}-${Math.round(estimatedLosses * 0.45)} (est.)`,
+        awayRecord: `${Math.round(estimatedWins * 0.45)}-${Math.round(estimatedLosses * 0.55)} (est.)`
       },
       rankings: rankings,
       recent: {
@@ -465,42 +515,8 @@ const calculatePercentiles = (metrics) => {
   };
 };
 
-const fetchAdvancedMetricsFromAPI = async (playerName, team) => {
-  try {
-    // Try to fetch from BaseballAPI if available with timeout
-    const apiUrl = 'http://localhost:8000';
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
-    
-    const response = await fetch(`${apiUrl}/player-advanced-metrics?name=${encodeURIComponent(playerName)}&team=${team}`, {
-      signal: controller.signal
-    });
-    
-    clearTimeout(timeoutId);
-    
-    if (response.ok) {
-      const data = await response.json();
-      console.log('✅ BaseballAPI data received for', playerName);
-      return {
-        exitVelocity: {
-          season: data.exit_velocity_season || 87.5,
-          recent: data.exit_velocity_recent || 87.5
-        },
-        barrelRate: {
-          season: data.barrel_rate_season || 8.5,
-          recent: data.barrel_rate_recent || 8.5
-        }
-      };
-    }
-  } catch (error) {
-    if (error.name === 'AbortError') {
-      console.log('⏰ BaseballAPI timeout for', playerName);
-    } else {
-      console.log('❌ BaseballAPI not available:', error.message);
-    }
-  }
-  return null;
-};
+// Removed fetchAdvancedMetricsFromAPI - BaseballAPI endpoint doesn't exist
+// Using performance-based estimates instead
 
 const loadTeamPerformanceData = async (teamAbbr, currentDate) => {
   try {

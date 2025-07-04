@@ -115,17 +115,17 @@ const SplitAnalysisTables = ({ splitAnalysis, player }) => {
           <tbody>
             <tr>
               <td>vs LHP</td>
-              <td>{vsLHP?.attack_angle ? `${vsLHP.attack_angle.toFixed(1)}°` : 'N/A'}</td>
-              <td>{vsLHP?.bat_speed ? `${vsLHP.bat_speed.toFixed(1)} mph` : 'N/A'}</td>
-              <td>{vsLHP?.swing_optimization_score ? vsLHP.swing_optimization_score.toFixed(1) : 'N/A'}</td>
-              <td>{vsLHP?.swing_count || 'N/A'}</td>
+              <td>{vsLHP?.attackAngle ? `${vsLHP.attackAngle.toFixed(1)}°` : 'N/A'}</td>
+              <td>{vsLHP?.batSpeed ? `${vsLHP.batSpeed.toFixed(1)} mph` : 'N/A'}</td>
+              <td>{vsLHP?.swingScore ? vsLHP.swingScore.toFixed(1) : 'N/A'}</td>
+              <td>{vsLHP?.hab ? vsLHP.hab.split('/')[1] : 'N/A'}</td>
             </tr>
             <tr>
               <td>vs RHP</td>
-              <td>{vsRHP?.attack_angle ? `${vsRHP.attack_angle.toFixed(1)}°` : 'N/A'}</td>
-              <td>{vsRHP?.bat_speed ? `${vsRHP.bat_speed.toFixed(1)} mph` : 'N/A'}</td>
-              <td>{vsRHP?.swing_optimization_score ? vsRHP.swing_optimization_score.toFixed(1) : 'N/A'}</td>
-              <td>{vsRHP?.swing_count || 'N/A'}</td>
+              <td>{vsRHP?.attackAngle ? `${vsRHP.attackAngle.toFixed(1)}°` : 'N/A'}</td>
+              <td>{vsRHP?.batSpeed ? `${vsRHP.batSpeed.toFixed(1)} mph` : 'N/A'}</td>
+              <td>{vsRHP?.swingScore ? vsRHP.swingScore.toFixed(1) : 'N/A'}</td>
+              <td>{vsRHP?.hab ? vsRHP.hab.split('/')[1] : 'N/A'}</td>
             </tr>
           </tbody>
         </table>
@@ -166,7 +166,7 @@ const SplitAnalysisTables = ({ splitAnalysis, player }) => {
             <span className="insight-label">Handedness Advantage:</span>
             <span className="insight-value">
               {splitAnalysis.vsLHP && splitAnalysis.vsRHP ? 
-                (splitAnalysis.vsLHP.swing_optimization_score > splitAnalysis.vsRHP.swing_optimization_score 
+                (splitAnalysis.vsLHP.swingScore > splitAnalysis.vsRHP.swingScore 
                   ? 'vs LHP' : 'vs RHP')
                 : 'N/A'
               }
