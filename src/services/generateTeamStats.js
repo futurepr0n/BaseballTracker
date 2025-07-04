@@ -38,6 +38,116 @@ async function loadRollingStats(dateStr) {
   }
 }
 
+async function calculateRealTeamRecords(targetDate) {
+  console.log('📊 Calculating real team records from game data...');
+  
+  const records = {};
+  
+  // Initialize all teams
+  MLB_TEAMS.forEach(team => {
+    records[team] = {
+      wins: 0,
+      losses: 0,
+      homeWins: 0,
+      homeLosses: 0,
+      awayWins: 0,
+      awayLosses: 0
+    };
+  });
+
+  // Parse target date to determine which files to scan
+  const targetDateObj = new Date(targetDate);
+  const currentYear = targetDateObj.getFullYear();
+  
+  // Get all months up to target date
+  const months = ['april', 'may', 'june', 'july', 'august', 'september', 'october'];
+  const targetMonth = targetDateObj.getMonth() + 1; // JavaScript months are 0-indexed
+  
+  console.log(`📅 Target date: ${targetDate}, Target month: ${targetMonth}`);
+  
+  for (let monthIndex = 4; monthIndex <= targetMonth; monthIndex++) { // Start from April (month 4)
+    if (monthIndex > 12) break;
+    
+    const monthName = months[monthIndex - 4]; // Adjust for array index
+    const monthDir = path.join(__dirname, '../../public/data', currentYear.toString(), monthName);
+    
+    console.log(`📂 Checking month: ${monthName} (${monthIndex}), Directory: ${monthDir}`);
+    
+    try {
+      const files = await fs.readdir(monthDir);
+      const jsonFiles = files.filter(f => f.endsWith('.json')).sort();
+      console.log(`  📁 Found ${jsonFiles.length} JSON files in ${monthName}`);
+      
+      // Show first few files for debugging
+      if (jsonFiles.length > 0) {
+        console.log(`  📋 Sample files: ${jsonFiles.slice(0, 3).join(', ')}${jsonFiles.length > 3 ? '...' : ''}`);
+      }
+      
+      for (const file of jsonFiles) {
+        const filePath = path.join(monthDir, file);
+        const fileDate = file.replace(`${monthName}_`, '').replace(`_${currentYear}.json`, '');
+        const day = parseInt(fileDate);
+        const gameDate = new Date(currentYear, monthIndex - 1, day);
+        
+        // Only process games up to target date
+        if (gameDate <= targetDateObj) {
+          let gamesProcessed = 0;
+          try {
+            const gameData = JSON.parse(await fs.readFile(filePath, 'utf-8'));
+            
+            if (gameData.games) {
+              gameData.games.forEach(game => {
+                if (game.status === 'Final' && game.homeScore !== null && game.awayScore !== null) {
+                  const homeTeam = game.homeTeam;
+                  const awayTeam = game.awayTeam;
+                  const homeScore = parseInt(game.homeScore);
+                  const awayScore = parseInt(game.awayScore);
+                  
+                  if (!records[homeTeam]) {
+                    console.warn(`⚠️  Unknown home team: ${homeTeam}`);
+                    return;
+                  }
+                  if (!records[awayTeam]) {
+                    console.warn(`⚠️  Unknown away team: ${awayTeam}`);
+                    return;
+                  }
+                  
+                  if (homeScore > awayScore) {
+                    // Home team wins
+                    records[homeTeam].wins++;
+                    records[homeTeam].homeWins++;
+                    records[awayTeam].losses++;
+                    records[awayTeam].awayLosses++;
+                    gamesProcessed++;
+                  } else if (awayScore > homeScore) {
+                    // Away team wins
+                    records[awayTeam].wins++;
+                    records[awayTeam].awayWins++;
+                    records[homeTeam].losses++;
+                    records[homeTeam].homeLosses++;
+                    gamesProcessed++;
+                  }
+                }
+              });
+            }
+            
+            if (gamesProcessed > 0) {
+              console.log(`    ✅ Found ${gamesProcessed} completed games`);
+            }
+          } catch (fileError) {
+            console.warn(`⚠️  Could not process ${filePath}:`, fileError.message);
+          }
+        }
+      }
+    } catch (dirError) {
+      console.warn(`⚠️  Could not read directory ${monthDir}:`, dirError.message);
+    }
+  }
+  
+  console.log(`✅ Calculated real team records through ${targetDate}`);
+  return records;
+}
+
 function calculateTeamStats(rollingData, teamAbbr) {
   // Collect all players from this team
   const teamPlayersMap = new Map();
@@ -107,15 +217,6 @@ function calculateTeamStats(rollingData, teamAbbr) {
   const slg = stats.totalAB > 0 ? ((stats.totalHits + stats.totalHR * 3) / stats.totalAB) : 0;
   stats.teamOPS = (obp + slg).toFixed(3);
   
-  // Estimate record (wins at .500 rate as baseline)
-  const estimatedWins = Math.round(stats.totalGames * 0.5);
-  const estimatedLosses = stats.totalGames - estimatedWins;
-  stats.estimatedRecord = `${estimatedWins}-${estimatedLosses}`;
-  
-  // Home/Away split estimates
-  stats.estimatedHomeRecord = `${Math.round(estimatedWins * 0.55)}-${Math.round(estimatedLosses * 0.45)}`;
-  stats.estimatedAwayRecord = `${Math.round(estimatedWins * 0.45)}-${Math.round(estimatedLosses * 0.55)}`;
-  
   return stats;
 }
 
@@ -172,14 +273,39 @@ async function generateTeamStats(targetDate) {
   
   console.log(`✅ Loaded rolling stats with ${rollingData.totalPlayers} players`);
   
+  // Calculate real team records from game data
+  const teamRecords = await calculateRealTeamRecords(targetDate);
+  
   // Calculate stats for each team
   const allTeamStats = {};
   
   for (const team of MLB_TEAMS) {
     const teamStats = calculateTeamStats(rollingData, team);
     if (teamStats) {
+      // Add real team records instead of estimates
+      const record = teamRecords[team];
+      if (record) {
+        const totalGames = record.wins + record.losses;
+        teamStats.actualRecord = `${record.wins}-${record.losses}`;
+        teamStats.homeRecord = `${record.homeWins}-${record.homeLosses}`;
+        teamStats.awayRecord = `${record.awayWins}-${record.awayLosses}`;
+        teamStats.winPercentage = totalGames > 0 ? (record.wins / totalGames).toFixed(3) : '.000';
+        teamStats.homeWinPercentage = (record.homeWins + record.homeLosses) > 0 ? 
+          (record.homeWins / (record.homeWins + record.homeLosses)).toFixed(3) : '.000';
+        teamStats.awayWinPercentage = (record.awayWins + record.awayLosses) > 0 ? 
+          (record.awayWins / (record.awayWins + record.awayLosses)).toFixed(3) : '.000';
+      } else {
+        // Fallback if no record data available
+        teamStats.actualRecord = '0-0';
+        teamStats.homeRecord = '0-0';
+        teamStats.awayRecord = '0-0';
+        teamStats.winPercentage = '.000';
+        teamStats.homeWinPercentage = '.000';
+        teamStats.awayWinPercentage = '.000';
+      }
+      
       allTeamStats[team] = teamStats;
-      console.log(`✅ ${team}: ${teamStats.players} players, ${teamStats.teamBA} BA, ${teamStats.runsPerGame} R/G`);
+      console.log(`✅ ${team}: ${teamStats.actualRecord} (${teamStats.winPercentage}), ${teamStats.players} players, ${teamStats.teamBA} BA`);
     } else {
       console.log(`⚠️  ${team}: No data found`);
     }

@@ -78,8 +78,17 @@ export const loadHandednessData = async (playerName, teamAbbr = null) => {
       
       console.log(`🔍 Using search key: ${searchKey}`);
       
-      const rhpResult = rhpData[searchKey];
-      const lhpResult = lhpData[searchKey];
+      // Search in the players array instead of direct key lookup
+      let rhpResult = null;
+      let lhpResult = null;
+      
+      if (rhpData.players) {
+        rhpResult = rhpData.players.find(p => p.name === searchKey);
+      }
+      
+      if (lhpData.players) {
+        lhpResult = lhpData.players.find(p => p.name === searchKey);
+      }
       
       console.log(`🔍 Handedness lookup results:`, { 
         searchKey,
@@ -116,10 +125,11 @@ export const loadHandednessData = async (playerName, teamAbbr = null) => {
 export const calculateHandednessBA = (handednessData) => {
   if (!handednessData) return '.000';
   
-  // Estimate BA based on swing optimization score
+  // Estimate BA based on attack angle and bat speed
   const baseBA = 0.240;
-  const bonus = (handednessData.swing_optimization_score - 50) * 0.004;
-  return Math.max(0.180, Math.min(0.350, baseBA + bonus)).toFixed(3);
+  const angleBonus = (handednessData.attack_angle || 10) > 15 ? 0.020 : -0.010;
+  const speedBonus = ((handednessData.avg_bat_speed || 70) - 70) * 0.002;
+  return Math.max(0.180, Math.min(0.350, baseBA + angleBonus + speedBonus)).toFixed(3);
 };
 
 /**
@@ -130,8 +140,8 @@ export const calculateHandednessSLG = (handednessData) => {
   
   // Estimate SLG based on attack angle and bat speed
   const baseSLG = 0.400;
-  const angleBonus = (handednessData.attack_angle - 15) * 0.008;
-  const speedBonus = (handednessData.bat_speed - 70) * 0.005;
+  const angleBonus = ((handednessData.attack_angle || 10) - 15) * 0.008;
+  const speedBonus = ((handednessData.avg_bat_speed || 70) - 70) * 0.005;
   return Math.max(0.300, Math.min(0.600, baseSLG + angleBonus + speedBonus)).toFixed(3);
 };
 
@@ -154,11 +164,11 @@ export const calculateHandednessWOBA = (handednessData) => {
   
   // Estimate wOBA based on multiple factors
   const baseWOBA = 0.320;
-  const swingBonus = (handednessData.swing_optimization_score - 50) * 0.003;
-  const angleBonus = (handednessData.attack_angle - 15) * 0.002;
-  const speedBonus = (handednessData.bat_speed - 70) * 0.002;
+  const angleBonus = ((handednessData.attack_angle || 10) - 15) * 0.002;
+  const speedBonus = ((handednessData.avg_bat_speed || 70) - 70) * 0.002;
+  const idealRateBonus = (handednessData.ideal_attack_angle_rate || 0.4) > 0.5 ? 0.015 : -0.010;
   
-  return Math.max(0.200, Math.min(0.450, baseWOBA + swingBonus + angleBonus + speedBonus)).toFixed(3);
+  return Math.max(0.200, Math.min(0.450, baseWOBA + angleBonus + speedBonus + idealRateBonus)).toFixed(3);
 };
 
 /**
@@ -171,16 +181,16 @@ export const formatHandednessSplits = (handednessData) => {
     if (!data) return null;
     
     return {
-      hab: `${Math.round(data.swing_count * 0.3)}/${data.swing_count}`,
+      hab: `${Math.round((data.competitive_swings || 100) * 0.3)}/${data.competitive_swings || 100}`,
       ba: calculateHandednessBA(data),
       slg: calculateHandednessSLG(data),
       iso: calculateHandednessISO(data),
       woba: calculateHandednessWOBA(data),
-      k_rate: `${(25 - data.swing_optimization_score * 0.3).toFixed(1)}%`,
-      bb_rate: `${(8 + data.swing_optimization_score * 0.1).toFixed(1)}%`,
-      swingScore: data.swing_optimization_score,
+      k_rate: `${Math.max(15, 30 - (data.ideal_attack_angle_rate || 0.4) * 25).toFixed(1)}%`,
+      bb_rate: `${Math.max(5, 6 + (data.ideal_attack_angle_rate || 0.4) * 8).toFixed(1)}%`,
+      swingScore: Math.round(((data.ideal_attack_angle_rate || 0.4) * 50) + ((data.avg_bat_speed || 70) / 3)),
       attackAngle: data.attack_angle,
-      batSpeed: data.bat_speed
+      batSpeed: data.avg_bat_speed
     };
   };
 

@@ -1,0 +1,242 @@
+.recent-game-history {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.section-header h3 {
+  margin: 0;
+  color: #2d3748;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.totals-summary {
+  background: #f7fafc;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #4a5568;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+}
+
+.games-table-container {
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.games-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.games-table thead {
+  background: #f8fafc;
+}
+
+.games-table th {
+  padding: 10px 8px;
+  text-align: left;
+  font-weight: 600;
+  color: #4a5568;
+  border-bottom: 2px solid #e2e8f0;
+  font-size: 0.85rem;
+}
+
+.games-table td {
+  padding: 8px;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: center;
+}
+
+.game-row {
+  transition: background-color 0.2s ease;
+}
+
+.game-row:hover {
+  background-color: #f8fafc;
+}
+
+.game-row.excellent {
+  background-color: rgba(34, 197, 94, 0.1);
+}
+
+.game-row.good {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.game-row.average {
+  background-color: rgba(156, 163, 175, 0.1);
+}
+
+.game-row.poor {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.date-cell {
+  font-weight: 500;
+  color: #4a5568;
+  text-align: left !important;
+  min-width: 60px;
+}
+
+.opponent-cell {
+  font-weight: 500;
+  color: #2563eb;
+  text-align: left !important;
+  min-width: 50px;
+}
+
+.stat-cell {
+  font-weight: 600;
+  min-width: 35px;
+}
+
+.stat-cell.hits {
+  color: #059669;
+}
+
+.stat-cell.hr {
+  color: #dc2626;
+}
+
+.stat-cell.rbi {
+  color: #7c3aed;
+}
+
+.stat-cell.runs {
+  color: #ea580c;
+}
+
+.stat-cell.strikeouts {
+  color: #6b7280;
+}
+
+.performance-cell {
+  min-width: 80px;
+}
+
+.performance-indicator {
+  font-size: 1.1rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  min-width: 24px;
+  text-align: center;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
+
+.performance-indicator.excellent {
+  background-color: rgba(34, 197, 94, 0.2);
+}
+
+.performance-indicator.good {
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+.performance-indicator.average {
+  background-color: rgba(156, 163, 175, 0.2);
+}
+
+.performance-indicator.poor {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+.performance-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #4a5568;
+}
+
+.legend-icon {
+  font-size: 0.9rem;
+  padding: 2px 4px;
+  border-radius: 3px;
+  display: inline-block;
+  min-width: 20px;
+  text-align: center;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
+
+.legend-icon.excellent {
+  background-color: rgba(34, 197, 94, 0.2);
+}
+
+.legend-icon.good {
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+.legend-icon.average {
+  background-color: rgba(156, 163, 175, 0.2);
+}
+
+.legend-icon.poor {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .recent-game-history {
+    padding: 16px;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .totals-summary {
+    font-size: 0.8rem;
+  }
+  
+  .games-table {
+    font-size: 0.8rem;
+  }
+  
+  .games-table th,
+  .games-table td {
+    padding: 6px 4px;
+  }
+  
+  .performance-legend {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .legend-item {
+    font-size: 0.75rem;
+  }
+}

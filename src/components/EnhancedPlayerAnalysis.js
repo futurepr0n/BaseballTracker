@@ -18,6 +18,8 @@ import PerformanceVisualization from './PlayerAnalysis/PerformanceVisualization'
 import SplitAnalysisTables from './PlayerAnalysis/SplitAnalysisTables';
 import AdvancedMetrics from './PlayerAnalysis/AdvancedMetrics';
 import TeamContext from './PlayerAnalysis/TeamContext';
+import RecentGameHistory from './PlayerAnalysis/RecentGameHistory';
+import DataQualityIndicator from './PlayerAnalysis/DataQualityIndicator';
 import './EnhancedPlayerAnalysis.css';
 
 /**
@@ -34,9 +36,16 @@ import './EnhancedPlayerAnalysis.css';
 const EnhancedPlayerAnalysis = ({ currentDate }) => {
   // Core state
   const [selectedPlayer, setSelectedPlayer] = useState(null);
-  const [, setPlayerHistory] = useState([]);
+  const [playerHistory, setPlayerHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [dataQuality, setDataQuality] = useState({
+    rollingStats: null,
+    teamStats: null,
+    handedness: null,
+    propAnalysis: null,
+    overall: 'unknown'
+  });
   
   // Analysis data
   const [splitAnalysis, setSplitAnalysis] = useState(null);
@@ -53,14 +62,32 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
       setLoading(true);
       setError(null);
       
+      // Initialize data quality tracking
+      const qualityTracker = {
+        rollingStats: null,
+        teamStats: null,
+        handedness: null,
+        propAnalysis: null,
+        overall: 'loading'
+      };
+      setDataQuality(qualityTracker);
+      
       console.log('Loading analysis data for:', player.name);
       
       // Load accurate rolling stats first
       const rollingStats = await getPlayerRollingStats(player.name, player.team, currentDate);
       
       if (!rollingStats || !rollingStats.season) {
+        qualityTracker.rollingStats = 'missing';
+        setDataQuality(qualityTracker);
         throw new Error(`No rolling stats found for ${player.name}. Ensure rolling stats are generated.`);
       }
+      
+      // Assess rolling stats quality
+      const hasSeasonStats = rollingStats.season && rollingStats.season.games > 0;
+      const hasRecentStats = rollingStats.last_7 && rollingStats.last_7.games > 0;
+      qualityTracker.rollingStats = hasSeasonStats && hasRecentStats ? 'excellent' : 
+                                   hasSeasonStats ? 'good' : 'poor';
       
       console.log('✅ Loaded rolling stats for', player.name, rollingStats.season);
       
@@ -97,15 +124,59 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
       
       // Convert the returned data to an array of player games for recent analysis
       const history = [];
-      Object.keys(dateRangeData).forEach(dateStr => {
+      
+      for (const dateStr of Object.keys(dateRangeData)) {
         const playersForDate = dateRangeData[dateStr];
         const playerData = playersForDate.find(p => 
           p.name === player.name && p.team === player.team
         );
+        
         if (playerData) {
-          history.push({ ...playerData, gameDate: dateStr });
+          // Enhance with opponent information by loading the full game data
+          try {
+            const gameDataResponse = await fetch(`/data/${dateStr.split('-')[0]}/${getMonthName(dateStr)}/${getMonthName(dateStr)}_${dateStr.split('-')[2]}_${dateStr.split('-')[0]}.json`);
+            if (gameDataResponse.ok) {
+              const gameData = await gameDataResponse.json();
+              let opponent = 'UNK';
+              let venue = '';
+              
+              // Find the game this player's team was in
+              const game = gameData.games?.find(g => 
+                g.homeTeam === player.team || g.awayTeam === player.team
+              );
+              
+              if (game) {
+                opponent = game.homeTeam === player.team ? game.awayTeam : game.homeTeam;
+                venue = game.venue || '';
+                const isHome = game.homeTeam === player.team;
+                opponent = isHome ? `vs ${opponent}` : `@ ${opponent}`;
+              }
+              
+              history.push({ 
+                ...playerData, 
+                gameDate: dateStr,
+                opponent: opponent,
+                venue: venue
+              });
+            } else {
+              // Fallback without opponent info
+              history.push({ ...playerData, gameDate: dateStr });
+            }
+          } catch (error) {
+            console.warn(`Could not load game context for ${dateStr}:`, error.message);
+            // Fallback without opponent info
+            history.push({ ...playerData, gameDate: dateStr });
+          }
         }
-      });
+      }
+      
+      // Helper function to convert date to month name
+      function getMonthName(dateStr) {
+        const month = parseInt(dateStr.split('-')[1]);
+        const months = ['', 'january', 'february', 'march', 'april', 'may', 'june', 
+                       'july', 'august', 'september', 'october', 'november', 'december'];
+        return months[month];
+      }
       
       // Sort by date (newest first)
       const playerHistory = history.sort((a, b) => 
@@ -120,8 +191,10 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
       
       try {
         await generateSplitAnalysis(player, playerHistory, rollingStats);
-        console.log('✓ Split analysis completed');
+        // Track handedness quality after split analysis (includes handedness data loading)
+        console.log('✓ Split analysis completed - tracking handedness quality');
       } catch (error) {
+        qualityTracker.handedness = 'error';
         console.error('Error in split analysis:', error);
       }
       
@@ -134,15 +207,24 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
       
       try {
         await generatePropAnalysis(player, playerHistory, stats2024);
+        // Track prop analysis quality
+        const hasHistoricalData = playerHistory.length >= 10;
+        const has2024Data = !!stats2024;
+        qualityTracker.propAnalysis = hasHistoricalData && has2024Data ? 'excellent' :
+                                     hasHistoricalData ? 'good' : 'poor';
         console.log('✓ Enhanced prop analysis completed');
       } catch (error) {
+        qualityTracker.propAnalysis = 'error';
         console.error('Error in enhanced prop analysis:', error);
       }
       
       try {
         await generateTeamSplits(player, playerHistory);
+        // Track team stats quality - assume good if no error occurred
+        qualityTracker.teamStats = 'good';
         console.log('✓ Team splits completed');
       } catch (error) {
+        qualityTracker.teamStats = 'error';
         console.error('Error in team splits:', error);
       }
       
@@ -153,9 +235,29 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
         console.error('Error in matchup context:', error);
       }
       
+      // Calculate overall data quality
+      const qualityScores = Object.values(qualityTracker).filter(q => q !== null && q !== 'loading');
+      const excellentCount = qualityScores.filter(q => q === 'excellent').length;
+      const goodCount = qualityScores.filter(q => q === 'good').length;
+      const totalScores = qualityScores.length;
+      
+      if (totalScores === 0) {
+        qualityTracker.overall = 'poor';
+      } else if (excellentCount / totalScores >= 0.7) {
+        qualityTracker.overall = 'excellent';
+      } else if ((excellentCount + goodCount) / totalScores >= 0.6) {
+        qualityTracker.overall = 'good';
+      } else {
+        qualityTracker.overall = 'poor';
+      }
+      
+      setDataQuality(qualityTracker);
+      console.log('📊 Data quality assessment:', qualityTracker);
+      
     } catch (err) {
       console.error('Error loading player analysis:', err);
       setError(err.message || 'Failed to load player analysis data');
+      setDataQuality(prev => ({ ...prev, overall: 'error' }));
     } finally {
       setLoading(false);
     }
@@ -172,6 +274,19 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
     try {
       // Load real handedness data using consolidated service
       const handednessData = await loadHandednessData(player.name, player.team);
+      
+      // Track handedness data quality
+      const hasRhpData = handednessData?.rhp && handednessData.rhp.competitive_swings > 50;
+      const hasLhpData = handednessData?.lhp && handednessData.lhp.competitive_swings > 50;
+      
+      // Update quality tracker from parent scope
+      if (dataQuality) {
+        const newQuality = { ...dataQuality };
+        newQuality.handedness = hasRhpData && hasLhpData ? 'excellent' :
+                                hasRhpData || hasLhpData ? 'good' : 
+                                handednessData ? 'poor' : 'missing';
+        setDataQuality(newQuality);
+      }
       
       // Use accurate rolling stats for season data
       const seasonStats = rollingStats.season ? {
@@ -195,20 +310,37 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
       // Use real matchup statistics calculation with recent game history
       const realMatchupStats = await calculateMatchupStatistics(player, history, handednessData);
       
+      // Format handedness data properly using the handedness service
+      const { formatHandednessSplits } = await import('../services/handednessService');
+      const formattedHandedness = handednessData ? formatHandednessSplits(handednessData) : null;
+      console.log('🎯 Formatted handedness data:', formattedHandedness);
+      
       // Calculate recent form from game history (rolling stats might have last30/last7)
       const recentForm = {
         last5: calculateRecentStats(history, 5),
         last10: calculateRecentStats(history, 10),
         last15: calculateRecentStats(history, 15),
         last20: calculateRecentStats(history, 20),
-        // Add rolling stats data if available
+        // Add rolling stats data if available - but ensure OBP/SLG are calculated
         last30: rollingStats.last30 ? {
           H: rollingStats.last30.H || 0,
           AB: rollingStats.last30.AB || 0,
           AVG: rollingStats.last30.avg || '.000',
           HR: rollingStats.last30.HR || 0,
           RBI: rollingStats.last30.RBI || 0,
-          games: rollingStats.last30.games || 0
+          BB: rollingStats.last30.BB || 0,
+          K: rollingStats.last30.K || 0,
+          games: rollingStats.last30.games || 0,
+          OBP: rollingStats.last30.obp || calculateOBP({
+            H: rollingStats.last30.H || 0,
+            BB: rollingStats.last30.BB || 0,
+            AB: rollingStats.last30.AB || 0
+          }),
+          SLG: rollingStats.last30.slg || calculateSLG({
+            H: rollingStats.last30.H || 0,
+            HR: rollingStats.last30.HR || 0,
+            AB: rollingStats.last30.AB || 0
+          }, history.slice(0, 30))
         } : calculateRecentStats(history, 30),
         last7: rollingStats.last7 ? {
           H: rollingStats.last7.H || 0,
@@ -216,14 +348,26 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
           AVG: rollingStats.last7.avg || '.000',
           HR: rollingStats.last7.HR || 0,
           RBI: rollingStats.last7.RBI || 0,
-          games: rollingStats.last7.games || 0
+          BB: rollingStats.last7.BB || 0,
+          K: rollingStats.last7.K || 0,
+          games: rollingStats.last7.games || 0,
+          OBP: rollingStats.last7.obp || calculateOBP({
+            H: rollingStats.last7.H || 0,
+            BB: rollingStats.last7.BB || 0,
+            AB: rollingStats.last7.AB || 0
+          }),
+          SLG: rollingStats.last7.slg || calculateSLG({
+            H: rollingStats.last7.H || 0,
+            HR: rollingStats.last7.HR || 0,
+            AB: rollingStats.last7.AB || 0
+          }, history.slice(0, 7))
         } : calculateRecentStats(history, 7)
       };
       
       setSplitAnalysis({
         season: seasonStats, // Use accurate rolling stats data
-        vsLHP: handednessData?.lhp || null,
-        vsRHP: handednessData?.rhp || null,
+        vsLHP: formattedHandedness?.vsLHP || null,
+        vsRHP: formattedHandedness?.vsRHP || null,
         recentForm,
         matchupStats: realMatchupStats
       });
@@ -482,6 +626,8 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
             previousSeasonStats={previousSeasonStats}
           />
           
+          <DataQualityIndicator dataQuality={dataQuality} />
+          
           <div className="analysis-grid">
             <div className="left-panel">
               <PerformanceVisualization 
@@ -501,6 +647,11 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
             <div className="right-panel">
               <AdvancedMetrics 
                 metrics={advancedMetrics}
+                player={selectedPlayer}
+              />
+              
+              <RecentGameHistory 
+                playerHistory={playerHistory}
                 player={selectedPlayer}
               />
             </div>
