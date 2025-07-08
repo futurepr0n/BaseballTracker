@@ -34,6 +34,25 @@
   /* --text-primary: #333; */
   /* --text-secondary: #666; */
   /* --text-muted: #888; */
+  
+  /* Surface and UI colors */
+  --surface-primary: #ffffff;
+  --surface-secondary: #f8f9fa;
+  --surface-hover: #f0f0f0;
+  --surface-active: #e8e8e8;
+  --border-color: #e0e0e0;
+  --border-light: #f0f0f0;
+  --accent-color: #0056b3;
+  --accent-hover: #004494;
+  --score-color: #4CAF50;
+  --primary-color: #2196f3;
+  --primary-dark: #1976d2;
+  --input-bg: #ffffff;
+  --hover-bg: #f5f5f5;
+  --stats-bg: #f8f9fa;
+  --item-bg: #f8f9fa;
+  
+  /* Border radius */
   --border-radius: 12px;
   --border-radius-small: 8px;
   --border-radius-large: 16px;
@@ -57,6 +76,28 @@
   --backdrop-filter: var(--glass-blur);
   --backdrop-filter-light: var(--glass-blur-light);
   --backdrop-filter-header: var(--glass-blur-header);
+  
+  /* CRITICAL: Text colors for glass mode - dark text on light glass backgrounds */
+  --text-primary: #1a1a2e;
+  --text-secondary: #333333;
+  --text-muted: #555555;
+  --accent-color: #0056b3;
+  --accent-hover: #004494;
+  
+  /* Surface colors for glass mode */
+  --surface-primary: rgba(255, 255, 255, 0.1);
+  --surface-secondary: rgba(255, 255, 255, 0.15);
+  --surface-hover: rgba(255, 255, 255, 0.2);
+  --surface-active: rgba(255, 255, 255, 0.25);
+  --border-color: rgba(255, 255, 255, 0.2);
+  --border-light: rgba(255, 255, 255, 0.1);
+  --score-color: #4CAF50;
+  --primary-color: #2196f3;
+  --primary-dark: #1976d2;
+  --input-bg: rgba(255, 255, 255, 0.1);
+  --hover-bg: rgba(255, 255, 255, 0.15);
+  --stats-bg: rgba(255, 255, 255, 0.05);
+  --item-bg: rgba(255, 255, 255, 0.05);
 }
 
 /* Classic Mode Theme Class */
@@ -74,6 +115,28 @@
   --backdrop-filter: var(--classic-blur);
   --backdrop-filter-light: var(--classic-blur-light);
   --backdrop-filter-header: var(--classic-blur-header);
+  
+  /* Text colors for classic mode - same as root defaults */
+  --text-primary: #1a202c;
+  --text-secondary: #4a5568;
+  --text-muted: #68778d;
+  --accent-color: #0056b3;
+  --accent-hover: #004494;
+  
+  /* Surface colors for classic mode */
+  --surface-primary: #ffffff;
+  --surface-secondary: #f8f9fa;
+  --surface-hover: #f0f0f0;
+  --surface-active: #e8e8e8;
+  --border-color: #e0e0e0;
+  --border-light: #f0f0f0;
+  --score-color: #4CAF50;
+  --primary-color: #2196f3;
+  --primary-dark: #1976d2;
+  --input-bg: #ffffff;
+  --hover-bg: #f5f5f5;
+  --stats-bg: #f8f9fa;
+  --item-bg: #f8f9fa;
 }
 
 /* Component-specific theme variables */
@@ -171,4 +234,73 @@
     background-color var(--transition-medium),
     border-color var(--transition-medium),
     backdrop-filter var(--transition-medium) !important;
+}
+
+/* Dark mode theme variables */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark mode text colors */
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --text-muted: #999999;
+    
+    /* Dark mode surface colors */
+    --surface-primary: #1a1a1a;
+    --surface-secondary: #2a2a2a;
+    --surface-hover: #333333;
+    --surface-active: #404040;
+    --border-color: #444444;
+    --border-light: #333333;
+    --accent-color: #4CAF50;
+    --accent-hover: #45a049;
+    --score-color: #4CAF50;
+    --primary-color: #2196f3;
+    --primary-dark: #1976d2;
+    --input-bg: #2a2a2a;
+    --hover-bg: #333333;
+    --stats-bg: #2a2a2a;
+    --item-bg: #2a2a2a;
+  }
+  
+  .theme-glass {
+    /* CRITICAL: Dark mode glass text colors - ensure visibility on transparent backgrounds */
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --text-muted: #999999;
+    --accent-color: #4CAF50;
+    --accent-hover: #45a049;
+    
+    /* Dark mode glass adjustments */
+    --surface-primary: rgba(255, 255, 255, 0.05);
+    --surface-secondary: rgba(255, 255, 255, 0.1);
+    --surface-hover: rgba(255, 255, 255, 0.15);
+    --surface-active: rgba(255, 255, 255, 0.2);
+    --border-color: rgba(255, 255, 255, 0.15);
+    --border-light: rgba(255, 255, 255, 0.08);
+    --input-bg: rgba(255, 255, 255, 0.05);
+    --hover-bg: rgba(255, 255, 255, 0.1);
+    --stats-bg: rgba(255, 255, 255, 0.03);
+    --item-bg: rgba(255, 255, 255, 0.03);
+  }
+  
+  .theme-classic {
+    /* Dark mode classic text colors - explicit override */
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --text-muted: #999999;
+    --accent-color: #4CAF50;
+    --accent-hover: #45a049;
+    
+    /* Dark mode classic adjustments */
+    --surface-primary: #1a1a1a;
+    --surface-secondary: #2a2a2a;
+    --surface-hover: #333333;
+    --surface-active: #404040;
+    --border-color: #444444;
+    --border-light: #333333;
+    --input-bg: #2a2a2a;
+    --hover-bg: #333333;
+    --stats-bg: #2a2a2a;
+    --item-bg: #2a2a2a;
+  }
 }

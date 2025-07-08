@@ -358,8 +358,29 @@
 
 .mobile-player-name {
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text-primary, #1a202c) !important;
   font-size: 1em;
+}
+
+/* CRITICAL: Force mobile player name visibility across all themes */
+.strategic-intelligence-card .mobile-player-name {
+  color: #1a202c !important;
+}
+
+/* Glass theme specific override */
+.theme-glass .strategic-intelligence-card .mobile-player-name {
+  color: #1a1a2e !important;
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  .strategic-intelligence-card .mobile-player-name {
+    color: #ffffff !important;
+  }
+  
+  .theme-glass .strategic-intelligence-card .mobile-player-name {
+    color: #ffffff !important;
+  }
 }
 
 .mobile-team-info {
@@ -430,6 +451,50 @@
 }
 
 .mobile-factor-item strong {
+  color: var(--text-primary);
+}
+
+/* Mobile Factor Impact */
+.mobile-factor-impact {
+  display: inline-block;
+  font-size: 0.65em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--surface-primary);
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-left: 8px;
+  float: right;
+}
+
+/* Mobile Factor Toggle */
+.mobile-factor-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  margin-top: 8px;
+  background: var(--surface-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border-light);
+}
+
+.mobile-factor-toggle:hover {
+  background: var(--surface-hover);
+  border-color: var(--accent-color);
+}
+
+.mobile-factor-toggle .toggle-text {
+  font-size: 0.8em;
+  color: var(--text-secondary);
+  font-weight: 500;
+  user-select: none;
+}
+
+.mobile-factor-toggle:hover .toggle-text {
   color: var(--text-primary);
 }
 
@@ -531,6 +596,20 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
+.strategic-intelligence-card.glass .mobile-factor-toggle {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.strategic-intelligence-card.glass .mobile-factor-toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.strategic-intelligence-card.glass .mobile-factor-impact {
+  background: rgba(255, 255, 255, 0.15);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .desktop-view {
@@ -582,16 +661,7 @@
 /* Theme-specific adjustments */
 @media (prefers-color-scheme: dark) {
   .strategic-intelligence-card:not(.glass) {
-    --surface-primary: #1a1a1a;
-    --surface-secondary: #2a2a2a;
-    --surface-hover: #333333;
-    --surface-active: #404040;
-    --text-primary: #ffffff;
-    --text-secondary: #cccccc;
-    --border-color: #444444;
-    --border-light: #333333;
-    --accent-color: #4CAF50;
-    --accent-hover: #45a049;
+    /* Dark mode theme variables handled by theme system */
   }
 }
 
