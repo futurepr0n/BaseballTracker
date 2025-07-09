@@ -1,0 +1,138 @@
+.nav-player-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.nav-search-input {
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 14px;
+  width: 200px;
+  transition: all 0.3s ease;
+}
+
+.nav-search-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.2);
+  width: 250px;
+}
+
+.nav-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.search-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 6px;
+  margin-left: -35px;
+  font-size: 16px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.search-button:hover {
+  opacity: 1;
+}
+
+.nav-search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 8px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  min-width: 300px;
+}
+
+.nav-search-result {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.nav-search-result:last-child {
+  border-bottom: none;
+}
+
+.nav-search-result:hover,
+.nav-search-result.selected {
+  background-color: #f5f5f5;
+}
+
+.nav-player-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.nav-player-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.nav-player-team {
+  font-size: 12px;
+  color: #666;
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.nav-player-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+.nav-player-stats span {
+  white-space: nowrap;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .nav-search-dropdown {
+    background: #2a2a2a;
+    border-color: #444;
+  }
+
+  .nav-search-result {
+    border-bottom-color: #444;
+  }
+
+  .nav-search-result:hover,
+  .nav-search-result.selected {
+    background-color: #3a3a3a;
+  }
+
+  .nav-player-name {
+    color: #fff;
+  }
+
+  .nav-player-team {
+    background: #3a3a3a;
+    color: #ddd;
+  }
+
+  .nav-player-stats {
+    color: #aaa;
+  }
+}
