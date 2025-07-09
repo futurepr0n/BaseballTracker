@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPlayerRollingStats, getAllPlayersFromRollingStats } from '../services/rollingStatsService';
 import './NavigationPlayerSearch.css';
 
 function NavigationPlayerSearch() {
@@ -16,26 +15,57 @@ function NavigationPlayerSearch() {
   useEffect(() => {
     const loadPlayers = async () => {
       try {
-        const rollingData = await getAllPlayersFromRollingStats();
+        console.log('🔍 Loading players from rolling stats for navigation search...');
         
-        if (rollingData && rollingData.players) {
-          const playersList = rollingData.players.map(player => ({
-            name: player.name,
-            team: player.team,
-            lastSeen: rollingData.lastUpdated || new Date().toISOString().split('T')[0],
-            position: 'OF', // Rolling stats don't include position
-            recentStats: {
-              AVG: player.avg || player.battingAvg || '.000',
-              HR: player.HR || player.totalHRs || 0,
-              RBI: player.RBI || player.totalRBIs || 0,
-              H: player.H || player.totalHits || 0
+        const response = await fetch(`/data/rolling_stats/rolling_stats_season_latest.json`);
+        if (!response.ok) {
+          throw new Error('Could not load rolling stats');
+        }
+        
+        const rollingData = await response.json();
+        console.log(`✅ Loaded rolling stats with ${rollingData.totalPlayers} players`);
+        
+        if (rollingData.allHitters && rollingData.allHitters.length > 0) {
+          // Helper function to merge player data from multiple sections
+          const mergePlayerData = (hitterData) => {
+            let mergedStats = { ...hitterData };
+            
+            // Merge HR data from allHRLeaders section
+            if (rollingData.allHRLeaders) {
+              const hrData = rollingData.allHRLeaders.find(p => 
+                p.name === hitterData.name && p.team === hitterData.team
+              );
+              if (hrData) {
+                mergedStats.HR = hrData.HR;
+                mergedStats.hrsPerGame = hrData.hrsPerGame;
+              }
             }
-          })).sort((a, b) => a.name.localeCompare(b.name));
+            
+            return mergedStats;
+          };
+          
+          const playersList = rollingData.allHitters.map(player => {
+            const mergedPlayer = mergePlayerData(player);
+            
+            return {
+              name: mergedPlayer.name,
+              team: mergedPlayer.team,
+              lastSeen: new Date().toISOString().split('T')[0],
+              position: 'OF', // Rolling stats don't include position
+              recentStats: {
+                AVG: mergedPlayer.avg || mergedPlayer.battingAvg || '.000',
+                HR: mergedPlayer.HR || mergedPlayer.totalHRs || 0,
+                RBI: mergedPlayer.RBI || mergedPlayer.totalRBIs || 0,
+                H: mergedPlayer.H || mergedPlayer.totalHits || 0
+              }
+            };
+          }).sort((a, b) => a.name.localeCompare(b.name));
           
           setAllPlayers(playersList);
+          console.log(`✅ Loaded ${playersList.length} players for navigation search`);
         }
       } catch (error) {
-        console.error('Error loading players:', error);
+        console.error('Error loading players for navigation search:', error);
       }
     };
 
