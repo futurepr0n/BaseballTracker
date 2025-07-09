@@ -19,7 +19,6 @@ const TINYURL_CONFIG = {
  */
 export const createTinyUrl = async (longUrl, options = {}) => {
   try {
-    console.log('[TinyURL] Creating short URL for:', longUrl.substring(0, 100) + '...');
 
     // For testing without API token - use the free web service
     if (!TINYURL_CONFIG.apiToken) {
@@ -56,7 +55,6 @@ export const createTinyUrl = async (longUrl, options = {}) => {
     }
 
     const data = await response.json();
-    console.log('[TinyURL] Short URL created:', data.data.tiny_url);
 
     return {
       success: true,
@@ -80,7 +78,6 @@ export const createTinyUrl = async (longUrl, options = {}) => {
  */
 const createTinyUrlFree = async (longUrl) => {
   try {
-    console.log('[TinyURL] Using free web service (no API token)');
 
     // Use the simple free API endpoint
     const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`, {
@@ -98,7 +95,6 @@ const createTinyUrlFree = async (longUrl) => {
       throw new Error('Failed to create TinyURL');
     }
 
-    console.log('[TinyURL] Free short URL created:', shortUrl);
 
     return {
       success: true,

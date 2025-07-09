@@ -106,12 +106,10 @@ const createGitHubGist = async (shareData) => {
   
   if (needsShortening(shareUrl)) {
     try {
-      console.log('[CapSheetSharing] Creating TinyURL for share link...');
       tinyUrlData = await createTinyUrl(shareUrl, {
         description: `CapSheet - ${shareData.summary.totalHitters}H, ${shareData.summary.totalPitchers}P`
       });
       finalUrl = tinyUrlData.shortUrl;
-      console.log('[CapSheetSharing] TinyURL created:', finalUrl);
     } catch (tinyError) {
       console.warn('[CapSheetSharing] TinyURL creation failed, using full URL:', tinyError.message);
       // Continue with the original URL
@@ -253,12 +251,10 @@ const createBase64Share = async (shareData) => {
   let tinyUrlData = null;
   
   try {
-    console.log('[CapSheetSharing] Creating TinyURL for long Base64 URL...');
     tinyUrlData = await createTinyUrl(shareUrl, {
       description: `CapSheet - ${shareData.summary.totalHitters}H, ${shareData.summary.totalPitchers}P (Base64)`
     });
     finalUrl = tinyUrlData.shortUrl;
-    console.log('[CapSheetSharing] TinyURL created for Base64:', finalUrl);
   } catch (tinyError) {
     console.error('[CapSheetSharing] TinyURL creation failed for Base64 URL:', tinyError.message);
     // For Base64 URLs, this is more critical since they're extremely long
