@@ -1,5 +1,7 @@
-// CapSheet Sharing Service - GitHub Gist Integration
+// CapSheet Sharing Service - GitHub Gist Integration with TinyURL Support
 // Provides URL-based sharing for CapSheet configurations without database requirements
+
+import { createTinyUrl, needsShortening } from './tinyUrlService';
 
 const GITHUB_GIST_API = 'https://api.github.com/gists';
 
@@ -97,14 +99,32 @@ const createGitHubGist = async (shareData) => {
   console.log('[CapSheetSharing] Gist created successfully:', gist.id);
 
   const shareUrl = `${window.location.origin}/capsheet?share=${gist.id}`;
+  
+  // Try to shorten the URL if it's long
+  let finalUrl = shareUrl;
+  let tinyUrlData = null;
+  
+  if (needsShortening(shareUrl)) {
+    try {
+      tinyUrlData = await createTinyUrl(shareUrl, {
+        description: `CapSheet - ${shareData.summary.totalHitters}H, ${shareData.summary.totalPitchers}P`
+      });
+      finalUrl = tinyUrlData.shortUrl;
+    } catch (tinyError) {
+      console.warn('[CapSheetSharing] TinyURL creation failed, using full URL:', tinyError.message);
+      // Continue with the original URL
+    }
+  }
 
   return {
-    url: shareUrl,
+    url: finalUrl,
+    fullUrl: shareUrl,
     gistUrl: gist.html_url,
     id: gist.id,
     created: shareData.created,
     summary: shareData.summary,
-    method: 'github-gist'
+    method: 'github-gist',
+    tinyUrl: tinyUrlData
   };
 };
 
@@ -225,14 +245,31 @@ const createBase64Share = async (shareData) => {
   const shareId = 'base64_' + Date.now().toString(36);
 
   console.log('[CapSheetSharing] Base64 share created:', shareId, 'Size:', jsonString.length, 'chars');
+  
+  // Always try to shorten Base64 URLs as they are very long
+  let finalUrl = shareUrl;
+  let tinyUrlData = null;
+  
+  try {
+    tinyUrlData = await createTinyUrl(shareUrl, {
+      description: `CapSheet - ${shareData.summary.totalHitters}H, ${shareData.summary.totalPitchers}P (Base64)`
+    });
+    finalUrl = tinyUrlData.shortUrl;
+  } catch (tinyError) {
+    console.error('[CapSheetSharing] TinyURL creation failed for Base64 URL:', tinyError.message);
+    // For Base64 URLs, this is more critical since they're extremely long
+    throw new Error('URL too long for sharing. TinyURL service unavailable. Please try GitHub Gist option.');
+  }
 
   return {
-    url: shareUrl,
+    url: finalUrl,
+    fullUrl: shareUrl,
     gistUrl: null,
     id: shareId,
     created: shareData.created,
     summary: shareData.summary,
-    method: 'base64'
+    method: 'base64',
+    tinyUrl: tinyUrlData
   };
 };
 

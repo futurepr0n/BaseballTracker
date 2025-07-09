@@ -30,6 +30,7 @@ import useCalculations from './hooks/useCalculations';
 import { exportToCSV, parseImportedCSV } from './utils/exportImport';
 import { saveHandicapper } from '../../services/handicapperService';
 
+
 // Import data service utilities  
 import { fetchRosterData } from './services/capSheetDataService';
 
@@ -1458,6 +1459,7 @@ const handlePitcherGamesHistoryChange = (newValue) => {
           <span className="action-icon">🔗</span> Share CapSheet
         </button>
       </div>
+
       
       {/* Loading state during data refresh */}
       {isLoadingPlayers && hasProcessedData === false && (
