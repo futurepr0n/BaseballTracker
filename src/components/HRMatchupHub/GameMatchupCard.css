@@ -1,14 +1,16 @@
 /* Game Matchup Card Styles */
 .game-matchup-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 235, 238, 0.4);
+  border: 1px solid rgba(230, 57, 70, 0.12);
   border-radius: 12px;
   padding: 1.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(230, 57, 70, 0.08);
 }
 
 .game-matchup-card::before {
@@ -18,15 +20,16 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, transparent, #f7931e, transparent);
+  background: linear-gradient(90deg, transparent, #e63946, transparent);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .game-matchup-card:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 235, 238, 0.6);
   transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 25px rgba(230, 57, 70, 0.15);
+  border-color: rgba(230, 57, 70, 0.2);
 }
 
 .game-matchup-card:hover::before {
@@ -34,14 +37,14 @@
 }
 
 .game-matchup-card.selected {
-  background: rgba(247, 147, 30, 0.1);
-  border-color: #f7931e;
-  box-shadow: 0 8px 25px rgba(247, 147, 30, 0.2);
+  background: rgba(230, 57, 70, 0.1);
+  border-color: #e63946;
+  box-shadow: 0 8px 25px rgba(230, 57, 70, 0.2);
 }
 
 .game-matchup-card.selected::before {
   opacity: 1;
-  background: linear-gradient(90deg, #ff6b35, #f7931e, #ffd700);
+  background: linear-gradient(90deg, #e63946, #dc2626, #ef4444);
 }
 
 /* Card Header */
@@ -72,13 +75,13 @@
 .team-code {
   font-weight: 600;
   font-size: 1.1rem;
-  color: #ffffff;
+  color: #333;
 }
 
 .vs-separator {
   font-size: 1.2rem;
   font-weight: 300;
-  color: #b0b8c4;
+  color: #666;
   margin: 0 0.5rem;
 }
 
@@ -90,7 +93,7 @@
 
 .game-time {
   font-size: 0.9rem;
-  color: #b0b8c4;
+  color: #666;
   font-weight: 500;
 }
 
@@ -111,7 +114,7 @@
 }
 
 .pitcher-info {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 6px;
   padding: 0.75rem;
   display: flex;
@@ -121,20 +124,20 @@
 
 .pitcher-info .label {
   font-size: 0.85rem;
-  color: #b0b8c4;
+  color: #666;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .pitcher-name {
   font-weight: 600;
-  color: #ffffff;
+  color: #333;
 }
 
 /* Pitcher Matchup */
 .pitcher-matchup {
-  background: linear-gradient(135deg, rgba(247, 147, 30, 0.1), rgba(255, 107, 53, 0.1));
-  border: 1px solid rgba(247, 147, 30, 0.2);
+  background: linear-gradient(135deg, rgba(230, 57, 70, 0.1), rgba(220, 38, 38, 0.1));
+  border: 1px solid rgba(230, 57, 70, 0.2);
   border-radius: 8px;
   padding: 1rem;
   text-align: center;
@@ -150,11 +153,11 @@
 
 .away-pitcher, .home-pitcher {
   font-weight: 600;
-  color: #ffffff;
+  color: #333;
   font-size: 0.95rem;
   padding: 0.3rem 0.6rem;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.4);
   min-width: 100px;
   text-align: center;
 }
@@ -170,11 +173,11 @@
 .vs-text {
   font-size: 0.85rem;
   font-weight: 500;
-  color: #f7931e;
+  color: #e63946;
   text-transform: uppercase;
   letter-spacing: 1px;
   padding: 0.2rem 0.5rem;
-  background: rgba(247, 147, 30, 0.2);
+  background: rgba(230, 57, 70, 0.2);
   border-radius: 4px;
 }
 
@@ -186,8 +189,8 @@
 }
 
 .team-summary {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(230, 57, 70, 0.12);
   border-radius: 8px;
   padding: 1rem;
 }
@@ -206,12 +209,12 @@
   align-items: center;
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(230, 57, 70, 0.1);
 }
 
 .team-label {
   font-weight: 600;
-  color: #ffffff;
+  color: #333;
   font-size: 0.9rem;
 }
 
@@ -224,8 +227,8 @@
 }
 
 .team-strength {
-  background: rgba(255, 255, 255, 0.1);
-  color: #b0b8c4;
+  background: rgba(255, 255, 255, 0.4);
+  color: #666;
 }
 
 /* Top Players */
@@ -235,7 +238,7 @@
 
 .players-label {
   font-size: 0.8rem;
-  color: #b0b8c4;
+  color: #666;
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -256,7 +259,7 @@
 
 .player-name {
   font-size: 0.85rem;
-  color: #ffffff;
+  color: #333;
   font-weight: 500;
   flex: 1;
   overflow: hidden;
@@ -267,7 +270,7 @@
 .player-score {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #f7931e;
+  color: #e63946;
   min-width: 30px;
   text-align: right;
 }
@@ -286,7 +289,7 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(230, 57, 70, 0.1);
 }
 
 .analysis-indicators {
@@ -303,7 +306,7 @@
 
 .indicator-label {
   font-size: 0.7rem;
-  color: #b0b8c4;
+  color: #666;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -311,7 +314,7 @@
 .indicator-value {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #ffffff;
+  color: #333;
 }
 
 .indicator.api .indicator-value {
@@ -319,7 +322,7 @@
 }
 
 .indicator.players .indicator-value {
-  color: #f7931e;
+  color: #e63946;
 }
 
 .indicator.confidence .indicator-value {
@@ -328,12 +331,12 @@
 
 .select-hint {
   font-size: 0.8rem;
-  color: #b0b8c4;
+  color: #666;
   font-style: italic;
 }
 
 .game-matchup-card.selected .select-hint {
-  color: #f7931e;
+  color: #e63946;
   font-weight: 500;
 }
 

@@ -151,19 +151,9 @@ const StrategicIntelligenceCard = ({ currentDate, playerData, gameData, teamData
       }
     }
     
-    // Try partial name matching (last name only)
-    const lastName = playerName.split(' ').pop();
-    if (lastName && lastName.length > 3) {
-      player = playerDataArray.find(p => {
-        const pName = p.name || p.Name || '';
-        return pName.toLowerCase().includes(lastName.toLowerCase());
-      });
-      
-      if (player) {
-        console.log(`🎯 Partial match ${playerName} -> ${player.name || player.Name} (by last name)`);
-        return player;
-      }
-    }
+    // REMOVED: Dangerous partial matching by last name only
+    // This was incorrectly matching "Jose Ramirez" to "A. Ramirez"
+    // TODO: Implement proper universal name normalizer matching if needed
     
     console.log(`🎯 No player match found for: ${playerName} (${team})`);
     return null;
@@ -1450,23 +1440,75 @@ const StrategicIntelligenceCard = ({ currentDate, playerData, gameData, teamData
                 </div>
                 
                 <div className="mobile-factors">
-                  <div className="mobile-factors-section">
-                    <h5>🟢 Opportunities</h5>
-                    {player.opportunities.slice(0, 3).map((opp, i) => (
-                      <div key={i} className="mobile-factor-item">
-                        <strong>{opp.factor}:</strong> {opp.description}
-                      </div>
-                    ))}
-                  </div>
-                  {player.risks.length > 0 && (
-                    <div className="mobile-factors-section">
-                      <h5>🔴 Risks</h5>
-                      {player.risks.slice(0, 2).map((risk, i) => (
-                        <div key={i} className="mobile-factor-item">
-                          <strong>{risk.factor}:</strong> {risk.description}
+                  {expandedFactors[index] ? (
+                    // Show ALL factors when expanded
+                    <>
+                      {player.opportunities.length > 0 && (
+                        <div className="mobile-factors-section">
+                          <h5>🟢 Opportunities</h5>
+                          {player.opportunities.map((opp, i) => (
+                            <div key={i} className="mobile-factor-item">
+                              <strong>{opp.factor}:</strong> {opp.description}
+                              <span className="mobile-factor-impact">{opp.impact}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      )}
+                      {player.risks.length > 0 && (
+                        <div className="mobile-factors-section">
+                          <h5>🔴 Risks</h5>
+                          {player.risks.map((risk, i) => (
+                            <div key={i} className="mobile-factor-item">
+                              <strong>{risk.factor}:</strong> {risk.description}
+                              <span className="mobile-factor-impact">{risk.impact}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <div 
+                        className="mobile-factor-toggle"
+                        onClick={() => toggleFactorExpansion(index)}
+                      >
+                        <span className="toggle-text">▲ Show Less</span>
+                      </div>
+                    </>
+                  ) : (
+                    // Show condensed view
+                    <>
+                      {player.opportunities.length > 0 && (
+                        <div className="mobile-factors-section">
+                          <h5>🟢 Opportunities</h5>
+                          {player.opportunities.slice(0, 2).map((opp, i) => (
+                            <div key={i} className="mobile-factor-item">
+                              <strong>{opp.factor}:</strong> {opp.description}
+                              <span className="mobile-factor-impact">{opp.impact}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {player.risks.length > 0 && (
+                        <div className="mobile-factors-section">
+                          <h5>🔴 Risks</h5>
+                          {player.risks.slice(0, 1).map((risk, i) => (
+                            <div key={i} className="mobile-factor-item">
+                              <strong>{risk.factor}:</strong> {risk.description}
+                              <span className="mobile-factor-impact">{risk.impact}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {/* Show "and X more" if there are additional factors */}
+                      {(player.opportunities.length + player.risks.length) > 3 && (
+                        <div 
+                          className="mobile-factor-toggle"
+                          onClick={() => toggleFactorExpansion(index)}
+                        >
+                          <span className="toggle-text">
+                            ▼ +{(player.opportunities.length + player.risks.length) - 3} more
+                          </span>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </div>

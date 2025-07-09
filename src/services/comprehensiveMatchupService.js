@@ -14,6 +14,7 @@ import comprehensiveWeatherService from './comprehensiveWeatherService';
 import advancedPitcherIntelligence from './advancedPitcherIntelligence';
 import enhancedPitcherIntelligenceService from './enhancedPitcherIntelligenceService';
 import { debugLog } from '../utils/debugConfig';
+import { normalizeToEnglish, createAllNameVariants, namesMatch } from '../utils/universalNameNormalizer';
 
 class ComprehensiveMatchupService {
   constructor() {

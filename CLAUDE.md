@@ -1077,6 +1077,375 @@ node src/services/generateTeamStats.js $TARGET_DATE
 
 This comprehensive integration ensures the Enhanced Player Analysis system provides accurate, real-time player evaluation without any mock data, leveraging the full depth of the application's statistical infrastructure.
 
+## Handedness Data Matching System (CRITICAL IMPLEMENTATION)
+
+### Overview
+The handedness data matching system resolves player name discrepancies between different data sources, enabling accurate swing path data display in Barrel Matchup Analysis and Launch Angle Masters cards. This system handles accented characters, name format variations, and asynchronous data loading challenges.
+
+### Core Problem and Solution
+
+**Problem Identified:**
+- Players with accented names (José Ramírez, Adolis García) appeared in tables but showed no swing path data (all dashes)
+- Name format mismatches: "Jose Ramirez" (API/search) vs "Ramírez, José" (handedness CSV files)
+- Timing issues: handedness datasets accessed before loading completed
+- Team assignment errors: "Adolis Garcia" assigned to ARI instead of TEX due to name conflicts
+
+**Solution Architecture:**
+1. **Comprehensive Name Normalization**: Handles accent removal and name format conversion
+2. **Asynchronous Data Loading**: Proper timing management for handedness context
+3. **Enhanced Team Assignment**: Accent-aware team assignment in data generation
+4. **Fallback Matching**: Multiple matching strategies with roster lookup integration
+
+### Key Components
+
+**handednessSwingDataService.js** - Core service for handedness data management:
+```javascript
+// Accent normalization with comprehensive character mapping
+normalizeAccents(str) {
+  const accentMap = {
+    'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ñ': 'n',
+    'Á': 'A', 'É': 'E', 'Í': 'I', 'Ó': 'O', 'Ú': 'U', 'Ñ': 'N',
+    // ... comprehensive mapping for all accented characters
+  };
+  return str.split('').map(char => accentMap[char] || char).join('');
+}
+
+// Name format conversion (handles "First Last" ↔ "Last, First")
+nameVariantsMatch(search, data) {
+  // Direct match
+  if (search === data) return true;
+  
+  // Handle "Lastname, Firstname" format conversion
+  if (data.includes(',')) {
+    const parts = data.split(', ');
+    if (parts.length === 2) {
+      const dataForward = `${parts[1]} ${parts[0]}`;  // "jose ramirez"
+      if (search === dataForward) return true;
+    }
+  }
+  
+  // Handle "Firstname Lastname" to "Lastname, Firstname" conversion
+  const searchParts = search.split(' ');
+  if (searchParts.length === 2) {
+    const searchReversed = `${searchParts[1]}, ${searchParts[0]}`;  // "ramirez, jose"
+    if (searchReversed === data) return true;
+  }
+  
+  return false;
+}
+```
+
+**Enhanced Player Lookup with Roster Integration:**
+```javascript
+// Multi-stage lookup with roster fallback
+async getPlayerDataByHandedness(datasets, playerName, handedness) {
+  // 1. Direct name matching with universal normalizer
+  for (const [key, playerData] of dataset) {
+    if (namesMatch(playerName, playerData.name)) {
+      return playerData;
+    }
+  }
+  
+  // 2. Roster lookup for full name resolution
+  const rosterResponse = await fetch('/data/rosters.json');
+  const rosterData = await rosterResponse.json();
+  const playerRoster = rosterData.find(p => {
+    // Try exact match first
+    if (p.name === playerName) return true;
+    if (p.fullName === playerName) return true;
+    
+    // Try normalized matching for accents
+    const normalizedPlayerName = this.normalizeAccents(playerName.toLowerCase());
+    const normalizedRosterName = this.normalizeAccents(p.name.toLowerCase());
+    const normalizedRosterFullName = this.normalizeAccents(p.fullName?.toLowerCase() || '');
+    
+    return normalizedRosterName === normalizedPlayerName || 
+           normalizedRosterFullName === normalizedPlayerName;
+  });
+  
+  // 3. Full name matching if roster entry found
+  if (fullName) {
+    for (const [key, playerData] of dataset) {
+      if (namesMatch(fullName, playerData.name)) {
+        return playerData;
+      }
+    }
+  }
+  
+  // 4. Fallback bulletproof matching
+  for (const [key, playerData] of dataset) {
+    const normalizedSearch = this.normalizeAccents(playerName.toLowerCase());
+    const normalizedData = this.normalizeAccents(playerData.name.toLowerCase());
+    
+    if (this.nameVariantsMatch(normalizedSearch, normalizedData)) {
+      return playerData;
+    }
+  }
+  
+  return null;
+}
+```
+
+### React Component Integration
+
+**BarrelMatchupCard.js** - Enhanced timing and async handling:
+```javascript
+// Separate effect to re-process when handedness datasets become available
+useEffect(() => {
+  if (handednessDatasets && analysisData) {
+    console.log('🔍 DATASETS NOW AVAILABLE - Re-processing analysis data...');
+    const reprocessData = async () => {
+      const processedData = await processAnalysisData(analysisData);
+      setAnalysisData(processedData);
+    };
+    reprocessData();
+  }
+}, [handednessDatasets]);
+
+// Enhanced data processing with proper async handling
+const processAnalysisData = async (analysis) => {
+  const processedPicks = await Promise.all(analysis.picks.map(async pick => {
+    const playerName = pick.player_name || pick.playerName || '';
+    
+    // Only try to get handedness data if datasets are loaded
+    let handednessData = null;
+    if (handednessDatasets && !handednessLoading) {
+      try {
+        handednessData = await getPlayerHandednessData(playerName);
+      } catch (error) {
+        console.error(`Error getting handedness data for ${playerName}:`, error);
+      }
+    }
+    
+    return {
+      ...pick,
+      handednessData,
+      // ... other processing
+    };
+  }));
+  
+  return { ...analysis, picks: processedPicks };
+};
+```
+
+**LaunchAngleMastersCard.js** - Async data processing:
+```javascript
+// Made processLaunchAngleMasters async for proper handedness data handling
+const processLaunchAngleMasters = async (picks) => {
+  if (!picks || !Array.isArray(picks)) return [];
+
+  // Calculate comprehensive master score for each player
+  const mastersData = await Promise.all(playersWithSwingData.map(async pick => {
+    const playerName = pick.player_name || pick.playerName || '';
+    const handednessData = await getPlayerHandednessData(playerName);
+    
+    // Use handedness data if available, otherwise fallback to hellraiser data
+    let swingScore, attackAngle, batSpeed;
+    if (handednessData) {
+      swingScore = (handednessData.ideal_attack_angle_rate || 0) * 100;
+      attackAngle = handednessData.attack_angle || 0;
+      batSpeed = handednessData.avg_bat_speed || 0;
+    } else {
+      swingScore = pick.swing_optimization_score || 0;
+      attackAngle = pick.swing_attack_angle || 0;
+      batSpeed = pick.swing_bat_speed || 0;
+    }
+    
+    // ... rest of master score calculation
+  }));
+  
+  return mastersData;
+};
+```
+
+### Data Generation Pipeline Enhancement
+
+**Enhanced Team Assignment (generate_hellraiser_analysis.py):**
+```python
+def normalize_accents(self, text: str) -> str:
+    """Normalize accented characters to plain English"""
+    if not text:
+        return ''
+    
+    # Comprehensive accent mapping
+    accent_map = {
+        'á': 'a', 'à': 'a', 'ä': 'a', 'â': 'a', 'ā': 'a', 'ą': 'a', 'å': 'a', 'ã': 'a',
+        'é': 'e', 'è': 'e', 'ë': 'e', 'ê': 'e', 'ē': 'e', 'ę': 'e',
+        'í': 'i', 'ì': 'i', 'ï': 'i', 'î': 'i', 'ī': 'i', 'į': 'i',
+        'ó': 'o', 'ò': 'o', 'ö': 'o', 'ô': 'o', 'ō': 'o', 'ø': 'o', 'õ': 'o',
+        'ú': 'u', 'ù': 'u', 'ü': 'u', 'û': 'u', 'ū': 'u', 'ų': 'u',
+        'ñ': 'n', 'ń': 'n', 'ç': 'c', 'č': 'c', 'ć': 'c',
+        # ... uppercase versions
+    }
+    
+    return ''.join(accent_map.get(char, char) for char in text)
+
+# Enhanced roster lookup with accent normalization
+def find_player_team(self, player_name: str) -> str:
+    """Find player's team with enhanced name matching"""
+    
+    # 1. Direct name matching
+    direct_match = self.roster_data.get(player_name)
+    if direct_match:
+        return direct_match
+    
+    # 2. Normalized name matching
+    normalized_search = self.normalize_accents(player_name.lower())
+    
+    for roster_name, team in self.roster_data.items():
+        normalized_roster = self.normalize_accents(roster_name.lower())
+        if normalized_search == normalized_roster:
+            return team
+    
+    # 3. Fallback to original logic
+    return self.original_find_player_team(player_name)
+```
+
+### Universal Name Normalizer Utility
+
+**utils/universalNameNormalizer.js** - Comprehensive name matching:
+```javascript
+// Accent normalization with comprehensive character support
+export const normalizeToEnglish = (text) => {
+  const accentMap = {
+    'á': 'a', 'à': 'a', 'ä': 'a', 'â': 'a', 'ā': 'a', 'ą': 'a', 'å': 'a', 'ã': 'a',
+    'é': 'e', 'è': 'e', 'ë': 'e', 'ê': 'e', 'ē': 'e', 'ę': 'e',
+    'í': 'i', 'ì': 'i', 'ï': 'i', 'î': 'i', 'ī': 'i', 'į': 'i',
+    'ó': 'o', 'ò': 'o', 'ö': 'o', 'ô': 'o', 'ō': 'o', 'ø': 'o', 'õ': 'o',
+    'ú': 'u', 'ù': 'u', 'ü': 'u', 'û': 'u', 'ū': 'u', 'ų': 'u',
+    'ñ': 'n', 'ń': 'n', 'ç': 'c', 'č': 'c', 'ć': 'c',
+    // ... uppercase versions
+  };
+  
+  return text.split('').map(char => accentMap[char] || char).join('');
+};
+
+// Create all possible name variants
+export const createAllNameVariants = (name) => {
+  const variants = [name];
+  const normalized = normalizeToEnglish(name);
+  
+  if (normalized !== name) {
+    variants.push(normalized);
+  }
+  
+  // Add "Last, First" and "First Last" variants
+  const parts = name.split(' ');
+  if (parts.length === 2) {
+    variants.push(`${parts[1]}, ${parts[0]}`);
+  }
+  
+  const commaParts = name.split(', ');
+  if (commaParts.length === 2) {
+    variants.push(`${commaParts[1]} ${commaParts[0]}`);
+  }
+  
+  return variants;
+};
+
+// Enhanced name matching with all variants
+export const namesMatch = (name1, name2) => {
+  if (!name1 || !name2) return false;
+  
+  const variants1 = createAllNameVariants(name1);
+  const variants2 = createAllNameVariants(name2);
+  
+  return variants1.some(v1 => 
+    variants2.some(v2 => 
+      v1.toLowerCase() === v2.toLowerCase()
+    )
+  );
+};
+```
+
+### HandednessContext Integration
+
+**contexts/HandednessContext.js** - Async context methods:
+```javascript
+// Enhanced context with async handedness data retrieval
+const getPlayerHandednessData = useCallback(async (playerName) => {
+  if (!handednessDatasets) {
+    console.log('🔍 HANDEDNESS CONTEXT: No datasets loaded yet');
+    return null;
+  }
+  
+  try {
+    return await handednessSwingDataService.getPlayerDataByHandedness(
+      handednessDatasets, 
+      playerName, 
+      selectedHandedness
+    );
+  } catch (error) {
+    console.error('Error getting handedness data:', error);
+    return null;
+  }
+}, [handednessDatasets, selectedHandedness]);
+```
+
+### Troubleshooting and Debugging
+
+**Debug Logging System:**
+```javascript
+// Comprehensive debug logging for name matching
+console.log(`🔍 HANDEDNESS: Looking up ${playerName} in ${handedness} dataset (${dataset.size} players)`);
+
+// Special debug for problematic players
+if (playerName.toLowerCase().includes('adolis')) {
+  console.log(`🔍🔍🔍 SPECIAL DEBUG - Checking dataset for Adolis:`);
+  for (const [key, playerData] of dataset) {
+    if (key.includes('adolis') || playerData.name.toLowerCase().includes('adolis')) {
+      console.log(`   Found in dataset - Key: "${key}", Name: "${playerData.name}"`);
+    }
+  }
+}
+```
+
+**Common Issues and Solutions:**
+
+1. **Player Shows in Table but No Swing Data:**
+   - **Cause**: Name format mismatch between API and handedness CSV
+   - **Solution**: Enhanced name normalization and variant matching
+   - **Check**: Browser console for handedness lookup logs
+
+2. **Wrong Team Assignment:**
+   - **Cause**: Accent characters causing name conflicts in team assignment
+   - **Solution**: Enhanced hellraiser script with accent normalization
+   - **Check**: Generated hellraiser analysis files for correct team assignments
+
+3. **Datasets Not Available:**
+   - **Cause**: Handedness context accessed before datasets loaded
+   - **Solution**: Proper async handling and loading state management
+   - **Check**: Console logs for "HANDEDNESS CONTEXT: No datasets loaded"
+
+### Performance Optimizations
+
+**Caching Strategy:**
+- **Service-level caching**: 5-minute cache for handedness datasets
+- **Map-based lookup**: Fast O(1) player lookup by lowercase name
+- **Async processing**: Non-blocking handedness data retrieval
+
+**Memory Management:**
+- **Singleton service**: Shared handedness service instance
+- **Lazy loading**: Datasets loaded only when needed
+- **Cache cleanup**: Automatic cache expiration and cleanup
+
+### Integration Testing
+
+**Test scenarios for handedness matching:**
+1. **José Ramírez** - Accent normalization test
+2. **Adolis García** - Team assignment and accent handling
+3. **Cal Raleigh** - Standard name format testing
+4. **Players with hyphens** - Complex name format handling
+5. **Players with Jr./Sr.** - Suffix handling in name matching
+
+**Expected behavior:**
+- All players in Barrel Matchup Analysis show swing path data when available
+- Launch Angle Masters correctly uses handedness-specific data
+- Team filtering works correctly for players with accented names
+- Async data loading doesn't break component rendering
+
+This comprehensive handedness matching system ensures accurate player data display across all components while handling the complexities of international names, data format variations, and asynchronous loading patterns.
+
 ### Data Dependencies
 This application requires:
 1. **BaseballScraper** CSV files in `../BaseballScraper/` directory
@@ -1088,5 +1457,6 @@ This application requires:
 7. Prediction files must be generated before dashboard displays complete data
 8. **Stadium HR analysis data** in `public/data/stadium/` for park factor calculations
 9. **Multi-hit statistics** in `public/data/multi_hit_stats/` for context enhancement
+10. **Handedness CSV files** in `public/data/stats/` for swing path analysis (bat-tracking-swing-path-RHP.csv, bat-tracking-swing-path-LHP.csv, bat-tracking-swing-path-all.csv)
 
 The application handles missing data gracefully and will find the closest available date when specific data is not available.

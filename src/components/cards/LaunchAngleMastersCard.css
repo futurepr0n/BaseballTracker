@@ -241,8 +241,29 @@
 
 .mobile-player-name {
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text-primary, #1a202c) !important;
   font-size: 1em;
+}
+
+/* CRITICAL: Force mobile player name visibility across all themes */
+.launch-angle-masters-card .mobile-player-name {
+  color: #1a202c !important;
+}
+
+/* Glass theme specific override */
+.theme-glass .launch-angle-masters-card .mobile-player-name {
+  color: #1a1a2e !important;
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  .launch-angle-masters-card .mobile-player-name {
+    color: #ffffff !important;
+  }
+  
+  .theme-glass .launch-angle-masters-card .mobile-player-name {
+    color: #ffffff !important;
+  }
 }
 
 .mobile-team-info {
@@ -450,16 +471,7 @@
 /* Theme-specific adjustments */
 @media (prefers-color-scheme: dark) {
   .launch-angle-masters-card:not(.glass) {
-    --surface-primary: #1a1a1a;
-    --surface-secondary: #2a2a2a;
-    --surface-hover: #333333;
-    --surface-active: #404040;
-    --text-primary: #ffffff;
-    --text-secondary: #cccccc;
-    --border-color: #444444;
-    --border-light: #333333;
-    --accent-color: #4CAF50;
-    --accent-hover: #45a049;
+    /* Dark mode theme variables handled by theme system */
   }
 }
 

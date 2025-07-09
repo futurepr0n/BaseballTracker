@@ -1,0 +1,139 @@
+.handedness-test {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+}
+
+.handedness-test h2 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.handedness-test p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.handedness-test button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.handedness-test button:hover {
+    background: #0056b3;
+}
+
+.handedness-test button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.test-results {
+    margin-top: 20px;
+}
+
+.test-result {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    padding: 15px;
+}
+
+.test-result.success {
+    border-left: 4px solid #28a745;
+}
+
+.test-result.failed {
+    border-left: 4px solid #dc3545;
+}
+
+.test-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.test-header h4 {
+    margin: 0;
+    color: #333;
+}
+
+.status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status.found {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status.not-found {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.test-details {
+    font-size: 14px;
+    color: #666;
+}
+
+.test-details p {
+    margin: 5px 0;
+}
+
+.handedness-data {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.handedness-data h5 {
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.handedness-data ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.handedness-data li {
+    margin: 5px 0;
+}
+
+.instructions {
+    margin-top: 30px;
+    background: #e9ecef;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.instructions h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.instructions ol {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.instructions li {
+    margin: 5px 0;
+    color: #666;
+}

@@ -3,7 +3,10 @@
  * 
  * Centralizes all handedness data loading and calculations
  * to avoid duplicate logic across components and services.
+ * Enhanced with Unicode normalization for special characters.
  */
+
+import { normalizeToEnglish, createAllNameVariants, namesMatch } from '../utils/universalNameNormalizer.js';
 
 // Cache for handedness data to avoid redundant fetches
 const handednessCache = new Map();
@@ -59,42 +62,65 @@ export const loadHandednessData = async (playerName, teamAbbr = null) => {
         lhpResponse.json()
       ]);
 
-      // Create search key based on full name or abbreviated name
-      let searchKey = null;
+      // Create search variants based on full name or abbreviated name
+      let searchVariants = [];
       
       if (fullName) {
-        // Use full name to create proper search key: "lastname, firstname"
+        // Use full name to create comprehensive search variants
+        searchVariants = createAllNameVariants(fullName);
+        // Also add CSV format variants
         const nameParts = fullName.split(' ');
-        const lastName = nameParts[nameParts.length - 1];
-        const firstName = nameParts.slice(0, -1).join(' ');
-        searchKey = `${lastName}, ${firstName}`;
+        if (nameParts.length >= 2) {
+          const lastName = nameParts[nameParts.length - 1];
+          const firstName = nameParts.slice(0, -1).join(' ');
+          const csvFormat = `${lastName}, ${firstName}`;
+          searchVariants.push(...createAllNameVariants(csvFormat));
+        }
       } else {
-        // Fallback to abbreviated name format
+        // Use abbreviated name
+        searchVariants = createAllNameVariants(playerName);
+        // Also add CSV format variants
         const nameParts = playerName.split(' ');
-        const lastName = nameParts[nameParts.length - 1];
-        const firstName = nameParts.slice(0, -1).join(' ');
-        searchKey = `${lastName}, ${firstName}`;
+        if (nameParts.length >= 2) {
+          const lastName = nameParts[nameParts.length - 1];
+          const firstName = nameParts.slice(0, -1).join(' ');
+          const csvFormat = `${lastName}, ${firstName}`;
+          searchVariants.push(...createAllNameVariants(csvFormat));
+        }
       }
       
-      console.log(`🔍 Using search key: ${searchKey}`);
+      console.log(`🔍 Using comprehensive search variants for ${playerName}:`, searchVariants.slice(0, 8));
       
-      // Search in the players array instead of direct key lookup
+      // Enhanced search in the players array with comprehensive name matching
       let rhpResult = null;
       let lhpResult = null;
       
       if (rhpData.players) {
-        rhpResult = rhpData.players.find(p => p.name === searchKey);
+        rhpResult = rhpData.players.find(p => {
+          if (!p.name) return false;
+          // Use comprehensive name matching
+          return namesMatch(playerName, p.name) || 
+                 (fullName && namesMatch(fullName, p.name));
+        });
       }
       
       if (lhpData.players) {
-        lhpResult = lhpData.players.find(p => p.name === searchKey);
+        lhpResult = lhpData.players.find(p => {
+          if (!p.name) return false;
+          // Use comprehensive name matching
+          return namesMatch(playerName, p.name) || 
+                 (fullName && namesMatch(fullName, p.name));
+        });
       }
       
-      console.log(`🔍 Handedness lookup results:`, { 
-        searchKey,
+      console.log(`🔍 Enhanced handedness lookup results:`, { 
+        playerName,
+        fullName,
         found: !!(rhpResult || lhpResult), 
         rhp: !!rhpResult, 
-        lhp: !!lhpResult 
+        lhp: !!lhpResult,
+        rhpName: rhpResult?.name,
+        lhpName: lhpResult?.name
       });
 
       const result = {
@@ -221,6 +247,156 @@ export const generateEstimatedSplits = (seasonStats, pitcherType) => {
     bb_rate: '8.0%',
     estimated: true
   };
+};
+
+/**
+ * Get player handedness with enhanced roster lookup
+ * @param {string} playerName - Player name (e.g., "A. García")
+ * @param {string} teamAbbr - Team abbreviation (e.g., "TEX")
+ * @returns {Promise<Object>} Handedness data with bats, throws, and swing path
+ */
+export const getPlayerHandedness = async (playerName, teamAbbr = null) => {
+  console.log(`🔍 HANDEDNESS LOOKUP: ${playerName} (${teamAbbr})`);
+  
+  try {
+    // First, try to get full name from roster
+    let fullName = null;
+    let matchedName = null;
+    
+    try {
+      console.log('🔍 Loading roster data...');
+      const rosterResponse = await fetch('/data/rosters.json');
+      if (rosterResponse.ok) {
+        const rosterData = await rosterResponse.json();
+        
+        // Find player in roster with various matching strategies
+        let foundPlayer = null;
+        
+        // Strategy 1: Direct name and team match
+        if (teamAbbr) {
+          foundPlayer = rosterData.find(p => 
+            p.name === playerName && p.team === teamAbbr
+          );
+          if (foundPlayer) {
+            console.log(`✓ Direct match found: ${foundPlayer.name} (${foundPlayer.team})`);
+          }
+        }
+        
+        // Strategy 2: Name match with first initial expansion
+        if (!foundPlayer) {
+          const searchStrategies = [
+            // Try exact match first
+            (p) => p.name === playerName,
+            // Try case-insensitive match
+            (p) => p.name.toLowerCase() === playerName.toLowerCase(),
+            // Try first initial + last name match
+            (p) => {
+              const displayParts = playerName.split(' ');
+              if (displayParts.length >= 2) {
+                const firstInitial = displayParts[0].replace('.', '');
+                const lastName = displayParts[1];
+                
+                // Check if player fullName contains matching parts
+                const fullNameLower = (p.fullName || p.name).toLowerCase();
+                const firstNameMatch = fullNameLower.includes(firstInitial.toLowerCase());
+                const lastNameMatch = fullNameLower.includes(lastName.toLowerCase());
+                
+                return firstNameMatch && lastNameMatch;
+              }
+              return false;
+            }
+          ];
+          
+          for (let i = 0; i < searchStrategies.length && !foundPlayer; i++) {
+            foundPlayer = rosterData.find(searchStrategies[i]);
+            if (foundPlayer) {
+              console.log(`✓ Strategy ${i + 1} match: ${foundPlayer.name} -> ${foundPlayer.fullName}`);
+            }
+          }
+        }
+        
+        if (foundPlayer) {
+          fullName = foundPlayer.fullName || foundPlayer.name;
+          matchedName = foundPlayer.name;
+          console.log(`✓ Full name from roster: ${fullName}`);
+        }
+      }
+    } catch (rosterError) {
+      console.log('Could not load roster data:', rosterError.message);
+    }
+    
+    // Load handedness data
+    console.log('🔍 Loading handedness data...');
+    const handednessResponse = await fetch('/data/handedness/all.json');
+    if (!handednessResponse.ok) {
+      console.log('Could not load handedness data');
+      return null;
+    }
+    
+    const handednessData = await handednessResponse.json();
+    if (!handednessData.players) {
+      console.log('Invalid handedness data format');
+      return null;
+    }
+    
+    // Search for player in handedness data
+    const searchNames = [playerName];
+    if (fullName) {
+      searchNames.push(fullName);
+      // Also try CSV format
+      const nameParts = fullName.split(' ');
+      if (nameParts.length >= 2) {
+        const lastName = nameParts[nameParts.length - 1];
+        const firstName = nameParts.slice(0, -1).join(' ');
+        searchNames.push(`${lastName}, ${firstName}`);
+      }
+    }
+    
+    console.log(`🔍 Searching handedness data with names:`, searchNames);
+    
+    let foundHandedness = null;
+    for (const searchName of searchNames) {
+      foundHandedness = handednessData.players.find(p => 
+        p.name && (
+          p.name === searchName ||
+          p.name.toLowerCase() === searchName.toLowerCase() ||
+          namesMatch(searchName, p.name)
+        )
+      );
+      
+      if (foundHandedness) {
+        console.log(`✓ Found handedness match: ${foundHandedness.name}`);
+        break;
+      }
+    }
+    
+    if (foundHandedness) {
+      const result = {
+        bats: foundHandedness.side === 'L' ? 'L' : 'R',
+        throws: foundHandedness.side === 'L' ? 'L' : 'R', // Assume same for now
+        swingPath: {
+          avgBatSpeed: foundHandedness.avg_bat_speed,
+          swingTilt: foundHandedness.swing_tilt,
+          attackAngle: foundHandedness.attack_angle,
+          attackDirection: foundHandedness.attack_direction,
+          idealAttackAngleRate: foundHandedness.ideal_attack_angle_rate,
+          competitiveSwings: foundHandedness.competitive_swings
+        },
+        matchedName: foundHandedness.name,
+        source: 'handedness_data'
+      };
+      
+      console.log(`✓ Handedness result:`, result);
+      return result;
+    }
+    
+    console.log(`✗ No handedness data found for ${playerName}`);
+    return null;
+    
+  } catch (error) {
+    console.error('Error in getPlayerHandedness:', error);
+    return null;
+  }
 };
 
 /**

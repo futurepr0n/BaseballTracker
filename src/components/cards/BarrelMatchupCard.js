@@ -13,7 +13,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
   const [sortConfig, setSortConfig] = useState({ key: 'pitcherContactAllowed', direction: 'desc' });
   const [expandedRows, setExpandedRows] = useState({});
   const { selectedTeam, includeMatchup, matchupTeam } = useTeamFilter();
-  const { selectedHandedness, getPlayerHandednessData, loadHandednessDatasets } = useHandedness();
+  const { selectedHandedness, getPlayerHandednessData, loadHandednessDatasets, handednessDatasets, loading: handednessLoading } = useHandedness();
 
   const loadBarrelAnalysis = useCallback(async () => {
     try {
@@ -38,12 +38,14 @@ const BarrelMatchupCard = ({ currentDate }) => {
       
       if (analysis.error) {
         if (analysis.picks && Array.isArray(analysis.picks)) {
-          setAnalysisData(processAnalysisData(analysis));
+          const processedData = await processAnalysisData(analysis);
+          setAnalysisData(processedData);
         } else {
           setError(analysis.error);
         }
       } else {
-        setAnalysisData(processAnalysisData(analysis));
+        const processedData = await processAnalysisData(analysis);
+        setAnalysisData(processedData);
       }
     } catch (err) {
       console.error('Error loading Barrel analysis:', err);
@@ -61,9 +63,21 @@ const BarrelMatchupCard = ({ currentDate }) => {
     loadBarrelAnalysis();
   }, [loadBarrelAnalysis, selectedHandedness]);
 
-  const processAnalysisData = (analysis) => {
+  // Separate effect to re-process when handedness datasets become available
+  useEffect(() => {
+    if (handednessDatasets && analysisData) {
+      console.log('🔍 DATASETS NOW AVAILABLE - Re-processing analysis data...');
+      const reprocessData = async () => {
+        const processedData = await processAnalysisData(analysisData);
+        setAnalysisData(processedData);
+      };
+      reprocessData();
+    }
+  }, [handednessDatasets]);
+
+  const processAnalysisData = async (analysis) => {
     // Extract pitcher metrics from reasoning field
-    const processedPicks = analysis.picks.map(pick => {
+    const processedPicks = await Promise.all(analysis.picks.map(async pick => {
       const reasoning = pick.reasoning || '';
       
       // Extract pitcher contact allowed (exit velocity)
@@ -99,7 +113,41 @@ const BarrelMatchupCard = ({ currentDate }) => {
       
       // Get handedness-specific swing data if available, otherwise fallback to hellraiser data
       const playerName = pick.player_name || pick.playerName || '';
-      const handednessData = getPlayerHandednessData(playerName);
+      
+      // Debug: Log what player name we're working with
+      console.log(`🔍 BARREL MATCHUP: Processing player: "${playerName}"`);
+      
+      // Special check for Adolis Garcia
+      if (playerName.toLowerCase().includes('adolis')) {
+        console.log(`🔍🔍🔍 SPECIAL DEBUG FOR ADOLIS:`);
+        console.log(`   Player name from pick: "${playerName}"`);
+        console.log(`   Handedness datasets loaded: ${!!handednessDatasets}`);
+        console.log(`   Selected handedness: ${selectedHandedness}`);
+      }
+      
+      // Only try to get handedness data if datasets are loaded
+      let handednessData = null;
+      if (handednessDatasets && !handednessLoading) {
+        try {
+          console.log(`🔍 BARREL MATCHUP: Attempting handedness lookup for ${playerName}`);
+          handednessData = await getPlayerHandednessData(playerName);
+          console.log(`🔍 BARREL MATCHUP: Handedness data for ${playerName}:`, handednessData ? 'Found' : 'Not found');
+          if (handednessData) {
+            console.log(`🔍 BARREL MATCHUP: Found swing data for ${playerName}:`, {
+              avgBatSpeed: handednessData.avg_bat_speed,
+              attackAngle: handednessData.attack_angle,
+              idealRate: handednessData.ideal_attack_angle_rate,
+              dataName: handednessData.name
+            });
+          } else if (playerName.toLowerCase().includes('adolis')) {
+            console.log(`🔍🔍🔍 FAILED TO FIND ADOLIS - handednessData is null`);
+          }
+        } catch (error) {
+          console.error(`Error getting handedness data for ${playerName}:`, error);
+        }
+      } else {
+        console.log(`🔍 BARREL MATCHUP: Cannot lookup handedness - datasets: ${!!handednessDatasets}, loading: ${handednessLoading}`);
+      }
       
       const swingPath = {
         avgBatSpeed: handednessData ? handednessData.avg_bat_speed : (pick.swing_bat_speed || null),
@@ -124,7 +172,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
         swingPath,
         matchupScore: calculateMatchupScore(playerBarrelRate, pitcherBarrelVulnerable, playerExitVelocity, pitcherContactAllowed, playerHardContact, pitcherHardContact, swingPath)
       };
-    });
+    }));
     
     return {
       ...analysis,
