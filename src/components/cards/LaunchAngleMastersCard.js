@@ -50,7 +50,7 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
         }
       } else {
         setAnalysisData(analysis);
-        const masters = processLaunchAngleMasters(analysis.picks);
+        const masters = await processLaunchAngleMasters(analysis.picks);
         setFilteredPlayers(masters);
       }
     } catch (err) {
@@ -69,31 +69,33 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
     loadLaunchAngleMasters();
   }, [loadLaunchAngleMasters, selectedHandedness]);
 
-  const processLaunchAngleMasters = (picks) => {
+  const processLaunchAngleMasters = async (picks) => {
     if (!picks || !Array.isArray(picks)) return [];
 
     // Filter picks that have swing path data OR handedness data
-    const playersWithSwingData = picks.filter(pick => {
+    const playersWithSwingData = [];
+    for (const pick of picks) {
       // First check hellraiser swing data
       if (pick.swing_bat_speed && 
           pick.swing_attack_angle !== undefined && 
           pick.swing_optimization_score !== undefined) {
-        return true;
+        playersWithSwingData.push(pick);
+        continue;
       }
       
       // Then check if player has handedness data
       const playerName = pick.player_name || pick.playerName || '';
-      const handednessData = getPlayerHandednessData(playerName);
-      return !!handednessData;
-      
-      return false;
-    });
+      const handednessData = await getPlayerHandednessData(playerName);
+      if (handednessData) {
+        playersWithSwingData.push(pick);
+      }
+    }
 
     // Calculate comprehensive master score for each player
-    const mastersData = playersWithSwingData.map(pick => {
+    const mastersData = await Promise.all(playersWithSwingData.map(async pick => {
       // Get handedness-specific data if available
       const playerName = pick.player_name || pick.playerName || '';
-      const handednessData = getPlayerHandednessData(playerName);
+      const handednessData = await getPlayerHandednessData(playerName);
 
       // Extract metrics from reasoning for barrel/exit velocity analysis
       const reasoning = pick.reasoning || '';
@@ -303,7 +305,7 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
         dataSource: handednessData ? `handedness_${selectedHandedness}` : 'hellraiser',
         competitiveSwings: handednessData ? handednessData.competitive_swings : null
       };
-    });
+    }));
 
     // Sort by master score and return top 25
     return mastersData

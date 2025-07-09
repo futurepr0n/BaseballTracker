@@ -10,37 +10,41 @@ export const HandednessProvider = ({ children }) => {
 
   // Load all handedness datasets once
   const loadHandednessDatasets = useCallback(async () => {
-    if (handednessDatasets) return; // Already loaded
+    if (handednessDatasets) {
+      console.log('🔍 DATASETS ALREADY LOADED');
+      return; // Already loaded
+    }
     
     try {
       setLoading(true);
-      console.log('Loading shared handedness datasets...');
+      console.log('🔍 LOADING handedness datasets...');
       const datasets = await handednessSwingDataService.loadAllHandednessDatasets();
-      console.log('Loaded shared datasets:', {
+      console.log('🔍 LOADED datasets:', {
         RHP: datasets.RHP.size,
         LHP: datasets.LHP.size, 
         ALL: datasets.ALL.size
       });
       setHandednessDatasets(datasets);
+      console.log('🔍 DATASETS SET IN STATE');
     } catch (error) {
-      console.error('Error loading shared handedness datasets:', error);
+      console.error('🔍 ERROR loading handedness datasets:', error);
     } finally {
       setLoading(false);
     }
   }, [handednessDatasets]);
 
   // Get player data for current handedness
-  const getPlayerHandednessData = useCallback((playerName) => {
+  const getPlayerHandednessData = useCallback(async (playerName) => {
     if (!handednessDatasets) return null;
-    return handednessSwingDataService.getPlayerDataByHandedness(
+    return await handednessSwingDataService.getPlayerDataByHandedness(
       handednessDatasets, playerName, selectedHandedness
     );
   }, [handednessDatasets, selectedHandedness]);
 
   // Get player data for specific handedness (useful for comparisons)
-  const getPlayerDataForHandedness = useCallback((playerName, handedness) => {
+  const getPlayerDataForHandedness = useCallback(async (playerName, handedness) => {
     if (!handednessDatasets) return null;
-    return handednessSwingDataService.getPlayerDataByHandedness(
+    return await handednessSwingDataService.getPlayerDataByHandedness(
       handednessDatasets, playerName, handedness
     );
   }, [handednessDatasets]);

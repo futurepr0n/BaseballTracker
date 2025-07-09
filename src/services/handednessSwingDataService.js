@@ -3,6 +3,8 @@
  * Service for loading and processing pitcher handedness-specific swing path data
  */
 
+import { normalizeToEnglish, createAllNameVariants, namesMatch } from '../utils/universalNameNormalizer';
+
 class HandednessSwingDataService {
   constructor() {
     this.cache = new Map();
@@ -173,17 +175,15 @@ class HandednessSwingDataService {
       
       if (handedness === 'ALL') {
         data = await this.getAllHandednessData();
-        return data.find(player => 
-          player.name.toLowerCase().includes(playerName.toLowerCase()) ||
-          playerName.toLowerCase().includes(player.name.toLowerCase())
-        );
       } else {
         data = await this.loadHandednessData(handedness);
-        return data.find(player => 
-          player.name.toLowerCase().includes(playerName.toLowerCase()) ||
-          playerName.toLowerCase().includes(player.name.toLowerCase())
-        );
       }
+      
+      // Use comprehensive name matching with universal name normalizer
+      return data.find(player => {
+        if (!player.name) return false;
+        return namesMatch(playerName, player.name);
+      });
     } catch (error) {
       console.error(`Error getting player data for ${playerName} vs ${handedness}:`, error);
       return null;
@@ -312,6 +312,8 @@ class HandednessSwingDataService {
         this.loadHandednessData('LHP'), 
         this.loadHandednessData('ALL')
       ]);
+      
+      console.log(`🔍 HANDEDNESS: Loaded datasets - RHP: ${rhpData.length}, LHP: ${lhpData.length}, ALL: ${allData.length} players`);
 
       // Create unified dataset structure
       const datasets = {
@@ -332,6 +334,14 @@ class HandednessSwingDataService {
       allData.forEach(player => {
         datasets.ALL.set(player.name.toLowerCase(), player);
       });
+      
+      // Debug: Check if García, Adolis is in the dataset
+      console.log('🔍 HANDEDNESS: Checking for García, Adolis in ALL dataset:');
+      for (const [key, player] of datasets.ALL) {
+        if (key.includes('garcia') || key.includes('garcía')) {
+          console.log(`   Found: key="${key}", name="${player.name}"`);
+        }
+      }
 
       return datasets;
     } catch (error) {
@@ -347,57 +357,154 @@ class HandednessSwingDataService {
   /**
    * Get player data for specific handedness from pre-loaded datasets
    */
-  getPlayerDataByHandedness(datasets, playerName, handedness) {
+  async getPlayerDataByHandedness(datasets, playerName, handedness) {
     if (!datasets || !datasets[handedness]) {
       console.log(`No dataset for ${handedness}`);
       return null;
     }
     
     const dataset = datasets[handedness];
-    const playerKey = playerName.toLowerCase();
+    console.log(`🔍 HANDEDNESS: Looking up ${playerName} in ${handedness} dataset (${dataset.size} players)`);
     
-    // Debug for Cal Raleigh specifically
-    const isCalRaleigh = playerName.toLowerCase().includes('raleigh');
-    if (isCalRaleigh) {
-      console.log(`Looking for Cal Raleigh in ${handedness} data:`, {
-        originalName: playerName,
-        searchKey: playerKey,
-        datasetSize: dataset.size
-      });
+    // Debug: Log what we're searching for
+    console.log(`🔍 HANDEDNESS: Searching for variations of "${playerName}"`);
+    
+    // Special debug for Adolis
+    if (playerName.toLowerCase().includes('adolis')) {
+      console.log(`🔍🔍🔍 SPECIAL DEBUG - Checking dataset for Adolis:`);
+      let foundCount = 0;
+      for (const [key, playerData] of dataset) {
+        if (key.includes('adolis') || playerData.name.toLowerCase().includes('adolis')) {
+          console.log(`   Found in dataset - Key: "${key}", Name: "${playerData.name}"`);
+          foundCount++;
+        }
+      }
+      console.log(`   Total Adolis entries found: ${foundCount}`);
     }
     
-    // Try direct match first
-    let playerData = dataset.get(playerKey);
-    if (playerData) {
-      if (isCalRaleigh) console.log('Found direct match!', playerData);
-      return playerData;
-    }
-    
-    // Try name format conversions
-    // Convert "Cal Raleigh" to "Raleigh, Cal" format
-    const nameParts = playerName.split(' ');
-    if (nameParts.length >= 2) {
-      const lastName = nameParts[nameParts.length - 1];
-      const firstName = nameParts.slice(0, -1).join(' ');
-      const convertedKey = `${lastName}, ${firstName}`.toLowerCase();
-      if (isCalRaleigh) console.log('Trying converted key:', convertedKey);
-      playerData = dataset.get(convertedKey);
-      if (playerData) {
-        if (isCalRaleigh) console.log('Found converted match!', playerData);
+    // First try direct matching with the provided name
+    for (const [key, playerData] of dataset) {
+      if (namesMatch(playerName, playerData.name)) {
+        console.log(`🔍 HANDEDNESS: Found direct match for ${playerName}: ${playerData.name}`);
         return playerData;
       }
     }
     
-    // Try partial matching as last resort
-    for (const [key, data] of dataset) {
-      if (key.includes(playerKey) || playerKey.includes(key)) {
-        if (isCalRaleigh) console.log('Found partial match:', key, data);
-        return data;
+    // If no direct match, try to get full name from roster
+    let fullName = null;
+    try {
+      const rosterResponse = await fetch('/data/rosters.json');
+      if (rosterResponse.ok) {
+        const rosterData = await rosterResponse.json();
+        const playerRoster = rosterData.find(p => {
+          // Try exact match first
+          if (p.name === playerName) return true;
+          
+          // Try fullName match
+          if (p.fullName === playerName) return true;
+          
+          // Try normalized matching for accents
+          const normalizedPlayerName = this.normalizeAccents(playerName.toLowerCase());
+          const normalizedRosterName = this.normalizeAccents(p.name.toLowerCase());
+          const normalizedRosterFullName = this.normalizeAccents(p.fullName?.toLowerCase() || '');
+          
+          return normalizedRosterName === normalizedPlayerName || 
+                 normalizedRosterFullName === normalizedPlayerName;
+        });
+        if (playerRoster && playerRoster.fullName) {
+          fullName = playerRoster.fullName;
+          console.log(`🔍 HANDEDNESS: Found full name in roster for ${playerName}: ${fullName}`);
+        } else {
+          console.log(`🔍 HANDEDNESS: No roster entry found for ${playerName}`);
+        }
+      }
+    } catch (error) {
+      console.log('Could not load roster data for full name lookup');
+    }
+    
+    // Try matching with full name if available
+    if (fullName) {
+      for (const [key, playerData] of dataset) {
+        if (namesMatch(fullName, playerData.name)) {
+          console.log(`🔍 HANDEDNESS: Found full name match for ${fullName}: ${playerData.name}`);
+          return playerData;
+        }
       }
     }
     
-    if (isCalRaleigh) console.log('No match found for Cal Raleigh');
+    // Fallback to bulletproof name matching for accented characters
+    for (const [key, playerData] of dataset) {
+      const normalizedSearch = this.normalizeAccents(playerName.toLowerCase());
+      const normalizedData = this.normalizeAccents(playerData.name.toLowerCase());
+      
+      if (this.nameVariantsMatch(normalizedSearch, normalizedData)) {
+        console.log(`🔍 Found fallback match for ${playerName}: ${playerData.name}`);
+        return playerData;
+      }
+      
+      // Also try with full name if available
+      if (fullName) {
+        const normalizedFullName = this.normalizeAccents(fullName.toLowerCase());
+        if (this.nameVariantsMatch(normalizedFullName, normalizedData)) {
+          console.log(`🔍 Found fallback full name match for ${fullName}: ${playerData.name}`);
+          return playerData;
+        }
+      }
+    }
+    
+    console.log(`🔍 HANDEDNESS: No match found for ${playerName}${fullName ? ` (${fullName})` : ''}`);
     return null;
+  }
+
+  /**
+   * Normalize accented characters to plain English
+   */
+  normalizeAccents(str) {
+    const accentMap = {
+      // Lowercase accented characters
+      'á': 'a', 'à': 'a', 'ä': 'a', 'â': 'a', 'ā': 'a', 'ą': 'a', 'å': 'a', 'ã': 'a',
+      'é': 'e', 'è': 'e', 'ë': 'e', 'ê': 'e', 'ē': 'e', 'ę': 'e',
+      'í': 'i', 'ì': 'i', 'ï': 'i', 'î': 'i', 'ī': 'i', 'į': 'i',
+      'ó': 'o', 'ò': 'o', 'ö': 'o', 'ô': 'o', 'ō': 'o', 'ø': 'o', 'õ': 'o',
+      'ú': 'u', 'ù': 'u', 'ü': 'u', 'û': 'u', 'ū': 'u', 'ų': 'u',
+      'ñ': 'n', 'ń': 'n', 'ç': 'c', 'č': 'c', 'ć': 'c',
+      
+      // Uppercase accented characters  
+      'Á': 'A', 'À': 'A', 'Ä': 'A', 'Â': 'A', 'Ā': 'A', 'Ą': 'A', 'Å': 'A', 'Ã': 'A',
+      'É': 'E', 'È': 'E', 'Ë': 'E', 'Ê': 'E', 'Ē': 'E', 'Ę': 'E',
+      'Í': 'I', 'Ì': 'I', 'Ï': 'I', 'Î': 'I', 'Ī': 'I', 'Į': 'I',
+      'Ó': 'O', 'Ò': 'O', 'Ö': 'O', 'Ô': 'O', 'Ō': 'O', 'Ø': 'O', 'Õ': 'O',
+      'Ú': 'U', 'Ù': 'U', 'Ü': 'U', 'Û': 'U', 'Ū': 'U', 'Ų': 'U',
+      'Ñ': 'N', 'Ń': 'N', 'Ç': 'C', 'Č': 'C', 'Ć': 'C'
+    };
+    
+    return str.split('').map(char => accentMap[char] || char).join('');
+  }
+
+  /**
+   * Check if name variants match (handles "Jose Ramirez" vs "Ramirez, Jose")
+   */
+  nameVariantsMatch(search, data) {
+    // Direct match
+    if (search === data) return true;
+    
+    // Handle "Lastname, Firstname" format conversion
+    if (data.includes(',')) {
+      const parts = data.split(', ');
+      if (parts.length === 2) {
+        const dataForward = `${parts[1]} ${parts[0]}`;  // "jose ramirez"
+        if (search === dataForward) return true;
+      }
+    }
+    
+    // Handle "Firstname Lastname" to "Lastname, Firstname" conversion
+    const searchParts = search.split(' ');
+    if (searchParts.length === 2) {
+      const searchReversed = `${searchParts[1]}, ${searchParts[0]}`;  // "ramirez, jose"
+      if (searchReversed === data) return true;
+    }
+    
+    return false;
   }
 
   /**
