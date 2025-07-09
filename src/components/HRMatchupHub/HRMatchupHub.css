@@ -1,36 +1,39 @@
-/* HR Matchup Hub - Professional Dark Theme */
+/* HR Matchup Hub - Dashboard Light Theme */
 .hr-matchup-hub {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f0f 100%);
-  color: #ffffff;
+  background: #f5f5f7;
+  color: #333;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 /* Hub Header */
 .hub-header {
-  background: rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
+  background: rgba(230, 57, 70, 0.05);
+  border: 1px solid rgba(230, 57, 70, 0.2);
+  border-left: 4px solid #e63946;
+  border-radius: 12px;
+  backdrop-filter: blur(35px) !important;
+  -webkit-backdrop-filter: blur(35px) !important;
   padding: 2rem 1.5rem 1rem;
   position: sticky;
   top: 0;
   z-index: 100;
+  margin: 1rem;
+  box-shadow: 
+    0 8px 32px rgba(230, 57, 70, 0.08),
+    0 2px 8px rgba(230, 57, 70, 0.03);
 }
 
 .header-content h1 {
   font-size: 2.5rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
-  background: linear-gradient(45deg, #ff6b35, #f7931e, #ffd700);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #333;
 }
 
 .subtitle {
   font-size: 1.1rem;
-  color: #b0b8c4;
+  color: #666;
   margin: 0 0 1.5rem 0;
   font-weight: 300;
 }
@@ -43,9 +46,9 @@
 }
 
 .tab-button {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #b0b8c4;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(230, 57, 70, 0.2);
+  color: #666;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   font-weight: 500;
@@ -53,20 +56,24 @@
   cursor: pointer;
   backdrop-filter: blur(5px) !important;
   -webkit-backdrop-filter: blur(5px) !important;
+  box-shadow: 0 2px 4px rgba(230, 57, 70, 0.05);
 }
 
 .tab-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background: rgba(230, 57, 70, 0.08);
+  color: #333;
   transform: translateY(-1px);
+  border-color: rgba(230, 57, 70, 0.25);
+  box-shadow: 0 4px 8px rgba(230, 57, 70, 0.1);
 }
 
 .tab-button.active {
-  background: linear-gradient(45deg, #ff6b35, #f7931e);
-  border-color: #f7931e;
-  color: #ffffff;
+  background: rgba(230, 57, 70, 0.15);
+  border-color: #e63946;
+  color: #333;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(247, 147, 30, 0.3);
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.2);
+  transform: translateY(-1px);
 }
 
 /* Hub Content */
@@ -95,14 +102,14 @@
 
 .progress-phase {
   font-size: 1.1rem;
-  color: #ffd700;
+  color: #e63946;
   margin: 0.5rem 0;
   font-weight: 500;
 }
 
 .progress-details {
   font-size: 0.95rem;
-  color: #b0b8c4;
+  color: #666;
   margin: 0.25rem 0;
 }
 
@@ -115,8 +122,8 @@
 .progress-bar {
   width: 100%;
   height: 24px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(230, 57, 70, 0.1);
+  border: 1px solid rgba(230, 57, 70, 0.2);
   border-radius: 12px;
   overflow: hidden;
   position: relative;
@@ -124,10 +131,10 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(45deg, #ff6b35, #f7931e);
+  background: linear-gradient(45deg, #e63946, #dc2626);
   transition: width 0.3s ease;
   position: relative;
-  box-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+  box-shadow: 0 0 10px rgba(230, 57, 70, 0.3);
 }
 
 .progress-fill::after {
@@ -156,12 +163,12 @@
   justify-content: space-between;
   margin-top: 0.5rem;
   font-size: 0.9rem;
-  color: #b0b8c4;
+  color: #666;
 }
 
 .progress-note {
   font-size: 0.95rem;
-  color: #8892a0;
+  color: #666;
   margin-top: 1rem;
   max-width: 600px;
   line-height: 1.5;
@@ -170,8 +177,8 @@
 .loading-spinner {
   width: 50px;
   height: 50px;
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top: 3px solid #f7931e;
+  border: 3px solid rgba(230, 57, 70, 0.1);
+  border-top: 3px solid #e63946;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1.5rem;
@@ -184,12 +191,12 @@
 
 .error-container h2,
 .no-data-container h2 {
-  color: #ff6b35;
+  color: #e63946;
   margin-bottom: 1rem;
 }
 
 .retry-button {
-  background: linear-gradient(45deg, #ff6b35, #f7931e);
+  background: linear-gradient(45deg, #e63946, #dc2626);
   border: none;
   color: white;
   padding: 0.75rem 1.5rem;
@@ -202,7 +209,7 @@
 
 .retry-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(247, 147, 30, 0.4);
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.4);
 }
 
 /* Overview Tab */
@@ -213,11 +220,17 @@
 }
 
 .analysis-summary {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(230, 57, 70, 0.05);
+  border: 1px solid rgba(230, 57, 70, 0.2);
+  border-left: 4px solid #e63946;
   border-radius: 12px;
   padding: 1.5rem;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  margin: 1rem;
+  box-shadow: 
+    0 8px 32px rgba(230, 57, 70, 0.08),
+    0 2px 8px rgba(230, 57, 70, 0.03);
 }
 
 .summary-header {
@@ -227,7 +240,7 @@
 .summary-header h3 {
   font-size: 1.5rem;
   margin: 0 0 1rem 0;
-  color: #ffffff;
+  color: #333;
 }
 
 .summary-stats {
@@ -237,23 +250,27 @@
 }
 
 .stat-box {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(230, 57, 70, 0.12);
   border-radius: 8px;
   padding: 1rem;
   text-align: center;
   transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .stat-box:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.25);
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.08);
+  border-color: rgba(230, 57, 70, 0.2);
 }
 
 .stat-label {
   display: block;
   font-size: 0.85rem;
-  color: #b0b8c4;
+  color: #666;
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -263,7 +280,7 @@
   display: block;
   font-size: 1.8rem;
   font-weight: 700;
-  color: #ffffff;
+  color: #333;
 }
 
 .stat-value.risk {
@@ -280,7 +297,7 @@
 .risk-warnings h4 {
   font-size: 1.2rem;
   margin: 0 0 1rem 0;
-  color: #ffffff;
+  color: #333;
 }
 
 .opportunity-list,
@@ -294,8 +311,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(230, 57, 70, 0.15);
   border-radius: 8px;
   padding: 1rem;
   transition: all 0.3s ease;
@@ -303,8 +320,9 @@
 
 .opportunity-item:hover,
 .warning-item:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.35);
   transform: translateX(4px);
+  border-color: rgba(230, 57, 70, 0.25);
 }
 
 .opportunity-info,
@@ -316,19 +334,19 @@
 
 .player-name {
   font-weight: 600;
-  color: #ffffff;
+  color: #333;
 }
 
 /* Specific styling for opportunity and warning player names */
 .opportunity-item .player-name,
 .warning-item .player-name {
-  color: #ffffff !important;
+  color: #333 !important;
   font-weight: 600;
 }
 
 .team-badge {
-  background: #f7931e;
-  color: #000000;
+  background: #e63946;
+  color: #ffffff;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -349,7 +367,7 @@
 .reason,
 .warning-reason {
   font-size: 0.85rem;
-  color: #b0b8c4;
+  color: #666;
 }
 
 /* Games Grid */
@@ -372,11 +390,17 @@
 
 /* Analysis Tab */
 .analysis-tab {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(230, 57, 70, 0.05);
+  border: 1px solid rgba(230, 57, 70, 0.2);
+  border-left: 4px solid #e63946;
   border-radius: 12px;
   padding: 1.5rem;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  margin: 1rem;
+  box-shadow: 
+    0 8px 32px rgba(230, 57, 70, 0.08),
+    0 2px 8px rgba(230, 57, 70, 0.03);
 }
 
 .game-header {
@@ -391,7 +415,7 @@
 .game-header h3 {
   font-size: 1.5rem;
   margin: 0;
-  color: #ffffff;
+  color: #333;
 }
 
 .game-meta {
@@ -444,8 +468,11 @@
   gap: 2rem;
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 8px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(230, 57, 70, 0.15);
 }
 
 .filter-controls,
@@ -457,14 +484,14 @@
 
 .analysis-controls label {
   font-weight: 500;
-  color: #b0b8c4;
+  color: #666;
   white-space: nowrap;
 }
 
 .analysis-controls select {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(230, 57, 70, 0.2);
+  color: #333;
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
   font-size: 0.9rem;
@@ -472,15 +499,15 @@
 
 .analysis-controls select:focus {
   outline: none;
-  border-color: #f7931e;
-  box-shadow: 0 0 0 2px rgba(247, 147, 30, 0.2);
+  border-color: #e63946;
+  box-shadow: 0 0 0 2px rgba(230, 57, 70, 0.2);
 }
 
 /* No Game Selected */
 .no-game-selected {
   text-align: center;
   padding: 3rem;
-  color: #b0b8c4;
+  color: #666;
 }
 
 .no-game-selected p {
@@ -489,17 +516,22 @@
 
 /* Venue Tab */
 .venue-tab {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(230, 57, 70, 0.05);
+  border: 1px solid rgba(230, 57, 70, 0.2);
+  border-left: 4px solid #e63946;
   border-radius: 12px;
   padding: 1.5rem;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  box-shadow: 
+    0 8px 32px rgba(230, 57, 70, 0.08),
+    0 2px 8px rgba(230, 57, 70, 0.03);
 }
 
 .venue-insights h3 {
   font-size: 1.5rem;
   margin: 0 0 1.5rem 0;
-  color: #ffffff;
+  color: #333;
 }
 
 .venue-insights-grid {
@@ -509,23 +541,24 @@
 }
 
 .venue-insight-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(230, 57, 70, 0.12);
   border-radius: 8px;
   padding: 1.5rem;
   transition: all 0.3s ease;
 }
 
 .venue-insight-card:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.35);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.08);
+  border-color: rgba(230, 57, 70, 0.2);
 }
 
 .venue-insight-card h4 {
   font-size: 1.2rem;
   margin: 0 0 1rem 0;
-  color: #f7931e;
+  color: #e63946;
 }
 
 .insight-stat {
@@ -535,19 +568,19 @@
 }
 
 .insight-stat .label {
-  color: #b0b8c4;
+  color: #666;
   font-size: 0.9rem;
 }
 
 .insight-stat .value {
-  color: #ffffff;
+  color: #333;
   font-weight: 500;
 }
 
 .insight-recommendations h5 {
   font-size: 1rem;
   margin: 1rem 0 0.5rem 0;
-  color: #ffffff;
+  color: #333;
 }
 
 .insight-recommendations ul {
@@ -558,7 +591,7 @@
 
 .insight-recommendations li {
   padding: 0.25rem 0;
-  color: #b0b8c4;
+  color: #666;
   font-size: 0.9rem;
   position: relative;
   padding-left: 1rem;
@@ -566,7 +599,7 @@
 
 .insight-recommendations li::before {
   content: '•';
-  color: #f7931e;
+  color: #e63946;
   font-weight: bold;
   position: absolute;
   left: 0;

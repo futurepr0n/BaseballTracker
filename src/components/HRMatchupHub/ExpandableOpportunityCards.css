@@ -11,7 +11,7 @@
 .cards-title {
   font-size: 1.4rem;
   font-weight: 600;
-  color: #ffffff;
+  color: #333;
   margin-bottom: 16px;
   text-align: center;
 }
@@ -24,22 +24,25 @@
 }
 
 .opportunity-card {
-  background: linear-gradient(145deg, #2a2a2a 0%, #1f1f1f 100%);
-  border: 1px solid #333;
+  background: rgba(255, 235, 238, 0.4);
+  border: 1px solid rgba(230, 57, 70, 0.12);
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(230, 57, 70, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .opportunity-card:hover {
-  border-color: #4a9eff;
-  box-shadow: 0 4px 16px rgba(74, 158, 255, 0.2);
+  border-color: #e63946;
+  box-shadow: 0 4px 16px rgba(230, 57, 70, 0.15);
+  background: rgba(255, 235, 238, 0.6);
 }
 
 .opportunity-card.expanded {
-  border-color: #4a9eff;
-  box-shadow: 0 6px 20px rgba(74, 158, 255, 0.3);
+  border-color: #e63946;
+  box-shadow: 0 6px 20px rgba(230, 57, 70, 0.2);
 }
 
 .card-header {
@@ -52,7 +55,7 @@
 }
 
 .card-header:hover {
-  background-color: rgba(74, 158, 255, 0.1);
+  background-color: rgba(230, 57, 70, 0.08);
 }
 
 .player-info {
@@ -65,19 +68,19 @@
 .expandable-cards-container .opportunity-card div.player-name {
   font-size: 1.1rem !important;
   font-weight: 600 !important;
-  color: #ffffff !important;
+  color: #333 !important;
   margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+  text-shadow: none !important;
   background: transparent !important;
 }
 
 /* Fallback for any missed player names */
 .player-name {
-  color: #ffffff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  color: #333 !important;
+  text-shadow: none;
 }
 
 /* Force visibility for all text in opportunity cards */
@@ -93,18 +96,18 @@
   display: flex;
   gap: 8px;
   font-size: 0.85rem;
-  color: #b0b0b0 !important;
+  color: #666 !important;
 }
 
 .expandable-cards-container .opportunity-card .team {
   font-weight: 500;
-  color: #4a9eff !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  color: #e63946 !important;
+  text-shadow: none;
 }
 
 .expandable-cards-container .opportunity-card .venue {
-  color: #cccccc !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  color: #666 !important;
+  text-shadow: none;
 }
 
 .card-scores {
@@ -124,13 +127,13 @@
 .score-value {
   font-size: 1.3rem;
   font-weight: 700;
-  color: #4a9eff;
+  color: #e63946;
   line-height: 1;
 }
 
 .score-label {
   font-size: 0.7rem;
-  color: #888;
+  color: #666;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -146,7 +149,7 @@
 
 .expand-indicator {
   font-size: 1.2rem;
-  color: #4a9eff;
+  color: #e63946;
   margin-left: 8px;
   transition: transform 0.3s ease;
   user-select: none;
@@ -157,12 +160,17 @@
 }
 
 .card-content {
-  border-top: 1px solid #333;
-  background-color: #1a1a1a;
+  border-top: 1px solid rgba(230, 57, 70, 0.12);
+  background-color: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .insights-tabs {
   padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .tab-content {
@@ -178,7 +186,7 @@
 .section-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #ffffff;
+  color: #333;
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -216,9 +224,9 @@
 }
 
 .reason-badge.low {
-  background: rgba(74, 158, 255, 0.2);
-  color: #4a9eff;
-  border: 1px solid rgba(74, 158, 255, 0.3);
+  background: rgba(230, 57, 70, 0.2);
+  color: #e63946;
+  border: 1px solid rgba(230, 57, 70, 0.3);
 }
 
 .reason-icon {
@@ -263,7 +271,7 @@
 
 .achievement-stats {
   font-size: 0.8rem;
-  color: #b0b0b0;
+  color: #666;
 }
 
 /* Streaks Grid */
@@ -299,7 +307,7 @@
 
 .streak-probability {
   font-size: 0.8rem;
-  color: #b0b0b0;
+  color: #666;
 }
 
 /* Venue Grid */
@@ -335,7 +343,7 @@
 
 .venue-stats {
   font-size: 0.8rem;
-  color: #b0b0b0;
+  color: #666;
 }
 
 /* Form Grid */
@@ -351,8 +359,8 @@
   align-items: center;
   gap: 10px;
   padding: 10px;
-  background: rgba(74, 158, 255, 0.1);
-  border: 1px solid rgba(74, 158, 255, 0.2);
+  background: rgba(230, 57, 70, 0.1);
+  border: 1px solid rgba(230, 57, 70, 0.2);
   border-radius: 8px;
 }
 
@@ -366,13 +374,13 @@
 
 .form-label {
   font-weight: 600;
-  color: #4a9eff;
+  color: #e63946;
   margin-bottom: 2px;
 }
 
 .form-stats {
   font-size: 0.8rem;
-  color: #b0b0b0;
+  color: #666;
 }
 
 .momentum-indicator {
@@ -380,13 +388,13 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 6px;
 }
 
 .momentum-label {
   font-size: 0.85rem;
-  color: #b0b0b0;
+  color: #666;
 }
 
 .momentum-value {
@@ -419,14 +427,14 @@
 
 .current-position {
   font-weight: 600;
-  color: #4a9eff;
+  color: #e63946;
   padding: 8px 12px;
-  background: rgba(74, 158, 255, 0.1);
+  background: rgba(230, 57, 70, 0.1);
   border-radius: 6px;
 }
 
 .home-away {
-  color: #b0b0b0;
+  color: #666;
   font-weight: normal;
 }
 
@@ -463,7 +471,7 @@
 
 .pattern-description {
   font-size: 0.85rem;
-  color: #b0b0b0;
+  color: #666;
 }
 
 .series-insights {
@@ -491,8 +499,8 @@
 }
 
 .insight-item.medium {
-  background: rgba(74, 158, 255, 0.1);
-  border: 1px solid rgba(74, 158, 255, 0.2);
+  background: rgba(230, 57, 70, 0.1);
+  border: 1px solid rgba(230, 57, 70, 0.2);
 }
 
 .insight-icon {
@@ -506,13 +514,13 @@
 
 .insight-title {
   font-weight: 600;
-  color: #ffffff;
+  color: #333;
   margin-bottom: 2px;
 }
 
 .insight-description {
   font-size: 0.85rem;
-  color: #b0b0b0;
+  color: #666;
 }
 
 /* Team Context */
@@ -549,7 +557,7 @@
 .no-opportunities {
   text-align: center;
   padding: 40px 20px;
-  color: #b0b0b0;
+  color: #666;
   font-style: italic;
 }
 
@@ -573,7 +581,7 @@
 }
 
 .api-help ol {
-  color: #ffffff;
+  color: #333;
   margin-left: 20px;
 }
 
@@ -582,17 +590,17 @@
 }
 
 .api-help code {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(230, 57, 70, 0.1);
   padding: 2px 6px;
   border-radius: 4px;
   font-family: monospace;
-  color: #4a9eff;
+  color: #e63946;
 }
 
 .loading-context {
   padding: 16px;
   text-align: center;
-  color: #b0b0b0;
+  color: #666;
   font-style: italic;
 }
 
@@ -611,13 +619,13 @@
   margin-top: 16px;
   text-align: center;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 8px;
 }
 
 .summary-text {
   font-size: 0.8rem;
-  color: #b0b0b0;
+  color: #666;
 }
 
 /* Mobile Responsiveness */
@@ -638,8 +646,8 @@
   .expandable-cards-container .opportunity-card .player-name,
   .player-name {
     font-size: 1rem;
-    color: #ffffff !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    color: #333 !important;
+    text-shadow: none;
   }
   
   .card-scores {

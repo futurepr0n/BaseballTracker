@@ -30,6 +30,7 @@ import {
 import PinheadsPlayhouse from './components/PinheadsPlayhouse/PinheadsPlayhouse';
 import HRMatchupHub from './components/HRMatchupHub/HRMatchupHub';
 import CSSFixesTest from './components/test/CSSFixesTest';
+import HandednessTest from './components/test/HandednessTest';
 
 import './styles/theme-variables.css'; // Import theme variables FIRST
 import './App.css';
@@ -196,6 +197,7 @@ function App() {
                 />} />
 
               <Route path="/css-test" element={<CSSFixesTest />} />
+              <Route path="/handedness-test" element={<HandednessTest />} />
 
             </Routes>
           </TeamFilterProvider>

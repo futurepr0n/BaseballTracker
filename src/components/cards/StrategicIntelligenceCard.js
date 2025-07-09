@@ -151,19 +151,9 @@ const StrategicIntelligenceCard = ({ currentDate, playerData, gameData, teamData
       }
     }
     
-    // Try partial name matching (last name only)
-    const lastName = playerName.split(' ').pop();
-    if (lastName && lastName.length > 3) {
-      player = playerDataArray.find(p => {
-        const pName = p.name || p.Name || '';
-        return pName.toLowerCase().includes(lastName.toLowerCase());
-      });
-      
-      if (player) {
-        console.log(`🎯 Partial match ${playerName} -> ${player.name || player.Name} (by last name)`);
-        return player;
-      }
-    }
+    // REMOVED: Dangerous partial matching by last name only
+    // This was incorrectly matching "Jose Ramirez" to "A. Ramirez"
+    // TODO: Implement proper universal name normalizer matching if needed
     
     console.log(`🎯 No player match found for: ${playerName} (${team})`);
     return null;
