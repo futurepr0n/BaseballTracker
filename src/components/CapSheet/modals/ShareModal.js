@@ -142,6 +142,25 @@ const ShareModal = ({ show, onClose, shareResult, isGenerating }) => {
                     ⚠️ {copyError}
                   </div>
                 )}
+                
+                {/* Show URL shortening info */}
+                {shareResult.tinyUrl && (
+                  <div className="url-shortening-info">
+                    <span className="info-icon">✨</span>
+                    <span className="info-text">
+                      URL shortened with TinyURL ({shareResult.fullUrl?.length || 2400}+ chars → {shareResult.url.length} chars)
+                    </span>
+                  </div>
+                )}
+                
+                {shareResult.method === 'base64' && !shareResult.tinyUrl && (
+                  <div className="url-warning">
+                    <span className="warning-icon">⚠️</span>
+                    <span className="warning-text">
+                      URL may be too long for some messaging apps
+                    </span>
+                  </div>
+                )}
               </div>
               
               <div className="share-options">

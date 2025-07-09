@@ -227,6 +227,50 @@
   font-weight: 500;
 }
 
+/* TinyURL Shortening Information */
+.url-shortening-info {
+  background: #f0f9ff;
+  color: #1e40af;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+  font-size: 13px;
+  border: 1px solid #bfdbfe;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.url-shortening-info .info-icon {
+  flex-shrink: 0;
+}
+
+.url-shortening-info .info-text {
+  font-weight: 500;
+}
+
+/* URL Warning for Long URLs */
+.url-warning {
+  background: #fffbeb;
+  color: #d97706;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+  font-size: 13px;
+  border: 1px solid #fed7aa;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.url-warning .warning-icon {
+  flex-shrink: 0;
+}
+
+.url-warning .warning-text {
+  font-weight: 500;
+}
+
 /* Share Options */
 .share-options {
   margin-bottom: 24px;
