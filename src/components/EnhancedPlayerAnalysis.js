@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { fetchPlayerData, fetchPlayerDataForDateRange, fetchFullSeasonPlayerData } from '../services/dataService';
 import { 
   calculatePropAnalysis, 
@@ -34,6 +35,8 @@ import './EnhancedPlayerAnalysis.css';
  * - Team context and splits
  */
 const EnhancedPlayerAnalysis = ({ currentDate }) => {
+  const location = useLocation();
+  
   // Core state
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [playerHistory, setPlayerHistory] = useState([]);
@@ -263,6 +266,21 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
     }
   }, [currentDate]);
 
+  // Handle navigation from search bar
+  useEffect(() => {
+    if (location.state?.selectedPlayer && location.state?.selectedTeam) {
+      // Create player object from navigation state
+      const navigatedPlayer = {
+        name: location.state.selectedPlayer,
+        team: location.state.selectedTeam
+      };
+      setSelectedPlayer(navigatedPlayer);
+      
+      // Clear the location state to prevent re-selection on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
+  
   // Load comprehensive player data when player is selected
   useEffect(() => {
     if (selectedPlayer) {

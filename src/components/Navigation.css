@@ -37,33 +37,7 @@
     color: white;
   }
   
-  /* Search input */
-  .nav-search {
-    display: flex;
-    align-items: center;
-  }
-  
-  .nav-search input {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px 0 0 4px;
-    font-size: 0.9rem;
-    min-width: 200px;
-  }
-  
-  .search-button {
-    background-color: #0056b3;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 0 4px 4px 0;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  
-  .search-button:hover {
-    background-color: #004494;
-  }
+  /* Search component moved to NavigationPlayerSearch */
   
   /* Mobile menu toggle */
   .menu-toggle {
@@ -122,16 +96,7 @@
       display: flex;
     }
     
-    .nav-search {
-      flex-grow: 1;
-      order: 2;
-      margin-left: 15px;
-    }
-    
-    .nav-search input {
-      min-width: 0;
-      flex-grow: 1;
-    }
+    /* NavigationPlayerSearch handles its own responsive styling */
     
     .nav-item a {
       padding: 12px 15px;

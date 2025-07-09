@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import NavigationPlayerSearch from './NavigationPlayerSearch';
 import './Navigation.css';
 
 /**
@@ -60,16 +61,7 @@ function Navigation() {
       </ul>
       
       {/* Search input */}
-      <div className="nav-search">
-        <input 
-          type="text"
-          placeholder="Search players..."
-          aria-label="Search players"
-        />
-        <button className="search-button" aria-label="Submit search">
-          🔍
-        </button>
-      </div>
+      <NavigationPlayerSearch />
     </nav>
   );
 }
