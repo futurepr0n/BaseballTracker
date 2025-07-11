@@ -3,7 +3,7 @@
  * Analyzes travel patterns, fatigue, and performance impacts
  */
 
-import { fetchPlayerDataForDateRange, convertDataMapToArray } from './dataService';
+import { fetchPlayerDataForDateRange, convertDataMapToArray } from './dataService.js';
 
 class TravelImpactAnalyzer {
   constructor() {

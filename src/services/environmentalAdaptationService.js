@@ -3,8 +3,8 @@
  * Analyzes player performance across different climate and environmental conditions
  */
 
-import { fetchPlayerDataForDateRange, convertDataMapToArray } from './dataService';
-import { getSeasonSafeDateRange, formatDateRangeDescription } from '../utils/seasonDateUtils';
+import { fetchPlayerDataForDateRange, convertDataMapToArray } from './dataService.js';
+import { getSeasonSafeDateRange, formatDateRangeDescription } from '../utils/seasonDateUtils.js';
 
 class EnvironmentalAdaptationService {
   constructor() {

@@ -41,7 +41,7 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
 
   const formatAdjustment = (value) => {
     if (value === 0) return '0';
-    return value > 0 ? `+${value.toFixed(1)}` : value.toFixed(1);
+    return value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
   };
 
   const handleRowClick = (playerName) => {
@@ -66,13 +66,13 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
             <span className="mobile-position">{player.isHome ? 'HOME' : 'AWAY'}</span>
           </div>
         </div>
-        <div className="mobile-total-score">{parseFloat(player.comprehensiveScore.totalScore).toFixed(1)}</div>
+        <div className="mobile-total-score">{parseFloat(player.comprehensiveScore.totalScore).toFixed(2)}</div>
       </div>
 
       <div className="mobile-card-content">
         <div className="mobile-stat">
           <div className="mobile-stat-label">Base Score</div>
-          <div className="mobile-stat-value neutral">{player.comprehensiveScore.baseScore.toFixed(1)}</div>
+          <div className="mobile-stat-value neutral">{player.comprehensiveScore.baseScore.toFixed(2)}</div>
         </div>
         <div className="mobile-stat">
           <div className="mobile-stat-label">Venue</div>
@@ -149,7 +149,7 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
             <div className="factor-list">
               <div className="factor-item">
                 <span className="factor-label">Base Performance:</span>
-                <span className="factor-value">{factorBreakdown.basePerformance.score.toFixed(1)}</span>
+                <span className="factor-value">{factorBreakdown.basePerformance.score.toFixed(2)}</span>
                 <span className="factor-desc">{factorBreakdown.basePerformance.description}</span>
               </div>
               
@@ -281,6 +281,15 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
           {/* Travel Analysis */}
           <div className="detail-section">
             <h4>Travel Impact</h4>
+            {console.log('🔍 TRAVEL DEBUG:', { 
+              playerName: player.playerName, 
+              team: player.team, 
+              isHome: player.isHome,
+              travelAnalysis,
+              hasPerformanceImpact: travelAnalysis?.performanceImpact,
+              travelType: travelAnalysis?.travelType,
+              distance: travelAnalysis?.travelDistance
+            })}
             {travelAnalysis && travelAnalysis.performanceImpact ? (
               <div className="travel-details">
                 <div className="travel-stat">
@@ -521,10 +530,10 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
                     <span className="team-badge">{player.team}</span>
                   </td>
                   <td className="score-cell">
-                    <span className="total-score">{parseFloat(player.comprehensiveScore.totalScore).toFixed(1)}</span>
+                    <span className="total-score">{parseFloat(player.comprehensiveScore.totalScore).toFixed(2)}</span>
                   </td>
                   <td className="base-cell">
-                    <span className="base-score">{player.comprehensiveScore.baseScore.toFixed(1)}</span>
+                    <span className="base-score">{player.comprehensiveScore.baseScore.toFixed(2)}</span>
                   </td>
                   <td className="venue-cell">
                     <span className={`adjustment ${(player.comprehensiveScore.adjustments.venue || 0) >= 0 ? 'positive' : 'negative'}`}>

@@ -3,8 +3,8 @@
  * Real travel analysis using stadium coordinates and previous game data
  */
 
-import { STADIUM_COORDINATES } from './stadiumCoordinates';
-import { fetchGameData } from './dataService';
+import { STADIUM_COORDINATES, TEAM_TO_STADIUM } from './stadiumCoordinates.js';
+import { fetchGameData } from './dataService.js';
 
 class EnhancedTravelService {
   constructor() {
@@ -14,29 +14,36 @@ class EnhancedTravelService {
 
   /**
    * Analyze real travel impact using coordinates and game history
+   * @param {string} team - The team code (e.g., 'ATL')
+   * @param {Date} currentDate - The date of the current game
+   * @param {string} currentVenue - The venue where the game is being played today
    */
-  async analyzeRealTravelImpact(team, currentDate, venue) {
+  async analyzeRealTravelImpact(team, currentDate, currentVenue) {
+    console.log(`🛫 TRAVEL SERVICE: Analyzing ${team} travel to ${currentVenue}`);
+    console.log(`🛫 PARAMS: team="${team}", date="${currentDate.toISOString().split('T')[0]}", venue="${currentVenue}"`);
+    
     const cacheKey = `travel_${team}_${currentDate.toISOString().split('T')[0]}`;
     
     if (this.cache.has(cacheKey)) {
       const cached = this.cache.get(cacheKey);
       if (Date.now() - cached.timestamp < this.cacheTimeout) {
+        console.log(`🛫 TRAVEL SERVICE: Using cached data for ${team}`);
         return cached.data;
       }
     }
 
     try {
-      // Get yesterday's game location
-      const yesterday = new Date(currentDate);
-      yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayData = await this.getYesterdayGameLocation(team, yesterday);
+      const previousGameData = await this.getPreviousGameLocation(team, currentDate);
       
-      if (!yesterdayData) {
+      if (!previousGameData) {
+        console.log(`🛫 TRAVEL SERVICE: No previous game found for ${team}, returning no travel data`);
         return this.getNoTravelData();
       }
+      
+      console.log(`🛫 TRAVEL SERVICE: Found previous game for ${team} at ${previousGameData.venue}`);
 
       // Calculate real travel impact
-      const travelAnalysis = this.calculateRealTravelData(yesterdayData.venue, venue, yesterdayData);
+      const travelAnalysis = this.calculateRealTravelData(previousGameData.venue, currentVenue, previousGameData);
       
       this.cache.set(cacheKey, {
         data: travelAnalysis,
@@ -51,36 +58,58 @@ class EnhancedTravelService {
   }
 
   /**
-   * Get yesterday's game location from JSON file
+   * Get previous game location from JSON files (looks back up to 5 days)
    */
-  async getYesterdayGameLocation(team, yesterdayDate) {
-    try {
-      const dateStr = yesterdayDate.toISOString().split('T')[0];
-      const [year, month, day] = dateStr.split('-');
-      const monthNames = ['january', 'february', 'march', 'april', 'may', 'june',
-                         'july', 'august', 'september', 'october', 'november', 'december'];
-      const monthName = monthNames[parseInt(month) - 1];
-      
-      const gameData = await fetchGameData(dateStr);
-      if (!gameData || !gameData.games) return null;
+  async getPreviousGameLocation(team, currentDate) {
+    console.log(`🛫 LOOKUP: Searching for ${team} previous games from ${currentDate.toISOString().split('T')[0]}`);
+    
+    // Look back up to 5 days to find the previous game
+    for (let daysBack = 1; daysBack <= 5; daysBack++) {
+      try {
+        const checkDate = new Date(currentDate);
+        checkDate.setDate(checkDate.getDate() - daysBack);
+        const dateStr = checkDate.toISOString().split('T')[0];
+        
+        console.log(`🛫 CHECKING: ${dateStr} (${daysBack} days back)`);
+        
+        const games = await fetchGameData(dateStr);
+        console.log(`🛫 DATA: ${dateStr} - Found ${games?.length || 0} games`);
+        
+        if (!games || !Array.isArray(games) || games.length === 0) {
+          console.log(`🛫 SKIP: ${dateStr} - No game data`);
+          continue;
+        }
 
-      // Find team's game yesterday
-      const teamGame = gameData.games.find(game => 
-        game.homeTeam === team || game.awayTeam === team
-      );
+        // Find team's game on this date
+        console.log(`🛫 GAMES: ${dateStr} - Games found:`, games.map(g => `${g.awayTeam} @ ${g.homeTeam}`));
+        
+        const teamGame = games.find(game => 
+          game.homeTeam === team || game.awayTeam === team
+        );
 
-      if (!teamGame) return null;
+        console.log(`🛫 SEARCH: Looking for ${team} in games, found:`, teamGame ? `${teamGame.awayTeam} @ ${teamGame.homeTeam}` : 'NONE');
 
-      return {
-        venue: teamGame.venue,
-        isHome: teamGame.homeTeam === team,
-        opponent: teamGame.homeTeam === team ? teamGame.awayTeam : teamGame.homeTeam,
-        gameDate: dateStr
-      };
-    } catch (error) {
-      console.warn('Could not load yesterday game data:', error);
-      return null;
+        if (teamGame) {
+          // If venue is not specified or is a team code, use the home team's stadium
+          let gameVenue = teamGame.venue;
+          if (!gameVenue || gameVenue.length === 3) {
+            gameVenue = TEAM_TO_STADIUM[teamGame.homeTeam] || teamGame.homeTeam;
+          }
+          
+          return {
+            venue: gameVenue,
+            isHome: teamGame.homeTeam === team,
+            opponent: teamGame.homeTeam === team ? teamGame.awayTeam : teamGame.homeTeam,
+            gameDate: dateStr,
+            daysAgo: daysBack
+          };
+        }
+      } catch (error) {
+        console.warn(`   Error loading data for day ${daysBack}:`, error.message);
+      }
     }
+    
+    return null;
   }
 
   /**
@@ -94,30 +123,47 @@ class EnhancedTravelService {
       return {
         travelType: 'SAME_SERIES',
         distance: 0,
+        travelDistance: 0, // UI expects this
         travelClassification: 'no_travel',
         travelImpact: 0,
         seriesGame: 2, // Assuming game 2+ of series
         restAdvantage: 5, // Advantage of staying in same city
         description: `Continuing series at ${currentVenue}`,
-        previousGame: yesterdayData
+        daysOfRest: (yesterdayData.daysAgo || 1) - 1, // UI expects this
+        consecutiveGames: 2, // Continuing series
+        previousGame: yesterdayData,
+        // UI expects performanceImpact object
+        performanceImpact: {
+          netPerformanceImpact: 0,
+          recommendation: `Continuing series at ${currentVenue}. No travel fatigue.`
+        }
       };
     }
 
     // Calculate real distance between venues
     const distance = this.calculateVenueDistance(previousVenue, currentVenue);
     const travelClassification = this.classifyTravelDistance(distance);
-    const travelImpact = this.calculateTravelFatigue(distance, travelClassification);
+    const daysAgo = yesterdayData.daysAgo || 1;
+    const travelImpact = this.calculateTravelFatigue(distance, travelClassification, daysAgo);
 
     return {
       travelType: 'TRAVELED',
       distance: Math.round(distance),
+      travelDistance: Math.round(distance), // UI expects this
       travelClassification,
       travelImpact,
       seriesGame: 1, // First game in new city
       restAdvantage: 0,
       description: `Traveled ${Math.round(distance)} miles from ${previousVenue}`,
+      daysOfRest: daysAgo - 1, // UI expects this
+      consecutiveGames: 1, // Simple implementation for now
       previousGame: yesterdayData,
-      fatigueFactors: this.analyzeFatigueFactors(distance, travelClassification)
+      fatigueFactors: this.analyzeFatigueFactors(distance, travelClassification),
+      // UI expects performanceImpact object
+      performanceImpact: {
+        netPerformanceImpact: travelImpact,
+        recommendation: `Traveled ${Math.round(distance)} miles from ${previousVenue}. ${travelClassification.replace('_', ' ')} trip with ${travelImpact} impact.`
+      }
     };
   }
 
@@ -143,6 +189,12 @@ class EnhancedTravelService {
     // Try exact match first
     if (STADIUM_COORDINATES[venue]) {
       return STADIUM_COORDINATES[venue];
+    }
+    
+    // Check if it's a team code (e.g., "ATL", "STL")
+    if (venue.length === 3 && TEAM_TO_STADIUM[venue]) {
+      const stadiumName = TEAM_TO_STADIUM[venue];
+      return STADIUM_COORDINATES[stadiumName];
     }
 
     // Try partial matching for venue names
@@ -188,7 +240,7 @@ class EnhancedTravelService {
   /**
    * Calculate travel fatigue impact score
    */
-  calculateTravelFatigue(distance, classification) {
+  calculateTravelFatigue(distance, classification, daysAgo = 1) {
     const baseImpact = {
       'no_travel': 0,
       'short_trip': -2,
@@ -196,8 +248,16 @@ class EnhancedTravelService {
       'long_trip': -8,
       'cross_country': -12
     };
+    
+    let impact = baseImpact[classification] || 0;
+    
+    // Reduce impact if team had rest days
+    if (daysAgo > 1) {
+      const restBonus = Math.min((daysAgo - 1) * 2, 6); // Up to 6 points recovery
+      impact = Math.min(0, impact + restBonus);
+    }
 
-    return baseImpact[classification] || 0;
+    return impact;
   }
 
   /**
@@ -229,10 +289,18 @@ class EnhancedTravelService {
     return {
       travelType: 'UNKNOWN',
       distance: 0,
+      travelDistance: 0, // UI expects this
       travelClassification: 'unknown',
       travelImpact: 0,
       description: 'Previous game location unknown',
-      previousGame: null
+      previousGame: null,
+      daysOfRest: 0, // UI expects this
+      consecutiveGames: 1, // UI expects this
+      // UI expects performanceImpact object
+      performanceImpact: {
+        netPerformanceImpact: 0,
+        recommendation: 'Previous game location unknown - no travel data available'
+      }
     };
   }
 }

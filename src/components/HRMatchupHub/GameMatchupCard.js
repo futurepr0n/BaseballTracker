@@ -131,6 +131,32 @@ const GameMatchupCard = ({ gameAnalysis, isSelected, onSelect, teamData }) => {
                 {awayTeamAnalysis?.teamSummary?.teamStrength || 'N/A'}
               </span>
             </div>
+
+            {/* Travel Impact Summary for Away Team */}
+            {(() => {
+              const firstPlayerWithTravel = awayTeamAnalysis?.playerAnalyses?.find(p => 
+                p.travelAnalysis && p.travelAnalysis.travelType !== 'UNKNOWN' && p.travelAnalysis.travelDistance > 0
+              );
+              
+              if (firstPlayerWithTravel && firstPlayerWithTravel.travelAnalysis) {
+                const travel = firstPlayerWithTravel.travelAnalysis;
+                return (
+                  <div className="travel-summary">
+                    <div className="travel-label">Travel Impact:</div>
+                    <div className="travel-details">
+                      <span className="travel-distance">{travel.travelDistance} miles</span>
+                      <span className="travel-classification">
+                        {travel.travelClassification?.replace('_', ' ') || 'N/A'}
+                      </span>
+                      <span className={`travel-impact ${travel.travelImpact < 0 ? 'negative' : 'positive'}`}>
+                        {travel.travelImpact > 0 ? '+' : ''}{travel.travelImpact}
+                      </span>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
             
             <div className="top-players">
               <div className="players-label">Top Targets:</div>
@@ -139,7 +165,7 @@ const GameMatchupCard = ({ gameAnalysis, isSelected, onSelect, teamData }) => {
                   {awayTopPlayers.map((player, index) => (
                     <div key={index} className="player-item">
                       <span className="player-name">{player.playerName}</span>
-                      <span className="player-score">{player.comprehensiveScore.totalScore}</span>
+                      <span className="player-score">{parseFloat(player.comprehensiveScore.totalScore).toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
@@ -158,6 +184,32 @@ const GameMatchupCard = ({ gameAnalysis, isSelected, onSelect, teamData }) => {
                 {homeTeamAnalysis?.teamSummary?.teamStrength || 'N/A'}
               </span>
             </div>
+
+            {/* Travel Impact Summary for Home Team */}
+            {(() => {
+              const firstPlayerWithTravel = homeTeamAnalysis?.playerAnalyses?.find(p => 
+                p.travelAnalysis && p.travelAnalysis.travelType !== 'UNKNOWN' && p.travelAnalysis.travelDistance > 0
+              );
+              
+              if (firstPlayerWithTravel && firstPlayerWithTravel.travelAnalysis) {
+                const travel = firstPlayerWithTravel.travelAnalysis;
+                return (
+                  <div className="travel-summary">
+                    <div className="travel-label">Travel Impact:</div>
+                    <div className="travel-details">
+                      <span className="travel-distance">{travel.travelDistance} miles</span>
+                      <span className="travel-classification">
+                        {travel.travelClassification?.replace('_', ' ') || 'N/A'}
+                      </span>
+                      <span className={`travel-impact ${travel.travelImpact < 0 ? 'negative' : 'positive'}`}>
+                        {travel.travelImpact > 0 ? '+' : ''}{travel.travelImpact}
+                      </span>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
             
             <div className="top-players">
               <div className="players-label">Top Targets:</div>
@@ -166,7 +218,7 @@ const GameMatchupCard = ({ gameAnalysis, isSelected, onSelect, teamData }) => {
                   {homeTopPlayers.map((player, index) => (
                     <div key={index} className="player-item">
                       <span className="player-name">{player.playerName}</span>
-                      <span className="player-score">{player.comprehensiveScore.totalScore}</span>
+                      <span className="player-score">{parseFloat(player.comprehensiveScore.totalScore).toFixed(2)}</span>
                     </div>
                   ))}
                 </div>

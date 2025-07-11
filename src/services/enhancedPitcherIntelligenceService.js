@@ -3,7 +3,7 @@
  * Comprehensive pitcher analysis with historical data, batter splits, and vulnerability assessment
  */
 
-import { fetchPlayerDataForDateRange, fetchPlayerData } from './dataService';
+import { fetchPlayerDataForDateRange, fetchPlayerData } from './dataService.js';
 
 class EnhancedPitcherIntelligenceService {
   constructor() {

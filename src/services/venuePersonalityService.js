@@ -3,8 +3,8 @@
  * Analyzes player venue preferences and psychological factors
  */
 
-import { fetchPlayerDataForDateRange } from './dataService';
-import { getSeasonSafeDateRange, formatDateRangeDescription, getSeasonStartDate } from '../utils/seasonDateUtils';
+import { fetchPlayerDataForDateRange } from './dataService.js';
+import { getSeasonSafeDateRange, formatDateRangeDescription, getSeasonStartDate } from '../utils/seasonDateUtils.js';
 
 class VenuePersonalityService {
   constructor() {
@@ -267,20 +267,9 @@ class VenuePersonalityService {
       }
     }
     
-    // Fallback: check if all target parts exist somewhere in current name
-    if (targetParts.length >= 2) {
-      const allPartsMatch = targetParts.every(part => 
-        currentParts.some(cp => 
-          cp.includes(part) || part.includes(cp) || 
-          matchesAbbreviation(part, cp) || matchesAbbreviation(cp, part)
-        )
-      );
-      
-      if (allPartsMatch) {
-        console.log(`🏟️ Matched all parts: "${targetPlayerName}" ↔ "${playerName}"`);
-        return true;
-      }
-    }
+    // DISABLED: This fallback logic was creating false matches
+    // "Mookie Betts" was matching "E. De La Cruz" because the logic was too permissive
+    // TODO: Implement safer fallback matching if needed
     
     return false;
   }

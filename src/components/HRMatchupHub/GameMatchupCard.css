@@ -439,3 +439,52 @@
     font-size: 0.8rem;
   }
 }
+
+/* Travel Summary */
+.travel-summary {
+  background: rgba(255, 152, 0, 0.1);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.travel-label {
+  font-size: 0.75rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.travel-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.travel-distance {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.travel-classification {
+  font-size: 0.8rem;
+  color: #666;
+  text-transform: capitalize;
+}
+
+.travel-impact {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.travel-impact.negative {
+  color: #f44336;
+}
+
+.travel-impact.positive {
+  color: #4caf50;
+}

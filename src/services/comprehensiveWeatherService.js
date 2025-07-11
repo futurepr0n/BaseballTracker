@@ -3,8 +3,8 @@
  * Integrates MLBWeatherCard data with player exit velocity profiles
  */
 
-import { ballparkData } from '../components/cards/MLBWeatherCard/ballparkData';
-import { getWindFactor } from '../components/cards/MLBWeatherCard/windUtils';
+import { ballparkData } from '../components/cards/MLBWeatherCard/ballparkData.js';
+import { getWindFactor } from '../components/cards/MLBWeatherCard/windUtils.js';
 
 class ComprehensiveWeatherService {
   constructor() {

@@ -3,16 +3,16 @@
  * Integrates all data sources for ultimate venue psychology and matchup analysis
  */
 
-import { fetchPlayerData } from './dataService';
-import venuePersonalityService from './venuePersonalityService';
-import travelImpactAnalyzer from './travelImpactAnalyzer';
-import environmentalAdaptationService from './environmentalAdaptationService';
-import scheduleAnalysisService from './scheduleAnalysisService';
-import baseballAnalysisService from './baseballAnalysisService';
-import enhancedTravelService from './enhancedTravelService';
-import comprehensiveWeatherService from './comprehensiveWeatherService';
-import advancedPitcherIntelligence from './advancedPitcherIntelligence';
-import enhancedPitcherIntelligenceService from './enhancedPitcherIntelligenceService';
+import { fetchPlayerData } from './dataService.js';
+import venuePersonalityService from './venuePersonalityService.js';
+import travelImpactAnalyzer from './travelImpactAnalyzer.js';
+import environmentalAdaptationService from './environmentalAdaptationService.js';
+import scheduleAnalysisService from './scheduleAnalysisService.js';
+import baseballAnalysisService from './baseballAnalysisService.js';
+import enhancedTravelService from './enhancedTravelService.js';
+import comprehensiveWeatherService from './comprehensiveWeatherService.js';
+import advancedPitcherIntelligence from './advancedPitcherIntelligence.js';
+import enhancedPitcherIntelligenceService from './enhancedPitcherIntelligenceService.js';
 import { debugLog } from '../utils/debugConfig';
 import { normalizeToEnglish, createAllNameVariants, namesMatch } from '../utils/universalNameNormalizer';
 
@@ -20,6 +20,35 @@ class ComprehensiveMatchupService {
   constructor() {
     this.cache = new Map();
     this.cacheTimeout = 15 * 60 * 1000; // 15 minutes for faster updates
+    this.teamTravelCache = new Map(); // Cache team-level travel analysis
+  }
+
+  /**
+   * Get team-level travel impact (cached to avoid redundant calculations)
+   */
+  async getTeamTravelImpact(teamCode, isHome, venue, currentDate = new Date()) {
+    const dateStr = currentDate.toISOString().split('T')[0];
+    const cacheKey = `team_travel_${teamCode}_${dateStr}`;
+    
+    // Return cached result if available
+    if (this.teamTravelCache.has(cacheKey)) {
+      return this.teamTravelCache.get(cacheKey);
+    }
+    
+    // FIXED: ANY team can travel (home teams returning from road trips, away teams traveling)
+    
+    try {
+      // Calculate travel impact for ANY team (home or away can travel)
+      console.log(`🏃‍♂️ TEAM TRAVEL: Calculating ${teamCode} travel impact (${isHome ? 'HOME' : 'AWAY'} team) to venue: ${venue}`);
+      const travelAnalysis = await enhancedTravelService.analyzeRealTravelImpact(teamCode, currentDate, venue);
+      this.teamTravelCache.set(cacheKey, travelAnalysis);
+      return travelAnalysis;
+    } catch (err) {
+      console.warn(`Team travel analysis failed for ${teamCode}:`, err);
+      const result = null;
+      this.teamTravelCache.set(cacheKey, result);
+      return result;
+    }
   }
 
   /**
@@ -391,9 +420,7 @@ class ComprehensiveMatchupService {
     // Home field advantage (+5 points for home team)
     const homeFieldBonus = isHome ? 5 : 0;
     
-    const totalScore = Math.max(0, Math.min(100, 
-      baseScore + venueImpact + travelImpact + environmentalImpact + scheduleImpact + homeFieldBonus
-    ));
+    const totalScore = Math.round((baseScore + venueImpact + travelImpact + environmentalImpact + scheduleImpact + homeFieldBonus) * 100) / 100;
 
     return {
       totalScore,
@@ -437,7 +464,7 @@ class ComprehensiveMatchupService {
       score += recentBonus;
     }
     
-    return Math.max(0, Math.min(100, score));
+    return Math.round(Math.max(0, score) * 100) / 100; // No upper cap - let metrics dictate
   }
 
   /**
@@ -1025,12 +1052,28 @@ class ComprehensiveMatchupService {
       
       const recentData = await fetchPlayerDataForDateRange(startDate, endDate);
       
-      if (!recentData || recentData.length === 0) {
+      if (!recentData) {
+        return false;
+      }
+      
+      // Handle different data structures - could be array or object with date keys
+      let dataToCheck = [];
+      if (Array.isArray(recentData)) {
+        dataToCheck = recentData;
+      } else if (typeof recentData === 'object') {
+        // If it's an object with date keys, get all the values
+        dataToCheck = Object.values(recentData);
+      } else {
+        console.warn(`Unexpected recentData structure for ${playerName}:`, typeof recentData);
+        return false;
+      }
+      
+      if (dataToCheck.length === 0) {
         return false;
       }
       
       // Check if player appears in any of the recent game data
-      for (const dayData of recentData) {
+      for (const dayData of dataToCheck) {
         if (Array.isArray(dayData)) {
           const foundPlayer = dayData.find(player => 
             (player.name === playerName || player.fullName === playerName) && 
@@ -1275,15 +1318,15 @@ class ComprehensiveMatchupService {
       const venue = game.venue || (isHome ? teamCode : game.homeTeam);
       
       // Get comprehensive analysis using enhanced services
+      // Use team-level travel impact (calculated once per team, not per player)
+      const enhancedTravelAnalysisPromise = this.getTeamTravelImpact(teamCode, isHome, venue, new Date());
+
       const [venueAnalysis, enhancedTravelAnalysis, weatherAnalysis] = await Promise.all([
         venuePersonalityService.analyzePlayerVenueHistory(playerName, venue).catch(err => {
           console.warn(`Venue analysis failed for ${playerName}:`, err);
           return null;
         }),
-        enhancedTravelService.analyzeRealTravelImpact(teamCode, new Date(), venue).catch(err => {
-          console.warn(`Enhanced travel analysis failed for ${teamCode}:`, err);
-          return null;
-        }),
+        enhancedTravelAnalysisPromise,
         comprehensiveWeatherService.analyzeWeatherImpact(venue, game.dateTime || new Date(), [player]).catch(err => {
           console.warn(`Weather analysis failed for ${venue}:`, err);
           // Return a fallback weather analysis instead of null
@@ -1362,18 +1405,18 @@ class ComprehensiveMatchupService {
     // Base score from HR prediction data
     let baseScore = 50; // Start with neutral
     
-    // Due factor (major component)
+    // Due factor (major component) - RESTORED to original values for true differentiation
     if (player.isDue && player.dueScore) {
       baseScore += Math.min(30, player.dueScore * 5); // Up to 30 points for being due
     }
     
-    // HR rate factor
+    // HR rate factor - RESTORED
     if (player.hrRate) {
       const hrRateScore = Math.min(15, (player.hrRate - 0.05) * 150); // Bonus for high HR rate
       baseScore += Math.max(-5, hrRateScore);
     }
     
-    // Games since last HR (pressure factor)
+    // Games since last HR (pressure factor) - RESTORED
     if (player.gamesSinceLastHR) {
       const pressureScore = Math.min(10, (player.gamesSinceLastHR - 10) * 0.5);
       baseScore += Math.max(0, pressureScore);
@@ -1391,9 +1434,22 @@ class ComprehensiveMatchupService {
     // NEW: Calculate contextual bonuses from additional analysis systems
     const contextualAnalysis = await this.calculateEnhancedContextualScore(player, baseScore);
     
-    const totalScore = Math.max(20, Math.min(95, 
-      baseScore + venueImpact + travelImpact + weatherImpact + restAdvantage + homeFieldBonus + contextualAnalysis.contextualBonus
-    ));
+    const rawScore = baseScore + venueImpact + travelImpact + weatherImpact + restAdvantage + homeFieldBonus + contextualAnalysis.contextualBonus;
+    const totalScore = Math.round(rawScore * 100) / 100; // NO CAPS - let metrics dictate score
+    
+    console.log(`🎯 SCORE CALCULATION for player:`, {
+      startingBase: 50,
+      enhancedBaseScore: baseScore,
+      venueImpact,
+      travelImpact,
+      weatherImpact,
+      restAdvantage,
+      homeFieldBonus,
+      contextualBonus: contextualAnalysis.contextualBonus,
+      rawScore,
+      finalScore: totalScore,
+      mathCheck: `${baseScore} + ${venueImpact} + ${travelImpact} + ${weatherImpact} + ${restAdvantage} + ${homeFieldBonus} + ${contextualAnalysis.contextualBonus} = ${rawScore}`
+    });
     
     return {
       totalScore,
@@ -1457,7 +1513,8 @@ class ComprehensiveMatchupService {
     // Home field advantage
     const homeFieldBonus = isHome ? 5 : 0;
     
-    const totalScore = Math.max(20, Math.min(95, baseScore + venueImpact + travelImpact + homeFieldBonus));
+    const rawScore = baseScore + venueImpact + travelImpact + homeFieldBonus;
+    const totalScore = Math.round(rawScore * 100) / 100; // NO CAPS - let metrics dictate score
     
     return {
       totalScore,
@@ -1504,7 +1561,8 @@ class ComprehensiveMatchupService {
     // Home field advantage
     const homeFieldBonus = isHome ? 5 : 0;
     
-    const totalScore = Math.max(20, Math.min(95, baseScore + homeFieldBonus));
+    const rawScore = baseScore + homeFieldBonus;
+    const totalScore = Math.round(Math.max(20, rawScore) * 100) / 100; // NO CAPS - let metrics dictate score
     
     return {
       totalScore,
@@ -2430,7 +2488,7 @@ class ComprehensiveMatchupService {
     }
 
     return {
-      contextualBonus: Math.min(40, contextualBonus), // Cap at 40 points
+      contextualBonus: contextualBonus, // NO CAP - let metrics drive the true score
       badges,
       hellraiserData,
       explanation: explanations.join(', '),

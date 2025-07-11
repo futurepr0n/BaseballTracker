@@ -6,8 +6,8 @@
  */
 
 // Import the SharedDataManager for efficient data loading
-import { getSharedDateRangeData, getDataManagerStats } from './SharedDataManager';
-import { debugLog } from '../utils/debugConfig';
+import { getSharedDateRangeData, getDataManagerStats } from './SharedDataManager.js';
+import { debugLog } from '../utils/debugConfig.js';
 
 // Note: playerLookupService integration will be handled in component files
 // Keeping legacy functions for backward compatibility
@@ -489,6 +489,7 @@ export const fetchGameData = async (dateStr) => {
 
     console.log(`Loading game data from: ${filePath}`);
     const response = await fetch(filePath);
+    console.log(`📅 FETCH Response: ${response.status} ${response.statusText}`);
 
     if (!response.ok) {
       // Only warn if it's within expected data range
@@ -503,8 +504,13 @@ export const fetchGameData = async (dateStr) => {
     }
 
     const data = await response.json();
-    dataCache.games[dateStr] = data.games || DEFAULT_GAME_DATA;
-    return dataCache.games[dateStr];
+    console.log(`📅 FETCHED DATA: ${JSON.stringify(data).substring(0, 200)}...`);
+    console.log(`📅 GAMES COUNT: ${data?.games?.length || 0}`);
+    
+    // Store the games array directly as existing code expects
+    const games = data.games || [];
+    dataCache.games[dateStr] = games;
+    return games;
 
   } catch (error) {
     // Only log errors for dates within expected data range

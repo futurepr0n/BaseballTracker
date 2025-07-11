@@ -288,7 +288,7 @@ const COMMON_DISTANCES = {
   'texas_to_toronto': ['Globe Life Field', 'Rogers Centre', getStadiumDistance('Globe Life Field', 'Rogers Centre')]
 };
 
-module.exports = {
+export {
   STADIUM_COORDINATES,
   TEAM_TO_STADIUM,
   calculateDistance,

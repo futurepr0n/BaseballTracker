@@ -818,7 +818,7 @@
   
   .hr-matchup-hub .matchup-table {
     width: 100%;
-    min-width: 785px;
+    min-width: auto; /* Remove fixed min-width to allow natural sizing */
   }
 }
 

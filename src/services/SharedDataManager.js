@@ -12,8 +12,8 @@
  * - Browser freeze from network congestion
  */
 
-import { formatDateString, formatDateForDisplay } from './dataService';
-import { debugLog } from '../utils/debugConfig';
+import { formatDateString, formatDateForDisplay } from './dataService.js';
+import { debugLog } from '../utils/debugConfig.js';
 
 class SharedDataManager {
   constructor() {

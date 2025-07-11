@@ -4,8 +4,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import dashboardContextService from './dashboardContextService';
-import { badgeManager } from '../utils/playerBadgeSystem';
+import dashboardContextService from './dashboardContextService.js';
+import { badgeManager } from '../utils/playerBadgeSystem.js';
 
 class BaseballAnalysisService {
   constructor(baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8000') {

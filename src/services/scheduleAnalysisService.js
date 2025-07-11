@@ -3,7 +3,7 @@
  * Analyzes consecutive games, rest patterns, and schedule-related performance impacts
  */
 
-import { fetchPlayerDataForDateRange, fetchGameData, convertDataMapToArray } from './dataService';
+import { fetchPlayerDataForDateRange, fetchGameData, convertDataMapToArray } from './dataService.js';
 
 class ScheduleAnalysisService {
   constructor() {
