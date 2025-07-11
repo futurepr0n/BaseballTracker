@@ -6,6 +6,8 @@ import './BatterMatchupTable.css';
  */
 const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
   const [expandedPlayer, setExpandedPlayer] = useState(null);
+  const [expandedSections, setExpandedSections] = useState(new Set());
+  const [activeTab, setActiveTab] = useState('stats');
 
   if (!players || players.length === 0) {
     return (
@@ -48,6 +50,20 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
     setExpandedPlayer(expandedPlayer === playerName ? null : playerName);
   };
 
+  const toggleSection = (sectionId) => {
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(sectionId)) {
+      newExpanded.delete(sectionId);
+    } else {
+      newExpanded.add(sectionId);
+    }
+    setExpandedSections(newExpanded);
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
+
   const handleSort = (column) => {
     onSortChange(column);
   };
@@ -56,89 +72,311 @@ const BatterMatchupTable = ({ players, sortOption, onSortChange }) => {
     return sortOption === column ? '▼' : '⇅';
   };
 
-  const renderMobileCard = (player, index) => (
-    <div key={`${player.playerName}_${player.team}_${index}`} className="mobile-player-card">
-      <div className="mobile-card-header">
-        <div className="mobile-player-info">
-          <div className="mobile-player-name">{player.playerName}</div>
-          <div className="mobile-team-position">
-            <span className="mobile-team-badge">{player.team}</span>
-            <span className="mobile-position">{player.isHome ? 'HOME' : 'AWAY'}</span>
-          </div>
-        </div>
-        <div className="mobile-total-score">{parseFloat(player.comprehensiveScore.totalScore).toFixed(2)}</div>
-      </div>
-
-      <div className="mobile-card-content">
-        <div className="mobile-stat">
-          <div className="mobile-stat-label">Base Score</div>
-          <div className="mobile-stat-value neutral">{player.comprehensiveScore.baseScore.toFixed(2)}</div>
-        </div>
-        <div className="mobile-stat">
-          <div className="mobile-stat-label">Venue</div>
-          <div className={`mobile-stat-value ${formatAdjustmentClass(player.comprehensiveScore.adjustments.venue || 0)}`}>
-            {formatAdjustment(player.comprehensiveScore.adjustments.venue || 0)}
-          </div>
-        </div>
-        <div className="mobile-stat">
-          <div className="mobile-stat-label">Travel</div>
-          <div className={`mobile-stat-value ${formatAdjustmentClass(player.comprehensiveScore.adjustments.travel || 0)}`}>
-            {formatAdjustment(player.comprehensiveScore.adjustments.travel || 0)}
-          </div>
-        </div>
-        <div className="mobile-stat">
-          <div className="mobile-stat-label">Context</div>
-          <div className={`mobile-stat-value ${formatAdjustmentClass(player.comprehensiveScore.contextualBonus || 0)}`}>
-            {formatAdjustment(player.comprehensiveScore.contextualBonus || 0)}
-          </div>
-        </div>
-      </div>
-
-      <div className="mobile-recommendation">
-        <div className={`mobile-action ${getRecommendationClass(player.recommendation)}`}>
-          {player.recommendation.action.replace('_', ' ')}
-        </div>
-        <div className="mobile-reason">{player.recommendation.reason}</div>
-      </div>
-
-      <div className="mobile-card-footer">
-        <div className="mobile-confidence">
-          <span>Confidence:</span>
-          <span className={`mobile-confidence-badge ${getConfidenceClass(player.confidenceLevel)}`}>
-            {player.confidenceLevel}%
-          </span>
-        </div>
-        <button 
-          className="mobile-expand-button"
-          onClick={() => handleRowClick(player.playerName)}
-        >
-          {expandedPlayer === player.playerName ? 'Less ▲' : 'More ▼'}
-        </button>
-      </div>
-
-      {player.comprehensiveScore.hellraiserData?.isHellraiserPick || (player.comprehensiveScore.contextualBadges && player.comprehensiveScore.contextualBadges.length > 0) ? (
-        <div className="mobile-contextual-indicators">
-          {player.comprehensiveScore.hellraiserData?.isHellraiserPick && (
-            <span className="mobile-hellraiser-indicator" title="Hellraiser Pick">🔥</span>
-          )}
-          {player.comprehensiveScore.contextualBadges && player.comprehensiveScore.contextualBadges.length > 0 && (
-            <span className="mobile-badge-count" title={`${player.comprehensiveScore.contextualBadges.length} active badges`}>
-              {player.comprehensiveScore.contextualBadges.length} badges 📊
-            </span>
-          )}
-        </div>
-      ) : null}
-
-      {expandedPlayer === player.playerName && (
-        <div style={{ marginTop: '1rem' }}>
-          {renderExpandedDetails(player)}
-        </div>
-      )}
+  const renderMobileTabNavigation = () => (
+    <div className="mobile-tab-navigation">
+      <button 
+        className={`mobile-tab ${activeTab === 'stats' ? 'active' : ''}`}
+        onClick={() => handleTabChange('stats')}
+      >
+        📊 Stats
+      </button>
+      <button 
+        className={`mobile-tab ${activeTab === 'matchup' ? 'active' : ''}`}
+        onClick={() => handleTabChange('matchup')}
+      >
+        🎯 Matchup
+      </button>
+      <button 
+        className={`mobile-tab ${activeTab === 'trends' ? 'active' : ''}`}
+        onClick={() => handleTabChange('trends')}
+      >
+        📈 Trends
+      </button>
+      <button 
+        className={`mobile-tab ${activeTab === 'context' ? 'active' : ''}`}
+        onClick={() => handleTabChange('context')}
+      >
+        ⚾ Context
+      </button>
     </div>
   );
 
+  const renderMobileTabContent = (player) => {
+    const { factorBreakdown, venueAnalysis, travelAnalysis, environmentalAnalysis } = player;
+
+    switch (activeTab) {
+      case 'stats':
+        return (
+          <div className="mobile-tab-content">
+            <div className="mobile-stats-section">
+              <h4>Core Performance</h4>
+              <div className="mobile-stats-grid">
+                <div className="mobile-stat-card">
+                  <span className="mobile-stat-label">Base Performance</span>
+                  <span className="mobile-stat-value">{factorBreakdown.basePerformance?.score?.toFixed(2) || 'N/A'}</span>
+                  <span className="mobile-stat-desc">{factorBreakdown.basePerformance?.description || ''}</span>
+                </div>
+                
+                {factorBreakdown.dueFactors && (
+                  <div className="mobile-stat-card">
+                    <span className="mobile-stat-label">HR Due Factor</span>
+                    <span className={`mobile-stat-value ${factorBreakdown.dueFactors.score >= 0 ? 'positive' : 'negative'}`}>
+                      {formatAdjustment(factorBreakdown.dueFactors.score)}
+                    </span>
+                    <span className="mobile-stat-desc">{factorBreakdown.dueFactors.description}</span>
+                  </div>
+                )}
+
+                {factorBreakdown.hrRateFactors && (
+                  <div className="mobile-stat-card">
+                    <span className="mobile-stat-label">HR Rate Factor</span>
+                    <span className={`mobile-stat-value ${factorBreakdown.hrRateFactors.score >= 0 ? 'positive' : 'negative'}`}>
+                      {formatAdjustment(factorBreakdown.hrRateFactors.score)}
+                    </span>
+                    <span className="mobile-stat-desc">{factorBreakdown.hrRateFactors.description}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'matchup':
+        return (
+          <div className="mobile-tab-content">
+            <div className="mobile-matchup-section">
+              <h4>Pitcher Intelligence</h4>
+              {factorBreakdown.pitcherIntelligence && factorBreakdown.pitcherIntelligence.overall.score !== 0 ? (
+                <div className="mobile-pitcher-analysis">
+                  <div className="mobile-stat-card">
+                    <span className="mobile-stat-label">Matchup Advantage</span>
+                    <span className={`mobile-stat-value ${factorBreakdown.pitcherIntelligence.overall.score >= 0 ? 'positive' : 'negative'}`}>
+                      {formatAdjustment(factorBreakdown.pitcherIntelligence.overall.score)}
+                    </span>
+                    <span className="mobile-stat-desc">{factorBreakdown.pitcherIntelligence.overall.description}</span>
+                  </div>
+                  <div className="mobile-threat-level">
+                    <span className="mobile-stat-label">Threat Level</span>
+                    <span className="mobile-stat-value">{factorBreakdown.pitcherIntelligence.threatLevel}</span>
+                  </div>
+                  {factorBreakdown.pitcherIntelligence.strategicRecommendation && (
+                    <div className="mobile-strategy">
+                      <strong>Strategy:</strong> {factorBreakdown.pitcherIntelligence.strategicRecommendation}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="mobile-no-data">No pitcher intelligence available</div>
+              )}
+            </div>
+          </div>
+        );
+
+      case 'trends':
+        return (
+          <div className="mobile-tab-content">
+            <div className="mobile-trends-section">
+              <h4>Pressure & Situational</h4>
+              <div className="mobile-stats-grid">
+                {factorBreakdown.pressureFactors && (
+                  <div className="mobile-stat-card">
+                    <span className="mobile-stat-label">Pressure Factor</span>
+                    <span className={`mobile-stat-value ${factorBreakdown.pressureFactors.score >= 0 ? 'positive' : 'negative'}`}>
+                      {formatAdjustment(factorBreakdown.pressureFactors.score)}
+                    </span>
+                    <span className="mobile-stat-desc">{factorBreakdown.pressureFactors.description}</span>
+                  </div>
+                )}
+
+                {factorBreakdown.homeFieldAdvantage && (
+                  <div className="mobile-stat-card">
+                    <span className="mobile-stat-label">Home Field</span>
+                    <span className={`mobile-stat-value ${factorBreakdown.homeFieldAdvantage.score >= 0 ? 'positive' : 'negative'}`}>
+                      {formatAdjustment(factorBreakdown.homeFieldAdvantage.score)}
+                    </span>
+                    <span className="mobile-stat-desc">{factorBreakdown.homeFieldAdvantage.description}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'context':
+        return (
+          <div className="mobile-tab-content">
+            <div className="mobile-context-section">
+              <h4>Environmental Factors</h4>
+              {venueAnalysis?.venuePersonality && (
+                <div className="mobile-venue-summary">
+                  <div className="mobile-stat-card">
+                    <span className="mobile-stat-label">Venue Type</span>
+                    <span className="mobile-stat-value">{venueAnalysis.venuePersonality.classification.replace('_', ' ')}</span>
+                    <span className="mobile-stat-desc">Games: {venueAnalysis.gamesPlayed} | HRs: {venueAnalysis.venueStats?.homeRuns || 0}</span>
+                  </div>
+                </div>
+              )}
+
+              {environmentalAnalysis?.environmentalImpacts && (
+                <div className="mobile-env-summary">
+                  <div className="mobile-stat-card">
+                    <span className="mobile-stat-label">Environmental Impact</span>
+                    <span className={`mobile-stat-value ${environmentalAnalysis.totalEnvironmentalImpact >= 0 ? 'positive' : 'negative'}`}>
+                      {formatAdjustment(environmentalAnalysis.totalEnvironmentalImpact)}
+                    </span>
+                    <span className="mobile-stat-desc">{environmentalAnalysis.classification?.replace('_', ' ') || 'N/A'}</span>
+                  </div>
+                </div>
+              )}
+
+              {travelAnalysis?.performanceImpact && (
+                <div className="mobile-travel-summary">
+                  <div className="mobile-stat-card">
+                    <span className="mobile-stat-label">Travel Impact</span>
+                    <span className="mobile-stat-value">{travelAnalysis.travelDistance || 0} miles</span>
+                    <span className="mobile-stat-desc">{travelAnalysis.performanceImpact.recommendation}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  const renderMobileCard = (player, index) => {
+    const sectionId = `${player.playerName}-${player.team}`;
+    const isExpanded = expandedSections.has(sectionId);
+
+    return (
+      <div key={`${player.playerName}_${player.team}_${index}`} className={`mobile-player-card ${getRecommendationClass(player.recommendation)}`}>
+        {/* Tier 1: Always visible summary */}
+        <div className="mobile-card-header">
+          <div className="mobile-player-info">
+            <div className="mobile-player-name">{player.playerName}</div>
+            <div className="mobile-team-position">
+              <span className="mobile-team-badge">{player.team}</span>
+              <span className="mobile-position">{player.isHome ? 'HOME' : 'AWAY'}</span>
+            </div>
+          </div>
+          <div className="mobile-total-score">{parseFloat(player.comprehensiveScore.totalScore).toFixed(2)}</div>
+        </div>
+
+        {/* Key Metrics Summary */}
+        <div className="mobile-summary-stats">
+          <div className="mobile-stat-compact">
+            <span className="mobile-stat-label">Base</span>
+            <span className="mobile-stat-value neutral">{player.comprehensiveScore.baseScore.toFixed(2)}</span>
+          </div>
+          <div className="mobile-stat-compact">
+            <span className="mobile-stat-label">Venue</span>
+            <span className={`mobile-stat-value ${formatAdjustmentClass(player.comprehensiveScore.adjustments.venue || 0)}`}>
+              {formatAdjustment(player.comprehensiveScore.adjustments.venue || 0)}
+            </span>
+          </div>
+          <div className="mobile-stat-compact">
+            <span className="mobile-stat-label">Context</span>
+            <span className={`mobile-stat-value ${formatAdjustmentClass(player.comprehensiveScore.contextualBonus || 0)}`}>
+              {formatAdjustment(player.comprehensiveScore.contextualBonus || 0)}
+            </span>
+          </div>
+          <div className="mobile-stat-compact">
+            <span className="mobile-stat-label">Confidence</span>
+            <span className={`mobile-confidence-badge ${getConfidenceClass(player.confidenceLevel)}`}>
+              {player.confidenceLevel}%
+            </span>
+          </div>
+        </div>
+
+        {/* Recommendation */}
+        <div className="mobile-recommendation">
+          <div className={`mobile-action ${getRecommendationClass(player.recommendation)}`}>
+            {player.recommendation.action.replace('_', ' ')}
+          </div>
+          <div className="mobile-reason">{player.recommendation.reason}</div>
+        </div>
+
+        {/* Contextual Indicators */}
+        {(player.comprehensiveScore.hellraiserData?.isHellraiserPick || (player.comprehensiveScore.contextualBadges && player.comprehensiveScore.contextualBadges.length > 0)) && (
+          <div className="mobile-contextual-indicators">
+            {player.comprehensiveScore.hellraiserData?.isHellraiserPick && (
+              <span className="mobile-hellraiser-indicator" title="Hellraiser Pick">🔥</span>
+            )}
+            {player.comprehensiveScore.contextualBadges && player.comprehensiveScore.contextualBadges.length > 0 && (
+              <span className="mobile-badge-count" title={`${player.comprehensiveScore.contextualBadges.length} active badges`}>
+                {player.comprehensiveScore.contextualBadges.length} badges 📊
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Expand/Collapse Button */}
+        <div className="mobile-card-footer">
+          <button 
+            className="mobile-expand-button"
+            onClick={() => toggleSection(sectionId)}
+          >
+            {isExpanded ? 'Less Details ▲' : 'More Details ▼'}
+          </button>
+        </div>
+
+        {/* Tier 2: Expandable detailed analysis with tabs */}
+        {isExpanded && (
+          <div className="mobile-expanded-section">
+            {renderMobileTabNavigation()}
+            {renderMobileTabContent(player)}
+            
+            {/* Contextual Analysis - Always show if available */}
+            {(player.comprehensiveScore?.contextualBadges && player.comprehensiveScore.contextualBadges.length > 0) && (
+              <div className="mobile-contextual-analysis">
+                <h4>Contextual Bonuses</h4>
+                
+                {/* Hellraiser Data */}
+                {player.comprehensiveScore.hellraiserData?.isHellraiserPick && (
+                  <div className="mobile-hellraiser-section">
+                    <div className="mobile-hellraiser-header">
+                      <span className="mobile-hellraiser-badge">🔥 Hellraiser Pick</span>
+                      <span className="mobile-classification">{player.comprehensiveScore.hellraiserData.classification}</span>
+                    </div>
+                    <div className="mobile-hellraiser-metrics">
+                      {player.comprehensiveScore.hellraiserData.exitVelocity > 0 && (
+                        <span className="mobile-metric">Exit Vel: {player.comprehensiveScore.hellraiserData.exitVelocity.toFixed(1)} mph</span>
+                      )}
+                      {player.comprehensiveScore.hellraiserData.barrelRate > 0 && (
+                        <span className="mobile-metric">Barrel: {player.comprehensiveScore.hellraiserData.barrelRate.toFixed(1)}%</span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Active Badges */}
+                <div className="mobile-badges">
+                  <div className="mobile-badges-header">Active Badges:</div>
+                  <div className="mobile-badges-list">
+                    {player.comprehensiveScore.contextualBadges.map((badge, idx) => (
+                      <div key={idx} className="mobile-badge-item">
+                        <span className="mobile-badge-emoji">{badge.emoji}</span>
+                        <span className="mobile-badge-label">{badge.label}</span>
+                        <span className={`mobile-badge-bonus ${badge.bonus >= 0 ? 'positive' : 'negative'}`}>
+                          {badge.bonus >= 0 ? '+' : ''}{badge.bonus}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderExpandedDetails = (player) => {
-    const { factorBreakdown, venueAnalysis, travelAnalysis, environmentalAnalysis, scheduleAnalysis } = player;
+    const { factorBreakdown, venueAnalysis, travelAnalysis, environmentalAnalysis } = player;
 
     return (
       <div className="expanded-details">
