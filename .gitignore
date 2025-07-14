@@ -11,3 +11,35 @@ issue/
 
 # Package lock files
 package-lock.json
+
+# Temporary cleanup and analysis files
+scripts/review/reports/
+scripts/data-validation/player_cleanup_batch_*.json
+scripts/data-validation/postponements_*.json
+backups/
+
+# All generated reports and analysis files
+*_report_*.json
+*_report.json
+verification_report*.json
+production_cleanup_test_report*.json
+staged_test_report*.json
+remaining_duplicate_report*.json
+comprehensive_duplicate_report*.json
+systematic_fix_report*.json
+
+# Logs and temporary reports
+*.log
+logs/
+scripts/review/*.json
+scripts/verification/*.json
+
+# Automation reports and temporary files
+scripts/automation/reports/
+automation_report_*.json
+
+# Batch execution artifacts
+batch_execution_*.json
+detailed_analysis_*.json
+cleanup_batch_*.json
+approved_batch_*.json

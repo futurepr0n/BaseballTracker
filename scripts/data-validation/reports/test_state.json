@@ -1,0 +1,26 @@
+{
+  "phase": "dry",
+  "startTime": "2025-07-12T13:00:42.470Z",
+  "results": {
+    "dryRunAnalysis": {
+      "totalRecommendations": 2409,
+      "highConfidenceCount": 27,
+      "averageConfidence": 0.8011207970111767
+    },
+    "dryRun": {
+      "dryRunExecution": false,
+      "reportAnalysis": false,
+      "playerValidation": false,
+      "confidenceCheck": true
+    }
+  },
+  "errors": [
+    {
+      "command": "node scripts/data-validation/batchDuplicateRemoval.js --dry-run",
+      "description": "Running batch duplicate removal dry-run",
+      "error": "Command failed: node scripts/data-validation/batchDuplicateRemoval.js --dry-run\n❌ Safety checks failed:\n  - Too many game removals: 2409 > 1000\n"
+    }
+  ],
+  "backupCreated": false,
+  "cleanupExecuted": false
+}
