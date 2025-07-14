@@ -10,6 +10,43 @@ const GlobalTooltip = () => {
   const { activeTooltip, tooltipPosition, tooltipData, closeTooltip } = useTooltip();
   const tooltipRef = useRef(null);
 
+  // Deduplicate game data by date, keeping the most complete entry
+  const deduplicateGameData = (gameData) => {
+    if (!gameData || !Array.isArray(gameData)) return [];
+    
+    const dateMap = new Map();
+    
+    gameData.forEach(game => {
+      const date = game.date_display || game.date;
+      if (!date) return;
+      
+      if (!dateMap.has(date)) {
+        dateMap.set(date, game);
+      } else {
+        // Keep the entry with more complete data (more non-zero stats)
+        const existing = dateMap.get(date);
+        const existingScore = (existing.hits || 0) + (existing.hr || 0) + (existing.rbi || 0) + (existing.abs || 0);
+        const newScore = (game.hits || 0) + (game.hr || 0) + (game.rbi || 0) + (game.abs || 0);
+        
+        // If new entry has more complete data, or if equal completeness but newer timestamp, replace
+        if (newScore > existingScore || 
+            (newScore === existingScore && (game.timestamp || 0) > (existing.timestamp || 0))) {
+          dateMap.set(date, game);
+          console.warn(`Duplicate date ${date} detected - kept more complete entry`);
+        } else {
+          console.warn(`Duplicate date ${date} detected - kept existing entry`);
+        }
+      }
+    });
+    
+    // Sort by date descending (most recent first)
+    return Array.from(dateMap.values()).sort((a, b) => {
+      const dateA = new Date(a.date_display || a.date);
+      const dateB = new Date(b.date_display || b.date);
+      return dateB - dateA;
+    });
+  };
+
   // Position tooltip when it opens
   useEffect(() => {
     if (activeTooltip && tooltipRef.current) {
@@ -778,7 +815,7 @@ const GlobalTooltip = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {tooltipData.detailedGameTable.map((game, idx) => (
+                    {deduplicateGameData(tooltipData.detailedGameTable).map((game, idx) => (
                       <tr key={idx} className={`
                         ${game.performance_level === 'exceptional' ? 'exceptional-game' : ''}
                         ${game.performance_level === 'poor' ? 'poor-game' : ''}

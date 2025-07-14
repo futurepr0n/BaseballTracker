@@ -153,6 +153,7 @@ function analyzeHotStreaks(playerName, team, seasonData) {
     const playerData = dayData.players?.find(p => p.name === playerName && p.team === team);
     
     if (playerData && playerData.AB > 0) {
+      
       const hits = Number(playerData.H) || 0;
       const atBats = Number(playerData.AB) || 0;
       const hasHit = hits > 0;
