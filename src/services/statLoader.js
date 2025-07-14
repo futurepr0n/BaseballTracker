@@ -17,12 +17,285 @@
 const fs = require('fs');
 const path = require('path');
 const { parse } = require('csv-parse/sync');
+const gameIdValidator = require('../../utils/gameIdValidator');
+const doubleheaderValidator = require('../../utils/doubleheaderValidator');
 const playerMappingService = require('./playerMappingService');
+const { detectEnhancedDuplicatesWithPrevention } = require('./enhancedDuplicateDetection');
+const { acquireProcessingLock, releaseProcessingLock, cleanupStaleLocks } = require('./processingLockManager');
 
 // --- Configuration ---
 const BASE_DATA_DIR = path.join('public', 'data');
+
+// Enhanced duplicate detection configuration
+const ENHANCED_CONFIG = {
+  // Processing tracking
+  PROCESSING_LOG_FILE: 'scripts/data-validation/processing_log.json',
+  BACKUP_DIR: 'backups/statloader_backups',
+  
+  // Duplicate detection settings
+  ENABLE_ENHANCED_VALIDATION: true,
+  ENABLE_PROCESSING_TRACKING: true,
+  ENABLE_AUTOMATIC_BACKUP: true,
+  
+  // Suspicious date ranges (known corruption periods)
+  SUSPICIOUS_DATE_RANGES: [
+    { start: '2025-07-02', end: '2025-07-09', reason: 'Known systematic corruption period' }
+  ],
+  
+  // Validation thresholds
+  VALIDATION_THRESHOLDS: {
+    MAX_REASONABLE_HITS_PER_GAME: 6,
+    MAX_REASONABLE_HR_PER_GAME: 4,
+    MIN_REASONABLE_AB_FOR_HITS: 1
+  }
+};
 const ROSTERS_FILE_PATH = path.join(__dirname, '..', '..', 'public', 'data', 'rosters.json');
 // --- End Configuration ---
+
+// --- Enhanced Validation Utilities ---
+
+/**
+ * Load processing log to track which CSV files have been processed
+ * @returns {object} Processing log data
+ */
+function loadProcessingLog() {
+  try {
+    if (fs.existsSync(ENHANCED_CONFIG.PROCESSING_LOG_FILE)) {
+      const logData = JSON.parse(fs.readFileSync(ENHANCED_CONFIG.PROCESSING_LOG_FILE, 'utf8'));
+      return logData;
+    }
+  } catch (error) {
+    console.warn('Warning: Could not load processing log:', error.message);
+  }
+  
+  return {
+    processedFiles: {},
+    lastUpdated: null,
+    version: '1.0'
+  };
+}
+
+/**
+ * Save processing log after successful processing
+ * @param {object} logData - Processing log data
+ * @param {string} csvFilePath - CSV file path that was processed
+ * @param {string} gameId - Game ID processed
+ */
+function saveProcessingLog(logData, csvFilePath, gameId) {
+  try {
+    // Ensure directory exists
+    const logDir = path.dirname(ENHANCED_CONFIG.PROCESSING_LOG_FILE);
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir, { recursive: true });
+    }
+    
+    // Update log data
+    const fileStats = fs.statSync(csvFilePath);
+    logData.processedFiles[csvFilePath] = {
+      gameId: gameId,
+      processedAt: new Date().toISOString(),
+      fileSize: fileStats.size,
+      fileModified: fileStats.mtime.toISOString(),
+      checksum: generateFileChecksum(csvFilePath)
+    };
+    logData.lastUpdated = new Date().toISOString();
+    
+    fs.writeFileSync(ENHANCED_CONFIG.PROCESSING_LOG_FILE, JSON.stringify(logData, null, 2));
+  } catch (error) {
+    console.warn('Warning: Could not save processing log:', error.message);
+  }
+}
+
+/**
+ * Generate simple checksum for CSV file to detect changes
+ * @param {string} filePath - File path
+ * @returns {string} Simple checksum
+ */
+function generateFileChecksum(filePath) {
+  try {
+    const stats = fs.statSync(filePath);
+    return `${stats.size}_${stats.mtime.getTime()}`;
+  } catch (error) {
+    return 'unknown';
+  }
+}
+
+/**
+ * Check if CSV file has already been processed
+ * @param {object} logData - Processing log data
+ * @param {string} csvFilePath - CSV file path
+ * @returns {boolean} True if file already processed
+ */
+function isFileAlreadyProcessed(logData, csvFilePath) {
+  if (!ENHANCED_CONFIG.ENABLE_PROCESSING_TRACKING) {
+    return false;
+  }
+  
+  const processedFile = logData.processedFiles[csvFilePath];
+  if (!processedFile) {
+    return false;
+  }
+  
+  // Check if file has been modified since processing
+  const currentChecksum = generateFileChecksum(csvFilePath);
+  return processedFile.checksum === currentChecksum;
+}
+
+/**
+ * Create backup of JSON file before modification
+ * @param {string} jsonFilePath - JSON file path
+ * @returns {string|null} Backup file path or null if backup failed
+ */
+function createJsonBackup(jsonFilePath) {
+  if (!ENHANCED_CONFIG.ENABLE_AUTOMATIC_BACKUP) {
+    return null;
+  }
+  
+  try {
+    // Ensure backup directory exists
+    if (!fs.existsSync(ENHANCED_CONFIG.BACKUP_DIR)) {
+      fs.mkdirSync(ENHANCED_CONFIG.BACKUP_DIR, { recursive: true });
+    }
+    
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const backupFileName = `${path.basename(jsonFilePath, '.json')}_backup_${timestamp}.json`;
+    const backupPath = path.join(ENHANCED_CONFIG.BACKUP_DIR, backupFileName);
+    
+    fs.copyFileSync(jsonFilePath, backupPath);
+    console.log(`📄 Created backup: ${backupPath}`);
+    return backupPath;
+  } catch (error) {
+    console.warn('Warning: Could not create backup:', error.message);
+    return null;
+  }
+}
+
+/**
+ * Validate game ID for potential issues
+ * @param {string} gameId - Game ID to validate
+ * @param {string} date - Game date
+ * @returns {object} Validation result
+ */
+function validateGameId(gameId, date) {
+  const validation = gameIdValidator.isValidGameId(gameId);
+  const analysis = gameIdValidator.analyzeGameIdPattern(gameId, { date });
+  
+  return {
+    isValid: validation.isValid,
+    isSuspicious: analysis.isSuspicious,
+    confidence: analysis.confidence,
+    warnings: analysis.suspiciousReasons || [],
+    recommendation: analysis.isSuspicious ? 'investigate' : 'proceed'
+  };
+}
+
+/**
+ * Check if date falls within suspicious ranges
+ * @param {string} date - Date to check
+ * @returns {object|null} Suspicious range info or null
+ */
+function checkSuspiciousDate(date) {
+  for (const range of ENHANCED_CONFIG.SUSPICIOUS_DATE_RANGES) {
+    if (date >= range.start && date <= range.end) {
+      return range;
+    }
+  }
+  return null;
+}
+
+/**
+ * Validate player statistics for reasonableness
+ * @param {object} player - Player data
+ * @returns {Array} Array of validation warnings
+ */
+function validatePlayerStats(player) {
+  const warnings = [];
+  const hits = parseInt(player.H) || 0;
+  const ab = parseInt(player.AB) || 0;
+  const hr = parseInt(player.HR) || 0;
+  
+  if (hits > ENHANCED_CONFIG.VALIDATION_THRESHOLDS.MAX_REASONABLE_HITS_PER_GAME) {
+    warnings.push(`Unusually high hits: ${hits} (max reasonable: ${ENHANCED_CONFIG.VALIDATION_THRESHOLDS.MAX_REASONABLE_HITS_PER_GAME})`);
+  }
+  
+  if (hr > ENHANCED_CONFIG.VALIDATION_THRESHOLDS.MAX_REASONABLE_HR_PER_GAME) {
+    warnings.push(`Unusually high HRs: ${hr} (max reasonable: ${ENHANCED_CONFIG.VALIDATION_THRESHOLDS.MAX_REASONABLE_HR_PER_GAME})`);
+  }
+  
+  if (hits > 0 && ab === 0) {
+    warnings.push(`Impossible stats: ${hits} hits with 0 at-bats`);
+  }
+  
+  return warnings;
+}
+
+/**
+ * Enhanced duplicate detection with sophisticated logic
+ * @param {Array} existingPlayers - Existing players in JSON
+ * @param {object} newPlayer - New player to check
+ * @param {string} gameId - Game ID being processed
+ * @param {string} date - Game date
+ * @returns {object} Duplicate analysis result
+ */
+function detectEnhancedDuplicates(existingPlayers, newPlayer, gameId, date) {
+  const result = {
+    isDuplicate: false,
+    duplicateType: null,
+    duplicateIndex: -1,
+    action: 'add',
+    warnings: [],
+    confidence: 1.0
+  };
+  
+  // Find existing player with same name and team
+  const existingPlayerIndex = existingPlayers.findIndex(p => 
+    p.name === newPlayer.name && 
+    p.team === newPlayer.team &&
+    (p.playerType === newPlayer.playerType || (!p.playerType && newPlayer.playerType === 'hitter'))
+  );
+  
+  if (existingPlayerIndex >= 0) {
+    const existingPlayer = existingPlayers[existingPlayerIndex];
+    
+    // Check for exact duplicate (same gameId)
+    if (existingPlayer.gameId === newPlayer.gameId) {
+      result.isDuplicate = true;
+      result.duplicateType = 'exact_duplicate';
+      result.duplicateIndex = existingPlayerIndex;
+      result.action = 'update';
+      result.warnings.push('Exact duplicate found - updating existing record');
+      return result;
+    }
+    
+    // Check for suspicious cross-date duplicate
+    const suspiciousDate = checkSuspiciousDate(date);
+    if (suspiciousDate) {
+      result.warnings.push(`Processing file in suspicious date range: ${suspiciousDate.reason}`);
+      result.confidence = 0.7;
+      
+      // In suspicious date ranges, be more cautious about duplicates
+      if (existingPlayer.gameId && 
+          Math.abs(parseInt(existingPlayer.gameId) - parseInt(newPlayer.gameId)) < 100) {
+        result.isDuplicate = true;
+        result.duplicateType = 'suspicious_cross_date';
+        result.duplicateIndex = existingPlayerIndex;
+        result.action = 'skip';
+        result.warnings.push('Potential cross-date duplicate in suspicious period - skipping');
+        return result;
+      }
+    }
+    
+    // Check for doubleheader legitimacy if different gameIds
+    if (existingPlayer.gameId !== newPlayer.gameId) {
+      // This could be a legitimate doubleheader
+      result.warnings.push('Player appears in multiple games - possible doubleheader');
+      result.action = 'add';
+      result.confidence = 0.8;
+    }
+  }
+  
+  return result;
+}
 
 /**
  * Cleans player name by removing potential trailing position abbreviations.
@@ -368,10 +641,25 @@ function createDirectoryIfNotExists(dirPath) {
 }
 
 /**
- * Main function to process the CSV and update the JSON.
+ * Main function to process the CSV and update the JSON with enhanced validation.
  */
-function processStatsFile(csvFilePath) {
-    console.log(`Processing stats file: ${csvFilePath}`);
+async function processStatsFile(csvFilePath) {
+    console.log(`🔄 Processing stats file: ${csvFilePath}`);
+
+    // 0. Enhanced Pre-Processing Validation
+    if (ENHANCED_CONFIG.ENABLE_ENHANCED_VALIDATION) {
+        console.log('🛡️  Enhanced validation enabled');
+        
+        // Load processing log
+        const processingLog = loadProcessingLog();
+        
+        // Check if file already processed
+        if (isFileAlreadyProcessed(processingLog, csvFilePath)) {
+            console.log(`⏭️  File already processed and unchanged: ${csvFilePath}`);
+            console.log('   To reprocess, delete or modify the CSV file');
+            return;
+        }
+    }
 
     // 1. Validate and Parse CSV Filename
     const csvFileName = path.basename(csvFilePath);
@@ -379,23 +667,53 @@ function processStatsFile(csvFilePath) {
     const nameParts = csvFileName.match(/^([A-Z]{2,3})_(hitting|pitching)_(\w+)_(\d{1,2})_(\d{4})_(\d+)\.csv$/i);
 
     if (!nameParts) {
-        console.error(`Error: Invalid CSV filename format: "${csvFileName}". Expected format: TEAM_[hitting|pitching]_month_day_year_gameId.csv`);
+        console.error(`❌ Error: Invalid CSV filename format: "${csvFileName}". Expected format: TEAM_[hitting|pitching]_month_day_year_gameId.csv`);
         process.exit(1);
     }
 
     const [, teamAbbreviation, statType, month, day, year, gameId] = nameParts;
     const monthLower = month.toLowerCase();
     const dayPadded = day.padStart(2, '0');
+    const gameDate = `${year}-${month.padStart(2, '0')}-${dayPadded}`;
 
-    console.log(`Parsed info: Team=${teamAbbreviation}, Type=${statType}, Year=${year}, Month=${monthLower}, Day=${dayPadded}, GameId=${gameId}`);
+    console.log(`📊 Parsed info: Team=${teamAbbreviation}, Type=${statType}, Year=${year}, Month=${monthLower}, Day=${dayPadded}, GameId=${gameId}, Date=${gameDate}`);
+
+    // 1.5. Enhanced Game ID Validation
+    if (ENHANCED_CONFIG.ENABLE_ENHANCED_VALIDATION) {
+        const gameIdValidation = validateGameId(gameId, gameDate);
+        
+        if (!gameIdValidation.isValid) {
+            console.error(`❌ Invalid game ID: ${gameId} - ${gameIdValidation.warnings.join(', ')}`);
+            console.error('   Stopping processing to prevent data corruption');
+            process.exit(1);
+        }
+        
+        if (gameIdValidation.isSuspicious) {
+            console.warn(`⚠️  Suspicious game ID detected: ${gameId}`);
+            gameIdValidation.warnings.forEach(warning => 
+                console.warn(`   - ${warning}`)
+            );
+            
+            if (gameIdValidation.recommendation === 'investigate') {
+                console.warn('   Proceeding with caution...');
+            }
+        }
+        
+        // Check for suspicious date ranges
+        const suspiciousDate = checkSuspiciousDate(gameDate);
+        if (suspiciousDate) {
+            console.warn(`⚠️  Processing file in known problem period: ${suspiciousDate.reason}`);
+            console.warn('   Enhanced duplicate detection will be applied');
+        }
+    }
 
     // 2. Construct Target JSON File Path
     const jsonFilePath = path.join(BASE_DATA_DIR, year, monthLower, `${monthLower}_${dayPadded}_${year}.json`);
-    console.log(`Target JSON file: ${jsonFilePath}`);
+    console.log(`📁 Target JSON file: ${jsonFilePath}`);
 
     // 3. Check if JSON File Exists
     if (!fs.existsSync(jsonFilePath)) {
-        console.error(`Error: Target JSON file not found: "${jsonFilePath}". Please ensure the schedule generator has run for this date.`);
+        console.error(`❌ Error: Target JSON file not found: "${jsonFilePath}". Please ensure the schedule generator has run for this date.`);
         process.exit(1);
     }
 
@@ -431,7 +749,6 @@ function processStatsFile(csvFilePath) {
     }
 
     // 6. Update Rosters File with New Players
-    const gameDate = `${year}-${monthLower === 'january' ? '01' : monthLower === 'february' ? '02' : monthLower === 'march' ? '03' : monthLower === 'april' ? '04' : monthLower === 'may' ? '05' : monthLower === 'june' ? '06' : monthLower === 'july' ? '07' : monthLower === 'august' ? '08' : monthLower === 'september' ? '09' : monthLower === 'october' ? '10' : monthLower === 'november' ? '11' : '12'}-${dayPadded}`;
     updateRostersFile(playersData, gameDate);
 
     // 7. Read Existing JSON Data
@@ -444,36 +761,103 @@ function processStatsFile(csvFilePath) {
         process.exit(1);
     }
 
-    // 8. Update JSON Data - Merging with existing players
+    // 7.5. Create backup before modification
+    if (ENHANCED_CONFIG.ENABLE_AUTOMATIC_BACKUP) {
+        createJsonBackup(jsonFilePath);
+    }
+
+    // 8. Enhanced JSON Data Update with intelligent duplicate detection
     if (!jsonData.players) {
         jsonData.players = [];
     }
     
     const existingPlayers = jsonData.players;
+    let playersAdded = 0;
+    let playersUpdated = 0;
+    let playersSkipped = 0;
+    const validationWarnings = [];
+    
+    console.log(`🔍 Processing ${playersData.length} players with enhanced duplicate detection...`);
     
     for (const newPlayer of playersData) {
-        // For each new player, check if they already exist (same name, team, type, and gameId)
-        const existingPlayerIndex = existingPlayers.findIndex(
-            p => p.name === newPlayer.name && 
-                 p.team === newPlayer.team && 
-                 p.gameId === newPlayer.gameId &&
-                 (p.playerType === newPlayer.playerType || (!p.playerType && statType.toLowerCase() === 'hitting'))
+        // Enhanced player statistics validation
+        if (ENHANCED_CONFIG.ENABLE_ENHANCED_VALIDATION) {
+            const statsWarnings = validatePlayerStats(newPlayer);
+            if (statsWarnings.length > 0) {
+                console.warn(`⚠️  Player stats validation warnings for ${newPlayer.name}:`);
+                statsWarnings.forEach(warning => console.warn(`   - ${warning}`));
+                validationWarnings.push({
+                    player: newPlayer.name,
+                    warnings: statsWarnings
+                });
+            }
+        }
+        
+        // Enhanced duplicate detection with prevention logic
+        const duplicateAnalysis = detectEnhancedDuplicatesWithPrevention(
+            existingPlayers, 
+            newPlayer, 
+            gameId, 
+            gameDate,
+            csvFilePath,
+            processingLog
         );
         
-        if (existingPlayerIndex >= 0) {
-            console.log(`Updating stats for existing player: ${newPlayer.name} (game ${gameId})`);
-            existingPlayers[existingPlayerIndex] = { 
-                ...existingPlayers[existingPlayerIndex], 
-                ...newPlayer 
-            };
-        } else {
-            console.log(`Adding new player: ${newPlayer.name} (game ${gameId})`);
-            existingPlayers.push(newPlayer);
+        // Log warnings from duplicate analysis
+        if (duplicateAnalysis.warnings.length > 0) {
+            duplicateAnalysis.warnings.forEach(warning => 
+                console.warn(`⚠️  ${newPlayer.name}: ${warning}`)
+            );
+        }
+        
+        // Take action based on duplicate analysis
+        switch (duplicateAnalysis.action) {
+            case 'update':
+                console.log(`🔄 Updating existing player: ${newPlayer.name} (game ${gameId})`);
+                existingPlayers[duplicateAnalysis.duplicateIndex] = { 
+                    ...existingPlayers[duplicateAnalysis.duplicateIndex], 
+                    ...newPlayer 
+                };
+                playersUpdated++;
+                break;
+                
+            case 'add':
+                console.log(`➕ Adding new player: ${newPlayer.name} (game ${gameId})`);
+                existingPlayers.push(newPlayer);
+                playersAdded++;
+                break;
+                
+            case 'skip':
+                console.warn(`🚫 DUPLICATE PREVENTED: ${newPlayer.name} (${duplicateAnalysis.duplicateType})`);
+                console.warn(`   📋 Reason: ${duplicateAnalysis.warnings.join(', ')}`);
+                console.warn(`   🎯 Confidence: ${(duplicateAnalysis.confidence * 100).toFixed(1)}%`);
+                playersSkipped++;
+                break;
+                
+            default:
+                console.warn(`❓ Unknown action for player: ${newPlayer.name} - adding by default`);
+                existingPlayers.push(newPlayer);
+                playersAdded++;
         }
     }
     
     jsonData.players = existingPlayers;
-    console.log(`JSON now contains ${jsonData.players.length} total players`);
+    
+    // Enhanced processing summary
+    console.log(`✅ Enhanced processing complete:`);
+    console.log(`   📊 Total players in JSON: ${jsonData.players.length}`);
+    console.log(`   ➕ Players added: ${playersAdded}`);
+    console.log(`   🔄 Players updated: ${playersUpdated}`);
+    console.log(`   ⏭️  Players skipped: ${playersSkipped}`);
+    
+    if (validationWarnings.length > 0) {
+        console.log(`   ⚠️  Validation warnings: ${validationWarnings.length}`);
+    }
+    
+    if (playersSkipped > 0) {
+        console.warn(`   🚨 ${playersSkipped} players were skipped due to suspected duplicates`);
+        console.warn(`   This may indicate data quality issues requiring investigation`);
+    }
 
     // 9. Update game scores based on player statistics
     console.log("Starting game score update process...");
@@ -495,10 +879,34 @@ function processStatsFile(csvFilePath) {
     // 10. Write Updated JSON Data Back to File
     try {
         fs.writeFileSync(jsonFilePath, JSON.stringify(jsonData, null, 2));
-        console.log(`Successfully updated JSON file: "${jsonFilePath}"`);
+        console.log(`✅ Successfully updated JSON file: "${jsonFilePath}"`);
     } catch (error) {
-        console.error(`Error writing updated JSON file "${jsonFilePath}": ${error.message}`);
+        console.error(`❌ Error writing updated JSON file "${jsonFilePath}": ${error.message}`);
         process.exit(1);
+    }
+    
+    // 11. Enhanced Post-Processing Tasks
+    if (ENHANCED_CONFIG.ENABLE_PROCESSING_TRACKING) {
+        // Update processing log
+        const processingLog = loadProcessingLog();
+        saveProcessingLog(processingLog, csvFilePath, gameId);
+        console.log(`📝 Updated processing log`);
+    }
+    
+    // Final enhanced summary
+    console.log(`🎯 Processing Summary for ${csvFileName}:`);
+    console.log(`   📅 Date: ${gameDate}`);
+    console.log(`   🆔 Game ID: ${gameId}`);
+    console.log(`   🏃 Players Added: ${playersAdded}`);
+    console.log(`   🔄 Players Updated: ${playersUpdated}`);
+    console.log(`   ⏭️  Players Skipped: ${playersSkipped}`);
+    
+    if (validationWarnings.length > 0) {
+        console.log(`   ⚠️  Validation Issues: ${validationWarnings.length} players had warnings`);
+    }
+    
+    if (playersSkipped > 0 || validationWarnings.length > 0) {
+        console.log(`💡 Recommendation: Review processing logs and consider running duplicate detection analysis`);
     }
 }
 
@@ -522,6 +930,36 @@ try {
      process.exit(1);
 }
 
-processStatsFile(csvFilePath);
+// Enhanced processing with lock management
+async function main() {
+    try {
+        // Clean up any stale locks from previous runs
+        cleanupStaleLocks();
+        
+        // Acquire processing lock to prevent concurrent processing
+        const lockAcquired = await acquireProcessingLock(csvFilePath);
+        if (!lockAcquired) {
+            console.error('❌ Could not acquire processing lock - file may be currently processing');
+            process.exit(1);
+        }
+        
+        // Process the file
+        await processStatsFile(csvFilePath);
+        
+        console.log('✅ Stat loading process finished successfully.');
+        
+    } catch (error) {
+        console.error('❌ Error during stat loading:', error.message);
+        process.exit(1);
+    } finally {
+        // Always release the lock
+        releaseProcessingLock(csvFilePath);
+    }
+}
 
-console.log('Stat loading process finished.');
+// Run the enhanced main function
+main().catch(error => {
+    console.error('❌ Fatal error:', error.message);
+    releaseProcessingLock(csvFilePath);
+    process.exit(1);
+});
