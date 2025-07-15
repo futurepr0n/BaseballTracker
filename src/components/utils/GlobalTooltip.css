@@ -708,7 +708,7 @@
 .global-tooltip {
   position: fixed;
   z-index: 9999; /* Highest z-index to ensure tooltips are always on top */
-  background-color: #ffffff !important;
+  background-color: #f7fafc !important; /* Light gray background for better contrast */
   border: 1px solid var(--border-light, #e2e8f0) !important;
   border-radius: 8px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
@@ -2363,5 +2363,85 @@
     align-items: flex-start;
     gap: 4px;
   }
+}
+
+/**
+ * CRITICAL TOOLTIP CONTRAST FIXES
+ * Ensure all tooltips have proper contrast with white backgrounds and dark text
+ * These fixes address the dark background/dark text readability issues
+ */
+
+/* 1. Force white background on main tooltip container */
+.global-tooltip {
+  background-color: #ffffff !important;
+  color: #1a202c !important;
+}
+
+/* 2. Fix all h4 headers to dark text */
+.global-tooltip h4 {
+  color: #1a202c !important;
+}
+
+/* 3. Fix explainer text to dark gray */
+.global-tooltip .streak-progression-explainer {
+  color: #4a5568 !important;
+}
+
+/* 4. Fix table headers to dark text */
+.global-tooltip table th {
+  color: #1a202c !important;
+  background-color: #f7fafc !important;
+}
+
+/* 5. Fix table cells to dark text */
+.global-tooltip table td {
+  color: #1a202c !important;
+}
+
+/* 6. Fix rate colors with proper contrast */
+.global-tooltip .high-rate {
+  color: #52c41a !important;
+}
+
+.global-tooltip .medium-rate {
+  color: #faad14 !important;
+}
+
+.global-tooltip .low-rate {
+  color: #ff4d4f !important;
+}
+
+/* 7. Fix summary labels and values */
+.global-tooltip .summary-label {
+  color: #4a5568 !important;
+}
+
+.global-tooltip .summary-value {
+  color: #1a202c !important;
+}
+
+/* 8. Fix tooltip date items (DayOfWeekHitLeaders) */
+.global-tooltip .day-hit-date-item {
+  color: #1a202c !important;
+  background-color: #ffffff !important;
+}
+
+.global-tooltip .day-hit-more-dates {
+  color: #1a202c !important;
+}
+
+.global-tooltip .no-date-data {
+  color: #1a202c !important;
+}
+
+/* 9. Fix summary backgrounds to light gray instead of dark */
+.global-tooltip .day-hit-summary,
+.global-tooltip .streak-summary {
+  background-color: #f7fafc !important;
+}
+
+/* 10. Ensure no-progression-data text is visible */
+.global-tooltip .no-progression-data {
+  color: #68778d !important;
 }
 
