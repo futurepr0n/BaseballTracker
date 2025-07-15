@@ -244,7 +244,7 @@ body .day-hit-tooltip {
   flex-direction: column;
   gap: 8px;
   margin-bottom: 15px;
-  background-color: #fffdf5;
+  background-color: #f7fafc !important;
   padding: 10px;
   border-radius: 4px;
   border-left: 3px solid #ffc107;
@@ -257,15 +257,16 @@ body .day-hit-tooltip {
 }
 
 .day-hit-tooltip .summary-label {
-  color: #666;
+  color: #4a5568 !important;
 }
 
 .day-hit-tooltip .summary-value {
   font-weight: 500;
+  color: #1a202c !important;
 }
 
 .day-hit-tooltip .summary-value.highlight {
-  color: #e6a700;
+  color: #3182ce !important;
   font-weight: 700;
 }
 
@@ -273,19 +274,22 @@ body .day-hit-tooltip {
 .day-hit-tooltip .day-hit-games h4 {
   margin: 0 0 8px 0;
   font-size: 0.9rem;
-  color: #555;
+  color: #1a202c !important;
 }
 
 .day-hit-tooltip .day-hit-date-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  background-color: #f7fafc !important;
 }
 
 .day-hit-tooltip .day-hit-date-item {
   padding: 6px 8px;
   border-bottom: 1px solid #f5f5f5;
   font-size: 0.85rem;
+  color: #1a202c !important;
+  background-color: white !important;
 }
 
 .day-hit-tooltip .day-hit-date-item:last-child {
@@ -295,7 +299,7 @@ body .day-hit-tooltip {
 .day-hit-tooltip .day-hit-more-dates {
   text-align: center;
   font-style: italic;
-  color: #999;
+  color: #1a202c !important;
   font-size: 0.8rem;
   margin-top: 8px;
 }

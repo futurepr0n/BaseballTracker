@@ -708,8 +708,8 @@
 .global-tooltip {
   position: fixed;
   z-index: 9999; /* Highest z-index to ensure tooltips are always on top */
-  background-color: #ffffff;
-  border: 1px solid var(--border-light, #e2e8f0);
+  background-color: #ffffff !important;
+  border: 1px solid var(--border-light, #e2e8f0) !important;
   border-radius: 8px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   overflow: hidden;
@@ -1258,14 +1258,14 @@
 
 .global-tooltip .streak-progression-header h4 {
   margin: 0 0 8px 0;
-  color: #1a202c;
+  color: #1a202c !important;
   font-size: 1rem;
 }
 
 .global-tooltip .streak-progression-explainer {
   margin: 0;
   font-size: 0.85rem;
-  color: #4a5568;
+  color: #4a5568 !important;
   font-style: italic;
 }
 
@@ -1284,39 +1284,39 @@
 
 /* Light mode with explicit colors (like enhanced-game-table) */
 .global-tooltip .streak-progression-table td {
-  color: #1a202c;
-  background-color: white;
+  color: #1a202c !important;
+  background-color: white !important;
 }
 
 .global-tooltip .streak-progression-table th {
-  background-color: #f7fafc;
+  background-color: #f7fafc !important;
   font-weight: 600;
-  color: #1a202c;
+  color: #1a202c !important;
   font-size: 0.9rem;
 }
 
 .global-tooltip .streak-progression-table tr.current-streak {
-  background-color: #dbeafe;
+  background-color: #dbeafe !important;
   font-weight: 600;
 }
 
 .global-tooltip .streak-progression-table .high-rate {
-  color: #52c41a;
+  color: #52c41a !important;
   font-weight: 600;
 }
 
 .global-tooltip .streak-progression-table .medium-rate {
-  color: #faad14;
+  color: #faad14 !important;
   font-weight: 600;
 }
 
 .global-tooltip .streak-progression-table .low-rate {
-  color: #ff4d4f;
+  color: #ff4d4f !important;
   font-weight: 600;
 }
 
 .global-tooltip .no-progression-data {
-  color: var(--text-muted, #68778d);
+  color: var(--text-muted, #68778d) !important;
   font-style: italic;
   text-align: center;
   padding: 20px 0;
