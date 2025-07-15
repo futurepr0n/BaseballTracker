@@ -957,9 +957,9 @@
 /* Dark mode support - Both system preference and theme class */
 @media (prefers-color-scheme: dark) {
   .global-tooltip {
-    background-color: #1f2937;
+    background-color: #f7fafc !important; /* Use light background for all tooltips */
     border-color: #374151;
-    color: #f9fafb;
+    color: #1a202c !important; /* Use dark text for contrast */
   }
   
   .global-tooltip .tooltip-header {
@@ -1065,9 +1065,9 @@
 
 /* Theme-based dark mode support for applications using theme classes */
 .theme-dark .global-tooltip {
-  background-color: #1f2937;
+  background-color: #f7fafc !important; /* Use light background for all tooltips */
   border-color: #374151;
-  color: #f9fafb;
+  color: #1a202c !important; /* Use dark text for contrast */
 }
 
 .theme-dark .global-tooltip .tooltip-header {
