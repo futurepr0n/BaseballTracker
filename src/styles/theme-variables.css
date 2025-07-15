@@ -77,10 +77,10 @@
   --backdrop-filter-light: var(--glass-blur-light);
   --backdrop-filter-header: var(--glass-blur-header);
   
-  /* CRITICAL: Text colors for glass mode - dark text on light glass backgrounds */
-  --text-primary: #1a1a2e;
-  --text-secondary: #333333;
-  --text-muted: #555555;
+  /* CRITICAL: Text colors for glass mode - enhanced contrast for readability */
+  --text-primary: #1a202c;
+  --text-secondary: #2d3748;
+  --text-muted: #4a5568;
   --accent-color: #0056b3;
   --accent-hover: #004494;
   
@@ -263,12 +263,12 @@
   }
   
   .theme-glass {
-    /* CRITICAL: Dark mode glass text colors - ensure visibility on transparent backgrounds */
+    /* CRITICAL: Dark mode glass text colors - high contrast for glass backgrounds */
     --text-primary: #ffffff;
-    --text-secondary: #cccccc;
-    --text-muted: #999999;
-    --accent-color: #4CAF50;
-    --accent-hover: #45a049;
+    --text-secondary: #e2e8f0;
+    --text-muted: #cbd5e0;
+    --accent-color: #60a5fa;
+    --accent-hover: #3b82f6;
     
     /* Dark mode glass adjustments */
     --surface-primary: rgba(255, 255, 255, 0.05);

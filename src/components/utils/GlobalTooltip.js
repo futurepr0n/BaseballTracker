@@ -4,10 +4,12 @@
  */
 import React, { useEffect, useRef } from 'react';
 import { useTooltip } from './TooltipContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import './GlobalTooltip.css';
 
 const GlobalTooltip = () => {
   const { activeTooltip, tooltipPosition, tooltipData, closeTooltip } = useTooltip();
+  const { themeMode } = useTheme();
   const tooltipRef = useRef(null);
 
   // Deduplicate game data by date, keeping the most complete entry
@@ -1312,7 +1314,7 @@ const GlobalTooltip = () => {
       />
       <div
         ref={tooltipRef}
-        className="global-tooltip"
+        className={`global-tooltip theme-${themeMode}`}
         data-tooltip-id={activeTooltip}
       >
       <div className="tooltip-header">

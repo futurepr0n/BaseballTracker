@@ -14,8 +14,8 @@
   margin: 0 0 12px 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #1f2937;
-  border-bottom: 2px solid #e5e7eb;
+  color: var(--text-primary, #1a202c);
+  border-bottom: 2px solid var(--border-light, #e2e8f0);
   padding-bottom: 8px;
 }
 
@@ -23,7 +23,7 @@
   margin: 16px 0 8px 0;
   font-size: 0.95rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary, #4a5568);
 }
 
 .pitcher-overview {
@@ -32,7 +32,7 @@
   align-items: center;
   margin-bottom: 16px;
   padding: 12px;
-  background-color: #f9fafb;
+  background-color: var(--background-light, #f7fafc);
   border-radius: 6px;
 }
 
@@ -44,13 +44,13 @@
 
 .pitcher-hand {
   font-weight: 500;
-  color: #374151;
+  color: var(--text-secondary, #4a5568);
 }
 
 .estimated-indicator {
   font-size: 0.8rem;
-  color: #92400e;
-  background-color: #fbbf24;
+  color: var(--warning-dark, #92400e);
+  background-color: var(--warning-light, #fbbf24);
   padding: 2px 6px;
   border-radius: 12px;
   font-weight: 500;
@@ -71,12 +71,12 @@
 .percentage-value {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text-primary, #1a202c);
 }
 
 .percentage-label {
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--text-muted, #68778d);
   margin-top: 2px;
 }
 
@@ -87,7 +87,7 @@
 .batters-table {
   max-height: 200px;
   overflow-y: auto;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-light, #e2e8f0);
   border-radius: 6px;
 }
 
@@ -101,34 +101,34 @@
 .batters-table td {
   padding: 6px 8px;
   text-align: left;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--background-muted, #edf2f7);
 }
 
 .batters-table th {
-  background-color: #f9fafb;
+  background-color: var(--background-light, #f7fafc);
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary, #4a5568);
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
 .batters-table tbody tr:hover {
-  background-color: #f9fafb;
+  background-color: var(--background-light, #f7fafc);
 }
 
 .batter-name {
   font-weight: 500;
-  color: #1f2937;
+  color: var(--text-primary, #1a202c);
 }
 
 .batter-team {
-  color: #6b7280;
+  color: var(--text-muted, #68778d);
   font-size: 0.8rem;
 }
 
 .batter-hand {
-  color: #374151;
+  color: var(--text-secondary, #4a5568);
   font-weight: 500;
 }
 
@@ -136,10 +136,10 @@
   padding: 8px;
   text-align: center;
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--text-muted, #68778d);
   font-style: italic;
-  background-color: #f9fafb;
-  border-top: 1px solid #e5e7eb;
+  background-color: var(--background-light, #f7fafc);
+  border-top: 1px solid var(--border-light, #e2e8f0);
 }
 
 .arsenal-section {
@@ -160,15 +160,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  background-color: #f9fafb;
+  background-color: var(--background-light, #f7fafc);
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  border-left: 4px solid #666666; /* Default color, overridden by style attribute */
+  border: 1px solid var(--border-light, #e2e8f0);
+  border-left: 4px solid var(--text-secondary, #4a5568); /* Default color, overridden by style attribute */
   transition: all 0.2s ease;
 }
 
 .pitch-display-card:hover {
-  background-color: #f3f4f6;
+  background-color: var(--background-muted, #edf2f7);
   transform: translateX(2px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -192,14 +192,14 @@
 
 .pitch-name-display {
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary, #1a202c);
   font-size: 0.9rem;
   line-height: 1.2;
 }
 
 .pitch-type-abbr {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted, #68778d);
   font-weight: 500;
 }
 
@@ -218,22 +218,22 @@
 
 .metric-label {
   font-size: 0.7rem;
-  color: #6b7280;
+  color: var(--text-muted, #68778d);
   margin-bottom: 2px;
 }
 
 .metric-value {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary, #4a5568);
 }
 
 /* Arsenal Summary in Tooltip */
 .arsenal-summary-tooltip {
-  background-color: #f3f4f6;
+  background-color: var(--background-muted, #edf2f7);
   padding: 12px;
   border-radius: 6px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-light, #e2e8f0);
 }
 
 .summary-row {
@@ -247,16 +247,21 @@
   margin-bottom: 0;
 }
 
-.summary-label {
+.global-tooltip .summary-label {
   font-size: 0.85rem;
-  color: #374151;
+  color: var(--text-secondary, #4a5568);
   font-weight: 500;
 }
 
-.summary-value {
+.global-tooltip .summary-value {
   font-size: 0.85rem;
-  color: #1f2937;
+  color: var(--text-primary, #1a202c);
   font-weight: 600;
+}
+
+.global-tooltip .summary-value.highlight {
+  color: #3182ce;
+  font-weight: 700;
 }
 
 /* Arsenal Classification Badges */
@@ -288,7 +293,7 @@
 
 .classification-badge.standard {
   background-color: #fef3c7;
-  color: #92400e;
+  color: var(--warning-dark, #92400e);
   border: 1px solid #fed7aa;
 }
 
@@ -311,27 +316,27 @@
   flex-direction: column;
   align-items: center;
   padding: 8px 12px;
-  background-color: #f3f4f6;
+  background-color: var(--background-muted, #edf2f7);
   border-radius: 6px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-light, #e2e8f0);
   min-width: 80px;
 }
 
 .pitch-name {
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary, #1a202c);
   font-size: 0.85rem;
 }
 
 .pitch-usage {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-muted, #68778d);
   margin-top: 2px;
 }
 
 .pitch-velocity {
   font-size: 0.75rem;
-  color: #374151;
+  color: var(--text-secondary, #4a5568);
   font-weight: 500;
   margin-top: 2px;
 }
@@ -346,16 +351,16 @@
 }
 
 .comprehensive-pitch-card {
-  background-color: #f9fafb;
+  background-color: var(--background-light, #f7fafc);
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  border-left: 4px solid #666666; /* Default color, overridden by style attribute */
+  border: 1px solid var(--border-light, #e2e8f0);
+  border-left: 4px solid var(--text-secondary, #4a5568); /* Default color, overridden by style attribute */
   padding: 12px;
   transition: all 0.2s ease;
 }
 
 .comprehensive-pitch-card:hover {
-  background-color: #f3f4f6;
+  background-color: var(--background-muted, #edf2f7);
   transform: translateX(2px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -386,14 +391,14 @@
 
 .pitch-name-display {
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary, #1a202c);
   font-size: 0.95rem;
   line-height: 1.2;
 }
 
 .pitch-usage-info {
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--text-muted, #68778d);
   font-weight: 500;
 }
 
@@ -420,13 +425,13 @@
   align-items: center;
   text-align: center;
   padding: 6px;
-  background-color: #f3f4f6;
+  background-color: var(--background-muted, #edf2f7);
   border-radius: 4px;
 }
 
 .pitch-stats-grid .stat-label {
   font-size: 0.7rem;
-  color: #6b7280;
+  color: var(--text-muted, #68778d);
   margin-bottom: 2px;
   font-weight: 500;
 }
@@ -434,7 +439,7 @@
 .pitch-stats-grid .stat-value {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-secondary, #4a5568);
 }
 
 .run-value-display {
@@ -442,14 +447,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 6px 8px;
-  background-color: #f3f4f6;
+  background-color: var(--background-muted, #edf2f7);
   border-radius: 4px;
   margin-top: 8px;
 }
 
 .rv-label {
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--text-muted, #68778d);
   font-weight: 500;
 }
 
@@ -468,17 +473,17 @@
 
 /* Comprehensive Arsenal Summary */
 .comprehensive-arsenal-summary {
-  background-color: #f3f4f6;
+  background-color: var(--background-muted, #edf2f7);
   padding: 16px;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-light, #e2e8f0);
   margin-top: 16px;
 }
 
 .comprehensive-arsenal-summary .summary-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary, #1a202c);
   margin-bottom: 12px;
   text-align: center;
 }
@@ -497,18 +502,18 @@
   padding: 6px 8px;
   background-color: white;
   border-radius: 4px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-light, #e2e8f0);
 }
 
 .comprehensive-arsenal-summary .summary-label {
   font-size: 0.8rem;
-  color: #374151;
+  color: var(--text-secondary, #4a5568);
   font-weight: 500;
 }
 
 .comprehensive-arsenal-summary .summary-value {
   font-size: 0.8rem;
-  color: #1f2937;
+  color: var(--text-primary, #1a202c);
   font-weight: 600;
 }
 
@@ -703,8 +708,8 @@
 .global-tooltip {
   position: fixed;
   z-index: 9999; /* Highest z-index to ensure tooltips are always on top */
-  background-color: white;
-  border: 1px solid #ddd;
+  background-color: #ffffff;
+  border: 1px solid var(--border-light, #e2e8f0);
   border-radius: 8px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   overflow: hidden;
@@ -741,8 +746,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background-color: #f9f9f9;
-  border-bottom: 1px solid #eee;
+  background-color: var(--background-light, #f7fafc);
+  border-bottom: 1px solid var(--border-light, #e2e8f0);
   font-weight: 500;
   font-size: 0.95rem;
   position: sticky;
@@ -752,7 +757,7 @@
 }
 
 .global-tooltip .tooltip-title {
-  color: #333;
+  color: var(--text-primary, #1a202c);
   font-weight: 600;
 }
 
@@ -766,7 +771,7 @@
   justify-content: center;
   border-radius: 50%;
   cursor: pointer;
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   font-size: 0.95rem;
   transition: all 0.2s ease;
   user-select: none;
@@ -774,7 +779,7 @@
 
 .global-tooltip .close-tooltip:hover {
   background-color: rgba(0, 0, 0, 0.05);
-  color: #333;
+  color: var(--text-primary, #1a202c);
 }
 
 .global-tooltip .close-tooltip:focus {
@@ -795,17 +800,17 @@
 }
 
 .global-tooltip .tooltip-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--background-muted, #edf2f7);
   border-radius: 3px;
 }
 
 .global-tooltip .tooltip-content::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: var(--text-muted, #68778d);
   border-radius: 3px;
 }
 
 .global-tooltip .tooltip-content::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: var(--text-secondary, #4a5568);
 }
 
 /* Desktop optimizations */
@@ -920,16 +925,16 @@
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .global-tooltip {
-    border: 2px solid #333;
+    border: 2px solid var(--text-primary, #1a202c);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   }
   
   .global-tooltip .tooltip-header {
-    border-bottom: 2px solid #333;
+    border-bottom: 2px solid var(--text-primary, #1a202c);
   }
   
   .global-tooltip .close-tooltip {
-    border: 1px solid #333;
+    border: 1px solid var(--text-primary, #1a202c);
   }
 }
 
@@ -949,7 +954,7 @@
   }
 }
 
-/* Dark mode support */
+/* Dark mode support - Both system preference and theme class */
 @media (prefers-color-scheme: dark) {
   .global-tooltip {
     background-color: #1f2937;
@@ -959,7 +964,7 @@
   
   .global-tooltip .tooltip-header {
     background-color: #374151;
-    border-bottom-color: #4b5563;
+    border-bottom-color: var(--text-secondary, #4a5568);
   }
   
   .global-tooltip .tooltip-title {
@@ -973,6 +978,159 @@
   .global-tooltip .close-tooltip:hover {
     background-color: rgba(255, 255, 255, 0.1);
     color: #f9fafb;
+  }
+  
+  /* Streak progression table dark mode fixes */
+  .global-tooltip .streak-progression-table th {
+    background-color: #374151;
+    color: #f9fafb;
+    border-bottom-color: #4b5563;
+  }
+  
+  .global-tooltip .streak-progression-table td {
+    color: #e5e7eb;
+    background-color: #1f2937;
+    border-bottom-color: #4b5563;
+  }
+  
+  .global-tooltip .streak-progression-table tr.current-streak {
+    background-color: #1e3a8a;
+    color: #dbeafe;
+  }
+  
+  .global-tooltip .streak-progression-table tr.current-streak td {
+    color: #dbeafe;
+  }
+  
+  /* Dark mode summary sections */
+  .global-tooltip .streak-summary {
+    background-color: #374151;
+    color: #f9fafb;
+  }
+  
+  .global-tooltip .day-hit-summary {
+    background-color: #374151;
+    color: #f9fafb;
+  }
+  
+  /* Dark mode highlight text */
+  .global-tooltip .summary-value.highlight {
+    color: #60a5fa;
+  }
+  
+  /* Dark mode header text */
+  .global-tooltip .streak-progression-header h4 {
+    color: #f9fafb;
+  }
+  
+  .global-tooltip .streak-progression-explainer {
+    color: #e5e7eb;
+  }
+
+  /* Dark mode summary labels and values - Enhanced for better contrast */
+  .global-tooltip .summary-label {
+    color: #e5e7eb !important; /* Light gray for better contrast in dark mode */
+  }
+  
+  .global-tooltip .summary-value {
+    color: #f9fafb !important; /* White for better contrast in dark mode */
+  }
+}
+
+/* Theme-based dark mode support for applications using theme classes */
+.theme-dark .global-tooltip {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+.theme-dark .global-tooltip .tooltip-header {
+  background-color: #374151;
+  border-bottom-color: #4a5568;
+}
+
+.theme-dark .global-tooltip .tooltip-title {
+  color: #f9fafb;
+}
+
+.theme-dark .global-tooltip .close-tooltip {
+  color: #d1d5db;
+}
+
+.theme-dark .global-tooltip .close-tooltip:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #f9fafb;
+}
+
+.theme-dark .global-tooltip .summary-label {
+  color: #e5e7eb !important;
+}
+
+.theme-dark .global-tooltip .summary-value {
+  color: #f9fafb !important;
+}
+
+.theme-dark .global-tooltip .summary-value.highlight {
+  color: #60a5fa;
+}
+
+.theme-dark .global-tooltip .streak-summary {
+  background-color: #374151;
+  color: #f9fafb;
+}
+
+.theme-dark .global-tooltip .day-hit-summary {
+  background-color: #374151;
+  color: #f9fafb;
+}
+
+/* Theme-based dark mode table fixes */
+.theme-dark .global-tooltip .streak-progression-table th {
+  background-color: #374151;
+  color: #f9fafb;
+  border-bottom-color: #4b5563;
+}
+
+.theme-dark .global-tooltip .streak-progression-table td {
+  color: #e5e7eb;
+  background-color: #1f2937;
+  border-bottom-color: #4b5563;
+}
+
+/* Theme-based dark mode header text */
+.theme-dark .global-tooltip .streak-progression-header h4 {
+  color: #f9fafb;
+}
+
+.theme-dark .global-tooltip .streak-progression-explainer {
+  color: #e5e7eb;
+}
+
+.theme-dark .global-tooltip .streak-progression-table tr.current-streak {
+  background-color: #1e3a8a;
+  color: #dbeafe;
+}
+
+.theme-dark .global-tooltip .streak-progression-table tr.current-streak td {
+  color: #dbeafe !important;
+}
+
+/* Removed failsafe rules that were overriding dark mode styles */
+
+/* High contrast mode fallback for accessibility */
+@media (prefers-contrast: high) {
+  .global-tooltip .summary-label {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    padding: 2px 4px !important;
+    border-radius: 2px !important;
+  }
+  
+  .global-tooltip .summary-value {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    padding: 2px 4px !important;
+    border-radius: 2px !important;
   }
 }
 
@@ -996,7 +1154,7 @@
   flex-direction: column;
   gap: 10px;
   margin-bottom: 20px;
-  background-color: #f9f9f9;
+  background-color: var(--background-light, #f7fafc);
   padding: 12px;
   border-radius: 6px;
 }
@@ -1007,20 +1165,7 @@
   align-items: center;
 }
 
-.global-tooltip .summary-label {
-  font-weight: 500;
-  color: #666;
-}
-
-.global-tooltip .summary-value {
-  font-weight: 600;
-  color: #333;
-}
-
-.global-tooltip .summary-value.highlight {
-  color: #0056b3;
-  font-weight: 700;
-}
+/* Base summary label/value styles moved to respect dark mode cascade */
 
 .global-tooltip .streak-progression-header {
   margin-bottom: 12px;
@@ -1028,14 +1173,14 @@
 
 .global-tooltip .streak-progression-header h4 {
   margin: 0 0 8px 0;
-  color: #333;
+  color: #1a202c;
   font-size: 1rem;
 }
 
 .global-tooltip .streak-progression-explainer {
   margin: 0;
   font-size: 0.85rem;
-  color: #666;
+  color: #4a5568;
   font-style: italic;
 }
 
@@ -1049,18 +1194,24 @@
 .global-tooltip .streak-progression-table td {
   padding: 8px 12px;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Light mode with explicit colors (like enhanced-game-table) */
+.global-tooltip .streak-progression-table td {
+  color: #1a202c;
+  background-color: white;
 }
 
 .global-tooltip .streak-progression-table th {
-  background-color: #f5f5f5;
+  background-color: #f7fafc;
   font-weight: 600;
-  color: #333;
+  color: #1a202c;
   font-size: 0.9rem;
 }
 
 .global-tooltip .streak-progression-table tr.current-streak {
-  background-color: #e6f7ff;
+  background-color: #dbeafe;
   font-weight: 600;
 }
 
@@ -1080,7 +1231,7 @@
 }
 
 .global-tooltip .no-progression-data {
-  color: #888;
+  color: var(--text-muted, #68778d);
   font-style: italic;
   text-align: center;
   padding: 20px 0;
@@ -1096,7 +1247,7 @@
   flex-direction: column;
   gap: 10px;
   margin-bottom: 20px;
-  background-color: #f9f9f9;
+  background-color: var(--background-light, #f7fafc);
   padding: 12px;
   border-radius: 6px;
 }
@@ -1113,7 +1264,7 @@
 
 .global-tooltip .day-hit-games h4 {
   margin: 0 0 12px 0;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   font-size: 1rem;
 }
 
@@ -1125,8 +1276,8 @@
 
 .global-tooltip .day-hit-date-item {
   padding: 6px 0;
-  border-bottom: 1px solid #f0f0f0;
-  color: #666;
+  border-bottom: 1px solid var(--border-light, #e2e8f0);
+  color: var(--text-secondary, #4a5568);
   font-size: 0.9rem;
 }
 
@@ -1137,12 +1288,12 @@
 .global-tooltip .day-hit-more-dates {
   margin: 8px 0 0 0;
   font-size: 0.85rem;
-  color: #888;
+  color: var(--text-muted, #68778d);
   font-style: italic;
 }
 
 .global-tooltip .no-date-data {
-  color: #888;
+  color: var(--text-muted, #68778d);
   font-style: italic;
   text-align: center;
   padding: 20px 0;
@@ -1172,7 +1323,7 @@
   flex-direction: column;
   gap: 10px;
   margin: 0 0 20px 0 !important; /* Remove any top margin */
-  background-color: #f9f9f9;
+  background-color: var(--background-light, #f7fafc);
   padding: 12px;
   border-radius: 6px;
 }
@@ -1189,7 +1340,7 @@
 
 .global-tooltip .pitcher-hr-breakdown h4 {
   margin: 0 0 12px 0;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   font-size: 1rem;
 }
 
@@ -1197,7 +1348,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background-color: #f9f9f9;
+  background-color: var(--background-light, #f7fafc);
   padding: 12px;
   border-radius: 6px;
 }
@@ -1210,15 +1361,15 @@
 
 .global-tooltip .venue-label {
   font-weight: 500;
-  color: #666;
+  color: var(--text-secondary, #4a5568);
 }
 
 .global-tooltip .venue-stats {
-  color: #333;
+  color: var(--text-primary, #1a202c);
 }
 
 .global-tooltip .venue-rate {
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   font-size: 0.9rem;
   margin-left: 4px;
 }
@@ -1229,7 +1380,7 @@
 
 .global-tooltip .pitcher-hr-opponents h4 {
   margin: 0 0 12px 0;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   font-size: 1rem;
 }
 
@@ -1237,7 +1388,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 8px;
-  background-color: #f9f9f9;
+  background-color: var(--background-light, #f7fafc);
   padding: 12px;
   border-radius: 6px;
 }
@@ -1247,7 +1398,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 4px 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-light, #e2e8f0);
 }
 
 .global-tooltip .opponent-stat:last-child {
@@ -1256,11 +1407,11 @@
 
 .global-tooltip .opponent-name {
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary, #1a202c);
 }
 
 .global-tooltip .opponent-count {
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   font-size: 0.9rem;
 }
 
@@ -1270,7 +1421,7 @@
 
 .global-tooltip .pitcher-hr-recent h4 {
   margin: 0 0 12px 0;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   font-size: 1rem;
 }
 
@@ -1278,7 +1429,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  background-color: #f9f9f9;
+  background-color: var(--background-light, #f7fafc);
   padding: 12px;
   border-radius: 6px;
 }
@@ -1289,7 +1440,7 @@
   gap: 8px;
   align-items: center;
   padding: 4px 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-light, #e2e8f0);
   font-size: 0.9rem;
 }
 
@@ -1298,21 +1449,21 @@
 }
 
 .global-tooltip .game-date {
-  color: #666;
+  color: var(--text-secondary, #4a5568);
 }
 
 .global-tooltip .game-venue {
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   font-size: 0.8rem;
 }
 
 .global-tooltip .game-opponent {
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary, #1a202c);
 }
 
 .global-tooltip .game-hrs {
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   font-size: 0.9rem;
 }
 
@@ -1344,12 +1495,12 @@
 
 .global-tooltip .momentum-factors-breakdown h4 {
   margin: 0 0 12px 0;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   font-size: 1rem;
 }
 
 .global-tooltip .momentum-factor {
-  background-color: #f9f9f9;
+  background-color: var(--background-light, #f7fafc);
   padding: 12px;
   border-radius: 6px;
   margin-bottom: 12px;
@@ -1365,7 +1516,7 @@
 
 .global-tooltip .factor-type {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   font-size: 0.9rem;
 }
 
@@ -1379,7 +1530,7 @@
 }
 
 .global-tooltip .factor-description {
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   font-size: 0.85rem;
   line-height: 1.4;
   margin-bottom: 6px;
@@ -1387,7 +1538,7 @@
 
 .global-tooltip .factor-details {
   font-size: 0.8rem;
-  color: #888;
+  color: var(--text-muted, #68778d);
   font-style: italic;
 }
 
@@ -1418,7 +1569,7 @@
 }
 
 .global-tooltip .streak-label {
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   font-weight: 500;
 }
 
@@ -1454,7 +1605,7 @@
 }
 
 .global-tooltip .momentum-label {
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   font-weight: 500;
 }
 
@@ -1515,12 +1666,12 @@
 
 .global-tooltip .risk-factors-breakdown h4 {
   margin: 0 0 12px 0;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   font-size: 1rem;
 }
 
 .global-tooltip .risk-factor {
-  background-color: #f9f9f9;
+  background-color: var(--background-light, #f7fafc);
   padding: 12px;
   border-radius: 6px;
   margin-bottom: 12px;
@@ -1536,7 +1687,7 @@
 
 .global-tooltip .factor-type {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   font-size: 0.9rem;
 }
 
@@ -1550,7 +1701,7 @@
 }
 
 .global-tooltip .factor-description {
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   font-size: 0.85rem;
   line-height: 1.4;
   margin-bottom: 6px;
@@ -1558,7 +1709,7 @@
 
 .global-tooltip .factor-details {
   font-size: 0.8rem;
-  color: #888;
+  color: var(--text-muted, #68778d);
   font-style: italic;
 }
 
@@ -1572,7 +1723,7 @@
 
 .global-tooltip .recent-performance-info h4 {
   margin: 0 0 10px 0;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   font-size: 1rem;
 }
 
@@ -1588,7 +1739,7 @@
   gap: 8px;
   align-items: center;
   padding: 4px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-light, #e2e8f0);
   font-size: 0.9rem;
 }
 
@@ -1597,16 +1748,16 @@
 }
 
 .global-tooltip .game-date {
-  color: #666;
+  color: var(--text-secondary, #4a5568);
 }
 
 .global-tooltip .game-stats {
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary, #1a202c);
 }
 
 .global-tooltip .game-avg {
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   font-size: 0.8rem;
 }
 
@@ -1637,7 +1788,7 @@
 }
 
 .global-tooltip .fatigue-label {
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   font-weight: 500;
 }
 
@@ -1673,7 +1824,7 @@
 /* Pitcher Matchup Tooltip Styles */
 .pitcher-matchup-details h4 {
   margin: 0 0 12px 0;
-  color: #1f2937;
+  color: var(--text-primary, #1a202c);
   font-size: 1.1rem;
   font-weight: 600;
 }
@@ -1684,7 +1835,7 @@
   align-items: center;
   margin-bottom: 16px;
   padding: 12px;
-  background-color: #f8fafc;
+  background-color: var(--background-light, #f7fafc);
   border-radius: 6px;
 }
 
@@ -1696,25 +1847,25 @@
   display: block;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text-primary, #1a202c);
 }
 
 .percentage-label {
   display: block;
   font-size: 0.8rem;
-  color: #6b7280;
+  color: var(--text-muted, #68778d);
   margin-top: 2px;
 }
 
 .pitcher-hand {
   font-size: 0.85rem;
-  color: #4b5563;
+  color: var(--text-secondary, #4a5568);
   font-weight: 500;
 }
 
 .batters-list h5 {
   margin: 0 0 8px 0;
-  color: #374151;
+  color: var(--text-secondary, #4a5568);
   font-size: 0.95rem;
   font-weight: 600;
 }
@@ -1731,23 +1882,23 @@
   justify-content: space-between;
   align-items: center;
   padding: 6px 8px;
-  background-color: #f9fafb;
+  background-color: var(--background-light, #f7fafc);
   border-radius: 4px;
   font-size: 0.85rem;
 }
 
 .batter-name {
   font-weight: 500;
-  color: #1f2937;
+  color: var(--text-primary, #1a202c);
 }
 
 .batter-team {
-  color: #6b7280;
+  color: var(--text-muted, #68778d);
   font-size: 0.8rem;
 }
 
 .batter-hand {
-  color: #4b5563;
+  color: var(--text-secondary, #4a5568);
   font-size: 0.8rem;
   font-weight: 500;
 }
@@ -1755,16 +1906,16 @@
 .no-batters {
   text-align: center;
   padding: 16px;
-  color: #6b7280;
+  color: var(--text-muted, #68778d);
   font-style: italic;
 }
 
 .matchup-context {
   margin-top: 12px;
   padding-top: 8px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border-light, #e2e8f0);
   text-align: center;
-  color: #6b7280;
+  color: var(--text-muted, #68778d);
 }
 
 /* Enhanced Positive Momentum Tooltip Styles */
@@ -1776,13 +1927,13 @@
 
 .global-tooltip .detailed-game-table h4 {
   margin: 0 0 12px 0;
-  color: #333;
+  color: var(--text-primary, #1a202c);
   font-size: 1rem;
   font-weight: 600;
 }
 
 .global-tooltip .game-table-container {
-  background-color: #f9f9f9;
+  background-color: var(--background-light, #f7fafc);
   border-radius: 6px;
   padding: 12px;
   overflow-x: auto;
@@ -1809,12 +1960,12 @@
 .global-tooltip .enhanced-game-table td {
   padding: 6px;
   text-align: center;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-light, #e2e8f0);
   background-color: white;
 }
 
 .global-tooltip .enhanced-game-table tr:hover {
-  background-color: #f5f5f5;
+  background-color: var(--background-light, #f7fafc);
 }
 
 /* Row styling based on performance */
@@ -1870,13 +2021,13 @@
 }
 
 .global-tooltip .enhanced-game-table .avg-average {
-  color: #666;
+  color: var(--text-secondary, #4a5568);
 }
 
 .global-tooltip .game-summary-totals {
   margin-top: 8px;
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   font-style: italic;
   text-align: center;
 }
@@ -1916,7 +2067,7 @@
 
 .global-tooltip .indicator-label {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   margin-bottom: 4px;
   font-weight: 500;
 }
@@ -1966,7 +2117,7 @@
 }
 
 .global-tooltip .cross-ref-type {
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   font-style: italic;
 }
 
@@ -2031,7 +2182,7 @@
 }
 
 .global-tooltip .analysis-label {
-  color: #666;
+  color: var(--text-secondary, #4a5568);
   font-weight: 500;
 }
 
@@ -2055,7 +2206,7 @@
 
 .global-tooltip .pattern-item {
   font-size: 0.75rem;
-  color: #555;
+  color: var(--text-secondary, #4a5568);
   margin: 1px 0;
 }
 
