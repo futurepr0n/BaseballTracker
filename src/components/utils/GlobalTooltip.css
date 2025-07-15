@@ -1035,6 +1035,32 @@
   .global-tooltip .summary-value {
     color: #f9fafb !important; /* White for better contrast in dark mode */
   }
+
+  /* Dark mode support for day-hit tooltip date items */
+  .global-tooltip .day-hit-date-list {
+    background-color: #374151 !important;
+  }
+
+  .global-tooltip .day-hit-date-item {
+    color: #f9fafb !important;
+    border-bottom-color: #4b5563 !important;
+    background-color: rgba(55, 65, 81, 0.5) !important;
+    font-weight: 500 !important;
+  }
+
+  .global-tooltip .day-hit-date-item:hover {
+    background-color: rgba(55, 65, 81, 0.8) !important;
+  }
+
+  .global-tooltip .day-hit-more-dates {
+    color: #e5e7eb !important;
+    font-weight: 500 !important;
+  }
+
+  .global-tooltip .no-date-data {
+    color: #e5e7eb !important;
+    font-weight: 500 !important;
+  }
 }
 
 /* Theme-based dark mode support for applications using theme classes */
@@ -1115,6 +1141,32 @@
   color: #dbeafe !important;
 }
 
+/* Dark mode support for day-hit tooltip date items */
+.theme-dark .global-tooltip .day-hit-date-list {
+  background-color: #374151 !important;
+}
+
+.theme-dark .global-tooltip .day-hit-date-item {
+  color: #f9fafb !important;
+  border-bottom-color: #4b5563 !important;
+  background-color: rgba(55, 65, 81, 0.5) !important;
+  font-weight: 500 !important;
+}
+
+.theme-dark .global-tooltip .day-hit-date-item:hover {
+  background-color: rgba(55, 65, 81, 0.8) !important;
+}
+
+.theme-dark .global-tooltip .day-hit-more-dates {
+  color: #e5e7eb !important;
+  font-weight: 500 !important;
+}
+
+.theme-dark .global-tooltip .no-date-data {
+  color: #e5e7eb !important;
+  font-weight: 500 !important;
+}
+
 /* Removed failsafe rules that were overriding dark mode styles */
 
 /* High contrast mode fallback for accessibility */
@@ -1131,6 +1183,39 @@
     background-color: #ffffff !important;
     padding: 2px 4px !important;
     border-radius: 2px !important;
+  }
+
+  /* High contrast mode for day-hit tooltip date items */
+  .global-tooltip .day-hit-date-list {
+    background-color: #ffffff !important;
+    border: 2px solid #000000 !important;
+  }
+
+  .global-tooltip .day-hit-date-item {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    border-bottom: 2px solid #000000 !important;
+    font-weight: 700 !important;
+  }
+
+  .global-tooltip .day-hit-date-item:hover {
+    background-color: #f0f0f0 !important;
+  }
+
+  .global-tooltip .day-hit-more-dates {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    padding: 2px 4px !important;
+    border-radius: 2px !important;
+    font-weight: 700 !important;
+  }
+
+  .global-tooltip .no-date-data {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    padding: 2px 4px !important;
+    border-radius: 2px !important;
+    font-weight: 700 !important;
   }
 }
 
@@ -1272,31 +1357,63 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  background-color: var(--background-light, #f7fafc);
+  border-radius: 6px;
+  overflow: hidden;
 }
 
+/* Enhanced date item styling with better contrast - Light mode by default */
 .global-tooltip .day-hit-date-item {
-  padding: 6px 0;
-  border-bottom: 1px solid var(--border-light, #e2e8f0);
-  color: var(--text-secondary, #4a5568);
-  font-size: 0.9rem;
+  padding: 8px 12px !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  color: #1a202c !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  background-color: #ffffff !important;
+  transition: background-color 0.2s ease;
+}
+
+/* Force light mode for non-dark theme tooltips */
+.global-tooltip:not(.theme-dark) .day-hit-date-item {
+  color: #1a202c !important;
+  background-color: #ffffff !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+.global-tooltip:not(.theme-dark) .day-hit-date-item:hover {
+  background-color: #f7fafc !important;
+}
+
+.global-tooltip:not(.theme-dark) .day-hit-more-dates {
+  color: #1a202c !important;
+}
+
+.global-tooltip:not(.theme-dark) .no-date-data {
+  color: #1a202c !important;
+}
+
+.global-tooltip .day-hit-date-item:hover {
+  background-color: #f7fafc !important;
 }
 
 .global-tooltip .day-hit-date-item:last-child {
-  border-bottom: none;
+  border-bottom: none !important;
 }
 
 .global-tooltip .day-hit-more-dates {
-  margin: 8px 0 0 0;
-  font-size: 0.85rem;
-  color: var(--text-muted, #68778d);
-  font-style: italic;
+  margin: 8px 0 0 0 !important;
+  font-size: 0.85rem !important;
+  color: #1a202c !important;
+  font-style: italic !important;
+  font-weight: 500 !important;
 }
 
 .global-tooltip .no-date-data {
-  color: var(--text-muted, #68778d);
-  font-style: italic;
-  text-align: center;
-  padding: 20px 0;
+  color: #1a202c !important;
+  font-style: italic !important;
+  text-align: center !important;
+  padding: 20px 0 !important;
+  font-weight: 500 !important;
 }
 
 /* Pitcher tooltip specific styles */
