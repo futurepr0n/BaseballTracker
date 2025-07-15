@@ -249,18 +249,18 @@
 
 .global-tooltip .summary-label {
   font-size: 0.85rem;
-  color: var(--text-secondary, #4a5568);
+  color: var(--text-secondary, #4a5568) !important;
   font-weight: 500;
 }
 
 .global-tooltip .summary-value {
   font-size: 0.85rem;
-  color: var(--text-primary, #1a202c);
+  color: var(--text-primary, #1a202c) !important;
   font-weight: 600;
 }
 
 .global-tooltip .summary-value.highlight {
-  color: #3182ce;
+  color: #3182ce !important;
   font-weight: 700;
 }
 
@@ -1332,7 +1332,7 @@
   flex-direction: column;
   gap: 10px;
   margin-bottom: 20px;
-  background-color: var(--background-light, #f7fafc);
+  background-color: var(--background-light, #f7fafc) !important;
   padding: 12px;
   border-radius: 6px;
 }
@@ -1349,7 +1349,7 @@
 
 .global-tooltip .day-hit-games h4 {
   margin: 0 0 12px 0;
-  color: var(--text-primary, #1a202c);
+  color: var(--text-primary, #1a202c) !important;
   font-size: 1rem;
 }
 
@@ -1357,7 +1357,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  background-color: var(--background-light, #f7fafc);
+  background-color: var(--background-light, #f7fafc) !important;
   border-radius: 6px;
   overflow: hidden;
 }
