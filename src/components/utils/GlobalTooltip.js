@@ -4,10 +4,12 @@
  */
 import React, { useEffect, useRef } from 'react';
 import { useTooltip } from './TooltipContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import './GlobalTooltip.css';
 
 const GlobalTooltip = () => {
   const { activeTooltip, tooltipPosition, tooltipData, closeTooltip } = useTooltip();
+  const { themeMode } = useTheme();
   const tooltipRef = useRef(null);
 
   // Position tooltip when it opens
@@ -1275,7 +1277,7 @@ const GlobalTooltip = () => {
       />
       <div
         ref={tooltipRef}
-        className="global-tooltip"
+        className={`global-tooltip theme-${themeMode}`}
         data-tooltip-id={activeTooltip}
       >
       <div className="tooltip-header">

@@ -28,7 +28,7 @@
 .dashboard-header h2 {
   margin-bottom: 5px;
   font-size: 1.8rem;
-  color: #333;
+  color: var(--text-primary, #333);
 }
 
 
@@ -1575,6 +1575,31 @@ html, body {
 }
 
 /* Player list and item styles now handled by PlayerItemStyles.css */
+
+/* Enhanced text readability across all theme combinations */
+.dashboard h1, .dashboard h2, .dashboard h3, .dashboard h4, .dashboard h5, .dashboard h6 {
+  color: var(--text-primary) !important;
+}
+
+.dashboard p, .dashboard span, .dashboard div {
+  color: var(--text-primary);
+}
+
+.dashboard .card h3 {
+  color: var(--text-primary) !important;
+}
+
+.dashboard .player-name {
+  color: var(--text-primary) !important;
+}
+
+.dashboard .player-team {
+  color: var(--text-secondary) !important;
+}
+
+.dashboard .stat-label {
+  color: var(--text-muted) !important;
+}
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {

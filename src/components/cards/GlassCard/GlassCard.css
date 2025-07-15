@@ -2,7 +2,7 @@
 
 /* Base Glass Card Styles */
 .glass-card {
-  background: rgba(255, 255, 255, 0.85) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
@@ -25,7 +25,7 @@
     0 12px 40px rgba(0, 0, 0, 0.15),
     0 4px 12px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
-  background: rgba(255, 255, 255, 0.9) !important;
+  background: rgba(255, 255, 255, 0.98) !important;
 }
 
 /* Glass Card Header */
@@ -132,13 +132,13 @@
 
 /* Dark Theme Glass Variants */
 .glass-card.dark-theme {
-  background: rgba(26, 26, 46, 0.85);
+  background: rgba(26, 26, 46, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #ffffff;
 }
 
 .glass-card.dark-theme:hover {
-  background: rgba(26, 26, 46, 0.9);
+  background: rgba(26, 26, 46, 0.98);
 }
 
 .glass-card.dark-theme .card-header {
