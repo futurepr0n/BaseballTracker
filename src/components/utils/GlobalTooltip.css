@@ -2445,3 +2445,106 @@
   color: #68778d !important;
 }
 
+/* 11. PITCHER TOOLTIP CONTRAST FIXES - Comprehensive overrides for all pitcher tooltip classes */
+
+/* Pitcher summary sections */
+.global-tooltip .pitcher-hr-summary {
+  background-color: #f7fafc !important;
+  color: #1a202c !important;
+}
+
+.global-tooltip .pitcher-hr-summary-item {
+  color: #1a202c !important;
+}
+
+/* Pitcher breakdown sections */
+.global-tooltip .pitcher-hr-breakdown {
+  color: #1a202c !important;
+}
+
+.global-tooltip .pitcher-hr-breakdown h4 {
+  color: #1a202c !important;
+}
+
+/* Venue labels and stats */
+.global-tooltip .venue-label {
+  color: #4a5568 !important;
+}
+
+.global-tooltip .venue-stats {
+  color: #1a202c !important;
+}
+
+.global-tooltip .venue-rate {
+  color: #4a5568 !important;
+}
+
+/* Opponents section */
+.global-tooltip .pitcher-hr-opponents {
+  color: #1a202c !important;
+}
+
+.global-tooltip .pitcher-hr-opponents h4 {
+  color: #1a202c !important;
+}
+
+.global-tooltip .opponent-stat {
+  color: #1a202c !important;
+}
+
+.global-tooltip .opponent-name {
+  color: #1a202c !important;
+}
+
+.global-tooltip .opponent-count {
+  color: #4a5568 !important;
+}
+
+/* Recent games section */
+.global-tooltip .pitcher-hr-recent {
+  color: #1a202c !important;
+}
+
+.global-tooltip .pitcher-hr-recent h4 {
+  color: #1a202c !important;
+}
+
+.global-tooltip .game-entry {
+  color: #1a202c !important;
+}
+
+.global-tooltip .game-date {
+  color: #1a202c !important;
+}
+
+.global-tooltip .game-venue {
+  color: #4a5568 !important;
+}
+
+.global-tooltip .game-opponent {
+  color: #1a202c !important;
+}
+
+.global-tooltip .game-hrs {
+  color: #4a5568 !important;
+}
+
+/* Home/Away stats grid */
+.global-tooltip .home-away-stats {
+  color: #1a202c !important;
+}
+
+.global-tooltip .stat-group {
+  color: #1a202c !important;
+}
+
+/* Opponents grid */
+.global-tooltip .opponents-grid {
+  color: #1a202c !important;
+}
+
+/* Recent games container */
+.global-tooltip .recent-games {
+  color: #1a202c !important;
+}
+
