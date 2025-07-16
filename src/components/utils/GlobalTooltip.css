@@ -249,18 +249,18 @@
 
 .global-tooltip .summary-label {
   font-size: 0.85rem;
-  color: var(--text-secondary, #4a5568);
+  color: var(--text-secondary, #4a5568) !important;
   font-weight: 500;
 }
 
 .global-tooltip .summary-value {
   font-size: 0.85rem;
-  color: var(--text-primary, #1a202c);
+  color: var(--text-primary, #1a202c) !important;
   font-weight: 600;
 }
 
 .global-tooltip .summary-value.highlight {
-  color: #3182ce;
+  color: #3182ce !important;
   font-weight: 700;
 }
 
@@ -708,8 +708,8 @@
 .global-tooltip {
   position: fixed;
   z-index: 9999; /* Highest z-index to ensure tooltips are always on top */
-  background-color: #ffffff;
-  border: 1px solid var(--border-light, #e2e8f0);
+  background-color: #f7fafc !important; /* Light gray background for better contrast */
+  border: 1px solid var(--border-light, #e2e8f0) !important;
   border-radius: 8px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   overflow: hidden;
@@ -957,9 +957,9 @@
 /* Dark mode support - Both system preference and theme class */
 @media (prefers-color-scheme: dark) {
   .global-tooltip {
-    background-color: #1f2937;
+    background-color: #f7fafc !important; /* Use light background for all tooltips */
     border-color: #374151;
-    color: #f9fafb;
+    color: #1a202c !important; /* Use dark text for contrast */
   }
   
   .global-tooltip .tooltip-header {
@@ -1035,13 +1035,39 @@
   .global-tooltip .summary-value {
     color: #f9fafb !important; /* White for better contrast in dark mode */
   }
+
+  /* Dark mode support for day-hit tooltip date items */
+  .global-tooltip .day-hit-date-list {
+    background-color: #374151 !important;
+  }
+
+  .global-tooltip .day-hit-date-item {
+    color: #f9fafb !important;
+    border-bottom-color: #4b5563 !important;
+    background-color: rgba(55, 65, 81, 0.5) !important;
+    font-weight: 500 !important;
+  }
+
+  .global-tooltip .day-hit-date-item:hover {
+    background-color: rgba(55, 65, 81, 0.8) !important;
+  }
+
+  .global-tooltip .day-hit-more-dates {
+    color: #e5e7eb !important;
+    font-weight: 500 !important;
+  }
+
+  .global-tooltip .no-date-data {
+    color: #e5e7eb !important;
+    font-weight: 500 !important;
+  }
 }
 
 /* Theme-based dark mode support for applications using theme classes */
 .theme-dark .global-tooltip {
-  background-color: #1f2937;
+  background-color: #f7fafc !important; /* Use light background for all tooltips */
   border-color: #374151;
-  color: #f9fafb;
+  color: #1a202c !important; /* Use dark text for contrast */
 }
 
 .theme-dark .global-tooltip .tooltip-header {
@@ -1115,6 +1141,32 @@
   color: #dbeafe !important;
 }
 
+/* Dark mode support for day-hit tooltip date items */
+.theme-dark .global-tooltip .day-hit-date-list {
+  background-color: #374151 !important;
+}
+
+.theme-dark .global-tooltip .day-hit-date-item {
+  color: #f9fafb !important;
+  border-bottom-color: #4b5563 !important;
+  background-color: rgba(55, 65, 81, 0.5) !important;
+  font-weight: 500 !important;
+}
+
+.theme-dark .global-tooltip .day-hit-date-item:hover {
+  background-color: rgba(55, 65, 81, 0.8) !important;
+}
+
+.theme-dark .global-tooltip .day-hit-more-dates {
+  color: #e5e7eb !important;
+  font-weight: 500 !important;
+}
+
+.theme-dark .global-tooltip .no-date-data {
+  color: #e5e7eb !important;
+  font-weight: 500 !important;
+}
+
 /* Removed failsafe rules that were overriding dark mode styles */
 
 /* High contrast mode fallback for accessibility */
@@ -1131,6 +1183,39 @@
     background-color: #ffffff !important;
     padding: 2px 4px !important;
     border-radius: 2px !important;
+  }
+
+  /* High contrast mode for day-hit tooltip date items */
+  .global-tooltip .day-hit-date-list {
+    background-color: #ffffff !important;
+    border: 2px solid #000000 !important;
+  }
+
+  .global-tooltip .day-hit-date-item {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    border-bottom: 2px solid #000000 !important;
+    font-weight: 700 !important;
+  }
+
+  .global-tooltip .day-hit-date-item:hover {
+    background-color: #f0f0f0 !important;
+  }
+
+  .global-tooltip .day-hit-more-dates {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    padding: 2px 4px !important;
+    border-radius: 2px !important;
+    font-weight: 700 !important;
+  }
+
+  .global-tooltip .no-date-data {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    padding: 2px 4px !important;
+    border-radius: 2px !important;
+    font-weight: 700 !important;
   }
 }
 
@@ -1173,14 +1258,14 @@
 
 .global-tooltip .streak-progression-header h4 {
   margin: 0 0 8px 0;
-  color: #1a202c;
+  color: #1a202c !important;
   font-size: 1rem;
 }
 
 .global-tooltip .streak-progression-explainer {
   margin: 0;
   font-size: 0.85rem;
-  color: #4a5568;
+  color: #4a5568 !important;
   font-style: italic;
 }
 
@@ -1199,39 +1284,39 @@
 
 /* Light mode with explicit colors (like enhanced-game-table) */
 .global-tooltip .streak-progression-table td {
-  color: #1a202c;
-  background-color: white;
+  color: #1a202c !important;
+  background-color: white !important;
 }
 
 .global-tooltip .streak-progression-table th {
-  background-color: #f7fafc;
+  background-color: #f7fafc !important;
   font-weight: 600;
-  color: #1a202c;
+  color: #1a202c !important;
   font-size: 0.9rem;
 }
 
 .global-tooltip .streak-progression-table tr.current-streak {
-  background-color: #dbeafe;
+  background-color: #dbeafe !important;
   font-weight: 600;
 }
 
 .global-tooltip .streak-progression-table .high-rate {
-  color: #52c41a;
+  color: #52c41a !important;
   font-weight: 600;
 }
 
 .global-tooltip .streak-progression-table .medium-rate {
-  color: #faad14;
+  color: #faad14 !important;
   font-weight: 600;
 }
 
 .global-tooltip .streak-progression-table .low-rate {
-  color: #ff4d4f;
+  color: #ff4d4f !important;
   font-weight: 600;
 }
 
 .global-tooltip .no-progression-data {
-  color: var(--text-muted, #68778d);
+  color: var(--text-muted, #68778d) !important;
   font-style: italic;
   text-align: center;
   padding: 20px 0;
@@ -1247,7 +1332,7 @@
   flex-direction: column;
   gap: 10px;
   margin-bottom: 20px;
-  background-color: var(--background-light, #f7fafc);
+  background-color: var(--background-light, #f7fafc) !important;
   padding: 12px;
   border-radius: 6px;
 }
@@ -1264,7 +1349,7 @@
 
 .global-tooltip .day-hit-games h4 {
   margin: 0 0 12px 0;
-  color: var(--text-primary, #1a202c);
+  color: var(--text-primary, #1a202c) !important;
   font-size: 1rem;
 }
 
@@ -1272,31 +1357,63 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  background-color: var(--background-light, #f7fafc) !important;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
+/* Enhanced date item styling with better contrast - Light mode by default */
 .global-tooltip .day-hit-date-item {
-  padding: 6px 0;
-  border-bottom: 1px solid var(--border-light, #e2e8f0);
-  color: var(--text-secondary, #4a5568);
-  font-size: 0.9rem;
+  padding: 8px 12px !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  color: #1a202c !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  background-color: #ffffff !important;
+  transition: background-color 0.2s ease;
+}
+
+/* Force light mode for non-dark theme tooltips */
+.global-tooltip:not(.theme-dark) .day-hit-date-item {
+  color: #1a202c !important;
+  background-color: #ffffff !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+.global-tooltip:not(.theme-dark) .day-hit-date-item:hover {
+  background-color: #f7fafc !important;
+}
+
+.global-tooltip:not(.theme-dark) .day-hit-more-dates {
+  color: #1a202c !important;
+}
+
+.global-tooltip:not(.theme-dark) .no-date-data {
+  color: #1a202c !important;
+}
+
+.global-tooltip .day-hit-date-item:hover {
+  background-color: #f7fafc !important;
 }
 
 .global-tooltip .day-hit-date-item:last-child {
-  border-bottom: none;
+  border-bottom: none !important;
 }
 
 .global-tooltip .day-hit-more-dates {
-  margin: 8px 0 0 0;
-  font-size: 0.85rem;
-  color: var(--text-muted, #68778d);
-  font-style: italic;
+  margin: 8px 0 0 0 !important;
+  font-size: 0.85rem !important;
+  color: #1a202c !important;
+  font-style: italic !important;
+  font-weight: 500 !important;
 }
 
 .global-tooltip .no-date-data {
-  color: var(--text-muted, #68778d);
-  font-style: italic;
-  text-align: center;
-  padding: 20px 0;
+  color: #1a202c !important;
+  font-style: italic !important;
+  text-align: center !important;
+  padding: 20px 0 !important;
+  font-weight: 500 !important;
 }
 
 /* Pitcher tooltip specific styles */
@@ -2246,5 +2363,188 @@
     align-items: flex-start;
     gap: 4px;
   }
+}
+
+/**
+ * CRITICAL TOOLTIP CONTRAST FIXES
+ * Ensure all tooltips have proper contrast with white backgrounds and dark text
+ * These fixes address the dark background/dark text readability issues
+ */
+
+/* 1. Force white background on main tooltip container */
+.global-tooltip {
+  background-color: #ffffff !important;
+  color: #1a202c !important;
+}
+
+/* 2. Fix all h4 headers to dark text */
+.global-tooltip h4 {
+  color: #1a202c !important;
+}
+
+/* 3. Fix explainer text to dark gray */
+.global-tooltip .streak-progression-explainer {
+  color: #4a5568 !important;
+}
+
+/* 4. Fix table headers to dark text */
+.global-tooltip table th {
+  color: #1a202c !important;
+  background-color: #f7fafc !important;
+}
+
+/* 5. Fix table cells to dark text */
+.global-tooltip table td {
+  color: #1a202c !important;
+}
+
+/* 6. Fix rate colors with proper contrast */
+.global-tooltip .high-rate {
+  color: #52c41a !important;
+}
+
+.global-tooltip .medium-rate {
+  color: #faad14 !important;
+}
+
+.global-tooltip .low-rate {
+  color: #ff4d4f !important;
+}
+
+/* 7. Fix summary labels and values */
+.global-tooltip .summary-label {
+  color: #4a5568 !important;
+}
+
+.global-tooltip .summary-value {
+  color: #1a202c !important;
+}
+
+/* 8. Fix tooltip date items (DayOfWeekHitLeaders) */
+.global-tooltip .day-hit-date-item {
+  color: #1a202c !important;
+  background-color: #ffffff !important;
+}
+
+.global-tooltip .day-hit-more-dates {
+  color: #1a202c !important;
+}
+
+.global-tooltip .no-date-data {
+  color: #1a202c !important;
+}
+
+/* 9. Fix summary backgrounds to light gray instead of dark */
+.global-tooltip .day-hit-summary,
+.global-tooltip .streak-summary {
+  background-color: #f7fafc !important;
+}
+
+/* 10. Ensure no-progression-data text is visible */
+.global-tooltip .no-progression-data {
+  color: #68778d !important;
+}
+
+/* 11. PITCHER TOOLTIP CONTRAST FIXES - Comprehensive overrides for all pitcher tooltip classes */
+
+/* Pitcher summary sections */
+.global-tooltip .pitcher-hr-summary {
+  background-color: #f7fafc !important;
+  color: #1a202c !important;
+}
+
+.global-tooltip .pitcher-hr-summary-item {
+  color: #1a202c !important;
+}
+
+/* Pitcher breakdown sections */
+.global-tooltip .pitcher-hr-breakdown {
+  color: #1a202c !important;
+}
+
+.global-tooltip .pitcher-hr-breakdown h4 {
+  color: #1a202c !important;
+}
+
+/* Venue labels and stats */
+.global-tooltip .venue-label {
+  color: #4a5568 !important;
+}
+
+.global-tooltip .venue-stats {
+  color: #1a202c !important;
+}
+
+.global-tooltip .venue-rate {
+  color: #4a5568 !important;
+}
+
+/* Opponents section */
+.global-tooltip .pitcher-hr-opponents {
+  color: #1a202c !important;
+}
+
+.global-tooltip .pitcher-hr-opponents h4 {
+  color: #1a202c !important;
+}
+
+.global-tooltip .opponent-stat {
+  color: #1a202c !important;
+}
+
+.global-tooltip .opponent-name {
+  color: #1a202c !important;
+}
+
+.global-tooltip .opponent-count {
+  color: #4a5568 !important;
+}
+
+/* Recent games section */
+.global-tooltip .pitcher-hr-recent {
+  color: #1a202c !important;
+}
+
+.global-tooltip .pitcher-hr-recent h4 {
+  color: #1a202c !important;
+}
+
+.global-tooltip .game-entry {
+  color: #1a202c !important;
+}
+
+.global-tooltip .game-date {
+  color: #1a202c !important;
+}
+
+.global-tooltip .game-venue {
+  color: #4a5568 !important;
+}
+
+.global-tooltip .game-opponent {
+  color: #1a202c !important;
+}
+
+.global-tooltip .game-hrs {
+  color: #4a5568 !important;
+}
+
+/* Home/Away stats grid */
+.global-tooltip .home-away-stats {
+  color: #1a202c !important;
+}
+
+.global-tooltip .stat-group {
+  color: #1a202c !important;
+}
+
+/* Opponents grid */
+.global-tooltip .opponents-grid {
+  color: #1a202c !important;
+}
+
+/* Recent games container */
+.global-tooltip .recent-games {
+  color: #1a202c !important;
 }
 

@@ -134,7 +134,7 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
                   <span className="rank-number">{index + 1}</span>
                 </div>
                 
-                <div className="player-info" onClick={(e) => handlePlayerClick(prediction, e)}>
+                <div className="player-info">
                   <div className="player-name">{prediction.playerName}</div>
                   <div className="player-team">{prediction.team}</div>
                 </div>
