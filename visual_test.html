@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poor Performance Risks - Tooltip Positioning Visual Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .test-description {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .test-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .test-button:hover {
+            background-color: #0056b3;
+        }
+        .test-results {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+        }
+        .status-pass {
+            color: #28a745;
+        }
+        .status-fail {
+            color: #dc3545;
+        }
+        .status-warn {
+            color: #ffc107;
+        }
+        .instructions {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Poor Performance Risks - Tooltip Positioning Test</h1>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Make sure the React development server is running on localhost:3000</li>
+                <li>Navigate to the dashboard and locate the "Poor Performance Risks" card</li>
+                <li>Use the test buttons below to verify the positioning</li>
+                <li>Check the embedded iframe for visual verification</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">Test 1: Open Application</div>
+            <div class="test-description">Opens the React application in a new tab</div>
+            <button class="test-button" onclick="openApp()">Open Dashboard</button>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">Test 2: Run Automated Positioning Test</div>
+            <div class="test-description">Runs the automated test script in the console</div>
+            <button class="test-button" onclick="runPositioningTest()">Run Test Script</button>
+            <div class="test-results" id="test-results"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">Test 3: Manual Verification Checklist</div>
+            <div class="test-description">Visual checklist for manual verification</div>
+            <div>
+                <label><input type="checkbox" id="check1"> All tooltip buttons are aligned on the right side</label><br>
+                <label><input type="checkbox" id="check2"> Buttons are vertically centered in each row</label><br>
+                <label><input type="checkbox" id="check3"> Layout is responsive on different screen sizes</label><br>
+                <label><input type="checkbox" id="check4"> Tooltip buttons are clickable and functional</label><br>
+                <label><input type="checkbox" id="check5"> Layout doesn't break with different content lengths</label><br>
+            </div>
+            <button class="test-button" onclick="checkResults()" style="margin-top: 10px;">Check Results</button>
+            <div class="test-results" id="manual-results"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">Test 4: Responsive Testing</div>
+            <div class="test-description">Test different screen sizes</div>
+            <button class="test-button" onclick="testResponsive('desktop')">Desktop View</button>
+            <button class="test-button" onclick="testResponsive('tablet')">Tablet View</button>
+            <button class="test-button" onclick="testResponsive('mobile')">Mobile View</button>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">Test 5: Visual Verification</div>
+            <div class="test-description">Embedded view of the dashboard</div>
+            <button class="test-button" onclick="loadDashboard()">Load Dashboard</button>
+            <iframe id="dashboard-frame" src="about:blank"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function openApp() {
+            window.open('http://localhost:3000', '_blank');
+        }
+
+        function runPositioningTest() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = 'Opening test script... Please check the browser console for results.';
+            
+            // Open the app and inject the test script
+            const testWindow = window.open('http://localhost:3000', '_blank');
+            
+            // Wait for the page to load, then inject the test script
+            setTimeout(() => {
+                if (testWindow && !testWindow.closed) {
+                    // Inject the test script
+                    const script = document.createElement('script');
+                    script.src = '/test_tooltip_positioning.js';
+                    testWindow.document.head.appendChild(script);
+                    
+                    resultsDiv.innerHTML = 'Test script injected. Check the browser console in the new tab for results.';
+                } else {
+                    resultsDiv.innerHTML = 'Could not open test window. Please open http://localhost:3000 manually and run the test.';
+                }
+            }, 2000);
+        }
+
+        function checkResults() {
+            const checks = [
+                document.getElementById('check1').checked,
+                document.getElementById('check2').checked,
+                document.getElementById('check3').checked,
+                document.getElementById('check4').checked,
+                document.getElementById('check5').checked
+            ];
+            
+            const passed = checks.filter(c => c).length;
+            const total = checks.length;
+            const resultsDiv = document.getElementById('manual-results');
+            
+            let status = 'status-pass';
+            let message = `✅ All tests passed! (${passed}/${total})`;
+            
+            if (passed < total) {
+                status = passed > total * 0.7 ? 'status-warn' : 'status-fail';
+                message = `⚠️ ${passed}/${total} tests passed. Please review failing items.`;
+            }
+            
+            resultsDiv.innerHTML = `<span class="${status}">${message}</span>`;
+        }
+
+        function testResponsive(size) {
+            const sizes = {
+                desktop: { width: 1200, height: 800 },
+                tablet: { width: 768, height: 1024 },
+                mobile: { width: 375, height: 667 }
+            };
+            
+            const config = sizes[size];
+            const testWindow = window.open(
+                'http://localhost:3000',
+                '_blank',
+                `width=${config.width},height=${config.height},resizable=yes`
+            );
+            
+            if (testWindow) {
+                testWindow.focus();
+            }
+        }
+
+        function loadDashboard() {
+            const frame = document.getElementById('dashboard-frame');
+            frame.src = 'http://localhost:3000';
+        }
+
+        // Auto-load dashboard on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                loadDashboard();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

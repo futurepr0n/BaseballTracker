@@ -104,7 +104,7 @@
 
 .poor-performance-card .risk-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   padding: 12px;
   margin-bottom: 8px;
@@ -175,18 +175,10 @@
 
 /* Player info styling */
 .poor-performance-card .player-info {
-  cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 4px;
-  border-radius: 4px;
   flex: 1;
   display: flex;
   flex-direction: column;
   margin-right: 10px;
-}
-
-.poor-performance-card .player-info:hover {
-  background-color: rgba(220, 38, 38, 0.1);
 }
 
 .poor-performance-card .player-name {
@@ -208,6 +200,8 @@
   gap: 4px;
   flex: 1;
   margin-left: 8px;
+  min-height: 48px;
+  justify-content: center;
 }
 
 .poor-performance-card .risk-score-compact {
@@ -311,13 +305,31 @@
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
   position: relative;
-  z-index: 15;
   flex-shrink: 0;
+  align-self: center;
+  margin-left: auto;
+  margin-right: 0;
+  order: 999;
 }
 
 .poor-performance-card .tooltip-trigger:hover {
   background: rgba(220, 38, 38, 0.2);
   transform: scale(1.1);
+}
+
+.poor-performance-card .tooltip-trigger:focus {
+  outline: 2px solid rgba(220, 38, 38, 0.5);
+  outline-offset: 2px;
+  background: rgba(220, 38, 38, 0.15);
+}
+
+.poor-performance-card .tooltip-trigger:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.poor-performance-card .tooltip-trigger:focus-visible {
+  outline: 2px solid rgba(220, 38, 38, 0.6);
+  outline-offset: 2px;
 }
 
 /* Card subtitle styling */
@@ -398,6 +410,14 @@
     padding: 10px 6px;
   }
   
+  .poor-performance-card .tooltip-trigger {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+    top: 4px;
+    right: 4px;
+  }
+  
   .poor-performance-card .risk-factors {
     display: none;
   }
@@ -416,6 +436,10 @@
     padding: 1px 4px;
   }
   
+  .poor-performance-card .risk-badge-overlay {
+    right: 6px;
+  }
+  
   .poor-performance-card .player-rank {
     width: 40px;
     height: 40px;
@@ -432,11 +456,23 @@
     gap: 6px;
   }
   
+  .poor-performance-card .tooltip-trigger {
+    width: 24px;
+    height: 24px;
+    font-size: 0.7rem;
+    top: 4px;
+    right: 4px;
+  }
+  
   .poor-performance-card .risk-level {
     display: none;
   }
   
   .poor-performance-card .risk-factors {
     display: none;
+  }
+  
+  .poor-performance-card .risk-badge-overlay {
+    right: 6px;
   }
 }
