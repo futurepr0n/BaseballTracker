@@ -1,11 +1,17 @@
 /* Dashboard.css - Only contains common dashboard styles */
 
 .dashboard {
-  padding: 20px;
+  padding: 20px 0;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .dashboard-header {
   margin-bottom: 20px;
+  width: 100%;
 }
 
 .dashboard-header-content {
@@ -50,12 +56,15 @@
 /* Team filter section - add space between filter and grid */
 .team-filter {
   margin-bottom: 25px;
+  width: 100%;
 }
 
 .dashboard-wrapper {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  align-items: center;
+  width: 100%;
 }
 
 /* Filter info messaging */
@@ -152,8 +161,7 @@
   gap: 20px;
   width: 100%;
   padding: 0;
-  margin: 0 auto;
-  max-width: 1200px;
+  margin: 0;
 }
 
 @media (max-width: 768px) {
