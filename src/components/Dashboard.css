@@ -1,17 +1,19 @@
 /* Dashboard.css - Only contains common dashboard styles */
 
 .dashboard {
-  padding: 20px 0;
+  padding: 20px;
   width: 100%;
-  max-width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
+  box-sizing: border-box;
 }
 
 .dashboard-header {
-  margin-bottom: 20px;
   width: 100%;
+  margin: 0 0 20px 0;
 }
 
 .dashboard-header-content {
@@ -55,15 +57,15 @@
 
 /* Team filter section - add space between filter and grid */
 .team-filter {
-  margin-bottom: 25px;
   width: 100%;
+  margin: 0 0 25px 0;
 }
 
 .dashboard-wrapper {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  align-items: center;
+  align-items: stretch;
   width: 100%;
 }
 
@@ -166,13 +168,22 @@
 
 @media (max-width: 768px) {
   .dashboard-grid {
+    grid-template-columns: 1fr; /* Single column on mobile */
     gap: 15px;
     padding: 0;
   }
 }
 
+/* Medium screens (tablets) - 2 columns if space allows */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}
+
 @media (max-width: 480px) {
   .dashboard-grid {
+    grid-template-columns: 1fr; /* Ensure single column on small mobile */
     gap: 10px;
   }
 }
@@ -474,12 +485,8 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Dashboard container controls */
-.dashboard {
-  width: 100%;
-  padding: 20px;
-  box-sizing: border-box;
-}
+/* Dashboard container controls - already defined above, this is duplicate */
+/* .dashboard styles moved to top of file */
 
 .dashboard-container {
   width: 100%;
@@ -528,7 +535,7 @@ html, body {
   
   /* Ensure dashboard has proper mobile padding */
   .dashboard {
-    padding: 15px 10px;
+    padding: 15px;
   }
   
   /* Ensure all cards fit within viewport with padding */
@@ -1048,7 +1055,7 @@ html, body {
   
   /* Reduce dashboard padding */
   .dashboard {
-    padding: 15px 5px; /* Reduced side padding */
+    padding: 15px; /* Consistent padding all around */
   }
   
   /* Make cards use more width */
