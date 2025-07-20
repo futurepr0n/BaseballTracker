@@ -44,7 +44,7 @@ validate_csv_format() {
     local filename=$(basename "$file")
     
     # Check if filename matches expected pattern: TEAM_[hitting|pitching]_month_day_year_gameId.csv
-    if [[ ! $filename =~ ^[A-Z]{2,3}_(hitting|pitching)_[a-zA-Z]+_[0-9]{1,2}_[0-9]{4}_[0-9]+\.csv$ ]]; then
+    if [[ ! $filename =~ ^[A-Za-z]{2,3}_(hitting|pitching)_[a-zA-Z]+_[0-9]{1,2}_[0-9]{4}_[0-9]+\.csv$ ]]; then
         print_status $RED "❌ Invalid filename format: $filename"
         print_status $YELLOW "   Expected: TEAM_[hitting|pitching]_month_day_year_gameId.csv"
         return 1

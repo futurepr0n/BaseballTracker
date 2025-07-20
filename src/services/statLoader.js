@@ -646,12 +646,15 @@ function createDirectoryIfNotExists(dirPath) {
 async function processStatsFile(csvFilePath) {
     console.log(`🔄 Processing stats file: ${csvFilePath}`);
 
+    // Load processing log (needed for various validations)
+    let processingLog = null;
+
     // 0. Enhanced Pre-Processing Validation
     if (ENHANCED_CONFIG.ENABLE_ENHANCED_VALIDATION) {
         console.log('🛡️  Enhanced validation enabled');
         
         // Load processing log
-        const processingLog = loadProcessingLog();
+        processingLog = loadProcessingLog();
         
         // Check if file already processed
         if (isFileAlreadyProcessed(processingLog, csvFilePath)) {
@@ -794,6 +797,9 @@ async function processStatsFile(csvFilePath) {
         }
         
         // Enhanced duplicate detection with prevention logic
+        if (!processingLog) {
+            processingLog = loadProcessingLog();
+        }
         const duplicateAnalysis = detectEnhancedDuplicatesWithPrevention(
             existingPlayers, 
             newPlayer, 
@@ -888,7 +894,9 @@ async function processStatsFile(csvFilePath) {
     // 11. Enhanced Post-Processing Tasks
     if (ENHANCED_CONFIG.ENABLE_PROCESSING_TRACKING) {
         // Update processing log
-        const processingLog = loadProcessingLog();
+        if (!processingLog) {
+            processingLog = loadProcessingLog();
+        }
         saveProcessingLog(processingLog, csvFilePath, gameId);
         console.log(`📝 Updated processing log`);
     }
