@@ -148,16 +148,16 @@
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: 1fr;
   gap: 20px;
   width: 100%;
   padding: 0;
   margin: 0 auto;
+  max-width: 1200px;
 }
 
 @media (max-width: 768px) {
   .dashboard-grid {
-    grid-template-columns: 1fr;
     gap: 15px;
     padding: 0;
   }
