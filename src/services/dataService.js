@@ -269,6 +269,12 @@ export const fetchFullSeasonPlayerData = async (startDate, maxDaysToLookBack = 1
   
   debugLog.dataService(`🏟️ Generated ${validDates.length} valid game dates for full season fetch`);
   
+  // Debug: Show first 10 dates being processed
+  console.log('📅 DEBUG: First 10 valid dates being processed:');
+  validDates.slice(0, 10).forEach((date, index) => {
+    console.log(`  ${index + 1}. ${date}`);
+  });
+  
   // Batch process to avoid overwhelming browser (larger batches for player analysis)
   const batchSize = 15;
   let successCount = 0;
@@ -301,6 +307,10 @@ export const fetchFullSeasonPlayerData = async (startDate, maxDaysToLookBack = 1
   }
   
   debugLog.dataService(`🏟️ FULL SEASON COMPLETE: ${successCount} dates with data from ${validDates.length} checked`);
+  
+  // Debug: Show which dates actually have data
+  console.log('📅 DEBUG: Dates that successfully loaded data:', Object.keys(result).slice(0, 10));
+  
   return result;
 };
 
@@ -311,8 +321,24 @@ const isValidMLBGameDate = (dateStr) => {
   const date = new Date(dateStr);
   const now = new Date();
   
-  // Don't request future dates
-  if (date > now) return false;
+  // Don't request future dates (compare dates only, not times)
+  // This fixes issue where "today" gets excluded when checking early in the day
+  const today = new Date();
+  today.setHours(23, 59, 59, 999); // Set to end of today
+  const dateOnly = new Date(date);
+  dateOnly.setHours(0, 0, 0, 0); // Set to start of date being checked
+  
+  // Debug specific dates we're interested in
+  if (dateStr === '2025-07-21' || dateStr === '2025-07-22') {
+    console.log(`📅 DEBUG: Checking ${dateStr}:`);
+    console.log(`  date: ${date}`);
+    console.log(`  today: ${today}`);
+    console.log(`  dateOnly: ${dateOnly}`);
+    console.log(`  dateOnly > today: ${dateOnly > today}`);
+    console.log(`  result: ${!(dateOnly > today)}`);
+  }
+  
+  if (dateOnly > today) return false;
   
   // MLB season roughly runs March 20 - October 31
   const year = date.getFullYear();
