@@ -3,7 +3,7 @@ import { useTeamFilter } from '../TeamFilterContext';
 import GlassCard from './GlassCard/GlassCard';
 import MobilePlayerCard from '../common/MobilePlayerCard';
 import SeasonOverviewChart from './PlayerPropsLadderCard/SeasonOverviewChart';
-import Recent3GamesChart from './PlayerPropsLadderCard/Recent3GamesChart';
+import Recent5GamesChart from './PlayerPropsLadderCard/Recent5GamesChart';
 import OpponentHistoryChart from './PlayerPropsLadderCard/OpponentHistoryChart';
 import enhancedGameDataService from '../../services/enhancedGameDataService';
 import './PlayerPropsLadderCard.css';
@@ -433,7 +433,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
       console.log(`📊 Found ${allGames.length} total games for ${player.name}`);
       
       // SECOND PASS: Separate into categories
-      const recentGames = allGames.slice(0, 3).map(game => ({
+      const recentGames = allGames.slice(0, 5).map(game => ({
         ...game,
         gameType: 'recent'
       }));
@@ -830,9 +830,9 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
                 propOption={currentPropOption}
               />
               
-              {/* Recent 3 Games Chart */}
-              <Recent3GamesChart 
-                recentGamesData={playerChartData?.recent3Games || recentGamesData}
+              {/* Recent 5 Games Chart */}
+              <Recent5GamesChart 
+                recentGamesData={playerChartData?.recent5Games || recentGamesData}
                 propOption={currentPropOption}
               />
               
@@ -919,13 +919,14 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
                     <>
                       {/* Season Overview Chart */}
                       <SeasonOverviewChart 
+                        player={selectedPlayer}
                         seasonData={playerChartData?.seasonOverview}
                         propOption={currentPropOption}
                       />
                       
-                      {/* Recent 3 Games Chart */}
-                      <Recent3GamesChart 
-                        recentGamesData={playerChartData?.recent3Games || recentGamesData}
+                      {/* Recent 5 Games Chart */}
+                      <Recent5GamesChart 
+                        recentGamesData={playerChartData?.recent5Games || recentGamesData}
                         propOption={currentPropOption}
                       />
                       

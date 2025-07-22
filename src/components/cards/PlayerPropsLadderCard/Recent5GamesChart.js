@@ -2,23 +2,22 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 /**
- * Recent 3 Games Chart Component
- * Shows the last 3 games performance with trend analysis
+ * Recent 5 Games Chart Component
+ * Shows the last 5 games performance with trend analysis
  */
-const Recent3GamesChart = ({ recentGamesData, propOption }) => {
+const Recent5GamesChart = ({ recentGamesData, propOption }) => {
   if (!recentGamesData || !Array.isArray(recentGamesData) || recentGamesData.length === 0) {
     return (
       <div className="chart-container">
-        <h5 className="chart-title">Recent 3 Games</h5>
+        <h5 className="chart-title">Recent 5 Games</h5>
         <div className="no-data-message">No recent games data available</div>
       </div>
     );
   }
 
-  // Prepare chart data - reverse to show chronological order (oldest to newest)
+  // Prepare chart data - keep most recent games on the right (left-to-right reading)
   const chartData = recentGamesData
-    .slice(0, 3)
-    .reverse()
+    .slice(0, 5)
     .map((game, index) => ({
       ...game,
       gameLabel: `Game ${index + 1}`,
@@ -63,7 +62,7 @@ const Recent3GamesChart = ({ recentGamesData, propOption }) => {
   return (
     <div className="chart-container recent-games-chart">
       <h5 className="chart-title">
-        Recent 3 Games - {propOption?.label}
+        Recent 5 Games - {propOption?.label}
         <span className="chart-subtitle">
           Performance trend analysis
         </span>
@@ -152,4 +151,4 @@ const Recent3GamesChart = ({ recentGamesData, propOption }) => {
   );
 };
 
-export default Recent3GamesChart;
+export default Recent5GamesChart;
