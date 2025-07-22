@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import hellraiserAnalysisService from '../../services/hellraiserAnalysisService';
 import { useTeamFilter } from '../TeamFilterContext';
+import MobilePlayerCard from '../common/MobilePlayerCard';
 import './HellraiserCard.css';
+import '../common/MobilePlayerCard.css';
 
 const HellraiserCard = ({ currentDate }) => {
   const [analysisData, setAnalysisData] = useState(null);
@@ -220,9 +222,9 @@ const HellraiserCard = ({ currentDate }) => {
       <div className="glass-card-container">
         <div className="glass-header">
           <h3>🔥 Pinheads HR Picks</h3>
-          
-          {/* Compact filters within header */}
-          <div className="compact-filters">
+        </div>
+        
+        <div className="compact-filters">
             <div className="filter-row">
               <span className="filter-label">Value:</span>
               <button className={selectedValue === 'all' ? 'active' : ''} onClick={() => setSelectedValue('all')}>All</button>
@@ -239,105 +241,202 @@ const HellraiserCard = ({ currentDate }) => {
               <button className={selectedPathway === 'pitcherDriven' ? 'active' : ''} onClick={() => setSelectedPathway('pitcherDriven')}>Pitcher-Driven</button>
             </div>
           </div>
-        </div>
 
-        <div className="scrollable-container">
-          {filteredPicks.length === 0 ? (
-            <div className="no-picks">
-              <p>No picks found for {selectedPathway === 'all' ? 'today' : getPathwayLabel(selectedPathway)}</p>
-            </div>
-          ) : (
-            <div className="picks-list">
-              {filteredPicks.map((pick, index) => (
-                <div key={index} className="pick-item">
-                  <div className="pick-header" onClick={() => toggleDetails(index)}>
-                    <div className="pick-main-info">
-                      <span className="player-name">
-                        {getClassificationIcon(pick.classification)} {pick.playerName}
-                      </span>
-                      <span className="team">{pick.team}</span>
-                      <span className="vs-info">vs {pick.pitcher}</span>
-                    </div>
-                    
-                    <div className="pick-metrics">
-                      <div 
-                        className="confidence-score"
-                        style={{ backgroundColor: getConfidenceColor(pick.confidenceScore) }}
-                      >
-                        {pick.confidenceScore}
-                      </div>
-                      <span className="classification">{pick.classification}</span>
-                      {pick.odds && (
-                        <span className="odds">
-                          {pick.odds.american}
+          {/* Desktop View */}
+          <div className="desktop-view">
+            <div className="scrollable-container">
+            {filteredPicks.length === 0 ? (
+              <div className="no-picks">
+                <p>No picks found for {selectedPathway === 'all' ? 'today' : getPathwayLabel(selectedPathway)}</p>
+              </div>
+            ) : (
+              <div className="picks-list">
+                {filteredPicks.map((pick, index) => (
+                  <div key={index} className="pick-item">
+                    <div className="pick-header" onClick={() => toggleDetails(index)}>
+                      <div className="pick-main-info">
+                        <span className="player-name">
+                          {getClassificationIcon(pick.classification)} {pick.playerName}
                         </span>
+                        <span className="team">{pick.team}</span>
+                        <span className="vs-info">vs {pick.pitcher}</span>
+                      </div>
+                      
+                      <div className="pick-metrics">
+                        <div 
+                          className="confidence-score"
+                          style={{ backgroundColor: getConfidenceColor(pick.confidenceScore) }}
+                        >
+                          {pick.confidenceScore}
+                        </div>
+                        <span className="classification">{pick.classification}</span>
+                        {pick.odds && (
+                          <span className="odds">
+                            {pick.odds.american}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="pick-summary">
+                      <span className="pathway-tag">{getPathwayLabel(pick.pathway)}</span>
+                      <span className="game-info">{pick.game}</span>
+                      {(pick.marketEfficiency === 'Undervalued' || pick.marketEfficiency?.value === 'positive') && (
+                        <span className="value-tag">💰 Value</span>
                       )}
                     </div>
-                  </div>
 
-                  <div className="pick-summary">
-                    <span className="pathway-tag">{getPathwayLabel(pick.pathway)}</span>
-                    <span className="game-info">{pick.game}</span>
-                    {(pick.marketEfficiency === 'Undervalued' || pick.marketEfficiency?.value === 'positive') && (
-                      <span className="value-tag">💰 Value</span>
+                    {showDetails[index] && (
+                      <div className="pick-details">
+                        <div className="reasoning-section">
+                          <h5>Analysis Reasoning:</h5>
+                          <p>{pick.reasoning}</p>
+                        </div>
+
+                        {pick.riskFactors?.length > 0 && (
+                          <div className="risk-factors">
+                            <h5>Risk Factors:</h5>
+                            <ul>
+                              {pick.riskFactors.map((risk, i) => (
+                                <li key={i} className="risk-factor">⚠️ {risk}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {pick.marketEfficiency && (
+                          <div className="market-analysis">
+                            <h5>Market Analysis:</h5>
+                            <div className="market-details">
+                              {typeof pick.marketEfficiency === 'string' ? (
+                                // Handle legacy string format
+                                <span className={`market-efficiency ${pick.marketEfficiency.toLowerCase()}`}>
+                                  Market Assessment: <strong>{pick.marketEfficiency}</strong>
+                                </span>
+                              ) : (
+                                // Handle detailed object format (preferred)
+                                <>
+                                  <span>Model Probability: {(pick.marketEfficiency.modelProbability * 100).toFixed(1)}%</span>
+                                  <span>Implied Probability: {(pick.marketEfficiency.impliedProbability * 100).toFixed(1)}%</span>
+                                  <span className={`edge ${pick.marketEfficiency.value}`}>
+                                    Edge: {(pick.marketEfficiency.edge * 100).toFixed(1)}%
+                                  </span>
+                                  <span className={`assessment ${pick.marketEfficiency.value}`}>
+                                    Assessment: <strong>{pick.marketEfficiency.assessment}</strong>
+                                  </span>
+                                  {pick.marketEfficiency.reasoning && (
+                                    <div className="value-reasoning">
+                                      <em>{pick.marketEfficiency.reasoning}</em>
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
-
-                  {showDetails[index] && (
-                    <div className="pick-details">
-                      <div className="reasoning-section">
-                        <h5>Analysis Reasoning:</h5>
-                        <p>{pick.reasoning}</p>
-                      </div>
-
-                      {pick.riskFactors?.length > 0 && (
-                        <div className="risk-factors">
-                          <h5>Risk Factors:</h5>
-                          <ul>
-                            {pick.riskFactors.map((risk, i) => (
-                              <li key={i} className="risk-factor">⚠️ {risk}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {pick.marketEfficiency && (
-                        <div className="market-analysis">
-                          <h5>Market Analysis:</h5>
-                          <div className="market-details">
-                            {typeof pick.marketEfficiency === 'string' ? (
-                              // Handle legacy string format
-                              <span className={`market-efficiency ${pick.marketEfficiency.toLowerCase()}`}>
-                                Market Assessment: <strong>{pick.marketEfficiency}</strong>
-                              </span>
-                            ) : (
-                              // Handle detailed object format (preferred)
-                              <>
-                                <span>Model Probability: {(pick.marketEfficiency.modelProbability * 100).toFixed(1)}%</span>
-                                <span>Implied Probability: {(pick.marketEfficiency.impliedProbability * 100).toFixed(1)}%</span>
-                                <span className={`edge ${pick.marketEfficiency.value}`}>
-                                  Edge: {(pick.marketEfficiency.edge * 100).toFixed(1)}%
-                                </span>
-                                <span className={`assessment ${pick.marketEfficiency.value}`}>
-                                  Assessment: <strong>{pick.marketEfficiency.assessment}</strong>
-                                </span>
-                                {pick.marketEfficiency.reasoning && (
-                                  <div className="value-reasoning">
-                                    <em>{pick.marketEfficiency.reasoning}</em>
-                                  </div>
-                                )}
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
             </div>
-          )}
-        </div>
+          </div>
+
+          {/* Mobile View */}
+          <div className="mobile-view">
+            {filteredPicks.length === 0 ? (
+              <div className="no-picks">
+                <p>No picks found for {selectedPathway === 'all' ? 'today' : getPathwayLabel(selectedPathway)}</p>
+              </div>
+            ) : (
+              <div className="mobile-cards">
+                {filteredPicks.slice(0, 15).map((pick, index) => {
+                  const secondaryMetrics = [
+                    { label: 'Method', value: getPathwayLabel(pick.pathway) },
+                    { label: 'Class', value: pick.classification }
+                  ];
+
+                  const expandableContent = (
+                    <div className="mobile-pick-details">
+                      <div className="mobile-analysis">
+                        <div className="analysis-item">
+                          <strong>Analysis Reasoning:</strong>
+                          <p style={{marginTop: '4px', fontSize: '12px', lineHeight: '1.4'}}>{pick.reasoning}</p>
+                        </div>
+
+                        {pick.riskFactors?.length > 0 && (
+                          <div className="analysis-item">
+                            <strong>Risk Factors:</strong>
+                            <ul style={{marginTop: '4px', fontSize: '11px', paddingLeft: '16px'}}>
+                              {pick.riskFactors.map((risk, i) => (
+                                <li key={i}>⚠️ {risk}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {pick.marketEfficiency && (
+                          <div className="analysis-item">
+                            <strong>Market Analysis:</strong>
+                            <div style={{marginTop: '4px', fontSize: '11px'}}>
+                              {typeof pick.marketEfficiency === 'string' ? (
+                                <div>Assessment: <strong>{pick.marketEfficiency}</strong></div>
+                              ) : (
+                                <>
+                                  <div>Model: {(pick.marketEfficiency.modelProbability * 100).toFixed(1)}%</div>
+                                  <div>Implied: {(pick.marketEfficiency.impliedProbability * 100).toFixed(1)}%</div>
+                                  <div>Edge: {(pick.marketEfficiency.edge * 100).toFixed(1)}%</div>
+                                  <div>Assessment: <strong>{pick.marketEfficiency.assessment}</strong></div>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+
+                  return (
+                    <MobilePlayerCard
+                      key={index}
+                      item={{
+                        name: pick.playerName,
+                        team: pick.team,
+                        opponent: pick.pitcher
+                      }}
+                      index={index}
+                      showRank={true}
+                      showExpandButton={true}
+                      controlled={true}
+                      isExpanded={showDetails[index] || false}
+                      onExpandChange={(expanded) => {
+                        setShowDetails(prev => ({
+                          ...prev,
+                          [index]: expanded
+                        }));
+                      }}
+                      primaryMetric={{
+                        value: pick.confidenceScore,
+                        label: 'Confidence'
+                      }}
+                      secondaryMetrics={secondaryMetrics}
+                      expandableContent={expandableContent}
+                      className={showDetails[index] ? 'selected' : ''}
+                      customActions={
+                        <div style={{display: 'flex', alignItems: 'center', gap: '8px', fontSize: '10px'}}>
+                          <span className="mobile-pathway-tag">{getPathwayLabel(pick.pathway)}</span>
+                          {(pick.marketEfficiency === 'Undervalued' || pick.marketEfficiency?.value === 'positive') && (
+                            <span className="mobile-value-tag">💰 Value</span>
+                          )}
+                        </div>
+                      }
+                    />
+                  );
+                })}
+              </div>
+            )}
+          </div>
       </div>
     </div>
   );

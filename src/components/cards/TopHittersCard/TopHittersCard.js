@@ -1,6 +1,8 @@
 import React from 'react';
 import { useTeamFilter } from '../../TeamFilterContext';
+import MobilePlayerCard from '../../common/MobilePlayerCard';
 import './TopHittersCard.css';
+import '../../common/MobilePlayerCard.css';
 
 /**
  * TopHittersCard - Shows top hitting performers
@@ -104,88 +106,141 @@ const TopHittersCard = ({
           )}
         </div>
         
-        {isLoading ? (
-          <div className="loading-indicator">Loading hitting stats...</div>
-        ) : displayHitters.length > 0 ? (
-          <div className="scrollable-container">
-          <ul className="player-list">
-            {displayHitters.map((player, index) => {
-              // Get team logo URL if teams data is available
-              const teamAbbr = player.team;
-              const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
-              const logoUrl = teamData ? teamData.logoUrl : null;
-              const teamColor = teamData ? teamData.primaryColor : "#4f46e5";
+        {/* Desktop View */}
+        <div className="desktop-view">
+          {isLoading ? (
+            <div className="loading-indicator">Loading hitting stats...</div>
+          ) : displayHitters.length > 0 ? (
+            <div className="scrollable-container">
+            <ul className="player-list">
+              {displayHitters.map((player, index) => {
+                // Get team logo URL if teams data is available
+                const teamAbbr = player.team;
+                const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
+                const logoUrl = teamData ? teamData.logoUrl : null;
+                const teamColor = teamData ? teamData.primaryColor : "#4f46e5";
 
-              const hits = Number(player.H) || 0;
-              const avg = player.avg || (player.AB > 0 ? (hits / player.AB).toFixed(3) : '.000');
+                const hits = Number(player.H) || 0;
+                const avg = player.avg || (player.AB > 0 ? (hits / player.AB).toFixed(3) : '.000');
 
-              return (
-                <li key={index} className="player-item hitter-item">
-                  {/* Enhanced rank indicator with logo inside */}
-                  <div className="player-rank" style={{ backgroundColor: teamColor }}>
-                    {logoUrl && (
-                      <>
-                        <img 
-                          src={logoUrl} 
-                          alt="" 
-                          className="rank-logo" 
-                          loading="lazy"
-                          aria-hidden="true"
-                        />
-                        <div className="rank-overlay"></div>
-                      </>
-                    )}
-                    <span className="rank-number">{index + 1}</span>
-                  </div>
-                  
-                  <div className="player-info">
-                    <span className="player-name">{player.name}</span>
-                    <span className="player-team">{player.team}</span>
-                  </div>
-                  
-                  <div className="player-stat hitting-stats">
-                    <div className="primary-stat">
-                      <span className="stat-value">{hits}</span>
-                      <span className="stat-label">Hits</span>
-                    </div>
-                    <div className="secondary-stats">
-                      <span className="batting-avg">{avg} AVG</span>
-                      {player.games > 1 && (
-                        <span className="games-played">({player.games} games)</span>
+                return (
+                  <li key={index} className="player-item hitter-item">
+                    {/* Enhanced rank indicator with logo inside */}
+                    <div className="player-rank" style={{ backgroundColor: teamColor }}>
+                      {logoUrl && (
+                        <>
+                          <img 
+                            src={logoUrl} 
+                            alt="" 
+                            className="rank-logo" 
+                            loading="lazy"
+                            aria-hidden="true"
+                          />
+                          <div className="rank-overlay"></div>
+                        </>
                       )}
+                      <span className="rank-number">{index + 1}</span>
                     </div>
-                  </div>
-                  
-                  {/* Keep the larger background logo */}
-                  {logoUrl && (
-                    <img 
-                      src={logoUrl} 
-                      alt="" 
-                      className="team-logo-bg" 
-                      loading="lazy"
-                      aria-hidden="true"
-                    />
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-          
-          {/* Show summary when team filtering */}
-          {teamContext && teamContext.totalHitters > teamContext.showing && (
-            <div className="team-filter-summary">
-              Showing top {teamContext.showing} of {teamContext.totalHitters} {teamContext.teamName} hitters
+                    
+                    <div className="player-info">
+                      <span className="player-name">{player.name}</span>
+                      <span className="player-team">{player.team}</span>
+                    </div>
+                    
+                    <div className="player-stat hitting-stats">
+                      <div className="primary-stat">
+                        <span className="stat-value">{hits}</span>
+                        <span className="stat-label">Hits</span>
+                      </div>
+                      <div className="secondary-stats">
+                        <span className="batting-avg">{avg} AVG</span>
+                        {player.games > 1 && (
+                          <span className="games-played">({player.games} games)</span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Keep the larger background logo */}
+                    {logoUrl && (
+                      <img 
+                        src={logoUrl} 
+                        alt="" 
+                        className="team-logo-bg" 
+                        loading="lazy"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+            
+            {/* Show summary when team filtering */}
+            {teamContext && teamContext.totalHitters > teamContext.showing && (
+              <div className="team-filter-summary">
+                Showing top {teamContext.showing} of {teamContext.totalHitters} {teamContext.teamName} hitters
+              </div>
+            )}
             </div>
+          ) : (
+            <p className="no-data">
+              {isFiltering 
+                ? `No hitting data available for ${teamContext?.teamName || 'selected team'}`
+                : 'No hitting data available for this period'
+              }
+            </p>
           )}
-          </div>
-        ) : (
-          <p className="no-data">
-            {isFiltering 
-              ? `No hitting data available for ${teamContext?.teamName || 'selected team'}`
-              : 'No hitting data available for this period'
-            }
-          </p>
-        )}
+        </div>
+
+        {/* Mobile View */}
+        <div className="mobile-view">
+          {isLoading ? (
+            <div className="loading-indicator">Loading hitting stats...</div>
+          ) : displayHitters.length > 0 ? (
+            <div className="mobile-cards">
+              {displayHitters.map((player, index) => {
+                const hits = Number(player.H) || 0;
+                const avg = player.avg || (player.AB > 0 ? (hits / player.AB).toFixed(3) : '.000');
+
+                const secondaryMetrics = [
+                  { label: 'AVG', value: avg },
+                  { label: 'Games', value: player.games || 1 }
+                ];
+
+                return (
+                  <MobilePlayerCard
+                    key={index}
+                    item={{
+                      name: player.name,
+                      team: player.team
+                    }}
+                    index={index}
+                    showRank={true}
+                    primaryMetric={{
+                      value: hits,
+                      label: 'Hits'
+                    }}
+                    secondaryMetrics={secondaryMetrics}
+                  />
+                );
+              })}
+
+              {/* Show summary when team filtering */}
+              {teamContext && teamContext.totalHitters > teamContext.showing && (
+                <div className="team-filter-summary mobile-summary">
+                  Showing top {teamContext.showing} of {teamContext.totalHitters} {teamContext.teamName} hitters
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="no-data">
+              {isFiltering 
+                ? `No hitting data available for ${teamContext?.teamName || 'selected team'}`
+                : 'No hitting data available for this period'
+              }
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

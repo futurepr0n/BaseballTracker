@@ -251,4 +251,14 @@
     max-height: 60vh;
     padding-bottom: 10px;
   }
+  
+  /* Mobile view windowed behavior */
+  .likely-to-hit-card .mobile-view {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .likely-to-hit-card .mobile-cards {
+    padding-bottom: 10px;
+  }
 }

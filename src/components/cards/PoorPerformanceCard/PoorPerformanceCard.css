@@ -405,6 +405,16 @@
     padding-top: 80px;
   }
   
+  /* Mobile view windowed behavior */
+  .poor-performance-card .mobile-view {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .poor-performance-card .mobile-cards {
+    padding-bottom: 10px;
+  }
+  
   .poor-performance-card .risk-item {
     gap: 8px;
     padding: 10px 6px;

@@ -457,6 +457,16 @@
     padding-bottom: 10px;
   }
   
+  /* Mobile view windowed behavior */
+  .hellraiser-card .mobile-view {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .hellraiser-card .mobile-cards {
+    padding-bottom: 10px;
+  }
+  
   .hellraiser-card .header-stats {
     gap: 12px;
   }

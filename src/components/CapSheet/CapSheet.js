@@ -1629,6 +1629,8 @@ const handlePitcherGamesHistoryChange = (newValue) => {
               gamesHistory={pitcherGamesHistory}
               refreshKey={pitcherRefreshKey}
               fetchPitcherById={fetchPitcherById} // Add this prop
+              hitters={selectedPlayers.hitters} // Add hitters data for batch add
+              pitcherSelectOptions={pitcherSelectOptions} // Add pitcher select options
             />
 
           </section>

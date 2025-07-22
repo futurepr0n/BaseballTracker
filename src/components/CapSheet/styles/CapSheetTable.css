@@ -7,7 +7,7 @@
   border-collapse: separate;
   table-layout: fixed;  /* Ensures consistent column widths */
   font-size: 0.9rem;
-  min-width: 1800px;    /* Accommodate all columns including dynamic second pitcher and handicappers */
+  min-width: 1400px;    /* Accommodate all columns including dynamic second pitcher and handicappers */
   border-spacing: 0;
 }
 
@@ -64,61 +64,98 @@
   text-overflow: ellipsis;
 }
 
-/* Specific column width assignments for consistent alignment */
-.capsheet-hitters-table th:nth-child(1) { width: 140px; } /* Player */
-.capsheet-hitters-table th:nth-child(2) { width: 60px; }  /* Team */
-.capsheet-hitters-table th:nth-child(3) { width: 80px; }  /* HR Last */
-.capsheet-hitters-table th:nth-child(4) { width: 80px; }  /* AB Last */
-.capsheet-hitters-table th:nth-child(5) { width: 80px; }  /* H Last */
-.capsheet-hitters-table th:nth-child(6) { width: 150px; } /* Performance Chart */
-.capsheet-hitters-table th:nth-child(7) { width: 120px; } /* Primary Pitcher */
-.capsheet-hitters-table th:nth-child(8) { width: 80px; }  /* Last IP */
-.capsheet-hitters-table th:nth-child(9) { width: 80px; }  /* PC_ST */
-.capsheet-hitters-table th:nth-child(10) { width: 60px; } /* K */
-.capsheet-hitters-table th:nth-child(11) { width: 60px; } /* HR */
-.capsheet-hitters-table th:nth-child(12) { width: 80px; } /* Throws */
-.capsheet-hitters-table th:nth-child(13) { width: 120px; } /* Second Pitcher */
+/* Class-based column width assignments for consistent alignment (more reliable than nth-child) */
 
-/* Specific widths for remaining static columns */
-.capsheet-hitters-table th:nth-child(14),
-.capsheet-hitters-table td:nth-child(14) { width: 80px; }  /* Second Pitcher Last IP (when dynamic) */
+/* Core player info columns */
+.capsheet-hitters-table th:nth-child(1),
+.capsheet-hitters-table td:nth-child(1) { width: 140px; } /* Player */
 
-.capsheet-hitters-table th:nth-child(15),
-.capsheet-hitters-table td:nth-child(15) { width: 80px; } /* Second Pitcher PC_ST (when dynamic) */
+.capsheet-hitters-table th:nth-child(2),
+.capsheet-hitters-table td:nth-child(2) { width: 60px; }  /* Team */
 
-.capsheet-hitters-table th:nth-child(16),
-.capsheet-hitters-table td:nth-child(16) { width: 60px; }  /* Second Pitcher K (when dynamic) */
+.capsheet-hitters-table th:nth-child(3),
+.capsheet-hitters-table td:nth-child(3) { width: 80px; }  /* HR Last */
 
-.capsheet-hitters-table th:nth-child(17),
-.capsheet-hitters-table td:nth-child(17) { width: 60px; }  /* Second Pitcher HR (when dynamic) */
+.capsheet-hitters-table th:nth-child(4),
+.capsheet-hitters-table td:nth-child(4) { width: 80px; }  /* AB Last */
 
-.capsheet-hitters-table th:nth-child(18),
-.capsheet-hitters-table td:nth-child(18) { width: 80px; }  /* Second Pitcher Throws (when dynamic) */
+.capsheet-hitters-table th:nth-child(5),
+.capsheet-hitters-table td:nth-child(5) { width: 80px; }  /* H Last */
 
-/* Static columns after second pitcher (adjust based on whether second pitcher is present) */
-.capsheet-hitters-table th:nth-child(19),
-.capsheet-hitters-table td:nth-child(19) { width: 80px; }  /* Exp SO */
+/* Performance chart column */
+.capsheet-hitters-table th:nth-child(6),
+.capsheet-hitters-table td:nth-child(6) { width: 150px; } /* Performance Chart */
 
-.capsheet-hitters-table th:nth-child(20),
-.capsheet-hitters-table td:nth-child(20) { width: 100px; } /* Stadium */
+/* Primary pitcher columns - using class-based selectors for better alignment */
+.capsheet-hitters-table th:nth-child(7),
+.capsheet-hitters-table td:nth-child(7) { width: 130px; } /* Primary Pitcher (increased width for buttons) */
 
-.capsheet-hitters-table th:nth-child(21),
-.capsheet-hitters-table td:nth-child(21) { width: 80px; }  /* Game O/U */
+/* Use class-based selectors for pitcher stat columns to avoid nth-child issues */
+.capsheet-hitters-pitcher-stat {
+  width: 80px !important;
+  max-width: 80px !important;
+  text-align: center !important;
+}
 
-.capsheet-hitters-table th:nth-child(22),
-.capsheet-hitters-table td:nth-child(22) { width: 60px; }  /* H */
+/* Throws columns */
+.throws-cell,
+.throws-header {
+  width: 80px !important;
+  max-width: 80px !important;
+  text-align: center !important;
+}
 
-.capsheet-hitters-table th:nth-child(23),
-.capsheet-hitters-table td:nth-child(23) { width: 60px; }  /* HR */
+/* Second pitcher container */
+.second-pitcher-container {
+  width: 130px !important; /* Increased width for add button */
+  max-width: 130px !important;
+}
 
-.capsheet-hitters-table th:nth-child(24),
-.capsheet-hitters-table td:nth-child(24) { width: 50px; }  /* B */
+/* Dynamic second pitcher stats columns */
+.second-pitcher-stat {
+  width: 80px !important;
+  max-width: 80px !important;
+  text-align: center !important;
+}
 
-/* Handicapper columns and Actions - ensure proper minimum width */
-.capsheet-hitters-table th:nth-child(n+25),
-.capsheet-hitters-table td:nth-child(n+25) {
-  min-width: 100px; /* Increased for handicapper names and actions */
+.second-pitcher-header {
+  width: 80px !important;
+  max-width: 80px !important;
+  text-align: center !important;
+  background-color: #e8f4f8 !important;
+  border-bottom-color: #bde0f0 !important;
+}
+
+/* Flexible approach for remaining columns - use class-based when possible */
+.capsheet-hitters-table .exp-so-cell,
+.capsheet-hitters-table .exp-so-header { width: 80px; }
+
+.capsheet-hitters-table .stadium-cell,
+.capsheet-hitters-table .stadium-header { width: 100px; }
+
+.capsheet-hitters-table .game-ou-cell,
+.capsheet-hitters-table .game-ou-header { width: 80px; }
+
+.capsheet-hitters-table .bet-h-cell,
+.capsheet-hitters-table .bet-h-header { width: 60px; }
+
+.capsheet-hitters-table .bet-hr-cell,
+.capsheet-hitters-table .bet-hr-header { width: 60px; }
+
+.capsheet-hitters-table .bet-b-cell,
+.capsheet-hitters-table .bet-b-header { width: 50px; }
+
+/* Handicapper columns and Actions - use class when possible */
+.capsheet-hitters-table .handicapper-header,
+.capsheet-hitters-table .handicapper-cell {
+  min-width: 100px;
   width: 100px;
+}
+
+.capsheet-hitters-table .actions-header,
+.capsheet-hitters-table .actions-cell {
+  width: 80px;
+  min-width: 80px;
 }
 
 /* Dynamic second pitcher columns - ensure proper alignment when present */
@@ -196,9 +233,9 @@
 }
 
 /* Responsive behavior - maintain horizontal scroll */
-@media (max-width: 1800px) {
+@media (max-width: 1520px) {
   .capsheet-hitters-table {
-    min-width: 1800px; /* Force horizontal scroll on smaller screens */
+    min-width: 1400px; /* Force horizontal scroll on smaller screens */
   }
 }
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PitcherRow from './TableRow/PitcherRow';
 import PlayerSelector from './PlayerSelector';
 import './PitcherPerformanceLineChart.css';
@@ -25,8 +25,87 @@ const PitchersTable = ({
   onRemoveHandicapper,
   gamesHistory,
   refreshKey,
-  fetchPitcherById // Add this prop to pass down to PitcherRow
+  fetchPitcherById, // Add this prop to pass down to PitcherRow
+  hitters, // Add hitters data to extract pitchers from
+  pitcherSelectOptions // Add pitcher select options to find pitcher IDs
 }) => {
+  // State for batch add functionality
+  const [isBatchAdding, setIsBatchAdding] = useState(false);
+  const [batchAddStatus, setBatchAddStatus] = useState('');
+
+  // Extract unique pitchers from hitters table and batch add them
+  const handleBatchAddFromHitters = async () => {
+    if (!hitters || hitters.length === 0) {
+      setBatchAddStatus('No hitters available to extract pitchers from');
+      setTimeout(() => setBatchAddStatus(''), 3000);
+      return;
+    }
+
+    setIsBatchAdding(true);
+    setBatchAddStatus('Extracting pitchers from hitters...');
+
+    try {
+      // Extract unique pitcher names from hitters
+      const uniquePitchers = new Set();
+      const pitchersToAdd = [];
+
+      hitters.forEach(hitter => {
+        // Check primary pitcher
+        if (hitter.pitcher && hitter.pitcher.trim() !== '') {
+          uniquePitchers.add(hitter.pitcher.trim());
+        }
+        
+        // Check second pitcher if exists
+        if (hitter.secondPitcher && hitter.secondPitcher.trim() !== '') {
+          uniquePitchers.add(hitter.secondPitcher.trim());
+        }
+      });
+
+      setBatchAddStatus(`Found ${uniquePitchers.size} unique pitchers...`);
+
+      let successCount = 0;
+      let totalCount = 0;
+
+      for (const pitcherName of uniquePitchers) {
+        totalCount++;
+        setBatchAddStatus(`Processing ${pitcherName}...`);
+
+        try {
+          // Check if pitcher already exists in the pitchers table
+          const existingPitcher = pitchers.find(p => p.name === pitcherName);
+          if (existingPitcher) {
+            console.log(`Pitcher ${pitcherName} already exists, skipping`);
+            continue;
+          }
+
+          // Find the pitcher in pitcherSelectOptions to get the ID
+          const pitcherOption = pitcherSelectOptions?.find(
+            option => option.label.includes(pitcherName)
+          );
+
+          if (pitcherOption) {
+            await onAddPitcher(pitcherOption.value);
+            successCount++;
+            console.log(`Successfully added pitcher: ${pitcherName}`);
+          } else {
+            console.warn(`Pitcher ${pitcherName} not found in available options`);
+          }
+        } catch (error) {
+          console.error(`Error adding pitcher ${pitcherName}:`, error);
+        }
+      }
+
+      setBatchAddStatus(`Successfully added ${successCount} of ${totalCount} pitchers`);
+      setTimeout(() => setBatchAddStatus(''), 3000);
+
+    } catch (error) {
+      console.error('Error during batch add:', error);
+      setBatchAddStatus('Error during batch add operation');
+      setTimeout(() => setBatchAddStatus(''), 3000);
+    } finally {
+      setIsBatchAdding(false);
+    }
+  };
   return (
     <div className="section-container">
       <h3 className="section-header">
@@ -51,6 +130,19 @@ const PitchersTable = ({
           noOptionsMessage="No pitchers found"
           selectId="pitcher-selector" // Add unique ID for select
         />
+        <button
+          className="action-btn batch-add-btn"
+          onClick={handleBatchAddFromHitters}
+          disabled={isBatchAdding || !hitters || hitters.length === 0}
+          title="Add all unique pitchers found in the hitters table"
+        >
+          {isBatchAdding ? '⟳ Adding...' : '📥 Add from Hitters Table'}
+        </button>
+        {batchAddStatus && (
+          <span className="batch-add-status">
+            {batchAddStatus}
+          </span>
+        )}
       </div>
 
       {/* Legend for the performance chart */}

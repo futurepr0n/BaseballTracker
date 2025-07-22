@@ -374,7 +374,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
   if (loading) {
     return (
       <GlassCard className="barrel-matchup-card" variant="default">
-        <div className="card-header">
+        <div className="glass-header">
           <h3>🎯 Barrel Matchup Analysis</h3>
         </div>
         <div className="loading-state">
@@ -388,7 +388,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
   if (error) {
     return (
       <GlassCard className="barrel-matchup-card" variant="default">
-        <div className="card-header">
+        <div className="glass-header">
           <h3>🎯 Barrel Matchup Analysis</h3>
         </div>
         <div className="error-state">
@@ -404,7 +404,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
   if (!analysisData || !analysisData.picks || analysisData.picks.length === 0) {
     return (
       <GlassCard className="barrel-matchup-card" variant="default">
-        <div className="card-header">
+        <div className="glass-header">
           <h3>🎯 Barrel Matchup Analysis</h3>
         </div>
         <div className="no-data">
@@ -809,21 +809,21 @@ const BarrelMatchupCard = ({ currentDate }) => {
         </div>
       </GlassScrollableContainer>
 
-      <div className="card-footer">
-        <div className="legend">
-          <span className="legend-item">🔴 High Vulnerability</span>
-          <span className="legend-item">🟡 Moderate</span>
-          <span className="legend-item">🟢 Low/Favorable</span>
+        <div className="card-footer">
+          <div className="legend">
+            <span className="legend-item">🔴 High Vulnerability</span>
+            <span className="legend-item">🟡 Moderate</span>
+            <span className="legend-item">🟢 Low/Favorable</span>
+          </div>
+          <div className="last-updated">
+            <small>
+              Updated: {analysisData?.updatedAt ? 
+                new Date(analysisData.updatedAt).toLocaleTimeString() : 
+                'Unknown'
+              }
+            </small>
+          </div>
         </div>
-        <div className="last-updated">
-          <small>
-            Updated: {analysisData?.updatedAt ? 
-              new Date(analysisData.updatedAt).toLocaleTimeString() : 
-              'Unknown'
-            }
-          </small>
-        </div>
-      </div>
     </GlassCard>
   );
 };

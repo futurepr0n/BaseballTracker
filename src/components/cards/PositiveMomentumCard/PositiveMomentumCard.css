@@ -385,6 +385,16 @@
     padding-top: 80px;
   }
   
+  /* Mobile view windowed behavior */
+  .positive-momentum-card .mobile-view {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .positive-momentum-card .mobile-cards {
+    padding-bottom: 10px;
+  }
+  
   .positive-momentum-card .momentum-item {
     gap: 8px;
     padding: 10px 6px;

@@ -9,6 +9,8 @@ import {
   getCurrentTimeSlot
 } from '../../../services/dataService';
 import { getPlayerDisplayName, getTeamDisplayName } from '../../../utils/playerNameUtils';
+import MobilePlayerCard from '../../common/MobilePlayerCard';
+import '../../common/MobilePlayerCard.css';
 import './TimeSlotHitsCard.css';
 
 
@@ -175,57 +177,129 @@ const TimeSlotHitsCard = ({ gameData, currentDate, teams }) => {
             No sufficient time slot history for today's players
           </div>
         ) : (
-          <div className="scrollable-container">
-          <ul className="player-list">
-            {timeSlotData.map((player, index) => {
-              const teamInfo = getTeamInfo(player.team);
-              
-              return (
-                <li key={`${player.name}_${player.team}`} className="player-item">
-                  {teamInfo.logoUrl && (
-                    <img 
-                      src={teamInfo.logoUrl} 
-                      alt={`${teamInfo.name} logo`}
-                      className="team-logo-bg"
+          <>
+            {/* Desktop View */}
+            <div className="desktop-view">
+              <div className="scrollable-container">
+                <ul className="player-list">
+                  {timeSlotData.map((player, index) => {
+                    const teamInfo = getTeamInfo(player.team);
+                    
+                    return (
+                      <li key={`${player.name}_${player.team}`} className="player-item">
+                        {teamInfo.logoUrl && (
+                          <img 
+                            src={teamInfo.logoUrl} 
+                            alt={`${teamInfo.name} logo`}
+                            className="team-logo-bg"
+                          />
+                        )}
+                        
+                        <div className="player-rank" style={{ backgroundColor: '#FF9800' }}>
+                          {teamInfo.logoUrl && (
+                            <>
+                              <img 
+                                src={teamInfo.logoUrl} 
+                                alt="" 
+                                className="rank-logo"
+                                loading="lazy"
+                                aria-hidden="true"
+                              />
+                              <div className="rank-overlay"></div>
+                            </>
+                          )}
+                          <span className="rank-number">{index + 1}</span>
+                        </div>
+                        
+                        <div className="player-info">
+                          <div className="player-name">{getPlayerDisplayName(player)}</div>
+                          <div className="player-team">{getTeamDisplayName(player)}</div>
+                        </div>
+                        
+                        <div className="player-stat">
+                          <span className="stat-highlight" style={{ color: '#FF9800' }}>
+                            {player.hitsPerGame} H/G
+                          </span>
+                          <small className="stat-note">
+                            {player.totalHits}H in {player.gamesInSlot}G ({player.battingAvg} AVG)
+                            <br />
+                            in {player.gameTimeSlot}
+                          </small>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
+
+            {/* Mobile View */}
+            <div className="mobile-view">
+              <div className="mobile-cards">
+                {timeSlotData.map((player, index) => {
+                  const teamInfo = getTeamInfo(player.team);
+                  
+                  return (
+                    <MobilePlayerCard
+                      key={`${player.name}_${player.team}`}
+                      item={{
+                        name: getPlayerDisplayName(player),
+                        team: player.team
+                      }}
+                      index={index}
+                      showRank={true}
+                      showExpandButton={true}
+                      primaryMetric={{
+                        value: player.hitsPerGame,
+                        label: 'H/G'
+                      }}
+                      secondaryMetrics={[
+                        { label: 'Total H', value: player.totalHits },
+                        { label: 'Games', value: player.gamesInSlot },
+                        { label: 'AVG', value: player.battingAvg }
+                      ]}
+                      expandableContent={
+                        <div className="mobile-analysis">
+                          <div className="metrics-grid">
+                            <div className="metric-item">
+                              <div className="metric-item-value">{player.hitsPerGame}</div>
+                              <div className="metric-item-label">Hits/Game</div>
+                            </div>
+                            <div className="metric-item">
+                              <div className="metric-item-value">{player.totalHits}</div>
+                              <div className="metric-item-label">Total Hits</div>
+                            </div>
+                            <div className="metric-item">
+                              <div className="metric-item-value">{player.gamesInSlot}</div>
+                              <div className="metric-item-label">Games Played</div>
+                            </div>
+                            <div className="metric-item">
+                              <div className="metric-item-value">{player.battingAvg}</div>
+                              <div className="metric-item-label">Batting AVG</div>
+                            </div>
+                          </div>
+                          
+                          <div className="analysis-item">
+                            <strong>Time Slot Performance:</strong> {player.gameTimeSlot}
+                          </div>
+                          
+                          <div className="analysis-item">
+                            <strong>Hit Rate:</strong> {((player.totalHits / player.gamesInSlot) * 100).toFixed(1)}% games with hits
+                          </div>
+                          
+                          {player.gameTimeSlot && (
+                            <div className="analysis-item">
+                              <strong>Schedule Context:</strong> Performs well in {player.gameTimeSlot.toLowerCase()} games
+                            </div>
+                          )}
+                        </div>
+                      }
                     />
-                  )}
-                  
-                  <div className="player-rank" style={{ backgroundColor: '#FF9800' }}>
-                    {teamInfo.logoUrl && (
-                      <>
-                        <img 
-                          src={teamInfo.logoUrl} 
-                          alt="" 
-                          className="rank-logo"
-                          loading="lazy"
-                          aria-hidden="true"
-                        />
-                        <div className="rank-overlay"></div>
-                      </>
-                    )}
-                    <span className="rank-number">{index + 1}</span>
-                  </div>
-                  
-                  <div className="player-info">
-                    <div className="player-name">{getPlayerDisplayName(player)}</div>
-                    <div className="player-team">{getTeamDisplayName(player)}</div>
-                  </div>
-                  
-                  <div className="player-stat">
-                    <span className="stat-highlight" style={{ color: '#FF9800' }}>
-                      {player.hitsPerGame} H/G
-                    </span>
-                    <small className="stat-note">
-                      {player.totalHits}H in {player.gamesInSlot}G ({player.battingAvg} AVG)
-                      <br />
-                      in {player.gameTimeSlot}
-                    </small>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-          </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
         )}
       </div>
     </div>
@@ -395,57 +469,129 @@ const TimeSlotHRCard = ({ gameData, currentDate, teams }) => {
             No sufficient HR history for today's players in their time slots
           </div>
         ) : (
-          <div className="scrollable-container">
-          <ul className="player-list">
-            {timeSlotData.map((player, index) => {
-              const teamInfo = getTeamInfo(player.team);
-              
-              return (
-                <li key={`${player.name}_${player.team}`} className="player-item">
-                  {teamInfo.logoUrl && (
-                    <img 
-                      src={teamInfo.logoUrl} 
-                      alt={`${teamInfo.name} logo`}
-                      className="team-logo-bg"
+          <>
+            {/* Desktop View */}
+            <div className="desktop-view">
+              <div className="scrollable-container">
+                <ul className="player-list">
+                  {timeSlotData.map((player, index) => {
+                    const teamInfo = getTeamInfo(player.team);
+                    
+                    return (
+                      <li key={`${player.name}_${player.team}`} className="player-item">
+                        {teamInfo.logoUrl && (
+                          <img 
+                            src={teamInfo.logoUrl} 
+                            alt={`${teamInfo.name} logo`}
+                            className="team-logo-bg"
+                          />
+                        )}
+                        
+                        <div className="player-rank" style={{ backgroundColor: '#06b6d4' }}>
+                          {teamInfo.logoUrl && (
+                            <>
+                              <img 
+                                src={teamInfo.logoUrl} 
+                                alt="" 
+                                className="rank-logo"
+                                loading="lazy"
+                                aria-hidden="true"
+                              />
+                              <div className="rank-overlay"></div>
+                            </>
+                          )}
+                          <span className="rank-number">{index + 1}</span>
+                        </div>
+                        
+                        <div className="player-info">
+                          <div className="player-name">{getPlayerDisplayName(player)}</div>
+                          <div className="player-team">{getTeamDisplayName(player)}</div>
+                        </div>
+                        
+                        <div className="player-stat">
+                          <span className="stat-highlight" style={{ color: '#06b6d4' }}>
+                            {player.hrsPerGame} HR/G
+                          </span>
+                          <small className="stat-note">
+                            {player.totalHRs} HRs in {player.gamesInSlot}G
+                            <br />
+                            in {player.gameTimeSlot}
+                          </small>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
+
+            {/* Mobile View */}
+            <div className="mobile-view">
+              <div className="mobile-cards">
+                {timeSlotData.map((player, index) => {
+                  const teamInfo = getTeamInfo(player.team);
+                  
+                  return (
+                    <MobilePlayerCard
+                      key={`${player.name}_${player.team}`}
+                      item={{
+                        name: getPlayerDisplayName(player),
+                        team: player.team
+                      }}
+                      index={index}
+                      showRank={true}
+                      showExpandButton={true}
+                      primaryMetric={{
+                        value: player.hrsPerGame,
+                        label: 'HR/G'
+                      }}
+                      secondaryMetrics={[
+                        { label: 'Total HR', value: player.totalHRs },
+                        { label: 'Games', value: player.gamesInSlot },
+                        { label: 'HR Rate', value: `${((player.totalHRs / player.gamesInSlot) * 100).toFixed(1)}%` }
+                      ]}
+                      expandableContent={
+                        <div className="mobile-analysis">
+                          <div className="metrics-grid">
+                            <div className="metric-item">
+                              <div className="metric-item-value">{player.hrsPerGame}</div>
+                              <div className="metric-item-label">HR/Game</div>
+                            </div>
+                            <div className="metric-item">
+                              <div className="metric-item-value">{player.totalHRs}</div>
+                              <div className="metric-item-label">Total HRs</div>
+                            </div>
+                            <div className="metric-item">
+                              <div className="metric-item-value">{player.gamesInSlot}</div>
+                              <div className="metric-item-label">Games Played</div>
+                            </div>
+                            <div className="metric-item">
+                              <div className="metric-item-value">{((player.totalHRs / player.gamesInSlot) * 100).toFixed(1)}%</div>
+                              <div className="metric-item-label">HR Success Rate</div>
+                            </div>
+                          </div>
+                          
+                          <div className="analysis-item">
+                            <strong>Time Slot Performance:</strong> {player.gameTimeSlot}
+                          </div>
+                          
+                          <div className="analysis-item">
+                            <strong>Power Display:</strong> {player.totalHRs} home runs in {player.gamesInSlot} games
+                          </div>
+                          
+                          {player.gameTimeSlot && (
+                            <div className="analysis-item">
+                              <strong>Schedule Context:</strong> Strong power in {player.gameTimeSlot.toLowerCase()} games
+                            </div>
+                          )}
+                        </div>
+                      }
                     />
-                  )}
-                  
-                  <div className="player-rank" style={{ backgroundColor: '#06b6d4' }}>
-                    {teamInfo.logoUrl && (
-                      <>
-                        <img 
-                          src={teamInfo.logoUrl} 
-                          alt="" 
-                          className="rank-logo"
-                          loading="lazy"
-                          aria-hidden="true"
-                        />
-                        <div className="rank-overlay"></div>
-                      </>
-                    )}
-                    <span className="rank-number">{index + 1}</span>
-                  </div>
-                  
-                  <div className="player-info">
-                    <div className="player-name">{getPlayerDisplayName(player)}</div>
-                    <div className="player-team">{getTeamDisplayName(player)}</div>
-                  </div>
-                  
-                  <div className="player-stat">
-                    <span className="stat-highlight" style={{ color: '#06b6d4' }}>
-                      {player.hrsPerGame} HR/G
-                    </span>
-                    <small className="stat-note">
-                      {player.totalHRs} HRs in {player.gamesInSlot}G
-                      <br />
-                      in {player.gameTimeSlot}
-                    </small>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-          </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
         )}
       </div>
     </div>

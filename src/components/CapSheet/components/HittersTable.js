@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import HitterRow from './TableRow/HitterRow';
 import PlayerSelector from './PlayerSelector';
+import { getMatchupFromTeam } from '../../../services/startingLineupService';
 import './HitterPerformanceLineChart.css';
 import '../styles/CapSheetTable.css';
 
@@ -31,11 +32,65 @@ const HittersTable = ({
   gamesHistory,
   refreshKey // Add refresh key to force re-render when needed
 }) => {
+  // State for auto-fill functionality
+  const [isAutoFilling, setIsAutoFilling] = useState(false);
+  const [autoFillStatus, setAutoFillStatus] = useState('');
+
   // Check if any hitter has a second pitcher to determine if we need those columns
   const hasAnySecondPitcher = hitters.some(hitter => {
     // Check if second pitcher exists in the player object
     return hitter.secondPitcherId || hitter.secondPitcher;
   });
+
+  // Auto-fill pitchers from starting lineups
+  const handleAutoFillPitchers = async () => {
+    setIsAutoFilling(true);
+    setAutoFillStatus('Loading starting lineups...');
+    
+    try {
+      let successCount = 0;
+      let totalCount = 0;
+      
+      for (const hitter of hitters) {
+        // Skip if pitcher already selected
+        if (hitter.pitcherId) continue;
+        
+        // Need opponent team to look up pitcher
+        if (!hitter.team) continue;
+        
+        totalCount++;
+        setAutoFillStatus(`Processing ${hitter.name}...`);
+        
+        try {
+          const matchupData = await getMatchupFromTeam(hitter.team);
+          if (matchupData && matchupData.opponentPitcher && matchupData.opponentPitcher !== 'TBD') {
+            // Find the pitcher ID from options
+            const pitcherOption = getPitcherOptionsForOpponent(hitter.team)?.find(
+              p => p.label.includes(matchupData.opponentPitcher)
+            );
+            
+            if (pitcherOption) {
+              onPitcherSelect(hitter.id, pitcherOption.value);
+              successCount++;
+              console.log(`Auto-filled pitcher for ${hitter.name}: ${matchupData.opponentPitcher}`);
+            }
+          }
+        } catch (error) {
+          console.warn(`Failed to auto-fill pitcher for ${hitter.name}:`, error);
+        }
+      }
+      
+      setAutoFillStatus(`Auto-filled ${successCount} of ${totalCount} pitchers`);
+      setTimeout(() => setAutoFillStatus(''), 3000);
+      
+    } catch (error) {
+      console.error('Error during auto-fill:', error);
+      setAutoFillStatus('Error loading starting lineups');
+      setTimeout(() => setAutoFillStatus(''), 3000);
+    } finally {
+      setIsAutoFilling(false);
+    }
+  };
 
   return (
     <div className="section-container">
@@ -61,6 +116,19 @@ const HittersTable = ({
           noOptionsMessage="No hitters found"
           selectId="hitter-selector"
         />
+        <button
+          className="action-btn auto-fill-btn"
+          onClick={handleAutoFillPitchers}
+          disabled={isAutoFilling || hitters.length === 0}
+          title="Auto-fill pitchers from starting lineups data"
+        >
+          {isAutoFilling ? '⟳ Auto-filling...' : '🔄 Auto-fill Pitchers'}
+        </button>
+        {autoFillStatus && (
+          <span className="auto-fill-status">
+            {autoFillStatus}
+          </span>
+        )}
       </div>
 
       {/* Legend for the performance chart */}

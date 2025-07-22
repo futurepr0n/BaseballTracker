@@ -43,6 +43,7 @@ import BarrelMatchupCard from './cards/BarrelMatchupCard';
 import LaunchAngleMastersCard from './cards/LaunchAngleMastersCard';
 import MilestoneTrackingCard from './cards/MilestoneTrackingCard';
 import StrategicIntelligenceCard from './cards/StrategicIntelligenceCard';
+import PlayerPropsLadderCard from './cards/PlayerPropsLadderCard';
 
 
 import LiveScoresCard from './cards/LiveScoresCard/LiveScoresCard';
@@ -1113,7 +1114,11 @@ const StatsTimePeriodSelector = () => (
     display: 'flex',
     gap: '8px',
     marginBottom: '15px',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    maxWidth: '100%',
+    width: '100%',
+    boxSizing: 'border-box',
+    overflow: 'hidden'
   }}>
     <span style={{ fontSize: '0.9rem', color: '#666', alignSelf: 'center' }}>Show:</span>
     {[
@@ -1256,7 +1261,13 @@ const noFilteredData = isFiltering &&
 ) : (
         <div className="dashboard-grid">
 
-                <div className="stats-controls" style={{ gridColumn: '1 / -1' }}>
+                <div className="stats-controls" style={{ 
+                  gridColumn: '1 / -1', 
+                  maxWidth: '100%',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  overflow: 'hidden'
+                }}>
         <StatsTimePeriodSelector />
       </div>
           
@@ -1320,6 +1331,11 @@ const noFilteredData = isFiltering &&
               poorPerformancePredictions={poorPerformancePredictions}
               positiveMomentumPredictions={positiveMomentumPredictions}
             />
+          </div>
+
+          {/* Player Props Ladder Card - Full width */}
+          <div style={{ gridColumn: '1 / -1' }}>
+            <PlayerPropsLadderCard currentDate={currentDate} gameData={filteredGameData} />
           </div>
           
           {/* Row 4: Top Hitters, HR Leaders, Recent Homers */}

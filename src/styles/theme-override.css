@@ -1,0 +1,465 @@
+/**
+ * theme-override.css
+ * 
+ * Global theme that provides consistent styling across all browsers
+ * without relying on OS/browser dark mode preferences.
+ * 
+ * This solves white-on-white text issues in dark mode browsers
+ * by explicitly setting all colors and backgrounds.
+ */
+
+/* Root theme variables - explicit values only */
+:root {
+  /* Primary Colors */
+  --theme-bg-primary: #f7fafc;          /* Light gray background */
+  --theme-bg-secondary: #edf2f7;        /* Slightly darker gray */
+  --theme-bg-tertiary: #e2e8f0;         /* Card backgrounds */
+  
+  /* Text Colors - High contrast */
+  --theme-text-primary: #1a202c;        /* Very dark gray (near black) */
+  --theme-text-secondary: #4a5568;      /* Medium gray */
+  --theme-text-tertiary: #718096;       /* Light gray */
+  --theme-text-accent: #5a67d8;         /* Blue accent */
+  
+  /* Glass Card Colors */
+  --theme-glass-bg: rgba(255, 255, 255, 0.25);
+  --theme-glass-border: rgba(255, 255, 255, 0.3);
+  --theme-glass-shadow: rgba(0, 0, 0, 0.1);
+  
+  /* Interactive Elements */
+  --theme-button-bg: #5a67d8;           /* Blue */
+  --theme-button-text: #ffffff;         /* White */
+  --theme-button-hover: #4c51bf;        /* Darker blue */
+  --theme-button-active-bg: #667eea;    /* Active state */
+  
+  /* Status Colors */
+  --theme-success: #48bb78;             /* Green */
+  --theme-warning: #ed8936;             /* Orange */
+  --theme-error: #f56565;               /* Red */
+  --theme-info: #4299e1;                /* Light blue */
+  
+  /* Borders and Dividers */
+  --theme-border-color: #cbd5e0;        /* Light gray border */
+  --theme-divider-color: #e2e8f0;       /* Subtle divider */
+  
+  /* Chart Colors */
+  --theme-chart-text: #2d3748;          /* Dark gray for chart labels */
+  --theme-chart-grid: #e2e8f0;          /* Light grid lines */
+}
+
+/* Force override of system colors */
+* {
+  /* Disable browser color adjustments */
+  -webkit-text-fill-color: initial;
+  forced-color-adjust: none;
+}
+
+/* Global text color enforcement */
+body,
+body * {
+  /* Ensure text is always visible */
+  color: var(--theme-text-primary);
+}
+
+/* Glass card specific overrides */
+.glass-card {
+  background: var(--theme-glass-bg) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--theme-glass-border) !important;
+  color: var(--theme-text-primary) !important;
+}
+
+.glass-card h1,
+.glass-card h2,
+.glass-card h3,
+.glass-card h4,
+.glass-card h5,
+.glass-card h6 {
+  color: var(--theme-text-primary) !important;
+}
+
+/* Specific glass header overrides - higher specificity to override individual card styles */
+.glass-header h1,
+.glass-header h2,
+.glass-header h3,
+.glass-header h4,
+.glass-header h5,
+.glass-header h6,
+.glass-card .glass-header h1,
+.glass-card .glass-header h2,
+.glass-card .glass-header h3,
+.glass-card .glass-header h4,
+.glass-card .glass-header h5,
+.glass-card .glass-header h6 {
+  color: var(--theme-text-primary) !important;
+  -webkit-text-fill-color: var(--theme-text-primary) !important;
+}
+
+.glass-card p,
+.glass-card span,
+.glass-card div {
+  color: inherit;
+}
+
+.glass-card .card-subtitle {
+  color: var(--theme-text-secondary) !important;
+  opacity: 1 !important;
+}
+
+/* Player Props Ladder Card specific fixes */
+.player-props-ladder-card {
+  color: var(--theme-text-primary) !important;
+}
+
+.player-props-ladder-card .prop-button {
+  background: var(--theme-button-bg) !important;
+  color: var(--theme-button-text) !important;
+  border: 1px solid var(--theme-button-bg) !important;
+}
+
+.player-props-ladder-card .prop-button:hover {
+  background: var(--theme-button-hover) !important;
+}
+
+.player-props-ladder-card .prop-button.active {
+  background: var(--theme-button-active-bg) !important;
+  color: var(--theme-button-text) !important;
+}
+
+.player-props-ladder-card .player-item {
+  background: rgba(255, 255, 255, 0.5) !important;
+  border: 1px solid var(--theme-border-color) !important;
+  color: var(--theme-text-primary) !important;
+}
+
+.player-props-ladder-card .player-item:hover {
+  background: rgba(255, 255, 255, 0.8) !important;
+}
+
+.player-props-ladder-card .player-name {
+  color: var(--theme-text-primary) !important;
+  font-weight: 600;
+}
+
+.player-props-ladder-card .player-team {
+  color: var(--theme-text-secondary) !important;
+}
+
+.player-props-ladder-card .player-rank {
+  background: var(--theme-button-bg) !important;
+  color: var(--theme-button-text) !important;
+}
+
+/* Chart text overrides */
+.recharts-text {
+  fill: var(--theme-chart-text) !important;
+}
+
+.recharts-cartesian-axis-tick-value {
+  fill: var(--theme-chart-text) !important;
+}
+
+.recharts-legend-item-text {
+  color: var(--theme-chart-text) !important;
+}
+
+/* Tooltip overrides */
+.chart-tooltip {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid var(--theme-border-color) !important;
+  color: var(--theme-text-primary) !important;
+}
+
+.chart-tooltip p {
+  color: var(--theme-text-primary) !important;
+}
+
+/* Table overrides */
+table {
+  color: var(--theme-text-primary) !important;
+}
+
+th {
+  color: var(--theme-text-primary) !important;
+  background: var(--theme-bg-secondary) !important;
+}
+
+td {
+  color: var(--theme-text-primary) !important;
+}
+
+/* Input and form elements */
+input,
+select,
+textarea {
+  color: var(--theme-text-primary) !important;
+  background: var(--theme-bg-primary) !important;
+  border-color: var(--theme-border-color) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--theme-text-tertiary) !important;
+}
+
+/* Button overrides */
+button {
+  color: var(--theme-button-text) !important;
+  background: var(--theme-button-bg) !important;
+}
+
+button:hover {
+  background: var(--theme-button-hover) !important;
+}
+
+/* Link overrides */
+a {
+  color: var(--theme-text-accent) !important;
+}
+
+a:hover {
+  color: var(--theme-button-hover) !important;
+}
+
+/* Navigation overrides */
+.navigation,
+.nav-link {
+  color: var(--theme-text-primary) !important;
+}
+
+.nav-link:hover {
+  color: var(--theme-text-accent) !important;
+}
+
+/* Override any media queries that might switch to dark mode */
+@media (prefers-color-scheme: dark) {
+  /* Force light theme even in dark mode preference */
+  :root {
+    color-scheme: light !important;
+  }
+  
+  body {
+    background: var(--theme-bg-primary) !important;
+    color: var(--theme-text-primary) !important;
+  }
+}
+
+/* Ensure visibility for all text elements */
+.loading-state,
+.error-state,
+.no-selection-state {
+  color: var(--theme-text-primary) !important;
+}
+
+.loading-state p,
+.error-state p,
+.no-selection-state p {
+  color: var(--theme-text-primary) !important;
+}
+
+/* Summary stat colors */
+.summary-label {
+  color: var(--theme-text-secondary) !important;
+}
+
+.summary-value {
+  color: var(--theme-text-primary) !important;
+  font-weight: 600;
+}
+
+/* Rate and probability text */
+.rate-value,
+.prob-value,
+.stat-value {
+  color: var(--theme-text-primary) !important;
+  font-weight: 600;
+}
+
+.rate-label,
+.prob-label,
+.stat-label {
+  color: var(--theme-text-secondary) !important;
+}
+
+/* Section titles */
+.section-title {
+  color: var(--theme-text-primary) !important;
+}
+
+/* Legend items */
+.legend-item {
+  color: var(--theme-text-secondary) !important;
+}
+
+/* Last updated text */
+.last-updated {
+  color: var(--theme-text-tertiary) !important;
+}
+
+/* Toggle text */
+.toggle-text {
+  color: var(--theme-text-secondary) !important;
+}
+
+/* Card footer */
+.card-footer {
+  border-top-color: var(--theme-border-color) !important;
+}
+
+/* Retry button */
+.retry-button {
+  background: var(--theme-button-bg) !important;
+  color: var(--theme-button-text) !important;
+  border: none !important;
+}
+
+.retry-button:hover {
+  background: var(--theme-button-hover) !important;
+}
+
+/* Mobile responsive overrides to preserve mobile layout while maintaining theme colors */
+@media (max-width: 1200px) {
+  /* Apply to all player-item cards that might have similar issues */
+  .player-props-ladder-card .player-item,
+  .likely-to-hit-card .player-item,
+  .home-run-leaders-card .player-item,
+  .most-recent-home-runs-card .player-item {
+    /* Allow mobile-specific layout adjustments while preserving theme colors */
+    padding: 8px 10px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Preserve mobile layout for all player-item cards while maintaining theme colors */
+  .player-props-ladder-card .player-item,
+  .likely-to-hit-card .player-item,
+  .home-run-leaders-card .player-item,
+  .most-recent-home-runs-card .player-item {
+    gap: 8px !important;
+    padding: 8px 10px !important;
+    /* Keep theme colors but allow mobile-specific sizing */
+    background: rgba(255, 255, 255, 0.5) !important;
+    border: 1px solid var(--theme-border-color) !important;
+    color: var(--theme-text-primary) !important;
+  }
+
+  .player-props-ladder-card .player-rank,
+  .likely-to-hit-card .player-rank,
+  .home-run-leaders-card .player-rank,
+  .most-recent-home-runs-card .player-rank {
+    font-size: 12px !important;
+    min-width: 25px !important;
+    background: var(--theme-button-bg) !important;
+    color: var(--theme-button-text) !important;
+  }
+
+  .player-props-ladder-card .player-info .player-name,
+  .likely-to-hit-card .player-info .player-name,
+  .home-run-leaders-card .player-info .player-name,
+  .most-recent-home-runs-card .player-info .player-name {
+    font-size: 12px !important;
+    color: var(--theme-text-primary) !important;
+    -webkit-text-fill-color: var(--theme-text-primary) !important;
+  }
+
+  .player-props-ladder-card .player-team,
+  .likely-to-hit-card .player-team,
+  .home-run-leaders-card .player-team,
+  .most-recent-home-runs-card .player-team {
+    font-size: 10px !important;
+    color: var(--theme-text-secondary) !important;
+    -webkit-text-fill-color: var(--theme-text-secondary) !important;
+  }
+
+  .player-props-ladder-card .player-stats,
+  .player-props-ladder-card .player-rate,
+  .player-props-ladder-card .player-prob,
+  .likely-to-hit-card .player-stats,
+  .home-run-leaders-card .player-stats,
+  .most-recent-home-runs-card .player-stats {
+    min-width: 50px !important;
+  }
+
+  .player-props-ladder-card .stat-value,
+  .player-props-ladder-card .rate-value,
+  .player-props-ladder-card .prob-value,
+  .likely-to-hit-card .stat-value,
+  .home-run-leaders-card .stat-value,
+  .most-recent-home-runs-card .stat-value {
+    font-size: 12px !important;
+    color: var(--theme-text-primary) !important;
+    -webkit-text-fill-color: var(--theme-text-primary) !important;
+  }
+
+  .player-props-ladder-card .stat-label,
+  .player-props-ladder-card .rate-label,
+  .player-props-ladder-card .prob-label,
+  .likely-to-hit-card .stat-label,
+  .home-run-leaders-card .stat-label,
+  .most-recent-home-runs-card .stat-label {
+    font-size: 9px !important;
+    color: var(--theme-text-secondary) !important;
+    -webkit-text-fill-color: var(--theme-text-secondary) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Small mobile specific overrides for all player-item cards */
+  .player-props-ladder-card .player-item,
+  .likely-to-hit-card .player-item,
+  .home-run-leaders-card .player-item,
+  .most-recent-home-runs-card .player-item {
+    gap: 6px !important;
+    padding: 6px 8px !important;
+  }
+
+  .player-props-ladder-card .player-rank,
+  .likely-to-hit-card .player-rank,
+  .home-run-leaders-card .player-rank,
+  .most-recent-home-runs-card .player-rank {
+    font-size: 11px !important;
+    min-width: 20px !important;
+  }
+
+  .player-props-ladder-card .player-info .player-name,
+  .likely-to-hit-card .player-info .player-name,
+  .home-run-leaders-card .player-info .player-name,
+  .most-recent-home-runs-card .player-info .player-name {
+    font-size: 11px !important;
+  }
+
+  .player-props-ladder-card .player-team,
+  .likely-to-hit-card .player-team,
+  .home-run-leaders-card .player-team,
+  .most-recent-home-runs-card .player-team {
+    font-size: 9px !important;
+  }
+
+  .player-props-ladder-card .player-stats,
+  .player-props-ladder-card .player-rate,
+  .player-props-ladder-card .player-prob,
+  .likely-to-hit-card .player-stats,
+  .home-run-leaders-card .player-stats,
+  .most-recent-home-runs-card .player-stats {
+    min-width: 40px !important;
+  }
+
+  .player-props-ladder-card .stat-value,
+  .player-props-ladder-card .rate-value,
+  .player-props-ladder-card .prob-value,
+  .likely-to-hit-card .stat-value,
+  .home-run-leaders-card .stat-value,
+  .most-recent-home-runs-card .stat-value {
+    font-size: 11px !important;
+  }
+
+  .player-props-ladder-card .stat-label,
+  .player-props-ladder-card .rate-label,
+  .player-props-ladder-card .prob-label,
+  .likely-to-hit-card .stat-label,
+  .home-run-leaders-card .stat-label,
+  .most-recent-home-runs-card .stat-label {
+    font-size: 8px !important;
+  }
+}

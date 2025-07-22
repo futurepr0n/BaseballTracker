@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
 import { debugLog } from '../../../utils/debugConfig';
+import MobilePlayerCard from '../../common/MobilePlayerCard';
 import './HRPredictionCard.css';
+import '../../common/MobilePlayerCard.css';
 
 /**
  * Enhanced HR Prediction Card with betting odds integration
@@ -265,82 +267,156 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
           )}
         </div>
 
-        <div className="scrollable-container">
-  <ul className="player-list">
-    {playersWithHomeRunPrediction
-      .filter(player => getPlayerOdds(player.name) !== null) // Filter out players without odds
-      .slice(0, 25)
-      .map((player, index) => {
-        const team = teams[player.team];
-        const playerOdds = getPlayerOdds(player.name);
-        const formattedOdds = formatOdds(playerOdds?.odds);
-        const oddsColor = getOddsColor(playerOdds?.odds);
+        {/* Desktop View */}
+        <div className="desktop-view">
+          <div className="scrollable-container">
+            <ul className="player-list">
+              {playersWithHomeRunPrediction
+                .filter(player => getPlayerOdds(player.name) !== null) // Filter out players without odds
+                .map((player, index) => {
+                  const team = teams[player.team];
+                  const playerOdds = getPlayerOdds(player.name);
+                  const formattedOdds = formatOdds(playerOdds?.odds);
+                  const oddsColor = getOddsColor(playerOdds?.odds);
 
-        return (
-          <li key={`${player.name}_${player.team}_${index}`} className="player-item">
-            {/* Team logo background */}
-            {team?.logoUrl && (
-              <img 
-                src={team.logoUrl} 
-                alt={team.name} 
-                className="team-logo-bg"
-              />
-            )}
-            
-            {/* Rank circle with team colors */}
-            <div 
-              className="player-rank" 
-              style={{ 
-                backgroundColor: team?.primaryColor || '#0056b3',
-                color: 'white'
-              }}
-            >
-              <img 
-                src={team?.logoUrl} 
-                alt={team?.name} 
-                className="rank-logo"
-              />
-              <div className="rank-overlay" style={{ backgroundColor: team?.primaryColor || '#0056b3' }}></div>
-              <span className="rank-number">{index + 1}</span>
-            </div>
-            
-            <div className="player-info">
-              <div className="player-name">{player.fullName || player.name}</div>
-              <div className="player-team-odds">
-                <span className="player-team">{team?.abbreviation || player.team}</span>
-                {formattedOdds && (
-                  <>
-                    <span className="odds-separator">•</span>
-                    <span 
-                      className="player-odds"
-                      style={{ color: oddsColor }}
-                      title={`Betting odds for ${player.name} to hit a home run`}
-                    >
-                      {formattedOdds}
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-            
-            <div className="player-stat">
-              <span className="hr-deficit">
-                {player.gamesSinceLastHR === 0 ? 'Hit HR last game' : 
-                 `${player.gamesSinceLastHR} games since HR`}
-              </span>
-              <div className="hr-detail">
-                {player.homeRunsThisSeason || 0} HRs this season
-                {player.daysSinceLastHR > 0 && (
-                  <span className="days-since">
-                    {player.daysSinceLastHR === 1 ? '1 day ago' : `${player.daysSinceLastHR} days ago`}
-                  </span>
-                )}
-              </div>
-            </div>
-          </li>
-        );
-      })}
-  </ul>
+                  return (
+                    <li key={`${player.name}_${player.team}_${index}`} className="player-item">
+                      {/* Team logo background */}
+                      {team?.logoUrl && (
+                        <img 
+                          src={team.logoUrl} 
+                          alt={team.name} 
+                          className="team-logo-bg"
+                        />
+                      )}
+                      
+                      {/* Rank circle with team colors */}
+                      <div 
+                        className="player-rank" 
+                        style={{ 
+                          backgroundColor: team?.primaryColor || '#0056b3',
+                          color: 'white'
+                        }}
+                      >
+                        <img 
+                          src={team?.logoUrl} 
+                          alt={team?.name} 
+                          className="rank-logo"
+                        />
+                        <div className="rank-overlay" style={{ backgroundColor: team?.primaryColor || '#0056b3' }}></div>
+                        <span className="rank-number">{index + 1}</span>
+                      </div>
+                      
+                      <div className="player-info">
+                        <div className="player-name">{player.fullName || player.name}</div>
+                        <div className="player-team-odds">
+                          <span className="player-team">{team?.abbreviation || player.team}</span>
+                          {formattedOdds && (
+                            <>
+                              <span className="odds-separator">•</span>
+                              <span 
+                                className="player-odds"
+                                style={{ color: oddsColor }}
+                                title={`Betting odds for ${player.name} to hit a home run`}
+                              >
+                                {formattedOdds}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="player-stat">
+                        <span className="hr-deficit">
+                          {player.gamesSinceLastHR === 0 ? 'Hit HR last game' : 
+                           `${player.gamesSinceLastHR} games since HR`}
+                        </span>
+                        <div className="hr-detail">
+                          {player.homeRunsThisSeason || 0} HRs this season
+                          {player.daysSinceLastHR > 0 && (
+                            <span className="days-since">
+                              {player.daysSinceLastHR === 1 ? '1 day ago' : `${player.daysSinceLastHR} days ago`}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+            </ul>
+          </div>
+        </div>
+
+        {/* Mobile View */}
+        <div className="mobile-view">
+          <div className="mobile-cards">
+            {playersWithHomeRunPrediction
+              .filter(player => getPlayerOdds(player.name) !== null) // Filter out players without odds
+              .slice(0, 15)
+              .map((player, index) => {
+                const team = teams[player.team];
+                const playerOdds = getPlayerOdds(player.name);
+                const formattedOdds = formatOdds(playerOdds?.odds);
+
+                const secondaryMetrics = [
+                  { 
+                    label: 'HRs', 
+                    value: `${player.homeRunsThisSeason || 0}` 
+                  },
+                  { 
+                    label: 'Odds', 
+                    value: formattedOdds || 'N/A' 
+                  }
+                ];
+
+                const expandableContent = (
+                  <div className="mobile-hr-details">
+                    <div className="mobile-hr-analysis">
+                      <div className="analysis-item">
+                        <strong>Home Run Analysis:</strong>
+                        <p style={{marginTop: '4px', fontSize: '12px', lineHeight: '1.4'}}>
+                          {player.gamesSinceLastHR === 0 
+                            ? 'Hit a home run in their last game - momentum building!' 
+                            : `${player.gamesSinceLastHR} games without a home run.`}
+                        </p>
+                      </div>
+
+                      <div className="analysis-item">
+                        <strong>Season Performance:</strong>
+                        <div style={{marginTop: '4px', fontSize: '11px'}}>
+                          <div>Total HRs: {player.homeRunsThisSeason || 0}</div>
+                          {player.daysSinceLastHR > 0 && (
+                            <div>Last HR: {player.daysSinceLastHR === 1 ? '1 day ago' : `${player.daysSinceLastHR} days ago`}</div>
+                          )}
+                          {formattedOdds && (
+                            <div>Betting Odds: {formattedOdds}</div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+
+                return (
+                  <MobilePlayerCard
+                    key={`${player.name}_${player.team}_${index}`}
+                    item={{
+                      name: player.fullName || player.name,
+                      team: team?.abbreviation || player.team
+                    }}
+                    index={index}
+                    showRank={true}
+                    showExpandButton={true}
+                    primaryMetric={{
+                      value: player.gamesSinceLastHR === 0 ? 'Last Game' : player.gamesSinceLastHR,
+                      label: player.gamesSinceLastHR === 0 ? 'Hit HR' : 'Games Since'
+                    }}
+                    secondaryMetrics={secondaryMetrics}
+                    expandableContent={expandableContent}
+                  />
+                );
+              })}
+          </div>
         </div>
 
         {oddsData.size > 0 && (

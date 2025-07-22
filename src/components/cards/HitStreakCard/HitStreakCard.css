@@ -395,4 +395,14 @@ body .streak-tooltip {
     max-height: 60vh;
     padding-bottom: 10px;
   }
+  
+  /* Mobile view windowed behavior */
+  .hit-streak-card .mobile-view {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .hit-streak-card .mobile-cards {
+    padding-bottom: 10px;
+  }
 }

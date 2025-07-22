@@ -278,6 +278,16 @@
     padding-top: 80px; /* Less top padding on mobile */
   }
   
+  /* Mobile view windowed behavior */
+  .hr-rate-card .mobile-view {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .hr-rate-card .mobile-cards {
+    padding-bottom: 10px;
+  }
+  
   .hr-rate-card .player-item {
     padding: 10px 6px;
   }

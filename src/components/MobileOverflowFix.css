@@ -32,6 +32,7 @@
   /* Dashboard specific fixes */
   .dashboard {
     width: 100%;
+    max-width: 100% !important; /* Override desktop max-width on mobile */
     padding: 15px 5px;
     box-sizing: border-box;
   }
