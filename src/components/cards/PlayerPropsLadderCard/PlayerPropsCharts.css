@@ -1,0 +1,254 @@
+/* PlayerPropsCharts.css - Styling for separate chart components */
+
+/* Chart Container Styling */
+.chart-container {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 16px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(156, 39, 176, 0.1);
+  margin-bottom: 16px;
+}
+
+.chart-title {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a202c;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.chart-subtitle {
+  font-size: 10px;
+  color: #4a5568;
+  font-weight: 400;
+  display: block;
+  margin-top: 2px;
+}
+
+.no-data-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: #4a5568;
+  font-style: italic;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  border: 2px dashed rgba(156, 39, 176, 0.2);
+}
+
+/* Chart-specific styling */
+.season-overview-chart {
+  border-left: 4px solid #4CAF50;
+}
+
+.recent-games-chart {
+  border-left: 4px solid #9c27b0;
+}
+
+.opponent-history-chart {
+  border-left: 4px solid #ff9800;
+}
+
+/* Summary sections */
+.season-summary,
+.recent-summary,
+.opponent-summary {
+  margin-top: 12px;
+  padding: 12px;
+  background: rgba(156, 39, 176, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(156, 39, 176, 0.1);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.summary-row:last-child {
+  margin-bottom: 0;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.summary-label {
+  font-size: 10px;
+  color: #4a5568;
+  font-weight: 500;
+  text-align: center;
+}
+
+.summary-value {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1a202c;
+  text-align: center;
+}
+
+/* Trend and performance indicators */
+.trend-improving,
+.positive {
+  color: #4CAF50 !important;
+}
+
+.trend-declining,
+.negative {
+  color: #f44336 !important;
+}
+
+.trend-stable,
+.neutral {
+  color: #FF9800 !important;
+}
+
+.success-rate {
+  color: #4CAF50 !important;
+  font-weight: 600;
+}
+
+/* Games breakdown (Recent3GamesChart) */
+.games-breakdown {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.game-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+  font-size: 11px;
+  border-left: 3px solid transparent;
+}
+
+.game-item.success {
+  border-left-color: #4CAF50;
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.game-item.miss {
+  border-left-color: #f44336;
+  background: rgba(244, 67, 54, 0.1);
+}
+
+.game-date {
+  font-weight: 500;
+  color: #1a202c;
+}
+
+.game-value {
+  font-weight: 700;
+  color: #9c27b0;
+  min-width: 20px;
+  text-align: center;
+}
+
+.game-opponent {
+  font-size: 10px;
+  color: #4a5568;
+  text-align: right;
+}
+
+/* Recent vs Historical comparison */
+.recent-vs-historical {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(156, 39, 176, 0.2);
+}
+
+.comparison-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+
+.comparison-label {
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.comparison-value {
+  color: #1a202c;
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .chart-container {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .chart-title {
+    font-size: 13px;
+  }
+  
+  .chart-subtitle {
+    font-size: 9px;
+  }
+  
+  .summary-row {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+  
+  .summary-item {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .game-item {
+    padding: 4px 6px;
+  }
+  
+  .game-date,
+  .game-value,
+  .game-opponent {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-container {
+    padding: 8px;
+  }
+  
+  .summary-item {
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  
+  .games-breakdown {
+    gap: 2px;
+  }
+  
+  .game-item {
+    flex-direction: column;
+    gap: 2px;
+    text-align: center;
+  }
+}

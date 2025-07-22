@@ -4,6 +4,8 @@ import { fetchPlayerData, fetchGameData } from '../../../services/dataService';
 import { useTooltip } from '../../utils/TooltipContext';
 import { createSafeId } from '../../utils/tooltipUtils';
 import { debugLog } from '../../../utils/debugConfig';
+import MobilePlayerCard from '../../common/MobilePlayerCard';
+import '../../common/MobilePlayerCard.css';
 import './PitcherHRsAllowedCard.css';
 
 /**
@@ -273,69 +275,148 @@ const PitcherHRsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
           )}
         </div>
         
-        <div className="scrollable-container">
-          <ul className="player-list">
+        {/* Desktop View */}
+        <div className="desktop-view">
+          <div className="scrollable-container">
+            <ul className="player-list">
+              {displayData.map((pitcher, index) => {
+                const pitcherKey = `${pitcher.name}_${pitcher.team}`;
+                // Use same approach as working DayOfWeekHitsCard
+                const teamData = teams && pitcher.team ? teams[pitcher.team] : null;
+                const logoUrl = teamData ? teamData.logoUrl : null;
+                
+                return (
+                  <li key={pitcherKey} className="player-item pitcher-hr-item">
+                    <div className="player-rank" style={{ backgroundColor: '#f43f5e' }}>
+                      {logoUrl && (
+                        <>
+                          <img 
+                            src={logoUrl} 
+                            alt="" 
+                            className="rank-logo"
+                            loading="lazy"
+                            aria-hidden="true"
+                          />
+                          <div className="rank-overlay"></div>
+                        </>
+                      )}
+                      <span className="rank-number">{index + 1}</span>
+                    </div>
+                    
+                    <div className="player-info" onClick={(e) => handlePitcherClick(pitcher, e)}>
+                      <div className="player-name">{pitcher.name}</div>
+                      <div className="player-team">{pitcher.team}</div>
+                    </div>
+                    
+                    <div className="player-stat pitcher-hr-stats">
+                      <div className="total-hrs">
+                        <span className="stat-value" style={{ color: '#f43f5e' }}>{pitcher.totalHRsAllowed}</span>
+                        <span className="stat-label">Total HRs</span>
+                      </div>
+                      <div className="hr-rate">
+                        <span className="stat-detail">{pitcher.hrsPerGame}/game</span>
+                      </div>
+                    </div>
+
+                    <button 
+                      className="expand-toggle tooltip-trigger"
+                      onClick={(e) => handlePitcherClick(pitcher, e)}
+                      aria-label="View detailed statistics"
+                    >
+                      ℹ️
+                    </button>
+                    
+                    {/* Enhanced background logo */}
+                    {logoUrl && (
+                      <img 
+                        src={logoUrl} 
+                        alt="" 
+                        className="team-logo-bg" 
+                        loading="lazy"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
+        
+        {/* Mobile View */}
+        <div className="mobile-view">
+          <div className="mobile-cards">
             {displayData.map((pitcher, index) => {
               const pitcherKey = `${pitcher.name}_${pitcher.team}`;
-              // Use same approach as working DayOfWeekHitsCard
               const teamData = teams && pitcher.team ? teams[pitcher.team] : null;
-              const logoUrl = teamData ? teamData.logoUrl : null;
               
               return (
-                <li key={pitcherKey} className="player-item pitcher-hr-item">
-                  <div className="player-rank" style={{ backgroundColor: '#f43f5e' }}>
-                    {logoUrl && (
-                      <>
-                        <img 
-                          src={logoUrl} 
-                          alt="" 
-                          className="rank-logo"
-                          loading="lazy"
-                          aria-hidden="true"
-                        />
-                        <div className="rank-overlay"></div>
-                      </>
-                    )}
-                    <span className="rank-number">{index + 1}</span>
-                  </div>
-                  
-                  <div className="player-info" onClick={(e) => handlePitcherClick(pitcher, e)}>
-                    <div className="player-name">{pitcher.name}</div>
-                    <div className="player-team">{pitcher.team}</div>
-                  </div>
-                  
-                  <div className="player-stat pitcher-hr-stats">
-                    <div className="total-hrs">
-                      <span className="stat-value" style={{ color: '#f43f5e' }}>{pitcher.totalHRsAllowed}</span>
-                      <span className="stat-label">Total HRs</span>
+                <MobilePlayerCard
+                  key={pitcherKey}
+                  item={{
+                    name: pitcher.name,
+                    team: pitcher.team
+                  }}
+                  index={index}
+                  showRank={true}
+                  showExpandButton={true}
+                  primaryMetric={{
+                    value: pitcher.totalHRsAllowed,
+                    label: 'HRs Allowed'
+                  }}
+                  secondaryMetrics={[
+                    { label: 'Per Game', value: pitcher.hrsPerGame },
+                    { label: 'Games', value: pitcher.gamesPlayed },
+                    { label: 'Home Rate', value: pitcher.homeHRRate },
+                    { label: 'Away Rate', value: pitcher.awayHRRate }
+                  ]}
+                  expandableContent={
+                    <div className="mobile-analysis">
+                      <div className="metrics-grid">
+                        <div className="metric-item">
+                          <div className="metric-item-value">{pitcher.totalHRsAllowed}</div>
+                          <div className="metric-item-label">Total HRs</div>
+                        </div>
+                        <div className="metric-item">
+                          <div className="metric-item-value">{pitcher.hrsPerGame}</div>
+                          <div className="metric-item-label">Per Game</div>
+                        </div>
+                        <div className="metric-item">
+                          <div className="metric-item-value">{pitcher.gamesPlayed}</div>
+                          <div className="metric-item-label">Games</div>
+                        </div>
+                        <div className="metric-item">
+                          <div className="metric-item-value">{pitcher.homeHRRate}</div>
+                          <div className="metric-item-label">Home Rate</div>
+                        </div>
+                      </div>
+                      
+                      <div className="analysis-item">
+                        <strong>Home vs Away:</strong> {pitcher.homeHRRate} home, {pitcher.awayHRRate} away
+                      </div>
+                      
+                      <div className="analysis-item">
+                        <strong>Most Vulnerable vs:</strong> {pitcher.mostVulnerableTeam} ({pitcher.mostVulnerableTeamHRs} HRs)
+                      </div>
+                      
+                      <div className="analysis-item">
+                        <strong>Games Split:</strong> {pitcher.gamesAtHome} home, {pitcher.gamesAway} away games
+                      </div>
+                      
+                      {pitcher.opposingTeamsArray && pitcher.opposingTeamsArray.length > 0 && (
+                        <div className="analysis-item">
+                          <strong>Top Opponents:</strong><br />
+                          {pitcher.opposingTeamsArray.slice(0, 3).map(opp => 
+                            `${opp.team}: ${opp.hrs} HRs`
+                          ).join(', ')}
+                        </div>
+                      )}
                     </div>
-                    <div className="hr-rate">
-                      <span className="stat-detail">{pitcher.hrsPerGame}/game</span>
-                    </div>
-                  </div>
-
-                  <button 
-                    className="expand-toggle tooltip-trigger"
-                    onClick={(e) => handlePitcherClick(pitcher, e)}
-                    aria-label="View detailed statistics"
-                  >
-                    ℹ️
-                  </button>
-                  
-                  {/* Enhanced background logo */}
-                  {logoUrl && (
-                    <img 
-                      src={logoUrl} 
-                      alt="" 
-                      className="team-logo-bg" 
-                      loading="lazy"
-                      aria-hidden="true"
-                    />
-                  )}
-                </li>
+                  }
+                />
               );
             })}
-          </ul>
+          </div>
         </div>
       </div>
     </div>

@@ -2,7 +2,9 @@
 
 import React from 'react';
 import { useTeamFilter } from '../../TeamFilterContext';
+import MobilePlayerCard from '../../common/MobilePlayerCard';
 import './HomeRunLeadersCard.css';
+import '../../common/MobilePlayerCard.css';
 
 /**
  * HomeRunLeadersCard - Shows home run leaders
@@ -112,88 +114,141 @@ const HomeRunLeadersCard = ({
         )}
         </div>
         
-        {isLoading ? (
-          <div className="loading-indicator">Loading home run stats...</div>
-        ) : displayHomers.length > 0 ? (
-          <div className="scrollable-container">
-          <ul className="player-list">
-            {displayHomers.map((player, index) => {
-              // Get team logo URL if teams data is available
-              const teamAbbr = player.team;
-              const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
-              const logoUrl = teamData ? teamData.logoUrl : null;
-              const teamColor = teamData ? teamData.primaryColor : "#e63946";
+        {/* Desktop View */}
+        <div className="desktop-view">
+          {isLoading ? (
+            <div className="loading-indicator">Loading home run stats...</div>
+          ) : displayHomers.length > 0 ? (
+            <div className="scrollable-container">
+            <ul className="player-list">
+              {displayHomers.map((player, index) => {
+                // Get team logo URL if teams data is available
+                const teamAbbr = player.team;
+                const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
+                const logoUrl = teamData ? teamData.logoUrl : null;
+                const teamColor = teamData ? teamData.primaryColor : "#e63946";
 
-              const hrs = Number(player.HR) || 0;
-              const rate = player.rate || (player.games > 0 ? (hrs / player.games).toFixed(2) : '0.00');
+                const hrs = Number(player.HR) || 0;
+                const rate = player.rate || (player.games > 0 ? (hrs / player.games).toFixed(2) : '0.00');
 
-              return (
-                <li key={index} className="player-item hr-leader-item">
-                  {/* Enhanced rank indicator with logo inside */}
-                  <div className="player-rank" style={{ backgroundColor: teamColor }}>
-                    {logoUrl && (
-                      <>
-                        <img 
-                          src={logoUrl} 
-                          alt="" 
-                          className="rank-logo" 
-                          loading="lazy"
-                          aria-hidden="true"
-                        />
-                        <div className="rank-overlay"></div>
-                      </>
-                    )}
-                    <span className="rank-number">{index + 1}</span>
-                  </div>
-                  
-                  <div className="player-info">
-                    <span className="player-name">{player.name}</span>
-                    <span className="player-team">{player.team}</span>
-                  </div>
-                  
-                  <div className="player-stat hr-stats">
-                    <div className="primary-stat">
-                      <span className="stat-value">{hrs}</span>
-                      <span className="stat-label">HRs</span>
-                    </div>
-                    <div className="secondary-stats">
-                      <span className="hr-rate">{rate}/game</span>
-                      {player.games > 1 && (
-                        <span className="games-played">({player.games} games)</span>
+                return (
+                  <li key={index} className="player-item hr-leader-item">
+                    {/* Enhanced rank indicator with logo inside */}
+                    <div className="player-rank" style={{ backgroundColor: teamColor }}>
+                      {logoUrl && (
+                        <>
+                          <img 
+                            src={logoUrl} 
+                            alt="" 
+                            className="rank-logo" 
+                            loading="lazy"
+                            aria-hidden="true"
+                          />
+                          <div className="rank-overlay"></div>
+                        </>
                       )}
+                      <span className="rank-number">{index + 1}</span>
                     </div>
-                  </div>
-                  
-                  {/* Keep the larger background logo */}
-                  {logoUrl && (
-                    <img 
-                      src={logoUrl} 
-                      alt="" 
-                      className="team-logo-bg" 
-                      loading="lazy"
-                      aria-hidden="true"
-                    />
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-          
-          {/* Show summary when team filtering */}
-          {teamContext && teamContext.totalHomers > teamContext.showing && (
-            <div className="team-filter-summary">
-              Showing top {teamContext.showing} of {teamContext.totalHomers} {teamContext.teamName} players with home runs
+                    
+                    <div className="player-info">
+                      <span className="player-name">{player.name}</span>
+                      <span className="player-team">{player.team}</span>
+                    </div>
+                    
+                    <div className="player-stat hr-stats">
+                      <div className="primary-stat">
+                        <span className="stat-value">{hrs}</span>
+                        <span className="stat-label">HRs</span>
+                      </div>
+                      <div className="secondary-stats">
+                        <span className="hr-rate">{rate}/game</span>
+                        {player.games > 1 && (
+                          <span className="games-played">({player.games} games)</span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Keep the larger background logo */}
+                    {logoUrl && (
+                      <img 
+                        src={logoUrl} 
+                        alt="" 
+                        className="team-logo-bg" 
+                        loading="lazy"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+            
+            {/* Show summary when team filtering */}
+            {teamContext && teamContext.totalHomers > teamContext.showing && (
+              <div className="team-filter-summary">
+                Showing top {teamContext.showing} of {teamContext.totalHomers} {teamContext.teamName} players with home runs
+              </div>
+            )}
             </div>
+          ) : (
+            <p className="no-data">
+              {isFiltering 
+                ? `No home run data available for ${teamContext?.teamName || 'selected team'}`
+                : 'No home run data available for this period'
+              }
+            </p>
           )}
-          </div>
-        ) : (
-          <p className="no-data">
-            {isFiltering 
-              ? `No home run data available for ${teamContext?.teamName || 'selected team'}`
-              : 'No home run data available for this period'
-            }
-          </p>
-        )}
+        </div>
+
+        {/* Mobile View */}
+        <div className="mobile-view">
+          {isLoading ? (
+            <div className="loading-indicator">Loading home run stats...</div>
+          ) : displayHomers.length > 0 ? (
+            <div className="mobile-cards">
+              {displayHomers.map((player, index) => {
+                const hrs = Number(player.HR) || 0;
+                const rate = player.rate || (player.games > 0 ? (hrs / player.games).toFixed(2) : '0.00');
+
+                const secondaryMetrics = [
+                  { label: 'Rate', value: `${rate}/game` },
+                  { label: 'Games', value: player.games || 1 }
+                ];
+
+                return (
+                  <MobilePlayerCard
+                    key={index}
+                    item={{
+                      name: player.name,
+                      team: player.team
+                    }}
+                    index={index}
+                    showRank={true}
+                    primaryMetric={{
+                      value: hrs,
+                      label: 'HRs'
+                    }}
+                    secondaryMetrics={secondaryMetrics}
+                  />
+                );
+              })}
+
+              {/* Show summary when team filtering */}
+              {teamContext && teamContext.totalHomers > teamContext.showing && (
+                <div className="team-filter-summary mobile-summary">
+                  Showing top {teamContext.showing} of {teamContext.totalHomers} {teamContext.teamName} players with home runs
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="no-data">
+              {isFiltering 
+                ? `No home run data available for ${teamContext?.teamName || 'selected team'}`
+                : 'No home run data available for this period'
+              }
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

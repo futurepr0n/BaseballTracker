@@ -402,6 +402,18 @@
     padding-bottom: 10px;
   }
   
+  /* Mobile view windowed behavior */
+  .time-slot-hits-card .mobile-view,
+  .time-slot-hr-card .mobile-view {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .time-slot-hits-card .mobile-cards,
+  .time-slot-hr-card .mobile-cards {
+    padding-bottom: 10px;
+  }
+  
   .time-slot-hits-card .player-item,
   .time-slot-hr-card .player-item {
     padding: 10px 6px;

@@ -321,7 +321,7 @@
   width: 100%;
   border-collapse: separate;
   font-size: 0.9rem; /* Slightly smaller font */
-  min-width: 1200px; /* Set a min-width to encourage horizontal scrolling */
+  min-width: 1000px; /* Set a min-width to encourage horizontal scrolling */
 }
 
 .capsheet-table th,
@@ -614,7 +614,7 @@
 /* Responsive adjustments */
 @media (max-width: 1200px) {
   /* Encourage scrolling sooner */
-  .capsheet-table { min-width: 1000px; }
+  .capsheet-table { min-width: 900px; }
 }
 
 @media (max-width: 992px) {

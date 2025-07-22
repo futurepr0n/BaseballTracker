@@ -257,4 +257,14 @@
     max-height: 60vh;
     padding-bottom: 10px;
   }
+  
+  /* Mobile view windowed behavior */
+  .continue-streak-card .mobile-view {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .continue-streak-card .mobile-cards {
+    padding-bottom: 10px;
+  }
 }

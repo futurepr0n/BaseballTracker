@@ -139,10 +139,11 @@
 /* Hitting stats styling */
 .top-hitters-card .hitting-stats {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
-  min-width: 120px;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  min-width: 140px;
+  flex-shrink: 0;
 }
 
 .top-hitters-card .primary-stat {
@@ -170,7 +171,7 @@
 .top-hitters-card .secondary-stats {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 2px;
   font-size: 0.8rem;
 }
@@ -335,6 +336,16 @@
     padding-bottom: 10px;
   }
   
+  /* Mobile view windowed behavior */
+  .top-hitters-card .mobile-view {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .top-hitters-card .mobile-cards {
+    padding-bottom: 10px;
+  }
+  
   .top-hitters-card .player-item {
     padding: 10px 6px;
   }
@@ -350,7 +361,8 @@
   }
   
   .top-hitters-card .hitting-stats {
-    min-width: 100px;
+    min-width: 120px;
+    gap: 8px;
   }
   
   .top-hitters-card .primary-stat .stat-value {
@@ -388,7 +400,8 @@
   }
   
   .top-hitters-card .hitting-stats {
-    min-width: 90px;
+    min-width: 100px;
+    gap: 6px;
   }
   
   .top-hitters-card .primary-stat .stat-value {

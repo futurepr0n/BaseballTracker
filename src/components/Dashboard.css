@@ -2,10 +2,20 @@
 
 .dashboard {
   padding: 20px;
+  width: 100%;
+  max-width: min(90vw, 1520px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  position: relative;
 }
 
 .dashboard-header {
-  margin-bottom: 20px;
+  width: 100%;
+  max-width: min(90vw, 1520px);
+  margin: 0 0 20px 0;
 }
 
 .dashboard-header-content {
@@ -49,13 +59,17 @@
 
 /* Team filter section - add space between filter and grid */
 .team-filter {
-  margin-bottom: 25px;
+  width: 100%;
+  max-width: min(90vw, 1520px);
+  margin: 0 0 25px 0;
 }
 
 .dashboard-wrapper {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  align-items: center;
+  width: 100%;
 }
 
 /* Filter info messaging */
@@ -148,23 +162,54 @@
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: 1fr;
   gap: 20px;
   width: 100%;
+  max-width: min(90vw, 1520px);
+  min-width: 320px;
   padding: 0;
   margin: 0 auto;
+  box-sizing: border-box;
+  overflow: hidden;
+  contain: layout size;
 }
 
 @media (max-width: 768px) {
+  .dashboard {
+    padding: 15px;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  
+  .dashboard-wrapper {
+    max-width: 100%;
+  }
+  
   .dashboard-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Single column on mobile */
     gap: 15px;
     padding: 0;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  
+  .dashboard-header {
+    max-width: 100%;
+  }
+  
+  .team-filter {
+    max-width: 100%;
   }
 }
 
+
 @media (max-width: 480px) {
+  .dashboard {
+    padding: 10px;
+  }
+  
   .dashboard-grid {
+    grid-template-columns: 1fr; /* Ensure single column on small mobile */
     gap: 10px;
   }
 }
@@ -191,6 +236,7 @@
   padding: 20px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
 }
 
@@ -378,25 +424,6 @@
 .scrollable-container {
   max-height: 350px;
   overflow-y: auto;
-  scrollbar-width: thin;
-}
-
-.scrollable-container::-webkit-scrollbar {
-  width: 6px;
-}
-
-.scrollable-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.scrollable-container::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
-
-.scrollable-container::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
 }
 
 /* Updates List */
@@ -466,12 +493,8 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Dashboard container controls */
-.dashboard {
-  width: 100%;
-  padding: 20px;
-  box-sizing: border-box;
-}
+/* Dashboard container controls - already defined above, this is duplicate */
+/* .dashboard styles moved to top of file */
 
 .dashboard-container {
   width: 100%;
@@ -485,6 +508,7 @@ html, body {
 .glass-card-container,
 [class*="-card"] {
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
 }
 
@@ -493,17 +517,137 @@ html, body {
 .glass-card .table-container,
 .table-container {
   width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
+  box-sizing: border-box;
 }
 
-/* Ensure proper text wrapping */
+/* Force all content to respect dashboard width limits */
+.dashboard * {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Specifically target elements with grid-column spanning */
+.dashboard [style*="grid-column"] {
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+/* Target stats-controls specifically */
+.dashboard .stats-controls {
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+/* Force all flex containers to respect width limits */
+.dashboard [style*="display: flex"],
+.dashboard [style*="display:flex"],
+.dashboard .stats-time-selector {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  flex-shrink: 1 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+/* Enforce strict grid container limits */
+.dashboard-grid {
+  max-width: min(90vw, 1520px) !important;
+  overflow: hidden !important;
+  contain: layout !important;
+}
+
+/* Force all grid children to respect parent width */
+.dashboard-grid > * {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* Specifically constrain wide tables */
+.dashboard table {
+  max-width: 100% !important;
+  width: 100% !important;
+  table-layout: auto !important;
+  min-width: 0 !important;
+}
+
+/* Override problematic min-widths in table cells */
+.dashboard table th,
+.dashboard table td {
+  min-width: 0 !important;
+  max-width: 200px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Ensure table containers can't force grid expansion */
+.dashboard .table-container,
+.dashboard .matchup-table-container,
+.dashboard .intelligence-container {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* Constrain grid containers that might expand beyond limits */
+.dashboard .opportunities-grid,
+.dashboard .insights-grid,
+.dashboard [class*="grid"] {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Force stats controls to respect dashboard width limits */
+.dashboard .stats-controls {
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-x: auto !important;
+}
+
+/* Ensure time selector doesn't exceed container */
+.dashboard .stats-time-selector {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  flex-wrap: wrap !important;
+}
+
+/* Ensure proper text wrapping and readability */
 .card p,
 .card span,
 .card div {
   word-wrap: break-word;
   overflow-wrap: break-word;
+}
+
+/* Improve table readability - allow content to be visible */
+.card table {
+  table-layout: auto;
+  width: 100%;
+}
+
+.card table th,
+.card table td {
+  padding: 8px 12px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: none;
+}
+
+/* Player name and content readability */
+.player-name {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  line-height: 1.3;
 }
 
 /* Responsive Adjustments */
@@ -520,7 +664,7 @@ html, body {
   
   /* Ensure dashboard has proper mobile padding */
   .dashboard {
-    padding: 15px 10px;
+    padding: 15px;
   }
   
   /* Ensure all cards fit within viewport with padding */
@@ -531,6 +675,16 @@ html, body {
     width: 100%;
     margin: 0;
     box-sizing: border-box;
+  }
+  
+  /* Improve mobile table readability */
+  .card table th,
+  .card table td {
+    padding: 6px 8px;
+    font-size: 12px;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
   
   /* Allow horizontal scroll for wide tables */
@@ -1040,7 +1194,7 @@ html, body {
   
   /* Reduce dashboard padding */
   .dashboard {
-    padding: 15px 5px; /* Reduced side padding */
+    padding: 15px; /* Consistent padding all around */
   }
   
   /* Make cards use more width */
@@ -1553,25 +1707,6 @@ html, body {
 .scrollable-container {
   max-height: 400px;
   overflow-y: auto;
-  scrollbar-width: thin;
-}
-
-.scrollable-container::-webkit-scrollbar {
-  width: 6px;
-}
-
-.scrollable-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.scrollable-container::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
-
-.scrollable-container::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
 }
 
 /* Player list and item styles now handled by PlayerItemStyles.css */

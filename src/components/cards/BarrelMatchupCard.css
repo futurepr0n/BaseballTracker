@@ -8,7 +8,8 @@
   backdrop-filter: blur(35px);
   -webkit-backdrop-filter: blur(35px);
   overflow: hidden;
-  height: 500px;
+  min-height: 400px;
+  max-height: 600px;
   display: flex;
   flex-direction: column;
   box-shadow: 
@@ -51,7 +52,7 @@
 
 .barrel-matchup-card .glass-header h3 {
   margin: 0;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -109,9 +110,10 @@
 }
 
 .barrel-matchup-card .matchup-table th {
-  padding: 12px 8px;
+  padding: 8px 6px;
   text-align: left;
   font-weight: 600;
+  font-size: 11px;
   color: #495057;
   border-bottom: 2px solid rgba(222, 226, 230, 0.8);
   white-space: nowrap;
@@ -129,10 +131,10 @@
 
 .barrel-matchup-card .header-subtitle {
   display: block;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: normal;
   color: #6c757d;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 /* Table Body */
@@ -685,9 +687,8 @@
 /* Mobile Portrait Mode */
 @media (max-width: 768px) {
   .barrel-matchup-card {
-    height: 720px;
-    min-height: 720px;
-    max-height: 720px;
+    min-height: 500px;
+    max-height: 80vh;
     width: 100%;
     margin: 0;
   }
@@ -709,7 +710,7 @@
   }
   
   .barrel-matchup-card .glass-header h3 {
-    font-size: 16px;
+    font-size: 14px;
   }
   
   .barrel-matchup-card .card-subtitle {
@@ -733,9 +734,8 @@
 
 @media (max-width: 480px) {
   .barrel-matchup-card {
-    height: 620px;
-    min-height: 620px;
-    max-height: 620px;
+    min-height: 450px;
+    max-height: 75vh;
   }
   
   .barrel-matchup-card .mobile-cards {

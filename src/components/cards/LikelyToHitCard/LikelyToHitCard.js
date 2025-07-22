@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './LikelyToHitCard.css';
 import { createSafeId, positionTooltip, setupTooltipCloseHandler } from '../../utils/tooltipUtils';
+import MobilePlayerCard from '../../common/MobilePlayerCard';
+import '../../common/MobilePlayerCard.css';
 
 /**
  * LikelyToHitCard - Shows players who are likely to get a hit in their next game
@@ -47,85 +49,161 @@ const LikelyToHitCard = ({
         <div className="glass-header">
           <h3>Players Due for a Hit</h3>
         </div>
-        {isLoading ? (
-          <div className="loading-indicator">Loading stats...</div>
-        ) : hitStreakData.likelyToGetHit && hitStreakData.likelyToGetHit.length > 0 ? (
-          <div className="scrollable-container">
-          <ul className="player-list">
-            {hitStreakData.likelyToGetHit.slice(0, 10).map((player, index) => {
-              const safeId = createSafeId(player.name, player.team);
-              const tooltipId = `likely_hit_${safeId}`;
-              
-              // Get team logo URL if teams data is available
-              const teamAbbr = player.team;
-              const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
-              const logoUrl = teamData ? teamData.logoUrl : null;
-              
-              return (
-                <li key={index} className="player-item">
-                  <div className="player-rank">
-                    {logoUrl && (
-                      <>
-                        <img 
-                          src={logoUrl} 
-                          alt="" 
-                          className="rank-logo" 
-                          loading="lazy"
-                          aria-hidden="true"
-                        />
-                        <div className="rank-overlay"></div>
-                      </>
-                    )}
-                    <span className="rank-number">{index + 1}</span>
-                  </div>
-                  <div className="player-info">
-                    <span className="player-name">{player.name}</span>
-                    <span className="player-team">{player.team}</span>
+        {/* Desktop View */}
+        <div className="desktop-view">
+          {isLoading ? (
+            <div className="loading-indicator">Loading stats...</div>
+          ) : hitStreakData.likelyToGetHit && hitStreakData.likelyToGetHit.length > 0 ? (
+            <div className="scrollable-container">
+            <ul className="player-list">
+              {hitStreakData.likelyToGetHit.slice(0, 10).map((player, index) => {
+                const safeId = createSafeId(player.name, player.team);
+                const tooltipId = `likely_hit_${safeId}`;
+                
+                // Get team logo URL if teams data is available
+                const teamAbbr = player.team;
+                const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
+                const logoUrl = teamData ? teamData.logoUrl : null;
+                
+                return (
+                  <li key={index} className="player-item">
+                    <div className="player-rank">
+                      {logoUrl && (
+                        <>
+                          <img 
+                            src={logoUrl} 
+                            alt="" 
+                            className="rank-logo" 
+                            loading="lazy"
+                            aria-hidden="true"
+                          />
+                          <div className="rank-overlay"></div>
+                        </>
+                      )}
+                      <span className="rank-number">{index + 1}</span>
+                    </div>
+                    <div className="player-info">
+                      <span className="player-name">{player.name}</span>
+                      <span className="player-team">{player.team}</span>
+                      
+                      {/* Recent performance indicator (last 10 games) */}
+                      {player.recentPerformance && (
+                        <div className="recent-performance">
+                          {player.recentPerformance.map((hit, idx) => (
+                            <span 
+                              key={idx} 
+                              className={`performance-dot ${hit ? 'hit' : 'no-hit'}`}
+                              title={hit ? 'Hit' : 'No Hit'}
+                            ></span>
+                          )).reverse()}
+                        </div>
+                      )}
+                    </div>
+                    <div 
+                      className="player-stat tooltip-container"
+                      data-tooltip-id={tooltipId}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleTooltip(player);
+                      }}
+                    >
+                      <div className="stat-highlight">{Math.abs(player.currentStreak)} games without hit</div>
+                      <small>Next game hit: {(player.streakEndProbability * 100).toFixed(1)}%</small>
+                      <small>Max drought: {player.longestNoHitStreak} games</small>
+                    </div>
                     
-                    {/* Recent performance indicator (last 10 games) */}
-                    {player.recentPerformance && (
-                      <div className="recent-performance">
-                        {player.recentPerformance.map((hit, idx) => (
-                          <span 
-                            key={idx} 
-                            className={`performance-dot ${hit ? 'hit' : 'no-hit'}`}
-                            title={hit ? 'Hit' : 'No Hit'}
-                          ></span>
-                        )).reverse()}
-                      </div>
+                    {/* Enhanced background logo */}
+                    {logoUrl && (
+                      <img 
+                        src={logoUrl} 
+                        alt="" 
+                        className="team-logo-bg" 
+                        loading="lazy"
+                        aria-hidden="true"
+                      />
                     )}
+                  </li>
+                );
+              })}
+            </ul>
+            </div>
+          ) : (
+            <p className="no-data">No players currently predicted for hits</p>
+          )}
+        </div>
+
+        {/* Mobile View */}
+        <div className="mobile-view">
+          {isLoading ? (
+            <div className="loading-indicator">Loading stats...</div>
+          ) : hitStreakData.likelyToGetHit && hitStreakData.likelyToGetHit.length > 0 ? (
+            <div className="mobile-cards">
+              {hitStreakData.likelyToGetHit.slice(0, 10).map((player, index) => {
+                const secondaryMetrics = [
+                  { label: 'Hit Prob', value: `${(player.streakEndProbability * 100).toFixed(1)}%` },
+                  { label: 'Max Drought', value: `${player.longestNoHitStreak} games` }
+                ];
+
+                const expandableContent = (
+                  <div className="mobile-drought-details">
+                    <div className="mobile-analysis">
+                      <div className="analysis-item">
+                        <strong>Hit Drought Analysis:</strong>
+                        <div style={{marginTop: '4px', fontSize: '12px'}}>
+                          <div>Current drought: {Math.abs(player.currentStreak)} games</div>
+                          <div>Next game hit probability: {(player.streakEndProbability * 100).toFixed(1)}%</div>
+                          <div>Longest career drought: {player.longestNoHitStreak} games</div>
+                        </div>
+                      </div>
+
+                      {player.recentPerformance && (
+                        <div className="analysis-item">
+                          <strong>Recent Performance (Last 10 games):</strong>
+                          <div className="mobile-performance-dots" style={{marginTop: '8px', display: 'flex', gap: '4px', flexWrap: 'wrap'}}>
+                            {player.recentPerformance.slice().reverse().map((hit, idx) => (
+                              <span 
+                                key={idx} 
+                                style={{
+                                  width: '16px',
+                                  height: '16px',
+                                  borderRadius: '50%',
+                                  backgroundColor: hit ? '#4CAF50' : '#F44336',
+                                  display: 'inline-block',
+                                  title: hit ? 'Hit' : 'No Hit'
+                                }}
+                              ></span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div 
-                    className="player-stat tooltip-container"
-                    data-tooltip-id={tooltipId}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleTooltip(player);
+                );
+
+                return (
+                  <MobilePlayerCard
+                    key={index}
+                    item={{
+                      name: player.name,
+                      team: player.team
                     }}
-                  >
-                    <div className="stat-highlight">{Math.abs(player.currentStreak)} games without hit</div>
-                    <small>Next game hit: {(player.streakEndProbability * 100).toFixed(1)}%</small>
-                    <small>Max drought: {player.longestNoHitStreak} games</small>
-                  </div>
-                  
-                  {/* Enhanced background logo */}
-                  {logoUrl && (
-                    <img 
-                      src={logoUrl} 
-                      alt="" 
-                      className="team-logo-bg" 
-                      loading="lazy"
-                      aria-hidden="true"
-                    />
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-          </div>
-        ) : (
-          <p className="no-data">No players currently predicted for hits</p>
-        )}
+                    index={index}
+                    showRank={true}
+                    showExpandButton={true}
+                    primaryMetric={{
+                      value: Math.abs(player.currentStreak),
+                      label: 'Games w/o Hit'
+                    }}
+                    secondaryMetrics={secondaryMetrics}
+                    expandableContent={expandableContent}
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <p className="no-data">No players currently predicted for hits</p>
+          )}
+        </div>
       </div>
 
       {/* Tooltips rendered outside card to avoid clipping - keep as is */}

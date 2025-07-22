@@ -335,4 +335,14 @@ body .day-hit-tooltip {
     max-height: 60vh;
     padding-bottom: 10px;
   }
+  
+  /* Mobile view windowed behavior */
+  .day-of-week-hits-card .mobile-view {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .day-of-week-hits-card .mobile-cards {
+    padding-bottom: 10px;
+  }
 }

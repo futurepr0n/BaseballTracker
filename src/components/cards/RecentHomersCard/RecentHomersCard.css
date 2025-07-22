@@ -191,10 +191,11 @@
 /* Recent HR stats styling */
 .recent-homers-card .recent-hr-stats {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
-  min-width: 120px;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  min-width: 180px;
+  flex-shrink: 0;
   text-align: right;
 }
 
@@ -222,7 +223,7 @@
 .recent-homers-card .hr-totals {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 2px;
 }
 
@@ -362,7 +363,8 @@
   }
   
   .recent-homers-card .recent-hr-stats {
-    min-width: 100px;
+    min-width: 150px;
+    gap: 8px;
   }
   
   .recent-homers-card .date-primary {
@@ -394,7 +396,8 @@
   }
   
   .recent-homers-card .recent-hr-stats {
-    min-width: 90px;
+    min-width: 130px;
+    gap: 6px;
   }
   
   .recent-homers-card .date-primary {
@@ -486,6 +489,16 @@
     position: relative;
     height: auto;
     max-height: 60vh;
+    padding-bottom: 10px;
+  }
+  
+  /* Mobile view windowed behavior */
+  .recent-homers-card .mobile-view {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .recent-homers-card .mobile-cards {
     padding-bottom: 10px;
   }
 }

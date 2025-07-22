@@ -33,6 +33,7 @@ import CSSFixesTest from './components/test/CSSFixesTest';
 import HandednessTest from './components/test/HandednessTest';
 
 import './styles/theme-variables.css'; // Import theme variables FIRST
+import './styles/theme-override.css'; // Global theme override for consistent cross-browser styling
 import './App.css';
 import './styles/classic-mode.css';
 

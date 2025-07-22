@@ -1,0 +1,71 @@
+/* ScrollbarCustomization.css - Unified scrollbar styling for better UX */
+
+/* Hide scrollbars in glass theme for cleaner appearance */
+.theme-glass ::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+.theme-glass * {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* For elements that absolutely need visible scrollbars, provide minimal styling */
+.theme-glass .scrollbar-visible::-webkit-scrollbar {
+  width: 4px;
+}
+
+.theme-glass .scrollbar-visible::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.theme-glass .scrollbar-visible::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+.theme-glass .scrollbar-visible::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.theme-glass .scrollbar-visible {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
+}
+
+/* Classic theme keeps subtle scrollbars */
+.theme-classic ::-webkit-scrollbar {
+  width: 6px;
+}
+
+.theme-classic ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.theme-classic ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.theme-classic ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.theme-classic * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.05);
+}
+
+/* Override component-specific colored scrollbars that are visually jarring */
+.theme-glass .batch-summary-section::-webkit-scrollbar-thumb,
+.theme-glass .batter-matchup-table::-webkit-scrollbar-thumb,
+.theme-glass .slot-machine-card::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.theme-glass .batch-summary-section,
+.theme-glass .batter-matchup-table,
+.theme-glass .slot-machine-card {
+  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05) !important;
+}

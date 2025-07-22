@@ -196,10 +196,11 @@
 /* HR stats styling */
 .hr-leaders-card .hr-stats {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
-  min-width: 120px;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  min-width: 140px;
+  flex-shrink: 0;
 }
 
 .hr-leaders-card .primary-stat {
@@ -227,7 +228,7 @@
 .hr-leaders-card .secondary-stats {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 2px;
   font-size: 0.8rem;
 }
@@ -422,7 +423,8 @@
   }
   
   .hr-leaders-card .hr-stats {
-    min-width: 100px;
+    min-width: 120px;
+    gap: 8px;
   }
   
   .hr-leaders-card .primary-stat .stat-value {
@@ -460,7 +462,8 @@
   }
   
   .hr-leaders-card .hr-stats {
-    min-width: 90px;
+    min-width: 100px;
+    gap: 6px;
   }
   
   .hr-leaders-card .primary-stat .stat-value {
@@ -590,6 +593,16 @@
     position: relative;
     height: auto;
     max-height: 60vh;
+    padding-bottom: 10px;
+  }
+  
+  /* Mobile view windowed behavior */
+  .hr-leaders-card .mobile-view {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .hr-leaders-card .mobile-cards {
     padding-bottom: 10px;
   }
 }
