@@ -226,8 +226,8 @@ async function generatePlayerChartData(player, propOption, games) {
   // Load historical game data
   const historicalGames = await loadHistoricalGameData(playerName, playerTeam, statKey);
   
-  // Recent 3 games
-  const recent3Games = historicalGames.slice(0, 3).map((game, index) => ({
+  // Recent 5 games
+  const recent5Games = historicalGames.slice(0, 5).map((game, index) => ({
     ...game,
     gameNumber: index + 1,
     gameType: 'recent'
@@ -277,7 +277,7 @@ async function generatePlayerChartData(player, propOption, games) {
   });
   
   return {
-    recent3Games,
+    recent5Games,
     seasonOverview,
     opponentHistory,
     totalHistoricalGames: historicalGames.length
