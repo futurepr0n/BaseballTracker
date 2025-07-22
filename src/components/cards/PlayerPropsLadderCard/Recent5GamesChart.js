@@ -48,9 +48,9 @@ const Recent5GamesChart = ({ recentGamesData, propOption }) => {
           <p className="tooltip-success">
             {data.success1Plus ? '✅ 1+ Success' : '❌ No Success'}
           </p>
-          {data.opponent && (
+          {(data.opponentDisplay || data.opponent) && (
             <p className="tooltip-opponent" style={{fontSize: '10px', color: '#999'}}>
-              vs {data.opponent}
+              {data.opponentDisplay || `vs ${data.opponent}`}
             </p>
           )}
         </div>
@@ -142,7 +142,7 @@ const Recent5GamesChart = ({ recentGamesData, propOption }) => {
             <div key={index} className={`game-item ${game.success1Plus ? 'success' : 'miss'}`}>
               <span className="game-date">{game.displayDate}</span>
               <span className="game-value">{game.value}</span>
-              <span className="game-opponent">vs {game.opponent || 'Unknown'}</span>
+              <span className="game-opponent">{game.opponentDisplay || `vs ${game.opponent || 'Unknown'}`}</span>
             </div>
           ))}
         </div>

@@ -76,6 +76,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
   const loadPlayerDataUnlimited = useCallback(async (endDate, playerName, playerTeam) => {
     try {
       console.log(`🔍 UNLIMITED: Loading comprehensive data for ${playerName} (${playerTeam})`);
+      console.log(`📅 FIXED: Using app selected date for consistency with other components: ${endDate.toISOString().split('T')[0]}`);
       
       // Phase 1: Try to get recent data (last 30 days) with higher priority
       const recentData = {};
@@ -86,9 +87,8 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
         const searchDate = new Date(now);
         searchDate.setDate(searchDate.getDate() - daysBack);
         
-        // Skip weekends and off-season dates for efficiency
-        const dayOfWeek = searchDate.getDay();
-        if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+        // FIXED: Removed weekend skipping - MLB plays 7 days a week
+        // Note: Baseball games happen on weekends, so we need to search all days
         
         // Check if it's a valid MLB season date
         const year = searchDate.getFullYear();
@@ -368,7 +368,8 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
       console.log(`🔍 Loading games for ${player.name} (${player.team}) - ${propKey}`);
       
       // Get comprehensive data using specialized unlimited approach
-      const endDate = currentDate || new Date();
+      // FIXED: Use app's selected date for consistency with other components like EnhancedPlayerAnalysis
+      const endDate = currentDate || new Date(); // Use app's selected date for consistency
       const historicalData = await loadPlayerDataUnlimited(endDate, player.name, player.team);
       
       const propOption = propOptions.find(p => p.key === propKey);
@@ -400,9 +401,29 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
             if (playerData && propOption.statKey) {
               const propValue = playerData[propOption.statKey] || 0;
               
-              // Check if this game was against the opponent
-              const gameOpponent = playerData.opponent || playerData.Opponent || 
-                                 playerData.vs || playerData.VS || playerData.opposingTeam;
+              // FIXED: Resolve opponent using game cross-reference instead of non-existent fields
+              let gameOpponent = null;
+              let opponentDisplay = null;
+              
+              // Try to resolve opponent using gameId cross-reference
+              if (playerData.gameId && dayData.games) {
+                const opponentInfo = enhancedGameDataService.resolveOpponentForPlayer(
+                  player.team, 
+                  playerData.gameId, 
+                  dayData.games
+                );
+                if (opponentInfo) {
+                  gameOpponent = opponentInfo.team;
+                  opponentDisplay = opponentInfo.formattedOpponent;
+                }
+              }
+              
+              // Fallback: try to extract from existing fields (for backwards compatibility)
+              if (!gameOpponent) {
+                gameOpponent = playerData.opponent || playerData.Opponent || 
+                              playerData.vs || playerData.VS || playerData.opposingTeam;
+                opponentDisplay = gameOpponent;
+              }
               
               const gameData = {
                 date: dateKey,
@@ -411,6 +432,8 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
                 success1Plus: propValue >= 1,
                 success2Plus: propValue >= 2,
                 opponent: gameOpponent,
+                opponentDisplay: opponentDisplay, // Properly formatted opponent display
+                gameId: playerData.gameId, // Include gameId for reference
                 rawData: playerData
               };
               
@@ -433,13 +456,13 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
       
       console.log(`📊 Found ${allGames.length} total games for ${player.name}`);
       
-      // SECOND PASS: Separate into categories
+      // SECOND PASS: Separate into categories (FIXED - return proper structure)
       const recentGames = allGames.slice(0, 5).map(game => ({
         ...game,
         gameType: 'recent'
       }));
       
-      // Get ALL games vs opponent (not limited)
+      // Get ALL games vs opponent (separate from recent games)
       const opponentHistory = allGames
         .filter(game => opponentTeam && game.opponent === opponentTeam)
         .map(game => ({
@@ -449,24 +472,20 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
       
       console.log(`📊 Separated: ${recentGames.length} recent games, ${opponentHistory.length} opponent history games`);
       
-      // Create combined display data
-      const combinedData = [...recentGames];
-      
-      // Add opponent history (ALL games, not limited to 5)
-      if (opponentHistory.length > 0) {
-        // Add separator info for reference
-        combinedData.opponentInfo = {
+      // FIXED: Return structured data instead of combined array
+      // This prevents Recent5GamesChart from receiving mixed data
+      const structuredData = {
+        recentGames: recentGames,
+        opponentHistory: opponentHistory,
+        opponentInfo: opponentTeam ? {
           team: opponentTeam,
           count: opponentHistory.length
-        };
-        
-        // Add ALL opponent games
-        combinedData.push(...opponentHistory);
-      }
+        } : null
+      };
       
-      console.log(`📊 Final combined data: ${combinedData.length} total games (${recentGames.length} recent + ${opponentHistory.length} opponent)`);
+      console.log(`📊 Returning structured data: ${recentGames.length} recent, ${opponentHistory.length} opponent vs ${opponentTeam}`);
       
-      return combinedData;
+      return structuredData;
     } catch (err) {
       console.error('Error loading recent games:', err);
       return [];
@@ -502,8 +521,16 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
         setPlayerChartData(fallbackChartData);
         
         // Load recent games data using existing method as fallback
-        const recentGames = await loadPlayerRecentGames(player, selectedProp);
-        setRecentGamesData(recentGames.slice(0, 3) || []);
+        const gameData = await loadPlayerRecentGames(player, selectedProp);
+        // FIXED: Handle new structured data format
+        if (gameData && gameData.recentGames) {
+          setRecentGamesData(gameData.recentGames || []);
+        } else if (Array.isArray(gameData)) {
+          // Fallback for legacy format
+          setRecentGamesData(gameData.slice(0, 5) || []);
+        } else {
+          setRecentGamesData([]);
+        }
       }
       
     } catch (err) {

@@ -2,12 +2,18 @@ import React from 'react';
 import './RecentGameHistory.css';
 
 const RecentGameHistory = ({ playerHistory, player }) => {
-  // Get the most recent 5 games
-  const recentGames = playerHistory.slice(0, 5);
+  // Ensure the playerHistory is sorted by date (newest first) as a safety measure
+  const sortedHistory = [...playerHistory].sort((a, b) => 
+    new Date(b.gameDate) - new Date(a.gameDate)
+  );
   
-  // Debug: Log the game data structure (can be removed in production)
-  // console.log('🎮 Recent Game History - Player:', player?.name);
-  // console.log('🎮 Recent games data:', recentGames);
+  // Get the most recent 5 games
+  const recentGames = sortedHistory.slice(0, 5);
+  
+  // Debug: Verify sorting is working correctly
+  if (recentGames.length > 0) {
+    console.log(`🎮 Recent Game History for ${player?.name}: First game ${recentGames[0]?.gameDate}, Last game ${recentGames[recentGames.length - 1]?.gameDate}`);
+  }
   
   const getOpponent = (game) => {
     // Try various opponent field names
@@ -28,7 +34,10 @@ const RecentGameHistory = ({ playerHistory, player }) => {
   const formatDate = (dateStr) => {
     if (!dateStr) return 'N/A';
     try {
-      const date = new Date(dateStr);
+      // Parse date string manually to avoid timezone conversion issues
+      // dateStr format: "2025-07-21"
+      const [year, month, day] = dateStr.split('-').map(Number);
+      const date = new Date(year, month - 1, day); // month is 0-indexed
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     } catch {
       return dateStr;

@@ -113,7 +113,35 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
       console.log('📊 2024 stats set in state:', stats2024);
       
       // Load full season game history for comprehensive analysis
-      const endDate = currentDate instanceof Date ? currentDate : new Date(currentDate);
+      // Enhanced date validation to prevent Invalid Date issues
+      let endDate;
+      if (!currentDate) {
+        console.log('📅 No currentDate provided, using today for Enhanced Player Analysis');
+        endDate = new Date();
+      } else if (currentDate instanceof Date) {
+        if (isNaN(currentDate.getTime())) {
+          console.warn('📅 currentDate is an invalid Date object, using today');
+          endDate = new Date();
+        } else {
+          endDate = currentDate;
+        }
+      } else {
+        // Try to convert string/other to Date
+        try {
+          const convertedDate = new Date(currentDate);
+          if (isNaN(convertedDate.getTime())) {
+            console.warn('📅 Could not convert currentDate to valid Date, using today');
+            endDate = new Date();
+          } else {
+            endDate = convertedDate;
+          }
+        } catch (error) {
+          console.error('📅 Error converting currentDate, using today:', error);
+          endDate = new Date();
+        }
+      }
+      
+      console.log(`📅 Enhanced Player Analysis using date: ${endDate.toISOString().split('T')[0]}`);
       
       // Calculate days since season start (typically late March)
       const currentYear = endDate.getFullYear();
@@ -127,6 +155,9 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
       
       // Convert the returned data to an array of player games for recent analysis
       const history = [];
+      
+      console.log('📅 DEBUG: dateRangeData keys (dates with data):', Object.keys(dateRangeData).slice(0, 10));
+      console.log('📅 DEBUG: Looking for player:', player.name, 'team:', player.team);
       
       for (const dateStr of Object.keys(dateRangeData)) {
         const playersForDate = dateRangeData[dateStr];
@@ -187,6 +218,14 @@ const EnhancedPlayerAnalysis = ({ currentDate }) => {
       );
       
       console.log(`Found ${playerHistory.length} recent games for analysis`);
+      
+      // Debug: Show the first 5 game dates to understand the sorting
+      if (playerHistory.length > 0) {
+        console.log('📅 DEBUG: First 10 game dates found (sorted newest first):');
+        playerHistory.slice(0, 10).forEach((game, index) => {
+          console.log(`  ${index + 1}. ${game.gameDate} - ${game.name} (${game.team}) vs ${game.opponent || 'UNK'}`);
+        });
+      }
       setPlayerHistory(playerHistory);
       
       // Generate analysis data with individual error handling

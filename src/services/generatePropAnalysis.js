@@ -143,9 +143,9 @@ async function loadHistoricalGameData(playerName, playerTeam, statKey, maxDaysBa
     const searchDate = new Date(now);
     searchDate.setDate(searchDate.getDate() - daysBack);
     
-    // Skip weekends for efficiency
-    const dayOfWeek = searchDate.getDay();
-    if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+    // REMOVED: Skip weekends - MLB plays games on weekends including Sunday doubleheaders
+    // const dayOfWeek = searchDate.getDay();
+    // if (dayOfWeek === 0 || dayOfWeek === 6) continue;
     
     // Check if it's a valid MLB season date
     const year = searchDate.getFullYear();
@@ -162,47 +162,57 @@ async function loadHistoricalGameData(playerName, playerTeam, statKey, maxDaysBa
       if (fs.existsSync(filePath)) {
         const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
         if (data.players && Array.isArray(data.players)) {
-          const playerData = data.players.find(p => 
+          // FIXED: Use filter() to get ALL player instances (handles doubleheaders)
+          const allPlayerData = data.players.filter(p => 
             (p.name === playerName || p.Name === playerName) && 
             (p.team === playerTeam || p.Team === playerTeam)
           );
           
-          if (playerData && playerData[statKey] !== undefined) {
-            const propValue = playerData[statKey] || 0;
-            
-            // Extract opponent information from games section
-            let opponent = 'Unknown';
-            let venue = '';
-            
-            if (data.games && Array.isArray(data.games)) {
-              // Find the game this player's team was in
-              const game = data.games.find(g => 
-                g.homeTeam === playerTeam || g.awayTeam === playerTeam
-              );
+          // Process each game this player appeared in on this date
+          for (const playerData of allPlayerData) {
+            if (playerData && playerData[statKey] !== undefined) {
+              const propValue = playerData[statKey] || 0;
               
-              if (game) {
-                const opponentTeam = game.homeTeam === playerTeam ? game.awayTeam : game.homeTeam;
-                const isHome = game.homeTeam === playerTeam;
-                opponent = isHome ? `vs ${opponentTeam}` : `@ ${opponentTeam}`;
-                venue = game.venue || '';
+              // Extract opponent information from games section
+              let opponent = 'Unknown';
+              let venue = '';
+              
+              if (data.games && Array.isArray(data.games) && playerData.gameId) {
+                // FIXED: Use gameId matching instead of team matching for proper game association
+                const game = data.games.find(g => 
+                  g.originalId === parseInt(playerData.gameId) || 
+                  g.gameId === parseInt(playerData.gameId) || 
+                  g.espnGameId === parseInt(playerData.gameId) ||
+                  g.originalId === playerData.gameId || 
+                  g.gameId === playerData.gameId || 
+                  g.espnGameId === playerData.gameId
+                );
+                
+                if (game) {
+                  const opponentTeam = game.homeTeam === playerTeam ? game.awayTeam : game.homeTeam;
+                  const isHome = game.homeTeam === playerTeam;
+                  opponent = isHome ? `vs ${opponentTeam}` : `@ ${opponentTeam}`;
+                  venue = game.venue || '';
+                }
               }
+              
+              // Fallback: check if player data already has opponent info
+              if (opponent === 'Unknown') {
+                opponent = playerData.opponent || playerData.Opponent || playerData.vs || playerData.VS || 'Unknown';
+              }
+              
+              historicalGames.push({
+                date: dateStr,
+                displayDate: searchDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                value: propValue,
+                success1Plus: propValue >= 1,
+                success2Plus: propValue >= 2,
+                opponent: opponent,
+                venue: venue,
+                gameData: playerData,
+                gameId: playerData.gameId // Include gameId for debugging/verification
+              });
             }
-            
-            // Fallback: check if player data already has opponent info
-            if (opponent === 'Unknown') {
-              opponent = playerData.opponent || playerData.Opponent || playerData.vs || playerData.VS || 'Unknown';
-            }
-            
-            historicalGames.push({
-              date: dateStr,
-              displayDate: searchDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-              value: propValue,
-              success1Plus: propValue >= 1,
-              success2Plus: propValue >= 2,
-              opponent: opponent,
-              venue: venue,
-              gameData: playerData
-            });
           }
         }
       }
