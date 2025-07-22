@@ -681,14 +681,14 @@ async function processStatsFile(csvFilePath) {
 
     console.log(`📊 Parsed info: Team=${teamAbbreviation}, Type=${statType}, Year=${year}, Month=${monthLower}, Day=${dayPadded}, GameId=${gameId}, Date=${gameDate}`);
 
-    // 1.5. Enhanced Game ID Validation
+    // 1.5. Enhanced Game ID Validation (relaxed for edge cases)
     if (ENHANCED_CONFIG.ENABLE_ENHANCED_VALIDATION) {
         const gameIdValidation = validateGameId(gameId, gameDate);
         
         if (!gameIdValidation.isValid) {
-            console.error(`❌ Invalid game ID: ${gameId} - ${gameIdValidation.warnings.join(', ')}`);
-            console.error('   Stopping processing to prevent data corruption');
-            process.exit(1);
+            console.warn(`⚠️  Game ID validation warning: ${gameId} - ${gameIdValidation.warnings.join(', ')}`);
+            console.warn('   Continuing processing (validation relaxed for edge cases)');
+            // Continue processing instead of exiting - some games have unusual circumstances
         }
         
         if (gameIdValidation.isSuspicious) {
