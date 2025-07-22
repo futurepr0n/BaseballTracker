@@ -92,12 +92,17 @@
   display: none;
 }
 
+/* Mobile Sort Controls - Hidden by default */
+.barrel-matchup-card .mobile-sort-controls {
+  display: none;
+}
+
 /* Table Styling */
 .barrel-matchup-card .matchup-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
-  table-layout: auto; /* Changed from fixed to auto for better responsive behavior */
+  table-layout: fixed; /* Fixed layout for consistent column widths */
 }
 
 .barrel-matchup-card .matchup-table thead {
@@ -594,71 +599,91 @@
   padding-left: 16px;
 }
 
-/* Column specific widths for desktop - responsive without fixed min-widths */
+/* Column specific widths for desktop - all 13 columns aggressively optimized */
 .barrel-matchup-card .player-col {
-  width: 25%;
-  min-width: 120px;
+  width: 12%; /* Reduced from 20% for more space */
+  min-width: 80px; /* Reduced from 120px */
 }
 
 @media (max-width: 768px) {
   .barrel-matchup-card .player-col {
-    min-width: 100px;
+    min-width: 100px; /* Keep mobile friendly */
   }
 }
 
 /* Pitch Contact */
 .barrel-matchup-card .matchup-table th:nth-child(2),
 .barrel-matchup-card .matchup-table td:nth-child(2) {
-  width: 10%;
+  width: 6%; /* Reduced from 8% */
 }
 
 /* Pitch Barrels */
 .barrel-matchup-card .matchup-table th:nth-child(3),
 .barrel-matchup-card .matchup-table td:nth-child(3) {
-  width: 10%;
+  width: 6%; /* Reduced from 8% */
 }
 
 /* Exit Velo */
 .barrel-matchup-card .matchup-table th:nth-child(4),
 .barrel-matchup-card .matchup-table td:nth-child(4) {
-  width: 9%;
+  width: 6%; /* Reduced from 7% */
 }
 
 /* Barrel Rate */
 .barrel-matchup-card .matchup-table th:nth-child(5),
 .barrel-matchup-card .matchup-table td:nth-child(5) {
-  width: 10%;
+  width: 6%; /* Reduced from 8% */
 }
 
 /* Hard Contact */
 .barrel-matchup-card .matchup-table th:nth-child(6),
 .barrel-matchup-card .matchup-table td:nth-child(6) {
-  width: 11%;
+  width: 6%; /* Reduced from 8% */
 }
 
 /* Hard Allowed */
 .barrel-matchup-card .matchup-table th:nth-child(7),
 .barrel-matchup-card .matchup-table td:nth-child(7) {
-  width: 11%;
+  width: 6%; /* Reduced from 8% */
+}
+
+/* Bat Speed */
+.barrel-matchup-card .matchup-table th:nth-child(8),
+.barrel-matchup-card .matchup-table td:nth-child(8) {
+  width: 6%; /* Reduced from 7% */
+}
+
+/* Attack Angle */
+.barrel-matchup-card .matchup-table th:nth-child(9),
+.barrel-matchup-card .matchup-table td:nth-child(9) {
+  width: 6%; /* Reduced from 7% */
+}
+
+/* Swing Path */
+.barrel-matchup-card .matchup-table th:nth-child(10),
+.barrel-matchup-card .matchup-table td:nth-child(10) {
+  width: 6%; /* Reduced from 7% */
 }
 
 /* Confidence */
-.barrel-matchup-card .matchup-table th:nth-child(8),
-.barrel-matchup-card .matchup-table td:nth-child(8) {
-  width: 9%;
+.barrel-matchup-card .matchup-table th:nth-child(11),
+.barrel-matchup-card .matchup-table td:nth-child(11) {
+  width: 8%; /* Slightly reduced from 8% to 7% but kept at 8 for readability */
 }
 
 /* Market Edge */
-.barrel-matchup-card .matchup-table th:nth-child(9),
-.barrel-matchup-card .matchup-table td:nth-child(9) {
-  width: 10%;
+.barrel-matchup-card .matchup-table th:nth-child(12),
+.barrel-matchup-card .matchup-table td:nth-child(12) {
+  width: 8%; /* Slightly reduced but kept readable */
 }
 
 /* Score */
-.barrel-matchup-card .matchup-table th:nth-child(10),
-.barrel-matchup-card .matchup-table td:nth-child(10) {
-  width: 8%;
+.barrel-matchup-card .matchup-table th:nth-child(13),
+.barrel-matchup-card .matchup-table td:nth-child(13) {
+  width: 6%; /* Kept compact for score */
 }
+
+/* Total width calculation: 12% + 9×6% + 2×8% + 6% = 12% + 54% + 16% + 6% = 88% (good spacing with margins) */
 
 /* Responsive Design */
 @media (max-width: 1200px) {
@@ -701,6 +726,42 @@
     display: block;
     flex: 1;
     overflow: hidden;
+  }
+  
+  /* Mobile Sort Controls */
+  .barrel-matchup-card .mobile-sort-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  .barrel-matchup-card .mobile-sort-controls label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--theme-text-primary, #1a202c) !important;
+    margin-right: 12px;
+  }
+  
+  .barrel-matchup-card .mobile-sort-dropdown {
+    flex: 1;
+    max-width: 250px;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--theme-text-primary, #1a202c) !important;
+    font-size: 0.9rem;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  
+  .barrel-matchup-card .mobile-sort-dropdown:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
   }
   
   .barrel-matchup-card .glass-header {
@@ -763,5 +824,188 @@
   
   .barrel-matchup-card .metric-item {
     padding: 6px;
+  }
+}
+
+/* Desktop Compact View with Rotated Headers - All 13 columns visible without scrolling */
+@media (min-width: 1024px) {
+  /* Table structure optimizations */
+  .barrel-matchup-card .matchup-table {
+    font-size: 8px; /* Further reduced from 9px for rotated headers */
+    table-layout: fixed; /* Important for consistent column widths */
+  }
+  
+  /* Standard header styling (Player column) */
+  .barrel-matchup-card .matchup-table th {
+    height: 120px; /* Increased height to accommodate rotated text */
+    vertical-align: bottom;
+    padding: 4px 2px; /* Ultra-compact padding */
+    text-align: center;
+    border-bottom: 2px solid rgba(222, 226, 230, 0.8);
+    position: relative;
+  }
+  
+  /* Player column header (not rotated) */
+  .barrel-matchup-card .player-col {
+    text-align: left;
+    padding-left: 6px;
+  }
+  
+  .barrel-matchup-card .player-col .header-text-wrapper {
+    font-size: 9px;
+    font-weight: 600;
+    color: #495057;
+    writing-mode: initial; /* Normal orientation for player column */
+  }
+  
+  /* Rotated headers for all metric columns */
+  .barrel-matchup-card .rotated-header .header-text-wrapper {
+    display: inline-block;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    font-size: 8px;
+    font-weight: 600;
+    color: #495057;
+    line-height: 1.2;
+  }
+  
+  /* Header main text styling */
+  .barrel-matchup-card .rotated-header .header-main {
+    display: block;
+    font-size: 8px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  
+  /* Header subtitle styling for rotated headers */
+  .barrel-matchup-card .rotated-header .header-subtitle {
+    display: block;
+    font-size: 6px; /* Extra small for subtitles */
+    font-weight: normal;
+    color: #6c757d;
+    opacity: 0.8;
+  }
+  
+  /* Hover effects for rotated sortable headers */
+  .barrel-matchup-card .rotated-header.sortable:hover {
+    background-color: rgba(222, 226, 230, 0.4);
+    cursor: pointer;
+  }
+  
+  /* Table body optimizations */
+  .barrel-matchup-card .matchup-table td {
+    padding: 4px 2px; /* Ultra-compact cell padding */
+    font-size: 8px; /* Reduced font size for more space */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+  
+  /* Player cell special treatment (larger text) */
+  .barrel-matchup-card .player-cell {
+    font-size: 8px;
+    text-align: left;
+    padding-left: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .barrel-matchup-card .player-name {
+    font-weight: 600;
+    display: block;
+  }
+  
+  .barrel-matchup-card .team-info {
+    font-size: 6px;
+    color: #6c757d;
+  }
+  
+  /* Metric cells ultra-compact */
+  .barrel-matchup-card .metric-cell {
+    font-size: 7px; /* Extra compact for narrow columns */
+    text-align: center;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+  
+  /* Score cell styling */
+  .barrel-matchup-card .score-cell {
+    font-size: 8px;
+    font-weight: 600;
+    text-align: center;
+  }
+  
+  /* Matchup score badge optimization */
+  .barrel-matchup-card .matchup-score {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px; /* Smaller padding */
+    border-radius: 12px;
+  }
+  
+  /* Sort indicators in rotated headers */
+  .barrel-matchup-card .rotated-header .header-main .sort-indicator {
+    font-size: 6px;
+    margin-left: 2px;
+  }
+}
+
+/* Ultra-wide desktop screens - slightly larger but still compact with rotated headers */
+@media (min-width: 1440px) {
+  .barrel-matchup-card .matchup-table {
+    font-size: 9px; /* Slightly larger on very wide screens */
+  }
+  
+  .barrel-matchup-card .matchup-table th {
+    height: 130px; /* Slightly taller for better readability */
+    padding: 5px 3px; /* A bit more padding on ultra-wide */
+  }
+  
+  /* Player column header (not rotated) */
+  .barrel-matchup-card .player-col .header-text-wrapper {
+    font-size: 10px;
+  }
+  
+  /* Rotated headers slightly larger on ultra-wide */
+  .barrel-matchup-card .rotated-header .header-text-wrapper {
+    font-size: 9px;
+  }
+  
+  .barrel-matchup-card .rotated-header .header-main {
+    font-size: 9px;
+  }
+  
+  .barrel-matchup-card .rotated-header .header-subtitle {
+    font-size: 7px;
+  }
+  
+  /* Table body slightly larger */
+  .barrel-matchup-card .matchup-table td {
+    font-size: 9px;
+    padding: 5px 3px;
+  }
+  
+  .barrel-matchup-card .player-cell {
+    font-size: 9px;
+  }
+  
+  .barrel-matchup-card .team-info {
+    font-size: 7px;
+  }
+  
+  .barrel-matchup-card .metric-cell {
+    font-size: 8px;
+  }
+  
+  .barrel-matchup-card .score-cell {
+    font-size: 9px;
+  }
+  
+  .barrel-matchup-card .matchup-score {
+    font-size: 10px;
+    padding: 3px 8px;
   }
 }

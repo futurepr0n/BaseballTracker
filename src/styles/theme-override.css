@@ -99,7 +99,7 @@ body * {
 .glass-card p,
 .glass-card span,
 .glass-card div {
-  color: inherit;
+  color: var(--theme-text-primary, #1a202c) !important;
 }
 
 .glass-card .card-subtitle {

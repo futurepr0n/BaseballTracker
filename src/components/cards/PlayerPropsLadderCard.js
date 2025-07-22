@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTeamFilter } from '../TeamFilterContext';
+import useTeamFilteredData from '../useTeamFilter';
 import GlassCard from './GlassCard/GlassCard';
 import MobilePlayerCard from '../common/MobilePlayerCard';
 import SeasonOverviewChart from './PlayerPropsLadderCard/SeasonOverviewChart';
@@ -640,8 +641,8 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
     }
   }, [selectedPlayer, selectedProp, getCurrentOpponent, loadEnhancedOpponentHistory]);
 
-  // Get filtered player list for selected prop with improved team filtering
-  const getFilteredPlayers = useCallback(() => {
+  // Get base player data for selected prop
+  const getBasePlayerData = useMemo(() => {
     if (!propAnalysisData || !propAnalysisData.propAnalysis || !selectedProp) {
       console.log('No prop analysis data or selected prop');
       return [];
@@ -653,33 +654,14 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
       return [];
     }
     
-    if (selectedTeam) {
-      if (includeMatchup && matchupTeam) {
-        // Get players from both teams in matchup mode
-        const team1Players = propData.teamSpecificLists[selectedTeam] || [];
-        const team2Players = propData.teamSpecificLists[matchupTeam] || [];
-        
-        // Take top 25 from each team for matchup analysis
-        const team1Top = team1Players.slice(0, 25);
-        const team2Top = team2Players.slice(0, 25);
-        
-        console.log(`Matchup mode: ${team1Top.length} from ${selectedTeam}, ${team2Top.length} from ${matchupTeam}`);
-        return [...team1Top, ...team2Top];
-      } else {
-        // Get players from selected team only
-        const teamPlayers = propData.teamSpecificLists[selectedTeam] || [];
-        const topTeamPlayers = teamPlayers.slice(0, 50);
-        
-        console.log(`Team filter: ${topTeamPlayers.length} players from ${selectedTeam}`);
-        return topTeamPlayers;
-      }
-    } else {
-      // Show top players overall
-      const topPlayers = propData.topPlayers || [];
-      console.log(`All teams: showing ${topPlayers.length} top players`);
-      return topPlayers;
-    }
-  }, [propAnalysisData, selectedProp, selectedTeam, includeMatchup, matchupTeam]);
+    // Always use topPlayers as base data, team filtering will be applied separately
+    const topPlayers = propData.topPlayers || [];
+    console.log(`Base data: ${topPlayers.length} players available for ${selectedProp}`);
+    return topPlayers;
+  }, [propAnalysisData, selectedProp]);
+  
+  // Apply team filtering using the standard hook
+  const filteredPlayers = useTeamFilteredData(getBasePlayerData, 'team');
 
 
   // Loading state
@@ -732,8 +714,13 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
     );
   }
 
-  const filteredPlayers = getFilteredPlayers();
   const currentPropOption = propOptions.find(p => p.key === selectedProp);
+  
+  // Display limit based on filtering state
+  const displayLimit = selectedTeam ? (includeMatchup && matchupTeam ? 50 : 50) : 25;
+  const displayPlayers = filteredPlayers.slice(0, displayLimit);
+  
+  console.log(`Team filtering: ${filteredPlayers.length} filtered, showing ${displayPlayers.length}`);
 
   return (
     <GlassCard className="player-props-ladder-card" variant="default">
@@ -770,8 +757,8 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
         <div className="matchup-toggle">
           <span className="toggle-text">
             {selectedTeam ? 
-              (includeMatchup && matchupTeam ? `Showing top 25 from each team` : `Showing ${selectedTeam} players`) :
-              'Showing top 50 players league-wide'
+              (includeMatchup && matchupTeam ? `Showing ${selectedTeam} vs ${matchupTeam} players` : `Showing ${selectedTeam} players`) :
+              `Showing top ${displayLimit} players league-wide`
             }
           </span>
         </div>
@@ -787,7 +774,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
               Top {currentPropOption?.label} Opportunities
             </h4>
             <div className="player-list">
-              {filteredPlayers.map((player, index) => (
+              {displayPlayers.map((player, index) => (
                 <div 
                   key={player.id}
                   className={`player-item ${selectedPlayer?.id === player.id ? 'selected' : ''}`}
@@ -885,7 +872,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
         {/* Mobile View */}
         <div className="mobile-view">
         <div className="mobile-cards">
-          {filteredPlayers.map((player, index) => {
+          {displayPlayers.map((player, index) => {
             const secondaryMetrics = [
               { label: 'Season', value: player.seasonTotal },
               { label: 'Per Game', value: player.rate },

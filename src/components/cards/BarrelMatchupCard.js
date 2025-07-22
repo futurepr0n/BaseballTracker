@@ -428,51 +428,79 @@ const BarrelMatchupCard = ({ currentDate }) => {
           <table className="matchup-table">
           <thead>
             <tr>
-              <th className="player-col">Player</th>
-              <th className="sortable" onClick={() => handleSort('pitcherContactAllowed')}>
-                Pitch Contact {getSortIndicator('pitcherContactAllowed')}
-                <span className="header-subtitle">Exit Velo</span>
+              <th className="player-col" scope="col">
+                <span className="header-text-wrapper">
+                  Player
+                </span>
               </th>
-              <th className="sortable" onClick={() => handleSort('pitcherBarrelVulnerable')}>
-                Pitch Barrels {getSortIndicator('pitcherBarrelVulnerable')}
-                <span className="header-subtitle">% Allowed</span>
+              <th className="sortable rotated-header" scope="col" onClick={() => handleSort('pitcherContactAllowed')}>
+                <span className="header-text-wrapper">
+                  <span className="header-main">Pitch Contact {getSortIndicator('pitcherContactAllowed')}</span>
+                  <span className="header-subtitle">Exit Velo</span>
+                </span>
               </th>
-              <th className="sortable" onClick={() => handleSort('playerExitVelocity')}>
-                Exit Velo {getSortIndicator('playerExitVelocity')}
-                <span className="header-subtitle">Player</span>
+              <th className="sortable rotated-header" scope="col" onClick={() => handleSort('pitcherBarrelVulnerable')}>
+                <span className="header-text-wrapper">
+                  <span className="header-main">Pitch Barrels {getSortIndicator('pitcherBarrelVulnerable')}</span>
+                  <span className="header-subtitle">% Allowed</span>
+                </span>
               </th>
-              <th className="sortable" onClick={() => handleSort('playerBarrelRate')}>
-                Barrel Rate {getSortIndicator('playerBarrelRate')}
-                <span className="header-subtitle">Player %</span>
+              <th className="sortable rotated-header" scope="col" onClick={() => handleSort('playerExitVelocity')}>
+                <span className="header-text-wrapper">
+                  <span className="header-main">Exit Velo {getSortIndicator('playerExitVelocity')}</span>
+                  <span className="header-subtitle">Player</span>
+                </span>
               </th>
-              <th className="sortable" onClick={() => handleSort('playerHardContact')}>
-                Hard Contact {getSortIndicator('playerHardContact')}
-                <span className="header-subtitle">Player %</span>
+              <th className="sortable rotated-header" scope="col" onClick={() => handleSort('playerBarrelRate')}>
+                <span className="header-text-wrapper">
+                  <span className="header-main">Barrel Rate {getSortIndicator('playerBarrelRate')}</span>
+                  <span className="header-subtitle">Player %</span>
+                </span>
               </th>
-              <th className="sortable" onClick={() => handleSort('pitcherHardContact')}>
-                Hard Allowed {getSortIndicator('pitcherHardContact')}
-                <span className="header-subtitle">Pitcher</span>
+              <th className="sortable rotated-header" scope="col" onClick={() => handleSort('playerHardContact')}>
+                <span className="header-text-wrapper">
+                  <span className="header-main">Hard Contact {getSortIndicator('playerHardContact')}</span>
+                  <span className="header-subtitle">Player %</span>
+                </span>
               </th>
-              <th className="sortable" onClick={() => handleSort('swingPath.avgBatSpeed')}>
-                Bat Speed {getSortIndicator('swingPath.avgBatSpeed')}
-                <span className="header-subtitle">mph</span>
+              <th className="sortable rotated-header" scope="col" onClick={() => handleSort('pitcherHardContact')}>
+                <span className="header-text-wrapper">
+                  <span className="header-main">Hard Allowed {getSortIndicator('pitcherHardContact')}</span>
+                  <span className="header-subtitle">Pitcher</span>
+                </span>
               </th>
-              <th className="sortable" onClick={() => handleSort('swingPath.attackAngle')}>
-                Attack Angle {getSortIndicator('swingPath.attackAngle')}
-                <span className="header-subtitle">degrees</span>
+              <th className="sortable rotated-header" scope="col" onClick={() => handleSort('swingPath.avgBatSpeed')}>
+                <span className="header-text-wrapper">
+                  <span className="header-main">Bat Speed {getSortIndicator('swingPath.avgBatSpeed')}</span>
+                  <span className="header-subtitle">mph</span>
+                </span>
               </th>
-              <th className="sortable" onClick={() => handleSort('swingPath.swingOptimizationScore')}>
-                Swing Path {getSortIndicator('swingPath.swingOptimizationScore')}
-                <span className="header-subtitle">Score</span>
+              <th className="sortable rotated-header" scope="col" onClick={() => handleSort('swingPath.attackAngle')}>
+                <span className="header-text-wrapper">
+                  <span className="header-main">Attack Angle {getSortIndicator('swingPath.attackAngle')}</span>
+                  <span className="header-subtitle">degrees</span>
+                </span>
               </th>
-              <th className="sortable" onClick={() => handleSort('confidenceScore')}>
-                Confidence {getSortIndicator('confidenceScore')}
+              <th className="sortable rotated-header" scope="col" onClick={() => handleSort('swingPath.swingOptimizationScore')}>
+                <span className="header-text-wrapper">
+                  <span className="header-main">Swing Path {getSortIndicator('swingPath.swingOptimizationScore')}</span>
+                  <span className="header-subtitle">Score</span>
+                </span>
               </th>
-              <th className="sortable" onClick={() => handleSort('marketEdge')}>
-                Market Edge {getSortIndicator('marketEdge')}
+              <th className="sortable rotated-header" scope="col" onClick={() => handleSort('confidenceScore')}>
+                <span className="header-text-wrapper">
+                  <span className="header-main">Confidence {getSortIndicator('confidenceScore')}</span>
+                </span>
               </th>
-              <th className="sortable" onClick={() => handleSort('matchupScore')}>
-                Score {getSortIndicator('matchupScore')}
+              <th className="sortable rotated-header" scope="col" onClick={() => handleSort('marketEdge')}>
+                <span className="header-text-wrapper">
+                  <span className="header-main">Market Edge {getSortIndicator('marketEdge')}</span>
+                </span>
+              </th>
+              <th className="sortable rotated-header" scope="col" onClick={() => handleSort('matchupScore')}>
+                <span className="header-text-wrapper">
+                  <span className="header-main">Score {getSortIndicator('matchupScore')}</span>
+                </span>
               </th>
             </tr>
           </thead>
@@ -653,6 +681,30 @@ const BarrelMatchupCard = ({ currentDate }) => {
         
         {/* Mobile View */}
         <div className="mobile-view">
+          {/* Mobile Sort Dropdown */}
+          <div className="mobile-sort-controls">
+            <label htmlFor="mobile-sort-select">Sort by:</label>
+            <select 
+              id="mobile-sort-select"
+              value={sortConfig.key} 
+              onChange={(e) => setSortConfig({key: e.target.value, direction: 'desc'})}
+              className="mobile-sort-dropdown"
+            >
+              <option value="matchupScore">Overall Score</option>
+              <option value="pitcherContactAllowed">Pitcher Contact (Exit Velo)</option>
+              <option value="pitcherBarrelVulnerable">Pitcher Barrels</option>
+              <option value="playerExitVelocity">Player Exit Velocity</option>
+              <option value="playerBarrelRate">Player Barrel Rate</option>
+              <option value="playerHardContact">Player Hard Contact</option>
+              <option value="pitcherHardContact">Pitcher Hard Allowed</option>
+              <option value="swingPath.avgBatSpeed">Bat Speed</option>
+              <option value="swingPath.attackAngle">Attack Angle</option>
+              <option value="swingPath.swingOptimizationScore">Swing Path Score</option>
+              <option value="confidenceScore">Confidence Score</option>
+              <option value="marketEdge">Market Edge</option>
+            </select>
+          </div>
+          
           <div className="mobile-cards">
             {sortedPicks.map((pick, index) => (
               <div key={index} className={`mobile-card ${expandedRows[index] ? 'expanded' : ''}`}>
