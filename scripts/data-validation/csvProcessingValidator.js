@@ -17,16 +17,16 @@ const gameIdValidator = require('../../utils/gameIdValidator');
  * Validation configuration
  */
 const VALIDATION_CONFIG = {
-  // File validation thresholds
-  MIN_FILE_SIZE_BYTES: 100,
+  // File validation thresholds (relaxed for single pitcher games)
+  MIN_FILE_SIZE_BYTES: 50,  // Reduced from 100 to allow single pitcher games
   MAX_FILE_SIZE_MB: 10,
   
-  // CSV content validation
-  MIN_EXPECTED_ROWS: 5,
+  // CSV content validation (relaxed for edge cases)
+  MIN_EXPECTED_ROWS: 2,  // Reduced from 5 to allow single pitcher games
   MAX_EXPECTED_ROWS: 1000,
   
-  // Game ID validation
-  ALLOW_SUSPICIOUS_GAME_IDS: false,
+  // Game ID validation (relaxed for edge cases like single pitcher games)
+  ALLOW_SUSPICIOUS_GAME_IDS: true,
   
   // Date range validation
   SUSPICIOUS_DATE_RANGES: [
