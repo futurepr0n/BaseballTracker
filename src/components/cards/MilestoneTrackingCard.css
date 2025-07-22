@@ -388,33 +388,4 @@
   }
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .milestone-tracking-card {
-    background: #1e1e1e;
-    color: #e0e0e0;
-  }
-  
-  .filter-group select {
-    background: #2a2a2a;
-    border-color: #444;
-    color: #e0e0e0;
-  }
-  
-  .milestone-item {
-    background: #2a2a2a;
-    border-color: #444;
-  }
-  
-  .milestone-item.heat-blazing {
-    background: linear-gradient(135deg, rgba(255, 235, 238, 0.1) 0%, rgba(255, 245, 245, 0.05) 100%);
-  }
-  
-  .milestone-item.heat-hot {
-    background: linear-gradient(135deg, rgba(255, 243, 224, 0.1) 0%, rgba(255, 248, 241, 0.05) 100%);
-  }
-  
-  .milestone-item.heat-warm {
-    background: linear-gradient(135deg, rgba(255, 248, 225, 0.1) 0%, rgba(255, 251, 240, 0.05) 100%);
-  }
-}
+/* Dark mode support removed - maintaining consistent light theme across all cards */
