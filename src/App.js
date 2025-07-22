@@ -88,10 +88,13 @@ function App() {
       <Router>
         <div className="app">
           <header className="app-header">
-           <div className="header-top-row">
-              <h1>
-                Capping.Pro
-              </h1>
+            <div className="header-top-row">
+              <div className="logo-section">
+                <a href="https://capping.pro" target="_blank" rel="noopener noreferrer" aria-label="Visit Capping.Pro">
+                  <img src="/data/logos/capping_pro_logo_w.svg" alt="Capping.Pro Logo" className="main-logo" />
+                </a>
+                <h1>Capping.Pro</h1>
+              </div>
               <div className="header-controls">
                 <div className="social-icons">
                   <a href="https://x.com/capping_pro" target="_blank" rel="noopener noreferrer" aria-label="Capping.Pro on X">

@@ -45,14 +45,14 @@
 
 .mlb-weather-card .glass-header h3 {
   margin: 0;
-  color: #333;
+  color: var(--theme-text-primary, #1a202c) !important;
   font-size: 1.1rem;
   font-weight: 600;
 }
 
 .card-subtitle {
   font-size: 0.9rem;
-  color: #666;
+  color: var(--theme-text-secondary, #4a5568) !important;
   margin-top: 4px;
 }
 
@@ -129,14 +129,14 @@
 .mini-card-header h4 {
   margin: 0;
   font-size: 1.1rem;
-  color: #333;
+  color: var(--theme-text-primary, #1a202c) !important;
   font-weight: 600;
 }
 
 .venue-name {
   margin: 2px 0 0;
   font-size: 0.85rem;
-  color: #666;
+  color: var(--theme-text-secondary, #4a5568) !important;
 }
 
 /* Mini Hourly Forecast */
@@ -159,7 +159,7 @@
 .hour-time {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #666;
+  color: var(--theme-text-secondary, #4a5568) !important;
   margin: 0 0 4px 0;
 }
 
@@ -167,6 +167,7 @@
   font-size: 1.25rem;
   font-weight: 600;
   margin: 0 0 4px 0;
+  color: var(--theme-text-primary, #1a202c) !important;
 }
 
 .mini-hour-slot .precip,
@@ -174,6 +175,7 @@
   font-size: 0.75rem;
   margin: 2px 0;
   white-space: nowrap;
+  color: var(--theme-text-secondary, #4a5568) !important;
 }
 
 /* Mini Wind Factor Section */
@@ -195,12 +197,12 @@
   display: block;
   font-size: 0.9rem;
   margin-bottom: 2px;
-  color: #1d9bf0;
+  color: var(--theme-text-primary, #1a202c) !important;
 }
 
 .mini-wind-factor .wind-factor-text span {
   font-size: 0.75rem;
-  color: #666;
+  color: var(--theme-text-secondary, #4a5568) !important;
 }
 
 /* Wind Diagram Styles */
@@ -261,7 +263,7 @@
   align-items: center;
   justify-content: center;
   min-height: 300px;
-  color: #666;
+  color: var(--theme-text-secondary, #4a5568) !important;
 }
 
 .loading-spinner {
@@ -280,7 +282,7 @@
 }
 
 .error-message {
-  color: #dc3545;
+  color: #dc3545 !important;
   font-weight: 500;
 }
 
@@ -288,7 +290,7 @@
 .dome-message {
   padding: 20px;
   text-align: center;
-  color: #666;
+  color: var(--theme-text-secondary, #4a5568) !important;
   font-style: italic;
 }
 

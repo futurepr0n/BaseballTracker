@@ -18,7 +18,7 @@
 .milestone-tracking-card .card-header h3 {
   margin: 0;
   font-size: 1.5rem;
-  color: var(--text-primary, #333);
+  color: var(--theme-text-primary, #1a202c) !important;
 }
 
 .header-stats {
@@ -66,7 +66,7 @@
 
 .filter-group label {
   font-size: 0.875rem;
-  color: var(--text-secondary, #666);
+  color: var(--theme-text-secondary, #4a5568) !important;
   font-weight: 600;
 }
 
@@ -75,7 +75,7 @@
   border: 1px solid var(--border-color, #ddd);
   border-radius: 6px;
   background: var(--input-bg, #fff);
-  color: var(--text-primary, #333);
+  color: var(--theme-text-primary, #1a202c) !important;
   font-size: 0.875rem;
   cursor: pointer;
 }
@@ -90,7 +90,7 @@
 
 .tonight-watch h4 {
   margin: 0 0 12px 0;
-  color: #e65100;
+  color: var(--theme-text-primary, #1a202c) !important;
   font-size: 1.1rem;
 }
 
@@ -105,7 +105,7 @@
   padding: 4px 10px;
   border-radius: 16px;
   font-size: 0.875rem;
-  color: #333;
+  color: var(--theme-text-primary, #1a202c) !important;
   border: 1px solid rgba(255, 152, 0, 0.3);
 }
 
@@ -177,12 +177,12 @@
 
 .player-name {
   font-weight: 700;
-  color: var(--text-primary, #333);
+  color: var(--theme-text-primary, #1a202c) !important;
   font-size: 1rem;
 }
 
 .team {
-  color: var(--text-secondary, #666);
+  color: var(--theme-text-secondary, #4a5568) !important;
   font-size: 0.875rem;
 }
 
@@ -206,18 +206,18 @@
 
 .timeline-label {
   font-size: 0.875rem;
-  color: var(--text-secondary, #666);
+  color: var(--theme-text-secondary, #4a5568) !important;
 }
 
 .timeline-value {
   font-weight: 600;
-  color: var(--text-primary, #333);
+  color: var(--theme-text-primary, #1a202c) !important;
 }
 
 .confidence {
   margin-left: 6px;
   font-size: 0.8rem;
-  color: var(--text-secondary, #666);
+  color: var(--theme-text-secondary, #4a5568) !important;
   font-weight: normal;
 }
 
@@ -237,12 +237,12 @@
 
 .pace-label {
   font-size: 0.8rem;
-  color: var(--text-secondary, #666);
+  color: var(--theme-text-secondary, #4a5568) !important;
 }
 
 .pace-value {
   font-weight: 600;
-  color: var(--text-primary, #333);
+  color: var(--theme-text-primary, #1a202c) !important;
   font-size: 0.875rem;
 }
 
@@ -273,7 +273,7 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.875rem;
-  color: var(--text-secondary, #666);
+  color: var(--theme-text-secondary, #4a5568) !important;
 }
 
 .momentum-indicator {
@@ -288,7 +288,7 @@
 .more-milestones {
   text-align: center;
   padding: 16px;
-  color: var(--text-secondary, #666);
+  color: var(--theme-text-secondary, #4a5568) !important;
   font-style: italic;
 }
 
@@ -301,7 +301,7 @@
 
 .hottest-players h4 {
   margin: 0 0 12px 0;
-  color: var(--text-primary, #333);
+  color: var(--theme-text-primary, #1a202c) !important;
   font-size: 1rem;
 }
 
@@ -317,7 +317,7 @@
   border-radius: 16px;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #d84315;
+  color: #d84315 !important;
   border: 1px solid #ff7043;
 }
 
@@ -326,14 +326,14 @@
   padding-top: 12px;
   border-top: 1px solid var(--border-color, #eee);
   text-align: right;
-  color: var(--text-secondary, #666);
+  color: var(--theme-text-secondary, #4a5568) !important;
 }
 
 .loading-state,
 .error-state {
   text-align: center;
   padding: 40px 20px;
-  color: var(--text-secondary, #666);
+  color: var(--theme-text-secondary, #4a5568) !important;
 }
 
 .loading-spinner {
@@ -388,33 +388,4 @@
   }
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .milestone-tracking-card {
-    background: #1e1e1e;
-    color: #e0e0e0;
-  }
-  
-  .filter-group select {
-    background: #2a2a2a;
-    border-color: #444;
-    color: #e0e0e0;
-  }
-  
-  .milestone-item {
-    background: #2a2a2a;
-    border-color: #444;
-  }
-  
-  .milestone-item.heat-blazing {
-    background: linear-gradient(135deg, rgba(255, 235, 238, 0.1) 0%, rgba(255, 245, 245, 0.05) 100%);
-  }
-  
-  .milestone-item.heat-hot {
-    background: linear-gradient(135deg, rgba(255, 243, 224, 0.1) 0%, rgba(255, 248, 241, 0.05) 100%);
-  }
-  
-  .milestone-item.heat-warm {
-    background: linear-gradient(135deg, rgba(255, 248, 225, 0.1) 0%, rgba(255, 251, 240, 0.05) 100%);
-  }
-}
+/* Dark mode support removed - maintaining consistent light theme across all cards */
