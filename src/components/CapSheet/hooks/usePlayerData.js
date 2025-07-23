@@ -1211,8 +1211,16 @@ const fetchPitcherById = async (pitcherId) => {
 
   // Function to get pitcher options for a specific opponent team
   const getPitcherOptionsForOpponent = (opponentTeam) => {
+    // Return empty array if no opponent team specified
+    if (!opponentTeam || !opponentTeam.trim()) {
+      console.log(`[getPitcherOptionsForOpponent] No opponent team specified: "${opponentTeam}"`);
+      return [];
+    }
+    
     // Filter the full pitcher roster to get only pitchers from the opponent team
     const teamPitchers = fullPitcherRoster.filter(pitcher => pitcher.team === opponentTeam);
+    
+    console.log(`[getPitcherOptionsForOpponent] Found ${teamPitchers.length} pitchers for opponent team "${opponentTeam}"`);
     
     // Map to select options format
     return teamPitchers.map(pitcher => ({
@@ -1270,9 +1278,12 @@ const fetchPitcherById = async (pitcherId) => {
     }
   
     const playerTeam = selectedPlayer.team;
-    const game = gameData.find(g => g.homeTeam === playerTeam || g.awayTeam === playerTeam);
+    const game = gameData?.find(g => g.homeTeam === playerTeam || g.awayTeam === playerTeam);
     let stadium = game ? game.venue || '' : '';
     let opponentTeam = game ? (game.homeTeam === playerTeam ? game.awayTeam : game.homeTeam) : '';
+    
+    // If no game found, leave opponent empty but allow manual entry
+    // This ensures the opponent field exists and can be edited to trigger pitcher options
   
     // Create a new player with basic info
     const basePlayer = {
@@ -1281,9 +1292,13 @@ const fetchPitcherById = async (pitcherId) => {
       opponent: opponentTeam  // Use 'opponent' field name to match HitterRow expectations
     };
     
-    // Debug logging for opponent field setting
+    // Debug logging for opponent field setting and game data availability
     console.log(`[usePlayerData] Adding ${selectedPlayer.name} (${playerTeam}) vs "${opponentTeam}"`);
     console.log(`[usePlayerData] Game found:`, game ? `${game.homeTeam} vs ${game.awayTeam}` : 'No game found');
+    console.log(`[usePlayerData] gameData available:`, gameData ? `${gameData.length} games` : 'gameData is null/undefined');
+    if (gameData && gameData.length > 0) {
+      console.log(`[usePlayerData] Available teams in gameData:`, [...new Set(gameData.flatMap(g => [g.homeTeam, g.awayTeam]))]);
+    }
     
     // Check if any other hitters from the same team already have values we can copy
     const teamHitters = selectedPlayers.hitters.filter(h => 
