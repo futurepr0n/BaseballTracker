@@ -5,6 +5,7 @@ import {
   fetchRosterData,
   generateMatchupAnalysis 
 } from '../../../services/dataService';
+import enhancedGameDataService from '../../../services/enhancedGameDataService';
 import { debugLog } from '../../../utils/debugConfig';
 import { getPlayerDisplayName, getTeamDisplayName } from '../../../utils/playerNameUtils';
 import './OpponentMatchupHitsCard.css';
@@ -14,6 +15,42 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [debugInfo, setDebugInfo] = useState('');
+  
+  // Helper function to get actual opponent matchup statistics
+  const getPlayerVsOpponentStats = async (playerName, playerTeam, opponentTeam) => {
+    try {
+      const analysis = await enhancedGameDataService.getPlayerVsOpponentAnalysis(
+        playerName, 
+        playerTeam, 
+        opponentTeam, 
+        'H' // Hits stat key
+      );
+      
+      if (analysis && analysis.games && analysis.games.length > 0) {
+        const games = analysis.games;
+        const totalHits = games.reduce((sum, game) => sum + (game.value || 0), 0);
+        const gamesPlayed = games.length;
+        const hitsPerGame = gamesPlayed > 0 ? (totalHits / gamesPlayed).toFixed(2) : '0.00';
+        
+        // Calculate batting average approximation
+        const totalABs = games.reduce((sum, game) => sum + (game.ab || 3), 0); // Default 3 AB per game if not available
+        const battingAverage = totalABs > 0 ? (totalHits / totalABs).toFixed(3) : '.000';
+        
+        return {
+          totalHits,
+          gamesPlayed,
+          hitsPerGame,
+          battingAverage,
+          gameHistory: games
+        };
+      }
+      
+      return { totalHits: 0, gamesPlayed: 0, hitsPerGame: '0.00', battingAverage: '.000', gameHistory: [] };
+    } catch (error) {
+      console.error('Error getting opponent stats:', error);
+      return { totalHits: 0, gamesPlayed: 0, hitsPerGame: '0.00', battingAverage: '.000', gameHistory: [] };
+    }
+  };
 
   useEffect(() => {
     const loadMatchupData = async () => {
@@ -60,15 +97,19 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
                         ? todaysGame.awayTeam 
                         : todaysGame.homeTeam;
                       
+                      // Get actual opponent matchup data using enhancedGameDataService
+                      const opponentStats = await getPlayerVsOpponentStats(player.name, player.team, opponent);
+                      
                       todaysPlayers.push({
                         playerName: player.name,
                         playerTeam: player.team,
                         opponentTeam: opponent,
-                        hitsPerGame: player.rate || 0,
-                        totalHits: player.seasonTotal || 0,
-                        gamesVsOpponent: 3, // Placeholder - could be enhanced with actual data
-                        battingAvg: (player.rate * 3).toFixed(3), // Rough approximation
-                        recentForm: player.trend === 'up' ? '🔥' : player.trend === 'down' ? '❄️' : '➡️'
+                        hitsPerGame: opponentStats.hitsPerGame || player.rate || 0,
+                        totalHits: opponentStats.totalHits || 0,
+                        gamesVsOpponent: opponentStats.gamesPlayed || 0,
+                        battingAvg: opponentStats.battingAverage || (player.rate * 0.3).toFixed(3),
+                        recentForm: player.trend === 'up' ? '🔥' : player.trend === 'down' ? '❄️' : '➡️',
+                        opponentHistory: opponentStats.gameHistory || []
                       });
                     }
                   }
@@ -226,7 +267,7 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
                   
                   <div className="player-info">
                     <div className="player-name">{getPlayerDisplayName(player)}</div>
-                    <div className="player-team">vs Opponent</div>
+                    <div className="player-team">vs {player.opponentTeam}</div>
                   </div>
                   
                   <div className="player-stat">
@@ -234,12 +275,17 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
                       {player.hitsPerGame} H/G
                     </span>
                     <small className="stat-note">
-                      {player.totalHits}H in {player.gamesVsOpponent}G 
+                      {player.totalHits}H in {player.gamesVsOpponent}G vs {player.opponentTeam}
                       ({player.battingAvg} AVG)
                       {player.recentForm && (
                         <span className="recent-form"> | {player.recentForm}</span>
                       )}
                     </small>
+                    {player.opponentHistory && player.opponentHistory.length > 0 && (
+                      <div className="opponent-history-mini" style={{ marginTop: '4px', fontSize: '10px' }}>
+                        Recent vs {player.opponentTeam}: {player.opponentHistory.slice(0, 5).map(game => game.value || 0).join('-')}
+                      </div>
+                    )}
                   </div>
                   
                   {/* Enhanced background logo */}
@@ -283,6 +329,37 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [debugInfo, setDebugInfo] = useState('');
+  
+  // Helper function to get actual opponent HR matchup statistics
+  const getPlayerVsOpponentHRStats = async (playerName, playerTeam, opponentTeam) => {
+    try {
+      const analysis = await enhancedGameDataService.getPlayerVsOpponentAnalysis(
+        playerName, 
+        playerTeam, 
+        opponentTeam, 
+        'HR' // Home runs stat key
+      );
+      
+      if (analysis && analysis.games && analysis.games.length > 0) {
+        const games = analysis.games;
+        const totalHRs = games.reduce((sum, game) => sum + (game.value || 0), 0);
+        const gamesPlayed = games.length;
+        const hrsPerGame = gamesPlayed > 0 ? (totalHRs / gamesPlayed).toFixed(3) : '0.000';
+        
+        return {
+          totalHRs,
+          gamesPlayed,
+          hrsPerGame,
+          gameHistory: games
+        };
+      }
+      
+      return { totalHRs: 0, gamesPlayed: 0, hrsPerGame: '0.000', gameHistory: [] };
+    } catch (error) {
+      console.error('Error getting opponent HR stats:', error);
+      return { totalHRs: 0, gamesPlayed: 0, hrsPerGame: '0.000', gameHistory: [] };
+    }
+  };
 
   useEffect(() => {
     const loadMatchupData = async () => {
@@ -328,14 +405,18 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
                         ? todaysGame.awayTeam 
                         : todaysGame.homeTeam;
                       
+                      // Get actual opponent HR matchup data
+                      const opponentHRStats = await getPlayerVsOpponentHRStats(player.name, player.team, opponent);
+                      
                       todaysPlayers.push({
                         playerName: player.name,
                         playerTeam: player.team,
                         opponentTeam: opponent,
-                        hrsPerGame: player.rate || 0,
-                        totalHRs: player.seasonTotal || 0,
-                        gamesVsOpponent: 3, // Placeholder - could be enhanced with actual data
-                        recentForm: player.trend === 'up' ? '🔥' : player.trend === 'down' ? '❄️' : '➡️'
+                        hrsPerGame: opponentHRStats.hrsPerGame || player.rate || 0,
+                        totalHRs: opponentHRStats.totalHRs || 0,
+                        gamesVsOpponent: opponentHRStats.gamesPlayed || 0,
+                        recentForm: player.trend === 'up' ? '🔥' : player.trend === 'down' ? '❄️' : '➡️',
+                        opponentHistory: opponentHRStats.gameHistory || []
                       });
                     }
                   }
@@ -478,7 +559,7 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
                   
                   <div className="player-info">
                     <div className="player-name">{getPlayerDisplayName(player)}</div>
-                    <div className="player-team">vs Opponent</div>
+                    <div className="player-team">vs {player.opponentTeam}</div>
                   </div>
                   
                   <div className="player-stat">
@@ -486,11 +567,16 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
                       {player.hrsPerGame} HR/G
                     </span>
                     <small className="stat-note">
-                      {player.totalHRs} HRs in {player.gamesVsOpponent}G
-                      {player.recentForm && player.recentForm.includes('✓') && (
-                        <span className="recent-indicator"> 🔥</span>
+                      {player.totalHRs} HRs in {player.gamesVsOpponent}G vs {player.opponentTeam}
+                      {player.recentForm && (
+                        <span className="recent-form"> | {player.recentForm}</span>
                       )}
                     </small>
+                    {player.opponentHistory && player.opponentHistory.length > 0 && (
+                      <div className="opponent-history-mini" style={{ marginTop: '4px', fontSize: '10px' }}>
+                        Recent HRs vs {player.opponentTeam}: {player.opponentHistory.slice(0, 5).map(game => game.value || 0).join('-')}
+                      </div>
+                    )}
                   </div>
                   
                   {/* Enhanced background logo */}
