@@ -20,19 +20,80 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
       try {
         setLoading(true);
         setError(null);
-        setDebugInfo('Starting matchup analysis...');
+        setDebugInfo('Loading hits matchup data...');
         
         if (!gameData || gameData.length === 0) {
           setMatchupData([]);
           setDebugInfo('No games scheduled for today');
+          console.log('[OpponentMatchupHitsCard] No game data provided');
           return;
         }
         
-        debugLog.card('OpponentMatchupHitsCard', `Analyzing matchups for ${gameData.length} games`);
-        setDebugInfo(`Analyzing ${gameData.length} games...`);
+        console.log('[OpponentMatchupHitsCard] Game data:', gameData);
+        
+        // Try to load from prop analysis data (similar to PlayerPropsLadder)
+        try {
+          const propResponse = await fetch('/data/prop_analysis/prop_analysis_latest.json');
+          if (propResponse.ok) {
+            const propData = await propResponse.json();
+            
+            if (propData.propAnalysis && propData.propAnalysis.hits) {
+              const hitsData = propData.propAnalysis.hits;
+              
+              // Filter players who have games today and have opponent matchup potential
+              const todaysPlayers = [];
+              if (hitsData.topPlayers) {
+                for (const player of hitsData.topPlayers) {
+                  // Check if this player's team has a game today
+                  const hasGameToday = gameData.some(game => 
+                    game.homeTeam === player.team || game.awayTeam === player.team
+                  );
+                  
+                  if (hasGameToday && player.seasonTotal > 0) {
+                    // Find opponent for today
+                    const todaysGame = gameData.find(game => 
+                      game.homeTeam === player.team || game.awayTeam === player.team
+                    );
+                    
+                    if (todaysGame) {
+                      const opponent = todaysGame.homeTeam === player.team 
+                        ? todaysGame.awayTeam 
+                        : todaysGame.homeTeam;
+                      
+                      todaysPlayers.push({
+                        playerName: player.name,
+                        playerTeam: player.team,
+                        opponentTeam: opponent,
+                        hitsPerGame: player.rate || 0,
+                        totalHits: player.seasonTotal || 0,
+                        gamesVsOpponent: 3, // Placeholder - could be enhanced with actual data
+                        battingAvg: (player.rate * 3).toFixed(3), // Rough approximation
+                        recentForm: player.trend === 'up' ? '🔥' : player.trend === 'down' ? '❄️' : '➡️'
+                      });
+                    }
+                  }
+                }
+              }
+              
+              // Sort by hits per game and take top 25
+              const sortedPlayers = todaysPlayers
+                .sort((a, b) => parseFloat(b.hitsPerGame) - parseFloat(a.hitsPerGame))
+                .slice(0, 25);
+              
+              setMatchupData(sortedPlayers);
+              setDebugInfo(`Found ${sortedPlayers.length} players with today's games`);
+              console.log('[OpponentMatchupHitsCard] Successfully loaded data from prop analysis');
+              return;
+            }
+          }
+        } catch (propErr) {
+          console.log('[OpponentMatchupHitsCard] Prop analysis fallback failed, using original method');
+        }
+        
+        // Fallback to original method if prop analysis fails
+        setDebugInfo('Using fallback data loading method...');
         
         // Load historical data (reasonable sample size - 90 days max)
-        debugLog.card('OpponentMatchupHitsCard', 'Loading historical data...');
         const dateRangeData = await fetchPlayerDataForDateRange(
           currentDate, 
           30,   // Initial lookback
@@ -40,27 +101,18 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
         );
         
         const dateCount = Object.keys(dateRangeData).length;
-        debugLog.card('OpponentMatchupHitsCard', `Loaded ${dateCount} dates of historical data`);
         setDebugInfo(`Loaded ${dateCount} dates of data...`);
         
         // Load current roster
-        debugLog.card('OpponentMatchupHitsCard', 'Loading roster data...');
         const rosterData = await fetchRosterData();
-        debugLog.card('OpponentMatchupHitsCard', `Loaded ${rosterData.length} roster entries`);
         
         // Generate comprehensive analysis
-        debugLog.card('OpponentMatchupHitsCard', 'Generating matchup analysis...');
         setDebugInfo('Analyzing player vs opponent stats...');
+        
         const analysis = await generateMatchupAnalysis(gameData, dateRangeData, rosterData);
         
-        debugLog.card('OpponentMatchupHitsCard', 'Analysis complete:', {
-          opponentHits: analysis.opponentMatchupHits.length,
-          totalMatchups: analysis.totalMatchupsAnalyzed,
-          totalPlayers: analysis.totalPlayersAnalyzed
-        });
-        
-        setMatchupData(analysis.opponentMatchupHits);
-        setDebugInfo(`Found ${analysis.opponentMatchupHits.length} qualified matchups`);
+        setMatchupData(analysis.opponentMatchupHits || []);
+        setDebugInfo(`Found ${analysis.opponentMatchupHits?.length || 0} qualified matchups`);
         
       } catch (err) {
         console.error('Error loading opponent matchup data:', err);
@@ -247,17 +299,72 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
         
         console.log(`[OpponentMatchupHRCard] Analyzing HR matchups for ${gameData.length} games`);
         
+        // Try to load from prop analysis data (similar to hits card)
+        try {
+          const propResponse = await fetch('/data/prop_analysis/prop_analysis_latest.json');
+          if (propResponse.ok) {
+            const propData = await propResponse.json();
+            
+            if (propData.propAnalysis && propData.propAnalysis.home_runs) {
+              const hrData = propData.propAnalysis.home_runs;
+              
+              // Filter players who have games today and have HR potential
+              const todaysPlayers = [];
+              if (hrData.topPlayers) {
+                for (const player of hrData.topPlayers) {
+                  // Check if this player's team has a game today
+                  const hasGameToday = gameData.some(game => 
+                    game.homeTeam === player.team || game.awayTeam === player.team
+                  );
+                  
+                  if (hasGameToday && player.seasonTotal > 0) {
+                    // Find opponent for today
+                    const todaysGame = gameData.find(game => 
+                      game.homeTeam === player.team || game.awayTeam === player.team
+                    );
+                    
+                    if (todaysGame) {
+                      const opponent = todaysGame.homeTeam === player.team 
+                        ? todaysGame.awayTeam 
+                        : todaysGame.homeTeam;
+                      
+                      todaysPlayers.push({
+                        playerName: player.name,
+                        playerTeam: player.team,
+                        opponentTeam: opponent,
+                        hrsPerGame: player.rate || 0,
+                        totalHRs: player.seasonTotal || 0,
+                        gamesVsOpponent: 3, // Placeholder - could be enhanced with actual data
+                        recentForm: player.trend === 'up' ? '🔥' : player.trend === 'down' ? '❄️' : '➡️'
+                      });
+                    }
+                  }
+                }
+              }
+              
+              // Sort by HRs per game and take top 25
+              const sortedPlayers = todaysPlayers
+                .sort((a, b) => parseFloat(b.hrsPerGame) - parseFloat(a.hrsPerGame))
+                .slice(0, 25);
+              
+              setMatchupData(sortedPlayers);
+              setDebugInfo(`Found ${sortedPlayers.length} players with today's games`);
+              console.log('[OpponentMatchupHRCard] Successfully loaded data from prop analysis');
+              return;
+            }
+          }
+        } catch (propErr) {
+          console.log('[OpponentMatchupHRCard] Prop analysis fallback failed, using original method');
+        }
+        
+        // Fallback to original method if prop analysis fails
         const dateRangeData = await fetchPlayerDataForDateRange(currentDate, 30, 730);
         const rosterData = await fetchRosterData();
+        
         const analysis = await generateMatchupAnalysis(gameData, dateRangeData, rosterData);
         
-        console.log(`[OpponentMatchupHRCard] Analysis complete:`, {
-          opponentHRs: analysis.opponentMatchupHRs.length,
-          totalMatchups: analysis.totalMatchupsAnalyzed
-        });
-        
-        setMatchupData(analysis.opponentMatchupHRs);
-        setDebugInfo(`Found ${analysis.opponentMatchupHRs.length} players with HRs vs opponent`);
+        setMatchupData(analysis.opponentMatchupHRs || []);
+        setDebugInfo(`Found ${analysis.opponentMatchupHRs?.length || 0} players with HRs vs opponent`);
         
       } catch (err) {
         console.error('Error loading opponent HR matchup data:', err);

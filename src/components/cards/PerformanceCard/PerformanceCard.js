@@ -20,12 +20,30 @@ const PerformanceCard = ({
     const loadPerformanceData = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('/data/player_performance_latest.json');
+        const response = await fetch('/data/predictions/player_performance_latest.json');
         if (response.ok) {
           const data = await response.json();
+          
+          // Handle both old format {overPerforming: [], underPerforming: []} 
+          // and new format {players: [{status: "over-performing"/"under-performing"}]}
+          let overPerforming = [];
+          let underPerforming = [];
+          
+          if (data.overPerforming && data.underPerforming) {
+            // Old format
+            overPerforming = data.overPerforming;
+            underPerforming = data.underPerforming;
+          } else if (data.players && Array.isArray(data.players)) {
+            // New format - filter by status
+            overPerforming = data.players.filter(player => player.status === 'over-performing');
+            underPerforming = data.players.filter(player => player.status === 'under-performing');
+          }
+          
+          console.log(`[PerformanceCard] Loaded ${underPerforming.length} under-performing players`);
+          
           setPerformanceData({
-            overPerforming: data.overPerforming || [],
-            underPerforming: data.underPerforming || []
+            overPerforming,
+            underPerforming
           });
         }
       } catch (error) {
