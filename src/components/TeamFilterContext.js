@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import { usePlayerScratchpad } from '../contexts/PlayerScratchpadContext';
 
 // Create the context
 const TeamFilterContext = createContext();
@@ -11,6 +12,9 @@ export function TeamFilterProvider({ children, teamData, gameData }) {
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [includeMatchup, setIncludeMatchup] = useState(false);
   const [matchupTeam, setMatchupTeam] = useState(null);
+  
+  // Access scratchpad context for filtering integration
+  const scratchpadContext = usePlayerScratchpad();
 
   // Create a map of team codes to roster players for quick lookups
   const [teamRosterMap, setTeamRosterMap] = useState({});
@@ -84,10 +88,25 @@ export function TeamFilterProvider({ children, teamData, gameData }) {
     setMatchupTeam(null);
   };
   
-  // Helper function to check if a player should be filtered based on team
-  // This improved version handles multiple ways of identifying a player's team
-  const shouldIncludePlayer = (playerTeam, playerName) => {
-    // If no team is selected, include all players
+  // Helper function to check if a player should be filtered based on team and scratchpad
+  // This improved version handles multiple ways of identifying a player's team and scratchpad filtering
+  // Memoized to prevent unnecessary Dashboard re-renders when scratchpad changes
+  const shouldIncludePlayer = useCallback((playerTeam, playerName) => {
+    // First check scratchpad filtering - if enabled, only show scratchpad players
+    if (scratchpadContext?.filterEnabled) {
+      const isInScratchpad = scratchpadContext.shouldIncludePlayer({ 
+        name: playerName, 
+        team: playerTeam 
+      });
+      
+      // If scratchpad filtering is enabled and player is not in scratchpad, exclude them
+      if (!isInScratchpad) return false;
+      
+      // If player is in scratchpad, continue with team filtering logic
+      // This allows combining scratchpad + team filters
+    }
+    
+    // If no team is selected, include all players (or just scratchpad players if that filter is active)
     if (!selectedTeam) return true;
     
     // First try direct match with team codes (most common case)
@@ -116,7 +135,17 @@ export function TeamFilterProvider({ children, teamData, gameData }) {
     
     // If no match found, don't include the player
     return false;
-  };
+  }, [
+    // Only include values that actually affect the filtering logic
+    scratchpadContext?.filterEnabled,
+    selectedTeam, 
+    includeMatchup, 
+    matchupTeam, 
+    teamData, 
+    teamRosterMap,
+    // Include shouldIncludePlayer function reference but not entire context
+    scratchpadContext?.shouldIncludePlayer
+  ]);
   
   // Helper function to check if a game should be filtered based on team
   const shouldIncludeGame = (game) => {
@@ -131,13 +160,16 @@ export function TeamFilterProvider({ children, teamData, gameData }) {
   
   // Debug function to log filter status
   const logFilterStatus = () => {
-    console.log('Team Filter Status:', {
+    console.log('Filter Status:', {
       selectedTeam,
       selectedTeamName: teamData[selectedTeam]?.name,
       matchupTeam,
       matchupTeamName: teamData[matchupTeam]?.name,
       includeMatchup,
-      rosterMapKeys: Object.keys(teamRosterMap)
+      rosterMapKeys: Object.keys(teamRosterMap),
+      scratchpadFilterEnabled: scratchpadContext?.filterEnabled,
+      scratchpadPlayerCount: scratchpadContext?.playerCount,
+      combinedFiltering: !!selectedTeam || scratchpadContext?.filterEnabled
     });
   };
   
@@ -153,7 +185,10 @@ export function TeamFilterProvider({ children, teamData, gameData }) {
     shouldIncludeGame,
     getTeamName,
     logFilterStatus,
-    isFiltering: !!selectedTeam
+    isFiltering: !!selectedTeam || scratchpadContext?.filterEnabled,
+    // Scratchpad integration
+    scratchpadFilterEnabled: scratchpadContext?.filterEnabled || false,
+    scratchpadPlayerCount: scratchpadContext?.playerCount || 0
   };
   
   return (
