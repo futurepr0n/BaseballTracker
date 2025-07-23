@@ -615,15 +615,17 @@ useEffect(() => {
 
 
   /**
- * Fetch hitter data by ID with the current game history setting
+ * Fetch hitter data by ID with specified game history setting
  * Similar to fetchPitcherById but for hitters
  * @param {string} hitterId - Hitter ID in format "name-team"
+ * @param {number} gamesHistory - Number of games to include in history (optional, defaults to current setting)
  * @returns {Promise<Object>} Hitter data with game history
  */
-const fetchHitterById = async (hitterId) => {
+const fetchHitterById = async (hitterId, gamesHistory = null) => {
   if (!hitterId) return null;
   
-  console.log(`[usePlayerData] Fetching data for hitter: ${hitterId}`);
+  const gamesToUse = gamesHistory || hitterGamesHistory;
+  console.log(`[usePlayerData] Fetching data for hitter: ${hitterId} with ${gamesToUse} games history`);
   
   // Split the ID format (name-team)
   const [hitterName, hitterTeam] = hitterId.split('-');
@@ -633,8 +635,8 @@ const fetchHitterById = async (hitterId) => {
   if (existingHitter) {
     console.log(`[usePlayerData] Found hitter in selectedPlayers: ${hitterName}`);
     
-    // Instead of just returning the existing hitter, apply the current game history setting
-    return fetchPlayerGameHistory(existingHitter, hitterGamesHistory);
+    // Instead of just returning the existing hitter, apply the specified game history setting
+    return fetchPlayerGameHistory(existingHitter, gamesToUse);
   }
   
   // If not found in selected hitters, look in available hitters
@@ -642,8 +644,8 @@ const fetchHitterById = async (hitterId) => {
   if (availableHitter) {
     console.log(`[usePlayerData] Found hitter in availablePlayers: ${hitterName}`);
     
-    // Apply the current game history setting
-    return fetchPlayerGameHistory(availableHitter, hitterGamesHistory);
+    // Apply the specified game history setting
+    return fetchPlayerGameHistory(availableHitter, gamesToUse);
   }
   
   // Check for hitter in roster data
@@ -703,8 +705,8 @@ const fetchHitterById = async (hitterId) => {
     if (dateRangeDataForHitters && Object.keys(dateRangeDataForHitters).length > 0) {
       console.log(`[usePlayerData] Getting game history for hitter: ${hitterName} using date-keyed data`);
       
-      // Apply the current game history setting
-      return fetchPlayerGameHistory(basicHitter, hitterGamesHistory);
+      // Apply the specified game history setting
+      return fetchPlayerGameHistory(basicHitter, gamesToUse);
     }
     
     return basicHitter;

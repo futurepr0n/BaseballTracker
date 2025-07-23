@@ -1,0 +1,437 @@
+/* HittersTable.css - Unique CSS for HittersTable only */
+
+/* Main table styling */
+.capsheet-hitters-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+  table-layout: fixed; /* Enable fixed layout for better column control */
+  margin-top: 10px;
+}
+
+/* Table header styling */
+.capsheet-hitters-table thead th {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  padding: 8px 6px;
+  text-align: center;
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.85em;
+  line-height: 1.2;
+  vertical-align: middle;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Table body cell styling */
+.capsheet-hitters-table tbody td {
+  border: 1px solid #dee2e6;
+  padding: 6px 4px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 0.85em;
+  line-height: 1.2;
+}
+
+/* Column width specifications */
+.capsheet-hitters-table th:nth-child(1),  /* Player */
+.capsheet-hitters-table td:nth-child(1) {
+  width: 140px;
+  min-width: 140px;
+  text-align: left;
+  padding-left: 8px;
+}
+
+.capsheet-hitters-table th:nth-child(2),  /* Team */
+.capsheet-hitters-table td:nth-child(2) {
+  width: 60px;
+  min-width: 60px;
+}
+
+.capsheet-hitters-table th:nth-child(3),  /* Opponent */
+.capsheet-hitters-table td:nth-child(3) {
+  width: 80px;
+  min-width: 80px;
+}
+
+.capsheet-hitters-table th:nth-child(4),  /* HR Last */
+.capsheet-hitters-table td:nth-child(4),
+.capsheet-hitters-table th:nth-child(5),  /* AB Last */
+.capsheet-hitters-table td:nth-child(5),
+.capsheet-hitters-table th:nth-child(6),  /* H Last */
+.capsheet-hitters-table td:nth-child(6) {
+  width: 50px;
+  min-width: 50px;
+}
+
+.capsheet-hitters-table th:nth-child(7),  /* Performance Chart */
+.capsheet-hitters-table td:nth-child(7) {
+  width: 180px;
+  min-width: 180px;
+}
+
+.capsheet-hitters-table th:nth-child(8),  /* Primary Pitcher */
+.capsheet-hitters-table td:nth-child(8) {
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+  text-align: left;
+  padding: 4px 6px;
+  word-wrap: break-word;
+  overflow: hidden;
+}
+
+.capsheet-hitters-table th:nth-child(9),   /* Last IP */
+.capsheet-hitters-table td:nth-child(9),
+.capsheet-hitters-table th:nth-child(10),  /* PC_ST */
+.capsheet-hitters-table td:nth-child(10),
+.capsheet-hitters-table th:nth-child(11),  /* K */
+.capsheet-hitters-table td:nth-child(11),
+.capsheet-hitters-table th:nth-child(12),  /* HR */
+.capsheet-hitters-table td:nth-child(12) {
+  width: 60px;
+  min-width: 60px;
+}
+
+.capsheet-hitters-table th:nth-child(13),  /* Throws */
+.capsheet-hitters-table td:nth-child(13) {
+  width: 80px;
+  min-width: 80px;
+}
+
+.capsheet-hitters-table th:nth-child(14),  /* Second Pitcher */
+.capsheet-hitters-table td:nth-child(14) {
+  width: 160px;
+  min-width: 160px;
+  text-align: left;
+  padding-left: 8px;
+}
+
+/* Second pitcher columns (when visible) */
+.capsheet-hitters-table .second-pitcher-header {
+  width: 50px;
+  min-width: 50px;
+}
+
+/* Remaining columns */
+.capsheet-hitters-table th:nth-last-child(n+1),
+.capsheet-hitters-table td:nth-last-child(n+1) {
+  width: 70px;
+  min-width: 70px;
+}
+
+/* Pitcher selection container styling */
+.capsheet-hitters-table .pitcher-selection-container {
+  width: 100%;
+  min-width: 200px;
+  max-width: 200px;
+}
+
+.capsheet-hitters-table .pitcher-selection-container .editable-cell {
+  width: 100%;
+  min-width: 200px;
+  max-width: 200px;
+  font-size: 0.8em;
+}
+
+/* Select dropdown styling for Primary Pitcher column */
+.capsheet-hitters-table .pitcher-selection-container .select__control {
+  min-height: 30px !important;
+  height: 30px !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 4px !important;
+  font-size: 0.8em !important;
+  width: 100% !important;
+  min-width: 200px !important;
+  max-width: 200px !important;
+}
+
+.capsheet-hitters-table .pitcher-selection-container .select__value-container {
+  padding: 2px 8px !important;
+  font-size: 0.8em !important;
+}
+
+.capsheet-hitters-table .pitcher-selection-container .select__single-value {
+  font-size: 0.8em !important;
+  color: #495057 !important;
+}
+
+.capsheet-hitters-table .pitcher-selection-container .select__placeholder {
+  font-size: 0.8em !important;
+  color: #6c757d !important;
+}
+
+.capsheet-hitters-table .pitcher-selection-container .select__menu {
+  font-size: 0.8em !important;
+  z-index: 1000 !important;
+}
+
+.capsheet-hitters-table .pitcher-selection-container .select__option {
+  font-size: 0.8em !important;
+  padding: 6px 12px !important;
+}
+
+/* Button group styling within pitcher cells */
+.capsheet-hitters-table .button-group {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+  justify-content: flex-start;
+}
+
+.capsheet-hitters-table .overlay-toggle-btn,
+.capsheet-hitters-table .matchup-analysis-btn {
+  padding: 2px 6px;
+  font-size: 0.7em;
+  border: 1px solid #dee2e6;
+  background: #f8f9fa;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.capsheet-hitters-table .overlay-toggle-btn:hover,
+.capsheet-hitters-table .matchup-analysis-btn:hover {
+  background: #e9ecef;
+}
+
+.capsheet-hitters-table .overlay-toggle-btn.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+/* Second pitcher add button */
+.capsheet-hitters-table .add-pitcher-btn {
+  padding: 4px 8px;
+  font-size: 0.75em;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.capsheet-hitters-table .add-pitcher-btn:hover {
+  background: #218838;
+}
+
+/* Input field styling */
+.capsheet-hitters-table .editable-cell {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid #ced4da;
+  border-radius: 3px;
+  font-size: 0.8em;
+  background: #fff;
+  text-align: center;
+}
+
+.capsheet-hitters-table .editable-cell:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Player name cell specific styling */
+.capsheet-hitters-table .player-name {
+  text-align: left !important;
+  font-weight: 500;
+  padding-left: 8px !important;
+}
+
+/* Performance chart cell */
+.capsheet-hitters-table .performance-chart-cell {
+  padding: 2px !important;
+  text-align: center;
+}
+
+/* No data message */
+.capsheet-hitters-table .no-data {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Loading row styling */
+.capsheet-hitters-table .loading-row {
+  opacity: 0.7;
+  background-color: #f8f9fa;
+}
+
+.capsheet-hitters-table .loading-row .loading-indicator {
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-left: 5px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Checkbox styling */
+.capsheet-hitters-table .custom-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Handicapper columns */
+.capsheet-hitters-table .checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+}
+
+.capsheet-hitters-table .checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.7em;
+  cursor: pointer;
+}
+
+.capsheet-hitters-table .mini-checkbox {
+  width: 12px;
+  height: 12px;
+}
+
+.capsheet-hitters-table .bet-type-checkboxes {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.capsheet-hitters-table .mini-checkbox-label {
+  font-size: 0.65em;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+/* Actions column */
+.capsheet-hitters-table .remove-btn {
+  padding: 4px 8px;
+  font-size: 0.75em;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.capsheet-hitters-table .remove-btn:hover {
+  background: #c82333;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+  .capsheet-hitters-table {
+    font-size: 0.8em;
+  }
+  
+  .capsheet-hitters-table th:nth-child(1),
+  .capsheet-hitters-table td:nth-child(1) {
+    width: 120px;
+    min-width: 120px;
+  }
+  
+  .capsheet-hitters-table th:nth-child(8),
+  .capsheet-hitters-table td:nth-child(8) {
+    width: 160px;
+    min-width: 160px;
+  }
+}
+
+/* Table container styling */
+.hitters-table-container {
+  overflow-x: auto;
+  overflow-y: visible;
+  max-width: 100%;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Ensure horizontal scrolling for narrow screens */
+@media (max-width: 1400px) {
+  .capsheet-hitters-table {
+    white-space: nowrap;
+    min-width: 1200px; /* Ensure minimum width for readability */
+  }
+  
+  .hitters-table-container {
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+}
+
+@media (max-width: 1200px) {
+  .capsheet-hitters-table {
+    min-width: 1000px;
+  }
+}
+
+/* Player attribute badges */
+.capsheet-hitters-table .player-attribute-badge {
+  display: inline-block;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-size: 0.7em;
+  font-weight: bold;
+  margin-left: 4px;
+}
+
+.capsheet-hitters-table .batter-hand {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.capsheet-hitters-table .pitcher-hand {
+  background-color: #28a745;
+  color: white;
+}
+
+.capsheet-hitters-table .favorable-matchup {
+  background-color: #28a745 !important;
+}
+
+.capsheet-hitters-table .unfavorable-matchup {
+  background-color: #dc3545 !important;
+}
+
+.capsheet-hitters-table .neutral-matchup {
+  background-color: #6c757d !important;
+}
+
+/* Throws info styling */
+.capsheet-hitters-table .throws-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.capsheet-hitters-table .pitch-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px;
+  justify-content: center;
+}
+
+.capsheet-hitters-table .pitch-type-badge {
+  background-color: #e9ecef;
+  color: #495057;
+  padding: 1px 3px;
+  border-radius: 2px;
+  font-size: 0.6em;
+  font-weight: bold;
+}

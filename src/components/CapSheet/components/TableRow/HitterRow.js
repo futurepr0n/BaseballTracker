@@ -306,6 +306,18 @@ const HitterRow = ({
           {(isRefreshingHitters || isLoadingHitter) && <span className="loading-indicator">⟳</span>}
         </td>
         <td>{selectedHitter.team}</td>
+        
+        {/* Opponent */}
+        <td>
+          <input 
+            type="text" 
+            className="editable-cell" 
+            value={player.opponent || ''} 
+            onChange={(e) => onFieldChange(player.id, 'opponent', e.target.value)} 
+            placeholder="Enter team" 
+          />
+        </td>
+        
         <td>{selectedHitter.prevGameHR}</td>
         <td>{selectedHitter.prevGameAB}</td>
         <td>{selectedHitter.prevGameH}</td>
@@ -374,8 +386,8 @@ const HitterRow = ({
               className="editable-cell" 
               value={player.pitcher || ''} 
               onChange={(e) => onFieldChange(player.id, 'pitcher', e.target.value)} 
-              placeholder={player.opponentTeam ? "No pitchers found" : "Enter name"} 
-              readOnly={!player.opponentTeam}
+              placeholder={player.opponent ? "No pitchers found" : "Enter opponent first"} 
+              readOnly={!player.opponent}
             />
           )}
         </td>
