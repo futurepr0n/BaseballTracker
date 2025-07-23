@@ -74,93 +74,6 @@
   padding-bottom: 20px;
 }
 
-/* ========== SHARED STYLES FOR BOTH CARDS ========== */
-
-/* Player list styling */
-.opponent-matchup-hits-card .player-list,
-.opponent-matchup-hr-card .player-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.opponent-matchup-hits-card .player-item,
-.opponent-matchup-hr-card .player-item {
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  margin-bottom: 8px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.opponent-matchup-hits-card .player-item:last-child,
-.opponent-matchup-hr-card .player-item:last-child {
-  margin-bottom: 0;
-}
-
-.opponent-matchup-hits-card .player-item:hover,
-.opponent-matchup-hr-card .player-item:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* Glass scrollbars and other shared styles */
-.opponent-matchup-hits-card .scrollable-container::-webkit-scrollbar,
-.opponent-matchup-hr-card .scrollable-container::-webkit-scrollbar {
-  width: 6px;
-}
-
-.opponent-matchup-hits-card .scrollable-container::-webkit-scrollbar-track,
-.opponent-matchup-hr-card .scrollable-container::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-}
-
-.opponent-matchup-hits-card .scrollable-container::-webkit-scrollbar-thumb {
-  background: rgba(20, 184, 166, 0.4);
-  border-radius: 3px;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-}
-
-.opponent-matchup-hits-card .scrollable-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(20, 184, 166, 0.6);
-}
-
-.opponent-matchup-hr-card .scrollable-container::-webkit-scrollbar-thumb {
-  background: rgba(251, 113, 133, 0.4);
-  border-radius: 3px;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-}
-
-.opponent-matchup-hr-card .scrollable-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(251, 113, 133, 0.6);
-}
-
-/* Theme-specific stat highlight colors */
-.opponent-matchup-hits-card .stat-highlight {
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: #14b8a6;
-  margin-bottom: 2px;
-}
-
-.opponent-matchup-hr-card .stat-highlight {
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: #fb7185;
-  margin-bottom: 2px;
-}
-
 /* ========== HRS vs CURRENT OPPONENT (Coral/Salmon Theme) ========== */
 .opponent-matchup-hr-card {
   grid-column: span 1;
@@ -273,7 +186,141 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Glass scrollbars and other shared styles */
+/* Player rank styling */
+.opponent-matchup-hits-card .player-rank,
+.opponent-matchup-hr-card .player-rank {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: bold;
+  margin-right: 15px;
+  position: relative;
+  overflow: hidden;
+}
+
+.opponent-matchup-hits-card .rank-logo,
+.opponent-matchup-hr-card .rank-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.opponent-matchup-hits-card .rank-overlay,
+.opponent-matchup-hr-card .rank-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.opponent-matchup-hits-card .rank-number,
+.opponent-matchup-hr-card .rank-number {
+  position: relative;
+  z-index: 3;
+  color: white;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Player info styling */
+.opponent-matchup-hits-card .player-info,
+.opponent-matchup-hr-card .player-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.opponent-matchup-hits-card .player-name,
+.opponent-matchup-hr-card .player-name {
+  font-weight: 500;
+  color: var(--text-primary, #1a202c);
+}
+
+.opponent-matchup-hits-card .player-team,
+.opponent-matchup-hr-card .player-team {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Player stats styling */
+.opponent-matchup-hits-card .player-stat,
+.opponent-matchup-hr-card .player-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 120px;
+}
+
+.opponent-matchup-hits-card .stat-note,
+.opponent-matchup-hr-card .stat-note {
+  font-size: 0.75rem;
+  color: #666;
+  line-height: 1.3;
+  text-align: right;
+  margin-top: 2px;
+}
+
+.opponent-matchup-hits-card .recent-form,
+.opponent-matchup-hr-card .recent-form {
+  font-weight: 500;
+}
+
+.opponent-matchup-hits-card .opponent-history-mini,
+.opponent-matchup-hr-card .opponent-history-mini {
+  color: #777;
+  font-weight: 400;
+  text-align: right;
+}
+
+/* Enhanced background logo */
+.opponent-matchup-hits-card .team-logo-bg,
+.opponent-matchup-hr-card .team-logo-bg {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  opacity: 0.08;
+  object-fit: contain;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Loading and error states */
+.opponent-matchup-hits-card .loading-indicator,
+.opponent-matchup-hr-card .loading-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.opponent-matchup-hits-card .no-data,
+.opponent-matchup-hr-card .no-data {
+  color: #888;
+  text-align: center;
+  padding: 40px 20px;
+  font-style: italic;
+}
+
+/* Glass scrollbars */
 .opponent-matchup-hits-card .scrollable-container::-webkit-scrollbar,
 .opponent-matchup-hr-card .scrollable-container::-webkit-scrollbar {
   width: 6px;
@@ -320,4 +367,26 @@
   font-size: 1.1rem;
   color: #fb7185;
   margin-bottom: 2px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .opponent-matchup-hits-card,
+  .opponent-matchup-hr-card {
+    grid-column: 1 / -1;
+  }
+  
+  .opponent-matchup-hits-card .glass-card-container,
+  .opponent-matchup-hr-card .glass-card-container {
+    min-height: auto;
+    height: auto;
+  }
+  
+  .opponent-matchup-hits-card .scrollable-container,
+  .opponent-matchup-hr-card .scrollable-container {
+    position: relative;
+    height: auto;
+    max-height: 60vh;
+    padding-bottom: 10px;
+  }
 }
