@@ -291,6 +291,23 @@ const HitterRow = ({
         className={isRefreshingHitters || isLoadingHitter ? "loading-row" : ""}
       >
         <td className="consolidated-player-info">
+          {/* Team logo background */}
+          {(() => {
+            const teamAbbr = selectedHitter.team || player.team;
+            const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
+            const logoUrl = teamData ? teamData.logoUrl : null;
+            
+            return logoUrl ? (
+              <img 
+                src={logoUrl} 
+                alt="" 
+                className="team-logo-bg" 
+                loading="lazy"
+                aria-hidden="true"
+              />
+            ) : null;
+          })()}
+          
           <div className="player-name-section">
             {selectedHitter.name || player.name}
             {/* First try to use selectedHitter.bats, fall back to player.bats */}
@@ -307,16 +324,7 @@ const HitterRow = ({
             {(isRefreshingHitters || isLoadingHitter) && <span className="loading-indicator">⟳</span>}
           </div>
           <div className="team-opponent-section">
-            <span className="team-info">({selectedHitter.team} vs </span>
-            <input 
-              type="text" 
-              className="opponent-input" 
-              value={player.opponent || ''} 
-              onChange={(e) => onFieldChange(player.id, 'opponent', e.target.value)} 
-              placeholder="OPP"
-              maxLength="3"
-            />
-            <span className="closing-paren">)</span>
+            <span className="team-info">{selectedHitter.team} vs {player.opponent || 'OPP'}</span>
           </div>
         </td>
         
