@@ -5,7 +5,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9em;
-  table-layout: fixed; /* Enable fixed layout for better column control */
+  table-layout: auto; /* Use auto layout for flexible column sizing */
   margin-top: 10px;
 }
 
@@ -74,13 +74,11 @@
 
 .capsheet-hitters-table th:nth-child(8),  /* Primary Pitcher */
 .capsheet-hitters-table td:nth-child(8) {
-  width: 220px;
-  min-width: 220px;
-  max-width: 220px;
+  min-width: 180px;
   text-align: left;
   padding: 4px 6px;
-  word-wrap: break-word;
-  overflow: hidden;
+  white-space: nowrap;
+  overflow: visible;
 }
 
 .capsheet-hitters-table th:nth-child(9),   /* Last IP */
@@ -125,14 +123,12 @@
 /* Pitcher selection container styling */
 .capsheet-hitters-table .pitcher-selection-container {
   width: 100%;
-  min-width: 200px;
-  max-width: 200px;
+  min-width: 180px;
 }
 
 .capsheet-hitters-table .pitcher-selection-container .editable-cell {
   width: 100%;
-  min-width: 200px;
-  max-width: 200px;
+  min-width: 180px;
   font-size: 0.8em;
 }
 
@@ -144,8 +140,7 @@
   border-radius: 4px !important;
   font-size: 0.8em !important;
   width: 100% !important;
-  min-width: 200px !important;
-  max-width: 200px !important;
+  min-width: 180px !important;
 }
 
 .capsheet-hitters-table .pitcher-selection-container .select__value-container {
@@ -156,6 +151,9 @@
 .capsheet-hitters-table .pitcher-selection-container .select__single-value {
   font-size: 0.8em !important;
   color: #495057 !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
 }
 
 .capsheet-hitters-table .pitcher-selection-container .select__placeholder {
@@ -345,8 +343,7 @@
   
   .capsheet-hitters-table th:nth-child(8),
   .capsheet-hitters-table td:nth-child(8) {
-    width: 160px;
-    min-width: 160px;
+    min-width: 150px;
   }
 }
 

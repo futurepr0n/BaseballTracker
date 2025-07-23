@@ -5,7 +5,7 @@
 .capsheet-hitters-table {
   width: 100%;
   border-collapse: separate;
-  table-layout: fixed;  /* Ensures consistent column widths */
+  /* table-layout: fixed; */  /* Changed to auto in HittersTable.css for flexible sizing */
   font-size: 0.9rem;
   min-width: 1400px;    /* Accommodate all columns including dynamic second pitcher and handicappers */
   border-spacing: 0;
@@ -86,9 +86,9 @@
 .capsheet-hitters-table th:nth-child(6),
 .capsheet-hitters-table td:nth-child(6) { width: 150px; } /* Performance Chart */
 
-/* Primary pitcher columns - using class-based selectors for better alignment */
-.capsheet-hitters-table th:nth-child(7),
-.capsheet-hitters-table td:nth-child(7) { width: 130px; } /* Primary Pitcher (increased width for buttons) */
+/* Primary pitcher columns - handled by HittersTable.css for better control */
+/* .capsheet-hitters-table th:nth-child(7),
+.capsheet-hitters-table td:nth-child(7) { width: 130px; } */ /* Primary Pitcher - See HittersTable.css */
 
 /* Use class-based selectors for pitcher stat columns to avoid nth-child issues */
 .capsheet-hitters-pitcher-stat {

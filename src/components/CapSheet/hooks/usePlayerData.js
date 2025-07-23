@@ -1276,12 +1276,12 @@ const fetchPitcherById = async (pitcherId) => {
     const basePlayer = {
       ...selectedPlayer,
       stadium,
-      opponentTeam
+      opponent: opponentTeam  // Use 'opponent' field name to match HitterRow expectations
     };
     
     // Check if any other hitters from the same team already have values we can copy
     const teamHitters = selectedPlayers.hitters.filter(h => 
-      h.team === playerTeam && h.opponentTeam === opponentTeam
+      h.team === playerTeam && h.opponent === opponentTeam
     );
     
     if (teamHitters.length > 0) {
@@ -1444,15 +1444,15 @@ const fetchPitcherById = async (pitcherId) => {
     // For Game O/U, we want to update all players in the same game
     if (field === 'gameOU') {
       const hitterTeam = currentHitter.team;
-      const opponentTeam = currentHitter.opponentTeam;
+      const opponentTeam = currentHitter.opponent;
       
       // Update the Game O/U for all hitters AND pitchers in this game
       setSelectedPlayers(prev => ({
         ...prev,
         // Update hitters in the same game
         hitters: prev.hitters.map(player => {
-          if ((player.team === hitterTeam && player.opponentTeam === opponentTeam) || 
-              (player.team === opponentTeam && player.opponentTeam === hitterTeam)) {
+          if ((player.team === hitterTeam && player.opponent === opponentTeam) || 
+              (player.team === opponentTeam && player.opponent === hitterTeam)) {
             return { ...player, [field]: value };
           }
           return player;
@@ -1610,7 +1610,7 @@ const fetchPitcherById = async (pitcherId) => {
     if (!currentHitter) return;
     
     const hitterTeam = currentHitter.team;
-    const opponentTeam = currentHitter.opponentTeam;
+    const opponentTeam = currentHitter.opponent;
     
     if (!pitcherId) {
       // If empty selection, just clear the pitcher fields for this specific hitter
@@ -1643,7 +1643,7 @@ const fetchPitcherById = async (pitcherId) => {
       ...prev,
       hitters: prev.hitters.map(player => {
         // Update this player and all other players from the same team facing same opponent
-        if (player.id === playerId || (player.team === hitterTeam && player.opponentTeam === opponentTeam)) {
+        if (player.id === playerId || (player.team === hitterTeam && player.opponent === opponentTeam)) {
           return { 
             ...player, 
             pitcher: pitcherName,
