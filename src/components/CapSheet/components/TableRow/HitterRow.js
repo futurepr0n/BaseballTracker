@@ -219,7 +219,7 @@ const HitterRow = ({
     renderCount.current += 1;
   });
 
-  // Custom styles for select dropdown to fix cutoff issue and prevent scroll lock
+  // Custom styles for select dropdown to fix cutoff issue and ensure proper display
   const customSelectStyles = {
     // Control is the main input element
     control: (base) => ({
@@ -228,17 +228,17 @@ const HitterRow = ({
       height: '30px',
       fontSize: '0.9em'
     }),
-    // Reduce z-index to prevent scroll lock issues - use reasonable z-index
+    // High z-index to ensure dropdown appears above table elements
     menu: (base) => ({
       ...base,
-      zIndex: 100, // Much lower z-index to prevent interference
+      zIndex: 9999,
       width: 'auto',
       minWidth: '100%'
     }),
-    // Lower z-index for menu portal as well
+    // High z-index for menu portal to ensure proper rendering
     menuPortal: (base) => ({
       ...base,
-      zIndex: 100 // Reduced from 9999 to prevent scroll lock
+      zIndex: 9999
     })
   };
 
@@ -357,8 +357,17 @@ const HitterRow = ({
                 isClearable
                 placeholder="Select pitcher..."
                 styles={customSelectStyles}
-                // Remove portal rendering to prevent scroll lock issues
+                // Enable portal rendering to prevent table clipping
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
                 menuPlacement="auto"
+                // Ensure options are properly formatted
+                getOptionLabel={(option) => {
+                  return option.label || option.value || String(option);
+                }}
+                getOptionValue={(option) => {
+                  return option.value || String(option);
+                }}
               />
               {player.pitcherId && selectedPitcher && (
                 <div className="button-group">
@@ -431,8 +440,6 @@ const HitterRow = ({
         
         {/* Second Pitcher - Add/Select Section */}
         <td className="second-pitcher-container">
-          {/* Debug logging for secondary pitcher options */}
-          {showSecondPitcher && console.log(`[HitterRow] Secondary pitcher options for ${player.name}: opponent="${player.opponent}", options=${pitcherOptions.length}`)}
           {player.pitcherId && !showSecondPitcher ? (
             <button 
               className="action-btn add-pitcher-btn"
@@ -448,12 +455,22 @@ const HitterRow = ({
                 classNamePrefix="select"
                 options={pitcherOptions}
                 value={secondPitcherId ? { value: secondPitcherId, label: secondPitcher } : null}
-                onChange={(option) => handleSecondPitcherSelect(option)}
+                onChange={(option) => {
+                  handleSecondPitcherSelect(option);
+                }}
                 isClearable
                 placeholder="Select 2nd pitcher..."
                 styles={customSelectStyles}
-                // Remove portal rendering to prevent scroll lock issues
+                // Enable portal rendering to prevent table clipping
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
                 menuPlacement="auto"
+                getOptionLabel={(option) => {
+                  return option.label || option.value || String(option);
+                }}
+                getOptionValue={(option) => {
+                  return option.value || String(option);
+                }}
               />
               {secondPitcherId && (
                 <button 
