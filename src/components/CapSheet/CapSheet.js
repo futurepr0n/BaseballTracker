@@ -182,7 +182,7 @@ function CapSheet({ playerData, gameData, currentDate }) {
     updatePlayersWithNewHandicapper,
     removeHandicapperFromPlayers,
     requestHistoryRefresh
-  } = usePlayerData(playerData, gameData, currentDate, hitterGamesHistory, pitcherGamesHistory); // Pass both game history values
+  } = usePlayerData(playerData, gameData, currentDate, hitterGamesHistory, pitcherGamesHistory, setHitterRefreshKey, setPitcherRefreshKey); // Pass both game history values and refresh setters
 
   // Initialize handicappers hook
   const {

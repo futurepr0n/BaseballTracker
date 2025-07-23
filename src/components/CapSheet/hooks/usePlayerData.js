@@ -29,7 +29,9 @@ const usePlayerData = (
   gameData, 
   currentDate, 
   hitterGamesHistory = 3, 
-  pitcherGamesHistory = 3
+  pitcherGamesHistory = 3,
+  setHitterRefreshKey,
+  setPitcherRefreshKey
 ) => {
   // State for the component
   const [selectedPlayers, setSelectedPlayers] = useState({
@@ -1279,6 +1281,10 @@ const fetchPitcherById = async (pitcherId) => {
       opponent: opponentTeam  // Use 'opponent' field name to match HitterRow expectations
     };
     
+    // Debug logging for opponent field setting
+    console.log(`[usePlayerData] Adding ${selectedPlayer.name} (${playerTeam}) vs "${opponentTeam}"`);
+    console.log(`[usePlayerData] Game found:`, game ? `${game.homeTeam} vs ${game.awayTeam}` : 'No game found');
+    
     // Check if any other hitters from the same team already have values we can copy
     const teamHitters = selectedPlayers.hitters.filter(h => 
       h.team === playerTeam && h.opponent === opponentTeam
@@ -1335,6 +1341,13 @@ const fetchPitcherById = async (pitcherId) => {
       ...prev,
       hitters: [...prev.hitters, playerWithHistory]
     }));
+    
+    // Force component refresh to ensure opponent field is properly synchronized
+    if (setHitterRefreshKey) {
+      setHitterRefreshKey(prev => prev + 1);
+    }
+    
+    console.log('[usePlayerData] Added hitter:', playerWithHistory.name, 'with opponent:', playerWithHistory.opponent);
   };
 
   const handleAddPitcherById = async (playerId) => {

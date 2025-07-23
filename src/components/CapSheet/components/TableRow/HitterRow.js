@@ -290,32 +290,34 @@ const HitterRow = ({
         data-games-history={gamesHistory}
         className={isRefreshingHitters || isLoadingHitter ? "loading-row" : ""}
       >
-        <td className="player-name">
-          {selectedHitter.name || player.name}
-          {/* First try to use selectedHitter.bats, fall back to player.bats */}
-          {(selectedHitter.bats || player.bats) && (
-            <span 
-              className={`player-attribute-badge batter-hand ${getMatchupClass(
-                selectedHitter.bats || player.bats, 
-                selectedPitcher?.throwingArm
-              )}`}
-            >
-              {selectedHitter.bats || player.bats}
-            </span>
-          )}
-          {(isRefreshingHitters || isLoadingHitter) && <span className="loading-indicator">⟳</span>}
-        </td>
-        <td>{selectedHitter.team}</td>
-        
-        {/* Opponent */}
-        <td>
-          <input 
-            type="text" 
-            className="editable-cell" 
-            value={player.opponent || ''} 
-            onChange={(e) => onFieldChange(player.id, 'opponent', e.target.value)} 
-            placeholder="Enter team" 
-          />
+        <td className="consolidated-player-info">
+          <div className="player-name-section">
+            {selectedHitter.name || player.name}
+            {/* First try to use selectedHitter.bats, fall back to player.bats */}
+            {(selectedHitter.bats || player.bats) && (
+              <span 
+                className={`player-attribute-badge batter-hand ${getMatchupClass(
+                  selectedHitter.bats || player.bats, 
+                  selectedPitcher?.throwingArm
+                )}`}
+              >
+                {selectedHitter.bats || player.bats}
+              </span>
+            )}
+            {(isRefreshingHitters || isLoadingHitter) && <span className="loading-indicator">⟳</span>}
+          </div>
+          <div className="team-opponent-section">
+            <span className="team-info">({selectedHitter.team} vs </span>
+            <input 
+              type="text" 
+              className="opponent-input" 
+              value={player.opponent || ''} 
+              onChange={(e) => onFieldChange(player.id, 'opponent', e.target.value)} 
+              placeholder="OPP"
+              maxLength="3"
+            />
+            <span className="closing-paren">)</span>
+          </div>
         </td>
         
         <td>{selectedHitter.prevGameHR}</td>
@@ -429,6 +431,8 @@ const HitterRow = ({
         
         {/* Second Pitcher - Add/Select Section */}
         <td className="second-pitcher-container">
+          {/* Debug logging for secondary pitcher options */}
+          {showSecondPitcher && console.log(`[HitterRow] Secondary pitcher options for ${player.name}: opponent="${player.opponent}", options=${pitcherOptions.length}`)}
           {player.pitcherId && !showSecondPitcher ? (
             <button 
               className="action-btn add-pitcher-btn"

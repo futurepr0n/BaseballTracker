@@ -36,44 +36,32 @@
 }
 
 /* Column width specifications */
-.capsheet-hitters-table th:nth-child(1),  /* Player */
+.capsheet-hitters-table th:nth-child(1),  /* Consolidated Player (Team vs Opponent) */
 .capsheet-hitters-table td:nth-child(1) {
-  width: 140px;
-  min-width: 140px;
+  width: 220px;
+  min-width: 220px;
   text-align: left;
-  padding-left: 8px;
+  padding: 6px 8px;
 }
 
-.capsheet-hitters-table th:nth-child(2),  /* Team */
-.capsheet-hitters-table td:nth-child(2) {
-  width: 60px;
-  min-width: 60px;
-}
-
-.capsheet-hitters-table th:nth-child(3),  /* Opponent */
-.capsheet-hitters-table td:nth-child(3) {
-  width: 80px;
-  min-width: 80px;
-}
-
-.capsheet-hitters-table th:nth-child(4),  /* HR Last */
-.capsheet-hitters-table td:nth-child(4),
-.capsheet-hitters-table th:nth-child(5),  /* AB Last */
-.capsheet-hitters-table td:nth-child(5),
-.capsheet-hitters-table th:nth-child(6),  /* H Last */
-.capsheet-hitters-table td:nth-child(6) {
+.capsheet-hitters-table th:nth-child(2),  /* HR Last */
+.capsheet-hitters-table td:nth-child(2),
+.capsheet-hitters-table th:nth-child(3),  /* AB Last */
+.capsheet-hitters-table td:nth-child(3),
+.capsheet-hitters-table th:nth-child(4),  /* H Last */
+.capsheet-hitters-table td:nth-child(4) {
   width: 50px;
   min-width: 50px;
 }
 
-.capsheet-hitters-table th:nth-child(7),  /* Performance Chart */
-.capsheet-hitters-table td:nth-child(7) {
+.capsheet-hitters-table th:nth-child(5),  /* Performance Chart */
+.capsheet-hitters-table td:nth-child(5) {
   width: 180px;
   min-width: 180px;
 }
 
-.capsheet-hitters-table th:nth-child(8),  /* Primary Pitcher */
-.capsheet-hitters-table td:nth-child(8) {
+.capsheet-hitters-table th:nth-child(6),  /* Primary Pitcher */
+.capsheet-hitters-table td:nth-child(6) {
   min-width: 180px;
   text-align: left;
   padding: 4px 6px;
@@ -81,30 +69,39 @@
   overflow: visible;
 }
 
-.capsheet-hitters-table th:nth-child(9),   /* Last IP */
+.capsheet-hitters-table th:nth-child(7),   /* Last IP */
+.capsheet-hitters-table td:nth-child(7),
+.capsheet-hitters-table th:nth-child(8),  /* PC_ST */
+.capsheet-hitters-table td:nth-child(8),
+.capsheet-hitters-table th:nth-child(9),  /* K */
 .capsheet-hitters-table td:nth-child(9),
-.capsheet-hitters-table th:nth-child(10),  /* PC_ST */
-.capsheet-hitters-table td:nth-child(10),
-.capsheet-hitters-table th:nth-child(11),  /* K */
-.capsheet-hitters-table td:nth-child(11),
-.capsheet-hitters-table th:nth-child(12),  /* HR */
-.capsheet-hitters-table td:nth-child(12) {
+.capsheet-hitters-table th:nth-child(10),  /* HR */
+.capsheet-hitters-table td:nth-child(10) {
   width: 60px;
   min-width: 60px;
 }
 
-.capsheet-hitters-table th:nth-child(13),  /* Throws */
-.capsheet-hitters-table td:nth-child(13) {
+.capsheet-hitters-table th:nth-child(11),  /* Throws */
+.capsheet-hitters-table td:nth-child(11) {
   width: 80px;
   min-width: 80px;
 }
 
-.capsheet-hitters-table th:nth-child(14),  /* Second Pitcher */
-.capsheet-hitters-table td:nth-child(14) {
-  width: 160px;
-  min-width: 160px;
+.capsheet-hitters-table th:nth-child(12),  /* Second Pitcher */
+.capsheet-hitters-table td:nth-child(12) {
+  width: 170px;
+  min-width: 170px;
+  max-width: 170px;
   text-align: left;
-  padding-left: 8px;
+  padding: 4px 6px;
+  overflow: hidden;
+}
+
+/* Second pitcher container styling */
+.capsheet-hitters-table .second-pitcher-container {
+  width: 100%;
+  max-width: 165px;
+  overflow: hidden;
 }
 
 /* Second pitcher columns (when visible) */
@@ -234,11 +231,50 @@
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
-/* Player name cell specific styling */
-.capsheet-hitters-table .player-name {
+/* Consolidated player info column styling */
+.capsheet-hitters-table .consolidated-player-info {
   text-align: left !important;
+  padding: 6px 8px !important;
+  vertical-align: top;
+}
+
+.capsheet-hitters-table .player-name-section {
   font-weight: 500;
-  padding-left: 8px !important;
+  margin-bottom: 2px;
+  line-height: 1.2;
+}
+
+.capsheet-hitters-table .team-opponent-section {
+  font-size: 0.85em;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.capsheet-hitters-table .team-info {
+  font-weight: 400;
+}
+
+.capsheet-hitters-table .opponent-input {
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  padding: 1px 4px;
+  font-size: 0.8em;
+  width: 35px;
+  text-align: center;
+  text-transform: uppercase;
+  background: #f9f9f9;
+}
+
+.capsheet-hitters-table .opponent-input:focus {
+  outline: none;
+  border-color: #80bdff;
+  background: #fff;
+}
+
+.capsheet-hitters-table .closing-paren {
+  font-weight: 400;
 }
 
 /* Performance chart cell */
@@ -337,12 +373,12 @@
   
   .capsheet-hitters-table th:nth-child(1),
   .capsheet-hitters-table td:nth-child(1) {
-    width: 120px;
-    min-width: 120px;
+    width: 180px;
+    min-width: 180px;
   }
   
-  .capsheet-hitters-table th:nth-child(8),
-  .capsheet-hitters-table td:nth-child(8) {
+  .capsheet-hitters-table th:nth-child(6),
+  .capsheet-hitters-table td:nth-child(6) {
     min-width: 150px;
   }
 }

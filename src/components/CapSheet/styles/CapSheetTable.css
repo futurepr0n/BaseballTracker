@@ -105,11 +105,11 @@
   text-align: center !important;
 }
 
-/* Second pitcher container */
-.second-pitcher-container {
-  width: 130px !important; /* Increased width for add button */
+/* Second pitcher container - handled by HittersTable.css for better control */
+/* .second-pitcher-container {
+  width: 130px !important; 
   max-width: 130px !important;
-}
+} */
 
 /* Dynamic second pitcher stats columns */
 .second-pitcher-stat {

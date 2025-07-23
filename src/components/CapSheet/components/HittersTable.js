@@ -298,9 +298,7 @@ const HittersTable = ({
           <table className="capsheet-hitters-table">
             <thead>
               <tr>
-                <th>Player</th>
-                <th>Team</th>
-                <th>Opponent</th>
+                <th>Player (Team vs Opponent)</th>
                 <th className="capsheet-hitters-stat-header">HR Last</th>
                 <th className="capsheet-hitters-stat-header">AB Last</th>
                 <th className="capsheet-hitters-stat-header">H Last</th>
@@ -361,6 +359,11 @@ const HittersTable = ({
                   const pitcherOptions = player.opponent
                     ? getPitcherOptionsForOpponent(player.opponent)
                     : [];
+                  
+                  // Debug logging for opponent field and pitcher options
+                  if (index === 0) { // Only log for first player to avoid spam
+                    console.log(`[HittersTable] Player: ${player.name}, Opponent: "${player.opponent}", PitcherOptions: ${pitcherOptions.length}`);
+                  }
 
                   return (
                     <HitterRow
@@ -388,7 +391,7 @@ const HittersTable = ({
                 <tr>
                   {/* Dynamic colspan calculation */}
                   <td colSpan={
-                    21 + // Base columns (increased from 20 to 21 for opponent column)
+                    19 + // Base columns (reduced from 21 to 19 after consolidating Player/Team/Opponent)
                     (hasAnySecondPitcher ? 5 : 0) + // Second pitcher columns
                     handicappers.length // Handicapper columns
                   } className="no-data">
