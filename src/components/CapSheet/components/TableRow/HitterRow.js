@@ -219,7 +219,7 @@ const HitterRow = ({
     renderCount.current += 1;
   });
 
-  // Custom styles for select dropdown to fix cutoff issue and prevent scroll lock
+  // Custom styles for select dropdown to fix cutoff issue and ensure proper display
   const customSelectStyles = {
     // Control is the main input element
     control: (base) => ({
@@ -228,17 +228,17 @@ const HitterRow = ({
       height: '30px',
       fontSize: '0.9em'
     }),
-    // Reduce z-index to prevent scroll lock issues - use reasonable z-index
+    // High z-index to ensure dropdown appears above table elements
     menu: (base) => ({
       ...base,
-      zIndex: 100, // Much lower z-index to prevent interference
+      zIndex: 9999,
       width: 'auto',
       minWidth: '100%'
     }),
-    // Lower z-index for menu portal as well
+    // High z-index for menu portal to ensure proper rendering
     menuPortal: (base) => ({
       ...base,
-      zIndex: 100 // Reduced from 9999 to prevent scroll lock
+      zIndex: 9999
     })
   };
 
@@ -290,22 +290,36 @@ const HitterRow = ({
         data-games-history={gamesHistory}
         className={isRefreshingHitters || isLoadingHitter ? "loading-row" : ""}
       >
-        <td className="player-name">
-          {selectedHitter.name || player.name}
-          {/* First try to use selectedHitter.bats, fall back to player.bats */}
-          {(selectedHitter.bats || player.bats) && (
-            <span 
-              className={`player-attribute-badge batter-hand ${getMatchupClass(
-                selectedHitter.bats || player.bats, 
-                selectedPitcher?.throwingArm
-              )}`}
-            >
-              {selectedHitter.bats || player.bats}
-            </span>
-          )}
-          {(isRefreshingHitters || isLoadingHitter) && <span className="loading-indicator">⟳</span>}
+        <td className="consolidated-player-info">
+          <div className="player-name-section">
+            {selectedHitter.name || player.name}
+            {/* First try to use selectedHitter.bats, fall back to player.bats */}
+            {(selectedHitter.bats || player.bats) && (
+              <span 
+                className={`player-attribute-badge batter-hand ${getMatchupClass(
+                  selectedHitter.bats || player.bats, 
+                  selectedPitcher?.throwingArm
+                )}`}
+              >
+                {selectedHitter.bats || player.bats}
+              </span>
+            )}
+            {(isRefreshingHitters || isLoadingHitter) && <span className="loading-indicator">⟳</span>}
+          </div>
+          <div className="team-opponent-section">
+            <span className="team-info">({selectedHitter.team} vs </span>
+            <input 
+              type="text" 
+              className="opponent-input" 
+              value={player.opponent || ''} 
+              onChange={(e) => onFieldChange(player.id, 'opponent', e.target.value)} 
+              placeholder="OPP"
+              maxLength="3"
+            />
+            <span className="closing-paren">)</span>
+          </div>
         </td>
-        <td>{selectedHitter.team}</td>
+        
         <td>{selectedHitter.prevGameHR}</td>
         <td>{selectedHitter.prevGameAB}</td>
         <td>{selectedHitter.prevGameH}</td>
@@ -343,8 +357,17 @@ const HitterRow = ({
                 isClearable
                 placeholder="Select pitcher..."
                 styles={customSelectStyles}
-                // Remove portal rendering to prevent scroll lock issues
+                // Enable portal rendering to prevent table clipping
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
                 menuPlacement="auto"
+                // Ensure options are properly formatted
+                getOptionLabel={(option) => {
+                  return option.label || option.value || String(option);
+                }}
+                getOptionValue={(option) => {
+                  return option.value || String(option);
+                }}
               />
               {player.pitcherId && selectedPitcher && (
                 <div className="button-group">
@@ -374,8 +397,8 @@ const HitterRow = ({
               className="editable-cell" 
               value={player.pitcher || ''} 
               onChange={(e) => onFieldChange(player.id, 'pitcher', e.target.value)} 
-              placeholder={player.opponentTeam ? "No pitchers found" : "Enter name"} 
-              readOnly={!player.opponentTeam}
+              placeholder={player.opponent ? "No pitchers found" : "Enter opponent first"} 
+              readOnly={!player.opponent}
             />
           )}
         </td>
@@ -432,12 +455,22 @@ const HitterRow = ({
                 classNamePrefix="select"
                 options={pitcherOptions}
                 value={secondPitcherId ? { value: secondPitcherId, label: secondPitcher } : null}
-                onChange={(option) => handleSecondPitcherSelect(option)}
+                onChange={(option) => {
+                  handleSecondPitcherSelect(option);
+                }}
                 isClearable
                 placeholder="Select 2nd pitcher..."
                 styles={customSelectStyles}
-                // Remove portal rendering to prevent scroll lock issues
+                // Enable portal rendering to prevent table clipping
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
                 menuPlacement="auto"
+                getOptionLabel={(option) => {
+                  return option.label || option.value || String(option);
+                }}
+                getOptionValue={(option) => {
+                  return option.value || String(option);
+                }}
               />
               {secondPitcherId && (
                 <button 

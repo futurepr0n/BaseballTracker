@@ -5,6 +5,7 @@ import { getMatchupFromTeam } from '../../../services/startingLineupService';
 import { usePlayerScratchpad } from '../../../contexts/PlayerScratchpadContext';
 import './HitterPerformanceLineChart.css';
 import '../styles/CapSheetTable.css';
+import './HittersTable.css';
 
 /**
  * Component for displaying the hitters table section
@@ -72,15 +73,41 @@ const HittersTable = ({
         try {
           const matchupData = await getMatchupFromTeam(hitter.team);
           if (matchupData && matchupData.opponentPitcher && matchupData.opponentPitcher !== 'TBD') {
-            // Find the pitcher ID from options
-            const pitcherOption = getPitcherOptionsForOpponent(hitter.team)?.find(
-              p => p.label.includes(matchupData.opponentPitcher)
+            // Get pitcher options for the opponent team, not the hitter's team
+            const opponentTeam = matchupData.opponent;
+            const pitcherOptions = getPitcherOptionsForOpponent(opponentTeam);
+            
+            // Find the pitcher ID from options with improved name matching
+            const pitcherOption = pitcherOptions?.find(
+              p => {
+                const optionName = p.label.toLowerCase().replace(/[^\w\s]/g, '').trim();
+                const matchupName = matchupData.opponentPitcher.toLowerCase().replace(/[^\w\s]/g, '').trim();
+                
+                // Try exact match first
+                if (optionName.includes(matchupName)) return true;
+                
+                // Try first/last name matching for cases like "Mike" vs "Michael"
+                const optionParts = optionName.split(' ');
+                const matchupParts = matchupName.split(' ');
+                
+                if (optionParts.length >= 2 && matchupParts.length >= 2) {
+                  // Check if last names match and first names start with same letter
+                  const lastNamesMatch = optionParts[optionParts.length - 1] === matchupParts[matchupParts.length - 1];
+                  const firstNamesCompatible = optionParts[0][0] === matchupParts[0][0];
+                  return lastNamesMatch && firstNamesCompatible;
+                }
+                
+                return false;
+              }
             );
             
             if (pitcherOption) {
               onPitcherSelect(hitter.id, pitcherOption.value);
+              onFieldChange(hitter.id, 'opponent', opponentTeam);
               successCount++;
-              console.log(`Auto-filled pitcher for ${hitter.name}: ${matchupData.opponentPitcher}`);
+              console.log(`Auto-filled pitcher for ${hitter.name}: ${matchupData.opponentPitcher} (${opponentTeam})`);
+            } else {
+              console.warn(`No pitcher match found for ${hitter.name} vs ${matchupData.opponentPitcher} from ${opponentTeam}`);
             }
           }
         } catch (error) {
@@ -264,15 +291,14 @@ const HittersTable = ({
         </div>
       </div>
 
-      <div className="table-container">
+      <div className="hitters-table-container">
         {isLoadingPlayers && hitters.length === 0 ? (
           <div className="loading-indicator">Loading player data...</div>
         ) : (
           <table className="capsheet-hitters-table">
             <thead>
               <tr>
-                <th>Player</th>
-                <th>Team</th>
+                <th>Player (Team vs Opponent)</th>
                 <th className="capsheet-hitters-stat-header">HR Last</th>
                 <th className="capsheet-hitters-stat-header">AB Last</th>
                 <th className="capsheet-hitters-stat-header">H Last</th>
@@ -329,10 +355,15 @@ const HittersTable = ({
             <tbody>
               {hitters.length > 0 ? (
                 hitters.map((player, index) => {
-                  // Get pitcher options for this hitter (based on opponent team)
-                  const pitcherOptions = player.opponentTeam
-                    ? getPitcherOptionsForOpponent(player.opponentTeam)
+                  // Get pitcher options for this hitter (based on opponent field)
+                  const pitcherOptions = player.opponent
+                    ? getPitcherOptionsForOpponent(player.opponent)
                     : [];
+                  
+                  // Debug logging for opponent field and pitcher options
+                  if (index === 0) { // Only log for first player to avoid spam
+                    console.log(`[HittersTable] Player: ${player.name}, Opponent: "${player.opponent}", PitcherOptions: ${pitcherOptions.length}`);
+                  }
 
                   return (
                     <HitterRow
@@ -360,7 +391,7 @@ const HittersTable = ({
                 <tr>
                   {/* Dynamic colspan calculation */}
                   <td colSpan={
-                    20 + // Base columns
+                    19 + // Base columns (reduced from 21 to 19 after consolidating Player/Team/Opponent)
                     (hasAnySecondPitcher ? 5 : 0) + // Second pitcher columns
                     handicappers.length // Handicapper columns
                   } className="no-data">

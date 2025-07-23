@@ -29,7 +29,9 @@ const usePlayerData = (
   gameData, 
   currentDate, 
   hitterGamesHistory = 3, 
-  pitcherGamesHistory = 3
+  pitcherGamesHistory = 3,
+  setHitterRefreshKey,
+  setPitcherRefreshKey
 ) => {
   // State for the component
   const [selectedPlayers, setSelectedPlayers] = useState({
@@ -615,15 +617,17 @@ useEffect(() => {
 
 
   /**
- * Fetch hitter data by ID with the current game history setting
+ * Fetch hitter data by ID with specified game history setting
  * Similar to fetchPitcherById but for hitters
  * @param {string} hitterId - Hitter ID in format "name-team"
+ * @param {number} gamesHistory - Number of games to include in history (optional, defaults to current setting)
  * @returns {Promise<Object>} Hitter data with game history
  */
-const fetchHitterById = async (hitterId) => {
+const fetchHitterById = async (hitterId, gamesHistory = null) => {
   if (!hitterId) return null;
   
-  console.log(`[usePlayerData] Fetching data for hitter: ${hitterId}`);
+  const gamesToUse = gamesHistory || hitterGamesHistory;
+  console.log(`[usePlayerData] Fetching data for hitter: ${hitterId} with ${gamesToUse} games history`);
   
   // Split the ID format (name-team)
   const [hitterName, hitterTeam] = hitterId.split('-');
@@ -633,8 +637,8 @@ const fetchHitterById = async (hitterId) => {
   if (existingHitter) {
     console.log(`[usePlayerData] Found hitter in selectedPlayers: ${hitterName}`);
     
-    // Instead of just returning the existing hitter, apply the current game history setting
-    return fetchPlayerGameHistory(existingHitter, hitterGamesHistory);
+    // Instead of just returning the existing hitter, apply the specified game history setting
+    return fetchPlayerGameHistory(existingHitter, gamesToUse);
   }
   
   // If not found in selected hitters, look in available hitters
@@ -642,8 +646,8 @@ const fetchHitterById = async (hitterId) => {
   if (availableHitter) {
     console.log(`[usePlayerData] Found hitter in availablePlayers: ${hitterName}`);
     
-    // Apply the current game history setting
-    return fetchPlayerGameHistory(availableHitter, hitterGamesHistory);
+    // Apply the specified game history setting
+    return fetchPlayerGameHistory(availableHitter, gamesToUse);
   }
   
   // Check for hitter in roster data
@@ -703,8 +707,8 @@ const fetchHitterById = async (hitterId) => {
     if (dateRangeDataForHitters && Object.keys(dateRangeDataForHitters).length > 0) {
       console.log(`[usePlayerData] Getting game history for hitter: ${hitterName} using date-keyed data`);
       
-      // Apply the current game history setting
-      return fetchPlayerGameHistory(basicHitter, hitterGamesHistory);
+      // Apply the specified game history setting
+      return fetchPlayerGameHistory(basicHitter, gamesToUse);
     }
     
     return basicHitter;
@@ -1207,8 +1211,16 @@ const fetchPitcherById = async (pitcherId) => {
 
   // Function to get pitcher options for a specific opponent team
   const getPitcherOptionsForOpponent = (opponentTeam) => {
+    // Return empty array if no opponent team specified
+    if (!opponentTeam || !opponentTeam.trim()) {
+      console.log(`[getPitcherOptionsForOpponent] No opponent team specified: "${opponentTeam}"`);
+      return [];
+    }
+    
     // Filter the full pitcher roster to get only pitchers from the opponent team
     const teamPitchers = fullPitcherRoster.filter(pitcher => pitcher.team === opponentTeam);
+    
+    console.log(`[getPitcherOptionsForOpponent] Found ${teamPitchers.length} pitchers for opponent team "${opponentTeam}"`);
     
     // Map to select options format
     return teamPitchers.map(pitcher => ({
@@ -1266,20 +1278,31 @@ const fetchPitcherById = async (pitcherId) => {
     }
   
     const playerTeam = selectedPlayer.team;
-    const game = gameData.find(g => g.homeTeam === playerTeam || g.awayTeam === playerTeam);
+    const game = gameData?.find(g => g.homeTeam === playerTeam || g.awayTeam === playerTeam);
     let stadium = game ? game.venue || '' : '';
     let opponentTeam = game ? (game.homeTeam === playerTeam ? game.awayTeam : game.homeTeam) : '';
+    
+    // If no game found, leave opponent empty but allow manual entry
+    // This ensures the opponent field exists and can be edited to trigger pitcher options
   
     // Create a new player with basic info
     const basePlayer = {
       ...selectedPlayer,
       stadium,
-      opponentTeam
+      opponent: opponentTeam  // Use 'opponent' field name to match HitterRow expectations
     };
+    
+    // Debug logging for opponent field setting and game data availability
+    console.log(`[usePlayerData] Adding ${selectedPlayer.name} (${playerTeam}) vs "${opponentTeam}"`);
+    console.log(`[usePlayerData] Game found:`, game ? `${game.homeTeam} vs ${game.awayTeam}` : 'No game found');
+    console.log(`[usePlayerData] gameData available:`, gameData ? `${gameData.length} games` : 'gameData is null/undefined');
+    if (gameData && gameData.length > 0) {
+      console.log(`[usePlayerData] Available teams in gameData:`, [...new Set(gameData.flatMap(g => [g.homeTeam, g.awayTeam]))]);
+    }
     
     // Check if any other hitters from the same team already have values we can copy
     const teamHitters = selectedPlayers.hitters.filter(h => 
-      h.team === playerTeam && h.opponentTeam === opponentTeam
+      h.team === playerTeam && h.opponent === opponentTeam
     );
     
     if (teamHitters.length > 0) {
@@ -1333,6 +1356,13 @@ const fetchPitcherById = async (pitcherId) => {
       ...prev,
       hitters: [...prev.hitters, playerWithHistory]
     }));
+    
+    // Force component refresh to ensure opponent field is properly synchronized
+    if (setHitterRefreshKey) {
+      setHitterRefreshKey(prev => prev + 1);
+    }
+    
+    console.log('[usePlayerData] Added hitter:', playerWithHistory.name, 'with opponent:', playerWithHistory.opponent);
   };
 
   const handleAddPitcherById = async (playerId) => {
@@ -1442,15 +1472,15 @@ const fetchPitcherById = async (pitcherId) => {
     // For Game O/U, we want to update all players in the same game
     if (field === 'gameOU') {
       const hitterTeam = currentHitter.team;
-      const opponentTeam = currentHitter.opponentTeam;
+      const opponentTeam = currentHitter.opponent;
       
       // Update the Game O/U for all hitters AND pitchers in this game
       setSelectedPlayers(prev => ({
         ...prev,
         // Update hitters in the same game
         hitters: prev.hitters.map(player => {
-          if ((player.team === hitterTeam && player.opponentTeam === opponentTeam) || 
-              (player.team === opponentTeam && player.opponentTeam === hitterTeam)) {
+          if ((player.team === hitterTeam && player.opponent === opponentTeam) || 
+              (player.team === opponentTeam && player.opponent === hitterTeam)) {
             return { ...player, [field]: value };
           }
           return player;
@@ -1608,7 +1638,7 @@ const fetchPitcherById = async (pitcherId) => {
     if (!currentHitter) return;
     
     const hitterTeam = currentHitter.team;
-    const opponentTeam = currentHitter.opponentTeam;
+    const opponentTeam = currentHitter.opponent;
     
     if (!pitcherId) {
       // If empty selection, just clear the pitcher fields for this specific hitter
@@ -1641,7 +1671,7 @@ const fetchPitcherById = async (pitcherId) => {
       ...prev,
       hitters: prev.hitters.map(player => {
         // Update this player and all other players from the same team facing same opponent
-        if (player.id === playerId || (player.team === hitterTeam && player.opponentTeam === opponentTeam)) {
+        if (player.id === playerId || (player.team === hitterTeam && player.opponent === opponentTeam)) {
           return { 
             ...player, 
             pitcher: pitcherName,
