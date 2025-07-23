@@ -1,6 +1,8 @@
 import React from 'react';
 import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
+import SimpleDesktopScratchpadIcon from '../../common/SimpleDesktopScratchpadIcon';
+import { getTeamLogoUrl } from '../../../utils/teamUtils';
 import './RecentHomersCard.css';
 import '../../common/MobilePlayerCard.css';
 
@@ -67,7 +69,7 @@ const RecentHomersCard = ({
                 // Get team logo URL if teams data is available
                 const teamAbbr = player.team;
                 const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
-                const logoUrl = teamData ? teamData.logoUrl : null;
+                const logoUrl = teamData ? teamData.logoUrl : getTeamLogoUrl(player.team);
                 const teamColor = teamData ? teamData.primaryColor : "#333333";
 
                 // Format the date
@@ -86,7 +88,8 @@ const RecentHomersCard = ({
 
                 return (
                   <li key={index} className="player-item recent-homer-item">
-                    {/* Enhanced rank indicator with logo inside */}
+                    <SimpleDesktopScratchpadIcon player={player} />
+                    
                     <div className="player-rank" style={{ backgroundColor: teamColor }}>
                       {logoUrl && (
                         <>
@@ -108,7 +111,7 @@ const RecentHomersCard = ({
                       <span className="player-team">{player.team}</span>
                     </div>
                     
-                    <div className="player-stat recent-hr-stats">
+                    <div className="recent-hr-stats">
                       <div className="hr-date">
                         <span className="date-primary">{formattedDate}</span>
                         <span className="date-secondary">({daysAgoText})</span>
@@ -123,7 +126,6 @@ const RecentHomersCard = ({
                       </div>
                     </div>
                     
-                    {/* Keep the larger background logo */}
                     {logoUrl && (
                       <img 
                         src={logoUrl} 

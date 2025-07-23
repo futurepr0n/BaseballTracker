@@ -3,6 +3,8 @@
 import React from 'react';
 import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
+import SimpleDesktopScratchpadIcon from '../../common/SimpleDesktopScratchpadIcon';
+import { getTeamLogoUrl } from '../../../utils/teamUtils';
 import './HomeRunLeadersCard.css';
 import '../../common/MobilePlayerCard.css';
 
@@ -125,7 +127,7 @@ const HomeRunLeadersCard = ({
                 // Get team logo URL if teams data is available
                 const teamAbbr = player.team;
                 const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
-                const logoUrl = teamData ? teamData.logoUrl : null;
+                const logoUrl = teamData ? teamData.logoUrl : getTeamLogoUrl(player.team);
                 const teamColor = teamData ? teamData.primaryColor : "#e63946";
 
                 const hrs = Number(player.HR) || 0;
@@ -133,7 +135,8 @@ const HomeRunLeadersCard = ({
 
                 return (
                   <li key={index} className="player-item hr-leader-item">
-                    {/* Enhanced rank indicator with logo inside */}
+                    <SimpleDesktopScratchpadIcon player={player} />
+                    
                     <div className="player-rank" style={{ backgroundColor: teamColor }}>
                       {logoUrl && (
                         <>
@@ -155,7 +158,7 @@ const HomeRunLeadersCard = ({
                       <span className="player-team">{player.team}</span>
                     </div>
                     
-                    <div className="player-stat hr-stats">
+                    <div className="hr-stats">
                       <div className="primary-stat">
                         <span className="stat-value">{hrs}</span>
                         <span className="stat-label">HRs</span>
@@ -168,7 +171,6 @@ const HomeRunLeadersCard = ({
                       </div>
                     </div>
                     
-                    {/* Keep the larger background logo */}
                     {logoUrl && (
                       <img 
                         src={logoUrl} 

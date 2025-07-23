@@ -1,6 +1,8 @@
 import React from 'react';
 import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
+import SimpleDesktopScratchpadIcon from '../../common/SimpleDesktopScratchpadIcon';
+import { getTeamLogoUrl } from '../../../utils/teamUtils';
 import './TopHittersCard.css';
 import '../../common/MobilePlayerCard.css';
 
@@ -117,7 +119,7 @@ const TopHittersCard = ({
                 // Get team logo URL if teams data is available
                 const teamAbbr = player.team;
                 const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
-                const logoUrl = teamData ? teamData.logoUrl : null;
+                const logoUrl = teamData ? teamData.logoUrl : getTeamLogoUrl(player.team);
                 const teamColor = teamData ? teamData.primaryColor : "#4f46e5";
 
                 const hits = Number(player.H) || 0;
@@ -125,6 +127,9 @@ const TopHittersCard = ({
 
                 return (
                   <li key={index} className="player-item hitter-item">
+                    {/* Simple scratchpad icon - always visible */}
+                    <SimpleDesktopScratchpadIcon player={player} />
+                    
                     {/* Enhanced rank indicator with logo inside */}
                     <div className="player-rank" style={{ backgroundColor: teamColor }}>
                       {logoUrl && (
@@ -147,7 +152,7 @@ const TopHittersCard = ({
                       <span className="player-team">{player.team}</span>
                     </div>
                     
-                    <div className="player-stat hitting-stats">
+                    <div className="hitting-stats">
                       <div className="primary-stat">
                         <span className="stat-value">{hits}</span>
                         <span className="stat-label">Hits</span>

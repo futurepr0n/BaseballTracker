@@ -476,3 +476,53 @@
 .recent-homer-item:nth-child(3) .date-primary {
   font-size: 1.45rem;
 }
+
+/* Scratchpad Filter Indicator */
+.scratchpad-filter-indicator {
+  display: flex;
+  align-items: center;
+  background-color: #e8f5e8;
+  border: 1px solid #4CAF50;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #2e7d2e;
+  font-size: 0.9rem;
+  font-weight: 500;
+  animation: slideInTeamContext 0.3s ease-out;
+}
+
+.scratchpad-filter-indicator .filter-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scratchpad-filter-indicator .scratchpad-icon {
+  font-size: 16px;
+  animation: pulse 2s infinite;
+}
+
+.scratchpad-filter-indicator .scratchpad-text {
+  line-height: 1.2;
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .scratchpad-filter-indicator {
+    background-color: rgba(76, 175, 80, 0.15);
+    border-color: #66BB6A;
+    color: #81C784;
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .scratchpad-filter-indicator {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+  }
+  
+  .scratchpad-filter-indicator .scratchpad-icon {
+    font-size: 14px;
+  }
+}

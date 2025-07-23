@@ -5,6 +5,7 @@ import { useTeamFilter } from '../TeamFilterContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import GlassCard, { GlassScrollableContainer } from './GlassCard/GlassCard';
 import { getPlayerDisplayName, getTeamDisplayName } from '../../utils/playerNameUtils';
+import SimpleDesktopScratchpadIcon from '../common/SimpleDesktopScratchpadIcon';
 import './StrategicIntelligenceCard.css';
 
 const StrategicIntelligenceCard = ({ currentDate, playerData, gameData, teamData, rollingStats, topPerformers, poorPerformancePredictions, positiveMomentumPredictions }) => {
@@ -1295,6 +1296,14 @@ const StrategicIntelligenceCard = ({ currentDate, playerData, gameData, teamData
                     <span className="rank-number">#{index + 1}</span>
                   </td>
                   <td className="player-cell">
+                    {/* Add scratchpad icon */}
+                    <SimpleDesktopScratchpadIcon 
+                      player={{
+                        name: getPlayerDisplayName(player),
+                        team: getTeamDisplayName(player).split(' ')[0], // Extract team abbreviation
+                        playerType: 'hitter'
+                      }} 
+                    />
                     <div className="player-info">
                       <span className="player-name">{getPlayerDisplayName(player)}</span>
                       <span className="team-info">{getTeamDisplayName(player)} vs {player.pitcher}</span>
@@ -1409,6 +1418,14 @@ const StrategicIntelligenceCard = ({ currentDate, playerData, gameData, teamData
             {sortedData.map((player, index) => (
               <div key={index} className="mobile-intelligence-card">
                 <div className="mobile-intelligence-header">
+                  {/* Add scratchpad icon for mobile */}
+                  <SimpleDesktopScratchpadIcon 
+                    player={{
+                      name: getPlayerDisplayName(player),
+                      team: getTeamDisplayName(player).split(' ')[0], // Extract team abbreviation
+                      playerType: 'hitter'
+                    }} 
+                  />
                   <div className="mobile-rank">#{index + 1}</div>
                   <div className="mobile-player-info">
                     <div className="mobile-player-name">{getPlayerDisplayName(player)}</div>

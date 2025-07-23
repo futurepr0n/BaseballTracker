@@ -120,6 +120,10 @@
   text-align: center;
 }
 
+.player-cell {
+  position: relative; /* Required for absolutely positioned scratchpad icon */
+}
+
 .rank-badge {
   display: flex;
   flex-direction: column;
@@ -211,6 +215,7 @@
   align-items: flex-start;
   gap: 12px;
   margin-bottom: 12px;
+  position: relative; /* Required for absolutely positioned scratchpad icon */
 }
 
 .rank-section {

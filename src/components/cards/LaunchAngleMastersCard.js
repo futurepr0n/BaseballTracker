@@ -6,6 +6,7 @@ import { useHandedness } from '../../contexts/HandednessContext';
 import GlassCard, { GlassScrollableContainer } from './GlassCard/GlassCard';
 import { getPlayerDisplayName, getTeamDisplayName } from '../../utils/playerNameUtils';
 import HandednessToggle from '../HandednessToggle/HandednessToggle';
+import SimpleDesktopScratchpadIcon from '../common/SimpleDesktopScratchpadIcon';
 import './LaunchAngleMastersCard.css';
 
 const LaunchAngleMastersCard = ({ currentDate }) => {
@@ -539,6 +540,14 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
                     </div>
                   </td>
                   <td className="player-cell">
+                    {/* Add scratchpad icon */}
+                    <SimpleDesktopScratchpadIcon 
+                      player={{
+                        name: getPlayerDisplayName(player),
+                        team: getTeamDisplayName(player).split(' ')[0], // Extract team abbreviation
+                        playerType: 'hitter'
+                      }} 
+                    />
                     <div className="player-info">
                       <span className="player-name">{getPlayerDisplayName(player)}</span>
                       <span className="team-info">{getTeamDisplayName(player)} vs {player.pitcher}</span>
@@ -610,6 +619,14 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
             {sortedPlayers.map((player, index) => (
               <div key={index} className="mobile-master-card">
                 <div className="mobile-master-header">
+                  {/* Add scratchpad icon for mobile */}
+                  <SimpleDesktopScratchpadIcon 
+                    player={{
+                      name: getPlayerDisplayName(player),
+                      team: getTeamDisplayName(player).split(' ')[0], // Extract team abbreviation
+                      playerType: 'hitter'
+                    }} 
+                  />
                   <div className="rank-section">
                     <span className="mobile-rank">#{index + 1}</span>
                     <span className="mobile-badge" title={player.classification}>

@@ -1,0 +1,347 @@
+/* ScratchpadWidget.css */
+
+.scratchpad-widget {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  min-width: 280px;
+  max-width: 350px;
+  transition: all 0.3s ease;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.scratchpad-widget.minimized {
+  min-width: auto;
+  max-width: auto;
+}
+
+/* Header */
+.scratchpad-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 10px 10px 0 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.scratchpad-widget.minimized .scratchpad-header {
+  border-radius: 10px;
+}
+
+.scratchpad-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.scratchpad-icon {
+  font-size: 16px;
+}
+
+.player-count-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 20px;
+  text-align: center;
+}
+
+.minimize-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  font-size: 12px;
+}
+
+.minimize-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Content */
+.scratchpad-content {
+  padding: 16px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.empty-state p {
+  margin: 0 0 8px;
+  font-weight: 500;
+}
+
+.empty-state small {
+  color: #999;
+  font-size: 12px;
+}
+
+/* Player Summary */
+.player-summary {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.summary-icon {
+  font-size: 18px;
+}
+
+.summary-count {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+}
+
+.summary-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Action Buttons */
+.scratchpad-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.scratchpad-actions button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.scratchpad-actions button:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+.filter-toggle-btn.active {
+  background: #4CAF50;
+  color: white;
+  border-color: #4CAF50;
+}
+
+.filter-toggle-btn.active:hover {
+  background: #45a049;
+}
+
+.clear-all-btn {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.clear-all-btn:hover {
+  background: #dc3545;
+  color: white;
+}
+
+/* Player List */
+.player-list {
+  border-top: 1px solid #eee;
+  padding-top: 16px;
+}
+
+.player-list-header h4 {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.player-items {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 6px;
+}
+
+.player-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.player-item:last-child {
+  border-bottom: none;
+}
+
+.player-item:hover {
+  background: #f8f9fa;
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.player-name {
+  font-weight: 500;
+  font-size: 13px;
+  color: #333;
+}
+
+.player-team {
+  font-size: 11px;
+  color: #666;
+  background: #e9ecef;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.player-type {
+  font-size: 14px;
+}
+
+.remove-player-btn {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.remove-player-btn:hover {
+  background: rgba(220, 53, 69, 0.1);
+}
+
+/* Filter Active Indicator */
+.filter-active-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #e8f5e8;
+  border-top: 1px solid #c3e6c3;
+  border-radius: 0 0 10px 10px;
+  font-size: 12px;
+  color: #2e7d2e;
+  font-weight: 500;
+}
+
+.filter-indicator-icon {
+  font-size: 14px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .scratchpad-widget {
+    right: 10px;
+    top: 70px;
+    min-width: 260px;
+    max-width: 300px;
+  }
+
+  .scratchpad-header {
+    padding: 10px 12px;
+  }
+
+  .scratchpad-content {
+    padding: 12px;
+  }
+
+  .player-summary {
+    gap: 12px;
+  }
+
+  .summary-count {
+    font-size: 18px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .scratchpad-widget {
+    background: rgba(30, 30, 30, 0.98);
+    border-color: #555;
+    color: #fff;
+  }
+
+  .scratchpad-actions button {
+    background: #2a2a2a;
+    border-color: #555;
+    color: #fff;
+  }
+
+  .scratchpad-actions button:hover {
+    background: #3a3a3a;
+  }
+
+  .player-summary {
+    background: #2a2a2a;
+  }
+
+  .player-item:hover {
+    background: #2a2a2a;
+  }
+
+  .player-team {
+    background: #444;
+    color: #ccc;
+  }
+
+  .player-items {
+    border-color: #555;
+    background: #2a2a2a;
+  }
+
+  .player-item {
+    border-color: #444;
+  }
+
+  .filter-active-indicator {
+    background: #2d3a2d;
+    border-color: #4a6b4a;
+    color: #7dd87d;
+  }
+}

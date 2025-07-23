@@ -20,6 +20,8 @@ import MatchupAnalyzer from './components/MatchupAnalyzer';
 import Navigation from './components/Navigation';
 import { TeamFilterProvider } from './components/TeamFilterContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { PlayerScratchpadProvider } from './contexts/PlayerScratchpadContext';
+import ScratchpadWidget from './components/ScratchpadWidget/ScratchpadWidget';
 import { 
   fetchPlayerData, 
   fetchTeamData, 
@@ -141,8 +143,9 @@ function App() {
         </header>
         
         <main className="app-content">
-          {/* Wrap routes with TeamFilterProvider to enable filtering */}
-          <TeamFilterProvider teamData={teamData} gameData={gameData}>
+          {/* Wrap routes with PlayerScratchpadProvider and TeamFilterProvider to enable filtering */}
+          <PlayerScratchpadProvider>
+            <TeamFilterProvider teamData={teamData} gameData={gameData}>
             <Routes>
               <Route path="/" element={<Dashboard 
                 playerData={playerData} 
@@ -204,7 +207,11 @@ function App() {
               <Route path="/handedness-test" element={<HandednessTest />} />
 
             </Routes>
+            
+            {/* Scratchpad Widget - Available on all pages */}
+            <ScratchpadWidget />
           </TeamFilterProvider>
+          </PlayerScratchpadProvider>
         </main>
         
         <footer className="app-footer">

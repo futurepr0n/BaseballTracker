@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PitcherRow from './TableRow/PitcherRow';
 import PlayerSelector from './PlayerSelector';
+import { usePlayerScratchpad } from '../../../contexts/PlayerScratchpadContext';
 import './PitcherPerformanceLineChart.css';
 
 /**
@@ -32,6 +33,13 @@ const PitchersTable = ({
   // State for batch add functionality
   const [isBatchAdding, setIsBatchAdding] = useState(false);
   const [batchAddStatus, setBatchAddStatus] = useState('');
+  
+  // State for scratchpad dump functionality
+  const [isDumpingFromScratchpad, setIsDumpingFromScratchpad] = useState(false);
+  const [dumpStatus, setDumpStatus] = useState('');
+  
+  // Access scratchpad context
+  const { getPitchers: getScratchpadPitchers, playerCount, pitcherCount } = usePlayerScratchpad();
 
   // Extract unique pitchers from hitters table and batch add them
   const handleBatchAddFromHitters = async () => {
@@ -106,6 +114,85 @@ const PitchersTable = ({
       setIsBatchAdding(false);
     }
   };
+
+  // Enhanced dump pitchers from scratchpad using bet slip scanner logic
+  const handleDumpFromScratchpad = async () => {
+    const scratchpadPitchers = getScratchpadPitchers();
+    
+    if (scratchpadPitchers.length === 0) {
+      setDumpStatus('No pitchers in scratchpad');
+      setTimeout(() => setDumpStatus(''), 3000);
+      return;
+    }
+
+    setIsDumpingFromScratchpad(true);
+    setDumpStatus(`Processing ${scratchpadPitchers.length} pitchers from scratchpad...`);
+
+    try {
+      // Import enhanced matching utility
+      const { processScratchpadPlayerForCapSheet } = await import('../../../utils/enhancedPlayerMatching');
+      
+      let successCount = 0;
+      let skippedCount = 0;
+      let errorCount = 0;
+      let notFoundCount = 0;
+
+      for (const scratchpadPlayer of scratchpadPitchers) {
+        setDumpStatus(`Processing ${scratchpadPlayer.name}...`);
+
+        try {
+          // Use enhanced player matching logic
+          const result = processScratchpadPlayerForCapSheet(
+            scratchpadPlayer,
+            pitcherOptions,
+            pitchers
+          );
+
+          if (result.success) {
+            // Found a match - add using the matched player ID
+            await onAddPitcher(result.playerId);
+            successCount++;
+            console.log(`✅ Successfully added pitcher: ${scratchpadPlayer.name} (${scratchpadPlayer.team})`);
+          } else if (result.reason === 'already_exists') {
+            skippedCount++;
+            console.log(`⏭️ Pitcher ${scratchpadPlayer.name} already in table`);
+          } else if (result.reason === 'no_match') {
+            notFoundCount++;
+            console.warn(`❌ No match found for ${scratchpadPlayer.name} (${scratchpadPlayer.team})`);
+          }
+          
+        } catch (error) {
+          console.error(`💥 Error adding pitcher ${scratchpadPlayer.name}:`, error);
+          errorCount++;
+        }
+      }
+
+      // Create comprehensive status message
+      const statusParts = [
+        successCount > 0 ? `Added ${successCount} pitchers` : null,
+        skippedCount > 0 ? `${skippedCount} already in table` : null,
+        notFoundCount > 0 ? `${notFoundCount} not found` : null,
+        errorCount > 0 ? `${errorCount} failed` : null
+      ].filter(Boolean);
+
+      const finalStatus = statusParts.length > 0 ? statusParts.join(', ') : 'No changes made';
+      setDumpStatus(finalStatus);
+      
+      // Show longer status for complex results
+      const timeoutDuration = (notFoundCount > 0 || errorCount > 0) ? 7000 : 5000;
+      setTimeout(() => setDumpStatus(''), timeoutDuration);
+
+      // Log summary
+      console.log(`🏁 Scratchpad dump complete: ${finalStatus}`);
+
+    } catch (error) {
+      console.error('💥 Error during enhanced scratchpad dump:', error);
+      setDumpStatus('Error during dump operation - check console');
+      setTimeout(() => setDumpStatus(''), 5000);
+    } finally {
+      setIsDumpingFromScratchpad(false);
+    }
+  };
   return (
     <div className="section-container">
       <h3 className="section-header">
@@ -138,9 +225,24 @@ const PitchersTable = ({
         >
           {isBatchAdding ? '⟳ Adding...' : '📥 Add from Hitters Table'}
         </button>
+        {pitcherCount > 0 && (
+          <button
+            className="action-btn scratchpad-dump-btn"
+            onClick={handleDumpFromScratchpad}
+            disabled={isDumpingFromScratchpad || pitcherCount === 0}
+            title={`Dump ${pitcherCount} pitchers from scratchpad to CapSheet`}
+          >
+            {isDumpingFromScratchpad ? '⟳ Adding...' : `📝 Dump ${pitcherCount} Pitchers`}
+          </button>
+        )}
         {batchAddStatus && (
           <span className="batch-add-status">
             {batchAddStatus}
+          </span>
+        )}
+        {dumpStatus && (
+          <span className="dump-status">
+            {dumpStatus}
           </span>
         )}
       </div>
