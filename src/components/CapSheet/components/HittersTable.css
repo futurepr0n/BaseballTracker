@@ -236,6 +236,39 @@
   text-align: left !important;
   padding: 6px 8px !important;
   vertical-align: top;
+  position: relative; /* For team logo positioning */
+  overflow: hidden; /* Contain the logo */
+}
+
+/* Team logo background for consolidated player info */
+.capsheet-hitters-table .consolidated-player-info .team-logo-bg {
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 140%;
+  width: auto;
+  max-width: 60%;
+  opacity: 0.08;
+  z-index: -1; /* Changed to negative z-index to stay behind everything */
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  object-fit: contain;
+  /* Subtle fade mask from right to left */
+  mask-image: linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0) 100%);
+}
+
+/* Subtle hover effect for team logo */
+.capsheet-hitters-table tr:hover .consolidated-player-info .team-logo-bg {
+  opacity: 0.12;
+}
+
+/* Ensure player content has normal stacking context */
+.capsheet-hitters-table .player-name-section,
+.capsheet-hitters-table .team-opponent-section {
+  position: relative;
+  /* Removed z-index to avoid creating new stacking context */
 }
 
 .capsheet-hitters-table .player-name-section {
@@ -251,34 +284,92 @@
   color: #999;
   display: flex;
   align-items: center;
-  gap: 2px;
-  font-weight: 300;
+  gap: 0; /* Remove gap to close spaces between elements */
+  font-weight: bold; /* Make entire section bold */
   margin-top: 1px;
+  justify-content: flex-start; /* Left justify the entire section */
+  margin-left: 0; /* Ensure no left margin for tight left alignment */
 }
 
 .capsheet-hitters-table .team-info {
-  font-weight: 400;
+  font-weight: bold;
+  font-size: 0.7em; /* Explicit size smaller than player name */
+  color: #999;
 }
 
 .capsheet-hitters-table .opponent-input {
-  border: 1px solid #ddd;
-  border-radius: 2px;
-  padding: 1px 4px;
-  font-size: 0.8em;
-  width: 35px;
-  text-align: center;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  font-size: 0.7em; /* Match team-info size */
+  width: 30px; /* Slightly smaller width */
+  text-align: left;
   text-transform: uppercase;
-  background: #f9f9f9;
+  background: transparent;
+  color: #999; /* Match section color */
+  font-weight: bold; /* Match section weight */
+  font-family: inherit;
+  outline: none; /* Remove focus outline completely */
+  box-shadow: none; /* Remove any box shadows */
 }
 
 .capsheet-hitters-table .opponent-input:focus {
   outline: none;
-  border-color: #80bdff;
-  background: #fff;
+  background: transparent; /* Keep transparent on focus */
+  border: none; /* No border on focus */
+  box-shadow: none; /* No shadow on focus */
+  color: #666; /* Slightly darker on focus for visibility */
 }
 
-.capsheet-hitters-table .closing-paren {
-  font-weight: 400;
+.capsheet-hitters-table .opponent-editable {
+  font-weight: bold;
+  font-size: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  outline: none;
+  display: inline;
+  min-width: 25px;
+  text-transform: uppercase;
+  cursor: text;
+}
+
+.capsheet-hitters-table .opponent-editable:focus {
+  background: rgba(0, 123, 255, 0.1);
+  border-radius: 2px;
+  outline: 1px solid #80bdff;
+}
+
+.capsheet-hitters-table .opponent-editable:empty:before {
+  content: 'OPP';
+  color: #ccc;
+  font-style: italic;
+}
+
+/* Ensure React Select dropdowns remain visible above team logos */
+.capsheet-hitters-table .select__menu,
+.capsheet-hitters-table .react-select__menu {
+  z-index: 9999 !important;
+}
+
+.capsheet-hitters-table .select__menu-portal,
+.capsheet-hitters-table .react-select__menu-portal {
+  z-index: 9999 !important;
+}
+
+/* Responsive adjustments for team logo */
+@media (max-width: 768px) {
+  .capsheet-hitters-table .consolidated-player-info .team-logo-bg {
+    height: 120%;
+    max-width: 50%;
+    opacity: 0.05; /* Even more subtle on mobile */
+    right: -10px; /* Move slightly more to the right */
+  }
+  
+  .capsheet-hitters-table tr:hover .consolidated-player-info .team-logo-bg {
+    opacity: 0.08; /* Reduced hover effect on mobile */
+  }
 }
 
 /* Performance chart cell */
