@@ -16,41 +16,6 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
   const [error, setError] = useState(null);
   const [debugInfo, setDebugInfo] = useState('');
   
-  // Helper function to get actual opponent matchup statistics
-  const getPlayerVsOpponentStats = async (playerName, playerTeam, opponentTeam) => {
-    try {
-      const analysis = await enhancedGameDataService.getPlayerVsOpponentAnalysis(
-        playerName, 
-        playerTeam, 
-        opponentTeam, 
-        'H' // Hits stat key
-      );
-      
-      if (analysis && analysis.games && analysis.games.length > 0) {
-        const games = analysis.games;
-        const totalHits = games.reduce((sum, game) => sum + (game.value || 0), 0);
-        const gamesPlayed = games.length;
-        const hitsPerGame = gamesPlayed > 0 ? (totalHits / gamesPlayed).toFixed(2) : '0.00';
-        
-        // Calculate batting average approximation
-        const totalABs = games.reduce((sum, game) => sum + (game.ab || 3), 0); // Default 3 AB per game if not available
-        const battingAverage = totalABs > 0 ? (totalHits / totalABs).toFixed(3) : '.000';
-        
-        return {
-          totalHits,
-          gamesPlayed,
-          hitsPerGame,
-          battingAverage,
-          gameHistory: games
-        };
-      }
-      
-      return { totalHits: 0, gamesPlayed: 0, hitsPerGame: '0.00', battingAverage: '.000', gameHistory: [] };
-    } catch (error) {
-      console.error('Error getting opponent stats:', error);
-      return { totalHits: 0, gamesPlayed: 0, hitsPerGame: '0.00', battingAverage: '.000', gameHistory: [] };
-    }
-  };
 
   useEffect(() => {
     const loadMatchupData = async () => {
@@ -68,7 +33,7 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
         
         console.log('[OpponentMatchupHitsCard] Game data:', gameData);
         
-        // Try to load from prop analysis data (similar to PlayerPropsLadder)
+        // Load from prop analysis and enhance with real opponent data
         try {
           const propResponse = await fetch('/data/prop_analysis/prop_analysis_latest.json');
           if (propResponse.ok) {
@@ -77,58 +42,147 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
             if (propData.propAnalysis && propData.propAnalysis.hits) {
               const hitsData = propData.propAnalysis.hits;
               
-              // Filter players who have games today and have opponent matchup potential
-              const todaysPlayers = [];
+              // Get players who have games today
+              const playersWithGamesToday = [];
               if (hitsData.topPlayers) {
                 for (const player of hitsData.topPlayers) {
-                  // Check if this player's team has a game today
-                  const hasGameToday = gameData.some(game => 
+                  const todaysGame = gameData.find(game => 
                     game.homeTeam === player.team || game.awayTeam === player.team
                   );
                   
-                  if (hasGameToday && player.seasonTotal > 0) {
-                    // Find opponent for today
-                    const todaysGame = gameData.find(game => 
-                      game.homeTeam === player.team || game.awayTeam === player.team
-                    );
+                  if (todaysGame && player.seasonTotal > 0) {
+                    const opponent = todaysGame.homeTeam === player.team 
+                      ? todaysGame.awayTeam 
+                      : todaysGame.homeTeam;
                     
-                    if (todaysGame) {
-                      const opponent = todaysGame.homeTeam === player.team 
-                        ? todaysGame.awayTeam 
-                        : todaysGame.homeTeam;
-                      
-                      // Get actual opponent matchup data using enhancedGameDataService
-                      const opponentStats = await getPlayerVsOpponentStats(player.name, player.team, opponent);
-                      
-                      todaysPlayers.push({
-                        playerName: player.name,
-                        playerTeam: player.team,
-                        opponentTeam: opponent,
-                        hitsPerGame: opponentStats.hitsPerGame || player.rate || 0,
-                        totalHits: opponentStats.totalHits || 0,
-                        gamesVsOpponent: opponentStats.gamesPlayed || 0,
-                        battingAvg: opponentStats.battingAverage || (player.rate * 0.3).toFixed(3),
-                        recentForm: player.trend === 'up' ? '🔥' : player.trend === 'down' ? '❄️' : '➡️',
-                        opponentHistory: opponentStats.gameHistory || []
-                      });
-                    }
+                    playersWithGamesToday.push({
+                      ...player,
+                      todaysOpponent: opponent,
+                      todaysGame: todaysGame
+                    });
                   }
                 }
               }
               
-              // Sort by hits per game and take top 25
-              const sortedPlayers = todaysPlayers
+              console.log(`[OpponentMatchupHitsCard] Found ${playersWithGamesToday.length} players with games today`);
+              
+              // Now load historical data for opponent analysis (similar to PlayerPropsLadder)
+              const endDate = currentDate || new Date();
+              const matchupDataPromises = playersWithGamesToday.map(async (player) => {
+                try {
+                  // Load historical data directly (bypass SharedDataManager like PlayerPropsLadder)
+                  const historicalData = {};
+                  const now = new Date(endDate);
+                  
+                  // Load last 90 days of data
+                  for (let daysBack = 0; daysBack < 90; daysBack++) {
+                    const searchDate = new Date(now);
+                    searchDate.setDate(searchDate.getDate() - daysBack);
+                    
+                    const year = searchDate.getFullYear();
+                    const seasonStart = year === 2025 ? new Date('2025-03-18') : new Date(`${year}-03-20`);
+                    const seasonEnd = new Date(`${year}-10-31`);
+                    if (searchDate < seasonStart || searchDate > seasonEnd) continue;
+                    
+                    const dateStr = searchDate.toISOString().split('T')[0];
+                    
+                    try {
+                      const [year, month, day] = dateStr.split('-');
+                      const monthName = searchDate.toLocaleString('default', { month: 'long' }).toLowerCase();
+                      const filePath = `/data/${year}/${monthName}/${monthName}_${day}_${year}.json`;
+                      
+                      const response = await fetch(filePath);
+                      if (response.ok) {
+                        const data = await response.json();
+                        if (data.players && Array.isArray(data.players) && data.players.length > 0) {
+                          historicalData[dateStr] = data;
+                        }
+                      }
+                    } catch (error) {
+                      continue;
+                    }
+                  }
+                  
+                  // Analyze games vs today's opponent
+                  let totalHits = 0;
+                  let gamesVsOpponent = 0;
+                  let totalABs = 0;
+                  const opponentGames = [];
+                  
+                  Object.entries(historicalData).forEach(([dateStr, dayData]) => {
+                    const playerData = dayData.players?.find(p => 
+                      p.name === player.name && p.team === player.team
+                    );
+                    
+                    if (playerData) {
+                      // Check if this was a game vs today's opponent
+                      const gameInfo = dayData.games?.find(g => 
+                        (g.homeTeam === player.team || g.awayTeam === player.team) &&
+                        (g.homeTeam === player.todaysOpponent || g.awayTeam === player.todaysOpponent)
+                      );
+                      
+                      if (gameInfo) {
+                        const hits = playerData.H || playerData.hits || 0;
+                        totalHits += hits;
+                        gamesVsOpponent++;
+                        totalABs += playerData.AB || playerData.ab || 3;
+                        opponentGames.push({
+                          date: dateStr,
+                          value: hits,
+                          ab: playerData.AB || playerData.ab || 3
+                        });
+                      }
+                    }
+                  });
+                  
+                  const hitsPerGame = gamesVsOpponent > 0 ? (totalHits / gamesVsOpponent).toFixed(2) : player.rate.toFixed(2);
+                  const battingAvg = totalABs > 0 ? (totalHits / totalABs).toFixed(3) : '.000';
+                  
+                  return {
+                    playerName: player.name,
+                    playerTeam: player.team,
+                    opponentTeam: player.todaysOpponent,
+                    hitsPerGame: hitsPerGame,
+                    totalHits: totalHits,
+                    gamesVsOpponent: gamesVsOpponent,
+                    battingAvg: battingAvg,
+                    recentForm: player.trend === 'up' ? '🔥' : player.trend === 'down' ? '❄️' : '➡️',
+                    opponentHistory: opponentGames.slice(-5).reverse() // Last 5 games
+                  };
+                } catch (error) {
+                  console.error(`Error processing ${player.name}:`, error);
+                  // Return player with season averages as fallback
+                  return {
+                    playerName: player.name,
+                    playerTeam: player.team,
+                    opponentTeam: player.todaysOpponent,
+                    hitsPerGame: player.rate.toFixed(2),
+                    totalHits: 0,
+                    gamesVsOpponent: 0,
+                    battingAvg: (player.rate * 0.3).toFixed(3),
+                    recentForm: player.trend === 'up' ? '🔥' : player.trend === 'down' ? '❄️' : '➡️',
+                    opponentHistory: []
+                  };
+                }
+              });
+              
+              // Wait for all player data to be processed
+              const processedPlayers = await Promise.all(matchupDataPromises);
+              
+              // Filter out players with no opponent history and sort
+              const qualifiedPlayers = processedPlayers
+                .filter(p => p.gamesVsOpponent >= 3) // Min 3 games vs opponent
                 .sort((a, b) => parseFloat(b.hitsPerGame) - parseFloat(a.hitsPerGame))
                 .slice(0, 25);
               
-              setMatchupData(sortedPlayers);
-              setDebugInfo(`Found ${sortedPlayers.length} players with today's games`);
-              console.log('[OpponentMatchupHitsCard] Successfully loaded data from prop analysis');
+              setMatchupData(qualifiedPlayers);
+              setDebugInfo(`Found ${qualifiedPlayers.length} qualified matchups (min 3 games)`);
+              console.log('[OpponentMatchupHitsCard] Successfully loaded and processed matchup data');
               return;
             }
           }
         } catch (propErr) {
-          console.log('[OpponentMatchupHitsCard] Prop analysis fallback failed, using original method');
+          console.log('[OpponentMatchupHitsCard] Error loading matchup data:', propErr);
         }
         
         // Fallback to original method if prop analysis fails
@@ -376,7 +430,7 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
         
         console.log(`[OpponentMatchupHRCard] Analyzing HR matchups for ${gameData.length} games`);
         
-        // Try to load from prop analysis data (similar to hits card)
+        // Load from prop analysis and enhance with real opponent data
         try {
           const propResponse = await fetch('/data/prop_analysis/prop_analysis_latest.json');
           if (propResponse.ok) {
@@ -385,57 +439,146 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
             if (propData.propAnalysis && propData.propAnalysis.home_runs) {
               const hrData = propData.propAnalysis.home_runs;
               
-              // Filter players who have games today and have HR potential
-              const todaysPlayers = [];
+              // Get players who have games today
+              const playersWithGamesToday = [];
               if (hrData.topPlayers) {
                 for (const player of hrData.topPlayers) {
-                  // Check if this player's team has a game today
-                  const hasGameToday = gameData.some(game => 
+                  const todaysGame = gameData.find(game => 
                     game.homeTeam === player.team || game.awayTeam === player.team
                   );
                   
-                  if (hasGameToday && player.seasonTotal > 0) {
-                    // Find opponent for today
-                    const todaysGame = gameData.find(game => 
-                      game.homeTeam === player.team || game.awayTeam === player.team
-                    );
+                  if (todaysGame && player.seasonTotal > 0) {
+                    const opponent = todaysGame.homeTeam === player.team 
+                      ? todaysGame.awayTeam 
+                      : todaysGame.homeTeam;
                     
-                    if (todaysGame) {
-                      const opponent = todaysGame.homeTeam === player.team 
-                        ? todaysGame.awayTeam 
-                        : todaysGame.homeTeam;
-                      
-                      // Get actual opponent HR matchup data
-                      const opponentHRStats = await getPlayerVsOpponentHRStats(player.name, player.team, opponent);
-                      
-                      todaysPlayers.push({
-                        playerName: player.name,
-                        playerTeam: player.team,
-                        opponentTeam: opponent,
-                        hrsPerGame: opponentHRStats.hrsPerGame || player.rate || 0,
-                        totalHRs: opponentHRStats.totalHRs || 0,
-                        gamesVsOpponent: opponentHRStats.gamesPlayed || 0,
-                        recentForm: player.trend === 'up' ? '🔥' : player.trend === 'down' ? '❄️' : '➡️',
-                        opponentHistory: opponentHRStats.gameHistory || []
-                      });
-                    }
+                    playersWithGamesToday.push({
+                      ...player,
+                      todaysOpponent: opponent,
+                      todaysGame: todaysGame
+                    });
                   }
                 }
               }
               
-              // Sort by HRs per game and take top 25
-              const sortedPlayers = todaysPlayers
-                .sort((a, b) => parseFloat(b.hrsPerGame) - parseFloat(a.hrsPerGame))
+              console.log(`[OpponentMatchupHRCard] Found ${playersWithGamesToday.length} players with games today`);
+              
+              // Now load historical data for opponent analysis
+              const endDate = currentDate || new Date();
+              const matchupDataPromises = playersWithGamesToday.map(async (player) => {
+                try {
+                  // Load historical data directly
+                  const historicalData = {};
+                  const now = new Date(endDate);
+                  
+                  // Load last 365 days for HR analysis (need more history for HRs)
+                  for (let daysBack = 0; daysBack < 365; daysBack++) {
+                    const searchDate = new Date(now);
+                    searchDate.setDate(searchDate.getDate() - daysBack);
+                    
+                    const year = searchDate.getFullYear();
+                    const seasonStart = year === 2025 ? new Date('2025-03-18') : new Date(`${year}-03-20`);
+                    const seasonEnd = new Date(`${year}-10-31`);
+                    if (searchDate < seasonStart || searchDate > seasonEnd) continue;
+                    
+                    const dateStr = searchDate.toISOString().split('T')[0];
+                    
+                    try {
+                      const [year, month, day] = dateStr.split('-');
+                      const monthName = searchDate.toLocaleString('default', { month: 'long' }).toLowerCase();
+                      const filePath = `/data/${year}/${monthName}/${monthName}_${day}_${year}.json`;
+                      
+                      const response = await fetch(filePath);
+                      if (response.ok) {
+                        const data = await response.json();
+                        if (data.players && Array.isArray(data.players) && data.players.length > 0) {
+                          historicalData[dateStr] = data;
+                        }
+                      }
+                    } catch (error) {
+                      continue;
+                    }
+                  }
+                  
+                  // Analyze games vs today's opponent
+                  let totalHRs = 0;
+                  let gamesVsOpponent = 0;
+                  const opponentGames = [];
+                  
+                  Object.entries(historicalData).forEach(([dateStr, dayData]) => {
+                    const playerData = dayData.players?.find(p => 
+                      p.name === player.name && p.team === player.team
+                    );
+                    
+                    if (playerData) {
+                      // Check if this was a game vs today's opponent
+                      const gameInfo = dayData.games?.find(g => 
+                        (g.homeTeam === player.team || g.awayTeam === player.team) &&
+                        (g.homeTeam === player.todaysOpponent || g.awayTeam === player.todaysOpponent)
+                      );
+                      
+                      if (gameInfo) {
+                        const hrs = playerData.HR || playerData.hr || playerData.homeRuns || 0;
+                        totalHRs += hrs;
+                        gamesVsOpponent++;
+                        opponentGames.push({
+                          date: dateStr,
+                          value: hrs
+                        });
+                      }
+                    }
+                  });
+                  
+                  const hrsPerGame = gamesVsOpponent > 0 ? (totalHRs / gamesVsOpponent).toFixed(3) : '0.000';
+                  
+                  return {
+                    playerName: player.name,
+                    playerTeam: player.team,
+                    opponentTeam: player.todaysOpponent,
+                    hrsPerGame: hrsPerGame,
+                    totalHRs: totalHRs,
+                    gamesVsOpponent: gamesVsOpponent,
+                    recentForm: player.trend === 'up' ? '🔥' : player.trend === 'down' ? '❄️' : '➡️',
+                    opponentHistory: opponentGames.slice(-5).reverse() // Last 5 games
+                  };
+                } catch (error) {
+                  console.error(`Error processing ${player.name}:`, error);
+                  // Return player with zero stats as fallback
+                  return {
+                    playerName: player.name,
+                    playerTeam: player.team,
+                    opponentTeam: player.todaysOpponent,
+                    hrsPerGame: '0.000',
+                    totalHRs: 0,
+                    gamesVsOpponent: 0,
+                    recentForm: player.trend === 'up' ? '🔥' : player.trend === 'down' ? '❄️' : '➡️',
+                    opponentHistory: []
+                  };
+                }
+              });
+              
+              // Wait for all player data to be processed
+              const processedPlayers = await Promise.all(matchupDataPromises);
+              
+              // Filter for players with HR history and sort
+              const qualifiedPlayers = processedPlayers
+                .filter(p => p.totalHRs > 0) // Must have at least 1 HR vs opponent
+                .sort((a, b) => {
+                  // Sort by HR rate, then by total HRs
+                  const rateCompare = parseFloat(b.hrsPerGame) - parseFloat(a.hrsPerGame);
+                  if (rateCompare !== 0) return rateCompare;
+                  return b.totalHRs - a.totalHRs;
+                })
                 .slice(0, 25);
               
-              setMatchupData(sortedPlayers);
-              setDebugInfo(`Found ${sortedPlayers.length} players with today's games`);
-              console.log('[OpponentMatchupHRCard] Successfully loaded data from prop analysis');
+              setMatchupData(qualifiedPlayers);
+              setDebugInfo(`Found ${qualifiedPlayers.length} players with HRs vs today's opponent`);
+              console.log('[OpponentMatchupHRCard] Successfully loaded and processed HR matchup data');
               return;
             }
           }
         } catch (propErr) {
-          console.log('[OpponentMatchupHRCard] Prop analysis fallback failed, using original method');
+          console.log('[OpponentMatchupHRCard] Error loading HR matchup data:', propErr);
         }
         
         // Fallback to original method if prop analysis fails
