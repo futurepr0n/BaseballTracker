@@ -391,3 +391,109 @@
 .theme-classic .mobile-card-content {
   background: #f1f3f4 !important;
 }
+
+/* Scratchpad Integration */
+
+/* Scratchpad indicator icon */
+.scratchpad-indicator {
+  margin-left: 6px;
+  font-size: 14px;
+  opacity: 0.8;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+/* Player in scratchpad styling */
+.mobile-card.in-scratchpad {
+  border-left: 4px solid #4CAF50;
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.mobile-card.in-scratchpad .mobile-card-header {
+  background: linear-gradient(90deg, rgba(76, 175, 80, 0.05) 0%, transparent 100%);
+}
+
+/* Long-press visual feedback */
+.mobile-card.long-pressing {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-color: #2196F3;
+  animation: longPressGlow 0.75s ease-in-out;
+}
+
+@keyframes longPressGlow {
+  0% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); }
+  50% { box-shadow: 0 4px 16px rgba(33, 150, 243, 0.4); }
+  100% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); }
+}
+
+.mobile-card.long-pressing .mobile-card-header {
+  background: linear-gradient(90deg, rgba(33, 150, 243, 0.1) 0%, transparent 100%);
+}
+
+/* User select prevention during long press */
+.mobile-card.long-pressing {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Touch feedback improvements */
+.mobile-card-header {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Accessibility improvements */
+.mobile-card[aria-pressed="true"] {
+  border-left: 4px solid #4CAF50;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .mobile-card.in-scratchpad {
+    border-left-width: 6px;
+    border-left-color: #2E7D2E;
+  }
+  
+  .scratchpad-indicator {
+    background: #2E7D2E;
+    color: white;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 12px;
+  }
+}
+
+/* Dark theme adjustments */
+@media (prefers-color-scheme: dark) {
+  .mobile-card.in-scratchpad {
+    background: rgba(76, 175, 80, 0.15);
+    border-left-color: #66BB6A;
+  }
+  
+  .mobile-card.long-pressing {
+    border-color: #42A5F5;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .scratchpad-indicator {
+    animation: none;
+  }
+  
+  .mobile-card.long-pressing {
+    animation: none;
+    transform: none;
+  }
+  
+  .mobile-card {
+    transition: none;
+  }
+}

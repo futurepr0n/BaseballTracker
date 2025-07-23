@@ -1,0 +1,167 @@
+/* SimpleDesktopScratchpadIcon.css - Clean, always-visible scratchpad icon */
+
+.simple-scratchpad-icon {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  padding: 0;
+  outline: none;
+  user-select: none;
+  /* Remove default button styling */
+  background-image: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Icon symbol styling */
+.simple-scratchpad-icon .icon-symbol {
+  color: #666;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+/* Not in scratchpad state - empty star */
+.simple-scratchpad-icon.not-in-scratchpad:hover {
+  background-color: #4CAF50;
+  border-color: #4CAF50;
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.simple-scratchpad-icon.not-in-scratchpad:hover .icon-symbol {
+  color: white;
+}
+
+/* In scratchpad state - filled star */
+.simple-scratchpad-icon.in-scratchpad {
+  background-color: #4CAF50;
+  border-color: #4CAF50;
+}
+
+.simple-scratchpad-icon.in-scratchpad .icon-symbol {
+  color: white;
+}
+
+.simple-scratchpad-icon.in-scratchpad:hover {
+  background-color: #f44336;
+  border-color: #f44336;
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+}
+
+/* Click feedback */
+.simple-scratchpad-icon:active {
+  transform: scale(0.95);
+}
+
+/* Focus styles for accessibility */
+.simple-scratchpad-icon:focus-visible {
+  outline: 2px solid #4CAF50;
+  outline-offset: 2px;
+}
+
+/* Success feedback animation when added */
+.simple-scratchpad-icon.success-added {
+  animation: successPulse 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes successPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.4);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .simple-scratchpad-icon {
+    background-color: rgba(30, 30, 30, 0.9);
+    border-color: #555;
+  }
+  
+  .simple-scratchpad-icon .icon-symbol {
+    color: #ccc;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .simple-scratchpad-icon {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .simple-scratchpad-icon,
+  .simple-scratchpad-icon .icon-symbol {
+    transition: none;
+  }
+  
+  .simple-scratchpad-icon.success-added {
+    animation: none;
+  }
+}
+
+/* Mobile adjustments - slightly smaller */
+@media (max-width: 768px) {
+  .simple-scratchpad-icon {
+    width: 20px;
+    height: 20px;
+    top: 4px;
+    right: 4px;
+    font-size: 12px;
+  }
+}
+
+/* Ensure icon doesn't interfere with other elements */
+.simple-scratchpad-icon {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Prevent icon clicks from bubbling to parent elements */
+.simple-scratchpad-icon * {
+  pointer-events: none;
+}
+
+/* Smooth entrance when parent item loads */
+.simple-scratchpad-icon {
+  animation: iconAppear 0.3s ease-out;
+}
+
+@keyframes iconAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTeamFilter } from '../TeamFilterContext';
+import SimpleDesktopScratchpadIcon from '../common/SimpleDesktopScratchpadIcon';
 import './MilestoneTrackingCard.css';
 
 const MilestoneTrackingCard = ({ currentDate }) => {
@@ -194,72 +195,84 @@ const MilestoneTrackingCard = ({ currentDate }) => {
 
       <div className="milestones-container">
         <div className="milestones-list">
-          {filteredMilestones.slice(0, 20).map((milestone, idx) => (
-            <div key={idx} className={`milestone-item heat-${milestone.milestone.heatLevel.toLowerCase()}`}>
-              <div className="milestone-header">
-                <div className="player-info">
-                  <span className="heat-emoji">{milestone.milestone.heatEmoji}</span>
-                  <span className="player-name">{milestone.player}</span>
-                  <span className="team">({milestone.team})</span>
-                </div>
-                <div className="milestone-target">
-                  <span 
-                    className="stat-value"
-                    style={{ color: getStatColor(milestone.milestone.stat) }}
-                  >
-                    {formatMilestone(
-                      milestone.milestone.current,
-                      milestone.milestone.target,
-                      milestone.milestone.stat
-                    )}
-                  </span>
-                </div>
-              </div>
-              
-              <div className="milestone-timeline">
-                <div className="timeline-item">
-                  <span className="timeline-label">Best Estimate:</span>
-                  <span className="timeline-value">
-                    {milestone.timeline.bestEstimate.games.toFixed(1)} games
-                    <span className="confidence">({milestone.timeline.bestEstimate.confidence}% conf)</span>
-                  </span>
-                </div>
+          {filteredMilestones.slice(0, 20).map((milestone, idx) => {
+            // Normalize player data for scratchpad
+            const playerForScratchpad = {
+              name: milestone.player,
+              team: milestone.team,
+              playerType: 'hitter' // milestone tracking is typically for hitters
+            };
+            
+            return (
+              <div key={idx} className={`milestone-item heat-${milestone.milestone.heatLevel.toLowerCase()}`}>
+                {/* Add scratchpad icon */}
+                <SimpleDesktopScratchpadIcon player={playerForScratchpad} />
                 
-                <div className="timeline-comparison">
-                  <div className="pace-item">
-                    <span className="pace-label">Season:</span>
-                    <span className="pace-value">{milestone.timeline.seasonPace.gamesNeeded.toFixed(1)}g</span>
+                <div className="milestone-header">
+                  <div className="player-info">
+                    <span className="heat-emoji">{milestone.milestone.heatEmoji}</span>
+                    <span className="player-name">{milestone.player}</span>
+                    <span className="team">({milestone.team})</span>
                   </div>
-                  <div className="pace-item">
-                    <span className="pace-label">Recent:</span>
-                    <span className="pace-value">
-                      {milestone.timeline.recentPace.gamesNeeded.toFixed(1)}g
-                      <span className="trend">{milestone.timeline.recentPace.trend}</span>
+                  <div className="milestone-target">
+                    <span 
+                      className="stat-value"
+                      style={{ color: getStatColor(milestone.milestone.stat) }}
+                    >
+                      {formatMilestone(
+                        milestone.milestone.current,
+                        milestone.milestone.target,
+                        milestone.milestone.stat
+                      )}
                     </span>
                   </div>
                 </div>
-              </div>
-              
-              {milestone.alerts && milestone.alerts.length > 0 && (
-                <div className="milestone-alerts">
-                  {milestone.alerts.map((alert, alertIdx) => (
-                    <span key={alertIdx} className="alert-badge">{alert}</span>
-                  ))}
+                
+                <div className="milestone-timeline">
+                  <div className="timeline-item">
+                    <span className="timeline-label">Best Estimate:</span>
+                    <span className="timeline-value">
+                      {milestone.timeline.bestEstimate.games.toFixed(1)} games
+                      <span className="confidence">({milestone.timeline.bestEstimate.confidence}% conf)</span>
+                    </span>
+                  </div>
+                  
+                  <div className="timeline-comparison">
+                    <div className="pace-item">
+                      <span className="pace-label">Season:</span>
+                      <span className="pace-value">{milestone.timeline.seasonPace.gamesNeeded.toFixed(1)}g</span>
+                    </div>
+                    <div className="pace-item">
+                      <span className="pace-label">Recent:</span>
+                      <span className="pace-value">
+                        {milestone.timeline.recentPace.gamesNeeded.toFixed(1)}g
+                        <span className="trend">{milestone.timeline.recentPace.trend}</span>
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              )}
-              
-              <div className="milestone-momentum">
-                {milestone.momentum.percentAboveSeason > 0 && (
-                  <span className="momentum-indicator">
-                    📈 {milestone.momentum.percentAboveSeason > 100 ? '+' : ''}{milestone.momentum.percentAboveSeason}% vs season avg
-                  </span>
+                
+                {milestone.alerts && milestone.alerts.length > 0 && (
+                  <div className="milestone-alerts">
+                    {milestone.alerts.map((alert, alertIdx) => (
+                      <span key={alertIdx} className="alert-badge">{alert}</span>
+                    ))}
+                  </div>
                 )}
-                <span className="recent-performance">
-                  Last 3: {milestone.momentum.last3Games} {milestone.milestone.stat}
-                </span>
+                
+                <div className="milestone-momentum">
+                  {milestone.momentum.percentAboveSeason > 0 && (
+                    <span className="momentum-indicator">
+                      📈 {milestone.momentum.percentAboveSeason > 100 ? '+' : ''}{milestone.momentum.percentAboveSeason}% vs season avg
+                    </span>
+                  )}
+                  <span className="recent-performance">
+                    Last 3: {milestone.momentum.last3Games} {milestone.milestone.stat}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         
         {filteredMilestones.length > 20 && (

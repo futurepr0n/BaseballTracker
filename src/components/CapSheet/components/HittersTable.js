@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import HitterRow from './TableRow/HitterRow';
 import PlayerSelector from './PlayerSelector';
 import { getMatchupFromTeam } from '../../../services/startingLineupService';
+import { usePlayerScratchpad } from '../../../contexts/PlayerScratchpadContext';
 import './HitterPerformanceLineChart.css';
 import '../styles/CapSheetTable.css';
 
@@ -35,6 +36,13 @@ const HittersTable = ({
   // State for auto-fill functionality
   const [isAutoFilling, setIsAutoFilling] = useState(false);
   const [autoFillStatus, setAutoFillStatus] = useState('');
+  
+  // State for scratchpad dump functionality
+  const [isDumpingFromScratchpad, setIsDumpingFromScratchpad] = useState(false);
+  const [dumpStatus, setDumpStatus] = useState('');
+  
+  // Access scratchpad context
+  const { getHitters: getScratchpadHitters, playerCount, hitterCount } = usePlayerScratchpad();
 
   // Check if any hitter has a second pitcher to determine if we need those columns
   const hasAnySecondPitcher = hitters.some(hitter => {
@@ -92,6 +100,85 @@ const HittersTable = ({
     }
   };
 
+  // Enhanced dump hitters from scratchpad using bet slip scanner logic
+  const handleDumpFromScratchpad = async () => {
+    const scratchpadHitters = getScratchpadHitters();
+    
+    if (scratchpadHitters.length === 0) {
+      setDumpStatus('No hitters in scratchpad');
+      setTimeout(() => setDumpStatus(''), 3000);
+      return;
+    }
+
+    setIsDumpingFromScratchpad(true);
+    setDumpStatus(`Processing ${scratchpadHitters.length} hitters from scratchpad...`);
+
+    try {
+      // Import enhanced matching utility
+      const { processScratchpadPlayerForCapSheet } = await import('../../../utils/enhancedPlayerMatching');
+      
+      let successCount = 0;
+      let skippedCount = 0;
+      let errorCount = 0;
+      let notFoundCount = 0;
+
+      for (const scratchpadPlayer of scratchpadHitters) {
+        setDumpStatus(`Processing ${scratchpadPlayer.name}...`);
+
+        try {
+          // Use enhanced player matching logic
+          const result = processScratchpadPlayerForCapSheet(
+            scratchpadPlayer,
+            hitterOptions,
+            hitters
+          );
+
+          if (result.success) {
+            // Found a match - add using the matched player ID
+            await onAddHitter(result.playerId);
+            successCount++;
+            console.log(`✅ Successfully added hitter: ${scratchpadPlayer.name} (${scratchpadPlayer.team})`);
+          } else if (result.reason === 'already_exists') {
+            skippedCount++;
+            console.log(`⏭️ Hitter ${scratchpadPlayer.name} already in table`);
+          } else if (result.reason === 'no_match') {
+            notFoundCount++;
+            console.warn(`❌ No match found for ${scratchpadPlayer.name} (${scratchpadPlayer.team})`);
+          }
+          
+        } catch (error) {
+          console.error(`💥 Error adding hitter ${scratchpadPlayer.name}:`, error);
+          errorCount++;
+        }
+      }
+
+      // Create comprehensive status message
+      const statusParts = [
+        successCount > 0 ? `Added ${successCount} hitters` : null,
+        skippedCount > 0 ? `${skippedCount} already in table` : null,
+        notFoundCount > 0 ? `${notFoundCount} not found` : null,
+        errorCount > 0 ? `${errorCount} failed` : null
+      ].filter(Boolean);
+
+      const finalStatus = statusParts.length > 0 ? statusParts.join(', ') : 'No changes made';
+      setDumpStatus(finalStatus);
+      
+      // Show longer status for complex results
+      const timeoutDuration = (notFoundCount > 0 || errorCount > 0) ? 7000 : 5000;
+      setTimeout(() => setDumpStatus(''), timeoutDuration);
+
+      // Log summary
+      console.log(`🏁 Scratchpad dump complete: ${finalStatus}`);
+
+    } catch (error) {
+      console.error('💥 Error during enhanced scratchpad dump:', error);
+      setDumpStatus('Error during dump operation - check console');
+      setTimeout(() => setDumpStatus(''), 5000);
+    } finally {
+      setIsDumpingFromScratchpad(false);
+    }
+  };
+
   return (
     <div className="section-container">
       <h3 className="section-header">
@@ -124,9 +211,24 @@ const HittersTable = ({
         >
           {isAutoFilling ? '⟳ Auto-filling...' : '🔄 Auto-fill Pitchers'}
         </button>
+        {hitterCount > 0 && (
+          <button
+            className="action-btn scratchpad-dump-btn"
+            onClick={handleDumpFromScratchpad}
+            disabled={isDumpingFromScratchpad || hitterCount === 0}
+            title={`Dump ${hitterCount} hitters from scratchpad to CapSheet`}
+          >
+            {isDumpingFromScratchpad ? '⟳ Adding...' : `📝 Dump ${hitterCount} Hitters`}
+          </button>
+        )}
         {autoFillStatus && (
           <span className="auto-fill-status">
             {autoFillStatus}
+          </span>
+        )}
+        {dumpStatus && (
+          <span className="dump-status">
+            {dumpStatus}
           </span>
         )}
       </div>

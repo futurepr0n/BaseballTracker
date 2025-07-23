@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './LikelyToHitCard.css';
 import { createSafeId, positionTooltip, setupTooltipCloseHandler } from '../../utils/tooltipUtils';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
+import SimpleDesktopScratchpadIcon from '../../common/SimpleDesktopScratchpadIcon';
+import { getTeamLogoUrl } from '../../../utils/teamUtils';
 import '../../common/MobilePlayerCard.css';
 
 /**
@@ -63,11 +65,14 @@ const LikelyToHitCard = ({
                 // Get team logo URL if teams data is available
                 const teamAbbr = player.team;
                 const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
-                const logoUrl = teamData ? teamData.logoUrl : null;
+                const logoUrl = teamData ? teamData.logoUrl : getTeamLogoUrl(player.team);
+                const teamColor = teamData ? teamData.primaryColor : "#FF9800";
                 
                 return (
-                  <li key={index} className="player-item">
-                    <div className="player-rank">
+                  <li key={index} className="player-item likely-hit-item">
+                    <SimpleDesktopScratchpadIcon player={player} />
+                    
+                    <div className="player-rank" style={{ backgroundColor: teamColor }}>
                       {logoUrl && (
                         <>
                           <img 
@@ -82,23 +87,25 @@ const LikelyToHitCard = ({
                       )}
                       <span className="rank-number">{index + 1}</span>
                     </div>
+                    
                     <div className="player-info">
                       <span className="player-name">{player.name}</span>
                       <span className="player-team">{player.team}</span>
-                      
-                      {/* Recent performance indicator (last 10 games) */}
-                      {player.recentPerformance && (
-                        <div className="recent-performance">
-                          {player.recentPerformance.map((hit, idx) => (
-                            <span 
-                              key={idx} 
-                              className={`performance-dot ${hit ? 'hit' : 'no-hit'}`}
-                              title={hit ? 'Hit' : 'No Hit'}
-                            ></span>
-                          )).reverse()}
-                        </div>
-                      )}
                     </div>
+                    
+                    {/* Recent performance indicator (last 10 games) */}
+                    {player.recentPerformance && (
+                      <div className="recent-performance">
+                        {player.recentPerformance.map((hit, idx) => (
+                          <span 
+                            key={idx} 
+                            className={`performance-dot ${hit ? 'hit' : 'no-hit'}`}
+                            title={hit ? 'Hit' : 'No Hit'}
+                          ></span>
+                        )).reverse()}
+                      </div>
+                    )}
+                    
                     <div 
                       className="player-stat tooltip-container"
                       data-tooltip-id={tooltipId}
@@ -112,7 +119,6 @@ const LikelyToHitCard = ({
                       <small>Max drought: {player.longestNoHitStreak} games</small>
                     </div>
                     
-                    {/* Enhanced background logo */}
                     {logoUrl && (
                       <img 
                         src={logoUrl} 

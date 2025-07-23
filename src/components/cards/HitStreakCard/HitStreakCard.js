@@ -3,6 +3,8 @@ import './HitStreakCard.css';
 import { createSafeId } from '../../utils/tooltipUtils';
 import { useTooltip } from '../../utils/TooltipContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
+import SimpleDesktopScratchpadIcon from '../../common/SimpleDesktopScratchpadIcon';
+import { getTeamLogoUrl } from '../../../utils/teamUtils';
 import '../../common/MobilePlayerCard.css';
 
 /**
@@ -53,28 +55,33 @@ const HitStreakCard = ({
                   // Get team logo URL if teams data is available
                   const teamAbbr = player.team;
                   const teamData = teams && teamAbbr ? teams[teamAbbr] : null;
-                  const logoUrl = teamData ? teamData.logoUrl : null;
+                  const logoUrl = teamData ? teamData.logoUrl : getTeamLogoUrl(player.team);
+                  const teamColor = teamData ? teamData.primaryColor : "#4CAF50";
                   
                   return (
-                    <li key={index} className="player-item">
-                    <div className="player-rank">
-                      {logoUrl && (
-                        <>
-                          <img 
-                            src={logoUrl} 
-                            alt="" 
-                            className="rank-logo" 
-                            loading="lazy"
-                            aria-hidden="true"
-                          />
-                          <div className="rank-overlay"></div>
-                        </>
-                      )}
-                      <span className="rank-number">{index + 1}</span>
-                    </div>
-                    <div className="player-info">
-                      <span className="player-name">{player.name}</span>
-                      <span className="player-team">{player.team}</span>
+                    <li key={index} className="player-item hit-streak-item">
+                      <SimpleDesktopScratchpadIcon player={player} />
+                      
+                      <div className="player-rank" style={{ backgroundColor: teamColor }}>
+                        {logoUrl && (
+                          <>
+                            <img 
+                              src={logoUrl} 
+                              alt="" 
+                              className="rank-logo" 
+                              loading="lazy"
+                              aria-hidden="true"
+                            />
+                            <div className="rank-overlay"></div>
+                          </>
+                        )}
+                        <span className="rank-number">{index + 1}</span>
+                      </div>
+                      
+                      <div className="player-info">
+                        <span className="player-name">{player.name}</span>
+                        <span className="player-team">{player.team}</span>
+                      </div>
                       
                       {/* Recent performance indicator (last 10 games) */}
                       <div className="recent-performance">
@@ -86,18 +93,17 @@ const HitStreakCard = ({
                           ></span>
                         )).reverse()}
                       </div>
-                    </div>
-                    <div 
-                      className="player-stat streak-stat tooltip-trigger"
-                      data-tooltip-id={tooltipId}
-                      onClick={(e) => handleTooltipClick(player, e)}
-                    >
-                      <div className="stat-highlight">{player.currentStreak} games</div>
-                      <small>Avg streak: {player.avgHitStreakLength.toFixed(1)}</small>
-                      <small>Continue: {(player.continuationProbability * 100).toFixed(1)}%</small>
-                    </div>
-                    
-                      {/* Enhanced background logo */}
+                      
+                      <div 
+                        className="player-stat streak-stat tooltip-trigger"
+                        data-tooltip-id={tooltipId}
+                        onClick={(e) => handleTooltipClick(player, e)}
+                      >
+                        <div className="stat-highlight">{player.currentStreak} games</div>
+                        <small>Avg streak: {player.avgHitStreakLength.toFixed(1)}</small>
+                        <small>Continue: {(player.continuationProbability * 100).toFixed(1)}%</small>
+                      </div>
+                      
                       {logoUrl && (
                         <img 
                           src={logoUrl} 

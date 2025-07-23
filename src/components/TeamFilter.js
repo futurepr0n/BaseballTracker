@@ -1,4 +1,5 @@
 import React from 'react';
+import { usePlayerScratchpad } from '../contexts/PlayerScratchpadContext';
 import './TeamFilter.css';
 
 /**
@@ -21,6 +22,9 @@ const TeamFilter = ({
   onMatchupToggle, 
   onReset 
 }) => {
+  // Access scratchpad context for filter indicator
+  const { filterEnabled: scratchpadFilterEnabled, playerCount: scratchpadPlayerCount } = usePlayerScratchpad();
+  
   // Convert teams object to array for dropdown
   const teams = Object.entries(teamData).map(([code, team]) => ({
     code,
@@ -65,10 +69,22 @@ const TeamFilter = ({
         )}
       </div>
 
+      {/* Scratchpad Filter Indicator */}
+      {scratchpadFilterEnabled && (
+        <div className="scratchpad-filter-indicator">
+          <div className="filter-status">
+            <span className="scratchpad-icon">📝</span>
+            <span className="scratchpad-text">
+              Scratchpad Filter: {scratchpadPlayerCount} player{scratchpadPlayerCount !== 1 ? 's' : ''}
+            </span>
+          </div>
+        </div>
+      )}
+
       <button 
         className="reset-filters" 
         onClick={onReset}
-        disabled={!selectedTeam && !includeMatchup}
+        disabled={!selectedTeam && !includeMatchup && !scratchpadFilterEnabled}
       >
         Reset Filters
       </button>

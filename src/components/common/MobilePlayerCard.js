@@ -6,6 +6,8 @@
  */
 
 import React, { useState } from 'react';
+import { usePlayerScratchpad } from '../../contexts/PlayerScratchpadContext';
+import { useLongPress } from '../../hooks/useLongPress';
 import './MobilePlayerCard.css';
 
 const MobilePlayerCard = ({
@@ -22,12 +24,48 @@ const MobilePlayerCard = ({
   // New props for controlled expansion
   controlled = false,
   isExpanded: externalExpanded = false,
-  onExpandChange = null
+  onExpandChange = null,
+  // Scratchpad integration props
+  enableScratchpad = true,
+  scratchpadSource = 'mobile-card'
 }) => {
   const [internalExpanded, setInternalExpanded] = useState(false);
   
   // Use external state if controlled, otherwise use internal state
   const isExpanded = controlled ? externalExpanded : internalExpanded;
+
+  // Scratchpad integration
+  const { togglePlayer, isPlayerInScratchpad } = usePlayerScratchpad();
+  
+  // Extract player data for scratchpad
+  const getPlayerData = () => ({
+    name: item.name || item.playerName || item.fullName,
+    fullName: item.fullName || item.name || item.playerName,
+    team: item.team,
+    playerType: item.playerType || (item.pitcher ? 'pitcher' : 'hitter'),
+    source: scratchpadSource
+  });
+
+  const isInScratchpad = enableScratchpad && isPlayerInScratchpad(getPlayerData());
+
+  // Long-press handling
+  const handleLongPress = () => {
+    if (!enableScratchpad) return;
+    
+    const playerData = getPlayerData();
+    if (playerData.name && playerData.team) {
+      togglePlayer(playerData);
+      
+      // Visual feedback
+      console.log(`${isInScratchpad ? 'Removed' : 'Added'} ${playerData.name} ${isInScratchpad ? 'from' : 'to'} scratchpad`);
+    }
+  };
+
+  const longPressHandlers = useLongPress(handleLongPress, {
+    threshold: 750,
+    onStart: () => console.log('Long press started'),
+    onCancel: () => console.log('Long press cancelled')
+  });
 
   const handleCardClick = (event) => {
     if (onCardClick) {
@@ -48,11 +86,12 @@ const MobilePlayerCard = ({
   };
 
   return (
-    <div className={`mobile-card ${className} ${isExpanded ? 'expanded' : ''}`}>
+    <div className={`mobile-card ${className} ${isExpanded ? 'expanded' : ''} ${isInScratchpad ? 'in-scratchpad' : ''} ${longPressHandlers.isLongPressing ? 'long-pressing' : ''}`}>
       <div 
         className="mobile-card-header" 
         onClick={handleCardClick}
         style={{ cursor: onCardClick ? 'pointer' : 'default' }}
+        {...(enableScratchpad ? longPressHandlers : {})}
       >
         {showRank && (
           <div className="player-rank">
@@ -61,7 +100,12 @@ const MobilePlayerCard = ({
         )}
         
         <div className="player-info">
-          <div className="player-name">{item.name || item.playerName || item.fullName}</div>
+          <div className="player-name">
+            {item.name || item.playerName || item.fullName}
+            {isInScratchpad && (
+              <span className="scratchpad-indicator" title="In scratchpad">📝</span>
+            )}
+          </div>
           <div className="team-info">
             {item.team && <span className="team">{item.team}</span>}
             {item.opponent && <span className="vs"> vs {item.opponent}</span>}

@@ -4,6 +4,7 @@ import { useTeamFilter } from '../TeamFilterContext';
 import { useHandedness } from '../../contexts/HandednessContext';
 import GlassCard, { GlassScrollableContainer } from './GlassCard/GlassCard';
 import { getPlayerDisplayName, getTeamDisplayName } from '../../utils/playerNameUtils';
+import SimpleDesktopScratchpadIcon from '../common/SimpleDesktopScratchpadIcon';
 import './BarrelMatchupCard.css';
 
 const BarrelMatchupCard = ({ currentDate }) => {
@@ -509,6 +510,14 @@ const BarrelMatchupCard = ({ currentDate }) => {
               <React.Fragment key={index}>
                 <tr className="data-row" onClick={() => toggleRowExpansion(index)}>
                   <td className="player-cell">
+                    {/* Add scratchpad icon */}
+                    <SimpleDesktopScratchpadIcon 
+                      player={{
+                        name: getPlayerDisplayName(pick),
+                        team: getTeamDisplayName(pick).split(' ')[0], // Extract team abbreviation
+                        playerType: 'hitter'
+                      }} 
+                    />
                     <div className="player-info">
                       <span className="player-name">{getPlayerDisplayName(pick)}</span>
                       <span className="team-info">{getTeamDisplayName(pick)} vs {pick.pitcher}</span>
@@ -709,6 +718,14 @@ const BarrelMatchupCard = ({ currentDate }) => {
             {sortedPicks.map((pick, index) => (
               <div key={index} className={`mobile-card ${expandedRows[index] ? 'expanded' : ''}`}>
                 <div className="mobile-card-header" onClick={() => toggleRowExpansion(index)}>
+                  {/* Add scratchpad icon for mobile */}
+                  <SimpleDesktopScratchpadIcon 
+                    player={{
+                      name: getPlayerDisplayName(pick),
+                      team: getTeamDisplayName(pick).split(' ')[0], // Extract team abbreviation
+                      playerType: 'hitter'
+                    }} 
+                  />
                   <div className="player-rank">
                     <span className="rank-number">{index + 1}</span>
                   </div>
