@@ -12,7 +12,7 @@ const HellraiserCard = ({ currentDate }) => {
   const [selectedPathway, setSelectedPathway] = useState('all');
   const [selectedValue, setSelectedValue] = useState('all');
   const [showDetails, setShowDetails] = useState({});
-  const { selectedTeam, includeMatchup, matchupTeam } = useTeamFilter();
+  const { selectedTeam, includeMatchup, matchupTeam, shouldIncludePlayer } = useTeamFilter();
 
   useEffect(() => {
     loadHellraiserAnalysis();
@@ -116,6 +116,13 @@ const HellraiserCard = ({ currentDate }) => {
         }
       });
     }
+    
+    // Apply scratchpad filtering - filter by player name and team
+    filteredPicks = filteredPicks.filter(pick => {
+      const playerName = pick.playerName || pick.player_name || '';
+      const playerTeam = pick.team || pick.Team || '';
+      return shouldIncludePlayer(playerTeam, playerName);
+    });
     
     return filteredPicks;
   };

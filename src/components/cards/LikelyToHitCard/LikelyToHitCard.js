@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './LikelyToHitCard.css';
 import { createSafeId, positionTooltip, setupTooltipCloseHandler } from '../../utils/tooltipUtils';
+import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import SimpleDesktopScratchpadIcon from '../../common/SimpleDesktopScratchpadIcon';
 import { getTeamLogoUrl } from '../../../utils/teamUtils';
@@ -17,6 +18,7 @@ const LikelyToHitCard = ({
   teams
 }) => {
   const [activeTooltip, setActiveTooltip] = useState(null);
+  const { shouldIncludePlayer } = useTeamFilter();
 
   // Close tooltips when date changes
   useEffect(() => {
@@ -27,6 +29,11 @@ const LikelyToHitCard = ({
   useEffect(() => {
     return setupTooltipCloseHandler(setActiveTooltip);
   }, []);
+
+  // Filter players based on team and scratchpad filters
+  const filteredPlayers = (hitStreakData.likelyToGetHit || []).filter(player => 
+    shouldIncludePlayer(player.team, player.name)
+  );
 
   const toggleTooltip = (player) => {
     const safeId = createSafeId(player.name, player.team);
@@ -55,10 +62,10 @@ const LikelyToHitCard = ({
         <div className="desktop-view">
           {isLoading ? (
             <div className="loading-indicator">Loading stats...</div>
-          ) : hitStreakData.likelyToGetHit && hitStreakData.likelyToGetHit.length > 0 ? (
+          ) : filteredPlayers.length > 0 ? (
             <div className="scrollable-container">
             <ul className="player-list">
-              {hitStreakData.likelyToGetHit.slice(0, 10).map((player, index) => {
+              {filteredPlayers.slice(0, 10).map((player, index) => {
                 const safeId = createSafeId(player.name, player.team);
                 const tooltipId = `likely_hit_${safeId}`;
                 
@@ -142,9 +149,9 @@ const LikelyToHitCard = ({
         <div className="mobile-view">
           {isLoading ? (
             <div className="loading-indicator">Loading stats...</div>
-          ) : hitStreakData.likelyToGetHit && hitStreakData.likelyToGetHit.length > 0 ? (
+          ) : filteredPlayers.length > 0 ? (
             <div className="mobile-cards">
-              {hitStreakData.likelyToGetHit.slice(0, 10).map((player, index) => {
+              {filteredPlayers.slice(0, 10).map((player, index) => {
                 const secondaryMetrics = [
                   { label: 'Hit Prob', value: `${(player.streakEndProbability * 100).toFixed(1)}%` },
                   { label: 'Max Drought', value: `${player.longestNoHitStreak} games` }
@@ -215,7 +222,7 @@ const LikelyToHitCard = ({
       {/* Tooltips rendered outside card to avoid clipping - keep as is */}
       {activeTooltip && activeTooltip.startsWith('likely_hit_') && (
         <>
-          {hitStreakData.likelyToGetHit.slice(0, 10).map((player) => {
+          {filteredPlayers.slice(0, 10).map((player) => {
             const safeId = createSafeId(player.name, player.team);
             const tooltipKey = `likely_hit_${safeId}`;
             

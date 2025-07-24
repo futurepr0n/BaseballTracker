@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTeamFilter } from '../TeamFilterContext';
+import { usePlayerScratchpad } from '../../contexts/PlayerScratchpadContext';
 import SimpleDesktopScratchpadIcon from '../common/SimpleDesktopScratchpadIcon';
 import './MilestoneTrackingCard.css';
 
@@ -12,6 +13,7 @@ const MilestoneTrackingCard = ({ currentDate }) => {
   const [sortBy, setSortBy] = useState('urgency'); // urgency, timeline, player
   
   const { shouldIncludePlayer, isFiltering } = useTeamFilter();
+  const { filterEnabled: scratchpadFilterEnabled } = usePlayerScratchpad();
 
   useEffect(() => {
     const loadMilestoneData = async () => {
@@ -48,7 +50,7 @@ const MilestoneTrackingCard = ({ currentDate }) => {
     };
     
     loadMilestoneData();
-  }, [currentDate]);
+  }, [currentDate, scratchpadFilterEnabled]);
 
   const filterMilestones = () => {
     if (!milestoneData || !milestoneData.milestones) return [];
@@ -57,7 +59,10 @@ const MilestoneTrackingCard = ({ currentDate }) => {
     
     // Apply team filter
     if (isFiltering) {
-      filtered = filtered.filter(m => shouldIncludePlayer(m.team));
+      filtered = filtered.filter(m => {
+        const playerName = m.player || m.playerName || '';
+        return shouldIncludePlayer(m.team, playerName);
+      });
     }
     
     // Apply heat level filter

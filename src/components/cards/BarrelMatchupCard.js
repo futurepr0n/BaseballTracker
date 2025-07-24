@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import hellraiserAnalysisService from '../../services/hellraiserAnalysisService';
 import { useTeamFilter } from '../TeamFilterContext';
+import { usePlayerScratchpad } from '../../contexts/PlayerScratchpadContext';
 import { useHandedness } from '../../contexts/HandednessContext';
 import GlassCard, { GlassScrollableContainer } from './GlassCard/GlassCard';
 import { getPlayerDisplayName, getTeamDisplayName } from '../../utils/playerNameUtils';
@@ -13,7 +14,8 @@ const BarrelMatchupCard = ({ currentDate }) => {
   const [error, setError] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'pitcherContactAllowed', direction: 'desc' });
   const [expandedRows, setExpandedRows] = useState({});
-  const { selectedTeam, includeMatchup, matchupTeam } = useTeamFilter();
+  const { selectedTeam, includeMatchup, matchupTeam, shouldIncludePlayer } = useTeamFilter();
+  const { filterEnabled: scratchpadFilterEnabled } = usePlayerScratchpad();
   const { selectedHandedness, getPlayerHandednessData, loadHandednessDatasets, handednessDatasets, loading: handednessLoading } = useHandedness();
 
   const loadBarrelAnalysis = useCallback(async () => {
@@ -54,7 +56,7 @@ const BarrelMatchupCard = ({ currentDate }) => {
     } finally {
       setLoading(false);
     }
-  }, [currentDate, selectedTeam, includeMatchup, matchupTeam, selectedHandedness]);
+  }, [currentDate, selectedTeam, includeMatchup, matchupTeam, selectedHandedness, scratchpadFilterEnabled]);
 
   useEffect(() => {
     loadHandednessDatasets();
@@ -415,7 +417,14 @@ const BarrelMatchupCard = ({ currentDate }) => {
     );
   }
 
-  const sortedPicks = sortData(analysisData.picks);
+  // Apply scratchpad filtering before sorting
+  const filteredPicks = analysisData.picks.filter(pick => {
+    const playerName = pick.playerName || pick.player_name || '';
+    const playerTeam = pick.team || pick.Team || '';
+    return shouldIncludePlayer(playerTeam, playerName);
+  });
+  
+  const sortedPicks = sortData(filteredPicks);
 
   return (
     <GlassCard className="barrel-matchup-card" variant="default">

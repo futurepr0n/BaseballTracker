@@ -18,7 +18,7 @@ const HomeRunLeadersCard = ({
   timePeriodText,
   teams 
 }) => {
-  const { isFiltering, selectedTeam, getTeamName, includeMatchup, matchupTeam } = useTeamFilter();
+  const { isFiltering, selectedTeam, getTeamName, includeMatchup, matchupTeam, shouldIncludePlayer } = useTeamFilter();
 
   // Get appropriate display limit based on filtering
   const getDisplayLimit = () => {

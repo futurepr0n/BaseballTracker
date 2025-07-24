@@ -86,6 +86,10 @@ export function TeamFilterProvider({ children, teamData, gameData }) {
     setSelectedTeam(null);
     setIncludeMatchup(false);
     setMatchupTeam(null);
+    // Also reset scratchpad filter if it's enabled
+    if (scratchpadContext?.filterEnabled) {
+      scratchpadContext.toggleFilter();
+    }
   };
   
   // Helper function to check if a player should be filtered based on team and scratchpad

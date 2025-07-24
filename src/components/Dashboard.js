@@ -5,6 +5,7 @@ import './Dashboard.css';
 import TeamFilter from './TeamFilter';
 import FilterIndicator from './FilterIndicator';
 import { useTeamFilter } from './TeamFilterContext';
+import { usePlayerScratchpad } from '../contexts/PlayerScratchpadContext';
 
 // Import theme context for Dashboard-specific theming
 import { useTheme } from '../contexts/ThemeContext';
@@ -82,6 +83,9 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     isFiltering,
     getTeamName
   } = useTeamFilter();
+  
+  // Get scratchpad context for dependency tracking
+  const { filterEnabled: scratchpadFilterEnabled } = usePlayerScratchpad();
   
   // Get theme context for Dashboard-specific styling
   const { themeMode } = useTheme();
@@ -256,9 +260,10 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
         
         // Apply team filtering if needed (matching your HR prediction logic)
         if (isFiltering) {
-          predictions = predictions.filter(player => 
-            shouldIncludePlayer(player.team)
-          );
+          predictions = predictions.filter(player => {
+            const playerName = player.playerName || player.name || player.Name || '';
+            return shouldIncludePlayer(player.team, playerName);
+          });
         }
         
         setPoorPerformancePredictions(predictions);
@@ -273,7 +278,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
   };
   
   loadPoorPerformancePredictions();
-}, [stableDateString, isFiltering, shouldIncludePlayer]); // Same dependencies as your HR predictions
+}, [stableDateString, isFiltering, shouldIncludePlayer, scratchpadFilterEnabled]); // Same dependencies as your HR predictions
 
 useEffect(() => {
   const loadPositiveMomentumPredictions = async () => {
@@ -303,9 +308,10 @@ useEffect(() => {
         
         // Apply team filtering if needed (matching your HR prediction logic)
         if (isFiltering) {
-          predictions = predictions.filter(player => 
-            shouldIncludePlayer(player.team)
-          );
+          predictions = predictions.filter(player => {
+            const playerName = player.playerName || player.name || player.Name || '';
+            return shouldIncludePlayer(player.team, playerName);
+          });
         }
         
         setPositiveMomentumPredictions(predictions);
@@ -320,17 +326,18 @@ useEffect(() => {
   };
   
   loadPositiveMomentumPredictions();
-}, [stableDateString, isFiltering, shouldIncludePlayer]); // Same dependencies as other predictions
+}, [stableDateString, isFiltering, shouldIncludePlayer, scratchpadFilterEnabled]); // Same dependencies as other predictions
 
 
   // Filter player data based on team selection
   const filteredPlayerData = useMemo(() => {
     if (!isFiltering) return playerData;
     
-    return playerData.filter(player => 
-      shouldIncludePlayer(player.team)
-    );
-  }, [playerData, isFiltering, shouldIncludePlayer]);
+    return playerData.filter(player => {
+      const playerName = player.name || player.Name || '';
+      return shouldIncludePlayer(player.team, playerName);
+    });
+  }, [playerData, isFiltering, shouldIncludePlayer, scratchpadFilterEnabled]);
   
   // Split filtered data into batters and pitchers
   const filteredBatterData = useMemo(() => {
@@ -489,9 +496,10 @@ useEffect(() => {
           
           // Apply team filtering if needed
           if (isFiltering) {
-            predictions = predictions.filter(player => 
-              shouldIncludePlayer(player.team)
-            );
+            predictions = predictions.filter(player => {
+              const playerName = player.playerName || player.name || player.Name || '';
+              return shouldIncludePlayer(player.team, playerName);
+            });
           }
           
           setPlayersWithHomeRunPrediction(predictions);
@@ -505,7 +513,7 @@ useEffect(() => {
     };
     
     loadHRPredictions();
-  }, [stableDateString, isFiltering, shouldIncludePlayer]);
+  }, [stableDateString, isFiltering, shouldIncludePlayer, scratchpadFilterEnabled]);
   
   // Load additional stats (day of week hits and hit streak data) with filtering
   useEffect(() => {
@@ -541,12 +549,14 @@ useEffect(() => {
           if (isFiltering) {
             const filteredData = {
               ...data,
-              topHitsByTotal: data.topHitsByTotal.filter(player => 
-                shouldIncludePlayer(player.team)
-              ),
-              topHitsByRate: data.topHitsByRate.filter(player => 
-                shouldIncludePlayer(player.team)
-              )
+              topHitsByTotal: data.topHitsByTotal.filter(player => {
+                const playerName = player.name || player.Name || '';
+                return shouldIncludePlayer(player.team, playerName);
+              }),
+              topHitsByRate: data.topHitsByRate.filter(player => {
+                const playerName = player.name || player.Name || '';
+                return shouldIncludePlayer(player.team, playerName);
+              })
             };
             setDayOfWeekHits(filteredData);
           } else {
@@ -576,18 +586,22 @@ useEffect(() => {
           // Apply team filtering if needed
           if (isFiltering) {
             const filteredData = {
-              hitStreaks: data.hitStreaks.filter(player => 
-                shouldIncludePlayer(player.team)
-              ),
-              noHitStreaks: data.noHitStreaks.filter(player => 
-                shouldIncludePlayer(player.team)
-              ),
-              likelyToGetHit: data.likelyToGetHit.filter(player => 
-                shouldIncludePlayer(player.team)
-              ),
-              likelyToContinueStreak: data.likelyToContinueStreak.filter(player => 
-                shouldIncludePlayer(player.team)
-              )
+              hitStreaks: data.hitStreaks.filter(player => {
+                const playerName = player.name || player.Name || '';
+                return shouldIncludePlayer(player.team, playerName);
+              }),
+              noHitStreaks: data.noHitStreaks.filter(player => {
+                const playerName = player.name || player.Name || '';
+                return shouldIncludePlayer(player.team, playerName);
+              }),
+              likelyToGetHit: data.likelyToGetHit.filter(player => {
+                const playerName = player.name || player.Name || '';
+                return shouldIncludePlayer(player.team, playerName);
+              }),
+              likelyToContinueStreak: data.likelyToContinueStreak.filter(player => {
+                const playerName = player.name || player.Name || '';
+                return shouldIncludePlayer(player.team, playerName);
+              })
             };
             setHitStreakData(filteredData);
           } else {
@@ -602,7 +616,7 @@ useEffect(() => {
     };
     
     loadAdditionalStats();
-  }, [stableDateString, isFiltering, shouldIncludePlayer]);
+  }, [stableDateString, isFiltering, shouldIncludePlayer, scratchpadFilterEnabled]);
 
   // Load pitcher matchup data with filtering
   useEffect(() => {
@@ -638,23 +652,29 @@ useEffect(() => {
           // Apply team filtering if needed
           if (isFiltering) {
             // Filter pitcher matchups
-            const filteredToughMatchups = data.toughPitcherMatchups.filter(pitcher => 
-              shouldIncludePlayer(pitcher.team)
-            );
+            const filteredToughMatchups = data.toughPitcherMatchups.filter(pitcher => {
+              const pitcherName = pitcher.name || pitcher.Name || '';
+              return shouldIncludePlayer(pitcher.team, pitcherName);
+            });
             
-            const filteredFavorableMatchups = data.favorablePitcherMatchups.filter(pitcher => 
-              shouldIncludePlayer(pitcher.team)
-            );
+            const filteredFavorableMatchups = data.favorablePitcherMatchups.filter(pitcher => {
+              const pitcherName = pitcher.name || pitcher.Name || '';
+              return shouldIncludePlayer(pitcher.team, pitcherName);
+            });
             
-            const filteredTeamAdvantages = data.teamHandednessAdvantages.filter(team => 
-              shouldIncludePlayer(team.team)
-            );
+            const filteredTeamAdvantages = data.teamHandednessAdvantages.filter(team => {
+              // For team advantages, we don't filter by player name - just check if team should be included
+              // But we still need to pass an empty string for player name to make function work
+              return shouldIncludePlayer(team.team, '');
+            });
             
             // Filter pitchers by team
             const filteredPitchersByTeam = {};
             
             Object.keys(data.allPitchersByTeam || {}).forEach(teamCode => {
-              if (shouldIncludePlayer(teamCode)) {
+              // For team-level filtering, we don't have specific player names
+              // But we still need to pass an empty string for player name to make function work
+              if (shouldIncludePlayer(teamCode, '')) {
                 filteredPitchersByTeam[teamCode] = data.allPitchersByTeam[teamCode];
               }
             });
@@ -683,7 +703,7 @@ useEffect(() => {
     };
     
     loadPitcherMatchups();
-  }, [stableDateString, isFiltering, shouldIncludePlayer]);
+  }, [stableDateString, isFiltering, shouldIncludePlayer, scratchpadFilterEnabled]);
   
   // Load player performance data and calculate top performers with filtering
   useEffect(() => {
@@ -714,9 +734,10 @@ useEffect(() => {
             console.log("[Dashboard] Team filtering active for performance data - generating comprehensive recent HR list");
             
             // Get all players from the filtered teams with HR data
-            const allTeamPlayersWithHRs = data.players ? data.players.filter(player => 
-              shouldIncludePlayer(player.team) && player.lastHRDate
-            ) : [];
+            const allTeamPlayersWithHRs = data.players ? data.players.filter(player => {
+              const playerName = player.name || player.Name || '';
+              return shouldIncludePlayer(player.team, playerName) && player.lastHRDate;
+            }) : [];
             
             // Sort by most recent HR date, then by total HRs
             const comprehensiveRecentHRs = allTeamPlayersWithHRs.sort((a, b) => {
@@ -730,9 +751,10 @@ useEffect(() => {
             
             filteredData = {
               ...data,
-              players: data.players ? data.players.filter(player => 
-                shouldIncludePlayer(player.team)
-              ) : [],
+              players: data.players ? data.players.filter(player => {
+                const playerName = player.name || player.Name || '';
+                return shouldIncludePlayer(player.team, playerName);
+              }) : [],
               recentHRs: comprehensiveRecentHRs // Use comprehensive list for team filtering
             };
           }
@@ -803,7 +825,7 @@ useEffect(() => {
     };
     
     loadPlayerPerformance();
-  }, [stableDateString, isFiltering, shouldIncludePlayer]);
+  }, [stableDateString, isFiltering, shouldIncludePlayer, scratchpadFilterEnabled]);
   
   // Load rolling stats (with priority: today > yesterday > 7-day rolling > season)
   useEffect(() => {
@@ -836,9 +858,9 @@ useEffect(() => {
           const rollingStatsData = JSON.parse(text);
           console.log(`[Dashboard] Successfully loaded rolling stats from file`);
           
-          // ENHANCED: Use comprehensive data for team filtering
-          if (isFiltering && selectedTeam) {
-            console.log(`[Dashboard] Team filtering active - using comprehensive data`);
+          // ENHANCED: Use comprehensive data for team filtering or scratchpad filtering
+          if (isFiltering) {
+            console.log(`[Dashboard] Filtering active (team or scratchpad) - using comprehensive data`);
             
             // Use comprehensive data (allHitters, allHRLeaders) for team filtering
             const allHitters = rollingStatsData.allHitters || rollingStatsData.topHitters || [];
@@ -848,17 +870,20 @@ useEffect(() => {
             console.log(`[Dashboard] Available comprehensive data: ${allHitters.length} hitters, ${allHRLeaders.length} HR leaders, ${allStrikeouts.length} strikeout pitchers`);
             
             // Filter by team using comprehensive data
-            const filteredHitters = allHitters.filter(player => 
-              shouldIncludePlayer(player.team)
-            );
+            const filteredHitters = allHitters.filter(player => {
+              const playerName = player.name || player.Name || '';
+              return shouldIncludePlayer(player.team, playerName);
+            });
             
-            const filteredHomers = allHRLeaders.filter(player => 
-              shouldIncludePlayer(player.team)
-            );
+            const filteredHomers = allHRLeaders.filter(player => {
+              const playerName = player.name || player.Name || '';
+              return shouldIncludePlayer(player.team, playerName);
+            });
             
-            const filteredStrikeouts = allStrikeouts.filter(player => 
-              shouldIncludePlayer(player.team)
-            );
+            const filteredStrikeouts = allStrikeouts.filter(player => {
+              const playerName = player.name || player.Name || '';
+              return shouldIncludePlayer(player.team, playerName);
+            });
             
             console.log(`[Dashboard] After team filtering: ${filteredHitters.length} hitters, ${filteredHomers.length} HR leaders, ${filteredStrikeouts.length} strikeout pitchers`);
             
@@ -941,12 +966,14 @@ useEffect(() => {
               console.log(`[Dashboard] Legacy method with team filtering - processing ALL team players`);
               
               // Filter all players by team (not just top performers)
-              allBatters = allBatters.filter(player => 
-                shouldIncludePlayer(player.team)
-              );
-              allPitchers = allPitchers.filter(player => 
-                shouldIncludePlayer(player.team)
-              );
+              allBatters = allBatters.filter(player => {
+                const playerName = player.name || player.Name || '';
+                return shouldIncludePlayer(player.team, playerName);
+              });
+              allPitchers = allPitchers.filter(player => {
+                const playerName = player.name || player.Name || '';
+                return shouldIncludePlayer(player.team, playerName);
+              });
             }
             
             // Find ALL performers (not limited) for team filtering
@@ -1003,9 +1030,15 @@ useEffect(() => {
       
       // Get ALL team players (not pre-filtered)
       const allTeamBatters = playerData
-        .filter(player => (player.playerType === 'hitter' || !player.playerType) && shouldIncludePlayer(player.team));
+        .filter(player => {
+          const playerName = player.name || player.Name || '';
+          return (player.playerType === 'hitter' || !player.playerType) && shouldIncludePlayer(player.team, playerName);
+        });
       const allTeamPitchers = playerData
-        .filter(player => player.playerType === 'pitcher' && shouldIncludePlayer(player.team));
+        .filter(player => {
+          const playerName = player.name || player.Name || '';
+          return player.playerType === 'pitcher' && shouldIncludePlayer(player.team, playerName);
+        });
       
       batters = allTeamBatters;
       pitchers = allTeamPitchers;
@@ -1039,14 +1072,17 @@ useEffect(() => {
   };
   
   loadEnhancedRollingStats();
-}, [filteredPlayerData, filteredBatterData, filteredPitcherData, stableDateString, isFiltering, shouldIncludePlayer, rollingStatsType, selectedTeam, includeMatchup, matchupTeam, playerData]);
+}, [filteredPlayerData, filteredBatterData, filteredPitcherData, stableDateString, isFiltering, shouldIncludePlayer, rollingStatsType, selectedTeam, includeMatchup, matchupTeam, playerData, scratchpadFilterEnabled]);
 
 // Also update the generateTeamSpecificStats function to be more comprehensive
 const generateTeamSpecificStats = (playerData, selectedTeam, includeMatchup, matchupTeam, shouldIncludePlayer) => {
   console.log(`[generateTeamSpecificStats] Generating comprehensive stats for team filter`);
   
   // Filter ALL players for the selected team(s) - this ensures we get everyone
-  const teamFilteredPlayers = playerData.filter(player => shouldIncludePlayer(player.team));
+  const teamFilteredPlayers = playerData.filter(player => {
+    const playerName = player.name || player.Name || '';
+    return shouldIncludePlayer(player.team, playerName);
+  });
   
   console.log(`[generateTeamSpecificStats] Found ${teamFilteredPlayers.length} total team players`);
   

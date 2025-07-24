@@ -9,6 +9,7 @@ import {
   getCurrentTimeSlot
 } from '../../../services/dataService';
 import { getPlayerDisplayName, getTeamDisplayName } from '../../../utils/playerNameUtils';
+import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import '../../common/MobilePlayerCard.css';
 import './TimeSlotHitsCard.css';
@@ -19,6 +20,7 @@ const TimeSlotHitsCard = ({ gameData, currentDate, teams }) => {
   const [currentTimeSlot, setCurrentTimeSlot] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { shouldIncludePlayer } = useTeamFilter();
 
   useEffect(() => {
     const analyzeTimeSlotPerformance = async () => {
@@ -182,7 +184,9 @@ const TimeSlotHitsCard = ({ gameData, currentDate, teams }) => {
             <div className="desktop-view">
               <div className="scrollable-container">
                 <ul className="player-list">
-                  {timeSlotData.map((player, index) => {
+                  {timeSlotData.filter(player => 
+                    shouldIncludePlayer(player.team, player.name)
+                  ).slice(0, 10).map((player, index) => {
                     const teamInfo = getTeamInfo(player.team);
                     
                     return (
@@ -236,7 +240,9 @@ const TimeSlotHitsCard = ({ gameData, currentDate, teams }) => {
             {/* Mobile View */}
             <div className="mobile-view">
               <div className="mobile-cards">
-                {timeSlotData.map((player, index) => {
+                {timeSlotData.filter(player => 
+                  shouldIncludePlayer(player.team, player.name)
+                ).slice(0, 10).map((player, index) => {
                   const teamInfo = getTeamInfo(player.team);
                   
                   return (
@@ -311,6 +317,7 @@ const TimeSlotHRCard = ({ gameData, currentDate, teams }) => {
   const [currentTimeSlot, setCurrentTimeSlot] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { shouldIncludePlayer } = useTeamFilter();
 
  useEffect(() => {
   const analyzeTimeSlotPerformance = async () => {
@@ -474,7 +481,9 @@ const TimeSlotHRCard = ({ gameData, currentDate, teams }) => {
             <div className="desktop-view">
               <div className="scrollable-container">
                 <ul className="player-list">
-                  {timeSlotData.map((player, index) => {
+                  {timeSlotData.filter(player => 
+                    shouldIncludePlayer(player.team, player.name)
+                  ).slice(0, 10).map((player, index) => {
                     const teamInfo = getTeamInfo(player.team);
                     
                     return (
@@ -528,7 +537,9 @@ const TimeSlotHRCard = ({ gameData, currentDate, teams }) => {
             {/* Mobile View */}
             <div className="mobile-view">
               <div className="mobile-cards">
-                {timeSlotData.map((player, index) => {
+                {timeSlotData.filter(player => 
+                  shouldIncludePlayer(player.team, player.name)
+                ).slice(0, 10).map((player, index) => {
                   const teamInfo = getTeamInfo(player.team);
                   
                   return (

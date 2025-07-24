@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import hellraiserAnalysisService from '../../services/hellraiserAnalysisService';
 import { useTeamFilter } from '../TeamFilterContext';
+import { usePlayerScratchpad } from '../../contexts/PlayerScratchpadContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useHandedness } from '../../contexts/HandednessContext';
 import GlassCard, { GlassScrollableContainer } from './GlassCard/GlassCard';
@@ -16,7 +17,8 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
   const [error, setError] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'masterScore', direction: 'desc' });
   
-  const { selectedTeam, includeMatchup, matchupTeam } = useTeamFilter();
+  const { selectedTeam, includeMatchup, matchupTeam, shouldIncludePlayer } = useTeamFilter();
+  const { filterEnabled: scratchpadFilterEnabled } = usePlayerScratchpad();
   const { themeMode } = useTheme();
   const { selectedHandedness, setSelectedHandedness, getPlayerHandednessData, loadHandednessDatasets } = useHandedness();
 
@@ -60,7 +62,7 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
     } finally {
       setLoading(false);
     }
-  }, [currentDate, selectedTeam, includeMatchup, matchupTeam, selectedHandedness]);
+  }, [currentDate, selectedTeam, includeMatchup, matchupTeam, selectedHandedness, scratchpadFilterEnabled]);
 
   useEffect(() => {
     loadHandednessDatasets();
@@ -308,8 +310,15 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
       };
     }));
 
+    // Apply scratchpad filtering before sorting
+    const filteredMastersData = mastersData.filter(player => {
+      const playerName = player.player_name || player.playerName || '';
+      const playerTeam = player.team || player.Team || '';
+      return shouldIncludePlayer(playerTeam, playerName);
+    });
+
     // Sort by master score and return top 25
-    return mastersData
+    return filteredMastersData
       .sort((a, b) => b.masterScore - a.masterScore)
       .slice(0, 25);
   };
