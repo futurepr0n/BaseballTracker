@@ -83,7 +83,19 @@ const findPlayerInRollingStats = (rollingData, playerName, playerTeam) => {
     }
   }
   
-  // 4. Look for stolen bases in allSBLeaders
+  // 4. Merge comprehensive stats from allPlayerStats (has totalBBs, totalStrikeouts, OBP, SLG, OPS)
+  if (rollingData.allPlayerStats) {
+    const statsData = rollingData.allPlayerStats.find(p => 
+      p.name === playerName && p.team === playerTeam
+    );
+    if (statsData) {
+      console.log(`🎯 Found ${playerName} in allPlayerStats with comprehensive stats`);
+      // Merge all comprehensive stats including totalBBs, totalStrikeouts, advanced metrics
+      playerStats = { ...playerStats, ...statsData };
+    }
+  }
+  
+  // 5. Look for stolen bases in allSBLeaders
   if (rollingData.allSBLeaders) {
     const sbData = rollingData.allSBLeaders.find(p => 
       p.name === playerName && p.team === playerTeam
@@ -94,7 +106,7 @@ const findPlayerInRollingStats = (rollingData, playerName, playerTeam) => {
     }
   }
   
-  // 5. Check hittersByTeam for any missing data
+  // 6. Check hittersByTeam for any missing data
   if (!playerStats.name && rollingData.hittersByTeam && rollingData.hittersByTeam[playerTeam]) {
     const teamData = rollingData.hittersByTeam[playerTeam].find(p => 
       p.name === playerName
@@ -105,7 +117,7 @@ const findPlayerInRollingStats = (rollingData, playerName, playerTeam) => {
     }
   }
   
-  // 6. Final fallback to topHitters
+  // 7. Final fallback to topHitters
   if (!playerStats.name && rollingData.topHitters) {
     const topData = rollingData.topHitters.find(p => 
       p.name === playerName && p.team === playerTeam
@@ -121,6 +133,7 @@ const findPlayerInRollingStats = (rollingData, playerName, playerTeam) => {
       H: playerStats.H,
       HR: playerStats.HR || 0,
       RBI: playerStats.RBI,
+      totalBBs: playerStats.totalBBs || 0,
       AVG: playerStats.avg || playerStats.battingAvg,
       games: playerStats.games
     });
@@ -218,6 +231,19 @@ export const getTeamRollingStats = async (teamAbbr, currentDate) => {
             ...existing,
             ...player,
             HR: player.HR
+          });
+        });
+    }
+    
+    // Merge comprehensive stats from allPlayerStats (includes totalBBs, advanced metrics)
+    if (seasonData.allPlayerStats) {
+      seasonData.allPlayerStats
+        .filter(p => p.team === teamAbbr)
+        .forEach(player => {
+          const existing = teamPlayersMap.get(player.name) || {};
+          teamPlayersMap.set(player.name, {
+            ...existing,
+            ...player
           });
         });
     }
