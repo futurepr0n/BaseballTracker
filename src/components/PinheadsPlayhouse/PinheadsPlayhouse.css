@@ -1112,3 +1112,80 @@
   font-size: 0.85rem;
   border: 1px solid #e2e8f0;
 }
+
+/* Trend Direction Filters */
+.trend-filters-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.trend-filters-section .form-group {
+  margin-bottom: 1rem;
+}
+
+.trend-filters-section .form-group:last-child {
+  margin-bottom: 0;
+}
+
+.trend-toggle-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.trend-toggle {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+.trend-toggle:hover {
+  background: #e2e8f0;
+  border-color: #cbd5e0;
+}
+
+.trend-toggle.active {
+  background: #4CAF50;
+  border-color: #45a049;
+  color: white;
+}
+
+.trend-toggle.active:hover {
+  background: #45a049;
+  border-color: #3d8b40;
+}
+
+/* Filter status display */
+.filter-status {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #e0f7fa;
+  border: 1px solid #4CAF50;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+/* Mobile responsiveness for trend filters */
+@media (max-width: 768px) {
+  .trend-toggle-group {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .trend-toggle {
+    justify-content: center;
+    padding: 0.75rem;
+  }
+}
