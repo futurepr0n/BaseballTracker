@@ -1,4 +1,6 @@
 import React from 'react';
+import MobilePlayerCard from '../../common/MobilePlayerCard';
+import '../../common/MobilePlayerCard.css';
 import './PerformanceCard.css';
 
 /**
@@ -103,58 +105,142 @@ const PerformanceCard = ({
           </div>
         </div>
         
-        <div className="scrollable-container">
-          <ul className="player-list">
-            {displayData.map((player, index) => {
-              // Get team logo URL if teams data is available
-              const teamAbbr = player.team;
-              const teamInfo = teamData && teamAbbr ? teamData[teamAbbr] : null;
-              const logoUrl = teamInfo ? teamInfo.logoUrl : null;
-              
-              return (
-                <li key={index} className="player-item">
-                  <div className="player-rank" style={{ backgroundColor: teamInfo?.colors?.primary || '#9C27B0' }}>
-                    {logoUrl && (
-                      <>
-                        <img 
-                          src={logoUrl} 
-                          alt="" 
-                          className="rank-logo" 
-                          loading="lazy"
-                          aria-hidden="true"
-                        />
-                        <div className="rank-overlay"></div>
-                      </>
-                    )}
-                    <span className="rank-number">{index + 1}</span>
-                  </div>
-                  <div className="player-info">
-                    <div className="player-name">{player.fullName || player.name}</div>
-                    <div className="player-team">{player.team}</div>
-                  </div>
-                  <div className="player-stat">
-                    <div className="stat-highlight">
-                      {player.performanceIndicator.toFixed(1)}%
+        <>
+          {/* Desktop View */}
+          <div className="scrollable-container desktop-view">
+            <ul className="player-list">
+              {displayData.map((player, index) => {
+                // Get team logo URL if teams data is available
+                const teamAbbr = player.team;
+                const teamInfo = teamData && teamAbbr ? teamData[teamAbbr] : null;
+                const logoUrl = teamInfo ? teamInfo.logoUrl : null;
+                
+                return (
+                  <li key={index} className="player-item">
+                    <div className="player-rank" style={{ backgroundColor: teamInfo?.colors?.primary || '#9C27B0' }}>
+                      {logoUrl && (
+                        <>
+                          <img 
+                            src={logoUrl} 
+                            alt="" 
+                            className="rank-logo" 
+                            loading="lazy"
+                            aria-hidden="true"
+                          />
+                          <div className="rank-overlay"></div>
+                        </>
+                      )}
+                      <span className="rank-number">{index + 1}</span>
                     </div>
-                    <small>Actual: {player.homeRunsThisSeason} HR</small>
-                    <small>Expected: {player.expectedHRs.toFixed(1)} HR</small>
+                    <div className="player-info">
+                      <div className="player-name">{player.fullName || player.name}</div>
+                      <div className="player-team">{player.team}</div>
+                    </div>
+                    <div className="player-stat">
+                      <div className="stat-highlight">
+                        {player.performanceIndicator.toFixed(1)}%
+                      </div>
+                      <small>Actual: {player.homeRunsThisSeason} HR</small>
+                      <small>Expected: {player.expectedHRs.toFixed(1)} HR</small>
+                    </div>
+                    
+                    {/* Enhanced background logo */}
+                    {logoUrl && (
+                      <img 
+                        src={logoUrl} 
+                        alt="" 
+                        className="team-logo-bg" 
+                        loading="lazy"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+          
+          {/* Mobile View */}
+          <div className="mobile-view">
+            <div className="mobile-cards">
+              {displayData.slice(0, 10).map((player, index) => {
+                const performanceGap = player.expectedHRs - player.homeRunsThisSeason;
+                const secondaryMetrics = [
+                  { label: 'Actual HRs', value: player.homeRunsThisSeason },
+                  { label: 'Expected', value: player.expectedHRs.toFixed(1) }
+                ];
+
+                const expandableContent = (
+                  <div className="mobile-performance-details">
+                    {/* Summary Metrics */}
+                    <div className="mobile-metrics-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '16px'}}>
+                      <div className="mobile-metric-item" style={{textAlign: 'center'}}>
+                        <div style={{fontSize: '16px', fontWeight: 'bold', color: '#9C27B0'}}>{player.homeRunsThisSeason}</div>
+                        <div style={{fontSize: '11px', color: '#ccc'}}>Actual HRs</div>
+                      </div>
+                      <div className="mobile-metric-item" style={{textAlign: 'center'}}>
+                        <div style={{fontSize: '16px', fontWeight: 'bold', color: '#FF9800'}}>{player.expectedHRs.toFixed(1)}</div>
+                        <div style={{fontSize: '11px', color: '#ccc'}}>Expected HRs</div>
+                      </div>
+                      <div className="mobile-metric-item" style={{textAlign: 'center'}}>
+                        <div style={{fontSize: '16px', fontWeight: 'bold', color: performanceGap > 0 ? '#f44336' : '#4CAF50'}}>{performanceGap > 0 ? '-' : '+'}{Math.abs(performanceGap).toFixed(1)}</div>
+                        <div style={{fontSize: '11px', color: '#ccc'}}>Gap</div>
+                      </div>
+                    </div>
+
+                    {/* Performance Context */}
+                    <div className="mobile-performance-context" style={{marginBottom: '16px', textAlign: 'center'}}>
+                      <strong>Performance Analysis:</strong>
+                      <div style={{marginTop: '8px', fontSize: '12px', color: '#ccc'}}>
+                        {player.performanceIndicator < 80 ? 
+                          `Significantly underperforming expectations by ${performanceGap.toFixed(1)} HRs` :
+                        player.performanceIndicator < 90 ? 
+                          `Moderately below expectations - ${performanceGap.toFixed(1)} HR gap` :
+                        player.performanceIndicator < 110 ? 
+                          `Performing close to expectations` :
+                          `Exceeding expectations by ${Math.abs(performanceGap).toFixed(1)} HRs`
+                        }
+                      </div>
+                    </div>
+
+                    {/* Performance Analysis */}
+                    <div className="mobile-detailed-analysis">
+                      <strong>Season Analysis:</strong>
+                      <div style={{marginTop: '8px', fontSize: '11px', color: '#ccc'}}>
+                        Based on current performance metrics, this player is {player.performanceIndicator < 100 ? 'under' : 'over'}performing 
+                        their expected home run production by {Math.abs(100 - player.performanceIndicator).toFixed(1)} percentage points.
+                        {player.performanceIndicator < 85 && ' This represents a significant opportunity for regression to the mean.'}
+                        {player.performanceIndicator > 115 && ' This hot streak may be unsustainable long-term.'}
+                      </div>
+                    </div>
                   </div>
-                  
-                  {/* Enhanced background logo */}
-                  {logoUrl && (
-                    <img 
-                      src={logoUrl} 
-                      alt="" 
-                      className="team-logo-bg" 
-                      loading="lazy"
-                      aria-hidden="true"
-                    />
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+                );
+
+                return (
+                  <MobilePlayerCard
+                    key={index}
+                    item={{
+                      name: player.fullName || player.name,
+                      team: player.team
+                    }}
+                    index={index}
+                    showRank={true}
+                    showExpandButton={true}
+                    primaryMetric={{
+                      value: player.performanceIndicator.toFixed(1) + '%',
+                      label: 'Performance vs Expected',
+                      color: '#9C27B0'
+                    }}
+                    secondaryMetrics={secondaryMetrics}
+                    expandableContent={expandableContent}
+                    className="mobile-under-performing-card"
+                    scratchpadSource="under-performing"
+                  />
+                );
+              })}
+            </div>
+          </div>
+        </>
       </div>
     </div>
   );

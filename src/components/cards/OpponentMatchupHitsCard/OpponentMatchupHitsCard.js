@@ -325,20 +325,15 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
                   </div>
                   
                   <div className="player-stat">
-                    <span className="stat-highlight" style={{ color: teams[player.playerTeam]?.colors?.primary || '#007bff' }}>
+                    <div className="stat-highlight" style={{ color: teams[player.playerTeam]?.colors?.primary || '#007bff' }}>
                       {player.hitsPerGame} H/G
-                    </span>
-                    <small className="stat-note">
-                      {player.totalHits}H in {player.gamesVsOpponent}G vs {player.opponentTeam}
-                      ({player.battingAvg} AVG)
-                      {player.recentForm && (
-                        <span className="recent-form"> | {player.recentForm}</span>
-                      )}
-                    </small>
+                    </div>
+                    <small>{player.totalHits}H in {player.gamesVsOpponent}G vs {player.opponentTeam}</small>
+                    <small>({player.battingAvg} AVG){player.recentForm && ` | ${player.recentForm}`}</small>
                     {player.opponentHistory && player.opponentHistory.length > 0 && (
-                      <div className="opponent-history-mini" style={{ marginTop: '4px', fontSize: '10px' }}>
-                        Recent vs {player.opponentTeam}: {player.opponentHistory.slice(0, 5).map(game => game.value || 0).join('-')}
-                      </div>
+                      <small style={{ fontSize: '10px', color: '#777' }}>
+                        Recent: {player.opponentHistory.slice(0, 5).map(game => game.value || 0).join('-')}
+                      </small>
                     )}
                   </div>
                   
@@ -706,19 +701,15 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
                   </div>
                   
                   <div className="player-stat">
-                    <span className="stat-highlight" style={{ color: teams[player.playerTeam]?.colors?.primary || '#e63946' }}>
+                    <div className="stat-highlight" style={{ color: teams[player.playerTeam]?.colors?.primary || '#e63946' }}>
                       {player.hrsPerGame} HR/G
-                    </span>
-                    <small className="stat-note">
-                      {player.totalHRs} HRs in {player.gamesVsOpponent}G vs {player.opponentTeam}
-                      {player.recentForm && (
-                        <span className="recent-form"> | {player.recentForm}</span>
-                      )}
-                    </small>
+                    </div>
+                    <small>{player.totalHRs} HRs in {player.gamesVsOpponent}G vs {player.opponentTeam}</small>
+                    {player.recentForm && <small>{player.recentForm}</small>}
                     {player.opponentHistory && player.opponentHistory.length > 0 && (
-                      <div className="opponent-history-mini" style={{ marginTop: '4px', fontSize: '10px' }}>
-                        Recent HRs vs {player.opponentTeam}: {player.opponentHistory.slice(0, 5).map(game => game.value || 0).join('-')}
-                      </div>
+                      <small style={{ fontSize: '10px', color: '#777' }}>
+                        Recent: {player.opponentHistory.slice(0, 5).map(game => game.value || 0).join('-')}
+                      </small>
                     )}
                   </div>
                   

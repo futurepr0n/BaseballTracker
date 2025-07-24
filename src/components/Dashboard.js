@@ -60,7 +60,7 @@ import MostHomeRunsAtHomeCard from './cards/MostHomeRunsAtHomeCard/MostHomeRunsA
 import { 
   OpponentMatchupHitsCard,
   OpponentMatchupHRCard
-} from './cards/OpponentMatchupHitsCard/OpponentMatchupHitsCard';
+} from './cards/OpponentMatchupHitsCard/OpponentMatchupCardsSimplified';
 
 import HitDroughtBounceBackCard from './cards/HitDroughtBounceBackCard/HitDroughtBounceBackCard';
 
@@ -85,6 +85,14 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
   
   // Get theme context for Dashboard-specific styling
   const { themeMode } = useTheme();
+  
+  // Stabilize currentDate to prevent unnecessary re-renders
+  const stableDateString = useMemo(() => {
+    if (currentDate instanceof Date) {
+      return currentDate.toISOString().split('T')[0]; // Convert to YYYY-MM-DD
+    }
+    return currentDate; // Already a string
+  }, [currentDate]);
   
   // State for core data
   const [playersWithHomeRunPrediction, setPlayersWithHomeRunPrediction] = useState([]);
@@ -205,7 +213,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
     };
     
     loadStadiumData();
-  }, [currentDate]);
+  }, [stableDateString]);
   
 
   useEffect(() => {
@@ -265,7 +273,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
   };
   
   loadPoorPerformancePredictions();
-}, [currentDate, isFiltering, shouldIncludePlayer]); // Same dependencies as your HR predictions
+}, [stableDateString, isFiltering, shouldIncludePlayer]); // Same dependencies as your HR predictions
 
 useEffect(() => {
   const loadPositiveMomentumPredictions = async () => {
@@ -312,7 +320,7 @@ useEffect(() => {
   };
   
   loadPositiveMomentumPredictions();
-}, [currentDate, isFiltering, shouldIncludePlayer]); // Same dependencies as other predictions
+}, [stableDateString, isFiltering, shouldIncludePlayer]); // Same dependencies as other predictions
 
 
   // Filter player data based on team selection
@@ -497,7 +505,7 @@ useEffect(() => {
     };
     
     loadHRPredictions();
-  }, [currentDate, isFiltering, shouldIncludePlayer]);
+  }, [stableDateString, isFiltering, shouldIncludePlayer]);
   
   // Load additional stats (day of week hits and hit streak data) with filtering
   useEffect(() => {
@@ -594,7 +602,7 @@ useEffect(() => {
     };
     
     loadAdditionalStats();
-  }, [currentDate, isFiltering, shouldIncludePlayer]);
+  }, [stableDateString, isFiltering, shouldIncludePlayer]);
 
   // Load pitcher matchup data with filtering
   useEffect(() => {
@@ -675,7 +683,7 @@ useEffect(() => {
     };
     
     loadPitcherMatchups();
-  }, [currentDate, isFiltering, shouldIncludePlayer]);
+  }, [stableDateString, isFiltering, shouldIncludePlayer]);
   
   // Load player performance data and calculate top performers with filtering
   useEffect(() => {
@@ -795,7 +803,7 @@ useEffect(() => {
     };
     
     loadPlayerPerformance();
-  }, [currentDate, isFiltering, shouldIncludePlayer]);
+  }, [stableDateString, isFiltering, shouldIncludePlayer]);
   
   // Load rolling stats (with priority: today > yesterday > 7-day rolling > season)
   useEffect(() => {
@@ -1031,7 +1039,7 @@ useEffect(() => {
   };
   
   loadEnhancedRollingStats();
-}, [filteredPlayerData, filteredBatterData, filteredPitcherData, currentDate, isFiltering, shouldIncludePlayer, rollingStatsType, selectedTeam, includeMatchup, matchupTeam, playerData]);
+}, [filteredPlayerData, filteredBatterData, filteredPitcherData, stableDateString, isFiltering, shouldIncludePlayer, rollingStatsType, selectedTeam, includeMatchup, matchupTeam, playerData]);
 
 // Also update the generateTeamSpecificStats function to be more comprehensive
 const generateTeamSpecificStats = (playerData, selectedTeam, includeMatchup, matchupTeam, shouldIncludePlayer) => {

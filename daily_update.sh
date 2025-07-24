@@ -299,6 +299,17 @@ main() {
         print_status $GREEN "✅ Team stats generated successfully"
     fi
     
+    # Step 7.5: Generate opponent matchup statistics
+    print_status $BLUE "🎯 Generating opponent matchup statistics..."
+    node src/services/generateOpponentMatchupStats.cjs $DATE
+    
+    if [ $? -ne 0 ]; then
+        print_status $YELLOW "⚠️  WARNING: Failed to generate opponent matchup stats (non-critical)"
+    else
+        print_status $GREEN "✅ Opponent matchup stats generated successfully"
+        ((files_created++))
+    fi
+    
     # Step 8: Verify files were created
     print_status $BLUE "🔍 Verifying generated files..."
     

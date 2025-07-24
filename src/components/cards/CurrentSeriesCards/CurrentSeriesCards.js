@@ -6,6 +6,8 @@ import {
   fetchRosterData,
   fetchGameData
 } from '../../../services/dataService';
+import MobilePlayerCard from '../../common/MobilePlayerCard';
+import '../../common/MobilePlayerCard.css';
 import './CurrentSeriesCards.css';
 
 /**
@@ -353,8 +355,10 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
             </small>
           </div>
         ) : (
-          <div className="scrollable-container">
-          <ul className="player-list">
+          <>
+            {/* Desktop View */}
+            <div className="scrollable-container desktop-view">
+            <ul className="player-list">
             {seriesData.map((player, index) => {
               const teamInfo = getTeamInfo(player.team);
               const opponentInfo = getTeamInfo(player.opponent);
@@ -411,6 +415,84 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
             })}
           </ul>
           </div>
+          
+          {/* Mobile View */}
+          <div className="mobile-view">
+            <div className="mobile-cards">
+              {seriesData.slice(0, 10).map((player, index) => {
+                const hitRate = player.gamesInSeries > 0 ? (player.totalHitsInSeries / player.gamesInSeries) : 0;
+                const secondaryMetrics = [
+                  { label: 'Series Games', value: player.gamesInSeries },
+                  { label: 'Hit Rate', value: `${(hitRate * 100).toFixed(1)}%` }
+                ];
+
+                const expandableContent = (
+                  <div className="mobile-series-details">
+                    {/* Summary Metrics */}
+                    <div className="mobile-metrics-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '16px'}}>
+                      <div className="mobile-metric-item" style={{textAlign: 'center'}}>
+                        <div style={{fontSize: '16px', fontWeight: 'bold', color: '#2196F3'}}>{player.totalHitsInSeries}</div>
+                        <div style={{fontSize: '11px', color: '#ccc'}}>Series Hits</div>
+                      </div>
+                      <div className="mobile-metric-item" style={{textAlign: 'center'}}>
+                        <div style={{fontSize: '16px', fontWeight: 'bold', color: '#FF9800'}}>{player.gamesInSeries}</div>
+                        <div style={{fontSize: '11px', color: '#ccc'}}>Games</div>
+                      </div>
+                      <div className="mobile-metric-item" style={{textAlign: 'center'}}>
+                        <div style={{fontSize: '16px', fontWeight: 'bold', color: '#4CAF50'}}>{player.avgInSeries}</div>
+                        <div style={{fontSize: '11px', color: '#ccc'}}>Series AVG</div>
+                      </div>
+                    </div>
+
+                    {/* Series Context */}
+                    <div className="mobile-series-context" style={{marginBottom: '16px', textAlign: 'center'}}>
+                      <strong>Current Series vs {player.opponent}:</strong>
+                      <div style={{marginTop: '8px', fontSize: '12px', color: '#ccc'}}>
+                        {player.totalHitsInSeries} hits in {player.gamesInSeries} games this series ({player.hitsPerGameInSeries} H/G)
+                      </div>
+                    </div>
+
+                    {/* Performance Analysis */}
+                    <div className="mobile-performance-analysis">
+                      <strong>Series Analysis:</strong>
+                      <div style={{marginTop: '8px', fontSize: '11px', color: '#ccc'}}>
+                        {hitRate >= 0.5 ? 
+                          `Excellent series performance with ${(hitRate * 100).toFixed(1)}% hit rate` :
+                        hitRate >= 0.3 ? 
+                          `Good series production vs ${player.opponent}` :
+                          `Building momentum in current series vs ${player.opponent}`
+                        }
+                        {player.seriesDateRange && ` | Series: ${player.seriesDateRange}`}
+                      </div>
+                    </div>
+                  </div>
+                );
+
+                return (
+                  <MobilePlayerCard
+                    key={index}
+                    item={{
+                      name: player.name,
+                      team: player.team
+                    }}
+                    index={index}
+                    showRank={true}
+                    showExpandButton={true}
+                    primaryMetric={{
+                      value: player.totalHitsInSeries,
+                      label: 'Hits vs ' + player.opponent,
+                      color: '#2196F3'
+                    }}
+                    secondaryMetrics={secondaryMetrics}
+                    expandableContent={expandableContent}
+                    className="mobile-current-series-hits-card"
+                    scratchpadSource="current-series-hits"
+                  />
+                );
+              })}
+            </div>
+          </div>
+          </>
         )}
         
         {/* Debug info at bottom when no data */}
@@ -590,8 +672,10 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
             </small>
           </div>
         ) : (
-          <div className="scrollable-container">
-          <ul className="player-list">
+          <>
+            {/* Desktop View */}
+            <div className="scrollable-container desktop-view">
+            <ul className="player-list">
             {seriesData.map((player, index) => {
               const teamInfo = getTeamInfo(player.team);
               const opponentInfo = getTeamInfo(player.opponent);
@@ -648,6 +732,86 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
             })}
           </ul>
           </div>
+          
+          {/* Mobile View */}
+          <div className="mobile-view">
+            <div className="mobile-cards">
+              {seriesData.slice(0, 10).map((player, index) => {
+                const hrRate = player.gamesInSeries > 0 ? (player.totalHRsInSeries / player.gamesInSeries) : 0;
+                const secondaryMetrics = [
+                  { label: 'Series Games', value: player.gamesInSeries },
+                  { label: 'HR Rate', value: player.hrsPerGameInSeries + '/G' }
+                ];
+
+                const expandableContent = (
+                  <div className="mobile-hr-series-details">
+                    {/* Summary Metrics */}
+                    <div className="mobile-metrics-grid" style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '16px'}}>
+                      <div className="mobile-metric-item" style={{textAlign: 'center'}}>
+                        <div style={{fontSize: '16px', fontWeight: 'bold', color: '#e63946'}}>{player.totalHRsInSeries}</div>
+                        <div style={{fontSize: '11px', color: '#ccc'}}>Series HRs</div>
+                      </div>
+                      <div className="mobile-metric-item" style={{textAlign: 'center'}}>
+                        <div style={{fontSize: '16px', fontWeight: 'bold', color: '#FF9800'}}>{player.gamesInSeries}</div>
+                        <div style={{fontSize: '11px', color: '#ccc'}}>Games</div>
+                      </div>
+                      <div className="mobile-metric-item" style={{textAlign: 'center'}}>
+                        <div style={{fontSize: '16px', fontWeight: 'bold', color: '#2196F3'}}>{player.hrsPerGameInSeries}</div>
+                        <div style={{fontSize: '11px', color: '#ccc'}}>HR/Game</div>
+                      </div>
+                    </div>
+
+                    {/* Series Context */}
+                    <div className="mobile-series-context" style={{marginBottom: '16px', textAlign: 'center'}}>
+                      <strong>HR Performance vs {player.opponent}:</strong>
+                      <div style={{marginTop: '8px', fontSize: '12px', color: '#ccc'}}>
+                        {player.totalHRsInSeries} home run{player.totalHRsInSeries > 1 ? 's' : ''} in {player.gamesInSeries} games this series
+                      </div>
+                    </div>
+
+                    {/* Performance Analysis */}
+                    <div className="mobile-performance-analysis">
+                      <strong>Power Analysis:</strong>
+                      <div style={{marginTop: '8px', fontSize: '11px', color: '#ccc'}}>
+                        {hrRate >= 0.5 ? 
+                          `Elite power display with ${player.hrsPerGameInSeries} HR/G vs ${player.opponent}` :
+                        hrRate >= 0.3 ? 
+                          `Strong power performance in current series` :
+                        player.totalHRsInSeries > 0 ?
+                          `Showed power potential vs ${player.opponent} pitching` :
+                          `Building toward power breakthrough in this series`
+                        }
+                        {player.seriesDateRange && ` | Series: ${player.seriesDateRange}`}
+                      </div>
+                    </div>
+                  </div>
+                );
+
+                return (
+                  <MobilePlayerCard
+                    key={index}
+                    item={{
+                      name: player.name,
+                      team: player.team
+                    }}
+                    index={index}
+                    showRank={true}
+                    showExpandButton={true}
+                    primaryMetric={{
+                      value: player.totalHRsInSeries,
+                      label: 'HRs vs ' + player.opponent,
+                      color: '#e63946'
+                    }}
+                    secondaryMetrics={secondaryMetrics}
+                    expandableContent={expandableContent}
+                    className="mobile-current-series-hr-card"
+                    scratchpadSource="current-series-hrs"
+                  />
+                );
+              })}
+            </div>
+          </div>
+          </>
         )}
         
         {/* Debug info */}
