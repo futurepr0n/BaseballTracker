@@ -16,7 +16,9 @@ export const usePlayerScratchpad = () => {
 const STORAGE_KEYS = {
   players: 'scratchpad-players',
   filterEnabled: 'scratchpad-filter-enabled',
-  widgetMinimized: 'scratchpad-widget-minimized'
+  widgetMinimized: 'scratchpad-widget-minimized',
+  widgetPosition: 'scratchpad-widget-position',
+  positionPreset: 'scratchpad-position-preset'
 };
 
 // Helper functions for localStorage
@@ -38,11 +40,27 @@ const saveToStorage = (key, value) => {
   }
 };
 
+// Default position calculation based on screen size
+const getDefaultPosition = () => {
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    return { x: 10, y: 70 }; // Mobile: left side, below header
+  } else {
+    return { x: window.innerWidth - 350, y: 80 }; // Desktop: right side, below header  
+  }
+};
+
 export const PlayerScratchpadProvider = ({ children }) => {
   // State management
   const [players, setPlayers] = useState(() => loadFromStorage(STORAGE_KEYS.players, []));
   const [filterEnabled, setFilterEnabled] = useState(() => loadFromStorage(STORAGE_KEYS.filterEnabled, false));
   const [widgetMinimized, setWidgetMinimized] = useState(() => loadFromStorage(STORAGE_KEYS.widgetMinimized, false));
+  const [widgetPosition, setWidgetPosition] = useState(() => 
+    loadFromStorage(STORAGE_KEYS.widgetPosition, getDefaultPosition())
+  );
+  const [positionPreset, setPositionPreset] = useState(() => 
+    loadFromStorage(STORAGE_KEYS.positionPreset, 'right')
+  );
   
   // Use ref to maintain current players state for stable function references
   const playersRef = useRef(players);
@@ -67,6 +85,16 @@ export const PlayerScratchpadProvider = ({ children }) => {
     saveToStorage(STORAGE_KEYS.widgetMinimized, widgetMinimized);
   }, [widgetMinimized]);
 
+  // Persist widget position to localStorage
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.widgetPosition, widgetPosition);
+  }, [widgetPosition]);
+
+  // Persist position preset to localStorage
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.positionPreset, positionPreset);
+  }, [positionPreset]);
+
   // Listen for storage changes (cross-tab synchronization)
   useEffect(() => {
     const handleStorageChange = (e) => {
@@ -76,6 +104,10 @@ export const PlayerScratchpadProvider = ({ children }) => {
         setFilterEnabled(loadFromStorage(STORAGE_KEYS.filterEnabled, false));
       } else if (e.key === STORAGE_KEYS.widgetMinimized) {
         setWidgetMinimized(loadFromStorage(STORAGE_KEYS.widgetMinimized, false));
+      } else if (e.key === STORAGE_KEYS.widgetPosition) {
+        setWidgetPosition(loadFromStorage(STORAGE_KEYS.widgetPosition, getDefaultPosition()));
+      } else if (e.key === STORAGE_KEYS.positionPreset) {
+        setPositionPreset(loadFromStorage(STORAGE_KEYS.positionPreset, 'right'));
       }
     };
 
@@ -189,12 +221,45 @@ export const PlayerScratchpadProvider = ({ children }) => {
     setFilterEnabled(prev => !prev);
   }, []);
 
+  // Position management functions
+  const updateWidgetPosition = useCallback((newPosition) => {
+    setWidgetPosition(newPosition);
+    setPositionPreset('custom'); // Mark as custom when manually positioned
+  }, []);
+
+  const setPositionToLeft = useCallback(() => {
+    const newPos = { x: 20, y: widgetPosition.y };
+    setWidgetPosition(newPos);
+    setPositionPreset('left');
+  }, [widgetPosition.y]);
+
+  const setPositionToRight = useCallback(() => {
+    const newPos = { x: window.innerWidth - 350, y: widgetPosition.y };
+    setWidgetPosition(newPos);
+    setPositionPreset('right');
+  }, [widgetPosition.y]);
+
+  const setPositionToCenter = useCallback(() => {
+    const centerX = (window.innerWidth - 300) / 2;
+    const newPos = { x: centerX, y: widgetPosition.y };
+    setWidgetPosition(newPos);
+    setPositionPreset('center');
+  }, [widgetPosition.y]);
+
+  const resetWidgetPosition = useCallback(() => {
+    const defaultPos = getDefaultPosition();
+    setWidgetPosition(defaultPos);
+    setPositionPreset('right');
+  }, []);
+
   // Context value
   const value = {
     // State
     players,
     filterEnabled,
     widgetMinimized,
+    widgetPosition,
+    positionPreset,
     
     // Player management
     addPlayer,
@@ -213,6 +278,13 @@ export const PlayerScratchpadProvider = ({ children }) => {
     
     // Widget controls
     toggleWidget,
+    
+    // Position controls
+    updateWidgetPosition,
+    setPositionToLeft,
+    setPositionToRight,
+    setPositionToCenter,
+    resetWidgetPosition,
     
     // Computed values
     playerCount: players.length,

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { usePlayerScratchpad } from '../../contexts/PlayerScratchpadContext';
+import { useDraggable } from '../../hooks/useDraggable';
 import './ScratchpadWidget.css';
 
 const ScratchpadWidget = () => {
@@ -11,13 +12,33 @@ const ScratchpadWidget = () => {
     isEmpty,
     filterEnabled,
     widgetMinimized,
+    widgetPosition,
+    positionPreset,
     removePlayer,
     clearAllPlayers,
     toggleFilter,
-    toggleWidget
+    toggleWidget,
+    updateWidgetPosition,
+    setPositionToLeft,
+    setPositionToRight,
+    setPositionToCenter,
+    resetWidgetPosition
   } = usePlayerScratchpad();
 
   const [showPlayerList, setShowPlayerList] = useState(false);
+  const [showPositionControls, setShowPositionControls] = useState(false);
+
+  // Set up draggable functionality
+  const draggable = useDraggable({
+    initialPosition: widgetPosition,
+    onPositionChange: updateWidgetPosition,
+    boundaries: {
+      minX: 10,
+      maxX: window.innerWidth - 320, // Widget width + padding
+      minY: 60,                       // Below header
+      maxY: window.innerHeight - 100  // Above bottom
+    }
+  });
 
   // Don't render if empty and minimized
   if (isEmpty && widgetMinimized) {
@@ -43,25 +64,98 @@ const ScratchpadWidget = () => {
   };
 
   return (
-    <div className={`scratchpad-widget ${widgetMinimized ? 'minimized' : 'expanded'}`}>
+    <div 
+      className={`scratchpad-widget ${widgetMinimized ? 'minimized' : 'expanded'} ${draggable.isDragging ? 'dragging' : ''}`}
+      {...draggable.dragHandlers}
+      ref={draggable.ref}
+    >
       {/* Widget Header */}
-      <div className="scratchpad-header" onClick={toggleWidget}>
-        <div className="scratchpad-title">
+      <div className="scratchpad-header">
+        {/* Drag Handle */}
+        <div className="drag-handle" title="Drag to move">
+          <div className="drag-dots">
+            <div className="dot"></div>
+            <div className="dot"></div>
+            <div className="dot"></div>
+            <div className="dot"></div>
+            <div className="dot"></div>
+            <div className="dot"></div>
+          </div>
+        </div>
+
+        {/* Title Section */}
+        <div className="scratchpad-title" onClick={toggleWidget}>
           <span className="scratchpad-icon">📝</span>
           <span className="scratchpad-text">Scratchpad</span>
           <span className="player-count-badge">{playerCount}</span>
         </div>
-        <button 
-          className="minimize-button"
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleWidget();
-          }}
-          title={widgetMinimized ? 'Expand scratchpad' : 'Minimize scratchpad'}
-        >
-          {widgetMinimized ? '▲' : '▼'}
-        </button>
+
+        {/* Header Controls */}
+        <div className="header-controls">
+          {/* Position Controls Button */}
+          <button 
+            className={`position-button ${showPositionControls ? 'active' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowPositionControls(!showPositionControls);
+            }}
+            title="Position controls"
+          >
+            📍
+          </button>
+
+          {/* Minimize Button */}
+          <button 
+            className="minimize-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleWidget();
+            }}
+            title={widgetMinimized ? 'Expand scratchpad' : 'Minimize scratchpad'}
+          >
+            {widgetMinimized ? '▲' : '▼'}
+          </button>
+        </div>
       </div>
+
+      {/* Position Controls (shown when active) */}
+      {showPositionControls && !widgetMinimized && (
+        <div className="position-controls">
+          <div className="position-buttons">
+            <button 
+              className={`pos-btn ${positionPreset === 'left' ? 'active' : ''}`}
+              onClick={setPositionToLeft}
+              title="Move to left"
+            >
+              ← Left
+            </button>
+            <button 
+              className={`pos-btn ${positionPreset === 'center' ? 'active' : ''}`}
+              onClick={setPositionToCenter}
+              title="Move to center"
+            >
+              ↑ Center
+            </button>
+            <button 
+              className={`pos-btn ${positionPreset === 'right' ? 'active' : ''}`}
+              onClick={setPositionToRight}
+              title="Move to right"
+            >
+              → Right
+            </button>
+            <button 
+              className="pos-btn reset"
+              onClick={resetWidgetPosition}
+              title="Reset position"
+            >
+              🔄 Reset
+            </button>
+          </div>
+          <div className="position-info">
+            Current: {positionPreset === 'custom' ? `Custom (${Math.round(draggable.position.x)}, ${Math.round(draggable.position.y)})` : positionPreset}
+          </div>
+        </div>
+      )}
 
       {/* Widget Content (shown when expanded) */}
       {!widgetMinimized && (
