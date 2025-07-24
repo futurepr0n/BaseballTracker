@@ -1,19 +1,23 @@
 /* ScratchpadWidget.css */
 
 .scratchpad-widget {
-  position: fixed;
-  top: 80px;
-  right: 20px;
   background: rgba(255, 255, 255, 0.98);
   border: 2px solid #ddd;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(10px);
-  z-index: 1000;
   min-width: 280px;
   max-width: 350px;
   transition: all 0.3s ease;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Dragging state enhancement */
+.scratchpad-widget.dragging {
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(15px);
+  border-color: #667eea;
+  transform-origin: center;
 }
 
 .scratchpad-widget.minimized {
@@ -87,6 +91,125 @@
 
 .minimize-button:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* Drag Handle */
+.drag-handle {
+  display: flex;
+  align-items: center;
+  cursor: grab;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.drag-handle:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-dots {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 2px;
+  width: 12px;
+  height: 12px;
+}
+
+.drag-dots .dot {
+  width: 2px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+}
+
+.scratchpad-widget.dragging .drag-dots .dot {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Header Controls */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.position-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  font-size: 14px;
+}
+
+.position-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.position-button.active {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Position Controls */
+.position-controls {
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.position-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.pos-btn {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.pos-btn:hover {
+  background: #f8f9fa;
+  border-color: #adb5bd;
+}
+
+.pos-btn.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.pos-btn.reset {
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
+}
+
+.pos-btn.reset:hover {
+  background: #5a6268;
+  border-color: #5a6268;
+}
+
+.position-info {
+  font-size: 11px;
+  color: #6c757d;
+  text-align: center;
+  font-weight: 500;
 }
 
 /* Content */
@@ -290,8 +413,6 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .scratchpad-widget {
-    right: 10px;
-    top: 70px;
     min-width: 260px;
     max-width: 300px;
   }
@@ -310,6 +431,26 @@
 
   .summary-count {
     font-size: 18px;
+  }
+
+  .position-buttons {
+    gap: 6px;
+  }
+
+  .pos-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .drag-dots {
+    width: 10px;
+    height: 10px;
+    gap: 1px;
+  }
+
+  .drag-dots .dot {
+    width: 1.5px;
+    height: 1.5px;
   }
 }
 
@@ -357,5 +498,52 @@
     background: #2d3a2d;
     border-color: #4a6b4a;
     color: #7dd87d;
+  }
+
+  .position-controls {
+    background: #2a2a2a;
+    border-color: #555;
+  }
+
+  .pos-btn {
+    background: #3a3a3a;
+    border-color: #555;
+    color: #fff;
+  }
+
+  .pos-btn:hover {
+    background: #4a4a4a;
+    border-color: #666;
+  }
+
+  .pos-btn.active {
+    background: #667eea;
+    border-color: #667eea;
+  }
+
+  .pos-btn.reset {
+    background: #6c757d;
+    border-color: #6c757d;
+  }
+
+  .pos-btn.reset:hover {
+    background: #5a6268;
+    border-color: #5a6268;
+  }
+
+  .position-info {
+    color: #ccc;
+  }
+
+  .drag-handle:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .position-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .position-button.active {
+    background: rgba(255, 255, 255, 0.2);
   }
 }
