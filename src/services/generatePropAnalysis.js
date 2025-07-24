@@ -33,6 +33,22 @@ const PROP_OPTIONS = [
   { key: 'walks', label: 'Walks', icon: '🚶', statKey: 'totalBBs' }
 ];
 
+/**
+ * Map rolling stats statKey to individual game data field names
+ * Rolling stats use aggregated names like 'totalBBs', but individual game data uses 'BB'
+ */
+function mapStatKeyToGameField(statKey) {
+  const mapping = {
+    'H': 'H',           // Hits - same name
+    'RBI': 'RBI',       // RBI - same name  
+    'R': 'R',           // Runs - same name
+    'HR': 'HR',         // Home Runs - same name
+    'totalBBs': 'BB'    // Walks - rolling stats use 'totalBBs', game data uses 'BB'
+  };
+  
+  return mapping[statKey] || statKey;
+}
+
 // Analysis thresholds
 const ANALYSIS_THRESHOLDS = {
   MIN_GAMES_PLAYED: 5,
@@ -170,8 +186,11 @@ async function loadHistoricalGameData(playerName, playerTeam, statKey, maxDaysBa
           
           // Process each game this player appeared in on this date
           for (const playerData of allPlayerData) {
-            if (playerData && playerData[statKey] !== undefined) {
-              const propValue = playerData[statKey] || 0;
+            // Map statKey to the correct field name in individual game data
+            const gameFieldName = mapStatKeyToGameField(statKey);
+            
+            if (playerData && playerData[gameFieldName] !== undefined) {
+              const propValue = playerData[gameFieldName] || 0;
               
               // Extract opponent information from games section
               let opponent = 'Unknown';
@@ -312,7 +331,7 @@ function getLeagueAverage(propKey) {
  * Calculate prop probabilities (enhanced with chart data)
  */
 async function calculatePropProbabilities(player, propOption, multiHitData) {
-  const games = player.G || player.games || 1;
+  const games = player.G || player.games || player.gamesPlayed || 1;
   const statKey = propOption.statKey;
   const seasonTotal = player[statKey] || 0;
   const seasonRate = seasonTotal / games;
@@ -401,13 +420,19 @@ async function processPlayerPropData(rollingData, multiHitData, propOption) {
           games: player.G || player.games || 0
         };
         
-        // Avoid duplicates using normalized names
-        const existingPlayer = allPlayers.find(p => 
+        // Merge data from different sections for the same player
+        const existingPlayerIndex = allPlayers.findIndex(p => 
           p.name === normalizedPlayer.name && p.team === normalizedPlayer.team
         );
         
-        if (!existingPlayer) {
+        if (existingPlayerIndex === -1) {
           allPlayers.push(normalizedPlayer);
+        } else {
+          // Merge data, preferring more complete data (e.g., from allPlayerStats)
+          allPlayers[existingPlayerIndex] = {
+            ...allPlayers[existingPlayerIndex],
+            ...normalizedPlayer
+          };
         }
       });
     }
@@ -418,13 +443,22 @@ async function processPlayerPropData(rollingData, multiHitData, propOption) {
   // Process each player with enhanced chart data (limit to top performers for efficiency)
   const limitedPlayers = allPlayers
     .filter(player => {
-      const games = player.G || player.games || 0;
+      const games = player.G || player.games || player.gamesPlayed || 0;
       const statValue = player[propOption.statKey] || 0;
-      return games >= ANALYSIS_THRESHOLDS.MIN_GAMES_PLAYED && statValue > 0;
+      const isQualified = games >= ANALYSIS_THRESHOLDS.MIN_GAMES_PLAYED && statValue > 0;
+      
+      // Debug logging for first few players if none qualify
+      if (allPlayers.indexOf(player) < 3) {
+        console.log(`    DEBUG: ${player.name} (${player.team}) - games: ${games}, ${propOption.statKey}: ${statValue}, qualified: ${isQualified}`);
+      }
+      
+      return isQualified;
     })
     .sort((a, b) => {
-      const aRate = (a[propOption.statKey] || 0) / (a.G || a.games || 1);
-      const bRate = (b[propOption.statKey] || 0) / (b.G || b.games || 1);
+      const aGames = a.G || a.games || a.gamesPlayed || 1;
+      const bGames = b.G || b.games || b.gamesPlayed || 1;
+      const aRate = (a[propOption.statKey] || 0) / aGames;
+      const bRate = (b[propOption.statKey] || 0) / bGames;
       return bRate - aRate; // Sort by rate descending
     })
     .slice(0, 100); // Limit to top 100 for performance
@@ -443,7 +477,8 @@ async function processPlayerPropData(rollingData, multiHitData, propOption) {
       fullName: player.fullName || player.Name || player.name || 'Unknown',
       team: player.Team || player.team || 'UNK',
       ...propAnalysis,
-      games: player.G || player.games || 0,
+      value: propAnalysis.seasonTotal, // Add explicit value field
+      games: player.G || player.games || player.gamesPlayed || 0,
       avg: player.BA || player.avg || 0,
       rawPlayer: player
     };
