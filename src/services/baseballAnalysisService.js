@@ -1574,9 +1574,15 @@ class BaseballAnalysisService {
     limit = 20,
     applyFilters = null,
     hittersFilter = null,
+    recentTrendFilter = [],
+    pitcherTrendFilter = [],
     includeDashboardContext = true,
     date = null
   }) {
+    console.log(`🎯 batchAnalysis called with trend filters:`, {
+      recentTrendFilter,
+      pitcherTrendFilter
+    });
     const requestData = {
       matchups,
       sort_by: sortBy,
@@ -1716,8 +1722,38 @@ class BaseballAnalysisService {
           }
         });
         
+        // Apply trend direction filters
+        let filteredPredictions = allPredictions;
+        
+        if (recentTrendFilter && recentTrendFilter.length > 0) {
+          console.log(`🔍 Applying Recent Trend filter: ${recentTrendFilter.join(', ')}`);
+          filteredPredictions = filteredPredictions.filter(prediction => {
+            const recentTrend = prediction.recent_trend_dir || 
+                               prediction.recent_N_games_raw_data?.trends_summary_obj?.trend_direction;
+            const included = recentTrendFilter.includes(recentTrend);
+            if (!included) {
+              console.log(`🚫 Filtered out ${prediction.player_name} - Recent trend: ${recentTrend}`);
+            }
+            return included;
+          });
+          console.log(`✅ Recent trend filter applied: ${filteredPredictions.length} predictions remaining`);
+        }
+        
+        if (pitcherTrendFilter && pitcherTrendFilter.length > 0) {
+          console.log(`🔍 Applying Pitcher Trend filter: ${pitcherTrendFilter.join(', ')}`);
+          filteredPredictions = filteredPredictions.filter(prediction => {
+            const pitcherTrend = prediction.pitcher_trend_dir;
+            const included = pitcherTrendFilter.includes(pitcherTrend);
+            if (!included) {
+              console.log(`🚫 Filtered out ${prediction.player_name} - Pitcher trend: ${pitcherTrend}`);
+            }
+            return included;
+          });
+          console.log(`✅ Pitcher trend filter applied: ${filteredPredictions.length} predictions remaining`);
+        }
+        
         // Apply limit
-        const limitedPredictions = allPredictions.slice(0, limit);
+        const limitedPredictions = filteredPredictions.slice(0, limit);
         result.predictions = limitedPredictions;
         result.total_predictions = limitedPredictions.length;
         

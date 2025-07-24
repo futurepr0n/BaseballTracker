@@ -13,6 +13,43 @@
   transition: all 0.3s ease;
 }
 
+/* Lighter background for pinheads batch summary */
+.batch-summary-section.pinheads-batch-summary {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 1px solid #cbd5e0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.batch-summary-section.pinheads-batch-summary .summary-header {
+  background: linear-gradient(90deg, #4a7c59 0%, #6b9578 100%);
+}
+
+.batch-summary-section.pinheads-batch-summary .summary-header h3,
+.batch-summary-section.pinheads-batch-summary .summary-header .player-count,
+.batch-summary-section.pinheads-batch-summary .stat-item {
+  color: #ffffff;
+}
+
+.batch-summary-section.pinheads-batch-summary .quick-insights-section,
+.batch-summary-section.pinheads-batch-summary .tab-content {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.batch-summary-section.pinheads-batch-summary .insight-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  color: #334155;
+}
+
+.batch-summary-section.pinheads-batch-summary .insight-label {
+  color: #1e293b;
+}
+
+.batch-summary-section.pinheads-batch-summary .insight-description {
+  color: #64748b;
+}
+
 .batch-summary-section:hover {
   box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
 }
@@ -292,6 +329,12 @@
   flex-direction: column;
 }
 
+/* Light blue background for opportunity tables */
+.opportunity-table {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #bae6fd;
+}
+
 /* Improve table container to flex */
 .opportunity-table .table-container,
 .pitcher-table .table-container {
@@ -308,6 +351,12 @@
   font-size: 14px;
   font-weight: 600;
   border-bottom: 1px solid #3a4554;
+}
+
+/* Light header for opportunity tables */
+.opportunity-table h5 {
+  background: linear-gradient(90deg, #0369a1 0%, #0284c7 100%);
+  border-bottom: 1px solid #bae6fd;
 }
 
 .table-container {
@@ -371,6 +420,12 @@
   z-index: 1;
 }
 
+/* Light theme for opportunity table headers */
+.opportunity-table th {
+  background: #0284c7;
+  color: #ffffff;
+}
+
 .opportunity-table td,
 .pitcher-table td {
   padding: 10px 12px;
@@ -380,9 +435,20 @@
   vertical-align: middle;
 }
 
+/* Light theme for opportunity table content */
+.opportunity-table td {
+  border-bottom: 1px solid #bae6fd;
+  color: #1e293b;
+}
+
 .opportunity-table tr:hover,
 .pitcher-table tr:hover {
   background: rgba(255, 255, 255, 0.05);
+}
+
+/* Light theme hover for opportunity table */
+.opportunity-table tr:hover {
+  background: rgba(3, 105, 161, 0.1);
 }
 
 /* Must-Play Table Special Styling */

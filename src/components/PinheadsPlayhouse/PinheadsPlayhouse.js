@@ -145,7 +145,9 @@ const PinheadsPlayhouse = () => {
     ascending: false,
     limit: 50,
     applyFilters: null,
-    hittersFilter: null
+    hittersFilter: null,
+    recentTrendFilter: [], // Array for multiple Recent Trend Dir selections
+    pitcherTrendFilter: []  // Array for multiple P Trend Dir selections
   });
 
   // Results state
@@ -631,11 +633,14 @@ const PinheadsPlayhouse = () => {
     }
   }, []);
 
-  // Clear specific batch matchup
+  // Clear pitcher from specific batch matchup
   const clearBatchMatchup = useCallback((index) => {
-    updateBatchMatchup(index, 'pitcher_name', '');
-    updateBatchMatchup(index, 'team_abbr', '');
-  }, []);
+    const updated = [...batchMatchups];
+    if (updated[index]) {
+      updated[index].pitcher_name = '';
+      setBatchMatchups(updated);
+    }
+  }, [batchMatchups]);
 
   // Fill all batch matchups from today's lineups
   const fillAllFromLineups = useCallback(async () => {
@@ -1100,7 +1105,7 @@ const PinheadsPlayhouse = () => {
                     type="button"
                     onClick={() => clearBatchMatchup(index)}
                     className="clear-btn"
-                    title="Clear this matchup"
+                    title="Clear pitcher"
                   >
                     🗑️
                   </button>
@@ -1141,6 +1146,67 @@ const PinheadsPlayhouse = () => {
                 min="1"
                 max="100"
               />
+            </div>
+            
+            {/* Trend Direction Filters */}
+            <div className="trend-filters-section">
+              <div className="form-group">
+                <label>Recent Trend Direction:</label>
+                <div className="trend-toggle-group">
+                  {['improving', 'stable', 'declining'].map(trend => (
+                    <button
+                      key={trend}
+                      type="button"
+                      className={`trend-toggle ${batchParams.recentTrendFilter.includes(trend) ? 'active' : ''}`}
+                      onClick={() => {
+                        console.log(`🔘 Toggling Recent Trend: ${trend}`);
+                        console.log(`🔘 Current recentTrendFilter:`, batchParams.recentTrendFilter);
+                        const newFilter = batchParams.recentTrendFilter.includes(trend)
+                          ? batchParams.recentTrendFilter.filter(t => t !== trend)
+                          : [...batchParams.recentTrendFilter, trend];
+                        console.log(`🔘 New recentTrendFilter:`, newFilter);
+                        setBatchParams({...batchParams, recentTrendFilter: newFilter});
+                      }}
+                    >
+                      {trend === 'improving' ? '📈' : trend === 'declining' ? '📉' : '➡️'} {trend.charAt(0).toUpperCase() + trend.slice(1)}
+                    </button>
+                  ))}
+                </div>
+                {batchParams.recentTrendFilter.length > 0 && (
+                  <div className="filter-status">
+                    Active filters: {batchParams.recentTrendFilter.join(', ')}
+                  </div>
+                )}
+              </div>
+              
+              <div className="form-group">
+                <label>Pitcher Trend Direction:</label>
+                <div className="trend-toggle-group">
+                  {['improving', 'stable', 'declining'].map(trend => (
+                    <button
+                      key={trend}
+                      type="button"
+                      className={`trend-toggle ${batchParams.pitcherTrendFilter.includes(trend) ? 'active' : ''}`}
+                      onClick={() => {
+                        console.log(`🔘 Toggling Pitcher Trend: ${trend}`);
+                        console.log(`🔘 Current pitcherTrendFilter:`, batchParams.pitcherTrendFilter);
+                        const newFilter = batchParams.pitcherTrendFilter.includes(trend)
+                          ? batchParams.pitcherTrendFilter.filter(t => t !== trend)
+                          : [...batchParams.pitcherTrendFilter, trend];
+                        console.log(`🔘 New pitcherTrendFilter:`, newFilter);
+                        setBatchParams({...batchParams, pitcherTrendFilter: newFilter});
+                      }}
+                    >
+                      {trend === 'improving' ? '📈' : trend === 'declining' ? '📉' : '➡️'} {trend.charAt(0).toUpperCase() + trend.slice(1)}
+                    </button>
+                  ))}
+                </div>
+                {batchParams.pitcherTrendFilter.length > 0 && (
+                  <div className="filter-status">
+                    Active filters: {batchParams.pitcherTrendFilter.join(', ')}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <button
