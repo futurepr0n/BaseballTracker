@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import './ContinueStreakCard.css';
 import { createSafeId } from '../../utils/tooltipUtils';
 import { useTooltip } from '../../utils/TooltipContext';
+import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import '../../common/MobilePlayerCard.css';
 
@@ -16,6 +17,7 @@ const ContinueStreakCard = ({
   teams
 }) => {
   const { openTooltip, closeTooltip } = useTooltip();
+  const { shouldIncludePlayer } = useTeamFilter();
 
   // Close tooltips when date changes
   useEffect(() => {
@@ -48,7 +50,9 @@ const ContinueStreakCard = ({
           ) : hitStreakData.likelyToContinueStreak && hitStreakData.likelyToContinueStreak.length > 0 ? (
             <div className="scrollable-container">
               <ul className="player-list">
-              {hitStreakData.likelyToContinueStreak.slice(0, 10).map((player, index) => {
+              {hitStreakData.likelyToContinueStreak.filter(player => 
+                shouldIncludePlayer(player.team, player.name)
+              ).slice(0, 10).map((player, index) => {
               const safeId = createSafeId(player.name, player.team);
               const tooltipId = `continue_streak_${safeId}`;
               // Get team logo URL if teams data is available
@@ -126,7 +130,9 @@ const ContinueStreakCard = ({
             <div className="loading-indicator">Loading stats...</div>
           ) : hitStreakData.likelyToContinueStreak && hitStreakData.likelyToContinueStreak.length > 0 ? (
             <div className="mobile-cards">
-              {hitStreakData.likelyToContinueStreak.slice(0, 10).map((player, index) => {
+              {hitStreakData.likelyToContinueStreak.filter(player => 
+                shouldIncludePlayer(player.team, player.name)
+              ).slice(0, 10).map((player, index) => {
                 const continuationPercentage = (player.continuationProbability * 100).toFixed(1);
                 
                 const secondaryMetrics = [

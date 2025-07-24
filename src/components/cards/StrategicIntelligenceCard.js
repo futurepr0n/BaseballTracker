@@ -19,7 +19,7 @@ const StrategicIntelligenceCard = ({ currentDate, playerData, gameData, teamData
   const [streakAnalysisData, setStreakAnalysisData] = useState(null);
   const [leagueStandings, setLeagueStandings] = useState(null); // Unfiltered league data
   
-  const { selectedTeam, includeMatchup, matchupTeam } = useTeamFilter();
+  const { selectedTeam, includeMatchup, matchupTeam, shouldIncludePlayer } = useTeamFilter();
   const { themeMode } = useTheme();
 
   // Load roster data for name mapping
@@ -612,7 +612,14 @@ const StrategicIntelligenceCard = ({ currentDate, playerData, gameData, teamData
     const safeGames = Array.isArray(games) ? games : [];
     const safeTeams = Array.isArray(teams) ? teams : [];
     
-    for (const pick of safeHellraiserPicks) {
+    // Apply scratchpad filtering before processing
+    const filteredHellraiserPicks = safeHellraiserPicks.filter(pick => {
+      const playerName = pick.playerName || pick.player_name || '';
+      const playerTeam = pick.team || pick.Team || '';
+      return shouldIncludePlayer(playerTeam, playerName);
+    });
+    
+    for (const pick of filteredHellraiserPicks) {
       // Find corresponding player data using enhanced name matching
       const playerInfo = findPlayerByName(pick.playerName, pick.team, safePlayers);
       

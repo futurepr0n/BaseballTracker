@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import './HitStreakCard.css';
 import { createSafeId } from '../../utils/tooltipUtils';
 import { useTooltip } from '../../utils/TooltipContext';
+import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import SimpleDesktopScratchpadIcon from '../../common/SimpleDesktopScratchpadIcon';
 import { getTeamLogoUrl } from '../../../utils/teamUtils';
@@ -18,11 +19,17 @@ const HitStreakCard = ({
   teams
 }) => {
   const { openTooltip, closeTooltip } = useTooltip();
+  const { shouldIncludePlayer } = useTeamFilter();
 
   // Close tooltips when date changes
   useEffect(() => {
     closeTooltip();
   }, [currentDate, closeTooltip]);
+
+  // Filter players based on team and scratchpad filters
+  const filteredPlayers = (hitStreakData.hitStreaks || []).filter(player => 
+    shouldIncludePlayer(player.team, player.name)
+  );
 
   const handleTooltipClick = (player, event) => {
     const safeId = createSafeId(player.name, player.team);
@@ -45,10 +52,10 @@ const HitStreakCard = ({
         <div className="desktop-view">
           {isLoading ? (
             <div className="loading-indicator">Loading stats...</div>
-          ) : hitStreakData.hitStreaks && hitStreakData.hitStreaks.length > 0 ? (
+          ) : filteredPlayers.length > 0 ? (
             <div className="scrollable-container">
               <ul className="player-list">
-                {hitStreakData.hitStreaks.slice(0, 10).map((player, index) => {
+                {filteredPlayers.slice(0, 10).map((player, index) => {
                   const safeId = createSafeId(player.name, player.team);
                   const tooltipId = `streak_hit_${safeId}`;
                   
@@ -127,9 +134,9 @@ const HitStreakCard = ({
         <div className="mobile-view">
           {isLoading ? (
             <div className="loading-indicator">Loading stats...</div>
-          ) : hitStreakData.hitStreaks && hitStreakData.hitStreaks.length > 0 ? (
+          ) : filteredPlayers.length > 0 ? (
             <div className="mobile-cards">
-              {hitStreakData.hitStreaks.slice(0, 10).map((player, index) => {
+              {filteredPlayers.slice(0, 10).map((player, index) => {
                 const safeId = createSafeId(player.name, player.team);
                 const tooltipId = `streak_hit_${safeId}`;
 

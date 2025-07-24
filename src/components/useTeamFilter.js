@@ -18,7 +18,8 @@ function useTeamFilteredData(data, teamField = 'team') {
     
     return data.filter(item => {
       const itemTeam = item[teamField];
-      return shouldIncludePlayer(itemTeam);
+      const playerName = item.name || item.playerName || item.Name || '';
+      return shouldIncludePlayer(itemTeam, playerName);
     });
   }, [data, selectedTeam, includeMatchup, matchupTeam, teamField, shouldIncludePlayer]);
   
@@ -44,7 +45,8 @@ export function useTeamFilteredObject(obj, getTeamFn) {
     return Object.fromEntries(
       Object.entries(obj).filter(([key, value]) => {
         const itemTeam = getTeamFn(key, value);
-        return shouldIncludePlayer(itemTeam);
+        const playerName = value.name || value.playerName || value.Name || key || '';
+        return shouldIncludePlayer(itemTeam, playerName);
       })
     );
   }, [obj, selectedTeam, includeMatchup, matchupTeam, getTeamFn, shouldIncludePlayer]);

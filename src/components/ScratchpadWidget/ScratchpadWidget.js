@@ -32,6 +32,12 @@ const ScratchpadWidget = () => {
   };
 
   const handleToggleFilter = () => {
+    // Prevent enabling filter when there are no players
+    if (!filterEnabled && isEmpty) {
+      alert('Please add players to the scratchpad before enabling the filter.');
+      return;
+    }
+    
     toggleFilter();
     // Show success feedback
     const message = filterEnabled 
@@ -50,6 +56,9 @@ const ScratchpadWidget = () => {
           <span className="scratchpad-icon">📝</span>
           <span className="scratchpad-text">Scratchpad</span>
           <span className="player-count-badge">{playerCount}</span>
+          {filterEnabled && (
+            <span className="filter-indicator" title="Scratchpad filter is active">🔍</span>
+          )}
         </div>
         <button 
           className="minimize-button"

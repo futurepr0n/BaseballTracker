@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import './DayOfWeekHitsCard.css';
 import { createSafeId } from '../../utils/tooltipUtils';
 import { useTooltip } from '../../utils/TooltipContext';
+import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import '../../common/MobilePlayerCard.css';
 
@@ -16,6 +17,7 @@ const DayOfWeekHitsCard = ({
   teams
 }) => {
   const { openTooltip, closeTooltip } = useTooltip();
+  const { shouldIncludePlayer } = useTeamFilter();
 
   // Close tooltips when date changes
   useEffect(() => {
@@ -48,7 +50,9 @@ const DayOfWeekHitsCard = ({
           ) : dayOfWeekHits.topHitsByTotal && dayOfWeekHits.topHitsByTotal.length > 0 ? (
             <div className="scrollable-container">
             <ul className="player-list">
-              {dayOfWeekHits.topHitsByTotal.slice(0, 10).map((player, index) => {
+              {dayOfWeekHits.topHitsByTotal.filter(player => 
+                shouldIncludePlayer(player.team, player.name)
+              ).slice(0, 10).map((player, index) => {
                 const safeId = createSafeId(player.name, player.team);
                 const tooltipId = `day_hit_${safeId}`;
                 
@@ -114,7 +118,9 @@ const DayOfWeekHitsCard = ({
             <div className="loading-indicator">Loading stats...</div>
           ) : dayOfWeekHits.topHitsByTotal && dayOfWeekHits.topHitsByTotal.length > 0 ? (
             <div className="mobile-cards">
-              {dayOfWeekHits.topHitsByTotal.slice(0, 10).map((player, index) => {
+              {dayOfWeekHits.topHitsByTotal.filter(player => 
+                shouldIncludePlayer(player.team, player.name)
+              ).slice(0, 10).map((player, index) => {
                 const hitRatePercentage = (player.hitRate * 100).toFixed(1);
                 
                 const secondaryMetrics = [

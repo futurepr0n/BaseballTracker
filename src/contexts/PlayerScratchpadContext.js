@@ -115,14 +115,26 @@ export const PlayerScratchpadProvider = ({ children }) => {
       if (removedPlayer) {
         console.log(`Removed ${removedPlayer.name} from scratchpad`);
       }
+      
+      // Auto-disable filter if this was the last player
+      if (filtered.length === 0 && filterEnabled) {
+        setFilterEnabled(false);
+        console.log('Auto-disabled scratchpad filter (last player removed)');
+      }
+      
       return filtered;
     });
-  }, []);
+  }, [filterEnabled]);
 
   const clearAllPlayers = useCallback(() => {
     console.log('Cleared all players from scratchpad');
     setPlayers([]);
-  }, []);
+    // Auto-disable filter when all players are removed
+    if (filterEnabled) {
+      setFilterEnabled(false);
+      console.log('Auto-disabled scratchpad filter (no players remaining)');
+    }
+  }, [filterEnabled]);
 
   const togglePlayer = useCallback((playerData) => {
     const playerId = `${playerData.name}-${playerData.team}`.toLowerCase().replace(/\s+/g, '-');
@@ -137,6 +149,13 @@ export const PlayerScratchpadProvider = ({ children }) => {
         if (removedPlayer) {
           console.log(`Removed ${removedPlayer.name} from scratchpad`);
         }
+        
+        // Auto-disable filter if this was the last player
+        if (filtered.length === 0 && filterEnabled) {
+          setFilterEnabled(false);
+          console.log('Auto-disabled scratchpad filter (last player removed via toggle)');
+        }
+        
         return filtered;
       } else {
         // Add player
@@ -154,7 +173,7 @@ export const PlayerScratchpadProvider = ({ children }) => {
         return [...prev, player];
       }
     });
-  }, []); // No dependencies!
+  }, [filterEnabled]);
 
   // Check if player is in scratchpad - use ref to avoid recreating this function
   const isPlayerInScratchpad = useCallback((playerData) => {

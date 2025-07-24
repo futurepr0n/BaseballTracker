@@ -5,6 +5,7 @@ import {
   fetchRosterData 
 } from '../../../services/dataService';
 import { getPlayerDisplayName, getTeamDisplayName } from '../../../utils/playerNameUtils';
+import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import './HitDroughtBounceBackCard.css';
 import '../../common/MobilePlayerCard.css';
@@ -13,6 +14,7 @@ const HitDroughtBounceBackCard = ({ gameData, currentDate, teams }) => {
   const [bounceBackData, setBounceBackData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { shouldIncludePlayer } = useTeamFilter();
 
   useEffect(() => {
     const analyzeBounceBackPatterns = async () => {
@@ -230,7 +232,9 @@ const HitDroughtBounceBackCard = ({ gameData, currentDate, teams }) => {
           ) : (
             <div className="scrollable-container">
               <ul className="player-list">
-                {bounceBackData.map((player, index) => {
+                {bounceBackData.filter(player => 
+                  shouldIncludePlayer(player.team, player.name)
+                ).slice(0, 10).map((player, index) => {
                   const teamInfo = getTeamInfo(player.team);
                   
                   return (
@@ -298,7 +302,9 @@ const HitDroughtBounceBackCard = ({ gameData, currentDate, teams }) => {
             </div>
           ) : (
             <div className="mobile-cards">
-              {bounceBackData.map((player, index) => {
+              {bounceBackData.filter(player => 
+                shouldIncludePlayer(player.team, player.name)
+              ).slice(0, 10).map((player, index) => {
                 const secondaryMetrics = [
                   { label: 'Next Game', value: `${player.oneGameBounceBackPct}%` },
                   { label: 'Droughts', value: player.totalDroughts }

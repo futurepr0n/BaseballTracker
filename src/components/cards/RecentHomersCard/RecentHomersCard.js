@@ -15,7 +15,7 @@ const RecentHomersCard = ({
   isLoading, 
   teams 
 }) => {
-  const { isFiltering, selectedTeam, getTeamName } = useTeamFilter();
+  const { isFiltering, selectedTeam, getTeamName, shouldIncludePlayer } = useTeamFilter();
 
   // Get appropriate display limit based on filtering
   const getDisplayLimit = () => {
