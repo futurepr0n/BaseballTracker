@@ -319,6 +319,16 @@ main() {
         ((files_created++))
     fi
     
+    # Step 7.6: Generate player prop analysis
+    print_status $BLUE "🎯 Generating player prop analysis..."
+    node src/services/generatePropAnalysis.js $DATE
+    
+    if [ $? -ne 0 ]; then
+        print_status $YELLOW "⚠️  WARNING: Failed to generate prop analysis (non-critical)"
+    else
+        print_status $GREEN "✅ Player prop analysis generated successfully"
+    fi
+    
     # Step 8: Verify files were created
     print_status $BLUE "🔍 Verifying generated files..."
     
