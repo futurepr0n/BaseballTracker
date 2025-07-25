@@ -67,6 +67,21 @@ const MobilePlayerCard = ({
     onCancel: () => console.log('Long press cancelled')
   });
 
+  // Explicitly extract only valid DOM event handlers to avoid invalid props
+  const longPressEventHandlers = {
+    onMouseDown: longPressHandlers.onMouseDown,
+    onTouchStart: longPressHandlers.onTouchStart,
+    onMouseUp: longPressHandlers.onMouseUp,
+    onTouchEnd: longPressHandlers.onTouchEnd,
+    onMouseMove: longPressHandlers.onMouseMove,
+    onTouchMove: longPressHandlers.onTouchMove,
+    onMouseLeave: longPressHandlers.onMouseLeave,
+    onContextMenu: longPressHandlers.onContextMenu
+  };
+
+  // Extract state separately to avoid passing to DOM
+  const { isLongPressing, cancel } = longPressHandlers;
+
   const handleCardClick = (event) => {
     if (onCardClick) {
       onCardClick(item, index, event);
@@ -86,12 +101,12 @@ const MobilePlayerCard = ({
   };
 
   return (
-    <div className={`mobile-card ${className} ${isExpanded ? 'expanded' : ''} ${isInScratchpad ? 'in-scratchpad' : ''} ${longPressHandlers.isLongPressing ? 'long-pressing' : ''}`}>
+    <div className={`mobile-card ${className} ${isExpanded ? 'expanded' : ''} ${isInScratchpad ? 'in-scratchpad' : ''} ${isLongPressing ? 'long-pressing' : ''}`}>
       <div 
         className="mobile-card-header" 
         onClick={handleCardClick}
         style={{ cursor: onCardClick ? 'pointer' : 'default' }}
-        {...(enableScratchpad ? longPressHandlers : {})}
+        {...(enableScratchpad ? longPressEventHandlers : {})}
       >
         {showRank && (
           <div className="player-rank">

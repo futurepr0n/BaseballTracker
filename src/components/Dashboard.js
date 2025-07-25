@@ -12,6 +12,9 @@ import { useTheme } from '../contexts/ThemeContext';
 import { HandednessProvider } from '../contexts/HandednessContext';
 import ThemeToggle from './ThemeToggle';
 
+// Import debug logging system
+import { debugLog } from '../utils/debugConfig';
+
 // Import tooltip system
 import { TooltipProvider } from './utils/TooltipContext';
 import GlobalTooltip from './utils/GlobalTooltip';
@@ -195,7 +198,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
       try {
         setStadiumLoading(true);
         
-        console.log('Loading stadium HR analysis data...');
+        debugLog.card('Dashboard', 'Loading stadium HR analysis data...');
         
         // Load the stadium analysis file
         const response = await fetch('/data/stadium/stadium_hr_analysis.json');
@@ -205,7 +208,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
           setStadiumData(null);
         } else {
           const data = await response.json();
-          console.log('Stadium data loaded:', data);
+          debugLog.card('Dashboard', 'Stadium data loaded:', data);
           setStadiumData(data);
         }
       } catch (error) {
@@ -267,7 +270,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
         }
         
         setPoorPerformancePredictions(predictions);
-        console.log(`Loaded ${predictions.length} poor performance predictions`);
+        debugLog.card('Dashboard', `Loaded ${predictions.length} poor performance predictions`);
       }
     } catch (error) {
       console.error('Error loading poor performance predictions:', error);
@@ -315,7 +318,7 @@ useEffect(() => {
         }
         
         setPositiveMomentumPredictions(predictions);
-        console.log(`Loaded ${predictions.length} positive momentum predictions`);
+        debugLog.card('Dashboard', `Loaded ${predictions.length} positive momentum predictions`);
       }
     } catch (error) {
       console.error('Error loading positive momentum predictions:', error);
@@ -384,11 +387,11 @@ useEffect(() => {
   // Track visit on component mount
   useEffect(() => {
     const trackVisit = async () => {
-      console.log('🔄 Starting visit tracking...');
+      debugLog.info('COMPONENTS', '🔄 Starting visit tracking...');
       try {
         setVisitLoading(true);
         
-        console.log('📤 Making POST request to https://visits.capping.pro/visits');
+        debugLog.info('API_CALLS', '📤 Making POST request to https://visits.capping.pro/visits');
         // Record visit
         const response = await fetch('https://visits.capping.pro/visits', {
           method: 'POST',
@@ -397,15 +400,15 @@ useEffect(() => {
           },
         });
         
-        console.log('📥 Response status:', response.status);
+        debugLog.info('API_CALLS', '📥 Response status:', response.status);
         
         if (response.ok) {
           const data = await response.json();
-          console.log('📊 Response data:', data);
+          debugLog.info('API_CALLS', '📊 Response data:', data);
           if (data.success) {
-            console.log('🔄 Setting visitCount to', data.totalPageLoads);
+            debugLog.info('COMPONENTS', '🔄 Setting visitCount to', data.totalPageLoads);
             setVisitCount(data.totalPageLoads);
-            console.log(`📈 Page load tracked! Total loads: ${data.totalPageLoads}`);
+            debugLog.info('COMPONENTS', `📈 Page load tracked! Total loads: ${data.totalPageLoads}`);
           } else {
             console.warn('❌ API response success was false:', data);
           }

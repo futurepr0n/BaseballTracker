@@ -43,3 +43,16 @@ batch_execution_*.json
 detailed_analysis_*.json
 cleanup_batch_*.json
 approved_batch_*.json
+
+# Dynamic Discovery System - Test and Debug Files
+test_dynamic_discovery.js
+*_test_discovery.js
+dynamic_discovery_test*.js
+bounce_back_comparison_test*.js
+
+# Generated file lists (auto-regenerated)
+public/data/available_files.json
+
+# Performance and debugging files
+performance_test*.json
+discovery_debug*.log
