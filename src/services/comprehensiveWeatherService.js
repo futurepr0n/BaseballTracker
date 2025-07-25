@@ -114,16 +114,23 @@ class ComprehensiveWeatherService {
       const response = await fetch(weatherUrl);
       
       if (!response.ok) {
-        console.warn('Weather API failed, using fallback');
+        if (response.status === 429) {
+          console.warn(`Weather API rate limited for ${ballpark.name}, using fallback`);
+        } else {
+          console.warn(`Weather API failed for ${ballpark.name} (${response.status}): ${response.statusText}`);
+        }
         return this.generateDefaultWeatherData(ballpark, gameTime);
       }
 
       const weatherData = await response.json();
       console.log(`Fetched real weather data for ${ballpark.name}:`, weatherData);
       
+      // Add small delay to prevent rate limiting on subsequent calls
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       return this.processRealWeatherData(weatherData, ballpark, gameTime);
     } catch (error) {
-      console.warn('Error fetching real weather data:', error);
+      console.warn(`Error fetching real weather data for ${ballpark.name}:`, error.message);
       return this.generateDefaultWeatherData(ballpark, gameTime);
     }
   }

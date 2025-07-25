@@ -29,17 +29,29 @@ window.debugControl = {
    */
   production: () => {
     setDebugMode('production');
-    console.log('🔕 Debug mode: PRODUCTION (errors only)');
+    // Also ensure console quiet mode is enabled
+    if (window.consoleQuiet) {
+      window.consoleQuiet.enable();
+    }
+    console.log('🔕 Debug mode: PRODUCTION (errors only, legacy console suppressed)');
   },
 
   development: () => {
     setDebugMode('development');
-    console.log('🔧 Debug mode: DEVELOPMENT (selective logging)');
+    // Disable console quiet mode for development debugging
+    if (window.consoleQuiet) {
+      window.consoleQuiet.disable();
+    }
+    console.log('🔧 Debug mode: DEVELOPMENT (selective logging, legacy console enabled)');
   },
 
   debug: () => {
     setDebugMode('debug');  
-    console.log('🐛 Debug mode: FULL DEBUG (all logging enabled)');
+    // Disable console quiet mode for full debugging
+    if (window.consoleQuiet) {
+      window.consoleQuiet.disable();
+    }
+    console.log('🐛 Debug mode: FULL DEBUG (all logging enabled, legacy console enabled)');
   },
 
   quiet: () => {

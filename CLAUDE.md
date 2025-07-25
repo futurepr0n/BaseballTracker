@@ -19,8 +19,8 @@ npm run build
 
 **Data Processing Pipeline:**
 ```bash
-# 1. Generate schedule data (run first)
-node src/services/scheduleGenerator.js
+# 1. Generate available files list (for dynamic discovery system)
+./generate_file_list.sh
 
 # 2. Process all CSV stats files from BaseballScraper
 ./process_all_stats.sh
@@ -32,7 +32,7 @@ npm run generate-milestones
 
 # 4. Run daily update (generates predictions and team stats)
 ./daily_update.sh [YYYY-MM-DD]
-# Now includes team statistics generation for Enhanced Player Analysis
+# Now includes automatic file list regeneration and team statistics generation
 ```
 
 **Handedness Data Setup (One-time or when CSV files updated):**
@@ -113,18 +113,55 @@ npm run generate-milestones
 - **Team Filter Context** - Global state for filtering players/games by team with matchup analysis
 - **Enhanced Player Analysis System** (`/players` route) - Comprehensive player performance analysis with real data integration
 
+### Dynamic Game Date Discovery System (CRITICAL ARCHITECTURE)
+
+**Problem Solved**: Previous system used brute force date iteration causing 100+ failed HTTP requests and arbitrary 50-date limits that truncated season analysis.
+
+**Solution Architecture**:
+1. **File List Generation**: `./generate_file_list.sh` scans all available data files
+2. **Complete Season Coverage**: No arbitrary limits - processes ALL available game dates
+3. **Performance Optimization**: Batched processing prevents browser blocking
+4. **Automatic Updates**: Daily integration ensures file list stays current
+
+**Core Components**:
+- **`generate_file_list.sh`**: Creates `public/data/available_files.json` with complete file inventory
+- **`dynamicGameDateService.js`**: Browser-compatible service for efficient game date discovery
+- **Daily Integration**: Automatic file list regeneration in `daily_update.sh`
+
+**Key Features**:
+- **Complete Season Traversal**: Processes all 184+ available files (March-October)
+- **No Early Exit**: Eliminated 50-date limit that was truncating analysis
+- **HTTP Error Prevention**: Only checks files that actually exist
+- **Postponement Handling**: Automatically adapts to schedule changes
+- **Performance Optimized**: 8-file batches with 5ms staggering prevents browser blocking
+
+**Usage Commands**:
+```bash
+# Generate/update file list (run after new data is added)
+./generate_file_list.sh
+
+# Daily update now includes automatic file list regeneration
+./daily_update.sh [YYYY-MM-DD]
+```
+
+**Integration Points**:
+- **Pitcher Cards**: `PitcherHRsAllowedCard`, `PitcherHitsAllowedCard` use complete season data
+- **Statistical Analysis**: Full historical context instead of truncated 50-date samples
+- **Browser Performance**: Eliminates message handler violations through intelligent batching
+
 ### Data Flow Architecture
 1. **Raw Data Sources**: 
    - Daily JSON files: `public/data/YYYY/month/month_DD_YYYY.json`
    - Static data: `teams.json`, `rosters.json`, `handicappers.json`
    - Generated predictions: `public/data/predictions/`
+   - **Available files list**: `public/data/available_files.json` (auto-generated)
 
 2. **Processing Pipeline**:
    - CSV files (from external BaseballScraper) → `statLoader.js` → Daily JSON
    - Daily JSON → `generateRollingStats.js` → Rolling statistics files
    - Rolling stats → `generateTeamStats.js` → Team performance data
    - Daily JSON → Prediction services → Analysis JSON files
-   - Historical data aggregation via `fetchPlayerDataForDateRange()`
+   - **Dynamic Discovery**: `generate_file_list.sh` → Available files list → Complete season analysis
 
 3. **Frontend Data Loading**:
    - Lazy loading with fallback to closest available date

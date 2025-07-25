@@ -277,6 +277,15 @@ main() {
         print_status $BLUE "ℹ️  Postponed game manager not available - skipping"
     fi
 
+    # Step 5.5: Update file list for dynamic game date discovery
+    print_status $BLUE "📅 Updating available files list for dynamic discovery..."
+    ./generate_file_list.sh
+    if [ $? -eq 0 ]; then
+        print_status $GREEN "✅ Available files list updated for complete season coverage"
+    else
+        print_status $YELLOW "⚠️ File list generation had issues - discovery will use fallback"
+    fi
+
     # Step 6: Generate all data (HR predictions and player performance)
     print_status $BLUE "📊 Generating prediction data files..."
     node src/services/generateHRPredictions3.js $DATE

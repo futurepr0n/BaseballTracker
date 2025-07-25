@@ -116,24 +116,28 @@ const MLBWeatherCard = ({ teams }) => {
 
         const dailyGames = scheduleData.dates[0].games;
 
-        // Process all games concurrently to fetch their weather data
-        const gamesWithWeather = await Promise.all(
-          dailyGames.map(async (game) => {
-            const homeTeamName = game.teams.home.team.name;
-            const parkInfo = ballparkData[homeTeamName];
-            
-            if (!parkInfo) return null; // Skip if we don't have park data
+        // Process games sequentially to avoid API rate limiting
+        const gamesWithWeather = [];
+        
+        for (const game of dailyGames) {
+          const homeTeamName = game.teams.home.team.name;
+          const parkInfo = ballparkData[homeTeamName];
+          
+          if (!parkInfo) continue; // Skip if we don't have park data
 
-            const isDome = ['Tropicana Field', 'Rogers Centre', 'Chase Field', 'Minute Maid Park', 
-                           'American Family Field', 'Globe Life Field', 'T-Mobile Park'].includes(parkInfo.name);
+          const isDome = ['Tropicana Field', 'Rogers Centre', 'Chase Field', 'Minute Maid Park', 
+                         'American Family Field', 'Globe Life Field', 'T-Mobile Park'].includes(parkInfo.name);
 
-            let weatherData = null;
-            let windFactor = { text: 'Indoor', description: 'This is an indoor or retractable roof stadium.' };
-            
-            if (!isDome) {
-                // Fetch weather only for open-air stadiums
-                const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${parkInfo.lat}&longitude=${parkInfo.lon}&hourly=temperature_2m,apparent_temperature,precipitation_probability,surface_pressure,windspeed_10m,winddirection_10m&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch&timezone=auto`;
-                const weatherResponse = await fetch(weatherUrl);
+          let weatherData = null;
+          let windFactor = { text: 'Indoor', description: 'This is an indoor or retractable roof stadium.' };
+          
+          if (!isDome) {
+            try {
+              // Fetch weather only for open-air stadiums with error handling
+              const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${parkInfo.lat}&longitude=${parkInfo.lon}&hourly=temperature_2m,apparent_temperature,precipitation_probability,surface_pressure,windspeed_10m,winddirection_10m&temperature_unit=fahrenheit&windspeed_unit=mph&precipitation_unit=inch&timezone=auto`;
+              const weatherResponse = await fetch(weatherUrl);
+              
+              if (weatherResponse.ok) {
                 weatherData = await weatherResponse.json();
                 
                 // Calculate the wind factor for the game's start time
@@ -144,25 +148,34 @@ const MLBWeatherCard = ({ teams }) => {
                 } else {
                     windFactor = {text: 'N/A', description: 'Could not determine game time wind.'};
                 }
+              } else {
+                console.warn(`Weather API failed for ${homeTeamName} (${weatherResponse.status}): ${weatherResponse.statusText}`);
+                windFactor = { text: 'Weather Unavailable', description: 'Could not fetch weather data.' };
+              }
+            } catch (error) {
+              console.warn(`Error fetching weather for ${homeTeamName}:`, error.message);
+              windFactor = { text: 'Weather Error', description: 'Error fetching weather data.' };
             }
+            
+            // Rate limiting: Add delay between requests to avoid API limits
+            await new Promise(resolve => setTimeout(resolve, 200)); // 200ms delay between requests
+          }
 
-            // Return a clean object for each game
-            return {
-              id: game.gamePk,
-              awayTeam: game.teams.away.team.name,
-              homeTeam: homeTeamName,
-              venue: parkInfo.name,
-              gameTime: game.gameDate,
-              weather: weatherData, // Will be null for domes
-              windFactor: windFactor,
-              parkOrientation: parkInfo.orientation,
-            };
-          })
-        );
+          // Return a clean object for each game
+          gamesWithWeather.push({
+            id: game.gamePk,
+            awayTeam: game.teams.away.team.name,
+            homeTeam: homeTeamName,
+            venue: parkInfo.name,
+            gameTime: game.gameDate,
+            weather: weatherData, // Will be null for domes or failed requests
+            windFactor: windFactor,
+            parkOrientation: parkInfo.orientation,
+          });
+        }
         
-        // Filter out any games we skipped (e.g., neutral site games not in our data)
-        const validGames = gamesWithWeather.filter(g => g !== null);
-        setGames(validGames);
+        // Set the games with weather data
+        setGames(gamesWithWeather);
       } catch (err) {
         setError('Failed to fetch weather data');
         console.error(err);

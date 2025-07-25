@@ -4,6 +4,7 @@ import { fetchPlayerData, fetchGameData } from '../../../services/dataService';
 import { useTooltip } from '../../utils/TooltipContext';
 import { createSafeId } from '../../utils/tooltipUtils';
 import { debugLog } from '../../../utils/debugConfig';
+import dynamicGameDateService from '../../../services/dynamicGameDateService';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import '../../common/MobilePlayerCard.css';
 import './PitcherHRsAllowedCard.css';
@@ -28,36 +29,46 @@ const PitcherHRsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
       try {
         debugLog.log('CARDS', '[PitcherHRsAllowedCard] Starting pitcher HR analysis...');
         
-        // Load ALL season data by manually iterating through all available dates
-        const seasonData = {};
-        const months = ['march', 'april', 'may', 'june'];
+        // Get current date string for dynamic discovery
+        const currentDateStr = currentDate ? currentDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
         
-        for (const month of months) {
-          // Try to load all days from each month
-          for (let day = 1; day <= 31; day++) {
-            try {
-              const testDate = new Date(2025, months.indexOf(month) + 2, day); // +2 because march=2
-              if (testDate.getMonth() !== months.indexOf(month) + 2) continue; // Invalid date
-              if (testDate >= new Date(currentDate)) break; // Don't load future dates
-              
-              const dateStr = testDate.toISOString().split('T')[0];
-              const playerData = await fetchPlayerData(dateStr);
-              
-              if (playerData && playerData.length > 0) {
-                seasonData[dateStr] = { players: playerData, date: dateStr };
-                debugLog.log('CARDS', `[PitcherHRsAllowedCard] Loaded data for ${dateStr}`);
-              }
-            } catch (error) {
-              // Date doesn't exist, continue
+        // Use dynamic file discovery to find actual game dates
+        debugLog.log('CARDS', '[PitcherHRsAllowedCard] Discovering actual game dates from data files...');
+        const gameDates = await dynamicGameDateService.getGameDatesForAnalysis(currentDateStr, {
+          maxDaysBack: 120
+        });
+        
+        if (!gameDates || gameDates.length === 0) {
+          console.warn('[PitcherHRsAllowedCard] No game dates discovered');
+          setPitcherHRData([]);
+          setIsLoading(false);
+          return;
+        }
+        
+        debugLog.log('CARDS', `[PitcherHRsAllowedCard] Discovered ${gameDates.length} actual game dates from ${gameDates[0]} to ${gameDates[gameDates.length - 1]}`);
+        
+        // Load player data for each discovered game date
+        const seasonData = {};
+        let loadedDates = 0;
+        
+        for (const gameDate of gameDates) {
+          try {
+            const playersForDate = await fetchPlayerData(gameDate);
+            if (playersForDate && playersForDate.length > 0) {
+              seasonData[gameDate] = { players: playersForDate };
+              loadedDates++;
             }
+          } catch (error) {
+            debugLog.log('CARDS', `[PitcherHRsAllowedCard] No data for ${gameDate}: ${error.message}`);
+            // Continue with other dates - this is expected for some dates
           }
         }
         
         const dateKeys = Object.keys(seasonData).sort();
-        debugLog.log('CARDS', `[PitcherHRsAllowedCard] Loaded complete season data: ${dateKeys.length} dates from ${dateKeys[0]} to ${dateKeys[dateKeys.length - 1]}`);
+        debugLog.log('CARDS', `[PitcherHRsAllowedCard] Successfully loaded ${loadedDates} of ${gameDates.length} discovered dates`);
         
         if (dateKeys.length === 0) {
-          console.warn('[PitcherHRsAllowedCard] No historical data found');
+          console.warn('[PitcherHRsAllowedCard] No historical data found in discovered dates');
           setPitcherHRData([]);
           setIsLoading(false);
           return;
