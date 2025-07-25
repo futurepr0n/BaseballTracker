@@ -16,6 +16,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [propAnalysisData, setPropAnalysisData] = useState(null);
+  const [propDataCache, setPropDataCache] = useState({});  // NEW: Cache for prop-specific data
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [playerChartData, setPlayerChartData] = useState(null);
   const [recentGamesData, setRecentGamesData] = useState(null);
@@ -182,30 +183,41 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
     { key: 'walks', label: 'Walks', icon: '🚶', statKey: 'totalBBs' }
   ], []);
 
-  // Load pre-computed prop analysis data
-  const loadPlayerPropData = useCallback(async (retryCount = 0) => {
+  // Load prop-specific data with caching
+  const loadPlayerPropData = useCallback(async (targetProp, retryCount = 0) => {
     const maxRetries = 3;
     const retryDelay = 1000 * (retryCount + 1); // Progressive delay
+    
+    // Check cache first
+    const cacheKey = `${targetProp}_${currentDateString}`;
+    if (propDataCache[cacheKey]) {
+      console.log(`🎯 Using cached data for ${targetProp}`, cacheKey);
+      setPropAnalysisData(propDataCache[cacheKey]);
+      setLoading(false);
+      return;
+    }
     
     try {
       setLoading(true);
       setError(null);
       
-      console.log('🎯 Loading pre-computed prop analysis data...', { 
+      console.log(`🎯 Loading prop-specific data for ${targetProp}...`, { 
         currentDate, 
         currentDateString,
+        targetProp,
+        cacheKey,
         loadAttempt: new Date().toISOString(),
         retryCount,
         maxRetries
       });
       
-      // Try to load date-specific file first, fallback to latest
+      // Try to load date-specific prop file first, fallback to latest
       let propAnalysisResponse;
       let dateSpecificFound = false;
       
       if (currentDateString) {
-        const dateSpecificUrl = `/data/prop_analysis/prop_analysis_${currentDateString}.json`;
-        console.log('📅 Trying date-specific URL:', dateSpecificUrl);
+        const dateSpecificUrl = `/data/prop_analysis/${targetProp}_analysis_${currentDateString}.json`;
+        console.log('📅 Trying date-specific prop URL:', dateSpecificUrl);
         
         // Add fetch timeout and better error handling
         const controller = new AbortController();
@@ -234,16 +246,16 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
         
         if (!propAnalysisResponse.ok || isHtml) {
           if (isHtml) {
-            console.log('📅 Date-specific file returned HTML (missing), using latest');
+            console.log(`📅 Date-specific ${targetProp} file returned HTML (missing), using latest`);
           } else {
-            console.log('📅 Date-specific prop analysis not found, using latest');
+            console.log(`📅 Date-specific ${targetProp} analysis not found, using latest`);
           }
           // Apply same timeout and cache control to latest file
           const latestController = new AbortController();
           const latestTimeoutId = setTimeout(() => latestController.abort(), 10000);
           
           try {
-            propAnalysisResponse = await fetch('/data/prop_analysis/prop_analysis_latest.json', {
+            propAnalysisResponse = await fetch(`/data/prop_analysis/${targetProp}_analysis_latest.json`, {
               signal: latestController.signal,
               cache: 'no-cache',
               headers: {
@@ -262,13 +274,13 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
           dateSpecificFound = true;
         }
       } else {
-        console.log('📅 No currentDate provided, using latest');
+        console.log(`📅 No currentDate provided, using latest for ${targetProp}`);
         // Apply same timeout and cache control to initial latest fetch
         const initialController = new AbortController();
         const initialTimeoutId = setTimeout(() => initialController.abort(), 10000);
         
         try {
-          propAnalysisResponse = await fetch('/data/prop_analysis/prop_analysis_latest.json', {
+          propAnalysisResponse = await fetch(`/data/prop_analysis/${targetProp}_analysis_latest.json`, {
             signal: initialController.signal,
             cache: 'no-cache',
             headers: {
@@ -297,36 +309,45 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
           statusText: propAnalysisResponse.statusText,
           contentType: finalContentType,
           url: propAnalysisResponse.url,
-          isHtml: isFinalHtml
+          isHtml: isFinalHtml,
+          targetProp
         };
         console.error('❌ HTTP Error details:', errorDetails);
         
         if (isFinalHtml) {
-          throw new Error(`Prop analysis files not found (server returned HTML). Please run: node src/services/generatePropAnalysis.js`);
+          throw new Error(`${targetProp} prop analysis files not found (server returned HTML). Please run: node src/services/generatePropAnalysis.js`);
         } else if (propAnalysisResponse.status === 404) {
-          throw new Error(`Prop analysis file not found. Please run: node src/services/generatePropAnalysis.js`);
+          throw new Error(`${targetProp} prop analysis file not found. Please run: node src/services/generatePropAnalysis.js`);
         } else {
-          throw new Error(`Failed to load prop analysis data (HTTP ${propAnalysisResponse.status}: ${propAnalysisResponse.statusText})`);
+          throw new Error(`Failed to load ${targetProp} prop analysis data (HTTP ${propAnalysisResponse.status}: ${propAnalysisResponse.statusText})`);
         }
       }
       
       const propData = await propAnalysisResponse.json();
-      console.log('✅ Pre-computed prop analysis loaded:', {
+      console.log(`✅ Pre-computed ${targetProp} analysis loaded:`, {
         date: propData.date,
-        propsAvailable: Object.keys(propData.propAnalysis || {}),
+        propType: propData.propType,
+        totalPlayers: propData.totalPlayers,
         generatedAt: propData.generatedAt,
         dataSize: JSON.stringify(propData).length
       });
       
+      // Cache the loaded data
+      setPropDataCache(prev => ({
+        ...prev,
+        [cacheKey]: propData
+      }));
+      
       setPropAnalysisData(propData);
       
     } catch (err) {
-      console.error('❌ Error loading pre-computed prop analysis:', err);
+      console.error(`❌ Error loading ${targetProp} prop analysis:`, err);
       console.error('Error details:', {
         message: err.message,
         stack: err.stack,
         currentDate: currentDate,
         currentDateString: currentDateString,
+        targetProp,
         retryCount
       });
       
@@ -339,28 +360,33 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
         err.message.includes('timed out') ||
         err.message.includes('Unexpected token')
       )) {
-        console.log(`🔄 Retrying in ${retryDelay}ms... (attempt ${retryCount + 1}/${maxRetries + 1})`);
+        console.log(`🔄 Retrying ${targetProp} in ${retryDelay}ms... (attempt ${retryCount + 1}/${maxRetries + 1})`);
         setLoading(false); // Allow UI to show retry state briefly
         
         setTimeout(() => {
-          loadPlayerPropData(retryCount + 1);
+          loadPlayerPropData(targetProp, retryCount + 1);
         }, retryDelay);
         
         return; // Don't set error state, we're retrying
       }
       
-      setError(`Pre-computed prop analysis data not available. ${err.message}`);
+      setError(`${targetProp} prop analysis data not available. ${err.message}`);
     } finally {
       if (retryCount === 0 || retryCount >= maxRetries) {
         setLoading(false);
       }
     }
-  }, [currentDateString, currentDate]);
+  }, [currentDateString, currentDate, propDataCache]);
 
-  // Load player prop data
+  // Load player prop data for initial selectedProp
   useEffect(() => {
-    loadPlayerPropData();
-  }, [loadPlayerPropData]);
+    loadPlayerPropData(selectedProp);
+  }, [loadPlayerPropData, currentDateString]);
+
+  // Reload data when selectedProp changes
+  useEffect(() => {
+    loadPlayerPropData(selectedProp);
+  }, [selectedProp, loadPlayerPropData]);
 
   // Load recent games and opponent history from historical data  
   const loadPlayerRecentGames = useCallback(async (player, propKey) => {
@@ -668,21 +694,21 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
     }
   }, [selectedPlayer, selectedProp, getCurrentOpponent, loadEnhancedOpponentHistory]);
 
-  // Get base player data for selected prop
+  // Get base player data for selected prop (updated for individual prop files)
   const getBasePlayerData = useMemo(() => {
-    if (!propAnalysisData || !propAnalysisData.propAnalysis || !selectedProp) {
+    if (!propAnalysisData || !selectedProp) {
       console.log('No prop analysis data or selected prop');
       return [];
     }
     
-    const propData = propAnalysisData.propAnalysis[selectedProp];
-    if (!propData) {
-      console.log(`No data available for prop: ${selectedProp}`);
+    // New structure: data is directly at root level for individual prop files
+    if (propAnalysisData.propType !== selectedProp) {
+      console.log(`Prop data mismatch: expected ${selectedProp}, got ${propAnalysisData.propType}`);
       return [];
     }
     
     // Always use topPlayers as base data, team filtering will be applied separately
-    const topPlayers = propData.topPlayers || [];
+    const topPlayers = propAnalysisData.topPlayers || [];
     console.log(`Base data: ${topPlayers.length} players available for ${selectedProp}`);
     return topPlayers;
   }, [propAnalysisData, selectedProp]);
@@ -716,7 +742,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
         <div className="error-state">
           <p>Error: {error}</p>
           <div className="error-actions">
-            <button onClick={() => loadPlayerPropData()} className="retry-button">
+            <button onClick={() => loadPlayerPropData(selectedProp)} className="retry-button">
               Retry Analysis
             </button>
             <button 
@@ -731,9 +757,10 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
             <details>
               <summary>Debug Info</summary>
               <div>Date: {currentDateString}</div>
-              <div>Files checked: prop_analysis_{currentDateString}.json, prop_analysis_latest.json</div>
-              <div>Files exist: Yes (verified via curl)</div>
-              <div>Likely cause: React dev server timing or browser cache</div>
+              <div>Selected Prop: {selectedProp}</div>
+              <div>Files checked: {selectedProp}_analysis_{currentDateString}.json, {selectedProp}_analysis_latest.json</div>
+              <div>Cache keys: {Object.keys(propDataCache).length > 0 ? Object.keys(propDataCache).join(', ') : 'None'}</div>
+              <div>Note: Now using individual prop files for better performance</div>
             </details>
           </div>
         </div>

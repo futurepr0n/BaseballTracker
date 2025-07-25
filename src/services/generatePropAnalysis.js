@@ -569,8 +569,68 @@ async function generatePropAnalysis(targetDate = new Date()) {
     console.log(`✅ ${propOption.label}: ${allPlayersForProp.length} total, ${topPlayers.length} top players, ${Object.keys(teamSpecificLists).length} teams`);
   }
   
-  // Prepare output data
-  const outputData = {
+  // Save individual files for each prop type
+  const year = targetDate.getFullYear();
+  const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+  const day = String(targetDate.getDate()).padStart(2, '0');
+  const dateStr = `${year}-${month}-${day}`;
+  
+  let allFilesSuccess = true;
+  const writtenFiles = [];
+  
+  console.log(`\n💾 Writing individual prop analysis files...`);
+  
+  // Write individual prop files
+  for (const propOption of PROP_OPTIONS) {
+    const propKey = propOption.key;
+    const propData = propAnalysisResults[propKey];
+    
+    if (!propData) {
+      console.warn(`⚠️ No data generated for ${propKey}, skipping...`);
+      continue;
+    }
+    
+    // Create individual prop file data structure
+    const individualPropData = {
+      date: targetDate.toISOString().split('T')[0],
+      generatedAt: new Date().toISOString(),
+      propType: propKey,
+      propInfo: propOption,
+      analysisConfig: ANALYSIS_THRESHOLDS,
+      totalPlayers: propData.totalPlayers,
+      topPlayers: propData.topPlayers,
+      teamSpecificLists: propData.teamSpecificLists,
+      lastUpdated: propData.lastUpdated,
+      chartDataIncluded: propData.chartDataIncluded,
+      dataSourcesUsed: {
+        rollingStats: !!rollingData,
+        multiHitStats: !!multiHitData,
+        rosterData: !!rosterData
+      }
+    };
+    
+    // Write date-specific file for this prop
+    const propOutputFileName = `${propKey}_analysis_${dateStr}.json`;
+    const propOutputPath = path.join(OUTPUT_DIR, propOutputFileName);
+    
+    console.log(`  📊 Writing ${propOption.label} analysis to ${propOutputFileName}...`);
+    const propSuccess = writeJsonFile(propOutputPath, individualPropData);
+    
+    if (propSuccess) {
+      writtenFiles.push(propOutputFileName);
+      
+      // Also write to latest file for this prop
+      const propLatestPath = path.join(OUTPUT_DIR, `${propKey}_analysis_latest.json`);
+      writeJsonFile(propLatestPath, individualPropData);
+      writtenFiles.push(`${propKey}_analysis_latest.json`);
+    } else {
+      allFilesSuccess = false;
+      console.error(`❌ Failed to write ${propKey} analysis file`);
+    }
+  }
+  
+  // Also create a combined file for backward compatibility (optional)
+  const combinedOutputData = {
     date: targetDate.toISOString().split('T')[0],
     generatedAt: new Date().toISOString(),
     propOptions: PROP_OPTIONS,
@@ -580,26 +640,24 @@ async function generatePropAnalysis(targetDate = new Date()) {
       rollingStats: !!rollingData,
       multiHitStats: !!multiHitData,
       rosterData: !!rosterData
-    }
+    },
+    note: "This combined file is deprecated. Use individual prop files for better performance."
   };
   
-  // Save date-specific file
-  const year = targetDate.getFullYear();
-  const month = String(targetDate.getMonth() + 1).padStart(2, '0');
-  const day = String(targetDate.getDate()).padStart(2, '0');
-  const dateStr = `${year}-${month}-${day}`;
+  const combinedOutputFileName = `prop_analysis_combined_${dateStr}.json`;
+  const combinedOutputPath = path.join(OUTPUT_DIR, combinedOutputFileName);
   
-  const outputFileName = `prop_analysis_${dateStr}.json`;
-  const outputPath = path.join(OUTPUT_DIR, outputFileName);
+  console.log(`  📦 Writing combined file for backward compatibility...`);
+  const combinedSuccess = writeJsonFile(combinedOutputPath, combinedOutputData);
   
-  console.log(`\n💾 Writing prop analysis to ${outputPath}...`);
-  const success = writeJsonFile(outputPath, outputData);
-  
-  // Also write to latest.json for easy access
-  if (success) {
-    const latestPath = path.join(OUTPUT_DIR, 'prop_analysis_latest.json');
-    writeJsonFile(latestPath, outputData);
+  if (combinedSuccess) {
+    writtenFiles.push(combinedOutputFileName);
+    const combinedLatestPath = path.join(OUTPUT_DIR, 'prop_analysis_combined_latest.json');
+    writeJsonFile(combinedLatestPath, combinedOutputData);
+    writtenFiles.push('prop_analysis_combined_latest.json');
   }
+  
+  const success = allFilesSuccess;
   
   const endTime = new Date();
   const analysisTime = ((endTime - startTime) / 1000).toFixed(1);
@@ -608,15 +666,24 @@ async function generatePropAnalysis(targetDate = new Date()) {
     console.log(`\n✅ Prop analysis generation completed successfully!`);
     console.log(`⏱️ Total time: ${analysisTime}s`);
     console.log(`📊 Analyzed ${PROP_OPTIONS.length} prop types`);
+    console.log(`📁 Generated ${writtenFiles.length} files (${PROP_OPTIONS.length * 2} prop files + ${combinedSuccess ? 2 : 0} combined files)`);
     
     // Log summary for each prop type
     PROP_OPTIONS.forEach(prop => {
       const analysis = propAnalysisResults[prop.key];
-      console.log(`   ${prop.icon} ${prop.label}: ${analysis.totalPlayers} players, ${Object.keys(analysis.teamSpecificLists).length} teams`);
+      if (analysis) {
+        console.log(`   ${prop.icon} ${prop.label}: ${analysis.totalPlayers} players, ${Object.keys(analysis.teamSpecificLists).length} teams`);
+        console.log(`      📄 Files: ${prop.key}_analysis_${dateStr}.json, ${prop.key}_analysis_latest.json`);
+      }
     });
     
-    console.log(`\n🎯 Prop analysis ready for PlayerPropsLadderCard component`);
-    console.log(`📁 Latest file: ${OUTPUT_DIR}/prop_analysis_latest.json`);
+    console.log(`\n🎯 Individual prop files ready for enhanced PlayerPropsLadderCard component`);
+    console.log(`📁 Prop files directory: ${OUTPUT_DIR}/`);
+    console.log(`💡 Expected file size reduction: ~80% (from ${Math.round(80)} MB to ~${Math.round(16)} MB per prop)`);
+    
+    if (combinedSuccess) {
+      console.log(`📦 Backward compatibility file: prop_analysis_combined_latest.json`);
+    }
   }
   
   return success;
