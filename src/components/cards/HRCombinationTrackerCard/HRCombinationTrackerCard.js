@@ -12,6 +12,8 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
   const [stats, setStats] = useState(null);
   const [scheduledPlayers, setScheduledPlayers] = useState([]);
   const [showAllResults, setShowAllResults] = useState(false);
+  const [selectedCombination, setSelectedCombination] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   
   const { selectedTeam, matchupTeam, includeMatchup, getTeamName, shouldIncludePlayer } = useTeamFilter();
 
@@ -77,6 +79,16 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
 
   const handleGroupSizeChange = (newSize) => {
     setGroupSize(newSize);
+  };
+
+  const handleCombinationClick = (combination) => {
+    setSelectedCombination(combination);
+    setShowDetailModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowDetailModal(false);
+    setSelectedCombination(null);
   };
 
   const formatPlayerNames = (players) => {
@@ -224,7 +236,12 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
             </div>
             
             {combinations.map((combo, index) => (
-              <div key={combo.combinationKey} className="glass-player-item combination-item">
+              <div 
+                key={combo.combinationKey} 
+                className="glass-player-item combination-item clickable-item"
+                onClick={() => handleCombinationClick(combo)}
+                title="Click to view occurrence details"
+              >
                 <div className="combination-header">
                   <div className="combination-rank">#{index + 1}</div>
                   <div className="combination-frequency">
@@ -283,6 +300,86 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
           )}
         </div>
       </div>
+
+      {/* Combination Detail Modal */}
+      {showDetailModal && selectedCombination && (
+        <div className="combination-modal-overlay" onClick={handleCloseModal}>
+          <div className="combination-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>🚀 HR Combination Details</h3>
+              <button className="modal-close" onClick={handleCloseModal}>×</button>
+            </div>
+            
+            <div className="modal-content">
+              <div className="combination-summary">
+                <div className="modal-players">
+                  <h4>Players:</h4>
+                  <div className="player-list">
+                    {selectedCombination.players.map((player, idx) => (
+                      <span key={idx} className="modal-player-tag">
+                        {player.name} ({player.team})
+                        {player.homeRuns && <span className="player-hrs"> - {player.homeRuns} HRs</span>}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="combination-stats-summary">
+                  <div className="stat-row">
+                    <span className="stat-label">Total Occurrences:</span>
+                    <span className="stat-value">{selectedCombination.occurrences}</span>
+                  </div>
+                  <div className="stat-row">
+                    <span className="stat-label">Total HRs Combined:</span>
+                    <span className="stat-value">{selectedCombination.totalHRs}</span>
+                  </div>
+                  <div className="stat-row">
+                    <span className="stat-label">Average HRs per Game:</span>
+                    <span className="stat-value">{selectedCombination.averageHRs}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="occurrence-timeline">
+                <h4>📅 Occurrence Timeline</h4>
+                <div className="timeline-chart">
+                  <div className="timeline-dates">
+                    {selectedCombination.dates.map((date, idx) => (
+                      <div key={idx} className="timeline-point">
+                        <div className="date-marker">
+                          <span className="occurrence-number">#{idx + 1}</span>
+                        </div>
+                        <div className="date-label">
+                          {new Date(date).toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric',
+                            year: 'numeric'
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="timeline-summary">
+                  <div className="timeline-stat">
+                    <span className="timeline-label">First Occurrence:</span>
+                    <span className="timeline-value">{new Date(selectedCombination.dates[0]).toLocaleDateString()}</span>
+                  </div>
+                  <div className="timeline-stat">
+                    <span className="timeline-label">Last Occurrence:</span>
+                    <span className="timeline-value">{new Date(selectedCombination.lastOccurrence).toLocaleDateString()}</span>
+                  </div>
+                  <div className="timeline-stat">
+                    <span className="timeline-label">Days Since Last:</span>
+                    <span className="timeline-value">{Math.abs(selectedCombination.daysSinceLastOccurrence)} days</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

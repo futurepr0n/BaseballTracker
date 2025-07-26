@@ -331,12 +331,31 @@ main() {
     
     # Step 7.7: Generate HR combinations analysis
     print_status $BLUE "🚀 Generating HR combinations from real player data..."
-    python3 generate_real_hr_combinations_fast.py
     
-    if [ $? -ne 0 ]; then
-        print_status $YELLOW "⚠️  WARNING: Failed to generate HR combinations (non-critical)"
+    # Check if BaseballScraper virtual environment exists
+    SCRAPER_VENV="../BaseballScraper/venv/bin/activate"
+    if [ -f "$SCRAPER_VENV" ]; then
+        # Activate BaseballScraper virtual environment and run script
+        source "$SCRAPER_VENV"
+        python3 generate_real_hr_combinations_fast.py
+        PYTHON_EXIT_CODE=$?
+        deactivate
+        
+        if [ $PYTHON_EXIT_CODE -ne 0 ]; then
+            print_status $YELLOW "⚠️  WARNING: Failed to generate HR combinations (non-critical)"
+        else
+            print_status $GREEN "✅ HR combinations generated successfully with real player data"
+        fi
     else
-        print_status $GREEN "✅ HR combinations generated successfully with real player data"
+        print_status $YELLOW "⚠️  WARNING: BaseballScraper virtual environment not found at $SCRAPER_VENV"
+        print_status $YELLOW "   Attempting to run with system Python3..."
+        python3 generate_real_hr_combinations_fast.py
+        
+        if [ $? -ne 0 ]; then
+            print_status $YELLOW "⚠️  WARNING: Failed to generate HR combinations (non-critical)"
+        else
+            print_status $GREEN "✅ HR combinations generated successfully with system Python"
+        fi
     fi
     
     # Step 8: Verify files were created

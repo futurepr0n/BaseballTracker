@@ -319,16 +319,16 @@ const TimeSlotHRCard = ({ gameData, currentDate, teams }) => {
   const [error, setError] = useState(null);
   const { shouldIncludePlayer } = useTeamFilter();
 
- useEffect(() => {
-  const analyzeTimeSlotPerformance = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      if (!gameData || gameData.length === 0) {
-        setTimeSlotData([]);
-        return;
-      }
+  useEffect(() => {
+    const analyzeTimeSlotPerformance = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        if (!gameData || gameData.length === 0) {
+          setTimeSlotData([]);
+          return;
+        }
       
       // Load historical data
       const dateRangeData = await fetchPlayerDataForDateRange(
@@ -411,21 +411,21 @@ const TimeSlotHRCard = ({ gameData, currentDate, teams }) => {
       // Set a generic display message since we have multiple time slots
       setCurrentTimeSlot("their scheduled game times");
       
-    } catch (err) {
-      console.error('Error analyzing time slot performance:', err);
-      setError('Failed to load time slot data');
-      setTimeSlotData([]);
-    } finally {
+      } catch (err) {
+        console.error('Error analyzing time slot performance:', err);
+        setError('Failed to load time slot data');
+        setTimeSlotData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (gameData.length > 0) {
+      analyzeTimeSlotPerformance();
+    } else {
       setLoading(false);
     }
-  };
-  
-  if (gameData.length > 0) {
-    analyzeTimeSlotPerformance();
-  } else {
-    setLoading(false);
-  }
-}, [gameData, currentDate]);
+  }, [gameData, currentDate]);
 
   const getTeamInfo = (teamAbbr) => {
     return teams[teamAbbr] || { 

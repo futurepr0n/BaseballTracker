@@ -95,13 +95,32 @@ def simulate_hr_combinations_from_real_players():
                 # Apply minimum occurrence requirements
                 min_required = 2 if group_size == 2 else 1
                 if occurrences >= min_required:
-                    # Generate realistic dates
+                    # Generate realistic dates within baseball season (April 1 - today's date)
                     dates = []
-                    base_date = datetime(2025, 4, 1)
-                    for i in range(occurrences):
-                        date_offset = i * (180 // max(1, occurrences)) + (i * 15)  # Spread across season
-                        game_date = base_date + timedelta(days=date_offset)
-                        dates.append(game_date.strftime('%Y-%m-%d'))
+                    season_start = datetime(2025, 4, 1)
+                    today = datetime.now()
+                    # Don't go past today or September 30, whichever is earlier
+                    season_end = min(today, datetime(2025, 9, 30))
+                    
+                    # If we're before season start, use a small range
+                    if today < season_start:
+                        season_start = datetime(2025, 4, 1)
+                        season_end = datetime(2025, 4, 30)
+                    
+                    season_days = (season_end - season_start).days
+                    
+                    # Only generate dates if we have a valid season range
+                    if season_days > 0:
+                        for i in range(occurrences):
+                            # Spread occurrences across the season more realistically
+                            date_offset = i * (season_days // max(1, occurrences)) + (i * 7)
+                            # Ensure we don't go past season end (today)
+                            date_offset = min(date_offset, season_days - 1)
+                            game_date = season_start + timedelta(days=date_offset)
+                            dates.append(game_date.strftime('%Y-%m-%d'))
+                    else:
+                        # Fallback: just use season start if no valid range
+                        dates.append(season_start.strftime('%Y-%m-%d'))
                     
                     latest_date = max(dates)
                     last_date = datetime.strptime(latest_date, '%Y-%m-%d')
@@ -135,12 +154,32 @@ def simulate_hr_combinations_from_real_players():
                 
                 min_required = 2 if group_size == 2 else 1
                 if occurrences >= min_required:
+                    # Generate realistic dates within baseball season (May 1 - today's date)
                     dates = []
-                    base_date = datetime(2025, 5, 1)
-                    for i in range(occurrences):
-                        date_offset = i * (120 // max(1, occurrences)) + (i * 20)
-                        game_date = base_date + timedelta(days=date_offset)
-                        dates.append(game_date.strftime('%Y-%m-%d'))
+                    season_start = datetime(2025, 5, 1)
+                    today = datetime.now()
+                    # Don't go past today or September 30, whichever is earlier
+                    season_end = min(today, datetime(2025, 9, 30))
+                    
+                    # If we're before season start, use a small range
+                    if today < season_start:
+                        season_start = datetime(2025, 5, 1)
+                        season_end = datetime(2025, 5, 31)
+                    
+                    season_days = (season_end - season_start).days
+                    
+                    # Only generate dates if we have a valid season range
+                    if season_days > 0:
+                        for i in range(occurrences):
+                            # Spread occurrences across the remaining season
+                            date_offset = i * (season_days // max(1, occurrences)) + (i * 12)
+                            # Ensure we don't go past season end (today)
+                            date_offset = min(date_offset, season_days - 1)
+                            game_date = season_start + timedelta(days=date_offset)
+                            dates.append(game_date.strftime('%Y-%m-%d'))
+                    else:
+                        # Fallback: just use season start if no valid range
+                        dates.append(season_start.strftime('%Y-%m-%d'))
                     
                     latest_date = max(dates)
                     last_date = datetime.strptime(latest_date, '%Y-%m-%d')
