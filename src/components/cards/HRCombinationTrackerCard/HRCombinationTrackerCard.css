@@ -826,6 +826,140 @@
   font-weight: 700;
 }
 
+/* Mobile Modal Styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    0 10px 20px rgba(0, 0, 0, 0.1);
+  width: 90vw;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow: hidden;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+.modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  max-height: calc(80vh - 80px);
+}
+
+.detail-players h4,
+.combination-stats-summary h4 {
+  margin: 0 0 12px 0;
+  color: #1a1a2e;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.detail-player-card {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  background: rgba(0, 86, 179, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 86, 179, 0.1);
+  margin-bottom: 8px;
+}
+
+.detail-player-card .player-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.detail-player-card .player-team {
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.detail-player-card .player-hrs {
+  font-size: 13px;
+  color: #0056b3;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Desktop Modal Overrides */
+.desktop-modal-overlay {
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.desktop-modal-content {
+  width: 90vw;
+  max-width: 800px;
+  max-height: 85vh;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.25),
+    0 12px 25px rgba(0, 0, 0, 0.15);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+.desktop-modal-content .modal-header {
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.15), rgba(80, 200, 120, 0.15));
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.desktop-modal-content .modal-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.desktop-modal-content .modal-body {
+  padding: 24px 28px;
+  overflow-y: auto;
+  max-height: calc(85vh - 90px);
+}
+
+.desktop-modal-content .modal-close {
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+  background: rgba(220, 53, 69, 0.1);
+  border: 2px solid rgba(220, 53, 69, 0.3);
+  color: #dc3545;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.desktop-modal-content .modal-close:hover {
+  background: rgba(220, 53, 69, 0.2);
+  border-color: #dc3545;
+  transform: scale(1.05);
+}
+
 /* Mobile Modal Responsiveness */
 @media (max-width: 768px) {
   .combination-modal-overlay {
@@ -899,5 +1033,444 @@
   
   .stat-row {
     padding: 6px 10px;
+  }
+}
+
+/* Enhanced Modal Styles - Dark Theme Grid Layout */
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.modal-player-card {
+  background: linear-gradient(135deg, #2d4a52, #1e3238);
+  border: 1px solid #64ffda;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.modal-player-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(100, 255, 218, 0.2);
+}
+
+.player-name {
+  font-weight: bold;
+  color: #fff;
+  font-size: 1.1em;
+  margin-bottom: 4px;
+}
+
+.player-team {
+  color: #64ffda;
+  font-size: 0.9em;
+  margin-bottom: 8px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.stat-card {
+  background: rgba(173, 216, 230, 0.3);
+  border: 1px solid rgba(173, 216, 230, 0.5);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  border-color: #64ffda;
+  transform: translateY(-2px);
+}
+
+.stat-card .stat-value {
+  color: #64ffda;
+  font-weight: bold;
+  font-size: 2em;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.stat-card .stat-label {
+  color: #ccc;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.timeline-header {
+  display: grid;
+  grid-template-columns: 80px 1fr 120px;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 2px solid #64ffda;
+  margin-bottom: 16px;
+  font-weight: bold;
+  color: #64ffda;
+}
+
+.timeline-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 120px;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #333;
+  transition: background 0.2s ease;
+}
+
+.timeline-row:hover {
+  background: rgba(100, 255, 218, 0.05);
+}
+
+.days-ago {
+  color: #999;
+  font-size: 0.9em;
+  text-align: right;
+}
+
+.summary-item {
+  color: #000;
+  margin-bottom: 8px;
+  font-size: 0.95em;
+}
+
+.summary-item:last-child {
+  margin-bottom: 0;
+}
+
+.summary-item strong {
+  color: #0056b3;
+}
+
+/* Enhanced Modal Overrides */
+.combination-modal {
+  max-width: 1200px \!important;
+  background: #1a1a1a \!important;
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #2d4a52, #1e3238) \!important;
+}
+
+.modal-header h3 {
+  color: #64ffda \!important;
+  font-size: 1.4em \!important;
+}
+
+.modal-close {
+  background: rgba(255, 255, 255, 0.1) \!important;
+  border: 2px solid #64ffda \!important;
+  color: #64ffda \!important;
+}
+
+.modal-close:hover {
+  background: #ff4444 \!important;
+  border-color: #ff4444 \!important;
+  color: white \!important;
+  transform: scale(1.1) \!important;
+}
+
+.modal-players h4,
+.combination-stats-summary h4,
+.occurrence-timeline h4 {
+  color: #64ffda \!important;
+  font-size: 1.2em \!important;
+  border-bottom: 2px solid #64ffda \!important;
+  padding-bottom: 8px \!important;
+}
+
+.timeline-chart {
+  background: #222 \!important;
+  border: 1px solid #333 \!important;
+}
+
+.timeline-summary {
+  background: linear-gradient(135deg, #2d4a52, #1e3238) \!important;
+  border: 1px solid #64ffda \!important;
+}
+
+/* Enhanced Mobile Responsiveness */
+@media (max-width: 768px) {
+  .modal-grid {
+    grid-template-columns: 1fr \!important;
+    gap: 24px \!important;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr \!important;
+  }
+  
+  .timeline-header,
+  .timeline-row {
+    grid-template-columns: 60px 1fr 80px \!important;
+    gap: 12px \!important;
+    font-size: 0.9em \!important;
+  }
+  
+  .player-grid {
+    grid-template-columns: 1fr \!important;
+  }
+}
+
+/* Enhanced Global Tooltip Styles */
+.combination-detail-tooltip.global-tooltip {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 600px;
+  max-height: 500px;
+  overflow-y: auto;
+  z-index: 10000;
+  animation: tooltipSlideIn 0.2s ease-out;
+}
+
+@keyframes tooltipSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.combination-detail-tooltip .tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(0, 86, 179, 0.1);
+  border-radius: 16px 16px 0 0;
+}
+
+.combination-detail-tooltip .tooltip-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #1a1a2e;
+  font-weight: 700;
+}
+
+.combination-detail-tooltip .tooltip-close {
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.combination-detail-tooltip .tooltip-close:hover {
+  background: rgba(220, 53, 69, 0.2);
+  transform: scale(1.05);
+}
+
+.combination-detail-tooltip .tooltip-content {
+  padding: 20px;
+}
+
+.combination-detail-tooltip .tooltip-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.combination-detail-tooltip .tooltip-players {
+  margin-bottom: 16px;
+}
+
+.combination-detail-tooltip .tooltip-players h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #1a1a2e;
+  font-weight: 600;
+}
+
+.combination-detail-tooltip .tooltip-player-card {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  background: rgba(0, 86, 179, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 86, 179, 0.1);
+  margin-bottom: 8px;
+}
+
+.combination-detail-tooltip .tooltip-player-card .player-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.combination-detail-tooltip .tooltip-player-card .player-team {
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.combination-detail-tooltip .tooltip-player-card .player-hrs {
+  font-size: 13px;
+  color: #0056b3;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.combination-detail-tooltip .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.combination-detail-tooltip .stat-card {
+  text-align: center;
+  padding: 12px;
+  background: rgba(173, 216, 230, 0.3);
+  border-radius: 8px;
+  border: 1px solid rgba(173, 216, 230, 0.5);
+}
+
+.combination-detail-tooltip .stat-card .stat-value {
+  font-size: 18px;
+  font-weight: bold;
+  color: #28a745;
+  display: block;
+}
+
+.combination-detail-tooltip .stat-card .stat-label {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.combination-detail-tooltip .occurrence-timeline h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #1a1a2e;
+  font-weight: 600;
+}
+
+.combination-detail-tooltip .timeline-chart {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+}
+
+.combination-detail-tooltip .timeline-header {
+  display: grid;
+  grid-template-columns: 60px 1fr 100px;
+  gap: 12px;
+  padding: 10px 12px;
+  background: rgba(0, 86, 179, 0.1);
+  font-weight: 600;
+  font-size: 13px;
+  color: #1a1a2e;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.combination-detail-tooltip .timeline-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 100px;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 13px;
+  transition: background-color 0.2s ease;
+}
+
+.combination-detail-tooltip .timeline-row:hover {
+  background: rgba(0, 86, 179, 0.05);
+}
+
+.combination-detail-tooltip .timeline-row:last-child {
+  border-bottom: none;
+}
+
+.combination-detail-tooltip .occurrence-number {
+  font-weight: 600;
+  color: #0056b3;
+}
+
+.combination-detail-tooltip .date-label {
+  color: #1a1a2e;
+  font-weight: 500;
+}
+
+.combination-detail-tooltip .days-ago {
+  color: #666;
+  font-style: italic;
+}
+
+.combination-detail-tooltip .timeline-summary {
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(255, 193, 7, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+.combination-detail-tooltip .summary-item {
+  font-size: 13px;
+  color: #000;
+  margin-bottom: 6px;
+}
+
+.combination-detail-tooltip .summary-item:last-child {
+  margin-bottom: 0;
+}
+
+.combination-detail-tooltip .summary-item strong {
+  color: #0056b3;
+  font-weight: 600;
+}
+
+/* Mobile responsiveness for tooltip */
+@media (max-width: 768px) {
+  .combination-detail-tooltip.global-tooltip {
+    width: 90vw;
+    max-width: 400px;
+    max-height: 80vh;
+    left: 5vw \!important;
+    top: 10vh \!important;
+  }
+
+  .combination-detail-tooltip .tooltip-header {
+    padding: 12px 16px;
+  }
+
+  .combination-detail-tooltip .tooltip-content {
+    padding: 16px;
+  }
+
+  .combination-detail-tooltip .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .combination-detail-tooltip .timeline-header,
+  .combination-detail-tooltip .timeline-row {
+    grid-template-columns: 50px 1fr 80px;
+    gap: 8px;
+    font-size: 12px;
   }
 }

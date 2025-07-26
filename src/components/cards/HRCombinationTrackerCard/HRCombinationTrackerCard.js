@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useTeamFilter } from '../../TeamFilterContext';
 import hrCombinationService from './HRCombinationService';
 import '../GlassCard/GlassCard.css';
@@ -13,7 +14,9 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
   const [scheduledPlayers, setScheduledPlayers] = useState([]);
   const [showAllResults, setShowAllResults] = useState(false);
   const [selectedCombination, setSelectedCombination] = useState(null);
-  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [showDetailTooltip, setShowDetailTooltip] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   
   const { selectedTeam, matchupTeam, includeMatchup, getTeamName, shouldIncludePlayer } = useTeamFilter();
 
@@ -81,15 +84,49 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
     setGroupSize(newSize);
   };
 
-  const handleCombinationClick = (combination) => {
+  const handleCombinationClick = (combination, event) => {
+    console.log('🔍 HR Combination clicked:', combination);
+    console.log('🔍 Click event:', event);
+    console.log('🔍 Window width:', window.innerWidth);
+    
+    // Check if mobile view (typically < 768px)
+    const isMobile = window.innerWidth < 768;
+    console.log('🔍 Is mobile?', isMobile);
+    
     setSelectedCombination(combination);
-    setShowDetailModal(true);
+    
+    if (isMobile) {
+      // Mobile: Show modal
+      console.log('🔍 Setting showModal = true');
+      setShowModal(true);
+    } else {
+      // Desktop: Show centered modal (like mobile but with different styling)
+      console.log('🔍 Setting up desktop modal');
+      setShowDetailTooltip(true);
+    }
+  };
+
+  const handleCloseTooltip = () => {
+    setShowDetailTooltip(false);
+    setSelectedCombination(null);
   };
 
   const handleCloseModal = () => {
-    setShowDetailModal(false);
+    setShowModal(false);
     setSelectedCombination(null);
   };
+
+  // Close tooltip when clicking outside
+  const handleDocumentClick = useCallback((e) => {
+    if (showDetailTooltip && !e.target.closest('.combination-detail-tooltip') && !e.target.closest('.combination-item')) {
+      handleCloseTooltip();
+    }
+  }, [showDetailTooltip]);
+
+  useEffect(() => {
+    document.addEventListener('click', handleDocumentClick);
+    return () => document.removeEventListener('click', handleDocumentClick);
+  }, [handleDocumentClick]);
 
   const formatPlayerNames = (players) => {
     return players.map(p => `${p.name} (${p.team})`).join(', ');
@@ -239,7 +276,7 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
               <div 
                 key={combo.combinationKey} 
                 className="glass-player-item combination-item clickable-item"
-                onClick={() => handleCombinationClick(combo)}
+                onClick={(e) => handleCombinationClick(combo, e)}
                 title="Click to view occurrence details"
               >
                 <div className="combination-header">
@@ -301,84 +338,228 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
         </div>
       </div>
 
-      {/* Combination Detail Modal */}
-      {showDetailModal && selectedCombination && (
-        <div className="combination-modal-overlay" onClick={handleCloseModal}>
-          <div className="combination-modal" onClick={(e) => e.stopPropagation()}>
+      {/* Mobile Modal for HR Combination Details */}
+      {showModal && selectedCombination && createPortal(
+        <div className="modal-overlay mobile-modal-overlay" onClick={handleCloseModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>🚀 HR Combination Details</h3>
-              <button className="modal-close" onClick={handleCloseModal}>×</button>
+              <button className="modal-close" onClick={handleCloseModal}>
+                <span>✕</span>
+              </button>
             </div>
             
-            <div className="modal-content">
-              <div className="combination-summary">
-                <div className="modal-players">
-                  <h4>Players:</h4>
-                  <div className="player-list">
-                    {selectedCombination.players.map((player, idx) => (
-                      <span key={idx} className="modal-player-tag">
-                        {player.name} ({player.team})
-                        {player.homeRuns && <span className="player-hrs"> - {player.homeRuns} HRs</span>}
-                      </span>
-                    ))}
+            <div className="modal-body">
+              <div className="combination-detail-content">
+                <div className="combination-summary">
+                  <div className="detail-players">
+                    <h4>👥 Players ({selectedCombination.players.length})</h4>
+                    <div className="player-grid">
+                      {selectedCombination.players.map((player, idx) => {
+                        // Try multiple data sources for season HRs (season_hrs is primary from accurate script)
+                        const seasonHRs = player.season_hrs || 
+                                         selectedCombination.playerHRDetails?.[idx]?.season_hrs || 
+                                         player.seasonHRs ||
+                                         player.homeRuns || 
+                                         player.HR ||
+                                         'N/A';
+                        
+                        return (
+                          <div key={idx} className="detail-player-card">
+                            <div className="player-name">{player.name}</div>
+                            <div className="player-team">({player.team})</div>
+                            <div className="player-hrs">🏠 {seasonHRs} season HRs</div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-                
-                <div className="combination-stats-summary">
-                  <div className="stat-row">
-                    <span className="stat-label">Total Occurrences:</span>
-                    <span className="stat-value">{selectedCombination.occurrences}</span>
-                  </div>
-                  <div className="stat-row">
-                    <span className="stat-label">Total HRs Combined:</span>
-                    <span className="stat-value">{selectedCombination.totalHRs}</span>
-                  </div>
-                  <div className="stat-row">
-                    <span className="stat-label">Average HRs per Game:</span>
-                    <span className="stat-value">{selectedCombination.averageHRs}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="occurrence-timeline">
-                <h4>📅 Occurrence Timeline</h4>
-                <div className="timeline-chart">
-                  <div className="timeline-dates">
-                    {selectedCombination.dates.map((date, idx) => (
-                      <div key={idx} className="timeline-point">
-                        <div className="date-marker">
-                          <span className="occurrence-number">#{idx + 1}</span>
-                        </div>
-                        <div className="date-label">
-                          {new Date(date).toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
-                        </div>
+                  
+                  <div className="combination-stats-summary">
+                    <h4>📊 Season Statistics</h4>
+                    <div className="stats-grid">
+                      <div className="stat-card">
+                        <div className="stat-value">{selectedCombination.occurrences}</div>
+                        <div className="stat-label">Times Together</div>
                       </div>
-                    ))}
+                      <div className="stat-card">
+                        <div className="stat-value">{selectedCombination.seasonTotalHRs || selectedCombination.totalHRs}</div>
+                        <div className="stat-label">Combined Season HRs</div>
+                      </div>
+                      <div className="stat-card">
+                        <div className="stat-value">{selectedCombination.averageHRsPerGame || selectedCombination.averageHRs}</div>
+                        <div className="stat-label">Avg HRs per Game</div>
+                      </div>
+                      <div className="stat-card">
+                        <div className="stat-value">{Math.abs(selectedCombination.daysSinceLastOccurrence)}</div>
+                        <div className="stat-label">Days Since Last</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                
-                <div className="timeline-summary">
-                  <div className="timeline-stat">
-                    <span className="timeline-label">First Occurrence:</span>
-                    <span className="timeline-value">{new Date(selectedCombination.dates[0]).toLocaleDateString()}</span>
+
+                <div className="occurrence-timeline">
+                  <h4>📅 When These Players Hit HRs Together</h4>
+                  <div className="timeline-chart">
+                    <div className="timeline-header">
+                      <span>Game</span>
+                      <span>Date</span>
+                      <span>Days Ago</span>
+                    </div>
+                    <div className="timeline-dates">
+                      {selectedCombination.dates.map((date, idx) => {
+                        const gameDate = new Date(date);
+                        const daysAgo = Math.floor((new Date() - gameDate) / (1000 * 60 * 60 * 24));
+                        return (
+                          <div key={idx} className="timeline-row">
+                            <div className="occurrence-number">#{idx + 1}</div>
+                            <div className="date-label">
+                              {gameDate.toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric',
+                                year: 'numeric'
+                              })}
+                            </div>
+                            <div className="days-ago">
+                              {daysAgo === 0 ? 'Today' : 
+                               daysAgo === 1 ? 'Yesterday' : 
+                               `${daysAgo} days ago`}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <div className="timeline-stat">
-                    <span className="timeline-label">Last Occurrence:</span>
-                    <span className="timeline-value">{new Date(selectedCombination.lastOccurrence).toLocaleDateString()}</span>
-                  </div>
-                  <div className="timeline-stat">
-                    <span className="timeline-label">Days Since Last:</span>
-                    <span className="timeline-value">{Math.abs(selectedCombination.daysSinceLastOccurrence)} days</span>
+                  
+                  <div className="timeline-summary">
+                    <div className="summary-item">
+                      <strong>First Time:</strong> {new Date(selectedCombination.dates[0]).toLocaleDateString()}
+                    </div>
+                    <div className="summary-item">
+                      <strong>Most Recent:</strong> {new Date(selectedCombination.lastOccurrence).toLocaleDateString()}
+                    </div>
+                    <div className="summary-item">
+                      <strong>Frequency:</strong> {selectedCombination.occurrences} times in {Math.floor((new Date(selectedCombination.lastOccurrence) - new Date(selectedCombination.dates[0])) / (1000 * 60 * 60 * 24))} days
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+        , document.body
+      )}
+
+      {/* Desktop Modal for HR Combination Details */}
+      {showDetailTooltip && selectedCombination && createPortal(
+        <div className="modal-overlay desktop-modal-overlay" onClick={handleCloseTooltip}>
+          <div className="modal-content desktop-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>🚀 HR Combination Details</h3>
+              <button className="modal-close" onClick={handleCloseTooltip}>
+                <span>✕</span>
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="combination-detail-content">
+                <div className="combination-summary">
+                  <div className="detail-players">
+                    <h4>👥 Players ({selectedCombination.players.length})</h4>
+                    <div className="player-grid">
+                      {selectedCombination.players.map((player, idx) => {
+                        // Try multiple data sources for season HRs (season_hrs is primary from accurate script)
+                        const seasonHRs = player.season_hrs || 
+                                         selectedCombination.playerHRDetails?.[idx]?.season_hrs || 
+                                         player.seasonHRs ||
+                                         player.homeRuns || 
+                                         player.HR ||
+                                         'N/A';
+                        
+                        return (
+                          <div key={idx} className="detail-player-card">
+                            <div className="player-name">{player.name}</div>
+                            <div className="player-team">({player.team})</div>
+                            <div className="player-hrs">🏠 {seasonHRs} season HRs</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  
+                  <div className="combination-stats-summary">
+                    <h4>📊 Season Statistics</h4>
+                    <div className="stats-grid">
+                      <div className="stat-card">
+                        <div className="stat-value">{selectedCombination.occurrences}</div>
+                        <div className="stat-label">Times Together</div>
+                      </div>
+                      <div className="stat-card">
+                        <div className="stat-value">{selectedCombination.seasonTotalHRs || selectedCombination.totalHRs}</div>
+                        <div className="stat-label">Combined Season HRs</div>
+                      </div>
+                      <div className="stat-card">
+                        <div className="stat-value">{selectedCombination.averageHRsPerGame || selectedCombination.averageHRs}</div>
+                        <div className="stat-label">Avg HRs per Game</div>
+                      </div>
+                      <div className="stat-card">
+                        <div className="stat-value">{Math.abs(selectedCombination.daysSinceLastOccurrence)}</div>
+                        <div className="stat-label">Days Since Last</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="occurrence-timeline">
+                  <h4>📅 When These Players Hit HRs Together</h4>
+                  <div className="timeline-chart">
+                    <div className="timeline-header">
+                      <span>Game</span>
+                      <span>Date</span>
+                      <span>Days Ago</span>
+                    </div>
+                    <div className="timeline-dates">
+                      {selectedCombination.dates.map((date, idx) => {
+                        const gameDate = new Date(date);
+                        const daysAgo = Math.floor((new Date() - gameDate) / (1000 * 60 * 60 * 24));
+                        return (
+                          <div key={idx} className="timeline-row">
+                            <div className="occurrence-number">#{idx + 1}</div>
+                            <div className="date-label">
+                              {gameDate.toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric',
+                                year: 'numeric'
+                              })}
+                            </div>
+                            <div className="days-ago">
+                              {daysAgo === 0 ? 'Today' : 
+                               daysAgo === 1 ? 'Yesterday' : 
+                               `${daysAgo} days ago`}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  
+                  <div className="timeline-summary">
+                    <div className="summary-item">
+                      <strong>First Time:</strong> {new Date(selectedCombination.dates[0]).toLocaleDateString()}
+                    </div>
+                    <div className="summary-item">
+                      <strong>Most Recent:</strong> {new Date(selectedCombination.lastOccurrence).toLocaleDateString()}
+                    </div>
+                    <div className="summary-item">
+                      <strong>Frequency:</strong> {selectedCombination.occurrences} times in {Math.floor((new Date(selectedCombination.lastOccurrence) - new Date(selectedCombination.dates[0])) / (1000 * 60 * 60 * 24))} days
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        , document.body
       )}
     </div>
   );
