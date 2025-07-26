@@ -67,6 +67,7 @@ import {
 } from './cards/OpponentMatchupHitsCard/OpponentMatchupCardsSimplified';
 
 import HitDroughtBounceBackCard from './cards/HitDroughtBounceBackCard/HitDroughtBounceBackCard';
+import HRCombinationTrackerCard from './cards/HRCombinationTrackerCard';
 
 /**
  * Dashboard component - Home page displaying summary of MLB data
@@ -1383,6 +1384,15 @@ const noFilteredData = isFiltering &&
           {/* Player Props Ladder Card - Full width */}
           <div style={{ gridColumn: '1 / -1' }}>
             <PlayerPropsLadderCard currentDate={currentDate} gameData={filteredGameData} />
+          </div>
+          
+          {/* HR Combination Tracker Card - Full width */}
+          <div style={{ gridColumn: '1 / -1' }}>
+            <HRCombinationTrackerCard 
+              gameData={filteredGameData}
+              playerData={playerData}
+              currentDate={currentDate}
+            />
           </div>
           
           {/* Row 4: Top Hitters, HR Leaders, Recent Homers */}
