@@ -329,15 +329,26 @@ main() {
         print_status $GREEN "✅ Player prop analysis generated successfully"
     fi
     
+    # Step 7.7: Generate HR combinations analysis
+    print_status $BLUE "🚀 Generating HR combinations from real player data..."
+    python3 generate_real_hr_combinations_fast.py
+    
+    if [ $? -ne 0 ]; then
+        print_status $YELLOW "⚠️  WARNING: Failed to generate HR combinations (non-critical)"
+    else
+        print_status $GREEN "✅ HR combinations generated successfully with real player data"
+    fi
+    
     # Step 8: Verify files were created
     print_status $BLUE "🔍 Verifying generated files..."
     
     HR_PRED_FILE="public/data/predictions/hr_predictions_${DATE}.json"
     PERF_FILE="public/data/predictions/player_performance_${DATE}.json"
     TEAM_STATS_FILE="public/data/team_stats/team_stats_${DATE}.json"
+    HR_COMBOS_FILE="public/data/hr_combinations/hr_combinations_latest.json"
     
     local files_created=0
-    local total_expected=3
+    local total_expected=4
     
     if [ -f "$HR_PRED_FILE" ]; then
         print_status $GREEN "✅ HR Predictions file created: $HR_PRED_FILE"
@@ -358,6 +369,13 @@ main() {
         ((files_created++))
     else
         print_status $YELLOW "⚠️  Team Stats file missing: $TEAM_STATS_FILE (non-critical)"
+    fi
+    
+    if [ -f "$HR_COMBOS_FILE" ]; then
+        print_status $GREEN "✅ HR Combinations file created: $HR_COMBOS_FILE"
+        ((files_created++))
+    else
+        print_status $YELLOW "⚠️  HR Combinations file missing: $HR_COMBOS_FILE (non-critical)"
     fi
     
     # Step 9: Final validation and recommendations
