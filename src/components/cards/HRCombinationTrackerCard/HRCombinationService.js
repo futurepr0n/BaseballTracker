@@ -255,10 +255,30 @@ class HRCombinationService {
     if (!combinationsData) {
       try {
         console.log('🔥 FETCHING HR combinations data from /data/hr_combinations/hr_combinations_latest.json');
-        const response = await fetch('/data/hr_combinations/hr_combinations_latest.json');
+        
+        // Set a timeout for large file loading
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+        
+        const response = await fetch('/data/hr_combinations/hr_combinations_latest.json', {
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
         console.log('🔥 Response status:', response.status, response.ok);
         
         if (response.ok) {
+          // Check content length before parsing
+          const contentLength = response.headers.get('content-length');
+          if (contentLength) {
+            const sizeMB = parseInt(contentLength) / 1024 / 1024;
+            console.log(`🔥 File size: ${sizeMB.toFixed(1)} MB`);
+            
+            if (sizeMB > 100) {
+              console.warn('🔥 WARNING: Large file detected, this may take a while to load...');
+            }
+          }
+          
           combinationsData = await response.json();
           
           console.log('🔥 LOADED DATA STRUCTURE:', {
@@ -268,7 +288,8 @@ class HRCombinationService {
             group2Length: combinationsData.group_2?.length,
             group3Length: combinationsData.group_3?.length,
             group4Length: combinationsData.group_4?.length,
-            metadata: combinationsData.metadata
+            metadata: combinationsData.metadata,
+            generatedAt: combinationsData.generatedAt
           });
           
           // Cache the data
@@ -279,11 +300,43 @@ class HRCombinationService {
           
           console.log('🔥 HR combinations data loaded and cached successfully');
         } else {
-          console.warn('🔥 FAILED to load HR combinations data - response not ok');
-          return [];
+          console.warn('🔥 FAILED to load HR combinations data - response not ok:', response.status, response.statusText);
+          
+          // Fallback: Try loading separate files (enhanced script format)
+          console.log('🔥 FALLBACK: Trying separate file format for group size:', groupSize);
+          try {
+            const separateFileResponse = await fetch(`/data/hr_combinations/hr_combinations_${groupSize}player_latest.json`);
+            if (separateFileResponse.ok) {
+              const separateData = await separateFileResponse.json();
+              console.log('🔥 FALLBACK SUCCESS: Loaded separate file data:', separateData.combinations?.length, 'combinations');
+              
+              // Convert to expected format
+              combinationsData = {
+                [`group_${groupSize}`]: separateData.combinations || [],
+                generatedAt: separateData.generatedAt,
+                dataSource: separateData.dataSource,
+                daysAnalyzed: separateData.daysAnalyzed
+              };
+              
+              // Cache the converted data
+              this.cache.set(cacheKey, {
+                data: combinationsData,
+                timestamp: Date.now()
+              });
+            } else {
+              return [];
+            }
+          } catch (separateError) {
+            console.error('🔥 FALLBACK FAILED:', separateError);
+            return [];
+          }
         }
       } catch (error) {
-        console.error('🔥 ERROR loading HR combinations data:', error);
+        if (error.name === 'AbortError') {
+          console.error('🔥 ERROR: HR combinations data loading timed out - file may be too large');
+        } else {
+          console.error('🔥 ERROR loading HR combinations data:', error);
+        }
         return [];
       }
     }

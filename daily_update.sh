@@ -337,7 +337,7 @@ main() {
     if [ -f "$SCRAPER_VENV" ]; then
         # Activate BaseballScraper virtual environment and run script
         source "$SCRAPER_VENV"
-        python3 generate_real_hr_combinations_fast.py
+        python3 generate_comprehensive_hr_combinations.py
         PYTHON_EXIT_CODE=$?
         deactivate
         
@@ -349,7 +349,7 @@ main() {
     else
         print_status $YELLOW "⚠️  WARNING: BaseballScraper virtual environment not found at $SCRAPER_VENV"
         print_status $YELLOW "   Attempting to run with system Python3..."
-        python3 generate_real_hr_combinations_fast.py
+        python3 generate_comprehensive_hr_combinations.py
         
         if [ $? -ne 0 ]; then
             print_status $YELLOW "⚠️  WARNING: Failed to generate HR combinations (non-critical)"
