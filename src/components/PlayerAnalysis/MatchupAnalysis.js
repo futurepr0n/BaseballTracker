@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import handednessResolver from '../../utils/handednessResolver';
 import './MatchupAnalysis.css';
 
 /**
@@ -11,6 +12,14 @@ import './MatchupAnalysis.css';
  * - Advanced metrics and percentiles
  */
 const MatchupAnalysis = ({ player, matchupContext, splitAnalysis }) => {
+  // State for batter handedness data
+  const [batterHandedness, setBatterHandedness] = useState({
+    handedness: null,
+    source: 'loading',
+    confidence: 0,
+    available: false
+  });
+
   // Use actual pitcher data from matchup context or fallback to placeholder
   const pitcher = matchupContext?.pitcherMatchup || {
     name: 'TBD',
@@ -22,6 +31,51 @@ const MatchupAnalysis = ({ player, matchupContext, splitAnalysis }) => {
     hr9: 'N/A',
     gamesPitched: 0
   };
+
+  // Utility function to format handedness display
+  const formatHandedness = (handedness) => {
+    if (!handedness) return { short: 'UNK', long: 'Unknown' };
+    
+    switch (handedness.toUpperCase()) {
+      case 'L':
+        return { short: 'LHB', long: 'Left-handed Batter' };
+      case 'R':
+        return { short: 'RHB', long: 'Right-handed Batter' };
+      case 'B':
+      case 'S':
+        return { short: 'SWB', long: 'Switch Batter' };
+      default:
+        return { short: 'UNK', long: 'Unknown Handedness' };
+    }
+  };
+
+  // Load batter handedness on component mount or when player changes
+  useEffect(() => {
+    const loadBatterHandedness = async () => {
+      if (player && player.name && player.team) {
+        try {
+          console.log(`🔍 Loading handedness for ${player.name} (${player.team})`);
+          const handednessData = await handednessResolver.getBatterHandedness(
+            player.name, 
+            player.team
+          );
+          
+          console.log(`✅ Handedness resolved:`, handednessData);
+          setBatterHandedness(handednessData);
+        } catch (error) {
+          console.error('Error loading batter handedness:', error);
+          setBatterHandedness({
+            handedness: 'UNK',
+            source: 'error',
+            confidence: 0,
+            available: false
+          });
+        }
+      }
+    };
+
+    loadBatterHandedness();
+  }, [player]);
 
   // Use real matchup statistics from splitAnalysis
   const matchupStats = splitAnalysis?.matchupStats || {
@@ -112,8 +166,20 @@ const MatchupAnalysis = ({ player, matchupContext, splitAnalysis }) => {
 
       <div className="matchup-title">
         <div className="batter-info">
-          <h4>{player.name} <span className="handedness">RHB</span></h4>
-          <p>{player.team} • Right-handed Batter</p>
+          <h4>
+            {player.name} 
+            <span className={`handedness ${batterHandedness.source === 'loading' ? 'loading' : ''}`}>
+              {batterHandedness.source === 'loading' ? '...' : formatHandedness(batterHandedness.handedness).short}
+            </span>
+          </h4>
+          <p>
+            {player.team} • {batterHandedness.source === 'loading' ? 'Loading...' : formatHandedness(batterHandedness.handedness).long}
+            {batterHandedness.available && batterHandedness.confidence > 0 && (
+              <span className="confidence-indicator" title={`Source: ${batterHandedness.source}, Confidence: ${batterHandedness.confidence}%`}>
+                {batterHandedness.confidence >= 90 ? ' ✓' : batterHandedness.confidence >= 70 ? ' ~' : ' ?'}
+              </span>
+            )}
+          </p>
         </div>
         <div className="vs-indicator">vs</div>
         <div className="pitcher-info">
@@ -219,8 +285,14 @@ const MatchupAnalysis = ({ player, matchupContext, splitAnalysis }) => {
           <div className="insight-card advantage">
             <h6>🎯 Matchup Advantage</h6>
             <p>
-              Strong performance vs RHP with {matchupStats.vsRHP.ba} BA and {matchupStats.vsRHP.slg} SLG. 
-              ISO of {matchupStats.vsRHP.iso} indicates good power potential against right-handed pitching.
+              {(() => {
+                const pitcherHand = pitcher.handedness === 'LHP' || pitcher.handedness === 'L' ? 'LHP' : 'RHP';
+                const relevantStats = pitcherHand === 'LHP' ? matchupStats.vsLHP : matchupStats.vsRHP;
+                const pitcherType = pitcherHand === 'LHP' ? 'left-handed' : 'right-handed';
+                
+                return `Performance vs ${pitcherHand} with ${relevantStats.ba} BA and ${relevantStats.slg} SLG. 
+                        ISO of ${relevantStats.iso} indicates ${parseFloat(relevantStats.iso) > 0.180 ? 'good' : 'limited'} power potential against ${pitcherType} pitching.`;
+              })()}
             </p>
           </div>
 
@@ -254,8 +326,14 @@ const MatchupAnalysis = ({ player, matchupContext, splitAnalysis }) => {
         <div className="summary-rating">
           <span className="rating-label">Matchup Rating:</span>
           <span className="rating-value favorable">
-            {parseFloat(matchupStats.vsRHP.woba) > 0.350 ? 'Favorable' : 
-             parseFloat(matchupStats.vsRHP.woba) > 0.320 ? 'Neutral' : 'Difficult'}
+            {(() => {
+              const pitcherHand = pitcher.handedness === 'LHP' || pitcher.handedness === 'L' ? 'LHP' : 'RHP';
+              const relevantStats = pitcherHand === 'LHP' ? matchupStats.vsLHP : matchupStats.vsRHP;
+              const woba = parseFloat(relevantStats.woba);
+              
+              return woba > 0.350 ? 'Favorable' : 
+                     woba > 0.320 ? 'Neutral' : 'Difficult';
+            })()}
           </span>
         </div>
         <div className="key-factors">

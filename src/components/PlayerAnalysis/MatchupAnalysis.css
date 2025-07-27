@@ -425,3 +425,54 @@
     border-color: #444;
   }
 }
+
+/* Handedness loading and confidence indicator styles */
+.handedness.loading {
+  color: #999;
+  font-style: italic;
+}
+
+.confidence-indicator {
+  font-size: 0.8rem;
+  margin-left: 4px;
+  cursor: help;
+}
+
+.confidence-indicator[title*="Confidence: 9"] {
+  color: #4caf50; /* High confidence - green */
+}
+
+.confidence-indicator[title*="Confidence: 8"],
+.confidence-indicator[title*="Confidence: 7"] {
+  color: #ff9800; /* Medium confidence - orange */
+}
+
+.confidence-indicator {
+  color: #f44336; /* Low confidence - red */
+}
+
+/* Loading state for batter info */
+.batter-info p:has(.confidence-indicator) {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+@media (prefers-color-scheme: dark) {
+  .handedness.loading {
+    color: #777;
+  }
+  
+  .confidence-indicator[title*="Confidence: 9"] {
+    color: #66bb6a;
+  }
+  
+  .confidence-indicator[title*="Confidence: 8"],
+  .confidence-indicator[title*="Confidence: 7"] {
+    color: #ffb74d;
+  }
+  
+  .confidence-indicator {
+    color: #ef5350;
+  }
+}
