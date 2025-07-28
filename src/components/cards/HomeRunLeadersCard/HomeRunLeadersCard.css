@@ -110,25 +110,21 @@
   margin-bottom: 0;
 }
 
-/* Glass Effect Scrollbar */
+/* Glass Effect Scrollbar - HIDDEN */
 .hr-leaders-card .scrollable-container::-webkit-scrollbar {
-  width: 6px;
+  width: 0;
 }
 
 .hr-leaders-card .scrollable-container::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
+  background: transparent;
 }
 
 .hr-leaders-card .scrollable-container::-webkit-scrollbar-thumb {
-  background: rgba(230, 57, 70, 0.4);
-  border-radius: 3px;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  background: transparent;
 }
 
 .hr-leaders-card .scrollable-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(230, 57, 70, 0.6);
+  background: transparent;
 }
 
 /* Player rank styling */
@@ -360,25 +356,23 @@
 .hr-leaders-card .scrollable-container {
   max-height: 400px;
   overflow-y: auto;
-  scrollbar-width: thin;
+  scrollbar-width: none;
 }
 
 .hr-leaders-card .scrollable-container::-webkit-scrollbar {
-  width: 6px;
+  width: 0;
 }
 
 .hr-leaders-card .scrollable-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
+  background: transparent;
 }
 
 .hr-leaders-card .scrollable-container::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
+  background: transparent;
 }
 
 .hr-leaders-card .scrollable-container::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: transparent;
 }
 
 /* Special highlighting for top performers */

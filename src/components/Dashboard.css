@@ -281,11 +281,51 @@
   color: #666;
 }
 
-/* Common Player Lists */
+/* Common Player Lists - CRITICAL FIX for horizontal layout issue */
 .player-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+}
+
+/* Global fix for all dashboard cards with player items */
+.card .player-list,
+.glass-card .player-list,
+[class*="-card"] .player-list {
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
+}
+
+.card .player-list .player-item,
+.glass-card .player-list .player-item,
+[class*="-card"] .player-list .player-item {
+  display: flex !important;
+  flex-direction: row !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+}
+
+/* Desktop view container fixes for all cards */
+.card .desktop-view,
+.glass-card .desktop-view,
+[class*="-card"] .desktop-view {
+  display: block !important;
+  width: 100% !important;
+}
+
+.card .desktop-view .scrollable-container,
+.glass-card .desktop-view .scrollable-container,
+[class*="-card"] .desktop-view .scrollable-container {
+  width: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
 }
 
 /* Import unified player item styles */

@@ -72,11 +72,25 @@
   padding-bottom: 20px;
 }
 
-/* Player list styling */
+/* Player list styling - CRITICAL FIX for horizontal layout issue */
 .hr-prediction .player-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  flex-wrap: nowrap !important;
+}
+
+/* Ensure each player item stays in vertical column */
+.hr-prediction .player-list .player-item {
+  display: flex !important;
+  flex-direction: row !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  margin-bottom: 8px !important;
 }
 
 .hr-prediction .player-item {
@@ -91,6 +105,9 @@
   border-radius: 8px;
   transition: all 0.2s ease;
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .hr-prediction .player-item:hover {
@@ -550,4 +567,29 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* CRITICAL: Desktop view layout fixes to override global CSS conflicts */
+.hr-prediction .desktop-view {
+  display: block !important;
+  width: 100% !important;
+}
+
+.hr-prediction .desktop-view .scrollable-container {
+  width: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+/* Additional specificity override for any global CSS affecting player layout */
+.card.hr-prediction .player-list {
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+}
+
+.card.hr-prediction .player-list .player-item {
+  display: flex !important;
+  flex-direction: row !important;
+  width: 100% !important;
 }

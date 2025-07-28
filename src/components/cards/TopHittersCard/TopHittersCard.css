@@ -79,15 +79,20 @@
   padding-bottom: 20px;
 }
 
-/* Player list styling */
+/* Player list styling - CRITICAL FIX for horizontal layout issue */
 .top-hitters-card .player-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  width: 100% !important;
 }
 
 .top-hitters-card .player-item {
-  display: flex;
+  display: flex !important;
+  flex-direction: row !important;
   align-items: center;
   padding: 12px;
   margin-bottom: 8px;
@@ -98,6 +103,9 @@
   border-radius: 8px;
   transition: all 0.2s ease;
   position: relative;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
 }
 
 .top-hitters-card .player-item:hover {
@@ -111,25 +119,21 @@
   margin-bottom: 0;
 }
 
-/* Glass Effect Scrollbar */
+/* Glass Effect Scrollbar - HIDDEN */
 .top-hitters-card .scrollable-container::-webkit-scrollbar {
-  width: 6px;
+  width: 0;
 }
 
 .top-hitters-card .scrollable-container::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
+  background: transparent;
 }
 
 .top-hitters-card .scrollable-container::-webkit-scrollbar-thumb {
-  background: rgba(59, 130, 246, 0.4);
-  border-radius: 3px;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  background: transparent;
 }
 
 .top-hitters-card .scrollable-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(59, 130, 246, 0.6);
+  background: transparent;
 }
 
 /* Player rank styling - base styles handled by PlayerItemStyles.css */
@@ -276,25 +280,23 @@
 .top-hitters-card .scrollable-container {
   max-height: 400px;
   overflow-y: auto;
-  scrollbar-width: thin;
+  scrollbar-width: none;
 }
 
 .top-hitters-card .scrollable-container::-webkit-scrollbar {
-  width: 6px;
+  width: 0;
 }
 
 .top-hitters-card .scrollable-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
+  background: transparent;
 }
 
 .top-hitters-card .scrollable-container::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
+  background: transparent;
 }
 
 .top-hitters-card .scrollable-container::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: transparent;
 }
 
 /* Special highlighting for top performers */
