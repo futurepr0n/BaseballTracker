@@ -25,6 +25,21 @@ const cardRegistry = [
     }
   },
   {
+    id: "weakspot-exploiters",
+    title: "🎯 Weakspot Exploiters",
+    type: "custom-component",
+    priority: 9.5,
+    component: "WeakspotExploitersCard",
+    dataSource: null, // Uses currentDate prop
+    enabled: true,
+    gridSpan: 2, // Wider card for detailed table
+    backgroundColor: "#0f1419",
+    borderColor: "#ff4d4f",
+    config: {
+      description: "Today's lineup confirmed hitters who exploit opposing pitcher weaknesses"
+    }
+  },
+  {
     id: "hr-prediction",
     title: "Players Due for Home Runs",
     type: "player-list",

@@ -45,6 +45,7 @@ import SlotMachineCard from './cards/SlotMachineCard/SlotMachineCard';
 import HellraiserCard from './cards/HellraiserCard';
 import BarrelMatchupCard from './cards/BarrelMatchupCard';
 import LaunchAngleMastersCard from './cards/LaunchAngleMastersCard';
+import WeakspotExploitersCard from './cards/WeakspotExploitersCard';
 import MilestoneTrackingCard from './cards/MilestoneTrackingCard';
 import StrategicIntelligenceCard from './cards/StrategicIntelligenceCard';
 import PlayerPropsLadderCard from './cards/PlayerPropsLadderCard';
@@ -1341,6 +1342,11 @@ const noFilteredData = isFiltering &&
           {/* Row 2: Weather, Pinheads HR Picks */}
           <MLBWeatherCard teams={teamData} />
           <HellraiserCard currentDate={currentDate} />
+          
+          {/* Weakspot Exploiters Card - Full width for strategic analysis */}
+          <div style={{ gridColumn: '1 / -1' }}>
+            <WeakspotExploitersCard currentDate={currentDate} />
+          </div>
 
           {/* Players due for Home Run - Above Barrel Matchups as requested */}
           <HRPredictionCard 
