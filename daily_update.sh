@@ -329,33 +329,20 @@ main() {
         print_status $GREEN "✅ Player prop analysis generated successfully"
     fi
     
-    # Step 7.7: Generate HR combinations analysis
-    print_status $BLUE "🚀 Generating HR combinations from real player data..."
+    # Step 7.7: Generate optimized HR combinations analysis
+    print_status $BLUE "🚀 Generating optimized HR combinations with adjusted thresholds..."
     
-    # Check if BaseballScraper virtual environment exists
-    SCRAPER_VENV="../BaseballScraper/venv/bin/activate"
-    if [ -f "$SCRAPER_VENV" ]; then
-        # Activate BaseballScraper virtual environment and run script
-        source "$SCRAPER_VENV"
-        python3 generate_memory_safe_hr_combinations.py
-        PYTHON_EXIT_CODE=$?
-        deactivate
-        
-        if [ $PYTHON_EXIT_CODE -ne 0 ]; then
-            print_status $YELLOW "⚠️  WARNING: Failed to generate HR combinations (non-critical)"
-        else
-            print_status $GREEN "✅ HR combinations generated successfully with real player data"
-        fi
+    # Use the new optimized script directly (no virtual environment needed)
+    python3 generate_hr_combinations_optimized.py
+    HR_COMBO_EXIT_CODE=$?
+    
+    if [ $HR_COMBO_EXIT_CODE -ne 0 ]; then
+        print_status $YELLOW "⚠️  WARNING: Failed to generate HR combinations (non-critical)"
     else
-        print_status $YELLOW "⚠️  WARNING: BaseballScraper virtual environment not found at $SCRAPER_VENV"
-        print_status $YELLOW "   Attempting to run with system Python3..."
-        python3 generate_memory_safe_hr_combinations.py
-        
-        if [ $? -ne 0 ]; then
-            print_status $YELLOW "⚠️  WARNING: Failed to generate HR combinations (non-critical)"
-        else
-            print_status $GREEN "✅ HR combinations generated successfully with system Python"
-        fi
+        print_status $GREEN "✅ Optimized HR combinations generated successfully"
+        print_status $GREEN "   • 2-player combinations: 4+ occurrences (reduced file size)"
+        print_status $GREEN "   • 3-player combinations: 2+ occurrences (more comprehensive)"
+        print_status $GREEN "   • 4-player combinations: 2+ occurrences (optimal)"
     fi
     
     # Step 8: Verify files were created
@@ -364,7 +351,16 @@ main() {
     HR_PRED_FILE="public/data/predictions/hr_predictions_${DATE}.json"
     PERF_FILE="public/data/predictions/player_performance_${DATE}.json"
     TEAM_STATS_FILE="public/data/team_stats/team_stats_${DATE}.json"
-    HR_COMBOS_FILE="public/data/hr_combinations/hr_combinations_latest.json"
+    
+    # Check for any of the new optimized HR combination files
+    HR_COMBOS_FOUND=false
+    for file in public/data/hr_combinations/hr_combinations_by_*_adjusted_*.json; do
+        if [ -f "$file" ]; then
+            HR_COMBOS_FOUND=true
+            HR_COMBOS_FILE="$file"
+            break
+        fi
+    done
     
     local files_created=0
     local total_expected=4
@@ -390,11 +386,13 @@ main() {
         print_status $YELLOW "⚠️  Team Stats file missing: $TEAM_STATS_FILE (non-critical)"
     fi
     
-    if [ -f "$HR_COMBOS_FILE" ]; then
-        print_status $GREEN "✅ HR Combinations file created: $HR_COMBOS_FILE"
+    if [ "$HR_COMBOS_FOUND" = true ]; then
+        print_status $GREEN "✅ Optimized HR Combinations files created"
+        print_status $GREEN "   Latest: $HR_COMBOS_FILE"
         ((files_created++))
     else
-        print_status $YELLOW "⚠️  HR Combinations file missing: $HR_COMBOS_FILE (non-critical)"
+        print_status $YELLOW "⚠️  HR Combinations files missing (non-critical)"
+        print_status $YELLOW "   Expected pattern: hr_combinations_by_*_adjusted_*.json"
     fi
     
     # Step 9: Final validation and recommendations
