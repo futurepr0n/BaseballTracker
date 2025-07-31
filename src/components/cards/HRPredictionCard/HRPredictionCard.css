@@ -1,6 +1,6 @@
 /* HRPredictionCard.css - Glass Effect with Odds Display (Based on RecentHomersCard) */
 
-.hr-prediction {
+.hr-prediction-card {
   grid-column: span 1;
   background: rgba(230, 57, 70, 0.05);
   border: 1px solid rgba(230, 57, 70, 0.2);
@@ -17,14 +17,14 @@
 }
 
 /* Glass card container for proper layering */
-.hr-prediction .glass-card-container {
+.hr-prediction-card .glass-card-container {
   position: relative;
   height: 100%;
   min-height: 420px;
 }
 
 /* Glass header that content scrolls behind - NO BORDER RADIUS */
-.hr-prediction .glass-header {
+.hr-prediction-card .glass-header {
   position: absolute;
   top: 0;
   left: 0;
@@ -39,21 +39,21 @@
   box-shadow: 0 4px 16px rgba(230, 57, 70, 0.05);
 }
 
-.hr-prediction .glass-header h3 {
+.hr-prediction-card .glass-header h3 {
   margin: 0 0 15px 0;
   color: #333;
   font-size: 1.1rem;
   font-weight: 600;
 }
 
-.hr-prediction .card-subtitle {
+.hr-prediction-card .card-subtitle {
   font-size: 0.85rem;
   color: var(--text-secondary, #4a5568);
   margin-top: 5px;
 }
 
 /* Glass Effect Scrollable Container */
-.hr-prediction .scrollable-container {
+.hr-prediction-card .scrollable-container {
   background: rgba(255, 235, 238, 0.4);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -73,7 +73,7 @@
 }
 
 /* Player list styling - CRITICAL FIX for horizontal layout issue */
-.hr-prediction .player-list {
+.hr-prediction-card .player-list {
   list-style: none !important;
   padding: 0 !important;
   margin: 0 !important;
@@ -84,7 +84,7 @@
 }
 
 /* Ensure each player item stays in vertical column */
-.hr-prediction .player-list .player-item {
+.hr-prediction-card .player-list .player-item {
   display: flex !important;
   flex-direction: row !important;
   width: 100% !important;
@@ -93,7 +93,7 @@
   margin-bottom: 8px !important;
 }
 
-.hr-prediction .player-item {
+.hr-prediction-card .player-item {
   display: flex;
   align-items: center;
   padding: 12px;
@@ -110,40 +110,40 @@
   flex-shrink: 0;
 }
 
-.hr-prediction .player-item:hover {
+.hr-prediction-card .player-item:hover {
   background: rgba(255, 255, 255, 0.25);
   transform: translateX(4px);
   box-shadow: 0 4px 12px rgba(230, 57, 70, 0.08);
   border-color: rgba(230, 57, 70, 0.2);
 }
 
-.hr-prediction .player-item:last-child {
+.hr-prediction-card .player-item:last-child {
   margin-bottom: 0;
 }
 
 /* Glass Effect Scrollbar */
-.hr-prediction .scrollable-container::-webkit-scrollbar {
+.hr-prediction-card .scrollable-container::-webkit-scrollbar {
   width: 6px;
 }
 
-.hr-prediction .scrollable-container::-webkit-scrollbar-track {
+.hr-prediction-card .scrollable-container::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
 }
 
-.hr-prediction .scrollable-container::-webkit-scrollbar-thumb {
+.hr-prediction-card .scrollable-container::-webkit-scrollbar-thumb {
   background: rgba(230, 57, 70, 0.4);
   border-radius: 3px;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
 }
 
-.hr-prediction .scrollable-container::-webkit-scrollbar-thumb:hover {
+.hr-prediction-card .scrollable-container::-webkit-scrollbar-thumb:hover {
   background: rgba(230, 57, 70, 0.6);
 }
 
 /* Player rank styling */
-.hr-prediction .player-rank {
+.hr-prediction-card .player-rank {
   width: 48px;
   height: 48px;
   display: flex;
@@ -160,7 +160,7 @@
   flex-shrink: 0;
 }
 
-.hr-prediction .player-rank .rank-logo {
+.hr-prediction-card .player-rank .rank-logo {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -169,14 +169,14 @@
   opacity: 0.7;
 }
 
-.hr-prediction .player-rank .rank-overlay {
+.hr-prediction-card .player-rank .rank-overlay {
   position: absolute;
   inset: 0;
   background-color: currentColor;
   opacity: 0.3;
 }
 
-.hr-prediction .player-rank .rank-number {
+.hr-prediction-card .player-rank .rank-number {
   position: relative;
   z-index: 10;
   color: white;
@@ -185,14 +185,14 @@
 }
 
 /* Player info styling */
-.hr-prediction .player-info {
+.hr-prediction-card .player-info {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   margin-right: 10px;
 }
 
-.hr-prediction .player-name {
+.hr-prediction-card .player-name {
   font-weight: 500;
   color: var(--text-primary, #1a202c);
   font-size: 0.95rem;
@@ -238,7 +238,7 @@
 }
 
 /* Enhanced player stat styling for HR predictions */
-.hr-prediction .player-stat {
+.hr-prediction-card .player-stat {
   display: flex;
   flex-direction: column;
   min-width: 160px;
@@ -270,7 +270,7 @@
 }
 
 /* Highlight players with very long droughts */
-.hr-prediction .player-item:nth-child(-n+3) .hr-deficit {
+.hr-prediction-card .player-item:nth-child(-n+3) .hr-deficit {
   background-color: rgba(230, 57, 70, 0.1);
   padding: 2px 6px;
   border-radius: 4px;
@@ -278,7 +278,7 @@
 }
 
 /* Enhanced background logo */
-.hr-prediction .player-item .team-logo-bg {
+.hr-prediction-card .player-item .team-logo-bg {
   position: absolute;
   right: 0;
   top: 0;
@@ -293,7 +293,7 @@
   object-position: center;
 }
 
-.hr-prediction .player-item:hover .team-logo-bg {
+.hr-prediction-card .player-item:hover .team-logo-bg {
   opacity: 0.1;
 }
 
@@ -333,7 +333,7 @@
 }
 
 /* Loading and no data states */
-.hr-prediction .loading-indicator {
+.hr-prediction-card .loading-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -342,7 +342,7 @@
   font-style: italic;
 }
 
-.hr-prediction .no-data {
+.hr-prediction-card .no-data {
   color: var(--text-muted, #68778d);
   text-align: center;
   padding: 40px 20px;
@@ -350,50 +350,50 @@
 }
 
 /* Special highlighting for top performers */
-.hr-prediction .player-item:first-child .hr-deficit {
+.hr-prediction-card .player-item:first-child .hr-deficit {
   font-size: 1.1rem;
   text-shadow: 0 1px 2px rgba(230, 57, 70, 0.3);
 }
 
-.hr-prediction .player-item:nth-child(2) .hr-deficit {
+.hr-prediction-card .player-item:nth-child(2) .hr-deficit {
   font-size: 1.05rem;
 }
 
-.hr-prediction .player-item:nth-child(3) .hr-deficit {
+.hr-prediction-card .player-item:nth-child(3) .hr-deficit {
   font-size: 1.02rem;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .hr-prediction {
+  .hr-prediction-card {
     grid-column: 1 / -1;
   }
   
   /* Remove footer space in mobile */
-  .hr-prediction .glass-card-container {
+  .hr-prediction-card .glass-card-container {
     min-height: auto;
     height: auto;
   }
   
-  .hr-prediction .scrollable-container {
+  .hr-prediction-card .scrollable-container {
     position: relative;
     height: auto;
     max-height: 60vh;
     padding-bottom: 10px;
   }
   
-  /* Mobile view windowed behavior */
-  .hr-prediction .mobile-view {
+  /* Mobile view windowing */
+  .hr-prediction-card .mobile-view {
     max-height: 60vh;
     overflow-y: auto;
   }
   
-  .hr-prediction .mobile-cards {
+  .hr-prediction-card .mobile-cards {
     padding-bottom: 10px;
   }
   
   /* Much more compact rows on mobile */
-  .hr-prediction .player-item {
+  .hr-prediction-card .player-item {
     padding: 6px 12px; /* Even tighter padding */
     margin-bottom: 4px; /* Minimal separation between rows */
     min-height: auto; /* Remove any min-height constraints */
@@ -403,13 +403,13 @@
   }
   
   /* Smaller rank circle on mobile */
-  .hr-prediction .player-rank {
+  .hr-prediction-card .player-rank {
     width: 32px;  /* Much smaller */
     height: 32px; 
     margin-right: 10px; /* Tighter margin */
   }
   
-  .hr-prediction .rank-number {
+  .hr-prediction-card .rank-number {
     font-size: 0.9rem; /* Smaller rank number */
   }
   
@@ -466,40 +466,40 @@
   }
   
   /* Much more compact stats section */
-  .hr-prediction .player-stat {
+  .hr-prediction-card .player-stat {
     min-width: 120px; /* Even smaller width */
   }
   
-  .hr-prediction .hr-deficit {
+  .hr-prediction-card .hr-deficit {
     font-size: 0.8rem; /* Smaller main stat */
     line-height: 1.1;
   }
   
-  .hr-prediction .hr-detail {
+  .hr-prediction-card .hr-detail {
     font-size: 0.65rem; /* Much smaller detail text */
     line-height: 1.1;
     margin-top: 1px; /* Minimal margin */
   }
   
-  .hr-prediction .days-since {
+  .hr-prediction-card .days-since {
     font-size: 0.6rem; /* Even smaller for days since */
   }
   
   /* Smaller status indicators */
-  .hr-prediction .odds-loading,
-  .hr-prediction .odds-error,
-  .hr-prediction .odds-info {
+  .hr-prediction-card .odds-loading,
+  .hr-prediction-card .odds-error,
+  .hr-prediction-card .odds-info {
     font-size: 0.65rem;
     padding: 2px 6px;
   }
   
   /* Compact footer */
-  .hr-prediction .odds-footer {
+  .hr-prediction-card .odds-footer {
     margin-top: 8px;
     padding-top: 6px;
   }
   
-  .hr-prediction .odds-footer small {
+  .hr-prediction-card .odds-footer small {
     font-size: 0.6rem;
   }
 }
@@ -546,15 +546,15 @@
 }
 
 /* Special styling for players who hit HR last game */
-.hr-prediction .player-item .hr-deficit:contains("Hit HR last game") {
+.hr-prediction-card .player-item .hr-deficit:contains("Hit HR last game") {
   color: #2e7d32;
   background-color: rgba(46, 125, 50, 0.1);
   border-left-color: #2e7d32;
 }
 
 /* Animation for team context elements */
-.hr-prediction .team-context,
-.hr-prediction .team-filter-summary {
+.hr-prediction-card .team-context,
+.hr-prediction-card .team-filter-summary {
   animation: slideInTeamContext 0.3s ease-out;
 }
 
@@ -569,26 +569,22 @@
   }
 }
 
-/* CRITICAL: Desktop view layout fixes to override global CSS conflicts */
-.hr-prediction .desktop-view {
-  display: block !important;
-  width: 100% !important;
-}
+/* Desktop/mobile view handling is now managed by global Dashboard.css */
 
-.hr-prediction .desktop-view .scrollable-container {
+.hr-prediction-card .desktop-view .scrollable-container {
   width: 100% !important;
   overflow-x: hidden !important;
   overflow-y: auto !important;
 }
 
 /* Additional specificity override for any global CSS affecting player layout */
-.card.hr-prediction .player-list {
+.card.hr-prediction-card .player-list {
   display: flex !important;
   flex-direction: column !important;
   flex-wrap: nowrap !important;
 }
 
-.card.hr-prediction .player-list .player-item {
+.card.hr-prediction-card .player-list .player-item {
   display: flex !important;
   flex-direction: row !important;
   width: 100% !important;

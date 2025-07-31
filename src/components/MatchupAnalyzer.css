@@ -1066,9 +1066,6 @@
 
 /* Enhanced MatchupAnalyzer.css with Arsenal Analysis Integration */
 
-/* Import existing styles */
-@import url('./MatchupAnalyzer.css');
-
 /* NEW: Arsenal Analysis Column Styles */
 .arsenal-column {
   min-width: 140px;

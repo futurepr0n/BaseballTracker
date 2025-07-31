@@ -3,7 +3,7 @@
 .dashboard {
   padding: 20px;
   width: 100%;
-  max-width: min(90vw, 1520px);
+  max-width: 1520px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -12,10 +12,22 @@
   position: relative;
 }
 
+@media (max-width: 1688px) {
+  .dashboard {
+    max-width: 90vw;
+  }
+}
+
 .dashboard-header {
   width: 100%;
-  max-width: min(90vw, 1520px);
+  max-width: 1520px;
   margin: 0 0 20px 0;
+}
+
+@media (max-width: 1688px) {
+  .dashboard-header {
+    max-width: 90vw;
+  }
 }
 
 .dashboard-header-content {
@@ -60,7 +72,7 @@
 /* Team filter section - add space between filter and grid */
 .team-filter {
   width: 100%;
-  max-width: min(90vw, 1520px);
+  max-width: 1520px;
   margin: 0 0 25px 0;
 }
 
@@ -165,7 +177,7 @@
   grid-template-columns: 1fr;
   gap: 20px;
   width: 100%;
-  max-width: min(90vw, 1520px);
+  max-width: 1520px;
   min-width: 320px;
   padding: 0;
   margin: 0 auto;
@@ -318,6 +330,28 @@
 [class*="-card"] .desktop-view {
   display: block !important;
   width: 100% !important;
+}
+
+/* Mobile view - hide by default */
+.card .mobile-view,
+.glass-card .mobile-view,
+[class*="-card"] .mobile-view {
+  display: none;
+}
+
+/* Mobile breakpoint - switch views */
+@media (max-width: 768px) {
+  .card .desktop-view,
+  .glass-card .desktop-view,
+  [class*="-card"] .desktop-view {
+    display: none !important;
+  }
+  
+  .card .mobile-view,
+  .glass-card .mobile-view,
+  [class*="-card"] .mobile-view {
+    display: block !important;
+  }
 }
 
 .card .desktop-view .scrollable-container,
@@ -598,7 +632,7 @@ html, body {
 
 /* Enforce strict grid container limits */
 .dashboard-grid {
-  max-width: min(90vw, 1520px) !important;
+  max-width: 1520px !important;
   overflow: hidden !important;
   contain: layout !important;
 }
