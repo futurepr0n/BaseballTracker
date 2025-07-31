@@ -1345,7 +1345,7 @@ const noFilteredData = isFiltering &&
           
           {/* Weakspot Exploiters Card - Full width for strategic analysis */}
           <div style={{ gridColumn: '1 / -1' }}>
-            <WeakspotExploitersCard currentDate={currentDate} />
+            <WeakspotExploitersCard currentDate={currentDate} gameData={gameData} />
           </div>
 
           {/* Players due for Home Run - Above Barrel Matchups as requested */}
