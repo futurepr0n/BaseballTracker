@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🚀 Exit Velocity Analysis Test - Oneil Cruz</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .test-container { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto; }
+        
+        /* Exit Velocity Analysis Styles */
+        .exit-velocity-analysis {
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(56, 142, 60, 0.08);
+            border: 1px solid rgba(56, 142, 60, 0.2);
+            border-radius: 8px;
+        }
+
+        .exit-velocity-analysis h5 {
+            margin: 0 0 8px 0;
+            font-size: 12px;
+            color: #388e3c;
+            font-weight: 600;
+        }
+
+        .exit-velocity-summary {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .power-percentile, .exit-velocity-avg {
+            font-size: 11px;
+            color: #333;
+        }
+
+        .elite-badge {
+            background: #4caf50;
+            color: white;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .power-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .power-metric {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 6px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 10px;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 12px;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .metric-indicator {
+            font-size: 10px;
+        }
+
+        .metric-description {
+            font-size: 9px;
+            color: #666;
+            line-height: 1.2;
+        }
+
+        .power-score-summary {
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 6px;
+        }
+
+        .power-score-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .power-score-label {
+            font-size: 10px;
+            color: #666;
+            font-weight: 600;
+            min-width: 60px;
+        }
+
+        .power-score-value {
+            font-size: 11px;
+            color: #333;
+            font-weight: 600;
+            min-width: 50px;
+        }
+
+        .power-score-visual {
+            flex: 1;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .power-score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff9800 0%, #4caf50 70%, #2e7d32 100%);
+            transition: width 0.3s ease;
+        }
+
+        .power-assessment {
+            text-align: center;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .power-assessment.strong {
+            background: rgba(255, 152, 0, 0.2);
+            color: #f57c00;
+        }
+        
+        .test-header { margin-bottom: 20px; text-align: center; color: #333; }
+        .data-source { font-size: 12px; color: #666; margin-top: 10px; padding: 8px; background: #f9f9f9; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🚀 Exit Velocity Analysis - Implementation Test</h1>
+            <h3>Oneil Cruz vs Antonio Senzatela</h3>
+            <p><strong>Data from:</strong> hellraiser_analysis_2025-08-01.json</p>
+        </div>
+
+        <div class="exit-velocity-analysis">
+            <h5>🚀 Exit Velocity Analysis:</h5>
+            <div class="exit-velocity-details">
+                <div class="exit-velocity-summary">
+                    <span class="power-percentile">
+                        Power Percentile: <strong>95th</strong><span class="elite-badge">Elite</span>
+                    </span>
+                    <span class="exit-velocity-avg">
+                        Exit Velocity: <strong>96.3 mph</strong>
+                    </span>
+                </div>
+                
+                <div class="power-metrics-grid">
+                    <div class="power-metric">
+                        <div class="metric-label">Barrel Rate</div>
+                        <div class="metric-value barrel-rate">
+                            <strong>20.8%</strong>
+                            <span class="metric-indicator excellent">🔥</span>
+                        </div>
+                        <div class="metric-description">Crushing the ball consistently</div>
+                    </div>
+                    
+                    <div class="power-metric">
+                        <div class="metric-label">Hard Hit %</div>
+                        <div class="metric-value hard-hit">
+                            <strong>57.5%</strong>
+                            <span class="metric-indicator excellent">💥</span>
+                        </div>
+                        <div class="metric-description">95+ mph contact rate</div>
+                    </div>
+                    
+                    <div class="power-metric">
+                        <div class="metric-label">Sweet Spot %</div>
+                        <div class="metric-value sweet-spot">
+                            <strong>34.1%</strong>
+                            <span class="metric-indicator excellent">🎯</span>
+                        </div>
+                        <div class="metric-description">Optimal launch angles</div>
+                    </div>
+                </div>
+                
+                <div class="power-score-summary">
+                    <div class="power-score-bar">
+                        <div class="power-score-label">Power Score:</div>
+                        <div class="power-score-value">
+                            <strong>77/100</strong>
+                        </div>
+                        <div class="power-score-visual">
+                            <div class="power-score-fill" style="width: 77%"></div>
+                        </div>
+                    </div>
+                    <div class="power-assessment strong">⭐ Strong Power Profile</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="data-source">
+            <strong>📊 Data Analysis:</strong><br>
+            • <strong>95th percentile exit velocity (96.3 mph)</strong> - Elite contact quality, only 5% of hitters hit the ball harder<br>
+            • <strong>20.8% barrel rate</strong> - Crushing the ball consistently (15%+ is excellent)<br>
+            • <strong>57.5% hard hit rate</strong> - Making solid contact at 95+ mph over half the time<br>
+            • <strong>34.1% sweet spot rate</strong> - Optimal launch angles (26-30°) for home runs<br>
+            • <strong>Power Score: 77/100</strong> - Strong power profile indicating HR potential<br><br>
+            <strong>🎯 Betting Intelligence:</strong> This analysis shows Oneil Cruz has elite raw power metrics that significantly increase his home run probability in favorable matchups.
+        </div>
+    </div>
+</body>
+</html>

@@ -391,6 +391,809 @@
   line-height: 1.4;
 }
 
+/* Arsenal Matchup Analysis Styles */
+.hellraiser-card .arsenal-analysis {
+  margin-top: 12px;
+  padding: 10px;
+  background: rgba(33, 150, 243, 0.08);
+  border: 1px solid rgba(33, 150, 243, 0.2);
+  border-radius: 8px;
+}
+
+.hellraiser-card .arsenal-analysis h5 {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #1976d2;
+  font-weight: 600;
+}
+
+.hellraiser-card .arsenal-summary {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.hellraiser-card .arsenal-advantage,
+.hellraiser-card .arsenal-confidence {
+  font-size: 11px;
+  color: #333;
+}
+
+.hellraiser-card .arsenal-advantages {
+  margin: 6px 0;
+}
+
+.hellraiser-card .advantage-positive {
+  font-size: 11px;
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.hellraiser-card .arsenal-concerns {
+  margin: 6px 0;
+}
+
+.hellraiser-card .advantage-negative {
+  font-size: 11px;
+  color: #d84315;
+  font-weight: 500;
+}
+
+.hellraiser-card .pitch-breakdown {
+  margin-top: 10px;
+}
+
+.hellraiser-card .pitch-breakdown h6 {
+  margin: 0 0 6px 0;
+  font-size: 11px;
+  color: #666;
+  font-weight: 600;
+}
+
+.hellraiser-card .pitch-matchup {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 4px 0;
+  padding: 4px 6px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.hellraiser-card .pitch-type {
+  font-size: 10px;
+  font-weight: 600;
+  color: #1976d2;
+  min-width: 25px;
+}
+
+.hellraiser-card .pitch-stats {
+  font-size: 10px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hellraiser-card .advantage-score {
+  font-weight: 600;
+  font-size: 10px;
+}
+
+.hellraiser-card .advantage-score.positive {
+  color: #2e7d32;
+}
+
+.hellraiser-card .advantage-score.negative {
+  color: #d84315;
+}
+
+/* Exit Velocity Analysis Styles */
+.hellraiser-card .exit-velocity-analysis {
+  margin-top: 12px;
+  padding: 10px;
+  background: rgba(56, 142, 60, 0.08);
+  border: 1px solid rgba(56, 142, 60, 0.2);
+  border-radius: 8px;
+}
+
+/* Recent Trends Analysis Styles */
+.hellraiser-card .trends-analysis {
+  margin-top: 12px;
+  padding: 10px;
+  background: rgba(103, 58, 183, 0.08);
+  border: 1px solid rgba(103, 58, 183, 0.2);
+  border-radius: 8px;
+}
+
+.hellraiser-card .trends-analysis h5 {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #673ab7;
+  font-weight: 600;
+}
+
+.hellraiser-card .trends-summary {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.hellraiser-card .trend-direction,
+.hellraiser-card .games-analyzed {
+  font-size: 11px;
+  color: #333;
+}
+
+.hellraiser-card .momentum-badge {
+  background: #e8f5e8;
+  color: #2e7d32;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.hellraiser-card .momentum-badge.negative {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+.hellraiser-card .trend-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.hellraiser-card .trend-metric {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+}
+
+.hellraiser-card .trend-metric .metric-label {
+  font-size: 10px;
+  color: #666;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.hellraiser-card .trend-metric .metric-value {
+  font-size: 12px;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.hellraiser-card .trend-indicator {
+  font-size: 10px;
+}
+
+.hellraiser-card .trend-indicator.up {
+  color: #2e7d32;
+}
+
+.hellraiser-card .trend-indicator.down {
+  color: #d32f2f;
+}
+
+.hellraiser-card .metric-comparison {
+  font-size: 9px;
+  color: #666;
+  line-height: 1.2;
+}
+
+.hellraiser-card .baseline-indicator {
+  font-size: 9px;
+  color: #666;
+  margin-left: 4px;
+}
+
+.hellraiser-card .hr-trend-summary {
+  margin-top: 10px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+}
+
+.hellraiser-card .hr-trend-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hellraiser-card .hr-trend-label {
+  font-size: 10px;
+  color: #666;
+  font-weight: 600;
+}
+
+.hellraiser-card .hr-counts {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hellraiser-card .hr-count {
+  font-size: 10px;
+  color: #333;
+}
+
+.hellraiser-card .trend-assessment {
+  text-align: center;
+}
+
+.hellraiser-card .trending {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.hellraiser-card .trending-up {
+  background: rgba(76, 175, 80, 0.2);
+  color: #2e7d32;
+}
+
+.hellraiser-card .trending-down {
+  background: rgba(244, 67, 54, 0.2);
+  color: #d32f2f;
+}
+
+.hellraiser-card .trending-stable {
+  background: rgba(158, 158, 158, 0.2);
+  color: #616161;
+}
+
+.hellraiser-card .trend-icon {
+  font-size: 10px;
+}
+
+.hellraiser-card .trend-text {
+  font-size: 9px;
+}
+
+/* Swing Mechanics Analysis Styles */
+.hellraiser-card .swing-mechanics-analysis {
+  margin-top: 12px;
+  padding: 10px;
+  background: rgba(255, 193, 7, 0.08);
+  border: 1px solid rgba(255, 193, 7, 0.2);
+  border-radius: 8px;
+}
+
+.hellraiser-card .swing-mechanics-analysis h5 {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #ffc107;
+  font-weight: 600;
+}
+
+.hellraiser-card .swing-mechanics-summary {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.hellraiser-card .optimization-score,
+.hellraiser-card .ideal-rate {
+  font-size: 11px;
+  color: #333;
+}
+
+.hellraiser-card .optimal-badge {
+  background: #4caf50;
+  color: white;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.hellraiser-card .good-badge {
+  background: #ff9800;
+  color: white;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.hellraiser-card .swing-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.hellraiser-card .swing-metric {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+}
+
+.hellraiser-card .swing-metric .metric-label {
+  font-size: 10px;
+  color: #666;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.hellraiser-card .swing-metric .metric-value {
+  font-size: 12px;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.hellraiser-card .swing-metric .metric-indicator {
+  font-size: 10px;
+}
+
+.hellraiser-card .swing-metric .metric-description {
+  font-size: 9px;
+  color: #666;
+  line-height: 1.2;
+}
+
+.hellraiser-card .swing-optimization-summary {
+  margin-top: 10px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+}
+
+.hellraiser-card .optimization-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.hellraiser-card .optimization-label {
+  font-size: 10px;
+  color: #666;
+  font-weight: 600;
+  min-width: 80px;
+}
+
+.hellraiser-card .optimization-value {
+  font-size: 11px;
+  color: #333;
+  font-weight: 600;
+  min-width: 50px;
+}
+
+.hellraiser-card .optimization-visual {
+  flex: 1;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.hellraiser-card .optimization-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffc107 0%, #ff9800 50%, #4caf50 100%);
+  transition: width 0.3s ease;
+}
+
+.hellraiser-card .mechanics-assessment {
+  text-align: center;
+}
+
+.hellraiser-card .mechanics {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.hellraiser-card .mechanics-elite {
+  background: rgba(76, 175, 80, 0.2);
+  color: #2e7d32;
+}
+
+.hellraiser-card .mechanics-strong {
+  background: rgba(255, 152, 0, 0.2);
+  color: #f57c00;
+}
+
+.hellraiser-card .mechanics-average {
+  background: rgba(255, 193, 7, 0.2);
+  color: #f9a825;
+}
+
+.hellraiser-card .mechanics-needs-work {
+  background: rgba(158, 158, 158, 0.2);
+  color: #616161;
+}
+
+.hellraiser-card .mechanics-icon {
+  font-size: 10px;
+}
+
+.hellraiser-card .mechanics-text {
+  font-size: 9px;
+}
+
+/* Pitcher Vulnerability Analysis Styles */
+.hellraiser-card .pitcher-vulnerability-analysis {
+  margin-top: 12px;
+  padding: 10px;
+  background: rgba(244, 67, 54, 0.08);
+  border: 1px solid rgba(244, 67, 54, 0.2);
+  border-radius: 8px;
+}
+
+.hellraiser-card .pitcher-vulnerability-analysis h5 {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #f44336;
+  font-weight: 600;
+}
+
+.hellraiser-card .pitcher-vulnerability-summary {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.hellraiser-card .vulnerability-score,
+.hellraiser-card .era-performance {
+  font-size: 11px;
+  color: #333;
+}
+
+.hellraiser-card .vulnerable-badge {
+  background: #f44336;
+  color: white;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.hellraiser-card .moderate-badge {
+  background: #ff9800;
+  color: white;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.hellraiser-card .struggling-badge {
+  background: #f44336;
+  color: white;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.hellraiser-card .dominant-badge {
+  background: #4caf50;
+  color: white;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.hellraiser-card .pitcher-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.hellraiser-card .pitcher-metric {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+}
+
+.hellraiser-card .pitcher-metric .metric-label {
+  font-size: 10px;
+  color: #666;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.hellraiser-card .pitcher-metric .metric-value {
+  font-size: 12px;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.hellraiser-card .pitcher-metric .metric-indicator.concerning {
+  color: #f44336;
+  font-size: 10px;
+}
+
+.hellraiser-card .pitcher-metric .metric-indicator.excellent {
+  color: #4caf50;
+  font-size: 10px;
+}
+
+.hellraiser-card .pitcher-metric .metric-description {
+  font-size: 9px;
+  color: #666;
+  line-height: 1.2;
+}
+
+.hellraiser-card .pitcher-vulnerability-summary-bar {
+  margin-top: 10px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+}
+
+.hellraiser-card .vulnerability-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.hellraiser-card .vulnerability-label {
+  font-size: 10px;
+  color: #666;
+  font-weight: 600;
+  min-width: 80px;
+}
+
+.hellraiser-card .vulnerability-value {
+  font-size: 11px;
+  color: #333;
+  font-weight: 600;
+  min-width: 50px;
+}
+
+.hellraiser-card .vulnerability-visual {
+  flex: 1;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.hellraiser-card .vulnerability-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50 0%, #ff9800 40%, #f44336 100%);
+  transition: width 0.3s ease;
+}
+
+.hellraiser-card .vulnerability-assessment {
+  text-align: center;
+}
+
+.hellraiser-card .vulnerability {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.hellraiser-card .vulnerability-high {
+  background: rgba(244, 67, 54, 0.2);
+  color: #d32f2f;
+}
+
+.hellraiser-card .vulnerability-moderate {
+  background: rgba(255, 152, 0, 0.2);
+  color: #f57c00;
+}
+
+.hellraiser-card .vulnerability-low {
+  background: rgba(76, 175, 80, 0.2);
+  color: #2e7d32;
+}
+
+.hellraiser-card .vulnerability-dominant {
+  background: rgba(76, 175, 80, 0.3);
+  color: #1b5e20;
+}
+
+.hellraiser-card .vulnerability-icon {
+  font-size: 10px;
+}
+
+.hellraiser-card .vulnerability-text {
+  font-size: 9px;
+}
+
+.hellraiser-card .exit-velocity-analysis h5 {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #388e3c;
+  font-weight: 600;
+}
+
+.hellraiser-card .exit-velocity-summary {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.hellraiser-card .power-percentile,
+.hellraiser-card .exit-velocity-avg {
+  font-size: 11px;
+  color: #333;
+}
+
+.hellraiser-card .elite-badge {
+  background: #4caf50;
+  color: white;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.hellraiser-card .above-avg-badge {
+  background: #ff9800;
+  color: white;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.hellraiser-card .power-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.hellraiser-card .power-metric {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+}
+
+.hellraiser-card .metric-label {
+  font-size: 10px;
+  color: #666;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.hellraiser-card .metric-value {
+  font-size: 12px;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.hellraiser-card .metric-indicator {
+  font-size: 10px;
+}
+
+.hellraiser-card .metric-description {
+  font-size: 9px;
+  color: #666;
+  line-height: 1.2;
+}
+
+.hellraiser-card .power-score-summary {
+  margin-top: 10px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+}
+
+.hellraiser-card .power-score-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.hellraiser-card .power-score-label {
+  font-size: 10px;
+  color: #666;
+  font-weight: 600;
+  min-width: 60px;
+}
+
+.hellraiser-card .power-score-value {
+  font-size: 11px;
+  color: #333;
+  font-weight: 600;
+  min-width: 50px;
+}
+
+.hellraiser-card .power-score-visual {
+  flex: 1;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.hellraiser-card .power-score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff9800 0%, #4caf50 70%, #2e7d32 100%);
+  transition: width 0.3s ease;
+}
+
+.hellraiser-card .power-assessment {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.hellraiser-card .power-assessment.elite {
+  background: rgba(76, 175, 80, 0.2);
+  color: #2e7d32;
+}
+
+.hellraiser-card .power-assessment.strong {
+  background: rgba(255, 152, 0, 0.2);
+  color: #f57c00;
+}
+
+.hellraiser-card .power-assessment.average {
+  background: rgba(158, 158, 158, 0.2);
+  color: #616161;
+}
+
 .hellraiser-card .risk-factors {
   margin-top: 8px;
 }
@@ -486,6 +1289,240 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
+  }
+  
+  /* Mobile Exit Velocity Analysis */
+  .hellraiser-card .power-metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin: 6px 0;
+  }
+  
+  .hellraiser-card .power-metric {
+    padding: 6px;
+  }
+  
+  .hellraiser-card .metric-label {
+    font-size: 9px;
+  }
+  
+  .hellraiser-card .metric-value {
+    font-size: 10px;
+  }
+  
+  .hellraiser-card .metric-description {
+    font-size: 8px;
+  }
+  
+  .hellraiser-card .power-score-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .hellraiser-card .exit-velocity-summary {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  /* Mobile Recent Trends Analysis */
+  .hellraiser-card .trend-metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin: 6px 0;
+  }
+  
+  .hellraiser-card .trend-metric {
+    padding: 6px;
+  }
+  
+  .hellraiser-card .trend-metric .metric-label {
+    font-size: 9px;
+  }
+  
+  .hellraiser-card .trend-metric .metric-value {
+    font-size: 10px;
+  }
+  
+  .hellraiser-card .metric-comparison {
+    font-size: 8px;
+  }
+  
+  .hellraiser-card .hr-trend-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .hellraiser-card .trends-summary {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .hellraiser-card .hr-counts {
+    gap: 8px;
+  }
+  
+  .hellraiser-card .trending {
+    font-size: 9px;
+  }
+  
+  /* Mobile Swing Mechanics Analysis */
+  .hellraiser-card .swing-metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin: 6px 0;
+  }
+  
+  .hellraiser-card .swing-metric {
+    padding: 6px;
+  }
+  
+  .hellraiser-card .swing-metric .metric-label {
+    font-size: 9px;
+  }
+  
+  .hellraiser-card .swing-metric .metric-value {
+    font-size: 10px;
+  }
+  
+  .hellraiser-card .swing-metric .metric-description {
+    font-size: 8px;
+  }
+  
+  .hellraiser-card .optimization-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .hellraiser-card .swing-mechanics-summary {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .hellraiser-card .mechanics {
+    font-size: 9px;
+  }
+  
+  /* Mobile Pitcher Vulnerability Analysis */
+  .hellraiser-card .pitcher-metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin: 6px 0;
+  }
+  
+  .hellraiser-card .pitcher-metric {
+    padding: 6px;
+  }
+  
+  .hellraiser-card .pitcher-metric .metric-label {
+    font-size: 9px;
+  }
+  
+  .hellraiser-card .pitcher-metric .metric-value {
+    font-size: 10px;
+  }
+  
+  .hellraiser-card .pitcher-metric .metric-description {
+    font-size: 8px;
+  }
+  
+  .hellraiser-card .vulnerability-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .hellraiser-card .pitcher-vulnerability-summary {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .hellraiser-card .vulnerability {
+    font-size: 9px;
+  }
+  
+  /* Mobile Breakdown Tabs */
+  .hellraiser-card .mobile-breakdown-tabs {
+    margin-top: 12px;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 8px;
+  }
+  
+  .hellraiser-card .mobile-tab-navigation {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+  
+  .hellraiser-card .mobile-tab-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 16px;
+    background: #f8f9fa;
+    color: #666;
+    font-size: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    min-width: fit-content;
+  }
+  
+  .hellraiser-card .mobile-tab-button:hover {
+    background: #e9ecef;
+    border-color: #ccc;
+  }
+  
+  .hellraiser-card .mobile-tab-button.active {
+    background: #d32f2f;
+    color: white;
+    border-color: #d32f2f;
+    font-weight: 600;
+  }
+  
+  .hellraiser-card .mobile-tab-icon {
+    font-size: 10px;
+  }
+  
+  .hellraiser-card .mobile-tab-label {
+    font-size: 9px;
+  }
+  
+  .hellraiser-card .mobile-tab-content {
+    min-height: 60px;
+  }
+  
+  .hellraiser-card .mobile-breakdown-section {
+    padding: 8px;
+    background: rgba(211, 47, 47, 0.05);
+    border: 1px solid rgba(211, 47, 47, 0.1);
+    border-radius: 6px;
+  }
+  
+  /* Mobile tab navigation scrolling */
+  .hellraiser-card .mobile-tab-navigation::-webkit-scrollbar {
+    height: 3px;
+  }
+  
+  .hellraiser-card .mobile-tab-navigation::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2px;
+  }
+  
+  .hellraiser-card .mobile-tab-navigation::-webkit-scrollbar-thumb {
+    background: #d32f2f;
+    border-radius: 2px;
+  }
+  
+  .hellraiser-card .mobile-tab-navigation::-webkit-scrollbar-thumb:hover {
+    background: #b71c1c;
   }
 }
 

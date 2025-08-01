@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Enhanced Arsenal Hellraiser Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .pick-item { border: 1px solid #ccc; margin: 10px 0; padding: 15px; border-radius: 8px; background: #f9f9f9; }
+        .pick-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .pick-main-info { display: flex; gap: 15px; align-items: center; }
+        .player-name { font-weight: bold; color: #1976d2; }
+        .team { background: #e3f2fd; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .vs-info { color: #666; }
+        .pick-metrics { display: flex; gap: 10px; align-items: center; }
+        .confidence-score { background: #f44336; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+        .classification { background: #4caf50; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .odds { color: #ff9800; font-weight: bold; }
+        .pick-summary { margin-top: 10px; display: flex; gap: 15px; }
+        .pathway-tag { background: #9c27b0; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        .game-info { color: #666; font-size: 12px; }
+        .pick-details { margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e0e0e0; }
+        .reasoning-section h5 { margin: 0 0 8px 0; color: #333; }
+        .reasoning-section p { margin: 0; line-height: 1.5; color: #555; }
+        
+        /* Arsenal Matchup Analysis Styles */
+        .arsenal-analysis { margin-top: 12px; padding: 10px; background: rgba(33, 150, 243, 0.08); border: 1px solid rgba(33, 150, 243, 0.2); border-radius: 8px; }
+        .arsenal-analysis h5 { margin: 0 0 8px 0; font-size: 14px; color: #1976d2; font-weight: 600; }
+        .arsenal-summary { display: flex; gap: 16px; margin-bottom: 8px; flex-wrap: wrap; }
+        .arsenal-advantage, .arsenal-confidence { font-size: 12px; color: #333; }
+        .arsenal-advantages { margin: 6px 0; }
+        .advantage-positive { font-size: 12px; color: #2e7d32; font-weight: 500; }
+        .arsenal-concerns { margin: 6px 0; }
+        .advantage-negative { font-size: 12px; color: #d84315; font-weight: 500; }
+        .pitch-breakdown { margin-top: 10px; }
+        .pitch-breakdown h6 { margin: 0 0 6px 0; font-size: 12px; color: #666; font-weight: 600; }
+        .pitch-matchup { display: flex; justify-content: space-between; align-items: center; margin: 4px 0; padding: 4px 6px; background: rgba(255, 255, 255, 0.6); border-radius: 4px; }
+        .pitch-type { font-size: 11px; font-weight: 600; color: #1976d2; min-width: 25px; }
+        .pitch-stats { font-size: 11px; color: #555; display: flex; align-items: center; gap: 6px; }
+        .advantage-score { font-weight: 600; font-size: 11px; }
+        .advantage-score.positive { color: #2e7d32; }
+        .advantage-score.negative { color: #d84315; }
+    </style>
+</head>
+<body>
+    <h1>🔥 Enhanced Arsenal Hellraiser Test</h1>
+    <div id="picks-container"></div>
+
+    <script>
+        // Sample enhanced data from our hellraiser analysis
+        const samplePick = {
+            "playerName": "Oneil Cruz",
+            "player_name": "Oneil Cruz", 
+            "team": "PIT",
+            "pitcher": "vs Antonio Senzatela",
+            "pitcher_name": "Antonio Senzatela",
+            "confidenceScore": 45.333560533277236,
+            "classification": "Solid Bet",
+            "pathway": "batterDriven",
+            "reasoning": "Elite exit velocity: 96.3 mph (95th percentile); Elite barrel rate: 20.8% (crushing the ball consistently); Strong power profile: 17.0 HRs, 0.199 ISO; Optimal swing mechanics: 93% efficiency; Hitter-friendly venue: Coors Field (HR factor: 1.30)",
+            "game": "COL @ COL",
+            "odds": { "american": "+255" },
+            "component_scores": {
+                "arsenal_matchup": {
+                    "matchup_available": true,
+                    "overall_advantage": 0.79952380952381,
+                    "confidence": 0.745,
+                    "pitch_matchups": {
+                        "FF": {
+                            "batter_slg": 0.5,
+                            "pitcher_slg_allowed": 0.504,
+                            "batter_woba": 0.356,
+                            "batter_hard_hit": 64.2,
+                            "pitcher_usage": 53.1,
+                            "advantage_score": 5.49,
+                            "sample_size": 91
+                        },
+                        "SL": {
+                            "batter_slg": 0.358,
+                            "pitcher_slg_allowed": 0.59,
+                            "batter_woba": 0.245,
+                            "batter_hard_hit": 56.7,
+                            "pitcher_usage": 22.5,
+                            "advantage_score": -10.27,
+                            "sample_size": 58
+                        }
+                    },
+                    "advantage_summary": "Strong vs FF (+5.5)",
+                    "disadvantage_summary": "Struggles vs SL (-10.3)",
+                    "total_sample_size": 149
+                }
+            }
+        };
+
+        function renderPick(pick) {
+            const arsenalMatchup = pick.component_scores?.arsenal_matchup;
+            const hasArsenal = arsenalMatchup?.matchup_available;
+            
+            return `
+                <div class="pick-item">
+                    <div class="pick-header">
+                        <div class="pick-main-info">
+                            <span class="player-name">💎 ${pick.playerName}</span>
+                            <span class="team">${pick.team}</span>
+                            <span class="vs-info">${pick.pitcher}</span>
+                        </div>
+                        <div class="pick-metrics">
+                            <div class="confidence-score">${pick.confidenceScore.toFixed(1)}</div>
+                            <span class="classification">${pick.classification}</span>
+                            <span class="odds">${pick.odds.american}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pick-summary">
+                        <span class="pathway-tag">Batter-Driven</span>
+                        <span class="game-info">${pick.game}</span>
+                    </div>
+                    
+                    <div class="pick-details">
+                        <div class="reasoning-section">
+                            <h5>Analysis Reasoning:</h5>
+                            <p>
+                                ${hasArsenal ? `<span style="color: #1976d2; font-weight: 600; display: block; margin-bottom: 4px;">
+                                    🎯 Arsenal: ${arsenalMatchup.overall_advantage > 0 ? '+' : ''}${arsenalMatchup.overall_advantage.toFixed(1)} advantage vs pitcher's mix
+                                </span>` : ''}
+                                ${pick.reasoning}
+                            </p>
+                        </div>
+
+                        ${hasArsenal ? `
+                        <div class="arsenal-analysis">
+                            <h5>🎯 Arsenal Matchup Analysis:</h5>
+                            <div class="arsenal-details">
+                                <div class="arsenal-summary">
+                                    <span class="arsenal-advantage">
+                                        Overall Advantage: <strong>${arsenalMatchup.overall_advantage > 0 ? '+' : ''}${arsenalMatchup.overall_advantage.toFixed(1)}</strong>
+                                    </span>
+                                    <span class="arsenal-confidence">
+                                        Confidence: <strong>${(arsenalMatchup.confidence * 100).toFixed(0)}%</strong>
+                                    </span>
+                                </div>
+                                
+                                ${arsenalMatchup.advantage_summary !== 'Limited advantages found' ? `
+                                <div class="arsenal-advantages">
+                                    <span class="advantage-positive">✅ ${arsenalMatchup.advantage_summary}</span>
+                                </div>` : ''}
+                                
+                                ${arsenalMatchup.disadvantage_summary !== 'No major weaknesses' ? `
+                                <div class="arsenal-concerns">
+                                    <span class="advantage-negative">⚠️ ${arsenalMatchup.disadvantage_summary}</span>
+                                </div>` : ''}
+
+                                <div class="pitch-breakdown">
+                                    <h6>Pitch-by-Pitch Breakdown:</h6>
+                                    ${Object.entries(arsenalMatchup.pitch_matchups).map(([pitchType, matchup]) => `
+                                        <div class="pitch-matchup">
+                                            <span class="pitch-type">${pitchType}:</span>
+                                            <span class="pitch-stats">
+                                                ${matchup.batter_slg.toFixed(3)} SLG vs ${matchup.pitcher_usage.toFixed(0)}% usage
+                                                <span class="advantage-score ${matchup.advantage_score > 0 ? 'positive' : 'negative'}">
+                                                    (${matchup.advantage_score > 0 ? '+' : ''}${matchup.advantage_score.toFixed(1)})
+                                                </span>
+                                            </span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render the sample pick
+        document.getElementById('picks-container').innerHTML = renderPick(samplePick);
+    </script>
+</body>
+</html>

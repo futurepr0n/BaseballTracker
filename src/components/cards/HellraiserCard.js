@@ -12,6 +12,7 @@ const HellraiserCard = ({ currentDate }) => {
   const [selectedPathway, setSelectedPathway] = useState('all');
   const [selectedValue, setSelectedValue] = useState('all');
   const [showDetails, setShowDetails] = useState({});
+  const [mobileAnalysisTab, setMobileAnalysisTab] = useState({});
   const { selectedTeam, includeMatchup, matchupTeam, shouldIncludePlayer } = useTeamFilter();
 
   useEffect(() => {
@@ -297,8 +298,411 @@ const HellraiserCard = ({ currentDate }) => {
                       <div className="pick-details">
                         <div className="reasoning-section">
                           <h5>Analysis Reasoning:</h5>
-                          <p>{pick.reasoning}</p>
+                          <p>
+                            {pick.component_scores?.arsenal_matchup?.matchup_available && (
+                              <span style={{color: '#1976d2', fontWeight: '600', display: 'block', marginBottom: '4px'}}>
+                                🎯 Arsenal: {pick.component_scores.arsenal_matchup.overall_advantage > 0 ? '+' : ''}{pick.component_scores.arsenal_matchup.overall_advantage.toFixed(1)} advantage vs pitcher's mix
+                              </span>
+                            )}
+                            {pick.reasoning}
+                          </p>
                         </div>
+
+                        {/* Enhanced Arsenal Matchup Analysis */}
+                        {pick.component_scores?.arsenal_matchup?.matchup_available && (
+                          <div className="arsenal-analysis">
+                            <h5>🎯 Arsenal Matchup Analysis:</h5>
+                            <div className="arsenal-details">
+                              <div className="arsenal-summary">
+                                <span className="arsenal-advantage">
+                                  Overall Advantage: <strong>{pick.component_scores.arsenal_matchup.overall_advantage > 0 ? '+' : ''}{pick.component_scores.arsenal_matchup.overall_advantage.toFixed(1)}</strong>
+                                </span>
+                                <span className="arsenal-confidence">
+                                  Confidence: <strong>{(pick.component_scores.arsenal_matchup.confidence * 100).toFixed(0)}%</strong>
+                                </span>
+                              </div>
+                              
+                              {pick.component_scores.arsenal_matchup.advantage_summary !== 'Limited advantages found' && (
+                                <div className="arsenal-advantages">
+                                  <span className="advantage-positive">✅ {pick.component_scores.arsenal_matchup.advantage_summary}</span>
+                                </div>
+                              )}
+                              
+                              {pick.component_scores.arsenal_matchup.disadvantage_summary !== 'No major weaknesses' && (
+                                <div className="arsenal-concerns">
+                                  <span className="advantage-negative">⚠️ {pick.component_scores.arsenal_matchup.disadvantage_summary}</span>
+                                </div>
+                              )}
+
+                              {pick.component_scores.arsenal_matchup.pitch_matchups && Object.keys(pick.component_scores.arsenal_matchup.pitch_matchups).length > 0 && (
+                                <div className="pitch-breakdown">
+                                  <h6>Pitch-by-Pitch Breakdown:</h6>
+                                  {Object.entries(pick.component_scores.arsenal_matchup.pitch_matchups).map(([pitchType, matchup]) => (
+                                    <div key={pitchType} className="pitch-matchup">
+                                      <span className="pitch-type">{pitchType}:</span>
+                                      <span className="pitch-stats">
+                                        {matchup.batter_slg.toFixed(3)} SLG vs {matchup.pitcher_usage.toFixed(0)}% usage
+                                        <span className={`advantage-score ${matchup.advantage_score > 0 ? 'positive' : 'negative'}`}>
+                                          ({matchup.advantage_score > 0 ? '+' : ''}{matchup.advantage_score.toFixed(1)})
+                                        </span>
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Enhanced Exit Velocity Analysis */}
+                        {pick.component_scores?.batter_analysis?.data_available && (
+                          <div className="exit-velocity-analysis">
+                            <h5>🚀 Exit Velocity Analysis:</h5>
+                            <div className="exit-velocity-details">
+                              <div className="exit-velocity-summary">
+                                <span className="power-percentile">
+                                  Power Percentile: <strong>{pick.component_scores.batter_analysis.exit_velocity_percentile}th</strong> 
+                                  {pick.component_scores.batter_analysis.exit_velocity_percentile >= 90 && <span className="elite-badge">Elite</span>}
+                                  {pick.component_scores.batter_analysis.exit_velocity_percentile >= 75 && pick.component_scores.batter_analysis.exit_velocity_percentile < 90 && <span className="above-avg-badge">Above Avg</span>}
+                                </span>
+                                <span className="exit-velocity-avg">
+                                  Exit Velocity: <strong>{pick.component_scores.batter_analysis.exit_velocity_avg} mph</strong>
+                                </span>
+                              </div>
+                              
+                              <div className="power-metrics-grid">
+                                <div className="power-metric">
+                                  <div className="metric-label">Barrel Rate</div>
+                                  <div className="metric-value barrel-rate">
+                                    <strong>{pick.component_scores.batter_analysis.barrel_rate}%</strong>
+                                    {pick.component_scores.batter_analysis.barrel_rate >= 15 && <span className="metric-indicator excellent">🔥</span>}
+                                    {pick.component_scores.batter_analysis.barrel_rate >= 10 && pick.component_scores.batter_analysis.barrel_rate < 15 && <span className="metric-indicator good">👍</span>}
+                                  </div>
+                                  <div className="metric-description">Crushing the ball consistently</div>
+                                </div>
+                                
+                                <div className="power-metric">
+                                  <div className="metric-label">Hard Hit %</div>
+                                  <div className="metric-value hard-hit">
+                                    <strong>{pick.component_scores.batter_analysis.hard_hit_percent}%</strong>
+                                    {pick.component_scores.batter_analysis.hard_hit_percent >= 50 && <span className="metric-indicator excellent">💥</span>}
+                                    {pick.component_scores.batter_analysis.hard_hit_percent >= 40 && pick.component_scores.batter_analysis.hard_hit_percent < 50 && <span className="metric-indicator good">⚡</span>}
+                                  </div>
+                                  <div className="metric-description">95+ mph contact rate</div>
+                                </div>
+                                
+                                <div className="power-metric">
+                                  <div className="metric-label">Sweet Spot %</div>
+                                  <div className="metric-value sweet-spot">
+                                    <strong>{pick.component_scores.batter_analysis.sweet_spot_percent}%</strong>
+                                    {pick.component_scores.batter_analysis.sweet_spot_percent >= 30 && <span className="metric-indicator excellent">🎯</span>}
+                                    {pick.component_scores.batter_analysis.sweet_spot_percent >= 25 && pick.component_scores.batter_analysis.sweet_spot_percent < 30 && <span className="metric-indicator good">📈</span>}
+                                  </div>
+                                  <div className="metric-description">Optimal launch angles</div>
+                                </div>
+                              </div>
+                              
+                              <div className="power-score-summary">
+                                <div className="power-score-bar">
+                                  <div className="power-score-label">Power Score:</div>
+                                  <div className="power-score-value">
+                                    <strong>{pick.component_scores.batter_analysis.power_score.toFixed(0)}/100</strong>
+                                  </div>
+                                  <div className="power-score-visual">
+                                    <div 
+                                      className="power-score-fill" 
+                                      style={{width: `${Math.min(100, pick.component_scores.batter_analysis.power_score)}%`}}
+                                    ></div>
+                                  </div>
+                                </div>
+                                {pick.component_scores.batter_analysis.power_score >= 90 && (
+                                  <div className="power-assessment elite">🌟 Elite Power Profile</div>
+                                )}
+                                {pick.component_scores.batter_analysis.power_score >= 75 && pick.component_scores.batter_analysis.power_score < 90 && (
+                                  <div className="power-assessment strong">⭐ Strong Power Profile</div>
+                                )}
+                                {pick.component_scores.batter_analysis.power_score >= 60 && pick.component_scores.batter_analysis.power_score < 75 && (
+                                  <div className="power-assessment average">📊 Average Power Profile</div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Recent Trends Analysis */}
+                        {pick.trend_analysis?.trend_available && (
+                          <div className="trends-analysis">
+                            <h5>📈 Recent Trends Analysis:</h5>
+                            <div className="trends-details">
+                              <div className="trends-summary">
+                                <span className="trend-direction">
+                                  Form: <strong>{pick.trend_analysis.trend_direction === 'improving' ? '📈 Improving' : 
+                                                 pick.trend_analysis.trend_direction === 'declining' ? '📉 Declining' : 
+                                                 '➡️ Stable'}</strong>
+                                  {pick.trend_analysis.momentum === 'positive' && <span className="momentum-badge positive">Positive Momentum</span>}
+                                  {pick.trend_analysis.momentum === 'negative' && <span className="momentum-badge negative">Negative Momentum</span>}
+                                </span>
+                                <span className="games-analyzed">
+                                  Analysis: <strong>{pick.trend_analysis.games_analyzed} games</strong>
+                                </span>
+                              </div>
+                              
+                              <div className="trend-metrics-grid">
+                                <div className="trend-metric">
+                                  <div className="metric-label">Recent 3G</div>
+                                  <div className="metric-value recent-3">
+                                    <strong>.{(pick.trend_analysis.recent_3_avg * 1000).toFixed(0)}</strong>
+                                    {pick.trend_analysis.recent_3_avg > pick.trend_analysis.season_avg && <span className="trend-indicator up">↗</span>}
+                                    {pick.trend_analysis.recent_3_avg < pick.trend_analysis.season_avg && <span className="trend-indicator down">↘</span>}
+                                  </div>
+                                  <div className="metric-comparison">
+                                    {pick.trend_analysis.recent_3_avg > pick.trend_analysis.season_avg ? 
+                                      `+${((pick.trend_analysis.recent_3_avg - pick.trend_analysis.season_avg) * 1000).toFixed(0)} pts` :
+                                      `${((pick.trend_analysis.recent_3_avg - pick.trend_analysis.season_avg) * 1000).toFixed(0)} pts`}
+                                  </div>
+                                </div>
+                                
+                                <div className="trend-metric">
+                                  <div className="metric-label">Recent 7G</div>
+                                  <div className="metric-value recent-7">
+                                    <strong>.{(pick.trend_analysis.recent_7_avg * 1000).toFixed(0)}</strong>
+                                    {pick.trend_analysis.recent_7_avg > pick.trend_analysis.season_avg && <span className="trend-indicator up">↗</span>}
+                                    {pick.trend_analysis.recent_7_avg < pick.trend_analysis.season_avg && <span className="trend-indicator down">↘</span>}
+                                  </div>
+                                  <div className="metric-comparison">
+                                    {pick.trend_analysis.recent_7_avg > pick.trend_analysis.season_avg ? 
+                                      `+${((pick.trend_analysis.recent_7_avg - pick.trend_analysis.season_avg) * 1000).toFixed(0)} pts` :
+                                      `${((pick.trend_analysis.recent_7_avg - pick.trend_analysis.season_avg) * 1000).toFixed(0)} pts`}
+                                  </div>
+                                </div>
+                                
+                                <div className="trend-metric">
+                                  <div className="metric-label">Season</div>
+                                  <div className="metric-value season">
+                                    <strong>.{(pick.trend_analysis.season_avg * 1000).toFixed(0)}</strong>
+                                    <span className="baseline-indicator">Baseline</span>
+                                  </div>
+                                  <div className="metric-comparison">Reference</div>
+                                </div>
+                              </div>
+                              
+                              <div className="hr-trend-summary">
+                                <div className="hr-trend-bar">
+                                  <div className="hr-trend-label">Recent HRs:</div>
+                                  <div className="hr-counts">
+                                    <span className="hr-count last-3">
+                                      Last 3G: <strong>{pick.trend_analysis.hr_last_3}</strong>
+                                    </span>
+                                    <span className="hr-count last-7">
+                                      Last 7G: <strong>{pick.trend_analysis.hr_last_7}</strong>
+                                    </span>
+                                  </div>
+                                </div>
+                                
+                                <div className="trend-assessment">
+                                  {pick.trend_analysis.is_trending_up ? (
+                                    <div className="trending trending-up">
+                                      <span className="trend-icon">🔥</span>
+                                      <span className="trend-text">Trending Up</span>
+                                    </div>
+                                  ) : pick.trend_analysis.recent_3_avg < pick.trend_analysis.season_avg * 0.8 ? (
+                                    <div className="trending trending-down">
+                                      <span className="trend-icon">❄️</span>
+                                      <span className="trend-text">Cold Streak</span>
+                                    </div>
+                                  ) : (
+                                    <div className="trending trending-stable">
+                                      <span className="trend-icon">➡️</span>
+                                      <span className="trend-text">Consistent Form</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Enhanced Swing Mechanics Analysis */}
+                        {(pick.swing_optimization_score > 0 || pick.component_scores?.swing_analysis) && (
+                          <div className="swing-mechanics-analysis">
+                            <h5>⚾ Swing Mechanics Analysis:</h5>
+                            <div className="swing-mechanics-details">
+                              <div className="swing-mechanics-summary">
+                                <span className="optimization-score">
+                                  Optimization: <strong>{pick.swing_optimization_score ? pick.swing_optimization_score.toFixed(0) : pick.component_scores?.swing_analysis?.optimization_score?.toFixed(0) || 'N/A'}%</strong>
+                                  {(pick.swing_optimization_score >= 85 || pick.component_scores?.swing_analysis?.optimization_score >= 85) && <span className="optimal-badge">Optimal</span>}
+                                  {((pick.swing_optimization_score >= 75 && pick.swing_optimization_score < 85) || (pick.component_scores?.swing_analysis?.optimization_score >= 75 && pick.component_scores?.swing_analysis?.optimization_score < 85)) && <span className="good-badge">Good</span>}
+                                </span>
+                                <span className="ideal-rate">
+                                  Ideal Rate: <strong>{pick.swing_ideal_rate ? (pick.swing_ideal_rate * 100).toFixed(1) : (pick.component_scores?.swing_analysis?.ideal_attack_angle_rate * 100)?.toFixed(1) || 'N/A'}%</strong>
+                                </span>
+                              </div>
+                              
+                              <div className="swing-metrics-grid">
+                                <div className="swing-metric">
+                                  <div className="metric-label">Bat Speed</div>
+                                  <div className="metric-value bat-speed">
+                                    <strong>{pick.swing_bat_speed ? pick.swing_bat_speed.toFixed(1) : pick.component_scores?.swing_analysis?.bat_speed?.toFixed(1) || 'N/A'} mph</strong>
+                                    {(pick.swing_bat_speed >= 75 || pick.component_scores?.swing_analysis?.bat_speed >= 75) && <span className="metric-indicator excellent">⚡</span>}
+                                    {((pick.swing_bat_speed >= 72 && pick.swing_bat_speed < 75) || (pick.component_scores?.swing_analysis?.bat_speed >= 72 && pick.component_scores?.swing_analysis?.bat_speed < 75)) && <span className="metric-indicator good">👍</span>}
+                                  </div>
+                                  <div className="metric-description">Raw swing velocity</div>
+                                </div>
+                                
+                                <div className="swing-metric">
+                                  <div className="metric-label">Attack Angle</div>
+                                  <div className="metric-value attack-angle">
+                                    <strong>{pick.swing_attack_angle ? pick.swing_attack_angle.toFixed(1) : pick.component_scores?.swing_analysis?.attack_angle?.toFixed(1) || 'N/A'}°</strong>
+                                    {((pick.swing_attack_angle >= 8 && pick.swing_attack_angle <= 16) || (pick.component_scores?.swing_analysis?.attack_angle >= 8 && pick.component_scores?.swing_analysis?.attack_angle <= 16)) && <span className="metric-indicator excellent">🎯</span>}
+                                    {((pick.swing_attack_angle >= 5 && pick.swing_attack_angle < 8) || (pick.swing_attack_angle > 16 && pick.swing_attack_angle <= 20) || (pick.component_scores?.swing_analysis?.attack_angle >= 5 && pick.component_scores?.swing_analysis?.attack_angle < 8) || (pick.component_scores?.swing_analysis?.attack_angle > 16 && pick.component_scores?.swing_analysis?.attack_angle <= 20)) && <span className="metric-indicator good">📈</span>}
+                                  </div>
+                                  <div className="metric-description">Launch angle optimization</div>
+                                </div>
+                                
+                                <div className="swing-metric">
+                                  <div className="metric-label">Swing Path</div>
+                                  <div className="metric-value swing-path">
+                                    <strong>{pick.swing_path_efficiency ? (pick.swing_path_efficiency * 100).toFixed(0) : 'Optimized'}%</strong>
+                                    {(pick.swing_optimization_score >= 80 || pick.component_scores?.swing_analysis?.optimization_score >= 80) && <span className="metric-indicator excellent">🔄</span>}
+                                    {((pick.swing_optimization_score >= 70 && pick.swing_optimization_score < 80) || (pick.component_scores?.swing_analysis?.optimization_score >= 70 && pick.component_scores?.swing_analysis?.optimization_score < 80)) && <span className="metric-indicator good">⚙️</span>}
+                                  </div>
+                                  <div className="metric-description">Swing efficiency rating</div>
+                                </div>
+                              </div>
+                              
+                              <div className="swing-optimization-summary">
+                                <div className="optimization-bar">
+                                  <div className="optimization-label">Mechanics Score:</div>
+                                  <div className="optimization-value">
+                                    <strong>{pick.swing_optimization_score ? pick.swing_optimization_score.toFixed(0) : pick.component_scores?.swing_analysis?.optimization_score?.toFixed(0) || 'N/A'}/100</strong>
+                                  </div>
+                                  <div className="optimization-visual">
+                                    <div 
+                                      className="optimization-fill" 
+                                      style={{width: `${Math.min(100, pick.swing_optimization_score || pick.component_scores?.swing_analysis?.optimization_score || 0)}%`}}
+                                    ></div>
+                                  </div>
+                                </div>
+                                
+                                <div className="mechanics-assessment">
+                                  {(pick.swing_optimization_score >= 85 || pick.component_scores?.swing_analysis?.optimization_score >= 85) ? (
+                                    <div className="mechanics mechanics-elite">
+                                      <span className="mechanics-icon">🌟</span>
+                                      <span className="mechanics-text">Elite Mechanics</span>
+                                    </div>
+                                  ) : (pick.swing_optimization_score >= 75 || pick.component_scores?.swing_analysis?.optimization_score >= 75) ? (
+                                    <div className="mechanics mechanics-strong">
+                                      <span className="mechanics-icon">⭐</span>
+                                      <span className="mechanics-text">Strong Mechanics</span>
+                                    </div>
+                                  ) : (pick.swing_optimization_score >= 65 || pick.component_scores?.swing_analysis?.optimization_score >= 65) ? (
+                                    <div className="mechanics mechanics-average">
+                                      <span className="mechanics-icon">📊</span>
+                                      <span className="mechanics-text">Average Mechanics</span>
+                                    </div>
+                                  ) : (
+                                    <div className="mechanics mechanics-needs-work">
+                                      <span className="mechanics-icon">🔧</span>
+                                      <span className="mechanics-text">Needs Optimization</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Enhanced Pitcher Vulnerability Analysis */}
+                        {pick.component_scores?.pitcher_analysis?.data_available && (
+                          <div className="pitcher-vulnerability-analysis">
+                            <h5>🎯 Pitcher Vulnerability Analysis:</h5>
+                            <div className="pitcher-vulnerability-details">
+                              <div className="pitcher-vulnerability-summary">
+                                <span className="vulnerability-score">
+                                  Vulnerability: <strong>{pick.component_scores.pitcher_analysis.vulnerability_score.toFixed(0)}/100</strong>
+                                  {pick.component_scores.pitcher_analysis.vulnerability_score >= 75 && <span className="vulnerable-badge">High Risk</span>}
+                                  {pick.component_scores.pitcher_analysis.vulnerability_score >= 60 && pick.component_scores.pitcher_analysis.vulnerability_score < 75 && <span className="moderate-badge">Moderate</span>}
+                                </span>
+                                <span className="era-performance">
+                                  ERA: <strong>{pick.component_scores.pitcher_analysis.era}</strong>
+                                  {pick.component_scores.pitcher_analysis.era >= 4.5 && <span className="struggling-badge">Struggling</span>}
+                                  {pick.component_scores.pitcher_analysis.era <= 3.0 && <span className="dominant-badge">Dominant</span>}
+                                </span>
+                              </div>
+                              
+                              <div className="pitcher-metrics-grid">
+                                <div className="pitcher-metric">
+                                  <div className="metric-label">Contact Quality</div>
+                                  <div className="metric-value contact-quality">
+                                    <strong>{pick.component_scores.pitcher_analysis.exit_velocity_allowed} mph</strong>
+                                    {pick.component_scores.pitcher_analysis.exit_velocity_allowed >= 92 && <span className="metric-indicator concerning">⚠️</span>}
+                                    {pick.component_scores.pitcher_analysis.exit_velocity_allowed <= 88 && <span className="metric-indicator excellent">🛡️</span>}
+                                  </div>
+                                  <div className="metric-description">Average exit velocity allowed</div>
+                                </div>
+                                
+                                <div className="pitcher-metric">
+                                  <div className="metric-label">Barrel Rate</div>
+                                  <div className="metric-value barrel-rate">
+                                    <strong>{pick.component_scores.pitcher_analysis.barrel_rate_allowed}%</strong>
+                                    {pick.component_scores.pitcher_analysis.barrel_rate_allowed >= 10 && <span className="metric-indicator concerning">🚨</span>}
+                                    {pick.component_scores.pitcher_analysis.barrel_rate_allowed <= 6 && <span className="metric-indicator excellent">🎯</span>}
+                                  </div>
+                                  <div className="metric-description">Barrels allowed per contact</div>
+                                </div>
+                                
+                                <div className="pitcher-metric">
+                                  <div className="metric-label">Strikeout Rate</div>
+                                  <div className="metric-value strikeout-rate">
+                                    <strong>{pick.component_scores.pitcher_analysis.k_percent}%</strong>
+                                    {pick.component_scores.pitcher_analysis.k_percent >= 25 && <span className="metric-indicator excellent">⚡</span>}
+                                    {pick.component_scores.pitcher_analysis.k_percent <= 18 && <span className="metric-indicator concerning">📉</span>}
+                                  </div>
+                                  <div className="metric-description">Strikeout percentage</div>
+                                </div>
+                              </div>
+                              
+                              <div className="pitcher-vulnerability-summary-bar">
+                                <div className="vulnerability-bar">
+                                  <div className="vulnerability-label">Vulnerability Score:</div>
+                                  <div className="vulnerability-value">
+                                    <strong>{pick.component_scores.pitcher_analysis.vulnerability_score.toFixed(0)}/100</strong>
+                                  </div>
+                                  <div className="vulnerability-visual">
+                                    <div 
+                                      className="vulnerability-fill" 
+                                      style={{width: `${Math.min(100, pick.component_scores.pitcher_analysis.vulnerability_score)}%`}}
+                                    ></div>
+                                  </div>
+                                </div>
+                                
+                                <div className="vulnerability-assessment">
+                                  {pick.component_scores.pitcher_analysis.vulnerability_score >= 75 ? (
+                                    <div className="vulnerability vulnerability-high">
+                                      <span className="vulnerability-icon">🚨</span>
+                                      <span className="vulnerability-text">High Vulnerability</span>
+                                    </div>
+                                  ) : pick.component_scores.pitcher_analysis.vulnerability_score >= 60 ? (
+                                    <div className="vulnerability vulnerability-moderate">
+                                      <span className="vulnerability-icon">⚠️</span>
+                                      <span className="vulnerability-text">Moderate Vulnerability</span>
+                                    </div>
+                                  ) : pick.component_scores.pitcher_analysis.vulnerability_score >= 40 ? (
+                                    <div className="vulnerability vulnerability-low">
+                                      <span className="vulnerability-icon">🛡️</span>
+                                      <span className="vulnerability-text">Low Vulnerability</span>
+                                    </div>
+                                  ) : (
+                                    <div className="vulnerability vulnerability-dominant">
+                                      <span className="vulnerability-icon">🔒</span>
+                                      <span className="vulnerability-text">Dominant Pitcher</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
 
                         {pick.riskFactors?.length > 0 && (
                           <div className="risk-factors">
@@ -364,13 +768,147 @@ const HellraiserCard = ({ currentDate }) => {
                     { label: 'Class', value: pick.classification }
                   ];
 
+                  // Get available breakdown tabs for this pick
+                  const availableTabs = [];
+                  if (pick.component_scores?.arsenal_matchup?.matchup_available) {
+                    availableTabs.push({ id: 'arsenal', label: '🎯 Arsenal', icon: '🎯' });
+                  }
+                  if (pick.component_scores?.batter_analysis?.data_available) {
+                    availableTabs.push({ id: 'power', label: '🚀 Power', icon: '🚀' });
+                  }
+                  if (pick.trend_analysis?.trend_available) {
+                    availableTabs.push({ id: 'trends', label: '📈 Trends', icon: '📈' });
+                  }
+                  if (pick.swing_optimization_score > 0 || pick.component_scores?.swing_analysis) {
+                    availableTabs.push({ id: 'mechanics', label: '⚾ Mechanics', icon: '⚾' });
+                  }
+                  if (pick.component_scores?.pitcher_analysis?.data_available) {
+                    availableTabs.push({ id: 'pitcher', label: '🛡️ Pitcher', icon: '🛡️' });
+                  }
+                  
+                  // Set default tab if not set
+                  const currentTab = mobileAnalysisTab[index] || (availableTabs.length > 0 ? availableTabs[0].id : 'overview');
+
                   const expandableContent = (
                     <div className="mobile-pick-details">
                       <div className="mobile-analysis">
+                        {/* Always show overview */}
                         <div className="analysis-item">
                           <strong>Analysis Reasoning:</strong>
                           <p style={{marginTop: '4px', fontSize: '12px', lineHeight: '1.4'}}>{pick.reasoning}</p>
                         </div>
+
+                        {/* Mobile Breakdown Tabs */}
+                        {availableTabs.length > 0 && (
+                          <div className="mobile-breakdown-tabs">
+                            <div className="mobile-tab-navigation">
+                              {availableTabs.map(tab => (
+                                <button
+                                  key={tab.id}
+                                  className={`mobile-tab-button ${currentTab === tab.id ? 'active' : ''}`}
+                                  onClick={() => setMobileAnalysisTab(prev => ({ ...prev, [index]: tab.id }))}
+                                >
+                                  <span className="mobile-tab-icon">{tab.icon}</span>
+                                  <span className="mobile-tab-label">{tab.label.replace(/🎯|🚀|📈|⚾/g, '').trim()}</span>
+                                </button>
+                              ))}
+                            </div>
+                            
+                            <div className="mobile-tab-content">
+                              {/* Arsenal Matchup Tab */}
+                              {currentTab === 'arsenal' && pick.component_scores?.arsenal_matchup?.matchup_available && (
+                                <div className="mobile-breakdown-section">
+                                  <div style={{fontSize: '11px'}}>
+                                    <div>Advantage: <strong>{pick.component_scores.arsenal_matchup.overall_advantage > 0 ? '+' : ''}{pick.component_scores.arsenal_matchup.overall_advantage.toFixed(1)}</strong> ({(pick.component_scores.arsenal_matchup.confidence * 100).toFixed(0)}% confidence)</div>
+                                    {pick.component_scores.arsenal_matchup.advantage_summary !== 'Limited advantages found' && (
+                                      <div style={{color: '#2e7d32', marginTop: '2px'}}>✅ {pick.component_scores.arsenal_matchup.advantage_summary}</div>
+                                    )}
+                                    {pick.component_scores.arsenal_matchup.disadvantage_summary !== 'No major weaknesses' && (
+                                      <div style={{color: '#d84315', marginTop: '2px'}}>⚠️ {pick.component_scores.arsenal_matchup.disadvantage_summary}</div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Power Analysis Tab */}
+                              {currentTab === 'power' && pick.component_scores?.batter_analysis?.data_available && (
+                                <div className="mobile-breakdown-section">
+                                  <div style={{fontSize: '11px'}}>
+                                    <div>Power Percentile: <strong>{pick.component_scores.batter_analysis.exit_velocity_percentile}th</strong> ({pick.component_scores.batter_analysis.exit_velocity_avg} mph)</div>
+                                    <div style={{marginTop: '2px'}}>Barrel Rate: <strong>{pick.component_scores.batter_analysis.barrel_rate}%</strong> | Hard Hit: <strong>{pick.component_scores.batter_analysis.hard_hit_percent}%</strong></div>
+                                    <div style={{marginTop: '2px'}}>Sweet Spot: <strong>{pick.component_scores.batter_analysis.sweet_spot_percent}%</strong> | Power Score: <strong>{pick.component_scores.batter_analysis.power_score.toFixed(0)}/100</strong></div>
+                                    {pick.component_scores.batter_analysis.power_score >= 90 && (
+                                      <div style={{color: '#4caf50', marginTop: '2px', fontWeight: '600'}}>🌟 Elite Power Profile</div>
+                                    )}
+                                    {pick.component_scores.batter_analysis.power_score >= 75 && pick.component_scores.batter_analysis.power_score < 90 && (
+                                      <div style={{color: '#ff9800', marginTop: '2px', fontWeight: '600'}}>⭐ Strong Power Profile</div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Trends Analysis Tab */}
+                              {currentTab === 'trends' && pick.trend_analysis?.trend_available && (
+                                <div className="mobile-breakdown-section">
+                                  <div style={{fontSize: '11px'}}>
+                                    <div>Form: <strong>{pick.trend_analysis.trend_direction === 'improving' ? '📈 Improving' : 
+                                                     pick.trend_analysis.trend_direction === 'declining' ? '📉 Declining' : 
+                                                     '➡️ Stable'}</strong> ({pick.trend_analysis.games_analyzed} games)</div>
+                                    <div style={{marginTop: '2px'}}>Recent 3G: <strong>.{(pick.trend_analysis.recent_3_avg * 1000).toFixed(0)}</strong> | Recent 7G: <strong>.{(pick.trend_analysis.recent_7_avg * 1000).toFixed(0)}</strong> | Season: <strong>.{(pick.trend_analysis.season_avg * 1000).toFixed(0)}</strong></div>
+                                    <div style={{marginTop: '2px'}}>HR: Last 3G ({pick.trend_analysis.hr_last_3}) | Last 7G ({pick.trend_analysis.hr_last_7})</div>
+                                    {pick.trend_analysis.is_trending_up ? (
+                                      <div style={{color: '#2e7d32', marginTop: '2px', fontWeight: '600'}}>🔥 Trending Up</div>
+                                    ) : pick.trend_analysis.recent_3_avg < pick.trend_analysis.season_avg * 0.8 ? (
+                                      <div style={{color: '#d32f2f', marginTop: '2px', fontWeight: '600'}}>❄️ Cold Streak</div>
+                                    ) : (
+                                      <div style={{color: '#616161', marginTop: '2px', fontWeight: '600'}}>➡️ Consistent Form</div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Swing Mechanics Tab */}
+                              {currentTab === 'mechanics' && (pick.swing_optimization_score > 0 || pick.component_scores?.swing_analysis) && (
+                                <div className="mobile-breakdown-section">
+                                  <div style={{fontSize: '11px'}}>
+                                    <div>Optimization: <strong>{pick.swing_optimization_score ? pick.swing_optimization_score.toFixed(0) : pick.component_scores?.swing_analysis?.optimization_score?.toFixed(0) || 'N/A'}%</strong> | Ideal Rate: <strong>{pick.swing_ideal_rate ? (pick.swing_ideal_rate * 100).toFixed(1) : (pick.component_scores?.swing_analysis?.ideal_attack_angle_rate * 100)?.toFixed(1) || 'N/A'}%</strong></div>
+                                    <div style={{marginTop: '2px'}}>Bat Speed: <strong>{pick.swing_bat_speed ? pick.swing_bat_speed.toFixed(1) : pick.component_scores?.swing_analysis?.bat_speed?.toFixed(1) || 'N/A'} mph</strong> | Attack Angle: <strong>{pick.swing_attack_angle ? pick.swing_attack_angle.toFixed(1) : pick.component_scores?.swing_analysis?.attack_angle?.toFixed(1) || 'N/A'}°</strong></div>
+                                    <div style={{marginTop: '2px'}}>Mechanics Score: <strong>{pick.swing_optimization_score ? pick.swing_optimization_score.toFixed(0) : pick.component_scores?.swing_analysis?.optimization_score?.toFixed(0) || 'N/A'}/100</strong></div>
+                                    {(pick.swing_optimization_score >= 85 || pick.component_scores?.swing_analysis?.optimization_score >= 85) ? (
+                                      <div style={{color: '#2e7d32', marginTop: '2px', fontWeight: '600'}}>🌟 Elite Mechanics</div>
+                                    ) : (pick.swing_optimization_score >= 75 || pick.component_scores?.swing_analysis?.optimization_score >= 75) ? (
+                                      <div style={{color: '#f57c00', marginTop: '2px', fontWeight: '600'}}>⭐ Strong Mechanics</div>
+                                    ) : (pick.swing_optimization_score >= 65 || pick.component_scores?.swing_analysis?.optimization_score >= 65) ? (
+                                      <div style={{color: '#f9a825', marginTop: '2px', fontWeight: '600'}}>📊 Average Mechanics</div>
+                                    ) : (
+                                      <div style={{color: '#616161', marginTop: '2px', fontWeight: '600'}}>🔧 Needs Optimization</div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Pitcher Vulnerability Tab */}
+                              {currentTab === 'pitcher' && pick.component_scores?.pitcher_analysis?.data_available && (
+                                <div className="mobile-breakdown-section">
+                                  <div style={{fontSize: '11px'}}>
+                                    <div>Vulnerability: <strong>{pick.component_scores.pitcher_analysis.vulnerability_score.toFixed(0)}/100</strong> | ERA: <strong>{pick.component_scores.pitcher_analysis.era}</strong></div>
+                                    <div style={{marginTop: '2px'}}>Contact Quality: <strong>{pick.component_scores.pitcher_analysis.exit_velocity_allowed} mph</strong> | Barrel Rate: <strong>{pick.component_scores.pitcher_analysis.barrel_rate_allowed}%</strong></div>
+                                    <div style={{marginTop: '2px'}}>Strikeout Rate: <strong>{pick.component_scores.pitcher_analysis.k_percent}%</strong></div>
+                                    {pick.component_scores.pitcher_analysis.vulnerability_score >= 75 ? (
+                                      <div style={{color: '#d32f2f', marginTop: '2px', fontWeight: '600'}}>🚨 High Vulnerability</div>
+                                    ) : pick.component_scores.pitcher_analysis.vulnerability_score >= 60 ? (
+                                      <div style={{color: '#f57c00', marginTop: '2px', fontWeight: '600'}}>⚠️ Moderate Vulnerability</div>
+                                    ) : pick.component_scores.pitcher_analysis.vulnerability_score >= 40 ? (
+                                      <div style={{color: '#388e3c', marginTop: '2px', fontWeight: '600'}}>🛡️ Low Vulnerability</div>
+                                    ) : (
+                                      <div style={{color: '#1976d2', marginTop: '2px', fontWeight: '600'}}>🔒 Dominant Pitcher</div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
 
                         {pick.riskFactors?.length > 0 && (
                           <div className="analysis-item">

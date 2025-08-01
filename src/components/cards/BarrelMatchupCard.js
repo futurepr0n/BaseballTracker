@@ -79,37 +79,23 @@ const BarrelMatchupCard = ({ currentDate }) => {
   }, [handednessDatasets]);
 
   const processAnalysisData = async (analysis) => {
-    // Extract pitcher metrics from reasoning field
+    // Extract pitcher metrics from structured component_scores data
     const processedPicks = await Promise.all(analysis.picks.map(async pick => {
       const reasoning = pick.reasoning || '';
       
-      // Extract pitcher contact allowed (exit velocity)
-      const contactMatch = reasoning.match(/Pitcher allows (?:solid|hard) contact \(([0-9.]+) mph\)/);
-      const pitcherContactAllowed = contactMatch ? parseFloat(contactMatch[1]) : 0;
+      // Use structured data from enhanced hellraiser component_scores
+      // Pitcher analysis from component_scores.pitcher_analysis
+      const pitcherAnalysis = pick.component_scores?.pitcher_analysis || {};
+      const pitcherContactAllowed = pitcherAnalysis.exit_velocity_allowed || 0;
+      const pitcherBarrelVulnerable = pitcherAnalysis.barrel_rate_allowed || 0;
+      const pitcherHardContact = pitcherAnalysis.exit_velocity_allowed || 0; // Same as contact allowed
+      const pitcherHRRate = pitcherAnalysis.hr_per_9 || 0;
       
-      // Extract pitcher barrel vulnerability
-      const barrelMatch = reasoning.match(/Pitcher vulnerable to barrels \(([0-9.]+)%\)/);
-      const pitcherBarrelVulnerable = barrelMatch ? parseFloat(barrelMatch[1]) : 0;
-      
-      // Extract player exit velocity
-      const exitVeloMatch = reasoning.match(/(?:Elite|Strong) exit velocity \(([0-9.]+) mph\)/);
-      const playerExitVelocity = exitVeloMatch ? parseFloat(exitVeloMatch[1]) : 0;
-      
-      // Extract player barrel rate
-      const barrelRateMatch = reasoning.match(/(?:Elite|Strong) barrel rate \(([0-9.]+)%\)/);
-      const playerBarrelRate = barrelRateMatch ? parseFloat(barrelRateMatch[1]) : 0;
-      
-      // Extract player hard contact rate
-      const hardContactMatch = reasoning.match(/(?:Elite|Strong) hard contact \(([0-9.]+)%\)/);
-      const playerHardContact = hardContactMatch ? parseFloat(hardContactMatch[1]) : 0;
-      
-      // Extract pitcher allows hard contact (exit velocity)
-      const pitcherHardContactMatch = reasoning.match(/Pitcher allows (?:hard|solid) contact \(([0-9.]+) mph\)/);
-      const pitcherHardContact = pitcherHardContactMatch ? parseFloat(pitcherHardContactMatch[1]) : 0;
-      
-      // Extract HR rate allowed
-      const hrRateMatch = reasoning.match(/(?:Moderate|High|Low) HR rate allowed \(([0-9.]+)\/game\)/);
-      const pitcherHRRate = hrRateMatch ? parseFloat(hrRateMatch[1]) : 0;
+      // Batter analysis from component_scores.batter_analysis  
+      const batterAnalysis = pick.component_scores?.batter_analysis || {};
+      const playerExitVelocity = batterAnalysis.exit_velocity_avg || pick.exit_velocity_avg || 0;
+      const playerBarrelRate = batterAnalysis.barrel_rate || pick.barrel_rate || 0;
+      const playerHardContact = batterAnalysis.hard_hit_percent || pick.hard_hit_percent || 0;
       
       // Calculate market edge value for sorting
       const marketEdge = pick.marketEfficiency?.edge || 0;
@@ -152,14 +138,20 @@ const BarrelMatchupCard = ({ currentDate }) => {
         console.log(`🔍 BARREL MATCHUP: Cannot lookup handedness - datasets: ${!!handednessDatasets}, loading: ${handednessLoading}`);
       }
       
+      // Swing analysis from component_scores.swing_analysis with fallbacks
+      const swingAnalysis = pick.component_scores?.swing_analysis || {};
+      
       const swingPath = {
-        avgBatSpeed: handednessData ? handednessData.avg_bat_speed : (pick.swing_bat_speed || null),
-        attackAngle: handednessData ? handednessData.attack_angle : (pick.swing_attack_angle || null),
+        avgBatSpeed: handednessData ? handednessData.avg_bat_speed : 
+          (swingAnalysis.bat_speed || pick.swing_bat_speed || null),
+        attackAngle: handednessData ? handednessData.attack_angle : 
+          (swingAnalysis.attack_angle || pick.swing_attack_angle || null),
         swingOptimizationScore: handednessData ? 
           Math.round(((handednessData.ideal_attack_angle_rate || 0) * 100) * 10) / 10 : // Round to 1 decimal
-          (pick.swing_optimization_score || null),
-        idealAttackAngleRate: handednessData ? handednessData.ideal_attack_angle_rate : (pick.swing_ideal_rate || null),
-        dataSource: handednessData ? `handedness_${selectedHandedness}` : 'hellraiser'
+          (swingAnalysis.optimization_score || pick.swing_optimization_score || null),
+        idealAttackAngleRate: handednessData ? handednessData.ideal_attack_angle_rate : 
+          (swingAnalysis.ideal_angle_rate || pick.swing_ideal_rate || null),
+        dataSource: handednessData ? `handedness_${selectedHandedness}` : 'enhanced_hellraiser'
       };
       
       return {

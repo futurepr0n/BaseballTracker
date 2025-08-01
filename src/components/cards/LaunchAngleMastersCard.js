@@ -78,10 +78,11 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
     // Filter picks that have swing path data OR handedness data
     const playersWithSwingData = [];
     for (const pick of picks) {
-      // First check hellraiser swing data
-      if (pick.swing_bat_speed && 
-          pick.swing_attack_angle !== undefined && 
-          pick.swing_optimization_score !== undefined) {
+      // First check enhanced hellraiser component_scores swing data
+      const swingAnalysis = pick.component_scores?.swing_analysis;
+      if ((swingAnalysis?.bat_speed || pick.swing_bat_speed) && 
+          (swingAnalysis?.attack_angle !== undefined || pick.swing_attack_angle !== undefined) && 
+          (swingAnalysis?.optimization_score !== undefined || pick.swing_optimization_score !== undefined)) {
         playersWithSwingData.push(pick);
         continue;
       }
@@ -100,65 +101,80 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
       const playerName = pick.player_name || pick.playerName || '';
       const handednessData = await getPlayerHandednessData(playerName);
 
-      // Extract metrics from reasoning for barrel/exit velocity analysis
+      // Use structured data from component_scores with fallbacks
       const reasoning = pick.reasoning || '';
       
-      // Extract pitcher contact allowed (exit velocity)
-      const contactMatch = reasoning.match(/Pitcher allows (?:solid|hard) contact \\(([0-9.]+) mph\\)/);
-      const pitcherContactAllowed = contactMatch ? parseFloat(contactMatch[1]) : 0;
+      // Pitcher analysis from component_scores
+      const pitcherAnalysis = pick.component_scores?.pitcher_analysis || {};
+      const pitcherContactAllowed = pitcherAnalysis.exit_velocity_allowed || 
+        (reasoning.match(/Pitcher allows (?:solid|hard) contact \(([0-9.]+) mph\)/) ? 
+         parseFloat(reasoning.match(/Pitcher allows (?:solid|hard) contact \(([0-9.]+) mph\)/)[1]) : 0);
       
-      // Extract pitcher barrel vulnerability  
-      const barrelMatch = reasoning.match(/Pitcher vulnerable to barrels \\(([0-9.]+)%\\)/);
-      const pitcherBarrelVulnerable = barrelMatch ? parseFloat(barrelMatch[1]) : 0;
+      const pitcherBarrelVulnerable = pitcherAnalysis.barrel_rate_allowed ||
+        (reasoning.match(/Pitcher vulnerable to barrels \(([0-9.]+)%\)/) ? 
+         parseFloat(reasoning.match(/Pitcher vulnerable to barrels \(([0-9.]+)%\)/)[1]) : 0);
       
-      // Extract player exit velocity - try multiple patterns
-      let playerExitVelocity = 0;
-      const exitVeloPatterns = [
-        /(?:Elite|Strong|Solid) exit velocity \\(([0-9.]+) mph\\)/,
-        /exit velocity \\(([0-9.]+) mph\\)/,
-        /Exit velocity: ([0-9.]+) mph/,
-        /([0-9.]+) mph exit velocity/
-      ];
+      // Batter analysis from component_scores with multiple fallbacks
+      const batterAnalysis = pick.component_scores?.batter_analysis || {};
+      let playerExitVelocity = batterAnalysis.exit_velocity_avg || pick.exit_velocity_avg || 0;
       
-      for (const pattern of exitVeloPatterns) {
-        const match = reasoning.match(pattern);
-        if (match) {
-          playerExitVelocity = parseFloat(match[1]);
-          break;
+      // If still no data, try regex patterns as final fallback
+      if (playerExitVelocity === 0) {
+        const exitVeloPatterns = [
+          /(?:Elite|Strong|Solid) exit velocity \(([0-9.]+) mph\)/,
+          /exit velocity \(([0-9.]+) mph\)/,
+          /Exit velocity: ([0-9.]+) mph/,
+          /([0-9.]+) mph exit velocity/
+        ];
+        
+        for (const pattern of exitVeloPatterns) {
+          const match = reasoning.match(pattern);
+          if (match) {
+            playerExitVelocity = parseFloat(match[1]);
+            break;
+          }
         }
       }
       
-      // Extract player barrel rate - try multiple patterns
-      let playerBarrelRate = 0;
-      const barrelPatterns = [
-        /(?:Elite|Strong|Solid) barrel rate \\(([0-9.]+)%\\)/,
-        /barrel rate \\(([0-9.]+)%\\)/,
-        /Barrel rate: ([0-9.]+)%/,
-        /([0-9.]+)% barrel rate/
-      ];
+      // Get player barrel rate from structured data with fallbacks
+      let playerBarrelRate = batterAnalysis.barrel_rate || pick.barrel_rate || 0;
       
-      for (const pattern of barrelPatterns) {
-        const match = reasoning.match(pattern);
-        if (match) {
-          playerBarrelRate = parseFloat(match[1]);
-          break;
+      // If still no data, try regex patterns as final fallback
+      if (playerBarrelRate === 0) {
+        const barrelPatterns = [
+          /(?:Elite|Strong|Solid) barrel rate \(([0-9.]+)%\)/,
+          /barrel rate \(([0-9.]+)%\)/,
+          /Barrel rate: ([0-9.]+)%/,
+          /([0-9.]+)% barrel rate/
+        ];
+        
+        for (const pattern of barrelPatterns) {
+          const match = reasoning.match(pattern);
+          if (match) {
+            playerBarrelRate = parseFloat(match[1]);
+            break;
+          }
         }
       }
       
-      // Extract player hard contact rate
-      let playerHardContact = 0;
-      const hardContactPatterns = [
-        /(?:Elite|Strong|Solid) hard contact \\(([0-9.]+)%\\)/,
-        /hard contact \\(([0-9.]+)%\\)/,
-        /Hard contact: ([0-9.]+)%/,
-        /([0-9.]+)% hard contact/
-      ];
+      // Get player hard contact rate from structured data with fallbacks
+      let playerHardContact = batterAnalysis.hard_hit_percent || pick.hard_hit_percent || 0;
       
-      for (const pattern of hardContactPatterns) {
-        const match = reasoning.match(pattern);
-        if (match) {
-          playerHardContact = parseFloat(match[1]);
-          break;
+      // If still no data, try regex patterns as final fallback
+      if (playerHardContact === 0) {
+        const hardContactPatterns = [
+          /(?:Elite|Strong|Solid) hard contact \(([0-9.]+)%\)/,
+          /hard contact \(([0-9.]+)%\)/,
+          /Hard contact: ([0-9.]+)%/,
+          /([0-9.]+)% hard contact/
+        ];
+        
+        for (const pattern of hardContactPatterns) {
+          const match = reasoning.match(pattern);
+          if (match) {
+            playerHardContact = parseFloat(match[1]);
+            break;
+          }
         }
       }
       
@@ -204,7 +220,7 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
       // Total: Attack Angle (35%) + Swing Path (25%) + Bat Speed (20%) + Exit Velo (10%) + Barrel Rate (10%) = 100%
       let masterScore = 0;
       
-      // Use handedness data if available, otherwise fallback to hellraiser data
+      // Use handedness data if available, otherwise fallback to enhanced hellraiser data
       let swingScore, attackAngle, batSpeed;
       if (handednessData) {
         // Use handedness-specific CSV data
@@ -212,10 +228,11 @@ const LaunchAngleMastersCard = ({ currentDate }) => {
         attackAngle = handednessData.attack_angle || 0;
         batSpeed = handednessData.avg_bat_speed || 0;
       } else {
-        // Fallback to hellraiser data
-        swingScore = pick.swing_optimization_score || 0;
-        attackAngle = pick.swing_attack_angle || 0;
-        batSpeed = pick.swing_bat_speed || 0;
+        // Fallback to enhanced hellraiser component_scores or legacy fields
+        const swingAnalysis = pick.component_scores?.swing_analysis || {};
+        swingScore = swingAnalysis.optimization_score || pick.swing_optimization_score || 0;
+        attackAngle = swingAnalysis.attack_angle || pick.swing_attack_angle || 0;
+        batSpeed = swingAnalysis.bat_speed || pick.swing_bat_speed || 0;
       }
       
       // Swing Path Optimization (25% weight) - supporting factor
