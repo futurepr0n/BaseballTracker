@@ -1297,7 +1297,7 @@ const processLaunchAngleMasters = async (picks) => {
 
 ### Data Generation Pipeline Enhancement
 
-**Enhanced Team Assignment (generate_hellraiser_analysis.py):**
+**Enhanced Team Assignment (enhanced_comprehensive_hellraiser.py):**
 ```python
 def normalize_accents(self, text: str) -> str:
     """Normalize accented characters to plain English"""

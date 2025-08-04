@@ -2,6 +2,8 @@
  * Team utilities for logo URLs and team colors
  */
 
+import { normalizeTeamAbbreviation } from './teamNormalizationUtils';
+
 // Team logo mappings
 const TEAM_LOGOS = {
   'ARI': '/data/logos/arizona-diamondbacks.png',
@@ -10,6 +12,7 @@ const TEAM_LOGOS = {
   'BOS': '/data/logos/boston-red-sox.png',
   'CHC': '/data/logos/chicago-cubs.png',
   'CHW': '/data/logos/chicago-white-sox.png',
+  'CWS': '/data/logos/chicago-white-sox.png',
   'CIN': '/data/logos/cincinnati-reds.png',
   'CLE': '/data/logos/cleveland-guardians.png',
   'COL': '/data/logos/colorado-rockies.png',
@@ -44,6 +47,7 @@ const TEAM_COLORS = {
   'BOS': '#BD3039',
   'CHC': '#0E3386',
   'CHW': '#27251F',
+  'CWS': '#27251F',
   'CIN': '#C6011F',
   'CLE': '#E31937',
   'COL': '#33006F',
@@ -77,7 +81,8 @@ const TEAM_COLORS = {
  */
 export const getTeamLogoUrl = (teamCode) => {
   if (!teamCode) return null;
-  return TEAM_LOGOS[teamCode.toUpperCase()] || null;
+  const normalizedTeam = normalizeTeamAbbreviation(teamCode);
+  return TEAM_LOGOS[normalizedTeam] || TEAM_LOGOS[teamCode.toUpperCase()] || null;
 };
 
 /**
@@ -87,7 +92,8 @@ export const getTeamLogoUrl = (teamCode) => {
  */
 export const getTeamColor = (teamCode) => {
   if (!teamCode) return '#4f46e5';
-  return TEAM_COLORS[teamCode.toUpperCase()] || '#4f46e5';
+  const normalizedTeam = normalizeTeamAbbreviation(teamCode);
+  return TEAM_COLORS[normalizedTeam] || TEAM_COLORS[teamCode.toUpperCase()] || '#4f46e5';
 };
 
 /**
@@ -109,7 +115,8 @@ export const getTeamData = (teamCode) => {
  */
 export const hasTeamLogo = (teamCode) => {
   if (!teamCode) return false;
-  return teamCode.toUpperCase() in TEAM_LOGOS;
+  const normalizedTeam = normalizeTeamAbbreviation(teamCode);
+  return normalizedTeam in TEAM_LOGOS || teamCode.toUpperCase() in TEAM_LOGOS;
 };
 
 export default {

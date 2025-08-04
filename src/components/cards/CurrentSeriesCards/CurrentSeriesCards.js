@@ -6,6 +6,7 @@ import {
   fetchRosterData,
   fetchGameData
 } from '../../../services/dataService';
+import { teamsMatch } from '../../../utils/teamNormalizationUtils';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import '../../common/MobilePlayerCard.css';
 import './CurrentSeriesCards.css';
@@ -39,9 +40,9 @@ const findCurrentSeriesStats = async (playerTeam, opponentTeam, dateRangeData, c
       continue;
     }
     
-    // Check if both teams have players in the data
-    const playerTeamPlayers = playersForDate.filter(p => p.team === playerTeam);
-    const opponentTeamPlayers = playersForDate.filter(p => p.team === opponentTeam);
+    // Check if both teams have players in the data (using team normalization)
+    const playerTeamPlayers = playersForDate.filter(p => teamsMatch(p.team, playerTeam));
+    const opponentTeamPlayers = playersForDate.filter(p => teamsMatch(p.team, opponentTeam));
     
     // Load game data to verify if these teams played each other
     let teamsPlayedEachOther = false;
@@ -67,7 +68,7 @@ const findCurrentSeriesStats = async (playerTeam, opponentTeam, dateRangeData, c
       // Add this game to the series
       seriesGames.unshift({ 
         date: dateStr, 
-        players: playersForDate.filter(p => p.team === playerTeam)
+        players: playersForDate.filter(p => teamsMatch(p.team, playerTeam))
       });
     } else if (playerTeamPlayers.length > 0 || opponentTeamPlayers.length > 0) {
       // One of the teams played but not against each other - series has ended

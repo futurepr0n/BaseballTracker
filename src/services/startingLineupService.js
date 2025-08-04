@@ -4,6 +4,8 @@
  * in Pinheads-Playhouse component
  */
 
+import { normalizeTeamAbbreviation, getAllTeamVariants } from '../utils/teamNormalizationUtils';
+
 // Cache for lineup data to minimize file reads
 const lineupCache = {
   data: null,
@@ -119,7 +121,18 @@ export const getMatchupFromTeam = async (teamAbbr) => {
       return null;
     }
     
-    const teamData = lineupData.quickLookup.byTeam[teamAbbr.toUpperCase()];
+    // Try all possible team abbreviation variants (CHW/CWS, ATH/OAK, etc.)
+    const teamVariants = getAllTeamVariants(teamAbbr);
+    let teamData = null;
+    
+    for (const variant of teamVariants) {
+      teamData = lineupData.quickLookup.byTeam[variant.toUpperCase()];
+      if (teamData) {
+        console.log(`📋 Found lineup data for ${teamAbbr} using variant ${variant}`);
+        break;
+      }
+    }
+    
     if (teamData) {
       return {
         opponentPitcher: teamData.opponentPitcher,
@@ -130,6 +143,7 @@ export const getMatchupFromTeam = async (teamAbbr) => {
       };
     }
     
+    console.warn(`⚠️ No lineup data found for team ${teamAbbr} (tried variants: ${teamVariants.join(', ')})`);
     return null;
   } catch (error) {
     console.error(`Error getting matchup for team ${teamAbbr}:`, error);

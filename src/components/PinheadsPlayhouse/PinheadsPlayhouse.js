@@ -3,6 +3,7 @@ import { useBaseballAnalysis } from '../../services/baseballAnalysisService';
 import batchSummaryService from '../../services/batchSummaryService';
 import startingLineupService from '../../services/startingLineupService';
 import handednessResolver from '../../utils/handednessResolver';
+import { normalizeToEnglish, findPlayerInRoster } from '../../utils/universalNameNormalizer';
 import BatchSummarySection from '../BatchSummarySection';
 import AutoFillButton from './AutoFillButton';
 import LineupRefreshButton from './LineupRefreshButton';
@@ -25,16 +26,28 @@ const SearchableDropdown = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
-  // Filter options based on search term
+  // Filter options based on search term with Spanish character normalization
   const filteredOptions = useMemo(() => {
     if (!searchTerm) return options;
     
     const term = searchTerm.toLowerCase();
+    const normalizedTerm = normalizeToEnglish(term);
+    
     return options.filter(option => {
       const display = option[displayKey]?.toLowerCase() || '';
       const value = option[valueKey]?.toLowerCase() || '';
       const secondary = option[secondaryKey]?.toLowerCase() || '';
-      return display.includes(term) || value.includes(term) || secondary.includes(term);
+      
+      // Normalize all search targets for accent-insensitive matching
+      const normalizedDisplay = normalizeToEnglish(display);
+      const normalizedValue = normalizeToEnglish(value);
+      const normalizedSecondary = normalizeToEnglish(secondary);
+      
+      // Match both original and normalized versions
+      return display.includes(term) || value.includes(term) || secondary.includes(term) ||
+             normalizedDisplay.includes(normalizedTerm) || 
+             normalizedValue.includes(normalizedTerm) || 
+             normalizedSecondary.includes(normalizedTerm);
     });
   }, [options, searchTerm, displayKey, valueKey, secondaryKey]);
 

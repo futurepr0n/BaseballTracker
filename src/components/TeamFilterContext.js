@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { usePlayerScratchpad } from '../contexts/PlayerScratchpadContext';
+import { teamsMatch } from '../utils/teamNormalizationUtils';
 
 // Create the context
 const TeamFilterContext = createContext();
@@ -113,9 +114,9 @@ export function TeamFilterProvider({ children, teamData, gameData }) {
     // If no team is selected, include all players (or just scratchpad players if that filter is active)
     if (!selectedTeam) return true;
     
-    // First try direct match with team codes (most common case)
-    if (playerTeam === selectedTeam) return true;
-    if (includeMatchup && playerTeam === matchupTeam) return true;
+    // Try team matching with normalization (handles CHW/CWS, ATH/OAK, etc.)
+    if (teamsMatch(playerTeam, selectedTeam)) return true;
+    if (includeMatchup && matchupTeam && teamsMatch(playerTeam, matchupTeam)) return true;
     
     // If team codes don't match, try looking up team by name
     // This handles cases where player data uses full team names
