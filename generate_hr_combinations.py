@@ -19,6 +19,11 @@ from itertools import combinations
 import glob
 import gc
 import time
+from pathlib import Path
+
+# Import centralized configuration
+sys.path.append(str(Path(__file__).parent.parent / 'BaseballScraper'))
+from config import PATHS, DATA_PATH
 
 def find_data_files():
     """Find and classify JSON files by data richness"""
@@ -26,7 +31,7 @@ def find_data_files():
     
     # Find all JSON files in date-based directory structure
     game_files = []
-    data_path = "public/data/2025"
+    data_path = DATA_PATH / "2025"
     
     # Check each month directory
     month_dirs = ['march', 'april', 'may', 'june', 'july', 'august', 'september', 'october']
@@ -388,8 +393,8 @@ def find_unlimited_combinations_streaming(daily_hr_data, player_season_stats, gr
 def save_separate_combination_files(combinations_data):
     """Save combinations to separate files by group size"""
     
-    output_dir = "public/data/hr_combinations"
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir = DATA_PATH / "hr_combinations"
+    output_dir.mkdir(exist_ok=True)
     
     # Add timestamp for versioning
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -522,7 +527,7 @@ def main():
         print(f"⏱️  Total processing time: {total_time:.2f} seconds")
         print(f"📊 Total combinations generated: {total_combinations:,}")
         print(f"💾 Total file size: {total_size:.2f} MB")
-        print(f"📁 Files saved in: public/data/hr_combinations/")
+        print(f"📁 Files saved in: {DATA_PATH / 'hr_combinations'}/")
         
         print(f"\n📈 COMPARISON WITH ORIGINAL THRESHOLDS:")
         print(f"   2-player: Reduced combinations (higher threshold 4+ vs 3+)")

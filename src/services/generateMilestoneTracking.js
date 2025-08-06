@@ -3,6 +3,9 @@
 const fs = require('fs').promises;
 const path = require('path');
 
+// Import centralized configuration
+const { paths } = require('../../config/dataPath');
+
 // Milestone definitions
 const MILESTONE_DEFINITIONS = {
   HR: { interval: 5, start: 5 },     // 5, 10, 15, 20, 25...
@@ -34,7 +37,7 @@ class MilestoneTracker {
   async processAllDailyFiles() {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
-    const dataDir = path.join(__dirname, `../../public/data/${currentYear}`);
+    const dataDir = paths.gameData(currentYear);
     
     console.log(`🔍 Scanning all ${currentYear} season data...`);
     
@@ -365,7 +368,7 @@ class MilestoneTracker {
 
   async saveResults() {
     const today = new Date().toISOString().split('T')[0];
-    const outputDir = path.join(__dirname, '../../public/data/predictions');
+    const outputDir = paths.predictions;
     const outputPath = path.join(outputDir, `milestone_tracking_${today}.json`);
     
     // Sort milestones by urgency and significance

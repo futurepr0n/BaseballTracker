@@ -12,6 +12,7 @@
 
 const fs = require('fs').promises;
 const path = require('path');
+const { paths } = require('../../config/dataPath');
 
 // MLB team abbreviations
 const MLB_TEAMS = [
@@ -22,13 +23,13 @@ const MLB_TEAMS = [
 
 async function loadRollingStats(dateStr) {
   try {
-    const statsPath = path.join(__dirname, '../../public/data/rolling_stats', `rolling_stats_season_${dateStr}.json`);
+    const statsPath = path.join(paths.rollingStats, `rolling_stats_season_${dateStr}.json`);
     const data = await fs.readFile(statsPath, 'utf-8');
     return JSON.parse(data);
   } catch (error) {
     // Try latest file as fallback
     try {
-      const latestPath = path.join(__dirname, '../../public/data/rolling_stats', 'rolling_stats_season_latest.json');
+      const latestPath = path.join(paths.rollingStats, 'rolling_stats_season_latest.json');
       const data = await fs.readFile(latestPath, 'utf-8');
       return JSON.parse(data);
     } catch (fallbackError) {
@@ -69,7 +70,7 @@ async function calculateRealTeamRecords(targetDate) {
     if (monthIndex > 12) break;
     
     const monthName = months[monthIndex - 4]; // Adjust for array index
-    const monthDir = path.join(__dirname, '../../public/data', currentYear.toString(), monthName);
+    const monthDir = paths.monthData(currentYear, monthName);
     
     console.log(`📂 Checking month: ${monthName} (${monthIndex}), Directory: ${monthDir}`);
     
@@ -333,7 +334,7 @@ async function generateTeamStats(targetDate) {
   };
   
   // Write to file
-  const outputDir = path.join(__dirname, '../../public/data/team_stats');
+  const outputDir = paths.teamStats;
   await fs.mkdir(outputDir, { recursive: true });
   
   const outputPath = path.join(outputDir, `team_stats_${targetDate}.json`);

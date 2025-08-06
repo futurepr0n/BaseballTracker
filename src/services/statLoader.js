@@ -8,8 +8,8 @@
  * CSV Filename Format: TEAM_[hitting|pitching]_month_day_year_gameId.csv 
  * (e.g., ARI_hitting_april_24_2025_401695376.csv)
  *
- * Target JSON File: public/data/<year>/<month>/<month>_<day>_<year>.json
- * Rosters File: public/data/rosters.json
+ * Target JSON File: <DATA_PATH>/<year>/<month>/<month>_<day>_<year>.json
+ * Rosters File: <DATA_PATH>/rosters.json
  *
  * Usage: node statLoader.js <path_to_csv_file>
  */
@@ -23,8 +23,11 @@ const playerMappingService = require('./playerMappingService');
 const { detectEnhancedDuplicatesWithPrevention } = require('./enhancedDuplicateDetection');
 const { acquireProcessingLock, releaseProcessingLock, cleanupStaleLocks } = require('./processingLockManager');
 
+// Import centralized data path configuration
+const { DATA_PATH } = require('../../config/dataPath');
+
 // --- Configuration ---
-const BASE_DATA_DIR = path.join('public', 'data');
+const BASE_DATA_DIR = DATA_PATH;
 
 // Enhanced duplicate detection configuration
 const ENHANCED_CONFIG = {
@@ -49,7 +52,7 @@ const ENHANCED_CONFIG = {
     MIN_REASONABLE_AB_FOR_HITS: 1
   }
 };
-const ROSTERS_FILE_PATH = path.join(__dirname, '..', '..', 'public', 'data', 'rosters.json');
+const ROSTERS_FILE_PATH = path.join(DATA_PATH, 'rosters.json');
 // --- End Configuration ---
 
 // --- Enhanced Validation Utilities ---

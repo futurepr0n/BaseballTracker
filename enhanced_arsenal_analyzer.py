@@ -5,8 +5,13 @@ Provides detailed pitch-by-pitch breakdowns with statistical evidence
 """
 import csv
 import json
+import sys
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
+
+# Import centralized configuration
+sys.path.append(str(Path(__file__).parent.parent / 'BaseballScraper'))
+from config import PATHS, DATA_PATH
 
 class EnhancedArsenalAnalyzer:
     """Provides detailed arsenal analysis with specific statistical evidence"""
@@ -403,7 +408,7 @@ def enhance_weakspot_justifications(stats_path: str, exploiters_data: List[Dict]
 
 if __name__ == "__main__":
     # Test the analyzer
-    stats_path = "public/data/stats"
+    stats_path = DATA_PATH / "stats"
     
     # Debug: Check if files exist
     arsenal_file = Path(stats_path) / "pitcherpitcharsenalstats_2025.csv"
