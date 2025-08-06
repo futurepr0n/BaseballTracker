@@ -97,12 +97,12 @@ create_daily_backup() {
         mkdir -p "$BACKUP_DIR"
         
         # Backup critical data files
-        if [ -d "public/data/predictions" ]; then
-            cp -r public/data/predictions "$BACKUP_DIR/" 2>/dev/null || true
+        if [ -d "../BaseballData/data/predictions" ]; then
+            cp -r ../BaseballData/data/predictions "$BACKUP_DIR/" 2>/dev/null || true
         fi
         
-        if [ -d "public/data/team_stats" ]; then
-            cp -r public/data/team_stats "$BACKUP_DIR/" 2>/dev/null || true
+        if [ -d "../BaseballData/data/team_stats" ]; then
+            cp -r ../BaseballData/data/team_stats "$BACKUP_DIR/" 2>/dev/null || true
         fi
         
         print_status $GREEN "✅ Backup created: $BACKUP_DIR"
@@ -333,7 +333,7 @@ main() {
     print_status $BLUE "🚀 Generating optimized HR combinations with adjusted thresholds..."
     
     # Use the new optimized script directly (no virtual environment needed)
-    python3 generate_hr_combinations_optimized.py
+    python3 generate_hr_combinations.py
     HR_COMBO_EXIT_CODE=$?
     
     if [ $HR_COMBO_EXIT_CODE -ne 0 ]; then
@@ -348,13 +348,13 @@ main() {
     # Step 8: Verify files were created
     print_status $BLUE "🔍 Verifying generated files..."
     
-    HR_PRED_FILE="public/data/predictions/hr_predictions_${DATE}.json"
-    PERF_FILE="public/data/predictions/player_performance_${DATE}.json"
-    TEAM_STATS_FILE="public/data/team_stats/team_stats_${DATE}.json"
+    HR_PRED_FILE="../BaseballData/data/predictions/hr_predictions_${DATE}.json"
+    PERF_FILE="../BaseballData/data/predictions/player_performance_${DATE}.json"
+    TEAM_STATS_FILE="../BaseballData/data/team_stats/team_stats_${DATE}.json"
     
     # Check for any of the new optimized HR combination files
     HR_COMBOS_FOUND=false
-    for file in public/data/hr_combinations/hr_combinations_by_*_adjusted_*.json; do
+    for file in ../BaseballData/data/hr_combinations/hr_combinations_by_*_adjusted_*.json; do
         if [ -f "$file" ]; then
             HR_COMBOS_FOUND=true
             HR_COMBOS_FILE="$file"
