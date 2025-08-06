@@ -8,6 +8,9 @@
 const fs = require('fs');
 const path = require('path');
 
+// Import centralized configuration
+const { paths } = require('../../config/dataPath');
+
 // Get the target date from command line or use today
 const targetDate = process.argv[2] || new Date().toISOString().split('T')[0];
 
@@ -18,13 +21,7 @@ async function generateOpponentMatchups() {
     // Load today's games
     const [year, month, day] = targetDate.split('-');
     const monthName = new Date(year, month - 1, 1).toLocaleString('default', { month: 'long' }).toLowerCase();
-    const gameFilePath = path.join(
-      process.cwd(),
-      'public/data',
-      year,
-      monthName,
-      `${monthName}_${day.padStart(2, '0')}_${year}.json`
-    );
+    const gameFilePath = paths.gameDataFile(parseInt(year), monthName, parseInt(day));
     
     if (!fs.existsSync(gameFilePath)) {
       console.log(`❌ Game file not found: ${gameFilePath}`);
@@ -45,7 +42,7 @@ async function generateOpponentMatchups() {
       };
       
       // Ensure directory exists
-      const outputDir = path.join(process.cwd(), 'public/data/opponent_matchups');
+      const outputDir = paths.opponentMatchups;
       if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir, { recursive: true });
       }
@@ -64,7 +61,7 @@ async function generateOpponentMatchups() {
     console.log(`📊 Processing ${gameData.games.length} scheduled games...`);
     
     // Load prop analysis data
-    const propAnalysisPath = path.join(process.cwd(), 'public/data/prop_analysis/prop_analysis_latest.json');
+    const propAnalysisPath = path.join(paths.propAnalysis, 'prop_analysis_latest.json');
     
     if (!fs.existsSync(propAnalysisPath)) {
       console.log('❌ Prop analysis data not found - skipping matchup generation');
@@ -106,7 +103,7 @@ async function generateOpponentMatchups() {
     }
     
     // Ensure directory exists
-    const outputDir = path.join(process.cwd(), 'public/data/opponent_matchups');
+    const outputDir = paths.opponentMatchups;
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
@@ -214,13 +211,7 @@ async function analyzePlayerVsOpponent(player, targetDate, lookbackDays, statTyp
     try {
       const [year, month, day] = dateStr.split('-');
       const monthName = searchDate.toLocaleString('default', { month: 'long' }).toLowerCase();
-      const filePath = path.join(
-        process.cwd(),
-        'public/data',
-        year,
-        monthName,
-        `${monthName}_${day.padStart(2, '0')}_${year}.json`
-      );
+      const filePath = paths.gameDataFile(parseInt(year), monthName, parseInt(day));
       
       if (fs.existsSync(filePath)) {
         const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));

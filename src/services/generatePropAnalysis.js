@@ -18,11 +18,14 @@
 const fs = require('fs');
 const path = require('path');
 
+// Import centralized configuration
+const { paths } = require('../../config/dataPath');
+
 // Configuration
-const ROSTER_PATH = path.join(__dirname, '../../public/data/rosters.json');
-const ROLLING_STATS_PATH = path.join(__dirname, '../../public/data/rolling_stats/rolling_stats_season_latest.json');
-const MULTI_HIT_STATS_PATH = path.join(__dirname, '../../public/data/multi_hit_stats/multi_hit_stats_latest.json');
-const OUTPUT_DIR = path.join(__dirname, '../../public/data/prop_analysis');
+const ROSTER_PATH = paths.rosters;
+const ROLLING_STATS_PATH = path.join(paths.rollingStats, 'rolling_stats_season_latest.json');
+const MULTI_HIT_STATS_PATH = path.join(paths.multiHitStats, 'multi_hit_stats_latest.json');
+const OUTPUT_DIR = paths.propAnalysis;
 
 // Prop analysis configuration matching PlayerPropsLadderCard
 const PROP_OPTIONS = [
@@ -173,7 +176,7 @@ async function loadHistoricalGameData(playerName, playerTeam, statKey, maxDaysBa
       const dateStr = searchDate.toISOString().split('T')[0];
       const [year, /* month */, day] = dateStr.split('-');
       const monthName = searchDate.toLocaleString('default', { month: 'long' }).toLowerCase();
-      const filePath = path.join(__dirname, `../../public/data/${year}/${monthName}/${monthName}_${day}_${year}.json`);
+      const filePath = paths.gameDataFile(parseInt(year), monthName, parseInt(day));
       
       if (fs.existsSync(filePath)) {
         const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -629,7 +632,9 @@ async function generatePropAnalysis(targetDate = new Date()) {
     }
   }
   
+  // DISABLED: Combined file generation (causes ~80MB files, GitHub issues)
   // Also create a combined file for backward compatibility (optional)
+  /*
   const combinedOutputData = {
     date: targetDate.toISOString().split('T')[0],
     generatedAt: new Date().toISOString(),
@@ -656,6 +661,10 @@ async function generatePropAnalysis(targetDate = new Date()) {
     writeJsonFile(combinedLatestPath, combinedOutputData);
     writtenFiles.push('prop_analysis_combined_latest.json');
   }
+  */
+  
+  // Skip combined file generation - using individual prop files only
+  const combinedSuccess = false;
   
   const success = allFilesSuccess;
   

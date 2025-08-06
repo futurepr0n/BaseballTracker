@@ -38,10 +38,13 @@ const {
 } = require('./enhancedBounceBackAnalyzer');
 console.log('✅ Positive momentum analysis enabled - stadium coordinates loaded');
 
+// Import centralized configuration
+const { paths } = require('../../config/dataPath');
+
 // Configuration
-const ROSTER_PATH = path.join(__dirname, '../../public/data/rosters.json');
-const SEASON_DATA_DIR = path.join(__dirname, '../../public/data/2025');
-const OUTPUT_DIR = path.join(__dirname, '../../public/data/predictions');
+const ROSTER_PATH = paths.rosters;
+const SEASON_DATA_DIR = paths.gameData(2025);
+const OUTPUT_DIR = paths.predictions;
 
 // Positive performance thresholds
 const POSITIVE_PERFORMANCE_THRESHOLDS = {

@@ -11,7 +11,7 @@
         "concurrently": "^9.1.2",
         "cors": "^2.8.5",
         "csv-parse": "^5.6.0",
-        "express": "^5.1.0",
+        "express": "^4.19.2",
         "lodash": "^4.17.21",
         "lucide-react": "^0.513.0",
         "papaparse": "^5.5.2",
@@ -31,7 +31,9 @@
         "eject": "react-scripts eject",
         "generate-schedule": "node src/services/scheduleGenerator.js",
         "convert-handedness": "node scripts/convertHandednessData.js",
-        "generate-milestones": "node src/services/generateMilestoneTracking.js"
+        "generate-milestones": "node src/services/generateMilestoneTracking.js",
+        "build-production": "npm run build && rm -rf build/data && ln -s ../../BaseballData/data build/data",
+        "production": "npm run build-production && serve -s build"
     },
     "eslintConfig": {
         "extends": [

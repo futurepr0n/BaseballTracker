@@ -11,28 +11,52 @@ npm start
 ```
 - Runs on localhost:3000
 - React development server with hot reloading
+- **🎯 Centralized Data**: Proxies `/data/` requests to `../BaseballData/data/`
 
 **Build for production:**
 ```bash
+# Standard build (no data)
 npm run build
+
+# Production build with centralized data symlink
+npm run build-production
+
+# Full production deployment (build + symlink + serve)
+npm run production
 ```
 
-**Data Processing Pipeline:**
+## 🔄 CENTRALIZED DATA ARCHITECTURE
+
+**CRITICAL:** BaseballTracker now uses centralized data from `../BaseballData/data/` instead of duplicated `public/data/`.
+
+### Development Environment
+- **Proxy Configuration**: `setupProxy.js` routes `/data/` to `../BaseballData/data/`
+- **Real-time Updates**: Changes to centralized data appear immediately
+- **No Builds Required**: Data updates don't require React rebuilds
+
+### Production Environment  
+- **Symlink Strategy**: `build/data` → `../../BaseballData/data`
+- **Static File Serving**: Standard `serve -s build` with centralized data access
+- **Automated Deployment**: `npm run production` handles build + symlink + serve
+
+**Data Processing Pipeline (Centralized):**
 ```bash
-# 1. Generate available files list (for dynamic discovery system)
+# 🎯 ALL DATA OPERATIONS USE CENTRALIZED PATHS
+
+# 1. Generate available files list (reads from centralized data)
 ./generate_file_list.sh
 
-# 2. Process all CSV stats files from BaseballScraper
+# 2. Process CSV files (reads from ../BaseballData/CSV_BACKUPS/)
 ./process_all_stats.sh
 
-# 3. Generate additional analysis files
+# 3. Generate analysis files (outputs to ../BaseballData/data/)
 node src/services/generateAdditionalStats.js
 node src/services/generatePitcherMatchups.js
 npm run generate-milestones
 
-# 4. Run daily update (generates predictions and team stats)
+# 4. Run daily update (centralizes all outputs)
 ./daily_update.sh [YYYY-MM-DD]
-# Now includes automatic file list regeneration and team statistics generation
+# Outputs to ../BaseballData/data/ instead of public/data/
 ```
 
 **Handedness Data Setup (One-time or when CSV files updated):**

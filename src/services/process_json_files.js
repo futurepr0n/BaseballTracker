@@ -1,8 +1,9 @@
 // process_json_files.js
 const fs = require('fs').promises;
 const path = require('path');
+const { resolveDataPath } = require('../../config/dataPath');
 
-const BASE_DATA_PATH = path.join(__dirname, '../../public/data/2025');
+const BASE_DATA_PATH = resolveDataPath('2025');
 
 async function processJsonFile(filePath) {
     try {

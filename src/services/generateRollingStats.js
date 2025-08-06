@@ -8,12 +8,13 @@
 
 const fs = require('fs');
 const path = require('path');
+const { paths } = require('../../config/dataPath');
 
 // Configuration
-const SEASON_DATA_DIR = path.join(__dirname, '../../public/data/2025');
-const OUTPUT_DIR = path.join(__dirname, '../../public/data/rolling_stats');
-const MULTI_HIT_OUTPUT_DIR = path.join(__dirname, '../../public/data/multi_hit_stats');
-const ROSTER_PATH = path.join(__dirname, '../../public/data/rosters.json');
+const SEASON_DATA_DIR = paths.gameData(2025);
+const OUTPUT_DIR = paths.rollingStats;
+const MULTI_HIT_OUTPUT_DIR = paths.multiHitStats;
+const ROSTER_PATH = paths.rosters;
 
 /**
  * Read JSON file safely

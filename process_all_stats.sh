@@ -3,8 +3,8 @@
 # Enhanced CSV Processing Script with Pre-Processing Validation
 # Prevents duplicate processing and adds comprehensive validation
 
-# Configuration
-CSV_DIR="../BaseballScraper"
+# Configuration - Use centralized CSV backups directory
+CSV_DIR="../BaseballData/CSV_BACKUPS"
 VALIDATION_SCRIPT="scripts/data-validation/csvProcessingValidator.js"
 PROCESSING_LOG="scripts/data-validation/processing_log.json"
 BACKUP_DIR="backups/csv_processing_backups"
