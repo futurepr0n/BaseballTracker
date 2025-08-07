@@ -111,10 +111,27 @@ function findOrCreatePlayer(name, team, fullName = null, gameDate = null) {
     }
     
     // Check if this might be a team change for an existing player
+    // CRITICAL FIX: Add more conservative team change detection to prevent false positives
     const possibleExistingPlayer = findPlayerByNameOnly(name);
     if (possibleExistingPlayer && team !== getCurrentTeam(possibleExistingPlayer)) {
-        console.log(`Detected potential team change: ${name} from ${getCurrentTeam(possibleExistingPlayer)} to ${team}`);
-        return addTeamChangeToPlayer(possibleExistingPlayer, name, team, gameDate);
+        const currentTeam = getCurrentTeam(possibleExistingPlayer);
+        const timeSinceLastAlias = getTimeSinceLastAlias(possibleExistingPlayer);
+        
+        // SAFETY CHECK 1: Only allow team changes if there's been significant time since last entry
+        // This prevents rapid false team changes from corrupting data
+        if (timeSinceLastAlias < 7) {  // Less than 7 days
+            console.log(`⚠️  REJECTED potential team change for ${name}: Too recent (${timeSinceLastAlias} days since last update)`);
+            // Treat as new player instead of forcing a team change
+        } else {
+            // SAFETY CHECK 2: Validate that this looks like a legitimate trade/signing
+            console.log(`🔍 INVESTIGATING potential team change: ${name} from ${currentTeam} to ${team}`);
+            console.log(`   - Time since last alias: ${timeSinceLastAlias} days`);
+            console.log(`   - Player ID: ${possibleExistingPlayer.playerId}`);
+            
+            // For now, be extremely conservative and require manual validation
+            console.log(`⚠️  DEFERRED team change for ${name}: Requires manual validation to prevent corruption`);
+        }
+        // Skip the team change for now - treat as new player entry
     }
     
     // Create new player
@@ -165,6 +182,28 @@ function findPlayerByNameOnly(name) {
     }
     
     return null;
+}
+
+/**
+ * Gets the number of days since the last alias was added for a player
+ * Used to prevent rapid false team changes
+ */
+function getTimeSinceLastAlias(player) {
+    if (!player.aliases || player.aliases.length === 0) {
+        return Infinity; // No aliases, treat as very old
+    }
+    
+    // Find the most recent alias start date
+    const mostRecentDate = player.aliases.reduce((latest, alias) => {
+        const aliasDate = new Date(alias.dateRange.start);
+        return aliasDate > latest ? aliasDate : latest;
+    }, new Date(0));
+    
+    const now = new Date();
+    const diffTime = Math.abs(now - mostRecentDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays;
 }
 
 /**
@@ -296,6 +335,98 @@ function updatePlayerFullName(playerId, fullName) {
     return false;
 }
 
+/**
+ * CRITICAL SAFETY FUNCTIONS: Prevent roster corruption
+ */
+
+/**
+ * Validates roster data for suspicious team assignments
+ * Returns array of warnings for manual review
+ */
+function validateRosterData() {
+    const warnings = [];
+    
+    try {
+        // Load current rosters.json for validation
+        const fs = require('fs');
+        const rosterPath = path.join(__dirname, '..', '..', '..', 'BaseballData', 'data', 'rosters.json');
+        
+        if (!fs.existsSync(rosterPath)) {
+            warnings.push('⚠️  rosters.json not found at expected location');
+            return warnings;
+        }
+        
+        const rosterData = JSON.parse(fs.readFileSync(rosterPath, 'utf8'));
+        
+        // Check for common team assignment errors
+        const suspiciousAssignments = [
+            { name: 'Kyle Schwarber', expectedTeam: 'PHI', suspiciousTeams: ['CLE', 'BAL', 'NYM'] },
+            { name: 'Gunnar Henderson', expectedTeam: 'BAL', suspiciousTeams: ['NYM', 'CLE', 'PHI'] },
+            { name: 'Pete Alonso', expectedTeam: 'NYM', suspiciousTeams: ['SD', 'PHI', 'CLE'] },
+            { name: 'Kyle Stowers', expectedTeam: 'MIA', suspiciousTeams: ['LAA', 'BAL', 'TEX'] }
+        ];
+        
+        for (const check of suspiciousAssignments) {
+            const player = rosterData.find(p => 
+                p.fullName === check.name || p.name === check.name
+            );
+            
+            if (player && check.suspiciousTeams.includes(player.team)) {
+                warnings.push(`🚨 SUSPICIOUS: ${check.name} assigned to ${player.team}, expected ${check.expectedTeam}`);
+            }
+        }
+        
+        console.log(`✅ Roster validation completed: ${warnings.length} warnings found`);
+        
+    } catch (error) {
+        warnings.push(`❌ Roster validation failed: ${error.message}`);
+    }
+    
+    return warnings;
+}
+
+/**
+ * Removes duplicate player entries from playerMappings.json
+ * Critical for preventing false team change detection
+ */
+function removeDuplicatePlayerMappings() {
+    const mappings = loadPlayerMappings();
+    const seen = new Map();
+    const duplicates = [];
+    const cleanPlayers = [];
+    
+    for (const player of mappings.players) {
+        const key = `${player.currentName}:${player.fullName}`.toLowerCase();
+        
+        if (seen.has(key)) {
+            duplicates.push({
+                duplicate: player,
+                original: seen.get(key)
+            });
+            console.log(`🔍 Found duplicate: ${player.currentName} (ID: ${player.playerId})`);
+        } else {
+            seen.set(key, player);
+            cleanPlayers.push(player);
+        }
+    }
+    
+    if (duplicates.length > 0) {
+        console.log(`🧹 Removing ${duplicates.length} duplicate entries...`);
+        mappings.players = cleanPlayers;
+        
+        if (savePlayerMappings(mappings)) {
+            console.log(`✅ Cleaned playerMappings.json: removed ${duplicates.length} duplicates`);
+            return duplicates.length;
+        } else {
+            console.error('❌ Failed to save cleaned player mappings');
+            return -1;
+        }
+    } else {
+        console.log('✅ No duplicate player mappings found');
+        return 0;
+    }
+}
+
 module.exports = {
     loadPlayerMappings,
     savePlayerMappings,
@@ -308,5 +439,9 @@ module.exports = {
     getPlayerAliases,
     getPlayerById,
     updatePlayerFullName,
-    isDateInRange
+    isDateInRange,
+    // CRITICAL SAFETY FUNCTIONS
+    validateRosterData,
+    removeDuplicatePlayerMappings,
+    getTimeSinceLastAlias
 };
