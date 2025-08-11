@@ -56,3 +56,4 @@ public/data/available_files.json
 # Performance and debugging files
 performance_test*.json
 discovery_debug*.log
+mcp-env/

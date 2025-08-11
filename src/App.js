@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   BrowserRouter as Router,
   Routes,
-  Route,
-  Link
+  Route
 } from 'react-router-dom';
 
 // Import debug control for immediate availability in console
@@ -31,6 +30,7 @@ import {
 
 import PinheadsPlayhouse from './components/PinheadsPlayhouse/PinheadsPlayhouse';
 import HRMatchupHub from './components/HRMatchupHub/HRMatchupHub';
+import DailyMatchupAnalysis from './components/DailyMatchupAnalysis/DailyMatchupAnalysis';
 import CSSFixesTest from './components/test/CSSFixesTest';
 import HandednessTest from './components/test/HandednessTest';
 
@@ -197,6 +197,13 @@ function App() {
                 />} />
 
               <Route path="/hr-matchups" element={<HRMatchupHub 
+                  playerData={playerData} 
+                  teamData={teamData} 
+                  gameData={gameData} 
+                  currentDate={currentDate}
+                />} />
+
+              <Route path="/daily-matchup-analysis" element={<DailyMatchupAnalysis 
                   playerData={playerData} 
                   teamData={teamData} 
                   gameData={gameData} 

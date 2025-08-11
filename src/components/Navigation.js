@@ -19,6 +19,7 @@ function Navigation() {
     { path: '/capsheet', label: 'CapSheet' },
     { path: '/matchup-analyzer', label: 'Matchup Analyzer' },
     { path: '/hr-matchups', label: 'HR Matchups' },
+    { path: '/daily-matchup-analysis', label: 'Daily Matchup Analysis' },
     { path: '/pinheads-playhouse', label: 'Pinheads Playhouse' }
   ];
   
