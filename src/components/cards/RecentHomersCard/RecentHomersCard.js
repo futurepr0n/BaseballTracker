@@ -3,6 +3,7 @@ import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import SimpleDesktopScratchpadIcon from '../../common/SimpleDesktopScratchpadIcon';
 import { getTeamLogoUrl } from '../../../utils/teamUtils';
+import { formatDateForDisplay, getDaysAgoText } from '../../../utils/dateUtils';
 import './RecentHomersCard.css';
 import '../../common/MobilePlayerCard.css';
 
@@ -72,19 +73,9 @@ const RecentHomersCard = ({
                 const logoUrl = teamData ? teamData.logoUrl : getTeamLogoUrl(player.team);
                 const teamColor = teamData ? teamData.primaryColor : "#333333";
 
-                // Format the date
-                const hrDate = new Date(player.lastHRDate);
-                const formattedDate = hrDate.toLocaleDateString('en-US', { 
-                  month: 'short', 
-                  day: 'numeric' 
-                });
-                
-                // Calculate days ago
-                const today = new Date();
-                const daysDiff = Math.floor((today - hrDate) / (1000 * 60 * 60 * 24));
-                const daysAgoText = daysDiff === 0 ? 'Today' : 
-                                   daysDiff === 1 ? 'Yesterday' : 
-                                   `${daysDiff} days ago`;
+                // Format the date using timezone-safe utilities
+                const formattedDate = formatDateForDisplay(player.lastHRDate);
+                const daysAgoText = getDaysAgoText(player.lastHRDate);
 
                 return (
                   <li key={index} className="player-item recent-homer-item">
@@ -164,19 +155,9 @@ const RecentHomersCard = ({
           ) : displayPlayers.length > 0 ? (
             <div className="mobile-cards">
               {displayPlayers.map((player, index) => {
-                // Format the date
-                const hrDate = new Date(player.lastHRDate);
-                const formattedDate = hrDate.toLocaleDateString('en-US', { 
-                  month: 'short', 
-                  day: 'numeric' 
-                });
-                
-                // Calculate days ago
-                const today = new Date();
-                const daysDiff = Math.floor((today - hrDate) / (1000 * 60 * 60 * 24));
-                const daysAgoText = daysDiff === 0 ? 'Today' : 
-                                   daysDiff === 1 ? 'Yesterday' : 
-                                   `${daysDiff} days ago`;
+                // Format the date using timezone-safe utilities
+                const formattedDate = formatDateForDisplay(player.lastHRDate);
+                const daysAgoText = getDaysAgoText(player.lastHRDate);
 
                 const secondaryMetrics = [
                   ...(Number(player.homeRunsThisSeason) > 0 ? [{ label: 'Season', value: `${player.homeRunsThisSeason} HRs` }] : []),
