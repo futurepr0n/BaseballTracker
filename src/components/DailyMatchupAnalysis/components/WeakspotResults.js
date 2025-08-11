@@ -1,4 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { 
+  formatPercentage, 
+  formatNumber, 
+  formatSampleSize,
+  formatABSinceHR,
+  getConfidenceClass,
+  getHRScoreClass,
+  groupOpportunitiesByPitcher
+} from '../utils/dataFormatting';
+import { generateOpportunityReasoning, formatReasoningForDisplay } from '../services/reasoningGenerator';
 
 const WeakspotResults = ({ analysis, opportunities, loading, enhanced }) => {
   const [expandedOpportunity, setExpandedOpportunity] = useState(null);
@@ -55,12 +65,7 @@ const WeakspotResults = ({ analysis, opportunities, loading, enhanced }) => {
     }
   });
 
-  const getConfidenceClass = (score) => {
-    if (score >= 70) return 'confidence-high';
-    if (score >= 50) return 'confidence-moderate';
-    if (score >= 30) return 'confidence-low';
-    return 'confidence-speculative';
-  };
+  // Confidence class function moved to utils/dataFormatting.js
 
   const getTypeIcon = (type) => {
     switch (type) {
@@ -80,13 +85,7 @@ const WeakspotResults = ({ analysis, opportunities, loading, enhanced }) => {
     }
   };
 
-  const formatPercentage = (value) => {
-    return typeof value === 'number' ? `${(value * 100).toFixed(1)}%` : 'N/A';
-  };
-
-  const formatNumber = (value, decimals = 1) => {
-    return typeof value === 'number' ? value.toFixed(decimals) : 'N/A';
-  };
+  // Formatting functions moved to utils/dataFormatting.js for consistency
 
   const toggleExpanded = (index) => {
     setExpandedOpportunity(expandedOpportunity === index ? null : index);
@@ -218,7 +217,7 @@ const WeakspotResults = ({ analysis, opportunities, loading, enhanced }) => {
                       )}
                       <div className="detail-item">
                         <span className="detail-label">Sample Size:</span>
-                        <span className="detail-value">{opportunity.sample_size || 'Unknown'} at-bats</span>
+                        <span className="detail-value">{formatSampleSize(opportunity.sample_size, opportunity.player_stats)}</span>
                       </div>
                       <div className="detail-item">
                         <span className="detail-label">Risk Level:</span>
@@ -265,13 +264,13 @@ const WeakspotResults = ({ analysis, opportunities, loading, enhanced }) => {
                     <div className="detail-section">
                       <h4>Enhanced Analytics</h4>
                       <div className="detail-items">
-                        {opportunity.additional_metrics.hr_probability && (
+                        {opportunity.additional_metrics.hr_probability !== undefined && (
                           <div className="detail-item">
                             <span className="detail-label">HR Probability:</span>
                             <span className="detail-value">{formatPercentage(opportunity.additional_metrics.hr_probability)}</span>
                           </div>
                         )}
-                        {opportunity.additional_metrics.hit_probability && (
+                        {opportunity.additional_metrics.hit_probability !== undefined && (
                           <div className="detail-item">
                             <span className="detail-label">Hit Probability:</span>
                             <span className="detail-value">{formatPercentage(opportunity.additional_metrics.hit_probability)}</span>

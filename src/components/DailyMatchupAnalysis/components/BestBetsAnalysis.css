@@ -1,0 +1,370 @@
+/* Best Bets Analysis Styles - Based on breakdown.PNG format */
+
+.best-bets-analysis {
+  background: #1a1a1a;
+  color: #ffffff;
+  font-family: 'Courier New', monospace;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Header Section */
+.analysis-header {
+  border-bottom: 2px solid #333;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.header-icon {
+  font-size: 20px;
+}
+
+.analysis-header h2 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.methodology-note {
+  font-size: 12px;
+  color: #cccccc;
+  line-height: 1.4;
+}
+
+/* Tier Recommendations */
+.tier-recommendations h3 {
+  color: #28a745;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Player Recommendation Cards */
+.player-recommendation {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.player-recommendation:hover {
+  border-color: #666;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.player-recommendation.tier-1 {
+  border-left: 4px solid #28a745;
+}
+
+.player-recommendation.tier-2 {
+  border-left: 4px solid #007bff;
+}
+
+.player-recommendation.tier-3 {
+  border-left: 4px solid #ffc107;
+}
+
+.player-recommendation.tier-4 {
+  border-left: 4px solid #fd7e14;
+}
+
+.player-recommendation.tier-5 {
+  border-left: 4px solid #6c757d;
+}
+
+/* Recommendation Header */
+.recommendation-header {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  cursor: pointer;
+  gap: 16px;
+}
+
+.position-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 120px;
+}
+
+.position-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.position-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.tier-label {
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.stars {
+  font-size: 14px;
+  margin-top: 2px;
+}
+
+/* Player Matchup */
+.player-matchup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.player-info,
+.pitcher-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-name,
+.pitcher-name {
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.player-team,
+.pitcher-team {
+  font-size: 11px;
+  color: #999;
+}
+
+.vs-indicator {
+  font-size: 12px;
+  color: #666;
+  font-weight: bold;
+}
+
+/* Key Metrics */
+.key-metrics {
+  display: flex;
+  gap: 20px;
+  margin-left: auto;
+}
+
+.key-metrics .metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+}
+
+.key-metrics .metric-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.key-metrics .metric-label {
+  font-size: 10px;
+  color: #999;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.expand-indicator {
+  font-size: 16px;
+  color: #666;
+  margin-left: 12px;
+}
+
+/* Recommendation Breakdown */
+.recommendation-breakdown {
+  background: #1e1e1e;
+  padding: 20px;
+  border-top: 1px solid #333;
+}
+
+.breakdown-section {
+  margin-bottom: 16px;
+}
+
+.breakdown-section h4 {
+  font-size: 12px;
+  color: #28a745;
+  font-weight: bold;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.breakdown-section p {
+  font-size: 11px;
+  line-height: 1.5;
+  color: #cccccc;
+  margin: 0;
+}
+
+.breakdown-section.risk-assessment h4 {
+  color: #dc3545;
+}
+
+/* Detailed Metrics Grid */
+.detailed-metrics {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #333;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.metric-detail {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #2a2a2a;
+  border-radius: 4px;
+  border: 1px solid #444;
+}
+
+.metric-detail .label {
+  font-size: 11px;
+  color: #999;
+  font-weight: 500;
+}
+
+.metric-detail .value {
+  font-size: 11px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+/* Analysis Summary */
+.analysis-summary {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 2px solid #333;
+}
+
+.summary-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #28a745;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: #999;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* Loading State */
+.best-bets-analysis.loading {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-content {
+  text-align: center;
+  color: #cccccc;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #333;
+  border-top: 4px solid #28a745;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.best-bets-analysis.empty {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-content {
+  text-align: center;
+  color: #666;
+}
+
+.empty-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .recommendation-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .player-matchup {
+    order: -1;
+    width: 100%;
+  }
+  
+  .key-metrics {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+  
+  .summary-stats {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}

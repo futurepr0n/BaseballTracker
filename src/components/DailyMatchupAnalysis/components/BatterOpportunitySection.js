@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useBaseballAnalysis } from '../../../services/baseballAnalysisService';
+import { 
+  formatPercentage, 
+  formatNumber, 
+  formatABSinceHR,
+  getHRScoreClass,
+  normalizePercentage
+} from '../utils/dataFormatting';
+import { generateOpportunityReasoning, formatReasoningForDisplay } from '../services/reasoningGenerator';
 import './BatterOpportunitySection.css';
 
 const BatterOpportunitySection = ({ analysis, matchups, loading, enhanced }) => {
@@ -130,13 +138,7 @@ const BatterOpportunitySection = ({ analysis, matchups, loading, enhanced }) => 
     }
   });
 
-  const getHRScoreClass = (score) => {
-    if (score >= 80) return 'hr-score-elite';
-    if (score >= 70) return 'hr-score-high';
-    if (score >= 60) return 'hr-score-moderate';
-    if (score >= 50) return 'hr-score-low';
-    return 'hr-score-minimal';
-  };
+  // HR Score class function moved to utils/dataFormatting.js
 
   const getOpportunityIcon = (opportunity) => {
     const hrScore = opportunity.hr_score || 0;
@@ -158,13 +160,7 @@ const BatterOpportunitySection = ({ analysis, matchups, loading, enhanced }) => 
     return 'Contact Opportunity';
   };
 
-  const formatPercentage = (value) => {
-    return typeof value === 'number' ? `${value.toFixed(1)}%` : 'N/A';
-  };
-
-  const formatNumber = (value, decimals = 1) => {
-    return typeof value === 'number' ? value.toFixed(decimals) : 'N/A';
-  };
+  // Formatting functions moved to utils/dataFormatting.js for consistency
 
   const toggleExpanded = (index) => {
     setExpandedBatter(expandedBatter === index ? null : index);
@@ -294,7 +290,7 @@ const BatterOpportunitySection = ({ analysis, matchups, loading, enhanced }) => 
                     <span className="metric-label">Hit Prob</span>
                   </div>
                   <div className="metric">
-                    <span className="metric-value">{formatNumber(opportunity.confidence * 100)}%</span>
+                    <span className="metric-value">{formatPercentage(opportunity.confidence)}</span>
                     <span className="metric-label">Confidence</span>
                   </div>
                 </div>
@@ -325,7 +321,7 @@ const BatterOpportunitySection = ({ analysis, matchups, loading, enhanced }) => 
                       {opportunity.ab_since_last_hr !== undefined && (
                         <div className="detail-item">
                           <span className="detail-label">AB Since HR:</span>
-                          <span className="detail-value">{opportunity.ab_since_last_hr}</span>
+                          <span className="detail-value">{formatABSinceHR(opportunity.ab_since_last_hr, opportunity.player_stats)}</span>
                         </div>
                       )}
                       {opportunity.expected_ab_per_hr && (
