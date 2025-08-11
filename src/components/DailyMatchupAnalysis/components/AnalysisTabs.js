@@ -1,0 +1,141 @@
+import React, { useState } from 'react';
+import WeakspotResults from './WeakspotResults';
+import BatterOpportunitySection from './BatterOpportunitySection';
+import './AnalysisTabs.css';
+
+const AnalysisTabs = ({ analysis, opportunities, loading, enhanced, matchups }) => {
+  const [activeTab, setActiveTab] = useState('pitcher-vulnerabilities');
+
+  const tabs = [
+    {
+      id: 'pitcher-vulnerabilities',
+      label: 'Pitcher Vulnerabilities',
+      icon: '🎯',
+      description: 'Analyze pitcher weakspots and timing patterns'
+    },
+    {
+      id: 'batter-opportunities', 
+      label: 'Batter Opportunities',
+      icon: '🏏',
+      description: 'Individual batter vs pitcher analysis and recommendations'
+    },
+    {
+      id: 'best-bets',
+      label: 'Best Bets',
+      icon: '⭐',
+      description: 'Top combined recommendations with confidence scoring'
+    },
+    {
+      id: 'detailed-breakdown',
+      label: 'Detailed Analysis',
+      icon: '📊',
+      description: 'Comprehensive matchup breakdowns and strategic context'
+    }
+  ];
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'pitcher-vulnerabilities':
+        return (
+          <WeakspotResults
+            analysis={analysis}
+            opportunities={opportunities}
+            loading={loading}
+            enhanced={enhanced}
+          />
+        );
+      
+      case 'batter-opportunities':
+        return (
+          <BatterOpportunitySection
+            analysis={analysis}
+            matchups={matchups}
+            loading={loading}
+            enhanced={enhanced}
+          />
+        );
+      
+      case 'best-bets':
+        return (
+          <div className="best-bets-section">
+            <div className="coming-soon">
+              <span className="coming-soon-icon">🚧</span>
+              <h3>Best Bets Analysis</h3>
+              <p>Combined pitcher vulnerability and batter opportunity recommendations coming soon!</p>
+              <div className="preview-features">
+                <div className="feature-item">
+                  <span className="feature-icon">⚡</span>
+                  <span>High-confidence power play recommendations</span>
+                </div>
+                <div className="feature-item">
+                  <span className="feature-icon">🎯</span>
+                  <span>Value bet identification with odds analysis</span>
+                </div>
+                <div className="feature-item">
+                  <span className="feature-icon">📈</span>
+                  <span>Risk-adjusted opportunity scoring</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      
+      case 'detailed-breakdown':
+        return (
+          <div className="detailed-breakdown-section">
+            <div className="coming-soon">
+              <span className="coming-soon-icon">🚧</span>
+              <h3>Detailed Analysis Breakdown</h3>
+              <p>In-depth strategic context and comprehensive matchup analysis coming soon!</p>
+              <div className="preview-features">
+                <div className="feature-item">
+                  <span className="feature-icon">🌤️</span>
+                  <span>Weather and stadium factor integration</span>
+                </div>
+                <div className="feature-item">
+                  <span className="feature-icon">📅</span>
+                  <span>Historical head-to-head performance analysis</span>
+                </div>
+                <div className="feature-item">
+                  <span className="feature-icon">🏥</span>
+                  <span>Injury report and lineup change impact</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="analysis-tabs">
+      <div className="tabs-header">
+        <div className="tabs-nav">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+              title={tab.description}
+            >
+              <span className="tab-icon">{tab.icon}</span>
+              <span className="tab-label">{tab.label}</span>
+            </button>
+          ))}
+        </div>
+        <div className="tab-description">
+          {tabs.find(tab => tab.id === activeTab)?.description}
+        </div>
+      </div>
+      
+      <div className="tab-content">
+        {renderTabContent()}
+      </div>
+    </div>
+  );
+};
+
+export default AnalysisTabs;

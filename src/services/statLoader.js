@@ -53,7 +53,91 @@ const ENHANCED_CONFIG = {
   }
 };
 const ROSTERS_FILE_PATH = path.join(DATA_PATH, 'rosters.json');
+const TEAM_CHANGES_LOG_FILE = path.join(DATA_PATH, 'team_changes_log.json');
+const SUSPICIOUS_CHANGES_LOG_FILE = path.join(DATA_PATH, 'suspicious_team_changes.json');
 // --- End Configuration ---
+
+// --- Team Change Logging Functions ---
+
+/**
+ * Log suspicious team changes that are blocked
+ * @param {object} teamChange - Team change data
+ */
+function logSuspiciousTeamChange(teamChange) {
+    try {
+        let suspiciousChanges = [];
+        
+        // Load existing log if it exists
+        if (fs.existsSync(SUSPICIOUS_CHANGES_LOG_FILE)) {
+            try {
+                const logData = JSON.parse(fs.readFileSync(SUSPICIOUS_CHANGES_LOG_FILE, 'utf8'));
+                suspiciousChanges = logData.suspiciousChanges || [];
+            } catch (error) {
+                console.warn('Could not load suspicious changes log:', error.message);
+            }
+        }
+        
+        // Add new suspicious change
+        suspiciousChanges.push({
+            ...teamChange,
+            blocked: true,
+            reason: 'Matches known corruption pattern',
+            loggedAt: new Date().toISOString()
+        });
+        
+        // Save updated log
+        const logData = {
+            lastUpdated: new Date().toISOString(),
+            totalSuspiciousChanges: suspiciousChanges.length,
+            suspiciousChanges: suspiciousChanges
+        };
+        
+        fs.writeFileSync(SUSPICIOUS_CHANGES_LOG_FILE, JSON.stringify(logData, null, 2), 'utf8');
+        console.log(`📝 Logged suspicious team change to: ${SUSPICIOUS_CHANGES_LOG_FILE}`);
+    } catch (error) {
+        console.error('Error logging suspicious team change:', error);
+    }
+}
+
+/**
+ * Log team changes for manual review
+ * @param {object} teamChange - Team change data
+ */
+function logTeamChangeForReview(teamChange) {
+    try {
+        let teamChanges = [];
+        
+        // Load existing log if it exists
+        if (fs.existsSync(TEAM_CHANGES_LOG_FILE)) {
+            try {
+                const logData = JSON.parse(fs.readFileSync(TEAM_CHANGES_LOG_FILE, 'utf8'));
+                teamChanges = logData.teamChanges || [];
+            } catch (error) {
+                console.warn('Could not load team changes log:', error.message);
+            }
+        }
+        
+        // Add new team change for review
+        teamChanges.push({
+            ...teamChange,
+            status: 'pending_review',
+            loggedAt: new Date().toISOString()
+        });
+        
+        // Save updated log
+        const logData = {
+            lastUpdated: new Date().toISOString(),
+            totalTeamChanges: teamChanges.length,
+            pendingReview: teamChanges.filter(tc => tc.status === 'pending_review').length,
+            teamChanges: teamChanges
+        };
+        
+        fs.writeFileSync(TEAM_CHANGES_LOG_FILE, JSON.stringify(logData, null, 2), 'utf8');
+        console.log(`📝 Logged team change for review: ${TEAM_CHANGES_LOG_FILE}`);
+    } catch (error) {
+        console.error('Error logging team change for review:', error);
+    }
+}
 
 // --- Enhanced Validation Utilities ---
 
@@ -401,11 +485,52 @@ function updateRostersFile(playersData, gameDate) {
                 console.log(`Added playerId ${mappedPlayer.playerId} to existing roster entry: ${player.name}`);
             }
             
-            // Update team if changed
+            // Enhanced team change validation - PREVENT UNAUTHORIZED CHANGES
             if (existingRoster.team !== player.team) {
-                console.log(`Updated team for ${player.name}: ${existingRoster.team} → ${player.team}`);
-                existingRoster.team = player.team;
-                playersUpdated++;
+                const teamChange = {
+                    playerName: player.name,
+                    playerId: mappedPlayer.playerId,
+                    fromTeam: existingRoster.team,
+                    toTeam: player.team,
+                    csvFile: process.argv[2] || 'unknown',
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Check for suspicious team changes that are likely data corruption
+                const suspiciousChanges = [
+                    { from: 'TB', to: 'ARI' },  // B. Lowe corruption pattern
+                    { from: 'KC', to: 'MIL' },  // KC players corruption pattern
+                    { from: 'KC', to: 'COL' },  // Alternative KC corruption
+                    { from: 'TB', to: 'COL' },  // Alternative TB corruption
+                    { from: 'TB', to: 'MIL' },  // Alternative TB corruption
+                ];
+                
+                const isSuspicious = suspiciousChanges.some(pattern => 
+                    pattern.from === teamChange.fromTeam && pattern.to === teamChange.toTeam
+                );
+                
+                if (isSuspicious) {
+                    console.error(`🚨 BLOCKED SUSPICIOUS TEAM CHANGE: ${teamChange.playerName} (${teamChange.playerId}) ${teamChange.fromTeam} → ${teamChange.toTeam}`);
+                    console.error(`   CSV File: ${teamChange.csvFile}`);
+                    console.error(`   This change matches known corruption patterns and has been blocked.`);
+                    console.error(`   If this is a legitimate trade, manually update rosters.json after investigation.`);
+                    
+                    // Log to team change file for manual review
+                    logSuspiciousTeamChange(teamChange);
+                    
+                    // DO NOT UPDATE - keep existing team
+                    continue;
+                }
+                
+                // For non-suspicious changes, require explicit validation
+                console.warn(`⚠️  TEAM CHANGE DETECTED (requires manual validation): ${teamChange.playerName} ${teamChange.fromTeam} → ${teamChange.toTeam}`);
+                console.warn(`   CSV File: ${teamChange.csvFile}`);
+                console.warn(`   This change has been logged for manual review. Roster not updated automatically.`);
+                
+                // Log for manual review but don't auto-update
+                logTeamChangeForReview(teamChange);
+                
+                // DO NOT UPDATE - keep existing team to prevent corruption
             }
             
             // Update fullName if we have more complete information
