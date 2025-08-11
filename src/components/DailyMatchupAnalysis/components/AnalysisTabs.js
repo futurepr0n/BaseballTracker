@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import WeakspotResults from './WeakspotResults';
+import EnhancedWeakspotResults from './EnhancedWeakspotResults';
 import BatterOpportunitySection from './BatterOpportunitySection';
+import BestBetsAnalysis from './BestBetsAnalysis';
 import './AnalysisTabs.css';
 
 const AnalysisTabs = ({ analysis, opportunities, loading, enhanced, matchups }) => {
@@ -37,7 +38,7 @@ const AnalysisTabs = ({ analysis, opportunities, loading, enhanced, matchups }) 
     switch (activeTab) {
       case 'pitcher-vulnerabilities':
         return (
-          <WeakspotResults
+          <EnhancedWeakspotResults
             analysis={analysis}
             opportunities={opportunities}
             loading={loading}
@@ -57,27 +58,12 @@ const AnalysisTabs = ({ analysis, opportunities, loading, enhanced, matchups }) 
       
       case 'best-bets':
         return (
-          <div className="best-bets-section">
-            <div className="coming-soon">
-              <span className="coming-soon-icon">🚧</span>
-              <h3>Best Bets Analysis</h3>
-              <p>Combined pitcher vulnerability and batter opportunity recommendations coming soon!</p>
-              <div className="preview-features">
-                <div className="feature-item">
-                  <span className="feature-icon">⚡</span>
-                  <span>High-confidence power play recommendations</span>
-                </div>
-                <div className="feature-item">
-                  <span className="feature-icon">🎯</span>
-                  <span>Value bet identification with odds analysis</span>
-                </div>
-                <div className="feature-item">
-                  <span className="feature-icon">📈</span>
-                  <span>Risk-adjusted opportunity scoring</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <BestBetsAnalysis
+            opportunities={opportunities}
+            matchups={matchups}
+            loading={loading}
+            enhanced={enhanced}
+          />
         );
       
       case 'detailed-breakdown':
