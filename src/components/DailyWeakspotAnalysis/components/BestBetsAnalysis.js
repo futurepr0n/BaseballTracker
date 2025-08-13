@@ -139,7 +139,7 @@ const BestBetsAnalysis = ({ opportunities, matchups, loading, enhanced }) => {
     // Sort by composite score and return top 5
     return playerScores
       .sort((a, b) => b.compositeScore - a.compositeScore)
-      .slice(0, 5);
+      .slice(0, 15);
   }, [batterOpportunities, opportunities, getTier]);
 
 
