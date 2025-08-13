@@ -1,0 +1,1055 @@
+/* Comprehensive Analysis Display Styles */
+
+.comprehensive-analysis-display {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 24px;
+}
+
+.analysis-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.header-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.analysis-header h2 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 24px;
+}
+
+.matchup-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.matchup-selector label {
+  font-weight: 600;
+  color: #495057;
+  font-size: 14px;
+}
+
+.matchup-dropdown {
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  color: #495057;
+  min-width: 200px;
+  cursor: pointer;
+}
+
+.matchup-dropdown:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.matchup-info {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+  color: #6c757d;
+  align-items: center;
+}
+
+.matchup-info .teams {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.matchup-counter {
+  background: #e9ecef;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.matchup-info .venue {
+  font-style: italic;
+}
+
+/* Analysis Sections */
+.analysis-section {
+  margin-bottom: 24px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #f8f9fa;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+
+.section-header:hover {
+  background: #e9ecef;
+}
+
+.section-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 18px;
+}
+
+.toggle-icon {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.section-content {
+  padding: 20px;
+}
+
+/* Pitcher Analysis */
+.pitcher-analysis-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pitcher-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pitcher-header h4 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 20px;
+}
+
+.pitcher-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.vulnerability-score {
+  font-weight: 600;
+  color: #e74c3c;
+}
+
+.pitcher-no-data {
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
+}
+
+.pitcher-no-data h4 {
+  margin: 0 0 8px 0;
+  color: #495057;
+}
+
+/* Analysis Categories */
+.analysis-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.analysis-category {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.analysis-category h5 {
+  margin: 0 0 16px 0;
+  color: #2c3e50;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.no-data {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Pitch Vulnerabilities */
+.pitch-vulnerabilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.pitch-card {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pitch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.pitch-name {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.vulnerability-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.vulnerability-badge.high {
+  background: #ffe0e0;
+  color: #d32f2f;
+}
+
+.vulnerability-badge.medium {
+  background: #fff3cd;
+  color: #f57c00;
+}
+
+.vulnerability-badge.low {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.pitch-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.stat-label {
+  color: #6c757d;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Inning Patterns */
+.inning-patterns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.inning-card {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.inning-card.high-vuln {
+  border-left: 4px solid #e74c3c;
+}
+
+.inning-card.med-vuln {
+  border-left: 4px solid #f39c12;
+}
+
+.inning-card.low-vuln {
+  border-left: 4px solid #27ae60;
+}
+
+.inning-header {
+  margin-bottom: 8px;
+}
+
+.inning-label {
+  display: block;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.vulnerability-score {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  color: #e74c3c;
+  margin-top: 4px;
+}
+
+.inning-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: #6c757d;
+}
+
+/* Position Vulnerabilities */
+.position-vulnerabilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.position-card {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.position-card.high-vuln {
+  border-left: 4px solid #e74c3c;
+}
+
+.position-card.med-vuln {
+  border-left: 4px solid #f39c12;
+}
+
+.position-card.low-vuln {
+  border-left: 4px solid #27ae60;
+}
+
+.position-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.position-number {
+  background: #2c3e50;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.position-name {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 12px;
+}
+
+.position-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.position-stats .stat {
+  display: flex;
+  justify-content: space-between;
+}
+
+.position-stats .label {
+  color: #6c757d;
+}
+
+.position-stats .value {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Pattern Recognition */
+.pattern-recognition-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.predictability-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+}
+
+.predictability-header .label {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.predictability-header .score {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.predictability-header .score.high {
+  background: #ffe0e0;
+  color: #d32f2f;
+}
+
+.predictability-header .score.medium {
+  background: #fff3cd;
+  color: #f57c00;
+}
+
+.predictability-header .score.low {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.sequences-analyzed {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.top-sequences {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.top-sequences h5 {
+  margin: 0 0 12px 0;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.sequences-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sequence-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #667eea;
+}
+
+.sequence-pattern {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.sequence-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.sequence-stats span {
+  padding: 2px 6px;
+  background: white;
+  border-radius: 4px;
+}
+
+/* Timing Windows */
+.timing-windows-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.timing-card {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.timing-card.high-vuln {
+  border-left: 4px solid #e74c3c;
+}
+
+.timing-card.med-vuln {
+  border-left: 4px solid #f39c12;
+}
+
+.timing-card.low-vuln {
+  border-left: 4px solid #27ae60;
+}
+
+.timing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.pitch-range {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.timing-header .vulnerability {
+  font-weight: 700;
+  color: #e74c3c;
+}
+
+.timing-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+/* Recent Form */
+.recent-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.recent-form .trend {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.recent-form .trend.improving {
+  background: #d4edda;
+  color: #155724;
+}
+
+.recent-form .trend.declining {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.recent-form .trend.stable {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+/* Overall Assessment */
+.overall-assessment {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.assessment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.advantage {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.advantage.significant {
+  background: #ffe0e0;
+  color: #d32f2f;
+}
+
+.advantage.moderate {
+  background: #fff3cd;
+  color: #f57c00;
+}
+
+.advantage.slight {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.vulnerable-pitcher {
+  font-weight: 600;
+  color: #e74c3c;
+}
+
+.vulnerability-comparison {
+  display: flex;
+  justify-content: space-around;
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pitcher-vuln {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.pitcher-vuln .label {
+  font-size: 12px;
+  color: #6c757d;
+  text-transform: uppercase;
+}
+
+.pitcher-vuln .value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e74c3c;
+}
+
+.key-patterns {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.key-patterns h5 {
+  margin: 0 0 12px 0;
+  color: #2c3e50;
+}
+
+.key-patterns ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.key-patterns li {
+  margin-bottom: 6px;
+  color: #495057;
+}
+
+.recommended-strategy {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.recommended-strategy h5 {
+  margin: 0 0 12px 0;
+  color: #2c3e50;
+}
+
+.recommended-strategy p {
+  margin: 0;
+  color: #495057;
+  line-height: 1.5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .comprehensive-analysis-display {
+    padding: 16px;
+  }
+
+  .header-main {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .analysis-header h2 {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .matchup-selector {
+    justify-content: center;
+  }
+
+  .matchup-dropdown {
+    min-width: 250px;
+  }
+
+  .matchup-info {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .pitch-vulnerabilities-grid,
+  .timing-windows-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inning-patterns-grid,
+  .position-vulnerabilities-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+
+  .assessment-header {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .vulnerability-comparison {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+/* Optimal Matchups Styles */
+.optimal-matchups-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.away-matchups h4,
+.home-matchups h4 {
+  margin: 0 0 16px 0;
+  color: #495057;
+  font-size: 16px;
+  font-weight: 600;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.optimal-matchups-section {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.matchups-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.matchups-header .pitcher-name {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 16px;
+}
+
+.matchups-header .matchup-count {
+  font-size: 14px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.matchups-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.matchup-card {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  border-left: 4px solid #6c757d;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.matchup-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Opportunity score color coding */
+.matchup-card.opportunity-5 {
+  border-left-color: #dc3545; /* Red - Excellent */
+}
+
+.matchup-card.opportunity-4 {
+  border-left-color: #fd7e14; /* Orange - Very Good */
+}
+
+.matchup-card.opportunity-3 {
+  border-left-color: #ffc107; /* Yellow - Good */
+}
+
+.matchup-card.opportunity-2 {
+  border-left-color: #28a745; /* Green - Moderate */
+}
+
+.matchup-card.opportunity-1,
+.matchup-card.opportunity-0 {
+  border-left-color: #6c757d; /* Gray - Low */
+}
+
+.matchup-card .matchup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.hitter-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hitter-info .hitter-name {
+  font-weight: 600;
+  font-size: 16px;
+  color: #2c3e50;
+}
+
+.hitter-info .batting-position {
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.opportunity-score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.opportunity-score .score {
+  font-size: 18px;
+  font-weight: 700;
+  color: #dc3545;
+}
+
+.opportunity-score .label {
+  font-size: 11px;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pitch-type-info {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.pitch-type-info .pitch-type {
+  font-weight: 600;
+  color: #495057;
+  font-size: 14px;
+}
+
+.pitch-type-info .pitch-name {
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.matchup-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.stat-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-values {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-values span {
+  font-size: 12px;
+  color: #6c757d;
+  font-family: 'Monaco', 'Menlo', monospace;
+}
+
+.reasoning {
+  padding: 8px;
+  background: #e3f2fd;
+  border-radius: 4px;
+  border-left: 3px solid #2196f3;
+}
+
+.reasoning-text {
+  font-size: 12px;
+  color: #1976d2;
+  font-style: italic;
+}
+
+/* Enhanced pattern recognition styles */
+.analysis-reliability {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.reliability.high {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.reliability.medium {
+  color: #ffc107;
+  font-weight: 600;
+}
+
+.reliability.low {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.sequence-breakdown {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.confidence {
+  font-size: 14px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.confidence.high {
+  color: #28a745;
+}
+
+.confidence.medium {
+  color: #ffc107;
+}
+
+.confidence.low {
+  color: #dc3545;
+}
+
+.sequence-item.3-pitch {
+  border-left-color: #28a745;
+}
+
+.sequence-item.2-pitch {
+  border-left-color: #ffc107;
+}
+
+.sequence-type-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.sequence-type-badge.3-pitch {
+  background: #d4edda;
+  color: #155724;
+}
+
+.sequence-type-badge.2-pitch {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.consistency-indicators {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.consistency {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: #e3f2fd;
+  color: #1976d2;
+  font-weight: 500;
+}
+
+.consistency.inning {
+  background: #e8f5e8;
+  color: #2e7d2e;
+}
+
+.consistency.count {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.confidence-mult {
+  font-size: 11px;
+  color: #495057;
+  font-weight: 500;
+}
+
+/* Responsive design for optimal matchups */
+@media (max-width: 768px) {
+  .optimal-matchups-container {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .matchup-stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .matchup-card .matchup-header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  
+  .opportunity-score {
+    align-items: flex-start;
+  }
+}

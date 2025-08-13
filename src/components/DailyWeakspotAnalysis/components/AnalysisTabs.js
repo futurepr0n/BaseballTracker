@@ -2,12 +2,19 @@ import React, { useState } from 'react';
 import EnhancedWeakspotResults from './EnhancedWeakspotResults';
 import BatterOpportunitySection from './BatterOpportunitySection';
 import BestBetsAnalysis from './BestBetsAnalysis';
+import ComprehensiveAnalysisDisplay from './ComprehensiveAnalysisDisplay';
 import './AnalysisTabs.css';
 
 const AnalysisTabs = ({ analysis, opportunities, loading, enhanced, matchups }) => {
-  const [activeTab, setActiveTab] = useState('pitcher-vulnerabilities');
+  const [activeTab, setActiveTab] = useState('comprehensive-display');
 
   const tabs = [
+    {
+      id: 'comprehensive-display',
+      label: 'Comprehensive Analysis',
+      icon: '📊',
+      description: 'Complete API response data in organized format'
+    },
     {
       id: 'pitcher-vulnerabilities',
       label: 'Pitcher Vulnerabilities',
@@ -29,13 +36,21 @@ const AnalysisTabs = ({ analysis, opportunities, loading, enhanced, matchups }) 
     {
       id: 'detailed-breakdown',
       label: 'Detailed Analysis',
-      icon: '📊',
+      icon: '📈',
       description: 'Comprehensive matchup breakdowns and strategic context'
     }
   ];
 
   const renderTabContent = () => {
     switch (activeTab) {
+      case 'comprehensive-display':
+        return (
+          <ComprehensiveAnalysisDisplay
+            analysis={analysis}
+            loading={loading}
+          />
+        );
+      
       case 'pitcher-vulnerabilities':
         return (
           <EnhancedWeakspotResults

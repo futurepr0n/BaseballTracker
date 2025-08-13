@@ -6,9 +6,9 @@ import ExportTools from './components/ExportTools';
 import { useBaseballAnalysis } from '../../services/baseballAnalysisService';
 import { weakspotService } from './services/weakspotService';
 import { normalizeGamesVenues } from '../../utils/venueNormalizer';
-import './DailyMatchupAnalysis.css';
+import './DailyWeakspotAnalysis.css';
 
-const DailyMatchupAnalysis = ({ playerData, teamData, gameData, currentDate }) => {
+const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) => {
   // Ensure proper date format (YYYY-MM-DD string)
   const formatDateForInput = (date) => {
     if (!date) return new Date().toISOString().split('T')[0];
@@ -128,18 +128,20 @@ const DailyMatchupAnalysis = ({ playerData, teamData, gameData, currentDate }) =
       const matchups = games.map(game => {
         // Handle lineup data format
         if (game.teams && game.pitchers) {
-          return {
+          const matchup = {
             awayPitcher: game.pitchers.away?.name,
             awayTeam: game.teams.away?.abbr,
             homePitcher: game.pitchers.home?.name,
             homeTeam: game.teams.home?.abbr,
             gameId: game.gameId,
-            venue: game.venue,
+            venue: game.venue?.name || game.venue,
             gameTime: game.gameTime
           };
+          console.log('🎯 DAILY WEAKSPOT: Lineup format matchup:', matchup);
+          return matchup;
         } else {
           // Handle fallback game data format
-          return {
+          const matchup = {
             awayPitcher: game.away_pitcher || game.awayPitcher,
             awayTeam: game.away_team || game.awayTeam,
             homePitcher: game.home_pitcher || game.homePitcher,
@@ -148,14 +150,16 @@ const DailyMatchupAnalysis = ({ playerData, teamData, gameData, currentDate }) =
             venue: game.venue,
             gameTime: game.time || game.gameTime
           };
+          console.log('🎯 DAILY WEAKSPOT: Fallback format matchup:', matchup);
+          return matchup;
         }
       });
 
       // Store matchups for use in BatterOpportunitySection
       setCurrentMatchups(matchups);
 
-      // Run weakspot analysis using our shell script integration
-      const weakspotResults = await weakspotService.runDailyMatchupAnalysis(
+      // Run weakspot analysis using our play-by-play data integration
+      const weakspotResults = await weakspotService.runDailyWeakspotAnalysis(
         matchups, 
         new Date(selectedDate).toISOString().split('T')[0]
       );
@@ -171,8 +175,12 @@ const DailyMatchupAnalysis = ({ playerData, teamData, gameData, currentDate }) =
         }
       }
 
+      console.log('🎯 WEAKSPOT ANALYSIS RESULTS:', enhancedResults);
+      console.log('🎯 OPPORTUNITIES COUNT:', enhancedResults.weakspot_opportunities?.length || 0);
+      console.log('🎯 MATCHUP ANALYSIS:', enhancedResults.matchup_analysis);
+      
       setWeakspotAnalysis(enhancedResults);
-      setFilteredOpportunities(enhancedResults.opportunities || []);
+      setFilteredOpportunities(enhancedResults.weakspot_opportunities || []);
       
     } catch (error) {
       setAnalysisError(`Analysis failed: ${error.message}`);
@@ -188,9 +196,9 @@ const DailyMatchupAnalysis = ({ playerData, teamData, gameData, currentDate }) =
   const handleClassificationChange = useCallback((mode) => {
     setClassificationMode(mode);
     
-    if (!weakspotAnalysis?.opportunities) return;
+    if (!weakspotAnalysis?.weakspot_opportunities) return;
     
-    let filtered = [...weakspotAnalysis.opportunities];
+    let filtered = [...weakspotAnalysis.weakspot_opportunities];
     
     switch (mode) {
       case 'confidence':
@@ -236,7 +244,7 @@ const DailyMatchupAnalysis = ({ playerData, teamData, gameData, currentDate }) =
   return (
     <div className="daily-matchup-analysis">
       <div className="analysis-header">
-        <h1>Daily Matchup Analysis</h1>
+        <h1>Daily Weakspot Analysis</h1>
         <p>Comprehensive weakspot and opportunity intelligence for scheduled games</p>
       </div>
 
@@ -293,7 +301,7 @@ const DailyMatchupAnalysis = ({ playerData, teamData, gameData, currentDate }) =
 
         {/* Help Section */}
         <div className="analysis-help">
-          <h3>How to Use Daily Matchup Analysis</h3>
+          <h3>How to Use Daily Weakspot Analysis</h3>
           <div className="help-grid">
             <div className="help-item">
               <h4>1. Select Date</h4>
@@ -318,4 +326,4 @@ const DailyMatchupAnalysis = ({ playerData, teamData, gameData, currentDate }) =
   );
 };
 
-export default DailyMatchupAnalysis;
+export default DailyWeakspotAnalysis;
