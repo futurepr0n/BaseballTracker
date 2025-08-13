@@ -159,9 +159,10 @@ const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) 
       setCurrentMatchups(matchups);
 
       // Run weakspot analysis using our play-by-play data integration
+      // Use selectedDate directly to avoid timezone conversion issues
       const weakspotResults = await weakspotService.runDailyWeakspotAnalysis(
         matchups, 
-        new Date(selectedDate).toISOString().split('T')[0]
+        selectedDate
       );
 
       // Enhance with Baseball API if available
