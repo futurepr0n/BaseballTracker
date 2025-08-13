@@ -9,11 +9,22 @@ import { normalizeGamesVenues } from '../../utils/venueNormalizer';
 import './DailyWeakspotAnalysis.css';
 
 const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) => {
-  // Ensure proper date format (YYYY-MM-DD string)
+  // Ensure proper date format (YYYY-MM-DD string) without timezone conversion
   const formatDateForInput = (date) => {
-    if (!date) return new Date().toISOString().split('T')[0];
+    if (!date) {
+      // Get current date without timezone issues
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
     if (typeof date === 'string') return date;
-    return date.toISOString().split('T')[0];
+    // For Date objects, format manually to avoid timezone conversion
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   // State management
@@ -49,7 +60,8 @@ const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) 
       if (!selectedDate) return;
 
       try {
-        const dateStr = new Date(selectedDate).toISOString().split('T')[0];
+        // Use selectedDate directly without timezone conversion
+        const dateStr = selectedDate;
         const response = await fetch(`/data/lineups/starting_lineups_${dateStr}.json`);
         
         if (response.ok) {
@@ -59,9 +71,11 @@ const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) 
           setSelectedGames(normalizedGames);
         } else {
           // Fallback to game data if lineups not available
-          const games = gameData?.filter(game => 
-            new Date(game.date).toISOString().split('T')[0] === dateStr
-          ) || [];
+          const games = gameData?.filter(game => {
+            // Compare dates directly without timezone conversion
+            const gameDate = typeof game.date === 'string' ? game.date : game.date.toISOString().split('T')[0];
+            return gameDate === dateStr;
+          }) || [];
           // Normalize venues for consistency
           const normalizedGames = normalizeGamesVenues(games);
           setSelectedGames(normalizedGames);
@@ -76,7 +90,7 @@ const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) 
   }, [selectedDate, gameData]);
 
   // Enhance results with Baseball API
-  const enhanceWithBaseballAPI = useCallback(async (weakspotResults, matchups) => {
+  const enhanceWithBaseballAPI = useCallback(async (weakspotResults) => {
     const enhancedOpportunities = [];
 
     for (const opportunity of weakspotResults.opportunities || []) {
@@ -169,7 +183,7 @@ const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) 
       let enhancedResults = weakspotResults;
       if (initialized && service) {
         try {
-          enhancedResults = await enhanceWithBaseballAPI(weakspotResults, matchups);
+          enhancedResults = await enhanceWithBaseballAPI(weakspotResults);
         } catch (apiError) {
           console.warn('Failed to enhance with Baseball API:', apiError);
           // Continue with basic results

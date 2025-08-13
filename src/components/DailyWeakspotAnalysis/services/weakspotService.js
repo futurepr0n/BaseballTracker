@@ -82,7 +82,7 @@ class WeakspotService {
         weakspot_opportunities: this.classifyOpportunities(opportunities),
         matchup_analysis: matchupAnalysis, // Add structured matchup data
         errors,
-        generated_at: new Date().toISOString(),
+        generated_at: new Date().toISOString(), // This is fine - it's just a timestamp, not a date comparison
         summary: this.generateSummary(opportunities),
         // Add debug info to identify structure
         debug_info: {

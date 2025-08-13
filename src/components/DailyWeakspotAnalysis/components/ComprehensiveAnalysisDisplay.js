@@ -42,7 +42,18 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
         const allMatchups = Object.values(analysis.matchup_analysis);
         if (allMatchups.length > 0) {
           const firstMatchup = allMatchups[0];
-          const date = firstMatchup.matchup?.date || new Date().toISOString().split('T')[0];
+          // Get date without timezone conversion
+          let date;
+          if (firstMatchup.matchup?.date) {
+            date = firstMatchup.matchup.date;
+          } else {
+            // Get current date without timezone issues
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            date = `${year}-${month}-${day}`;
+          }
           
           const response = await fetch(`/data/lineups/starting_lineups_${date}.json`);
           if (response.ok) {
