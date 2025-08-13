@@ -30,7 +30,7 @@ import {
 
 import PinheadsPlayhouse from './components/PinheadsPlayhouse/PinheadsPlayhouse';
 import HRMatchupHub from './components/HRMatchupHub/HRMatchupHub';
-import DailyMatchupAnalysis from './components/DailyMatchupAnalysis/DailyMatchupAnalysis';
+import DailyWeakspotAnalysis from './components/DailyWeakspotAnalysis/DailyWeakspotAnalysis';
 import CSSFixesTest from './components/test/CSSFixesTest';
 import HandednessTest from './components/test/HandednessTest';
 
@@ -203,7 +203,7 @@ function App() {
                   currentDate={currentDate}
                 />} />
 
-              <Route path="/daily-matchup-analysis" element={<DailyMatchupAnalysis 
+              <Route path="/daily-weakspot-analysis" element={<DailyWeakspotAnalysis 
                   playerData={playerData} 
                   teamData={teamData} 
                   gameData={gameData} 

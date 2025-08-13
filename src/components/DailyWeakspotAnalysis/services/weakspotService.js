@@ -7,9 +7,7 @@
 
 class WeakspotService {
   constructor() {
-    this.baseUrl = process.env.NODE_ENV === 'development' 
-      ? 'http://localhost:3001' 
-      : '';
+    this.baseUrl = 'http://localhost:8000';
     
     // Cache for analysis results
     this.analysisCache = new Map();
@@ -17,9 +15,9 @@ class WeakspotService {
   }
 
   /**
-   * Run daily matchup analysis for all games on a given date
+   * Run daily weakspot analysis for all games on a given date
    */
-  async runDailyMatchupAnalysis(matchups, date) {
+  async runDailyWeakspotAnalysis(matchups, date) {
     const cacheKey = `${date}-${matchups.length}-${JSON.stringify(matchups).substring(0, 100)}`;
     
     // Check cache first
@@ -48,14 +46,50 @@ class WeakspotService {
         }
       });
 
+      // Process matchup analysis data
+      const matchupAnalysis = {};
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+          const matchupKey = `matchup_${index}`;
+          matchupAnalysis[matchupKey] = {
+            matchup: matchups[index],
+            ...result.value
+          };
+          
+          console.log('🎯 WEAKSPOT SERVICE: Constructed matchup analysis:', {
+            matchupKey,
+            originalMatchup: matchups[index],
+            resultValue: result.value,
+            finalStructure: matchupAnalysis[matchupKey]
+          });
+          
+          // Debug logging for data structure
+          console.log(`🎯 WEAKSPOT SERVICE: Processing matchup ${index}:`, {
+            matchupKey,
+            has_away_pitcher_analysis: !!result.value.away_pitcher_analysis,
+            has_home_pitcher_analysis: !!result.value.home_pitcher_analysis,
+            away_pitcher: result.value.away_pitcher_analysis?.pitcher_name,
+            home_pitcher: result.value.home_pitcher_analysis?.pitcher_name,
+            opportunities_count: result.value.opportunities?.length || 0
+          });
+        }
+      });
+
       const analysis = {
         date,
         total_matchups: matchups.length,
         successful_analyses: results.filter(r => r.status === 'fulfilled').length,
-        opportunities: this.classifyOpportunities(opportunities),
+        weakspot_opportunities: this.classifyOpportunities(opportunities),
+        matchup_analysis: matchupAnalysis, // Add structured matchup data
         errors,
         generated_at: new Date().toISOString(),
-        summary: this.generateSummary(opportunities)
+        summary: this.generateSummary(opportunities),
+        // Add debug info to identify structure
+        debug_info: {
+          has_matchup_analysis: Object.keys(matchupAnalysis).length > 0,
+          matchup_keys: Object.keys(matchupAnalysis),
+          total_successful_results: results.filter(r => r.status === 'fulfilled').length
+        }
       };
 
       // Cache the result
@@ -91,16 +125,16 @@ class WeakspotService {
       });
 
       if (!response.ok) {
-        // Fallback to mock data for development
-        return this.generateMockAnalysis(matchup, date);
+        throw new Error(`API responded with status ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
       return this.processAnalysisResults(data, matchup);
       
     } catch (error) {
-      console.warn(`Using mock data for ${matchup.awayPitcher} vs ${matchup.homePitcher}:`, error.message);
-      return this.generateMockAnalysis(matchup, date);
+      console.error(`API call failed for ${matchup.awayPitcher} vs ${matchup.homePitcher}:`, error.message);
+      // Re-throw the error instead of falling back to mock data
+      throw error;
     }
   }
 
@@ -134,12 +168,27 @@ class WeakspotService {
       ));
     }
 
+    console.log(`🎯 WEAKSPOT SERVICE DEBUG: Extracted ${opportunities.length} opportunities from API response`);
+    console.log('🎯 WEAKSPOT SERVICE DEBUG: API rawData.matchup:', rawData.matchup);
+    console.log('🎯 WEAKSPOT SERVICE DEBUG: Original matchup:', matchup);
+    
+    // Return comprehensive analysis structure
     return {
-      matchup,
+      matchup: rawData.matchup || matchup, // Use API response matchup if available, fallback to original
       opportunities,
+      // Preserve raw analysis data for enhanced display
+      away_pitcher_analysis: rawData.away_pitcher_analysis,
+      home_pitcher_analysis: rawData.home_pitcher_analysis,
+      overall_matchup_assessment: rawData.overall_matchup_assessment, // Add this for direct access
+      pitcher_analysis: {
+        away_pitcher: rawData.away_pitcher_analysis,
+        home_pitcher: rawData.home_pitcher_analysis,
+        overall_assessment: rawData.overall_matchup_assessment
+      },
       metadata: {
-        analysis_time: rawData.analysis_time,
-        data_quality: rawData.data_quality || 'unknown'
+        analysis_time: rawData.generated_at,
+        data_quality: rawData.data_source || 'play_by_play_historical',
+        analysis_type: rawData.analysis_type
       }
     };
   }
@@ -149,35 +198,36 @@ class WeakspotService {
    */
   extractOpportunities(analysis, pitcher, opposingTeam, pitcherTeam, side) {
     const opportunities = [];
-    const lineupVulnerabilities = analysis.lineup_vulnerabilities || {};
-    const inningPatterns = analysis.inning_patterns || {};
-    const pitchPatterns = analysis.pitch_patterns || {};
-
-    // Extract position-based opportunities
-    Object.entries(lineupVulnerabilities).forEach(([position, data]) => {
-      if (data.vulnerability_score > 25 && data.confidence > 0.6) {
+    
+    // Extract pitch vulnerability opportunities
+    const pitchVulnerabilities = analysis.pitch_vulnerabilities || {};
+    Object.entries(pitchVulnerabilities).forEach(([pitchType, data]) => {
+      if (data.vulnerability_score > 8) { // Lower threshold for pitch vulnerabilities
         opportunities.push({
-          type: 'position_vulnerability',
+          type: 'pitch_vulnerability',
           pitcher,
           pitcher_team: pitcherTeam,
           opposing_team: opposingTeam,
           side,
-          position: parseInt(position.split('_')[1]),
+          pitch_type: pitchType,
           vulnerability_score: data.vulnerability_score,
-          success_rate: data.vulnerability_rate,
-          confidence_score: data.confidence * data.vulnerability_score,
+          hr_rate: data.hr_rate,
+          hit_rate: data.hit_rate,
+          strikeout_rate: data.strikeout_rate,
+          confidence_score: Math.min(data.vulnerability_score * 10, 100),
           sample_size: data.sample_size,
           details: {
-            avg_velocity: data.avg_velocity,
-            leverage_situations: data.leverage_situations
+            pitch_type: pitchType,
+            effectiveness: data.strikeout_rate > 0.2 ? 'effective_but_vulnerable' : 'concerning'
           }
         });
       }
     });
 
     // Extract inning-based opportunities
+    const inningPatterns = analysis.inning_patterns || {};
     Object.entries(inningPatterns).forEach(([inning, data]) => {
-      if (data.vulnerability_score > 30 && data.confidence > 0.7) {
+      if (data.vulnerability_score > 15) { // Adjusted threshold
         opportunities.push({
           type: 'inning_vulnerability',
           pitcher,
@@ -186,20 +236,97 @@ class WeakspotService {
           side,
           inning: parseInt(inning.split('_')[1]),
           vulnerability_score: data.vulnerability_score,
-          success_rate: data.vulnerability_rate,
-          confidence_score: data.confidence * data.vulnerability_score,
-          hr_frequency: data.hr_frequency || 0,
+          hr_frequency: data.hr_frequency,
+          hit_frequency: data.hit_frequency,
+          walk_frequency: data.walk_frequency,
+          confidence_score: data.vulnerability_score * 3,
+          sample_size: data.sample_size,
           details: {
-            avg_velocity: data.avg_velocity,
-            avg_pitch_count: data.avg_pitch_count
+            inning: parseInt(inning.split('_')[1]),
+            pattern: data.vulnerability_score > 20 ? 'high_vulnerability' : 'moderate_vulnerability'
+          }
+        });
+      }
+    });
+
+    // Extract count weakness opportunities
+    const countWeaknesses = analysis.count_weaknesses || {};
+    Object.entries(countWeaknesses).forEach(([count, data]) => {
+      if (data.weakness_score > 80) { // High threshold for count weaknesses
+        opportunities.push({
+          type: 'count_weakness',
+          pitcher,
+          pitcher_team: pitcherTeam,
+          opposing_team: opposingTeam,
+          side,
+          count: count,
+          weakness_score: data.weakness_score,
+          control_rate: data.control_rate,
+          confidence_score: Math.min(data.weakness_score, 100),
+          sample_size: data.sample_size,
+          details: {
+            count: count,
+            situation: count.startsWith('2-') || count.startsWith('3-') ? 'hitter_count' : 'neutral'
+          }
+        });
+      }
+    });
+
+    // Extract timing window opportunities
+    const timingWindows = analysis.timing_windows || {};
+    Object.entries(timingWindows).forEach(([window, data]) => {
+      if (data.vulnerability_score > 20) {
+        opportunities.push({
+          type: 'timing_window',
+          pitcher,
+          pitcher_team: pitcherTeam,
+          opposing_team: opposingTeam,
+          side,
+          timing_window: window,
+          vulnerability_score: data.vulnerability_score,
+          hit_rate: data.hit_rate,
+          average_velocity: data.average_velocity,
+          confidence_score: data.vulnerability_score * 2.5,
+          sample_size: data.sample_size,
+          details: {
+            pitch_range: window,
+            fatigue_factor: window.includes('81-') || window.includes('101-') ? 'high' : 'moderate'
+          }
+        });
+      }
+    });
+
+    // Extract individual position vulnerability opportunities
+    const positionVulnerabilities = analysis.position_vulnerabilities || {};
+    Object.entries(positionVulnerabilities).forEach(([position, data]) => {
+      if (data.vulnerability_score > 8) { // Threshold for meaningful position vulnerabilities
+        const positionNumber = parseInt(position.split('_')[1]);
+        opportunities.push({
+          type: 'position_vulnerability',
+          pitcher,
+          pitcher_team: pitcherTeam,
+          opposing_team: opposingTeam,
+          side,
+          position: positionNumber,
+          vulnerability_score: data.vulnerability_score,
+          hr_rate: data.hr_rate,
+          hit_rate: data.hit_rate,
+          confidence_score: Math.min(data.vulnerability_score * 8, 100), // Scale to 0-100
+          sample_size: data.sample_size,
+          details: {
+            batting_position: positionNumber,
+            lineup_spot: this.getPositionDescription(positionNumber),
+            effectiveness: data.hr_rate > 0.05 ? 'hr_vulnerable' : 'hit_vulnerable',
+            strategic_value: this.getStrategicValue(positionNumber, data.vulnerability_score)
           }
         });
       }
     });
 
     // Extract predictability opportunities
-    const predictability = pitchPatterns.predictability_score || 0;
-    if (predictability > 10) {
+    const patternRecognition = analysis.pattern_recognition || {};
+    const predictability = patternRecognition.predictability_score || 0;
+    if (predictability > 15) {
       opportunities.push({
         type: 'predictability',
         pitcher,
@@ -207,12 +334,12 @@ class WeakspotService {
         opposing_team: opposingTeam,
         side,
         predictability_score: predictability,
-        confidence_score: Math.min(predictability * 5, 100),
-        vulnerability_score: predictability * 2,
-        sequences: this.getTopSequences(pitchPatterns.sequence_patterns || {}),
+        confidence_score: Math.min(predictability * 3, 100),
+        vulnerability_score: predictability,
+        sequences: patternRecognition.top_sequences || [],
         details: {
-          total_sequences: pitchPatterns.total_sequences || 0,
-          most_common_sequence: this.getMostCommonSequence(pitchPatterns.sequence_patterns || {})
+          total_sequences: patternRecognition.total_sequences_analyzed || 0,
+          pattern_level: predictability > 50 ? 'highly_predictable' : 'moderately_predictable'
         }
       });
     }
@@ -409,6 +536,44 @@ class WeakspotService {
       data,
       timestamp: Date.now()
     });
+  }
+
+  /**
+   * Position analysis helper methods
+   */
+  getPositionDescription(positionNumber) {
+    const descriptions = {
+      1: 'Leadoff Hitter',
+      2: '#2 Hitter', 
+      3: '#3 Hitter',
+      4: 'Cleanup Hitter',
+      5: '#5 Hitter',
+      6: '#6 Hitter',
+      7: '#7 Hitter',
+      8: '#8 Hitter',
+      9: '#9 Hitter'
+    };
+    return descriptions[positionNumber] || `Position ${positionNumber}`;
+  }
+
+  getStrategicValue(positionNumber, vulnerabilityScore) {
+    // Heart of the order (3-5) gets higher strategic value
+    if ([3, 4, 5].includes(positionNumber) && vulnerabilityScore > 15) {
+      return 'high_value_target';
+    }
+    // Power positions (4, 5) with good vulnerability
+    if ([4, 5].includes(positionNumber) && vulnerabilityScore > 10) {
+      return 'power_position_opportunity';
+    }
+    // Leadoff vulnerability
+    if (positionNumber === 1 && vulnerabilityScore > 12) {
+      return 'leadoff_opportunity';
+    }
+    // Bottom of order vulnerability
+    if ([7, 8, 9].includes(positionNumber) && vulnerabilityScore > 18) {
+      return 'bottom_order_exploitation';
+    }
+    return 'standard_opportunity';
   }
 
   /**

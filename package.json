@@ -33,7 +33,11 @@
         "convert-handedness": "node scripts/convertHandednessData.js",
         "generate-milestones": "node src/services/generateMilestoneTracking.js",
         "build-production": "npm run build && rm -rf build/data && ln -s ../../BaseballData/data build/data",
-        "production": "npm run build-production && serve -s build"
+        "production": "npm run build-production && nohup serve -s build > /dev/null 2>&1 &",
+        "production-fg": "npm run build-production && serve -s build",
+        "serve": "serve -s build",
+        "serve-bg": "nohup serve -s build > /dev/null 2>&1 &",
+        "kill-serve": "pkill -f 'serve.*build' || true"
     },
     "eslintConfig": {
         "extends": [
