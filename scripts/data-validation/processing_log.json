@@ -3723,8 +3723,722 @@
       "fileSize": 180,
       "fileModified": "2025-08-11T13:42:04.779Z",
       "checksum": "180_1754919724779"
+    },
+    "../BaseballData/CSV_BACKUPS/ARI_hitting_august_11_2025_401696685.csv": {
+      "gameId": "401696685",
+      "processedAt": "2025-08-14T16:35:03.985Z",
+      "fileSize": 408,
+      "fileModified": "2025-08-12T14:32:13.560Z",
+      "checksum": "408_1755009133560"
+    },
+    "../BaseballData/CSV_BACKUPS/ARI_hitting_august_12_2025_401696700.csv": {
+      "gameId": "401696700",
+      "processedAt": "2025-08-14T16:35:04.414Z",
+      "fileSize": 407,
+      "fileModified": "2025-08-14T14:00:48.417Z",
+      "checksum": "407_1755180048417"
+    },
+    "../BaseballData/CSV_BACKUPS/ARI_hitting_august_13_2025_401696715.csv": {
+      "gameId": "401696715",
+      "processedAt": "2025-08-14T16:35:04.845Z",
+      "fileSize": 447,
+      "fileModified": "2025-08-14T14:00:48.417Z",
+      "checksum": "447_1755180048417"
+    },
+    "../BaseballData/CSV_BACKUPS/ARI_pitching_august_11_2025_401696685.csv": {
+      "gameId": "401696685",
+      "processedAt": "2025-08-14T16:35:07.082Z",
+      "fileSize": 225,
+      "fileModified": "2025-08-12T14:32:13.560Z",
+      "checksum": "225_1755009133560"
+    },
+    "../BaseballData/CSV_BACKUPS/ARI_pitching_august_12_2025_401696700.csv": {
+      "gameId": "401696700",
+      "processedAt": "2025-08-14T16:35:07.460Z",
+      "fileSize": 188,
+      "fileModified": "2025-08-14T14:00:48.417Z",
+      "checksum": "188_1755180048417"
+    },
+    "../BaseballData/CSV_BACKUPS/ARI_pitching_august_13_2025_401696715.csv": {
+      "gameId": "401696715",
+      "processedAt": "2025-08-14T16:35:07.970Z",
+      "fileSize": 223,
+      "fileModified": "2025-08-14T14:00:48.417Z",
+      "checksum": "223_1755180048417"
+    },
+    "../BaseballData/CSV_BACKUPS/ATL_hitting_august_12_2025_401696694.csv": {
+      "gameId": "401696694",
+      "processedAt": "2025-08-14T16:35:10.305Z",
+      "fileSize": 429,
+      "fileModified": "2025-08-14T14:00:48.417Z",
+      "checksum": "429_1755180048417"
+    },
+    "../BaseballData/CSV_BACKUPS/ATL_hitting_august_13_2025_401696709.csv": {
+      "gameId": "401696709",
+      "processedAt": "2025-08-14T16:35:10.821Z",
+      "fileSize": 390,
+      "fileModified": "2025-08-14T14:00:48.418Z",
+      "checksum": "390_1755180048418"
+    },
+    "../BaseballData/CSV_BACKUPS/ATL_pitching_august_12_2025_401696694.csv": {
+      "gameId": "401696694",
+      "processedAt": "2025-08-14T16:35:13.910Z",
+      "fileSize": 145,
+      "fileModified": "2025-08-14T14:00:48.418Z",
+      "checksum": "145_1755180048418"
+    },
+    "../BaseballData/CSV_BACKUPS/ATL_pitching_august_13_2025_401696709.csv": {
+      "gameId": "401696709",
+      "processedAt": "2025-08-14T16:35:14.354Z",
+      "fileSize": 258,
+      "fileModified": "2025-08-14T14:00:48.418Z",
+      "checksum": "258_1755180048418"
+    },
+    "../BaseballData/CSV_BACKUPS/BAL_hitting_august_12_2025_401696699.csv": {
+      "gameId": "401696699",
+      "processedAt": "2025-08-14T16:35:17.651Z",
+      "fileSize": 480,
+      "fileModified": "2025-08-14T14:00:48.418Z",
+      "checksum": "480_1755180048418"
+    },
+    "../BaseballData/CSV_BACKUPS/BAL_hitting_august_13_2025_401696714.csv": {
+      "gameId": "401696714",
+      "processedAt": "2025-08-14T16:35:18.186Z",
+      "fileSize": 480,
+      "fileModified": "2025-08-14T14:00:48.418Z",
+      "checksum": "480_1755180048418"
+    },
+    "../BaseballData/CSV_BACKUPS/BAL_pitching_august_12_2025_401696699.csv": {
+      "gameId": "401696699",
+      "processedAt": "2025-08-14T16:35:20.998Z",
+      "fileSize": 110,
+      "fileModified": "2025-08-14T14:00:48.418Z",
+      "checksum": "110_1755180048418"
+    },
+    "../BaseballData/CSV_BACKUPS/BAL_pitching_august_13_2025_401696714.csv": {
+      "gameId": "401696714",
+      "processedAt": "2025-08-14T16:35:21.471Z",
+      "fileSize": 174,
+      "fileModified": "2025-08-14T14:00:48.418Z",
+      "checksum": "174_1755180048418"
+    },
+    "../BaseballData/CSV_BACKUPS/BOS_hitting_august_11_2025_401696686.csv": {
+      "gameId": "401696686",
+      "processedAt": "2025-08-14T16:35:24.495Z",
+      "fileSize": 509,
+      "fileModified": "2025-08-12T14:32:13.560Z",
+      "checksum": "509_1755009133560"
+    },
+    "../BaseballData/CSV_BACKUPS/BOS_hitting_august_12_2025_401696701.csv": {
+      "gameId": "401696701",
+      "processedAt": "2025-08-14T16:35:25.042Z",
+      "fileSize": 429,
+      "fileModified": "2025-08-14T14:00:48.419Z",
+      "checksum": "429_1755180048419"
+    },
+    "../BaseballData/CSV_BACKUPS/BOS_hitting_august_13_2025_401696716.csv": {
+      "gameId": "401696716",
+      "processedAt": "2025-08-14T16:35:25.594Z",
+      "fileSize": 432,
+      "fileModified": "2025-08-14T14:00:48.419Z",
+      "checksum": "432_1755180048419"
+    },
+    "../BaseballData/CSV_BACKUPS/BOS_pitching_august_11_2025_401696686.csv": {
+      "gameId": "401696686",
+      "processedAt": "2025-08-14T16:35:28.119Z",
+      "fileSize": 185,
+      "fileModified": "2025-08-12T14:32:13.560Z",
+      "checksum": "185_1755009133560"
+    },
+    "../BaseballData/CSV_BACKUPS/BOS_pitching_august_12_2025_401696701.csv": {
+      "gameId": "401696701",
+      "processedAt": "2025-08-14T16:35:28.512Z",
+      "fileSize": 140,
+      "fileModified": "2025-08-14T14:00:48.419Z",
+      "checksum": "140_1755180048419"
+    },
+    "../BaseballData/CSV_BACKUPS/BOS_pitching_august_13_2025_401696716.csv": {
+      "gameId": "401696716",
+      "processedAt": "2025-08-14T16:35:28.882Z",
+      "fileSize": 144,
+      "fileModified": "2025-08-14T14:00:48.419Z",
+      "checksum": "144_1755180048419"
+    },
+    "../BaseballData/CSV_BACKUPS/CHC_hitting_august_12_2025_401696695.csv": {
+      "gameId": "401696695",
+      "processedAt": "2025-08-14T16:35:31.560Z",
+      "fileSize": 432,
+      "fileModified": "2025-08-14T14:00:48.419Z",
+      "checksum": "432_1755180048419"
+    },
+    "../BaseballData/CSV_BACKUPS/CHC_hitting_august_13_2025_401696710.csv": {
+      "gameId": "401696710",
+      "processedAt": "2025-08-14T16:35:32.102Z",
+      "fileSize": 433,
+      "fileModified": "2025-08-14T14:00:48.419Z",
+      "checksum": "433_1755180048419"
+    },
+    "../BaseballData/CSV_BACKUPS/CHC_pitching_august_12_2025_401696695.csv": {
+      "gameId": "401696695",
+      "processedAt": "2025-08-14T16:35:34.603Z",
+      "fileSize": 107,
+      "fileModified": "2025-08-14T14:00:48.419Z",
+      "checksum": "107_1755180048419"
+    },
+    "../BaseballData/CSV_BACKUPS/CHC_pitching_august_13_2025_401696710.csv": {
+      "gameId": "401696710",
+      "processedAt": "2025-08-14T16:35:35.033Z",
+      "fileSize": 221,
+      "fileModified": "2025-08-14T14:00:48.420Z",
+      "checksum": "221_1755180048420"
+    },
+    "../BaseballData/CSV_BACKUPS/CHW_hitting_august_11_2025_401696688.csv": {
+      "gameId": "401696688",
+      "processedAt": "2025-08-14T16:35:37.659Z",
+      "fileSize": 398,
+      "fileModified": "2025-08-12T14:32:13.561Z",
+      "checksum": "398_1755009133561"
+    },
+    "../BaseballData/CSV_BACKUPS/CHW_hitting_august_12_2025_401696703.csv": {
+      "gameId": "401696703",
+      "processedAt": "2025-08-14T16:35:38.188Z",
+      "fileSize": 435,
+      "fileModified": "2025-08-14T14:00:48.420Z",
+      "checksum": "435_1755180048420"
+    },
+    "../BaseballData/CSV_BACKUPS/CHW_hitting_august_13_2025_401696718.csv": {
+      "gameId": "401696718",
+      "processedAt": "2025-08-14T16:35:38.687Z",
+      "fileSize": 434,
+      "fileModified": "2025-08-14T14:00:48.420Z",
+      "checksum": "434_1755180048420"
+    },
+    "../BaseballData/CSV_BACKUPS/CHW_hitting_july_11_2025_401696319.csv": {
+      "gameId": "401696319",
+      "processedAt": "2025-08-14T16:35:40.830Z",
+      "fileSize": 558,
+      "fileModified": "2025-08-14T16:34:29.375Z",
+      "checksum": "558_1755189269375"
+    },
+    "../BaseballData/CSV_BACKUPS/CHW_hitting_july_11_2025_401800822.csv": {
+      "gameId": "401800822",
+      "processedAt": "2025-08-14T16:35:41.404Z",
+      "fileSize": 516,
+      "fileModified": "2025-08-14T16:34:00.270Z",
+      "checksum": "516_1755189240270"
+    },
+    "../BaseballData/CSV_BACKUPS/CHW_pitching_august_11_2025_401696688.csv": {
+      "gameId": "401696688",
+      "processedAt": "2025-08-14T16:35:42.166Z",
+      "fileSize": 257,
+      "fileModified": "2025-08-12T14:32:13.561Z",
+      "checksum": "257_1755009133561"
+    },
+    "../BaseballData/CSV_BACKUPS/CHW_pitching_august_12_2025_401696703.csv": {
+      "gameId": "401696703",
+      "processedAt": "2025-08-14T16:35:42.560Z",
+      "fileSize": 181,
+      "fileModified": "2025-08-14T14:00:48.420Z",
+      "checksum": "181_1755180048420"
+    },
+    "../BaseballData/CSV_BACKUPS/CHW_pitching_august_13_2025_401696718.csv": {
+      "gameId": "401696718",
+      "processedAt": "2025-08-14T16:35:42.933Z",
+      "fileSize": 142,
+      "fileModified": "2025-08-14T14:00:48.420Z",
+      "checksum": "142_1755180048420"
+    },
+    "../BaseballData/CSV_BACKUPS/CHW_pitching_july_11_2025_401696319.csv": {
+      "gameId": "401696319",
+      "processedAt": "2025-08-14T16:35:44.906Z",
+      "fileSize": 255,
+      "fileModified": "2025-08-14T16:34:29.376Z",
+      "checksum": "255_1755189269376"
+    },
+    "../BaseballData/CSV_BACKUPS/CHW_pitching_july_11_2025_401800822.csv": {
+      "gameId": "401800822",
+      "processedAt": "2025-08-14T16:35:45.335Z",
+      "fileSize": 186,
+      "fileModified": "2025-08-14T16:34:00.271Z",
+      "checksum": "186_1755189240271"
+    },
+    "../BaseballData/CSV_BACKUPS/CIN_hitting_august_11_2025_401696684.csv": {
+      "gameId": "401696684",
+      "processedAt": "2025-08-14T16:35:46.191Z",
+      "fileSize": 431,
+      "fileModified": "2025-08-12T14:32:13.561Z",
+      "checksum": "431_1755009133561"
+    },
+    "../BaseballData/CSV_BACKUPS/CIN_hitting_august_12_2025_401696698.csv": {
+      "gameId": "401696698",
+      "processedAt": "2025-08-14T16:35:46.729Z",
+      "fileSize": 430,
+      "fileModified": "2025-08-14T14:00:48.420Z",
+      "checksum": "430_1755180048420"
+    },
+    "../BaseballData/CSV_BACKUPS/CIN_hitting_august_13_2025_401696713.csv": {
+      "gameId": "401696713",
+      "processedAt": "2025-08-14T16:35:47.257Z",
+      "fileSize": 394,
+      "fileModified": "2025-08-14T14:00:48.420Z",
+      "checksum": "394_1755180048420"
+    },
+    "../BaseballData/CSV_BACKUPS/CIN_pitching_august_11_2025_401696684.csv": {
+      "gameId": "401696684",
+      "processedAt": "2025-08-14T16:35:50.037Z",
+      "fileSize": 148,
+      "fileModified": "2025-08-12T14:32:13.561Z",
+      "checksum": "148_1755009133561"
+    },
+    "../BaseballData/CSV_BACKUPS/CIN_pitching_august_12_2025_401696698.csv": {
+      "gameId": "401696698",
+      "processedAt": "2025-08-14T16:35:50.432Z",
+      "fileSize": 180,
+      "fileModified": "2025-08-14T14:00:48.421Z",
+      "checksum": "180_1755180048421"
+    },
+    "../BaseballData/CSV_BACKUPS/CIN_pitching_august_13_2025_401696713.csv": {
+      "gameId": "401696713",
+      "processedAt": "2025-08-14T16:35:50.862Z",
+      "fileSize": 214,
+      "fileModified": "2025-08-14T14:00:48.421Z",
+      "checksum": "214_1755180048421"
+    },
+    "../BaseballData/CSV_BACKUPS/CLE_hitting_august_12_2025_401696696.csv": {
+      "gameId": "401696696",
+      "processedAt": "2025-08-14T16:35:53.781Z",
+      "fileSize": 474,
+      "fileModified": "2025-08-14T14:00:48.421Z",
+      "checksum": "474_1755180048421"
+    },
+    "../BaseballData/CSV_BACKUPS/CLE_hitting_august_13_2025_401696711.csv": {
+      "gameId": "401696711",
+      "processedAt": "2025-08-14T16:35:54.340Z",
+      "fileSize": 513,
+      "fileModified": "2025-08-14T14:00:48.421Z",
+      "checksum": "513_1755180048421"
+    },
+    "../BaseballData/CSV_BACKUPS/CLE_hitting_july_11_2025_401696319.csv": {
+      "gameId": "401696319",
+      "processedAt": "2025-08-14T16:35:56.409Z",
+      "fileSize": 478,
+      "fileModified": "2025-08-14T16:34:29.373Z",
+      "checksum": "478_1755189269373"
+    },
+    "../BaseballData/CSV_BACKUPS/CLE_hitting_july_11_2025_401800822.csv": {
+      "gameId": "401800822",
+      "processedAt": "2025-08-14T16:35:56.942Z",
+      "fileSize": 433,
+      "fileModified": "2025-08-14T16:34:00.267Z",
+      "checksum": "433_1755189240267"
+    },
+    "../BaseballData/CSV_BACKUPS/CLE_pitching_august_12_2025_401696696.csv": {
+      "gameId": "401696696",
+      "processedAt": "2025-08-14T16:35:57.702Z",
+      "fileSize": 217,
+      "fileModified": "2025-08-14T14:00:48.422Z",
+      "checksum": "217_1755180048422"
+    },
+    "../BaseballData/CSV_BACKUPS/CLE_pitching_august_13_2025_401696711.csv": {
+      "gameId": "401696711",
+      "processedAt": "2025-08-14T16:35:58.082Z",
+      "fileSize": 224,
+      "fileModified": "2025-08-14T14:00:48.422Z",
+      "checksum": "224_1755180048422"
+    },
+    "../BaseballData/CSV_BACKUPS/CLE_pitching_july_11_2025_401696319.csv": {
+      "gameId": "401696319",
+      "processedAt": "2025-08-14T16:36:00.058Z",
+      "fileSize": 260,
+      "fileModified": "2025-08-14T16:34:29.374Z",
+      "checksum": "260_1755189269374"
+    },
+    "../BaseballData/CSV_BACKUPS/CLE_pitching_july_11_2025_401800822.csv": {
+      "gameId": "401800822",
+      "processedAt": "2025-08-14T16:36:00.495Z",
+      "fileSize": 177,
+      "fileModified": "2025-08-14T16:34:00.269Z",
+      "checksum": "177_1755189240269"
+    },
+    "../BaseballData/CSV_BACKUPS/COL_hitting_august_11_2025_401696687.csv": {
+      "gameId": "401696687",
+      "processedAt": "2025-08-14T16:36:01.312Z",
+      "fileSize": 428,
+      "fileModified": "2025-08-12T14:32:13.562Z",
+      "checksum": "428_1755009133562"
+    },
+    "../BaseballData/CSV_BACKUPS/COL_hitting_august_12_2025_401696702.csv": {
+      "gameId": "401696702",
+      "processedAt": "2025-08-14T16:36:01.850Z",
+      "fileSize": 468,
+      "fileModified": "2025-08-14T14:00:48.422Z",
+      "checksum": "468_1755180048422"
+    },
+    "../BaseballData/CSV_BACKUPS/COL_hitting_august_13_2025_401696717.csv": {
+      "gameId": "401696717",
+      "processedAt": "2025-08-14T16:36:02.393Z",
+      "fileSize": 510,
+      "fileModified": "2025-08-14T14:00:48.422Z",
+      "checksum": "510_1755180048422"
+    },
+    "../BaseballData/CSV_BACKUPS/COL_pitching_august_11_2025_401696687.csv": {
+      "gameId": "401696687",
+      "processedAt": "2025-08-14T16:36:04.622Z",
+      "fileSize": 185,
+      "fileModified": "2025-08-12T14:32:13.562Z",
+      "checksum": "185_1755009133562"
+    },
+    "../BaseballData/CSV_BACKUPS/COL_pitching_august_12_2025_401696702.csv": {
+      "gameId": "401696702",
+      "processedAt": "2025-08-14T16:36:05.002Z",
+      "fileSize": 111,
+      "fileModified": "2025-08-14T14:00:48.422Z",
+      "checksum": "111_1755180048422"
+    },
+    "../BaseballData/CSV_BACKUPS/COL_pitching_august_13_2025_401696717.csv": {
+      "gameId": "401696717",
+      "processedAt": "2025-08-14T16:36:05.395Z",
+      "fileSize": 216,
+      "fileModified": "2025-08-14T14:00:48.423Z",
+      "checksum": "216_1755180048423"
+    },
+    "../BaseballData/CSV_BACKUPS/DET_hitting_august_11_2025_401696688.csv": {
+      "gameId": "401696688",
+      "processedAt": "2025-08-14T16:36:07.730Z",
+      "fileSize": 512,
+      "fileModified": "2025-08-12T14:32:13.562Z",
+      "checksum": "512_1755009133562"
+    },
+    "../BaseballData/CSV_BACKUPS/DET_hitting_august_12_2025_401696703.csv": {
+      "gameId": "401696703",
+      "processedAt": "2025-08-14T16:36:08.314Z",
+      "fileSize": 551,
+      "fileModified": "2025-08-14T14:00:48.423Z",
+      "checksum": "551_1755180048423"
+    },
+    "../BaseballData/CSV_BACKUPS/DET_hitting_august_13_2025_401696718.csv": {
+      "gameId": "401696718",
+      "processedAt": "2025-08-14T16:36:08.843Z",
+      "fileSize": 511,
+      "fileModified": "2025-08-14T14:00:48.423Z",
+      "checksum": "511_1755180048423"
+    },
+    "../BaseballData/CSV_BACKUPS/DET_pitching_august_11_2025_401696688.csv": {
+      "gameId": "401696688",
+      "processedAt": "2025-08-14T16:36:11.033Z",
+      "fileSize": 183,
+      "fileModified": "2025-08-12T14:32:13.562Z",
+      "checksum": "183_1755009133562"
+    },
+    "../BaseballData/CSV_BACKUPS/DET_pitching_august_12_2025_401696703.csv": {
+      "gameId": "401696703",
+      "processedAt": "2025-08-14T16:36:11.445Z",
+      "fileSize": 184,
+      "fileModified": "2025-08-14T14:00:48.423Z",
+      "checksum": "184_1755180048423"
+    },
+    "../BaseballData/CSV_BACKUPS/DET_pitching_august_13_2025_401696718.csv": {
+      "gameId": "401696718",
+      "processedAt": "2025-08-14T16:36:11.851Z",
+      "fileSize": 186,
+      "fileModified": "2025-08-14T14:00:48.423Z",
+      "checksum": "186_1755180048423"
+    },
+    "../BaseballData/CSV_BACKUPS/HOU_hitting_august_11_2025_401696686.csv": {
+      "gameId": "401696686",
+      "processedAt": "2025-08-14T16:36:14.190Z",
+      "fileSize": 466,
+      "fileModified": "2025-08-12T14:32:13.562Z",
+      "checksum": "466_1755009133562"
+    },
+    "../BaseballData/CSV_BACKUPS/HOU_hitting_august_12_2025_401696701.csv": {
+      "gameId": "401696701",
+      "processedAt": "2025-08-14T16:36:14.781Z",
+      "fileSize": 508,
+      "fileModified": "2025-08-14T14:00:48.424Z",
+      "checksum": "508_1755180048424"
+    },
+    "../BaseballData/CSV_BACKUPS/HOU_hitting_august_13_2025_401696716.csv": {
+      "gameId": "401696716",
+      "processedAt": "2025-08-14T16:36:15.332Z",
+      "fileSize": 466,
+      "fileModified": "2025-08-14T14:00:48.424Z",
+      "checksum": "466_1755180048424"
+    },
+    "../BaseballData/CSV_BACKUPS/HOU_pitching_august_11_2025_401696686.csv": {
+      "gameId": "401696686",
+      "processedAt": "2025-08-14T16:36:17.568Z",
+      "fileSize": 253,
+      "fileModified": "2025-08-12T14:32:13.563Z",
+      "checksum": "253_1755009133563"
+    },
+    "../BaseballData/CSV_BACKUPS/HOU_pitching_august_12_2025_401696701.csv": {
+      "gameId": "401696701",
+      "processedAt": "2025-08-14T16:36:17.979Z",
+      "fileSize": 224,
+      "fileModified": "2025-08-14T14:00:48.424Z",
+      "checksum": "224_1755180048424"
+    },
+    "../BaseballData/CSV_BACKUPS/HOU_pitching_august_13_2025_401696716.csv": {
+      "gameId": "401696716",
+      "processedAt": "2025-08-14T16:36:18.336Z",
+      "fileSize": 143,
+      "fileModified": "2025-08-14T14:00:48.424Z",
+      "checksum": "143_1755180048424"
+    },
+    "../BaseballData/CSV_BACKUPS/KC_hitting_august_11_2025_401696690.csv": {
+      "gameId": "401696690",
+      "processedAt": "2025-08-14T16:36:20.684Z",
+      "fileSize": 441,
+      "fileModified": "2025-08-12T14:32:13.563Z",
+      "checksum": "441_1755009133563"
+    },
+    "../BaseballData/CSV_BACKUPS/KC_hitting_august_12_2025_401696705.csv": {
+      "gameId": "401696705",
+      "processedAt": "2025-08-14T16:36:21.242Z",
+      "fileSize": 472,
+      "fileModified": "2025-08-14T14:00:48.424Z",
+      "checksum": "472_1755180048424"
+    },
+    "../BaseballData/CSV_BACKUPS/KC_hitting_august_13_2025_401696720.csv": {
+      "gameId": "401696720",
+      "processedAt": "2025-08-14T16:36:21.810Z",
+      "fileSize": 516,
+      "fileModified": "2025-08-14T14:00:48.424Z",
+      "checksum": "516_1755180048424"
+    },
+    "../BaseballData/CSV_BACKUPS/KC_pitching_august_11_2025_401696690.csv": {
+      "gameId": "401696690",
+      "processedAt": "2025-08-14T16:36:24.014Z",
+      "fileSize": 220,
+      "fileModified": "2025-08-12T14:32:13.563Z",
+      "checksum": "220_1755009133563"
+    },
+    "../BaseballData/CSV_BACKUPS/KC_pitching_august_12_2025_401696705.csv": {
+      "gameId": "401696705",
+      "processedAt": "2025-08-14T16:36:24.429Z",
+      "fileSize": 215,
+      "fileModified": "2025-08-14T14:00:48.424Z",
+      "checksum": "215_1755180048424"
+    },
+    "../BaseballData/CSV_BACKUPS/KC_pitching_august_13_2025_401696720.csv": {
+      "gameId": "401696720",
+      "processedAt": "2025-08-14T16:36:24.828Z",
+      "fileSize": 214,
+      "fileModified": "2025-08-14T14:00:48.425Z",
+      "checksum": "214_1755180048425"
+    },
+    "../BaseballData/CSV_BACKUPS/LAA_hitting_august_11_2025_401696691.csv": {
+      "gameId": "401696691",
+      "processedAt": "2025-08-14T16:36:27.229Z",
+      "fileSize": 508,
+      "fileModified": "2025-08-12T14:32:13.563Z",
+      "checksum": "508_1755009133563"
+    },
+    "../BaseballData/CSV_BACKUPS/LAA_hitting_august_12_2025_401696706.csv": {
+      "gameId": "401696706",
+      "processedAt": "2025-08-14T16:36:27.816Z",
+      "fileSize": 508,
+      "fileModified": "2025-08-14T14:00:48.425Z",
+      "checksum": "508_1755180048425"
+    },
+    "../BaseballData/CSV_BACKUPS/LAA_hitting_august_13_2025_401696721.csv": {
+      "gameId": "401696721",
+      "processedAt": "2025-08-14T16:36:28.368Z",
+      "fileSize": 428,
+      "fileModified": "2025-08-14T14:00:48.425Z",
+      "checksum": "428_1755180048425"
+    },
+    "../BaseballData/CSV_BACKUPS/LAA_pitching_august_11_2025_401696691.csv": {
+      "gameId": "401696691",
+      "processedAt": "2025-08-14T16:36:31.220Z",
+      "fileSize": 221,
+      "fileModified": "2025-08-12T14:32:13.564Z",
+      "checksum": "221_1755009133564"
+    },
+    "../BaseballData/CSV_BACKUPS/LAA_pitching_august_12_2025_401696706.csv": {
+      "gameId": "401696706",
+      "processedAt": "2025-08-14T16:36:31.705Z",
+      "fileSize": 330,
+      "fileModified": "2025-08-14T14:00:48.425Z",
+      "checksum": "330_1755180048425"
+    },
+    "../BaseballData/CSV_BACKUPS/LAA_pitching_august_13_2025_401696721.csv": {
+      "gameId": "401696721",
+      "processedAt": "2025-08-14T16:36:32.142Z",
+      "fileSize": 261,
+      "fileModified": "2025-08-14T14:00:48.425Z",
+      "checksum": "261_1755180048425"
+    },
+    "../BaseballData/CSV_BACKUPS/LAD_hitting_august_11_2025_401696691.csv": {
+      "gameId": "401696691",
+      "processedAt": "2025-08-14T16:36:35.147Z",
+      "fileSize": 503,
+      "fileModified": "2025-08-12T14:32:13.564Z",
+      "checksum": "503_1755009133564"
+    },
+    "../BaseballData/CSV_BACKUPS/LAD_hitting_august_12_2025_401696706.csv": {
+      "gameId": "401696706",
+      "processedAt": "2025-08-14T16:36:35.742Z",
+      "fileSize": 546,
+      "fileModified": "2025-08-14T14:00:48.425Z",
+      "checksum": "546_1755180048425"
+    },
+    "../BaseballData/CSV_BACKUPS/LAD_hitting_august_13_2025_401696721.csv": {
+      "gameId": "401696721",
+      "processedAt": "2025-08-14T16:36:36.253Z",
+      "fileSize": 390,
+      "fileModified": "2025-08-14T14:00:48.426Z",
+      "checksum": "390_1755180048426"
+    },
+    "../BaseballData/CSV_BACKUPS/LAD_pitching_august_11_2025_401696691.csv": {
+      "gameId": "401696691",
+      "processedAt": "2025-08-14T16:36:38.499Z",
+      "fileSize": 181,
+      "fileModified": "2025-08-12T14:32:13.564Z",
+      "checksum": "181_1755009133564"
+    },
+    "../BaseballData/CSV_BACKUPS/LAD_pitching_august_12_2025_401696706.csv": {
+      "gameId": "401696706",
+      "processedAt": "2025-08-14T16:36:38.937Z",
+      "fileSize": 261,
+      "fileModified": "2025-08-14T14:00:48.426Z",
+      "checksum": "261_1755180048426"
+    },
+    "../BaseballData/CSV_BACKUPS/LAD_pitching_august_13_2025_401696721.csv": {
+      "gameId": "401696721",
+      "processedAt": "2025-08-14T16:36:39.382Z",
+      "fileSize": 187,
+      "fileModified": "2025-08-14T14:00:48.426Z",
+      "checksum": "187_1755180048426"
+    },
+    "../BaseballData/CSV_BACKUPS/MIA_hitting_august_12_2025_401696696.csv": {
+      "gameId": "401696696",
+      "processedAt": "2025-08-14T16:36:41.751Z",
+      "fileSize": 469,
+      "fileModified": "2025-08-14T14:00:48.426Z",
+      "checksum": "469_1755180048426"
+    },
+    "../BaseballData/CSV_BACKUPS/MIA_hitting_august_13_2025_401696711.csv": {
+      "gameId": "401696711",
+      "processedAt": "2025-08-14T16:36:42.352Z",
+      "fileSize": 509,
+      "fileModified": "2025-08-14T14:00:48.426Z",
+      "checksum": "509_1755180048426"
+    },
+    "../BaseballData/CSV_BACKUPS/MIA_pitching_august_12_2025_401696696.csv": {
+      "gameId": "401696696",
+      "processedAt": "2025-08-14T16:36:45.468Z",
+      "fileSize": 184,
+      "fileModified": "2025-08-14T14:00:48.427Z",
+      "checksum": "184_1755180048427"
+    },
+    "../BaseballData/CSV_BACKUPS/MIA_pitching_august_13_2025_401696711.csv": {
+      "gameId": "401696711",
+      "processedAt": "2025-08-14T16:36:45.844Z",
+      "fileSize": 184,
+      "fileModified": "2025-08-14T14:00:48.427Z",
+      "checksum": "184_1755180048427"
+    },
+    "../BaseballData/CSV_BACKUPS/MIL_hitting_august_11_2025_401696689.csv": {
+      "gameId": "401696689",
+      "processedAt": "2025-08-14T16:36:49.050Z",
+      "fileSize": 396,
+      "fileModified": "2025-08-12T14:32:13.564Z",
+      "checksum": "396_1755009133564"
+    },
+    "../BaseballData/CSV_BACKUPS/MIL_hitting_august_12_2025_401696704.csv": {
+      "gameId": "401696704",
+      "processedAt": "2025-08-14T16:36:49.602Z",
+      "fileSize": 516,
+      "fileModified": "2025-08-14T14:00:48.427Z",
+      "checksum": "516_1755180048427"
+    },
+    "../BaseballData/CSV_BACKUPS/MIL_hitting_august_13_2025_401696719.csv": {
+      "gameId": "401696719",
+      "processedAt": "2025-08-14T16:36:50.144Z",
+      "fileSize": 519,
+      "fileModified": "2025-08-14T14:00:48.427Z",
+      "checksum": "519_1755180048427"
+    },
+    "../BaseballData/CSV_BACKUPS/MIL_pitching_august_11_2025_401696689.csv": {
+      "gameId": "401696689",
+      "processedAt": "2025-08-14T16:36:52.322Z",
+      "fileSize": 148,
+      "fileModified": "2025-08-12T14:32:13.565Z",
+      "checksum": "148_1755009133565"
+    },
+    "../BaseballData/CSV_BACKUPS/MIL_pitching_august_12_2025_401696704.csv": {
+      "gameId": "401696704",
+      "processedAt": "2025-08-14T16:36:52.694Z",
+      "fileSize": 182,
+      "fileModified": "2025-08-14T14:00:48.428Z",
+      "checksum": "182_1755180048428"
+    },
+    "../BaseballData/CSV_BACKUPS/MIL_pitching_august_13_2025_401696719.csv": {
+      "gameId": "401696719",
+      "processedAt": "2025-08-14T16:36:53.112Z",
+      "fileSize": 220,
+      "fileModified": "2025-08-14T14:00:48.428Z",
+      "checksum": "220_1755180048428"
+    },
+    "../BaseballData/CSV_BACKUPS/MIN_hitting_august_11_2025_401696683.csv": {
+      "gameId": "401696683",
+      "processedAt": "2025-08-14T16:36:55.492Z",
+      "fileSize": 434,
+      "fileModified": "2025-08-12T14:32:13.565Z",
+      "checksum": "434_1755009133565"
+    },
+    "../BaseballData/CSV_BACKUPS/MIN_hitting_august_12_2025_401696697.csv": {
+      "gameId": "401696697",
+      "processedAt": "2025-08-14T16:36:56.075Z",
+      "fileSize": 475,
+      "fileModified": "2025-08-14T14:00:48.428Z",
+      "checksum": "475_1755180048428"
+    },
+    "../BaseballData/CSV_BACKUPS/MIN_hitting_august_13_2025_401696712.csv": {
+      "gameId": "401696712",
+      "processedAt": "2025-08-14T16:36:56.622Z",
+      "fileSize": 430,
+      "fileModified": "2025-08-14T14:00:48.428Z",
+      "checksum": "430_1755180048428"
+    },
+    "../BaseballData/CSV_BACKUPS/MIN_pitching_august_11_2025_401696683.csv": {
+      "gameId": "401696683",
+      "processedAt": "2025-08-14T16:36:58.824Z",
+      "fileSize": 148,
+      "fileModified": "2025-08-12T14:32:13.565Z",
+      "checksum": "148_1755009133565"
+    },
+    "../BaseballData/CSV_BACKUPS/MIN_pitching_august_12_2025_401696697.csv": {
+      "gameId": "401696697",
+      "processedAt": "2025-08-14T16:36:59.205Z",
+      "fileSize": 183,
+      "fileModified": "2025-08-14T14:00:48.428Z",
+      "checksum": "183_1755180048428"
+    },
+    "../BaseballData/CSV_BACKUPS/MIN_pitching_august_13_2025_401696712.csv": {
+      "gameId": "401696712",
+      "processedAt": "2025-08-14T16:36:59.573Z",
+      "fileSize": 145,
+      "fileModified": "2025-08-14T14:00:48.429Z",
+      "checksum": "145_1755180048429"
+    },
+    "../BaseballData/CSV_BACKUPS/NYM_hitting_august_12_2025_401696694.csv": {
+      "gameId": "401696694",
+      "processedAt": "2025-08-14T16:37:01.954Z",
+      "fileSize": 424,
+      "fileModified": "2025-08-14T14:00:48.429Z",
+      "checksum": "424_1755180048429"
+    },
+    "../BaseballData/CSV_BACKUPS/NYM_hitting_august_13_2025_401696709.csv": {
+      "gameId": "401696709",
+      "processedAt": "2025-08-14T16:37:02.484Z",
+      "fileSize": 385,
+      "fileModified": "2025-08-14T14:00:48.429Z",
+      "checksum": "385_1755180048429"
     }
   },
-  "lastUpdated": "2025-08-11T14:44:45.199Z",
+  "lastUpdated": "2025-08-14T16:37:02.484Z",
   "version": "1.0"
 }
