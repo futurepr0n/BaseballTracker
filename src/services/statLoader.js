@@ -533,10 +533,33 @@ function updateRostersFile(playersData, gameDate) {
                 // DO NOT UPDATE - keep existing team to prevent corruption
             }
             
-            // Update fullName if we have more complete information
-            if (!existingRoster.fullName || player.name.length > existingRoster.fullName.length) {
+            // CRITICAL FIX: Validate name compatibility before updating fullName
+            // The old logic "longer name = better" was catastrophically wrong
+            if (!existingRoster.fullName || existingRoster.fullName === existingRoster.name) {
+                // Only set if missing or same as short name
                 existingRoster.fullName = player.name;
                 playersUpdated++;
+                console.log(`Updated fullName for ${existingRoster.name}: '${existingRoster.fullName}' → '${player.name}'`);
+            } else if (existingRoster.fullName !== player.name) {
+                // VALIDATION: Check if names are logically compatible
+                const existingLastName = getLastName(existingRoster.fullName);
+                const incomingLastName = getLastName(player.name);
+                const shortLastName = getLastName(existingRoster.name);
+                
+                if (existingLastName && incomingLastName && shortLastName) {
+                    const existingMatches = existingLastName.toLowerCase() === shortLastName.toLowerCase();
+                    const incomingMatches = incomingLastName.toLowerCase() === shortLastName.toLowerCase();
+                    
+                    if (incomingMatches && !existingMatches) {
+                        // Incoming name is compatible, existing is not - update
+                        console.log(`🔧 CORRECTING fullName for ${existingRoster.name}: '${existingRoster.fullName}' → '${player.name}' (name validation passed)`);
+                        existingRoster.fullName = player.name;
+                        playersUpdated++;
+                    } else if (!incomingMatches) {
+                        // Incoming name is NOT compatible - log warning and reject
+                        console.warn(`🚨 REJECTED fullName update for ${existingRoster.name}: attempted '${existingRoster.fullName}' → '${player.name}' (last names don't match)`);
+                    }
+                }
             }
         } else {
             // Create new roster entry
@@ -1091,6 +1114,20 @@ async function main() {
         // Always release the lock
         releaseProcessingLock(csvFilePath);
     }
+}
+
+// CRITICAL UTILITY: Extract last name for validation
+function getLastName(fullName) {
+    if (!fullName) return '';
+    
+    // Handle "Last, First" format
+    if (fullName.includes(',')) {
+        return fullName.split(',')[0].trim();
+    }
+    
+    // Handle "First Last" or "F. Last" format
+    const parts = fullName.trim().split(' ');
+    return parts.length > 1 ? parts[parts.length - 1] : '';
 }
 
 // Run the enhanced main function
