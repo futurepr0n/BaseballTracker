@@ -28,6 +28,7 @@ const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) 
     return `${year}-${month}-${day}`;
   };
 
+
   // State management
   const [selectedDate, setSelectedDate] = useState(formatDateForInput(currentDate));
   const [selectedGames, setSelectedGames] = useState([]);
@@ -133,6 +134,18 @@ const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) 
     if (!games || games.length === 0) {
       setAnalysisError('No games available for the selected date');
       return;
+    }
+
+    // Track visitor engagement when user actually runs analysis
+    try {
+      await fetch('https://visits.capping.pro/visits', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (error) {
+      console.debug('Visit tracking failed:', error);
     }
 
     setAnalysisLoading(true);
