@@ -3,7 +3,7 @@ import { useBaseballAnalysis } from '../../services/baseballAnalysisService';
 import batchSummaryService from '../../services/batchSummaryService';
 import startingLineupService from '../../services/startingLineupService';
 import handednessResolver from '../../utils/handednessResolver';
-import { normalizeToEnglish, findPlayerInRoster } from '../../utils/universalNameNormalizer';
+import { normalizeToEnglish } from '../../utils/universalNameNormalizer';
 import BatchSummarySection from '../BatchSummarySection';
 import AutoFillButton from './AutoFillButton';
 import LineupRefreshButton from './LineupRefreshButton';
@@ -123,6 +123,7 @@ const SearchableDropdown = ({
 
 
 const PinheadsPlayhouse = () => {
+
   // API service hook
   const { 
     initialized, 
@@ -273,25 +274,6 @@ const PinheadsPlayhouse = () => {
     { key: 'category', label: 'Category', description: 'Player category (Hidden Gem, High Confidence, etc.)' }
   ];
 
-  // Track visitor on mount
-  useEffect(() => {
-    const trackVisit = async () => {
-      try {
-        await fetch('https://visits.capping.pro/visits', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        // Don't need to process response for tracking
-      } catch (error) {
-        // Silent fail for visit tracking
-        console.debug('Visit tracking failed:', error);
-      }
-    };
-
-    trackVisit();
-  }, []);
 
   // Load JSON data on mount
   useEffect(() => {
@@ -500,6 +482,18 @@ const PinheadsPlayhouse = () => {
       return;
     }
 
+    // Track visitor engagement when user actually runs analysis
+    try {
+      await fetch('https://visits.capping.pro/visits', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (error) {
+      console.debug('Visit tracking failed:', error);
+    }
+
     setAnalysisLoading(true);
     setAnalysisError(null);
 
@@ -534,6 +528,18 @@ const PinheadsPlayhouse = () => {
     if (validMatchups.length === 0) {
       setAnalysisError('Please add at least one valid matchup');
       return;
+    }
+
+    // Track visitor engagement when user actually runs batch analysis
+    try {
+      await fetch('https://visits.capping.pro/visits', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (error) {
+      console.debug('Visit tracking failed:', error);
     }
 
     setAnalysisLoading(true);
