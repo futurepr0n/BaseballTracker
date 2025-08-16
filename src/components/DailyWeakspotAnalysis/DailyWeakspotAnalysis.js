@@ -6,6 +6,7 @@ import ExportTools from './components/ExportTools';
 import { useBaseballAnalysis } from '../../services/baseballAnalysisService';
 import { weakspotService } from './services/weakspotService';
 import { normalizeGamesVenues } from '../../utils/venueNormalizer';
+import GlobalTooltip from '../utils/GlobalTooltip';
 import './DailyWeakspotAnalysis.css';
 
 const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) => {
@@ -337,6 +338,9 @@ const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) 
           </div>
         </div>
       </div>
+
+      {/* Global Tooltip for dashboard card insights */}
+      <GlobalTooltip />
     </div>
   );
 };

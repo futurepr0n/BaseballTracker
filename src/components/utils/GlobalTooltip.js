@@ -105,7 +105,15 @@ const GlobalTooltip = () => {
   const getTooltipContent = () => {
     if (!activeTooltip || !tooltipData) return null;
 
-    const { type, player, ...data } = tooltipData;
+    const { type, player } = tooltipData;
+    
+    console.log('🔧 GlobalTooltip getTooltipContent:', { 
+      activeTooltip, 
+      type, 
+      playerName: player?.playerName || player?.name,
+      hasPlayer: !!player,
+      tooltipData 
+    });
     
 
     if (type === 'streak_hit' && player) {
@@ -689,6 +697,261 @@ const GlobalTooltip = () => {
               </div>
             </div>
           )}
+        </div>
+      );
+    }
+
+    if (type === 'hr_prediction' && player) {
+      // Handle both old API format and HR predictions format
+      const hrScore = player.hr_score || player.hrScore || player.dueScore;
+      const hrProbability = player.hr_probability || player.hrProbability || (player.hrRate ? (player.hrRate * 100).toFixed(1) : null);
+      const recentForm = player.recent_form_description || player.recentForm || (player.isDue ? 'Due for HR' : 'Standard');
+      
+      return (
+        <div className="hr-prediction-details">
+          <div className="hr-summary">
+            <div className="hr-summary-item">
+              <span className="summary-label">HR Score:</span>
+              <span className="summary-value highlight">{hrScore ? Number(hrScore).toFixed(1) : 'N/A'}</span>
+            </div>
+            <div className="hr-summary-item">
+              <span className="summary-label">HR Rate:</span>
+              <span className="summary-value">{hrProbability || 'N/A'}{hrProbability ? '%' : ''}</span>
+            </div>
+            <div className="hr-summary-item">
+              <span className="summary-label">Status:</span>
+              <span className="summary-value">{recentForm}</span>
+            </div>
+            {player.gamesSinceLastHR && (
+              <div className="hr-summary-item">
+                <span className="summary-label">Games Since HR:</span>
+                <span className="summary-value highlight">{player.gamesSinceLastHR}</span>
+              </div>
+            )}
+          </div>
+          
+          <div className="hr-factors">
+            <h4>⚡ HR Prediction Analysis</h4>
+            {player.hr_factors?.map((factor, idx) => (
+              <div key={idx} className="hr-factor">
+                <div className="factor-description">{factor.description || factor}</div>
+              </div>
+            )) || (
+              <div className="hr-analysis">
+                {player.expectedGamesBetweenHRs && (
+                  <div className="hr-factor">
+                    <div className="factor-description">Expected games between HRs: {player.expectedGamesBetweenHRs}</div>
+                  </div>
+                )}
+                {player.daysSinceLastHR && (
+                  <div className="hr-factor">
+                    <div className="factor-description">Days since last HR: {player.daysSinceLastHR} days</div>
+                  </div>
+                )}
+                {player.lastHRDate && (
+                  <div className="hr-factor">
+                    <div className="factor-description">Last HR: {new Date(player.lastHRDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                  </div>
+                )}
+                {player.isDue && (
+                  <div className="hr-factor">
+                    <div className="factor-description">✅ Player is statistically due for a home run</div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="hr-season-stats">
+            <h4>📊 Season Statistics</h4>
+            <div className="season-stats-grid">
+              {player.homeRunsThisSeason && (
+                <div className="stat-item">
+                  <span className="stat-label">Season HRs:</span>
+                  <span className="stat-value">{player.homeRunsThisSeason}</span>
+                </div>
+              )}
+              {player.gamesPlayed && (
+                <div className="stat-item">
+                  <span className="stat-label">Games Played:</span>
+                  <span className="stat-value">{player.gamesPlayed}</span>
+                </div>
+              )}
+              {player.hrRate && (
+                <div className="stat-item">
+                  <span className="stat-label">HR/Game Rate:</span>
+                  <span className="stat-value">{player.hrRate.toFixed(3)}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {player.venue_factor && (
+            <div className="venue-context">
+              <h4>🏟️ Venue Context</h4>
+              <div className="venue-info">
+                <span>Park Factor: {player.venue_factor}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    if (type === 'likely_hit' && player) {
+      return (
+        <div className="likely-hit-details">
+          <div className="hit-summary">
+            <div className="hit-summary-item">
+              <span className="summary-label">Hit Probability:</span>
+              <span className="summary-value highlight">{player.hit_probability || player.hitProbability || 'N/A'}%</span>
+            </div>
+            <div className="hit-summary-item">
+              <span className="summary-label">Season Average:</span>
+              <span className="summary-value">{player.season_avg ? (player.season_avg * 100).toFixed(1) : 'N/A'}%</span>
+            </div>
+            <div className="hit-summary-item">
+              <span className="summary-label">Recent Form:</span>
+              <span className="summary-value">{player.recent_form || 'Good'}</span>
+            </div>
+          </div>
+          
+          <div className="hit-factors">
+            <h4>📈 Hit Likelihood Factors</h4>
+            {player.hit_factors?.map((factor, idx) => (
+              <div key={idx} className="hit-factor">
+                <div className="factor-description">{factor.description || factor}</div>
+              </div>
+            )) || (
+              <div className="hit-factor">
+                <div className="factor-description">High hit probability based on recent analysis</div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    if (type === 'multi_hit' && player) {
+      return (
+        <div className="multi-hit-details">
+          <div className="multi-hit-summary">
+            <div className="multi-hit-summary-item">
+              <span className="summary-label">Multi-Hit Rate:</span>
+              <span className="summary-value highlight">{player.multi_hit_rate || player.multiHitRate || 'N/A'}%</span>
+            </div>
+            <div className="multi-hit-summary-item">
+              <span className="summary-label">Multi-Hit Games:</span>
+              <span className="summary-value">{player.multi_hit_games || player.multiHitGames || 'N/A'}</span>
+            </div>
+            <div className="multi-hit-summary-item">
+              <span className="summary-label">Last Multi-Hit:</span>
+              <span className="summary-value">{player.last_multi_hit_date || player.lastMultiHitDate || 'Unknown'}</span>
+            </div>
+          </div>
+          
+          <div className="multi-hit-factors">
+            <h4>🎯 Multi-Hit Factors</h4>
+            {player.multi_hit_factors?.map((factor, idx) => (
+              <div key={idx} className="multi-hit-factor">
+                <div className="factor-description">{factor.description || factor}</div>
+              </div>
+            )) || (
+              <div className="multi-hit-factor">
+                <div className="factor-description">Strong multi-hit candidate based on recent patterns</div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    if (type === 'time_slot' && player) {
+      return (
+        <div className="time-slot-details">
+          <div className="time-slot-summary">
+            <div className="time-slot-summary-item">
+              <span className="summary-label">Day of Week:</span>
+              <span className="summary-value highlight">{player.dayOfWeek || 'Unknown'}</span>
+            </div>
+            <div className="time-slot-summary-item">
+              <span className="summary-label">Hits on {player.dayOfWeek}s:</span>
+              <span className="summary-value">{player.hits || 'N/A'}</span>
+            </div>
+            <div className="time-slot-summary-item">
+              <span className="summary-label">Games on {player.dayOfWeek}s:</span>
+              <span className="summary-value">{player.games || 'N/A'}</span>
+            </div>
+            <div className="time-slot-summary-item">
+              <span className="summary-label">Hit Rate:</span>
+              <span className="summary-value">{player.hitRate ? player.hitRate.toFixed(2) : 'N/A'}</span>
+            </div>
+          </div>
+          
+          <div className="time-slot-context">
+            <h4>⏰ {player.dayOfWeek} Performance Analysis</h4>
+            <div className="context-info">
+              <span>Strong performance on {player.dayOfWeek}s with {player.hits || 0} hits in {player.games || 0} games</span>
+            </div>
+          </div>
+
+          {player.dates && player.dates.length > 0 && (
+            <div className="recent-dates">
+              <h4>📅 Recent {player.dayOfWeek} Games</h4>
+              <div className="dates-list">
+                {player.dates.slice(0, 5).map((date, idx) => (
+                  <span key={idx} className="date-item">
+                    {new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </span>
+                ))}
+                {player.dates.length > 5 && <span className="more-dates">+{player.dates.length - 5} more</span>}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    if (type === 'matchup_edge' && player) {
+      return (
+        <div className="matchup-edge-details">
+          <div className="matchup-summary">
+            <div className="matchup-summary-item">
+              <span className="summary-label">Batting Hand:</span>
+              <span className="summary-value">{player.hand || 'Unknown'}</span>
+            </div>
+            <div className="matchup-summary-item">
+              <span className="summary-label">vs Pitcher:</span>
+              <span className="summary-value highlight">{player.opposingPitcher || 'Unknown'}</span>
+            </div>
+            <div className="matchup-summary-item">
+              <span className="summary-label">Pitcher Hand:</span>
+              <span className="summary-value">{player.opposingPitcherHand || 'Unknown'}</span>
+            </div>
+            <div className="matchup-summary-item">
+              <span className="summary-label">Matchup Type:</span>
+              <span className="summary-value">{player.matchupType === 'same_handed' ? 'Same-Handed' : 'Opposite-Handed'}</span>
+            </div>
+          </div>
+          
+          <div className="matchup-context">
+            <h4>🆚 Pitcher Matchup Analysis</h4>
+            <div className="context-info">
+              <span>
+                {player.matchupType === 'same_handed' 
+                  ? `Challenging same-handed matchup vs ${player.opposingPitcher}`
+                  : `Favorable opposite-handed matchup vs ${player.opposingPitcher}`
+                }
+              </span>
+            </div>
+          </div>
+
+          <div className="historical-context">
+            <h4>📊 Historical Context</h4>
+            <div className="context-info">
+              <span>Part of tough pitcher matchup analysis for {player.opposingPitcherTeam}</span>
+            </div>
+          </div>
         </div>
       );
     }

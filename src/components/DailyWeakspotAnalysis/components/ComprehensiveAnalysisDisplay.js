@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './ComprehensiveAnalysisDisplay.css';
 import pitchMatchupService from '../services/pitchMatchupService';
+import dashboardContextService from '../../../services/dashboardContextService';
+import { useTooltip } from '../../utils/TooltipContext';
+import { createSafeId } from '../../utils/tooltipUtils';
 
 const ComprehensiveAnalysisDisplay = ({ analysis }) => {
-  console.log('🎯 COMPREHENSIVE DISPLAY: Component rendered with analysis:', !!analysis);
   
   // Utility function to safely format numbers with toFixed
   const safeToFixed = (value, decimals = 1, fallback = 'N/A') => {
@@ -21,8 +23,10 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
   });
   const [selectedMatchupIndex, setSelectedMatchupIndex] = useState(0);
   const [lineupData, setLineupData] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [optimalMatchups, setOptimalMatchups] = useState({});
+  const [playerContexts, setPlayerContexts] = useState({});
+  const [selectedPlayerTooltip, setSelectedPlayerTooltip] = useState(null);
+  const { openTooltip } = useTooltip();
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
@@ -31,12 +35,46 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
     }));
   };
 
+  const showDashboardTooltip = (player, tooltipType, event) => {
+    console.log('🔧 showDashboardTooltip called:', { 
+      player: player?.playerName || player?.name, 
+      tooltipType, 
+      playerData: player 
+    });
+    
+    // Stop event propagation to ensure this handler gets called
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const safeId = createSafeId(player.playerName || player.name, player.team);
+    const tooltipId = `${tooltipType}_${safeId}`;
+    
+    console.log('🔧 Opening tooltip:', { tooltipId, tooltipType, hasOpenTooltip: !!openTooltip });
+    
+    try {
+      openTooltip(tooltipId, event.currentTarget, {
+        type: tooltipType,
+        player: player
+      });
+      console.log('🔧 Tooltip opened successfully');
+    } catch (error) {
+      console.error('🔧 Error opening tooltip:', error);
+    }
+  };
+
+  const showPlayerSummary = (playerName, playerContext) => {
+    setSelectedPlayerTooltip({ playerName, playerContext });
+  };
+
+  const closePlayerTooltip = () => {
+    setSelectedPlayerTooltip(null);
+  };
+
   // Load lineup data when analysis changes
   useEffect(() => {
     const loadLineupData = async () => {
       if (!analysis) return;
       
-      setLoading(true);
       try {
         // Get the current matchup to determine the date
         const allMatchups = Object.values(analysis.matchup_analysis);
@@ -65,8 +103,6 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
         }
       } catch (error) {
         console.error('Error loading lineup data:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -75,22 +111,15 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
 
   // Load optimal matchups when lineup data is available
   useEffect(() => {
-    console.log('🎯 OPTIMAL MATCHUPS EFFECT: Triggered with lineupData:', !!lineupData, 'analysis:', !!analysis);
-    
     const loadOptimalMatchups = async () => {
       if (!lineupData || !analysis) {
-        console.log('🎯 OPTIMAL MATCHUPS EFFECT: Early return - missing data. LineupData:', !!lineupData, 'Analysis:', !!analysis);
         return;
       }
 
-      console.log('🎯 OPTIMAL MATCHUPS EFFECT: Starting to load optimal matchups...');
       const allMatchups = Object.values(analysis.matchup_analysis);
-      console.log('🎯 OPTIMAL MATCHUPS EFFECT: Found', allMatchups.length, 'matchups to analyze');
       const newOptimalMatchups = {};
 
       for (const [index, matchupData] of allMatchups.entries()) {
-        console.log(`🎯 OPTIMAL MATCHUPS EFFECT: Processing matchup ${index + 1}/${allMatchups.length}`);
-        
         const awayOptimal = await pitchMatchupService.analyzeOptimalMatchups(
           matchupData.away_pitcher_analysis?.pitch_vulnerabilities,
           matchupData.away_pitcher_analysis?.opposing_team,
@@ -109,11 +138,80 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
         };
       }
 
-      console.log('🎯 OPTIMAL MATCHUPS EFFECT: Analysis complete, setting optimal matchups:', newOptimalMatchups);
       setOptimalMatchups(newOptimalMatchups);
     };
 
     loadOptimalMatchups();
+  }, [lineupData, analysis]);
+
+  // Load player dashboard contexts when lineup data is available
+  useEffect(() => {
+    const loadPlayerContexts = async () => {
+      if (!lineupData || !analysis) return;
+
+      const allMatchups = Object.values(analysis.matchup_analysis);
+      const playerContextMap = {};
+
+      for (const matchupData of allMatchups) {
+        const date = matchupData.matchup?.date || new Date().toISOString().split('T')[0];
+        
+        // Process both teams
+        const teams = [
+          { name: matchupData.away_pitcher_analysis?.opposing_team, side: 'away' },
+          { name: matchupData.home_pitcher_analysis?.opposing_team, side: 'home' }
+        ];
+
+        for (const team of teams) {
+          if (!team.name) continue;
+
+          // Find the game for this team
+          const game = lineupData.games?.find(g => 
+            g.teams?.away?.abbr === team.name || g.teams?.home?.abbr === team.name
+          );
+          
+          if (!game) continue;
+
+          // Get lineup for this team
+          const isAway = game.teams?.away?.abbr === team.name;
+          const lineup = isAway ? game.lineups?.away : game.lineups?.home;
+          
+          if (!lineup) continue;
+
+          // Handle both 'batters' and 'batting_order' data structures
+          let batters = [];
+          if (lineup.batters) {
+            batters = lineup.batters;
+          } else if (lineup.batting_order) {
+            batters = lineup.batting_order.map(batter => ({
+              name: batter.name,
+              batting_order: batter.position,
+              season_stats: batter.season_stats,
+              status: batter.status || 'confirmed'
+            }));
+          }
+
+          // Load dashboard context for each player
+          for (const batter of batters) {
+            const playerKey = `${batter.name}-${team.name}`;
+            if (!playerContextMap[playerKey]) {
+              try {
+                const context = await dashboardContextService.getPlayerContext(
+                  batter.name, 
+                  team.name, 
+                  date
+                );
+                playerContextMap[playerKey] = context;
+              } catch (error) {
+                playerContextMap[playerKey] = null;
+              }
+            }
+          }
+        }
+      }
+      setPlayerContexts(playerContextMap);
+    };
+
+    loadPlayerContexts();
   }, [lineupData, analysis]);
 
   // Helper function to get lineup hitter for a specific position
@@ -323,14 +421,15 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
     );
   };
 
-  const renderPositionVulnerabilities = (positions, opposingTeam) => {
+  const renderPositionVulnerabilities = (positions, opposingTeam, pitcherSide) => {
     if (!positions || Object.keys(positions).length === 0) {
       return <div className="no-data">No position vulnerability data available</div>;
     }
 
+
     return (
       <div className="position-vulnerabilities-grid">
-        {Object.entries(positions)
+          {Object.entries(positions)
           .sort(([a], [b]) => {
             const posA = parseInt(a.replace('position_', ''));
             const posB = parseInt(b.replace('position_', ''));
@@ -346,20 +445,109 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
             // Get actual lineup hitter for this position
             const lineupHitter = getLineupHitterForPosition(posNum, opposingTeam);
             
+            // Get dashboard context for this player
+            let playerContext = null;
+            if (lineupHitter) {
+              const playerKey = `${lineupHitter.name}-${opposingTeam}`;
+              playerContext = playerContexts[playerKey];
+            }
+            
+            // Keep original vulnerability class (no color changes)
+            const enhancedVulnClass = data.vulnerability_score > 15 ? 'high-vuln' : 
+                                     data.vulnerability_score > 10 ? 'med-vuln' : 'low-vuln';
+            
             return (
-              <div key={position} className={`position-card ${data.vulnerability_score > 15 ? 'high-vuln' : data.vulnerability_score > 10 ? 'med-vuln' : 'low-vuln'}`}>
+              <div key={position} className={`position-card ${enhancedVulnClass}`}>
                 <div className="position-header">
                   <span className="position-number">#{posNum}</span>
                   <span className="position-name">{positionNames[posNum]}</span>
                   {lineupHitter && (
                     <div className="actual-hitter">
-                      <span className="hitter-name">{lineupHitter.name}</span>
+                      <span className="hitter-name">
+                        {lineupHitter.name}
+                        {playerContext && playerContext.badges && playerContext.badges.length > 0 && (
+                          <span 
+                            className="dashboard-indicator" 
+                            title={`Dashboard insights: ${playerContext.badges.map(badge => {
+                              if (typeof badge === 'string') return badge;
+                              return badge.fullText || badge.text || badge.emoji || 'Insight';
+                            }).join(', ')}`}
+                            onClick={() => showPlayerSummary(lineupHitter.name, playerContext)}
+                          >
+                            🚀
+                          </span>
+                        )}
+                      </span>
                       {lineupHitter.batting_avg && (
                         <span className="hitter-avg">.{lineupHitter.batting_avg}</span>
                       )}
                     </div>
                   )}
                 </div>
+                
+                {/* Dashboard Card Insights */}
+                {playerContext && playerContext.badges && playerContext.badges.length > 0 && (
+                  <div className="dashboard-insights">
+                    <div className="insight-badges">
+                      {playerContext.badges.slice(0, 3).map((badge, idx) => {
+                        // Get tooltip type from badge structure or fallback to text analysis
+                        const tooltipType = badge.type || (() => {
+                          const badgeText = typeof badge === 'string' ? badge : (badge.fullText || badge.text || badge.emoji || '');
+                          if (typeof badgeText !== 'string') return 'positive_momentum'; // fallback if not string
+                          if (badgeText.includes('Hot Streak') || badgeText.includes('Active Streak')) return 'streak_hit';
+                          if (badgeText.includes('Due for HR') || badgeText.includes('HR Candidate')) return 'hr_prediction';
+                          if (badgeText.includes('Positive Momentum') || badgeText.includes('Improved Form')) return 'positive_momentum';
+                          if (badgeText.includes('Risk')) return 'poor_performance';
+                          if (badgeText.includes('Likely Hit')) return 'likely_hit';
+                          if (badgeText.includes('Multi-Hit')) return 'multi_hit';
+                          if (badgeText.includes('Time Slot')) return 'time_slot';
+                          if (badgeText.includes('Matchup Edge')) return 'matchup_edge';
+                          return 'positive_momentum'; // default
+                        })();
+                        
+                        const playerData = {
+                          playerName: lineupHitter.name,
+                          team: opposingTeam,
+                          // Include the raw data from the specific prediction type
+                          ...(playerContext.positivePerformanceData || {}),
+                          ...(playerContext.poorPerformanceData || {}),
+                          ...(playerContext.hitStreakData || {}),
+                          ...(playerContext.hrPredictionData || {}),
+                          ...(playerContext.likelyToHitData || {}),
+                          ...(playerContext.timeSlotData || {}),
+                          ...(playerContext.opponentMatchupData || {})
+                        };
+                        
+                        const badgeDisplay = typeof badge === 'string' ? badge : (badge.emoji || badge.text || badge.fullText || '🚀');
+                        const badgeTitle = typeof badge === 'string' ? badge : (badge.text || badge.fullText || 'Analysis');
+                        
+                        console.log('🔧 Rendering badge:', { 
+                          badgeDisplay, 
+                          badgeTitle, 
+                          tooltipType, 
+                          playerName: lineupHitter.name,
+                          hasPlayerData: !!playerData,
+                          playerDataKeys: Object.keys(playerData)
+                        });
+                        
+                        return (
+                          <span 
+                            key={idx} 
+                            className={`insight-badge clickable ${tooltipType.toLowerCase().replace('_', '-')}`} 
+                            title={`Click for detailed ${badgeTitle} analysis`}
+                            onClick={(e) => {
+                              console.log('🔧 Badge clicked!', { playerName: lineupHitter.name, tooltipType });
+                              showDashboardTooltip(playerData, tooltipType, e);
+                            }}
+                          >
+                            {badgeDisplay}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <div className="position-stats">
                   <div className="stat">
                     <span className="label">Vuln:</span>
@@ -385,6 +573,30 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
                     </div>
                   )}
                 </div>
+
+                {/* Player Highlights and Warnings */}
+                {playerContext && (playerContext.highlights?.length > 0 || playerContext.warnings?.length > 0) && (
+                  <div className="player-intelligence">
+                    {playerContext.highlights && playerContext.highlights.length > 0 && (
+                      <div className="highlights">
+                        {playerContext.highlights.slice(0, 2).map((highlight, idx) => (
+                          <div key={idx} className="highlight">
+                            ✨ {highlight}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {playerContext.warnings && playerContext.warnings.length > 0 && (
+                      <div className="warnings">
+                        {playerContext.warnings.slice(0, 1).map((warning, idx) => (
+                          <div key={idx} className="warning">
+                            ⚠️ {warning}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -518,7 +730,7 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
 
           <div className="analysis-category">
             <h5>🎯 Position Vulnerabilities</h5>
-            {renderPositionVulnerabilities(pitcherData.position_vulnerabilities, pitcherData.opposing_team)}
+            {renderPositionVulnerabilities(pitcherData.position_vulnerabilities, pitcherData.opposing_team, side)}
           </div>
 
           <div className="analysis-category">
@@ -710,6 +922,104 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Player Tooltip Modal */}
+      {selectedPlayerTooltip && (
+        <div className="player-tooltip-overlay" onClick={closePlayerTooltip}>
+          <div className="player-tooltip-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="tooltip-header">
+              <h3>{selectedPlayerTooltip.playerName} - Dashboard Insights</h3>
+              <button className="close-tooltip" onClick={closePlayerTooltip}>×</button>
+            </div>
+            <div className="tooltip-content">
+              {selectedPlayerTooltip.playerContext.badges && selectedPlayerTooltip.playerContext.badges.length > 0 && (
+                <div className="tooltip-badges">
+                  <h4>Dashboard Cards (click for details):</h4>
+                  <div className="badge-list">
+                    {selectedPlayerTooltip.playerContext.badges.map((badge, idx) => {
+                      // Get tooltip type from badge structure or fallback to text analysis
+                      const tooltipType = badge.type || (() => {
+                        const badgeText = typeof badge === 'string' ? badge : (badge.fullText || badge.text || badge.emoji || '');
+                        if (typeof badgeText !== 'string') return 'positive_momentum'; // fallback if not string
+                        if (badgeText.includes('Hot Streak') || badgeText.includes('Active Streak')) return 'streak_hit';
+                        if (badgeText.includes('Due for HR') || badgeText.includes('HR Candidate')) return 'hr_prediction';
+                        if (badgeText.includes('Positive Momentum') || badgeText.includes('Improved Form')) return 'positive_momentum';
+                        if (badgeText.includes('Risk')) return 'poor_performance';
+                        if (badgeText.includes('Likely Hit')) return 'likely_hit';
+                        if (badgeText.includes('Multi-Hit')) return 'multi_hit';
+                        return 'positive_momentum'; // default
+                      })();
+                      const playerData = {
+                        playerName: selectedPlayerTooltip.playerName,
+                        // Include all raw data from dashboard context
+                        ...selectedPlayerTooltip.playerContext.positivePerformanceData,
+                        ...selectedPlayerTooltip.playerContext.poorPerformanceData,
+                        ...selectedPlayerTooltip.playerContext.hitStreakData,
+                        ...selectedPlayerTooltip.playerContext.hrPredictionData,
+                        ...selectedPlayerTooltip.playerContext.likelyToHitData
+                      };
+                      
+                      return (
+                        <span 
+                          key={idx} 
+                          className="tooltip-badge clickable"
+                          onClick={(e) => {
+                            closePlayerTooltip(); // Close summary first
+                            showDashboardTooltip(playerData, tooltipType, e);
+                          }}
+                        >
+                          {typeof badge === 'string' ? badge : (badge.fullText || badge.text || badge.emoji || 'Insight')}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              
+              {selectedPlayerTooltip.playerContext.standoutReasons && selectedPlayerTooltip.playerContext.standoutReasons.length > 0 && (
+                <div className="tooltip-reasons">
+                  <h4>Key Factors:</h4>
+                  <ul>
+                    {selectedPlayerTooltip.playerContext.standoutReasons.map((reason, idx) => (
+                      <li key={idx}>{reason}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {selectedPlayerTooltip.playerContext.positivePerformanceData && (
+                <div className="tooltip-detailed-data">
+                  <h4>Positive Performance Analysis:</h4>
+                  <div className="performance-score">
+                    Score: {selectedPlayerTooltip.playerContext.positivePerformanceData.totalPositiveScore}
+                  </div>
+                  <div className="momentum-level">
+                    Momentum: {selectedPlayerTooltip.playerContext.positivePerformanceData.momentumLevel}
+                  </div>
+                  
+                  {selectedPlayerTooltip.playerContext.positivePerformanceData.positiveFactors && (
+                    <div className="positive-factors">
+                      <h5>Positive Factors:</h5>
+                      {selectedPlayerTooltip.playerContext.positivePerformanceData.positiveFactors.map((factor, idx) => (
+                        <div key={idx} className="factor-item">
+                          <strong>{factor.type}:</strong> {factor.description} ({factor.positivePoints} pts)
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {selectedPlayerTooltip.playerContext.contextSummary && (
+                <div className="tooltip-summary">
+                  <h4>Summary:</h4>
+                  <p>{selectedPlayerTooltip.playerContext.contextSummary}</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

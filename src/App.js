@@ -20,6 +20,7 @@ import Navigation from './components/Navigation';
 import { TeamFilterProvider } from './components/TeamFilterContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { PlayerScratchpadProvider } from './contexts/PlayerScratchpadContext';
+import { TooltipProvider } from './components/utils/TooltipContext';
 import ScratchpadWidget from './components/ScratchpadWidget/ScratchpadWidget';
 import { 
   fetchPlayerData, 
@@ -203,12 +204,16 @@ function App() {
                   currentDate={currentDate}
                 />} />
 
-              <Route path="/daily-weakspot-analysis" element={<DailyWeakspotAnalysis 
-                  playerData={playerData} 
-                  teamData={teamData} 
-                  gameData={gameData} 
-                  currentDate={currentDate}
-                />} />
+              <Route path="/daily-weakspot-analysis" element={
+                <TooltipProvider>
+                  <DailyWeakspotAnalysis 
+                    playerData={playerData} 
+                    teamData={teamData} 
+                    gameData={gameData} 
+                    currentDate={currentDate}
+                  />
+                </TooltipProvider>
+              } />
 
               <Route path="/css-test" element={<CSSFixesTest />} />
               <Route path="/handedness-test" element={<HandednessTest />} />
