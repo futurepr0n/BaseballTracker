@@ -22,6 +22,37 @@
   position: relative;
   height: 100%;
   min-height: 420px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+/* Collapsible states for container */
+.top-hitters-card .glass-card-container.collapsed {
+  max-height: 80px; /* Just enough for basic header */
+  min-height: 80px !important; /* Override the default min-height */
+  height: 80px; /* Force specific height when collapsed */
+}
+
+.top-hitters-card .glass-card-container.expanded {
+  max-height: 2000px; /* Large enough for full content */
+  min-height: 720px; /* Enough for padding-top (140px) + 5 player items (5 * 88px = 440px) + padding-bottom (20px) + buffer */
+  height: auto; /* Allow natural height when expanded */
+}
+
+/* Hide content when container is collapsed */
+.top-hitters-card .glass-card-container.collapsed .glass-content {
+  display: none;
+}
+
+/* Compact header when collapsed */
+.top-hitters-card .glass-card-container.collapsed .glass-header {
+  padding: 15px 20px;
+}
+
+/* Reduce header elements when collapsed */
+.top-hitters-card .glass-card-container.collapsed .team-hitting-summary,
+.top-hitters-card .glass-card-container.collapsed .card-subtitle.team-context {
+  margin-bottom: 5px;
 }
 
 /* Glass header that content scrolls behind */
@@ -36,8 +67,8 @@
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(59, 130, 246, 0.15);
   padding: 20px;
-  pointer-events: none;
-  /* Ensure header text is visible but doesn't block interactions */
+  pointer-events: auto;
+  /* Allow header interactions for collapsible functionality */
   box-shadow: 0 4px 16px rgba(59, 130, 246, 0.05);
 }
 
@@ -64,7 +95,6 @@
   background: rgba(230, 242, 255, 0.4);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border-radius: 0 0 12px 12px;
   height: 100%;
   overflow-y: auto;
   overflow-x: visible;
@@ -276,12 +306,7 @@
   font-style: italic;
 }
 
-/* Scrollable container for player lists */
-.top-hitters-card .scrollable-container {
-  max-height: 400px;
-  overflow-y: auto;
-  scrollbar-width: none;
-}
+/* Scrollable container for player lists - removed max-height limit */
 
 .top-hitters-card .scrollable-container::-webkit-scrollbar {
   width: 0;

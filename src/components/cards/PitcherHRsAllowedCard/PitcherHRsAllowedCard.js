@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import useTeamFilteredData from '../../useTeamFilter';
 import { fetchPlayerData, fetchGameData } from '../../../services/dataService';
 import { useTooltip } from '../../utils/TooltipContext';
 import { createSafeId } from '../../utils/tooltipUtils';
 import { debugLog } from '../../../utils/debugConfig';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import dynamicGameDateService from '../../../services/dynamicGameDateService';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import '../../common/MobilePlayerCard.css';
 import './PitcherHRsAllowedCard.css';
+import '../../../styles/CollapsibleGlass.css';
 
 /**
  * Card component showing pitchers ranked by home runs allowed
@@ -18,6 +20,8 @@ const PitcherHRsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [dataRange, setDataRange] = useState({ startDate: null, endDate: null, totalDays: 0 });
   const { openTooltip } = useTooltip();
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
 
   // Apply team filtering
   const filteredData = useTeamFilteredData(pitcherHRData, 'team');
@@ -218,6 +222,18 @@ const PitcherHRsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
     analyzePitcherHRs();
   }, [currentDate]);
 
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'pitcher-hrs-allowed-card'
+      );
+      return cleanup;
+    }
+  }, []);
+
   const handlePitcherClick = (pitcher, event) => {
     const safeId = createSafeId(pitcher.name, pitcher.team);
     const tooltipId = `pitcher_hrs_${safeId}`;
@@ -247,8 +263,8 @@ const PitcherHRsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
   if (isLoading) {
     return (
       <div className="card pitcher-hrs-allowed-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>🔥 Most HRs Allowed (Pitchers)</h3>
           </div>
           <div className="loading-indicator">
@@ -262,8 +278,8 @@ const PitcherHRsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
   if (displayData.length === 0) {
     return (
       <div className="card pitcher-hrs-allowed-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>🔥 Most HRs Allowed (Pitchers)</h3>
           </div>
           <div className="no-data">
@@ -276,8 +292,8 @@ const PitcherHRsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
 
   return (
     <div className="card pitcher-hrs-allowed-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>🔥 Most HRs Allowed (Pitchers)</h3>
           {dataRange.startDate && (
             <p className="card-subtitle">
@@ -285,6 +301,9 @@ const PitcherHRsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
             </p>
           )}
         </div>
+        
+        {/* Collapsible Content */}
+        <div className="glass-content expanded">
         
         {/* Desktop View */}
         <div className="desktop-view">
@@ -429,6 +448,8 @@ const PitcherHRsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
             })}
           </div>
         </div>
+        
+        </div> {/* End collapsible content */}
       </div>
     </div>
   );

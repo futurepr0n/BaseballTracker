@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './DayOfWeekHitsCard.css';
 import { createSafeId } from '../../utils/tooltipUtils';
 import { useTooltip } from '../../utils/TooltipContext';
 import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import '../../common/MobilePlayerCard.css';
+import '../../../styles/CollapsibleGlass.css';
 
 /**
  * DayOfWeekHitsCard - Shows players who perform best on specific days of the week
@@ -18,11 +20,25 @@ const DayOfWeekHitsCard = ({
 }) => {
   const { openTooltip, closeTooltip } = useTooltip();
   const { shouldIncludePlayer } = useTeamFilter();
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
 
   // Close tooltips when date changes
   useEffect(() => {
     closeTooltip();
   }, [currentDate, closeTooltip]);
+
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'day-of-week-hits-card'
+      );
+      return cleanup;
+    }
+  }, []);
 
   const handleTooltipClick = (player, event) => {
     const safeId = createSafeId(player.name, player.team);
@@ -38,10 +54,13 @@ const DayOfWeekHitsCard = ({
 
   return (
     <div className="card day-of-week-hits-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>{dayOfWeekHits.dayOfWeek} Hit Leaders</h3>
         </div>
+        
+        {/* Collapsible Content */}
+        <div className="glass-content expanded">
         
         {/* Desktop View */}
         <div className="desktop-view">
@@ -226,7 +245,9 @@ const DayOfWeekHitsCard = ({
           ) : (
             <p className="no-data">No {dayOfWeekHits.dayOfWeek} hit data available</p>
           )}
-        </div>
+        </div> {/* End mobile-view */}
+        
+        </div> {/* End collapsible content */}
       </div>
     </div>
   );

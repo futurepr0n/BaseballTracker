@@ -1,0 +1,27 @@
+/* CollapsibleGlass.css - W3Schools style collapsible for glass cards */
+
+/* Make glass-header clickable */
+.glass-header.collapsible {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.glass-header.collapsible:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* The collapsible content - styles now handled by individual component CSS */
+
+/* Optional: Add a subtle indicator when collapsed */
+.glass-header.collapsible::after {
+  content: '▼';
+  float: right;
+  margin-left: 5px;
+  transition: transform 0.3s ease;
+  opacity: 0.7;
+}
+
+.glass-header.collapsible.collapsed::after {
+  transform: rotate(-90deg);
+}

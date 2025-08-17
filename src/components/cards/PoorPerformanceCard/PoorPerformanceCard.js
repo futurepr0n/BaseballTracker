@@ -1,14 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import useTeamFilteredData from '../../useTeamFilter';
 import { useTooltip } from '../../utils/TooltipContext';
 import { createSafeId } from '../../utils/tooltipUtils';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
+// import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import './PoorPerformanceCard.css';
 import '../../common/MobilePlayerCard.css';
 
 const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: teamData, maxItems = 15 }) => {
   const [error, setError] = useState(null);
   const { openTooltip } = useTooltip();
+  const containerRef = useRef(null);
+
+  // Initialize collapsible functionality
+  // useEffect(() => {
+  //   if (containerRef.current) {
+  //     initializeCollapsibleGlass(containerRef.current, 'poor-performance-card');
+  //   }
+  // }, []);
 
   // Apply team filtering
   const filteredData = useTeamFilteredData(poorPerformancePredictions, 'team');
@@ -59,12 +68,17 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
 
   if (isLoading) {
     return (
-      <div className="card poor-performance-card">
+      <div className="card poor-performance-card" ref={containerRef}>
         <div className="glass-card-container">
           <div className="glass-header">
             <h3>⚠️ Poor Performance Risks</h3>
+            <button className="collapse-toggle" aria-label="Toggle section">
+              <span className="collapse-icon">−</span>
+            </button>
           </div>
-          <div className="loading-indicator">Loading performance risk analysis...</div>
+          <div className="collapsible-content">
+            <div className="loading-indicator">Loading performance risk analysis...</div>
+          </div>
         </div>
       </div>
     );
@@ -72,12 +86,17 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
 
   if (error) {
     return (
-      <div className="card poor-performance-card">
+      <div className="card poor-performance-card" ref={containerRef}>
         <div className="glass-card-container">
           <div className="glass-header">
             <h3>⚠️ Poor Performance Risks</h3>
+            <button className="collapse-toggle" aria-label="Toggle section">
+              <span className="collapse-icon">−</span>
+            </button>
           </div>
-          <div className="error-message">Error: {error}</div>
+          <div className="collapsible-content">
+            <div className="error-message">Error: {error}</div>
+          </div>
         </div>
       </div>
     );
@@ -87,26 +106,35 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
 
   if (displayData.length === 0) {
     return (
-      <div className="card poor-performance-card">
+      <div className="card poor-performance-card" ref={containerRef}>
         <div className="glass-card-container">
           <div className="glass-header">
             <h3>⚠️ Poor Performance Risks</h3>
+            <button className="collapse-toggle" aria-label="Toggle section">
+              <span className="collapse-icon">−</span>
+            </button>
           </div>
-          <div className="no-data">No significant performance risks identified for the selected teams.</div>
+          <div className="collapsible-content">
+            <div className="no-data">No significant performance risks identified for the selected teams.</div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="card poor-performance-card">
+    <div className="card poor-performance-card" ref={containerRef}>
       <div className="glass-card-container">
         <div className="glass-header">
           <h3>⚠️ Poor Performance Risks</h3>
           <div className="card-subtitle">
             {displayData.filter(p => p.riskLevel === 'HIGH').length} High Risk, {displayData.filter(p => p.riskLevel === 'MEDIUM').length} Medium Risk
           </div>
+          <button className="collapse-toggle" aria-label="Toggle section">
+            <span className="collapse-icon">−</span>
+          </button>
         </div>
+        <div className="collapsible-content">
         
         {/* Desktop View */}
         <div className="desktop-view">
@@ -322,6 +350,7 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
               );
             })}
           </div>
+        </div>
         </div>
       </div>
     </div>

@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTeamFilter } from '../TeamFilterContext';
 import { usePlayerScratchpad } from '../../contexts/PlayerScratchpadContext';
 import SimpleDesktopScratchpadIcon from '../common/SimpleDesktopScratchpadIcon';
+import { initializeCollapsibleGlass } from '../../utils/collapsibleGlass';
+import '../../styles/CollapsibleGlass.css';
 import './MilestoneTrackingCard.css';
 
 const MilestoneTrackingCard = ({ currentDate }) => {
@@ -14,6 +16,8 @@ const MilestoneTrackingCard = ({ currentDate }) => {
   
   const { shouldIncludePlayer, isFiltering } = useTeamFilter();
   const { filterEnabled: scratchpadFilterEnabled } = usePlayerScratchpad();
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     const loadMilestoneData = async () => {
@@ -51,6 +55,25 @@ const MilestoneTrackingCard = ({ currentDate }) => {
     
     loadMilestoneData();
   }, [currentDate, scratchpadFilterEnabled]);
+
+  // Initialize collapsible functionality
+  useEffect(() => {
+    console.log('🔍 MilestoneTrackingCard: useEffect running for collapsible initialization');
+    console.log('🔍 HeaderRef:', headerRef.current);
+    console.log('🔍 ContainerRef:', containerRef.current);
+    
+    if (headerRef.current && containerRef.current) {
+      console.log('🔍 Both refs available, initializing collapsible...');
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'milestone-tracking-card'
+      );
+      return cleanup;
+    } else {
+      console.log('🔍 Refs not ready yet, will try again...');
+    }
+  }, [milestoneData]); // Add milestoneData as dependency to ensure it runs after data loads
 
   const filterMilestones = () => {
     if (!milestoneData || !milestoneData.milestones) return [];
@@ -140,63 +163,83 @@ const MilestoneTrackingCard = ({ currentDate }) => {
   const summary = milestoneData?.summary || {};
 
   return (
-    <div className="milestone-tracking-card">
-      <div className="card-header">
-        <h3>🎯 Milestone Tracking</h3>
-        <div className="header-stats">
-          <span className="stat-badge blazing">🔥🔥🔥 {summary.byHeatLevel?.BLAZING || 0}</span>
-          <span className="stat-badge hot">🔥🔥 {summary.byHeatLevel?.HOT || 0}</span>
-          <span className="stat-badge warm">🔥 {summary.byHeatLevel?.WARM || 0}</span>
-        </div>
-      </div>
-
-      <div className="filters-row">
-        <div className="filter-group">
-          <label>Heat Level:</label>
-          <select value={selectedHeatLevel} onChange={(e) => setSelectedHeatLevel(e.target.value)}>
-            <option value="ALL">All Heat Levels</option>
-            <option value="BLAZING">🔥🔥🔥 Blazing</option>
-            <option value="HOT">🔥🔥 Hot</option>
-            <option value="WARM">🔥 Warm</option>
-          </select>
-        </div>
-        
-        <div className="filter-group">
-          <label>Stat:</label>
-          <select value={selectedStat} onChange={(e) => setSelectedStat(e.target.value)}>
-            <option value="ALL">All Stats</option>
-            <option value="HR">Home Runs</option>
-            <option value="H">Hits</option>
-            <option value="RBI">RBI</option>
-            <option value="R">Runs</option>
-          </select>
-        </div>
-        
-        <div className="filter-group">
-          <label>Sort By:</label>
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-            <option value="urgency">Urgency</option>
-            <option value="timeline">Timeline</option>
-            <option value="player">Player Name</option>
-          </select>
-        </div>
-      </div>
-
-      {summary.tonightWatch && summary.tonightWatch.length > 0 && (
-        <div className="tonight-watch">
-          <h4>⚡ Tonight's Watch List</h4>
-          <div className="tonight-list">
-            {summary.tonightWatch.slice(0, 5).map((player, idx) => (
-              <span key={idx} className="tonight-player">
-                {player.player} ({player.team}): {player.milestone}
-              </span>
-            ))}
-            {summary.tonightWatch.length > 5 && (
-              <span className="more-count">+{summary.tonightWatch.length - 5} more</span>
-            )}
+    <div className="card milestone-tracking-card">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
+          <div className="header-title-row">
+            <h3>🎯 Milestone Tracking</h3>
+            <div className="header-stats">
+              <span className="stat-badge blazing">🔥🔥🔥 {summary.byHeatLevel?.BLAZING || 0}</span>
+              <span className="stat-badge hot">🔥🔥 {summary.byHeatLevel?.HOT || 0}</span>
+              <span className="stat-badge warm">🔥 {summary.byHeatLevel?.WARM || 0}</span>
+            </div>
           </div>
+          
+          <div className="filters-row">
+            <div className="filter-group">
+              <label>Heat Level:</label>
+              <select 
+                value={selectedHeatLevel} 
+                onChange={(e) => setSelectedHeatLevel(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <option value="ALL">All Heat Levels</option>
+                <option value="BLAZING">🔥🔥🔥 Blazing</option>
+                <option value="HOT">🔥🔥 Hot</option>
+                <option value="WARM">🔥 Warm</option>
+              </select>
+            </div>
+            
+            <div className="filter-group">
+              <label>Stat:</label>
+              <select 
+                value={selectedStat} 
+                onChange={(e) => setSelectedStat(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <option value="ALL">All Stats</option>
+                <option value="HR">Home Runs</option>
+                <option value="H">Hits</option>
+                <option value="RBI">RBI</option>
+                <option value="R">Runs</option>
+              </select>
+            </div>
+            
+            <div className="filter-group">
+              <label>Sort By:</label>
+              <select 
+                value={sortBy} 
+                onChange={(e) => setSortBy(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <option value="urgency">Urgency</option>
+                <option value="timeline">Timeline</option>
+                <option value="player">Player Name</option>
+              </select>
+            </div>
+          </div>
+          
+          {/* Tonight's watch list */}
+          {summary.tonightWatch && summary.tonightWatch.length > 0 && (
+            <div className="tonight-watch">
+              <h4>⚡ Tonight's Watch List</h4>
+              <div className="tonight-list">
+                {summary.tonightWatch.slice(0, 5).map((player, idx) => (
+                  <span key={idx} className="tonight-player">
+                    {player.player} ({player.team}): {player.milestone}
+                  </span>
+                ))}
+                {summary.tonightWatch.length > 5 && (
+                  <span className="more-count">+{summary.tonightWatch.length - 5} more</span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-      )}
+        
+        {/* Collapsible Content */}
+        <div className="glass-content expanded">
+          <div className="scrollable-container">
 
       <div className="milestones-container">
         <div className="milestones-list">
@@ -298,13 +341,16 @@ const MilestoneTrackingCard = ({ currentDate }) => {
         </div>
       )}
       
-      <div className="card-footer">
-        <small>
-          Last updated: {milestoneData?.lastUpdated ? 
-            new Date(milestoneData.lastUpdated).toLocaleString() : 
-            'Unknown'
-          }
-        </small>
+          <div className="card-footer">
+            <small>
+              Last updated: {milestoneData?.lastUpdated ? 
+                new Date(milestoneData.lastUpdated).toLocaleString() : 
+                'Unknown'
+              }
+            </small>
+          </div>
+          </div>
+        </div>
       </div>
     </div>
   );

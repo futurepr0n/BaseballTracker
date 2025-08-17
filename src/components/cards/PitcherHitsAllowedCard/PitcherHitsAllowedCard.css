@@ -37,8 +37,12 @@
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(139, 92, 246, 0.15);
   padding: 20px;
-  pointer-events: none;
+  pointer-events: auto;
   box-shadow: 0 4px 16px rgba(139, 92, 246, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .pitcher-hits-allowed-card .glass-header h3 {
@@ -348,4 +352,47 @@
     width: 28px;
     height: 28px;
   }
+}
+
+/* Collapsible functionality */
+.pitcher-hits-allowed-card .collapse-toggle {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  margin-left: 10px;
+}
+
+.pitcher-hits-allowed-card .collapse-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.pitcher-hits-allowed-card .collapsible-content {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+/* Collapsed state */
+.pitcher-hits-allowed-card.collapsed .glass-card-container {
+  min-height: 80px;
+  height: 80px;
+}
+
+.pitcher-hits-allowed-card.collapsed .collapsible-content {
+  opacity: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.pitcher-hits-allowed-card.collapsed .glass-header {
+  border-bottom: none;
+}
+
+.pitcher-hits-allowed-card.collapsed .collapse-icon {
+  transform: rotate(90deg);
 }

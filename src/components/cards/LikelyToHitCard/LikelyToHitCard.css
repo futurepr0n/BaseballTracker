@@ -36,8 +36,11 @@
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(82, 196, 26, 0.15);
   padding: 20px;
-  pointer-events: none;
+  pointer-events: auto;
   box-shadow: 0 4px 16px rgba(82, 196, 26, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .likely-to-hit-card .glass-header h3 {
@@ -261,4 +264,46 @@
   .likely-to-hit-card .mobile-cards {
     padding-bottom: 10px;
   }
+}
+
+/* Collapsible functionality */
+.likely-to-hit-card .collapse-toggle {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.likely-to-hit-card .collapse-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.likely-to-hit-card .collapsible-content {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+/* Collapsed state */
+.likely-to-hit-card.collapsed .glass-card-container {
+  min-height: 80px;
+  height: 80px;
+}
+
+.likely-to-hit-card.collapsed .collapsible-content {
+  opacity: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.likely-to-hit-card.collapsed .glass-header {
+  border-bottom: none;
+}
+
+.likely-to-hit-card.collapsed .collapse-icon {
+  transform: rotate(90deg);
 }

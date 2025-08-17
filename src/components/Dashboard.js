@@ -1545,10 +1545,8 @@ const noFilteredData = isFiltering &&
 
           {/* Team Last Result Cards */}
 <TeamComingOffWinCard 
-  gameData={gameData}
-  playerData={filteredBatterData.concat(filteredPitcherData)}
   teamData={teamData}
-    currentDate={currentDate}  
+  currentDate={currentDate}  
 />
 
 <TeamComingOffLossCard 

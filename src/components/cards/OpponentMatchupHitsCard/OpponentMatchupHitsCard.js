@@ -1,5 +1,5 @@
 // src/components/cards/OpponentMatchupHitsCard/OpponentMatchupHitsCard.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   fetchPlayerDataForDateRange, 
   fetchRosterData,
@@ -8,6 +8,7 @@ import {
 import enhancedGameDataService from '../../../services/enhancedGameDataService';
 import { debugLog } from '../../../utils/debugConfig';
 import { getPlayerDisplayName, getTeamDisplayName } from '../../../utils/playerNameUtils';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import './OpponentMatchupHitsCard.css';
 
 const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
@@ -15,6 +16,7 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [debugInfo, setDebugInfo] = useState('');
+  const containerRef = useRef(null);
   
 
   useEffect(() => {
@@ -598,6 +600,18 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
     loadMatchupData();
   }, [gameData, currentDate]);
 
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (containerRef.current) {
+      const glassHeader = containerRef.current.querySelector('.glass-header');
+      const glassCardContainer = containerRef.current.querySelector('.glass-card-container');
+      
+      if (glassHeader && glassCardContainer) {
+        return initializeCollapsibleGlass(glassHeader, glassCardContainer, 'opponent-matchup-hits-card');
+      }
+    }
+  }, []);
+
   const getTeamInfo = (teamAbbr) => {
     return teams[teamAbbr] || { 
       name: teamAbbr, 
@@ -650,7 +664,7 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
   }
 
   return (
-    <div className="card opponent-matchup-hr-card">
+    <div className="card opponent-matchup-hr-card" ref={containerRef}>
       <div className="glass-card-container">
         <div className="glass-header">
           <h3>💥 HRs vs Current Opponent</h3>

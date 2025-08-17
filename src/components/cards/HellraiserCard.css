@@ -20,6 +20,36 @@
   position: relative;
   height: 100%;
   min-height: 420px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+/* Collapsible states for container */
+.hellraiser-card .glass-card-container.collapsed {
+  max-height: 80px; /* Just enough for basic header */
+  min-height: 80px !important; /* Override the default min-height */
+  height: 80px; /* Force specific height when collapsed */
+}
+
+.hellraiser-card .glass-card-container.expanded {
+  max-height: 2000px; /* Large enough for full content */
+  min-height: 720px; /* Enough for full content */
+  height: auto; /* Allow natural height when expanded */
+}
+
+/* Hide content when container is collapsed */
+.hellraiser-card .glass-card-container.collapsed .glass-content {
+  display: none;
+}
+
+/* Compact header when collapsed */
+.hellraiser-card .glass-card-container.collapsed .glass-header {
+  padding: 15px 20px;
+}
+
+/* Reduce header elements when collapsed */
+.hellraiser-card .glass-card-container.collapsed .compact-filters {
+  margin-top: 5px;
 }
 
 /* Glass header with fire gradient that content scrolls behind */

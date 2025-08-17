@@ -1,12 +1,14 @@
 // Enhanced HomeRunLeadersCard.js - Add this to your existing HomeRunLeadersCard component
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import SimpleDesktopScratchpadIcon from '../../common/SimpleDesktopScratchpadIcon';
 import { getTeamLogoUrl } from '../../../utils/teamUtils';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import './HomeRunLeadersCard.css';
 import '../../common/MobilePlayerCard.css';
+import '../../../styles/CollapsibleGlass.css';
 
 /**
  * HomeRunLeadersCard - Shows home run leaders
@@ -19,6 +21,8 @@ const HomeRunLeadersCard = ({
   teams 
 }) => {
   const { isFiltering, selectedTeam, getTeamName, includeMatchup, matchupTeam, shouldIncludePlayer } = useTeamFilter();
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
 
   // Get appropriate display limit based on filtering
   const getDisplayLimit = () => {
@@ -69,10 +73,22 @@ const HomeRunLeadersCard = ({
 
   const teamHRSummary = getTeamHRSummary();
 
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'hr-leaders-card'
+      );
+      return cleanup;
+    }
+  }, []);
+
   return (
     <div className="card hr-leaders-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>💥 Home Run Leaders ({timePeriodText})</h3>
           
           {/* Enhanced subtitle with team context */}
@@ -115,6 +131,9 @@ const HomeRunLeadersCard = ({
           </div>
         )}
         </div>
+        
+        {/* Collapsible Content */}
+        <div className="glass-content expanded">
         
         {/* Desktop View */}
         <div className="desktop-view">
@@ -251,6 +270,8 @@ const HomeRunLeadersCard = ({
             </p>
           )}
         </div>
+        
+        </div> {/* End collapsible content */}
       </div>
     </div>
   );

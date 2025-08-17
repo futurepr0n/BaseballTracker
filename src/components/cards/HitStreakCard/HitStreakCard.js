@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './HitStreakCard.css';
 import { createSafeId } from '../../utils/tooltipUtils';
 import { useTooltip } from '../../utils/TooltipContext';
@@ -6,7 +6,9 @@ import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import SimpleDesktopScratchpadIcon from '../../common/SimpleDesktopScratchpadIcon';
 import { getTeamLogoUrl } from '../../../utils/teamUtils';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import '../../common/MobilePlayerCard.css';
+import '../../../styles/CollapsibleGlass.css';
 
 /**
  * HitStreakCard - Shows players with active hit streaks
@@ -20,6 +22,20 @@ const HitStreakCard = ({
 }) => {
   const { openTooltip, closeTooltip } = useTooltip();
   const { shouldIncludePlayer } = useTeamFilter();
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
+
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'hit-streak-card'
+      );
+      return cleanup;
+    }
+  }, []);
 
   // Close tooltips when date changes
   useEffect(() => {
@@ -44,10 +60,13 @@ const HitStreakCard = ({
 
   return (
     <div className="card hit-streak-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>Current Hit Streaks</h3>
         </div>
+        
+        {/* Collapsible Content */}
+        <div className="glass-content expanded">
         {/* Desktop View */}
         <div className="desktop-view">
           {isLoading ? (
@@ -291,6 +310,8 @@ const HitStreakCard = ({
             <p className="no-data">No active hitting streaks</p>
           )}
         </div>
+        
+        </div> {/* End collapsible content */}
       </div>
     </div>
   );

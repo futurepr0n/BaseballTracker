@@ -23,6 +23,18 @@
   position: relative;
   height: 100%;
   min-height: 420px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.opponent-matchup-hits-card .glass-card-container.collapsed {
+  height: 80px;
+  min-height: 80px;
+}
+
+.opponent-matchup-hits-card .glass-card-container.expanded {
+  height: 100%;
+  min-height: 420px;
 }
 
 /* Glass header that content scrolls behind */
@@ -37,8 +49,18 @@
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(20, 184, 166, 0.15);
   padding: 20px;
-  pointer-events: none;
+  pointer-events: all;
+  cursor: pointer;
   box-shadow: 0 4px 16px rgba(20, 184, 166, 0.05);
+  transition: all 0.3s ease;
+}
+
+.opponent-matchup-hits-card .glass-header:hover {
+  background: rgba(20, 184, 166, 0.12);
+}
+
+.opponent-matchup-hits-card .glass-header.collapsed {
+  border-bottom: none;
 }
 
 .opponent-matchup-hits-card .glass-header h3 {
@@ -97,6 +119,18 @@
   position: relative;
   height: 100%;
   min-height: 420px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.opponent-matchup-hr-card .glass-card-container.collapsed {
+  height: 80px;
+  min-height: 80px;
+}
+
+.opponent-matchup-hr-card .glass-card-container.expanded {
+  height: 100%;
+  min-height: 420px;
 }
 
 /* Glass header that content scrolls behind */
@@ -111,8 +145,18 @@
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(251, 113, 133, 0.15);
   padding: 20px;
-  pointer-events: none;
+  pointer-events: all;
+  cursor: pointer;
   box-shadow: 0 4px 16px rgba(251, 113, 133, 0.05);
+  transition: all 0.3s ease;
+}
+
+.opponent-matchup-hr-card .glass-header:hover {
+  background: rgba(251, 113, 133, 0.12);
+}
+
+.opponent-matchup-hr-card .glass-header.collapsed {
+  border-bottom: none;
 }
 
 .opponent-matchup-hr-card .glass-header h3 {

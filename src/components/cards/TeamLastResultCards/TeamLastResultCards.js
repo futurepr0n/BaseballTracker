@@ -216,15 +216,15 @@ const TeamComingOffWinCard = ({ teamData, currentDate }) => {
       console.log('[TeamComingOffWinCard] Loading historical data...');
 
       try {
-        // Look back 7 days to find completed games
+        // Look back 14 days to find completed games (increased from 7)
         const endDate = new Date(currentDate);
         const startDate = new Date(currentDate);
-        startDate.setDate(startDate.getDate() - 7);
+        startDate.setDate(startDate.getDate() - 14);
 
         console.log(`[TeamComingOffWinCard] Fetching data from ${formatDateString(startDate)} to ${formatDateString(endDate)}`);
 
         // Fetch player data for date range
-        const playerData = await fetchPlayerDataForDateRange(endDate, 7, 7);
+        const playerData = await fetchPlayerDataForDateRange(endDate, 14, 14);
         setHistoricalPlayerData(playerData);
 
         // Fetch game data for each date
@@ -426,9 +426,6 @@ const TeamComingOffWinCard = ({ teamData, currentDate }) => {
   );
 };
 
-// Export components at the end to avoid initialization issues
-export { TeamComingOffWinCard, TeamComingOffLossCard };
-
 /**
  * Team Coming Off Loss Card Component
  */
@@ -445,15 +442,15 @@ const TeamComingOffLossCard = ({ teamData, currentDate }) => {
       console.log('[TeamComingOffLossCard] Loading historical data...');
 
       try {
-        // Look back 7 days to find completed games
+        // Look back 14 days to find completed games (increased from 7)
         const endDate = new Date(currentDate);
         const startDate = new Date(currentDate);
-        startDate.setDate(startDate.getDate() - 7);
+        startDate.setDate(startDate.getDate() - 14);
 
         console.log(`[TeamComingOffLossCard] Fetching data from ${formatDateString(startDate)} to ${formatDateString(endDate)}`);
 
         // Fetch player data for date range
-        const playerData = await fetchPlayerDataForDateRange(endDate, 7, 7);
+        const playerData = await fetchPlayerDataForDateRange(endDate, 14, 14);
         setHistoricalPlayerData(playerData);
 
         // Fetch game data for each date
@@ -654,3 +651,5 @@ const TeamComingOffLossCard = ({ teamData, currentDate }) => {
     </div>
   );
 };
+// Export components at the end
+export { TeamComingOffWinCard, TeamComingOffLossCard };

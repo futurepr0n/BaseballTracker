@@ -37,7 +37,7 @@ const TimeSlotHitsCard = ({ gameData, currentDate, teams }) => {
         const dateRangeData = await fetchPlayerDataForDateRange(
           currentDate, 
           30,   // Initial lookback
-          90    // Max lookback (3 months) - reduced from 365 days
+          365   // Max lookback (1 year) - increased to match HR card
         );
         
         // Create a map of team -> game time slot

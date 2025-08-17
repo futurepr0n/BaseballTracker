@@ -23,6 +23,18 @@
   position: relative;
   height: 100%;
   min-height: 420px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.hit-drought-bounce-back-card .glass-card-container.collapsed {
+  height: 80px;
+  min-height: 80px;
+}
+
+.hit-drought-bounce-back-card .glass-card-container.expanded {
+  height: 100%;
+  min-height: 420px;
 }
 
 /* Glass header that content scrolls behind */
@@ -37,8 +49,18 @@
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(16, 185, 129, 0.15);
   padding: 20px;
-  pointer-events: none;
+  pointer-events: all;
+  cursor: pointer;
   box-shadow: 0 4px 16px rgba(16, 185, 129, 0.05);
+  transition: all 0.3s ease;
+}
+
+.hit-drought-bounce-back-card .glass-header:hover {
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.hit-drought-bounce-back-card .glass-header.collapsed {
+  border-bottom: none;
 }
 
 .hit-drought-bounce-back-card .glass-header h3 {

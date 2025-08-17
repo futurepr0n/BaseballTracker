@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import useTeamFilteredData from '../../useTeamFilter';
 import { fetchPlayerData, fetchGameData } from '../../../services/dataService';
 import { useTooltip } from '../../utils/TooltipContext';
 import { createSafeId } from '../../utils/tooltipUtils';
 import { debugLog } from '../../../utils/debugConfig';
 import dynamicGameDateService from '../../../services/dynamicGameDateService';
+// import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import '../../common/MobilePlayerCard.css';
 import './PitcherHitsAllowedCard.css';
@@ -18,6 +19,14 @@ const PitcherHitsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [dataRange, setDataRange] = useState({ startDate: null, endDate: null, totalDays: 0 });
   const { openTooltip } = useTooltip();
+  const containerRef = useRef(null);
+
+  // Initialize collapsible functionality
+  // useEffect(() => {
+  //   if (containerRef.current) {
+  //     initializeCollapsibleGlass(containerRef.current, 'pitcher-hits-allowed-card');
+  //   }
+  // }, []);
 
   // Apply team filtering
   const filteredData = useTeamFilteredData(pitcherHitsData, 'team');
@@ -266,13 +275,18 @@ const PitcherHitsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
 
   if (isLoading) {
     return (
-      <div className="card pitcher-hits-allowed-card">
+      <div className="card pitcher-hits-allowed-card" ref={containerRef}>
         <div className="glass-card-container">
           <div className="glass-header">
             <h3>📈 Most Hits Allowed (Pitchers)</h3>
+            <button className="collapse-toggle" aria-label="Toggle section">
+              <span className="collapse-icon">−</span>
+            </button>
           </div>
-          <div className="loading-indicator">
-            Loading pitcher hits analysis...
+          <div className="collapsible-content">
+            <div className="loading-indicator">
+              Loading pitcher hits analysis...
+            </div>
           </div>
         </div>
       </div>
@@ -281,13 +295,18 @@ const PitcherHitsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
 
   if (displayData.length === 0) {
     return (
-      <div className="card pitcher-hits-allowed-card">
+      <div className="card pitcher-hits-allowed-card" ref={containerRef}>
         <div className="glass-card-container">
           <div className="glass-header">
             <h3>📈 Most Hits Allowed (Pitchers)</h3>
+            <button className="collapse-toggle" aria-label="Toggle section">
+              <span className="collapse-icon">−</span>
+            </button>
           </div>
-          <div className="no-data">
-            No pitcher hits data available for the selected period.
+          <div className="collapsible-content">
+            <div className="no-data">
+              No pitcher hits data available for the selected period.
+            </div>
           </div>
         </div>
       </div>
@@ -295,7 +314,7 @@ const PitcherHitsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
   }
 
   return (
-    <div className="card pitcher-hits-allowed-card">
+    <div className="card pitcher-hits-allowed-card" ref={containerRef}>
       <div className="glass-card-container">
         <div className="glass-header">
           <h3>📈 Most Hits Allowed (Pitchers)</h3>
@@ -304,7 +323,11 @@ const PitcherHitsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
               {formatDateRange()}
             </p>
           )}
+          <button className="collapse-toggle" aria-label="Toggle section">
+            <span className="collapse-icon">−</span>
+          </button>
         </div>
+        <div className="collapsible-content">
         
         {/* Desktop View */}
         <div className="desktop-view">
@@ -447,6 +470,7 @@ const PitcherHitsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
               );
             })}
           </div>
+        </div>
         </div>
       </div>
     </div>

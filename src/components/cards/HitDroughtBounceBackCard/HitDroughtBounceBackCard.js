@@ -1,5 +1,5 @@
 // src/components/cards/HitDroughtBounceBackCard/HitDroughtBounceBackCard.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   fetchPlayerDataForDateRange, 
   fetchRosterData 
@@ -7,6 +7,7 @@ import {
 import { getPlayerDisplayName, getTeamDisplayName } from '../../../utils/playerNameUtils';
 import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import './HitDroughtBounceBackCard.css';
 import '../../common/MobilePlayerCard.css';
 
@@ -15,6 +16,7 @@ const HitDroughtBounceBackCard = ({ gameData, currentDate, teams }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { shouldIncludePlayer } = useTeamFilter();
+  const containerRef = useRef(null);
 
   useEffect(() => {
     const analyzeBounceBackPatterns = async () => {
@@ -80,6 +82,18 @@ const HitDroughtBounceBackCard = ({ gameData, currentDate, teams }) => {
       analyzeBounceBackPatterns();
     }
   }, [gameData, currentDate]);
+
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (containerRef.current) {
+      const glassHeader = containerRef.current.querySelector('.glass-header');
+      const glassCardContainer = containerRef.current.querySelector('.glass-card-container');
+      
+      if (glassHeader && glassCardContainer) {
+        return initializeCollapsibleGlass(glassHeader, glassCardContainer, 'hit-drought-bounce-back-card');
+      }
+    }
+  }, []);
 
   /**
    * Analyze a player's bounce back pattern after hitless games
@@ -214,7 +228,7 @@ const HitDroughtBounceBackCard = ({ gameData, currentDate, teams }) => {
   }
 
   return (
-    <div className="card hit-drought-bounce-back-card">
+    <div className="card hit-drought-bounce-back-card" ref={containerRef}>
       <div className="glass-card-container">
         <div className="glass-header">
           <h3>🔄 Hit Expected After Drought</h3>

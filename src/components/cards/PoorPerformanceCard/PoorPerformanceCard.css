@@ -43,8 +43,12 @@
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(220, 38, 38, 0.15);
   padding: 20px;
-  pointer-events: none;
+  pointer-events: auto;
   box-shadow: 0 4px 16px rgba(220, 38, 38, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .poor-performance-card .glass-header h3 {
@@ -486,4 +490,47 @@
   .poor-performance-card .risk-badge-overlay {
     right: 6px;
   }
+}
+
+/* Collapsible functionality */
+.poor-performance-card .collapse-toggle {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  margin-left: 10px;
+}
+
+.poor-performance-card .collapse-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.poor-performance-card .collapsible-content {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+/* Collapsed state */
+.poor-performance-card.collapsed .glass-card-container {
+  min-height: 80px;
+  height: 80px;
+}
+
+.poor-performance-card.collapsed .collapsible-content {
+  opacity: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.poor-performance-card.collapsed .glass-header {
+  border-bottom: none;
+}
+
+.poor-performance-card.collapsed .collapse-icon {
+  transform: rotate(90deg);
 }

@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { BarChart3, TrendingUp, Target, Loader2, AlertCircle } from 'lucide-react';
 import { useTeamFilter } from '../../TeamFilterContext';
 import { debugLog } from '../../../utils/debugConfig';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import './MultiHitDashboardCard.css'; // Import your CSS styles
 
 const MultiHitDashboardCard = ({ teams = {} }) => {
@@ -11,6 +12,7 @@ const MultiHitDashboardCard = ({ teams = {} }) => {
   const [gameData, setGameData] = useState({});
   const [rosterData, setRosterData] = useState([]);
   const { selectedTeam, includeMatchup, matchupTeam, shouldIncludePlayer } = useTeamFilter();
+  const containerRef = useRef(null);
 
   // Clean player names utility function
   const cleanPlayerName = (nameInput) => {
@@ -100,6 +102,18 @@ const MultiHitDashboardCard = ({ teams = {} }) => {
     };
 
     loadData();
+  }, []);
+
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (containerRef.current) {
+      const glassHeader = containerRef.current.querySelector('.glass-header');
+      const glassCardContainer = containerRef.current.querySelector('.glass-card-container');
+      
+      if (glassHeader && glassCardContainer) {
+        return initializeCollapsibleGlass(glassHeader, glassCardContainer, 'multi-hit-dashboard-card');
+      }
+    }
   }, []);
 
   // Process the pre-processed data for display
@@ -194,7 +208,7 @@ const MultiHitDashboardCard = ({ teams = {} }) => {
   }
 
   return (
-    <div className="multi-hit-dashboard">
+    <div className="multi-hit-dashboard" ref={containerRef}>
       <div className="glass-card-container">
         {/* Glass Header */}
         <div className="glass-header">

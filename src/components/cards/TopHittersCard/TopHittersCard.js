@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import SimpleDesktopScratchpadIcon from '../../common/SimpleDesktopScratchpadIcon';
 import { getTeamLogoUrl } from '../../../utils/teamUtils';
+// import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import './TopHittersCard.css';
 import '../../common/MobilePlayerCard.css';
+import '../../../styles/CollapsibleGlass.css';
 
 /**
  * TopHittersCard - Shows top hitting performers
@@ -16,7 +18,9 @@ const TopHittersCard = ({
   timePeriodText, 
   teams 
 }) => {
-  const { isFiltering, selectedTeam, getTeamName, includeMatchup, matchupTeam, shouldIncludePlayer } = useTeamFilter();
+  const { isFiltering, selectedTeam, getTeamName, includeMatchup, matchupTeam } = useTeamFilter();
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
 
   // Get appropriate display limit based on filtering
   const getDisplayLimit = () => {
@@ -65,10 +69,22 @@ const TopHittersCard = ({
 
   const teamSummary = getTeamSummary();
 
+  // Initialize collapsible functionality
+  // useEffect(() => {
+  //   if (headerRef.current && containerRef.current) {
+  //     const cleanup = initializeCollapsibleGlass(
+  //       headerRef.current, 
+  //       containerRef.current, // Use the glass-card-container ref
+  //       'top-hitters-card'
+  //     );
+  //     return cleanup;
+  //   }
+  // }, []);
+
   return (
     <div className="card top-hitters-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>🎯 Top Hitters ({timePeriodText})</h3>
           
           {/* Enhanced subtitle with team context */}
@@ -107,6 +123,9 @@ const TopHittersCard = ({
             </div>
           )}
         </div>
+        
+        {/* Collapsible Content */}
+        <div className="glass-content expanded">
         
         {/* Desktop View */}
         <div className="desktop-view">
@@ -246,6 +265,8 @@ const TopHittersCard = ({
             </p>
           )}
         </div>
+        
+        </div> {/* End collapsible content */}
       </div>
     </div>
   );
