@@ -66,7 +66,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  padding-top: 100px; /* Space for header with odds info */
+  padding-top: 120px; /* Space for header with odds info */
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 20px;
@@ -369,10 +369,33 @@
     grid-column: 1 / -1;
   }
   
+  /* CRITICAL FIX: Ensure proper glass header positioning on mobile */
+  .hr-prediction-card .glass-header {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 20 !important;
+    /* Ensure header stays at the very top */
+    margin: 0 !important;
+    border-radius: 12px 12px 0 0 !important;
+    /* Remove any potential gaps */
+    transform: none !important;
+    /* Mobile-specific background for better visibility */
+    background: rgba(230, 57, 70, 0.12) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    border-bottom: 1px solid rgba(230, 57, 70, 0.2) !important;
+  }
+  
   /* Remove footer space in mobile */
   .hr-prediction-card .glass-card-container {
     min-height: auto;
     height: auto;
+    /* Ensure container starts at absolute top */
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
   }
   
   .hr-prediction-card .scrollable-container {
@@ -380,16 +403,27 @@
     height: auto;
     max-height: 60vh;
     padding-bottom: 10px;
+    /* CRITICAL: Add proper buffer for mobile glass header */
+    padding-top: 110px !important;
+    /* Ensure scrollable content starts below the glass header */
+    margin-top: 0 !important;
   }
   
-  /* Mobile view windowing */
+  /* Mobile view windowing with proper buffer */
   .hr-prediction-card .mobile-view {
     max-height: 60vh;
     overflow-y: auto;
+    /* Ensure mobile cards start below glass header */
+    padding-top: 110px !important;
+    /* Position relative to allow scrolling behind header */
+    position: relative !important;
+    z-index: 10 !important;
   }
   
   .hr-prediction-card .mobile-cards {
     padding-bottom: 10px;
+    /* Ensure cards can scroll behind header */
+    z-index: 5 !important;
   }
   
   /* Much more compact rows on mobile */

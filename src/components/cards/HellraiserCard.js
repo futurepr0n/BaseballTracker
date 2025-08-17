@@ -230,9 +230,8 @@ const HellraiserCard = ({ currentDate }) => {
       <div className="glass-card-container">
         <div className="glass-header">
           <h3>🔥 Pinheads HR Picks</h3>
-        </div>
-        
-        <div className="compact-filters">
+          
+          <div className="compact-filters">
             <div className="filter-row">
               <span className="filter-label">Value:</span>
               <button className={selectedValue === 'all' ? 'active' : ''} onClick={() => setSelectedValue('all')}>All</button>
@@ -249,6 +248,7 @@ const HellraiserCard = ({ currentDate }) => {
               <button className={selectedPathway === 'pitcherDriven' ? 'active' : ''} onClick={() => setSelectedPathway('pitcherDriven')}>Pitcher-Driven</button>
             </div>
           </div>
+        </div>
 
           {/* Desktop View */}
           <div className="desktop-view">

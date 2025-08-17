@@ -115,7 +115,7 @@
   border-radius: 8px;
   transition: all 0.2s ease;
   position: relative;
-  overflow: visible;
+  overflow: hidden; /* CRITICAL FIX: Contain team logo background */
   max-width: 100%;
   width: 100%;
 }
@@ -270,19 +270,20 @@
   white-space: nowrap;
 }
 
-/* Enhanced background logo */
+/* Enhanced background logo - FIXED: Properly contained within player-item */
 .poor-performance-card .risk-item .team-logo-bg {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 800px;
-  height: 800px;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 66%;
   opacity: 0.06;
   z-index: -1;
   pointer-events: none;
   transition: opacity 0.2s ease;
-  object-fit: contain;
-  transform: translate(-50%, -50%);
+  object-fit: cover;
+  object-position: center;
+  transform: translate(20%, -10%) scale(2.2);
 }
 
 .poor-performance-card .risk-item:hover .team-logo-bg {
