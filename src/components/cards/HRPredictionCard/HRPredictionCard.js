@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Papa from 'papaparse';
 import { debugLog } from '../../../utils/debugConfig';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import './HRPredictionCard.css';
 import '../../common/MobilePlayerCard.css';
+import '../../../styles/CollapsibleGlass.css';
 
 /**
  * Enhanced HR Prediction Card with betting odds integration
@@ -12,6 +14,8 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
   const [oddsData, setOddsData] = useState(new Map());
   const [oddsLoading, setOddsLoading] = useState(true);
   const [oddsError, setOddsError] = useState(null);
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
 
   // Load odds data from CSV file
   useEffect(() => {
@@ -158,6 +162,18 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
     loadOddsData();
   }, []);
 
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'hr-prediction-card'
+      );
+      return cleanup;
+    }
+  }, []);
+
   // Function to find odds for a player
   const getPlayerOdds = (playerName) => {
     if (!playerName || oddsData.size === 0) {
@@ -228,8 +244,8 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
   if (isLoading) {
     return (
       <div className="card hr-prediction-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>⏳Players Due for A Home Run</h3>
           </div>
           <div className="loading-indicator">Loading predictions...</div>
@@ -241,8 +257,8 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
   if (!playersWithHomeRunPrediction || playersWithHomeRunPrediction.length === 0) {
     return (
       <div className="card hr-prediction-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>⏳Players Due for A Home Run</h3>
           </div>
           <div className="no-data">No HR prediction data available</div>
@@ -253,8 +269,8 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
 
   return (
     <div className="card hr-prediction-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>⏳Players Due for A Home Run</h3>
           {oddsLoading && (
             <div className="odds-loading">Loading odds...</div>
@@ -266,6 +282,9 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
             <div className="odds-info">📊 Live odds included</div>
           )}
         </div>
+        
+        {/* Collapsible Content */}
+        <div className="glass-content expanded">
 
         {/* Desktop View */}
         <div className="desktop-view">
@@ -430,6 +449,8 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
             </small>
           </div>
         )}
+        
+        </div> {/* End collapsible content */}
       </div>
     </div>
   );

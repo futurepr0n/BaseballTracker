@@ -7,6 +7,7 @@ import './HRCombinationTrackerCard.css';
 
 const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
   const [combinations, setCombinations] = useState([]);
+  const [filteredCombinations, setFilteredCombinations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [groupSize, setGroupSize] = useState(3);
@@ -17,8 +18,82 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
   const [showModal, setShowModal] = useState(false);
   const [showDetailTooltip, setShowDetailTooltip] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [playerSearch, setPlayerSearch] = useState('');
   
   const { selectedTeam, matchupTeam, includeMatchup, getTeamName, shouldIncludePlayer } = useTeamFilter();
+
+  // Player search filtering function
+  const filterCombinationsByPlayer = useCallback((combinations, searchTerm) => {
+    if (!searchTerm.trim()) {
+      console.log('🔍 No search term, returning all combinations:', combinations?.length || 0);
+      return combinations || [];
+    }
+    
+    if (!combinations || !Array.isArray(combinations)) {
+      console.log('🔍 No valid combinations array provided:', combinations);
+      return [];
+    }
+    
+    const normalizedSearch = searchTerm.toLowerCase().trim();
+    console.log('🔍 Filtering with normalized search:', normalizedSearch);
+    
+    const filtered = combinations.filter(combo => {
+      if (!combo || !combo.players || !Array.isArray(combo.players)) {
+        console.log('🔍 Invalid combo structure:', combo);
+        return false;
+      }
+      
+      // Check if any player in the combination matches the search
+      const hasMatch = combo.players.some(player => {
+        const playerName = player.name || '';
+        const normalizedPlayerName = playerName.toLowerCase();
+        
+        // Split player name into first and last name for flexible matching
+        const nameParts = normalizedPlayerName.split(' ');
+        const firstNameMatches = nameParts.some(part => part.startsWith(normalizedSearch));
+        
+        // Also check if full name contains the search term
+        const fullNameContains = normalizedPlayerName.includes(normalizedSearch);
+        
+        const matches = firstNameMatches || fullNameContains;
+        
+        if (matches) {
+          console.log(`🔍 Found match: "${playerName}" matches search "${searchTerm}"`);
+        }
+        
+        return matches;
+      });
+      
+      return hasMatch;
+    });
+    
+    console.log('🔍 Filtering complete:', {
+      originalCount: combinations.length,
+      filteredCount: filtered.length,
+      searchTerm
+    });
+    
+    return filtered;
+  }, []);
+
+  // Apply player search filter when search term changes
+  useEffect(() => {
+    console.log('🔍 Player search filter effect triggered:', {
+      searchTerm: playerSearch,
+      combinationsCount: combinations?.length || 0,
+      combinationsSample: combinations?.[0]?.players?.map(p => p.name) || 'none'
+    });
+    
+    const filtered = filterCombinationsByPlayer(combinations, playerSearch);
+    console.log('🔍 Filter result:', {
+      originalCount: combinations?.length || 0,
+      filteredCount: filtered?.length || 0,
+      searchTerm: playerSearch
+    });
+    
+    setFilteredCombinations(filtered);
+    setStats(hrCombinationService.getCombinationStats(filtered));
+  }, [combinations, playerSearch, filterCombinationsByPlayer]);
 
   const loadCombinationData = useCallback(async () => {
     setLoading(true);
@@ -63,6 +138,7 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
       }
       
       setCombinations(filteredCombinations);
+      setFilteredCombinations(filteredCombinations);
       setStats(hrCombinationService.getCombinationStats(filteredCombinations));
       
       // Set a dummy scheduled players count for display
@@ -180,6 +256,35 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
 
       {/* Controls */}
       <div className="combination-controls">
+        {/* Player Search */}
+        <div className="player-search-controls">
+          <label className="control-label">Search Player:</label>
+          <div className="search-input-container">
+            <input
+              type="text"
+              placeholder="Enter first or last name..."
+              value={playerSearch}
+              onChange={(e) => setPlayerSearch(e.target.value)}
+              disabled={loading}
+              className="player-search-input"
+            />
+            {playerSearch && (
+              <button 
+                className="clear-search-button"
+                onClick={() => setPlayerSearch('')}
+                title="Clear search"
+              >
+                ×
+              </button>
+            )}
+          </div>
+          {playerSearch && (
+            <div className="control-hint">
+              Showing combinations containing "{playerSearch}"
+            </div>
+          )}
+        </div>
+        
         {/* Group Size Controls */}
         <div className="group-size-controls">
           <label className="control-label">Group Size:</label>
@@ -255,11 +360,15 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
               Try Again
             </button>
           </div>
-        ) : combinations.length === 0 ? (
+        ) : !filteredCombinations || filteredCombinations.length === 0 ? (
           <div className="no-combinations">
             <span className="info-icon">🔍</span>
             <div className="info-message">
-              No {groupSize}-player combinations found where all players hit HRs on the same day
+              {playerSearch ? (
+                <>No {groupSize}-player combinations found containing "{playerSearch}"</>
+              ) : (
+                <>No {groupSize}-player combinations found where all players hit HRs on the same day</>
+              )}
               {teamContext && (
                 <><br />with {teamContext.description.toLowerCase()}</>
               )}
@@ -268,17 +377,26 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
         ) : (
           <div className="glass-scrollable">
             <div className="sticky-header">
-              {combinations.length} Historical HR Combinations Found
-              {!showAllResults && <span className="result-limit-note"> (limited to top 50 - use "Show All" for complete results)</span>}
+              {filteredCombinations.length} Historical HR Combinations Found
+              {playerSearch && (
+                <span className="search-filter-note"> (filtered for "{playerSearch}")</span>
+              )}
+              {!showAllResults && !playerSearch && <span className="result-limit-note"> (limited to top 50 - use "Show All" for complete results)</span>}
             </div>
             
-            {combinations.map((combo, index) => (
-              <div 
-                key={combo.combinationKey} 
-                className="glass-player-item combination-item clickable-item"
-                onClick={(e) => handleCombinationClick(combo, e)}
-                title="Click to view occurrence details"
-              >
+            {filteredCombinations && filteredCombinations.length > 0 && filteredCombinations.map((combo, index) => {
+              if (!combo || !combo.players) {
+                console.warn('🔍 Invalid combo data at index', index, combo);
+                return null;
+              }
+              
+              return (
+                <div 
+                  key={combo.combinationKey || `combo-${index}`} 
+                  className="glass-player-item combination-item clickable-item"
+                  onClick={(e) => handleCombinationClick(combo, e)}
+                  title="Click to view occurrence details"
+                >
                 <div className="combination-header">
                   <div className="combination-rank">#{index + 1}</div>
                   <div className="combination-frequency">
@@ -319,7 +437,8 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
                   <div className="recent-indicator">🔥 Recent</div>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -328,8 +447,13 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
       <div className="card-footer">
         <div className="footer-stats">
           <span className="data-info">
-            Data from 2025 season analysis ({combinations.length} combinations shown)
+            Data from 2025 season analysis ({filteredCombinations.length} combinations shown)
           </span>
+          {playerSearch && (
+            <span className="filter-info">
+              • Filtered by player search: "{playerSearch}"
+            </span>
+          )}
           {teamContext && (
             <span className="filter-info">
               • Filtered by {teamContext.description.toLowerCase()}

@@ -9,6 +9,9 @@ import {
 import './utils/debugControl';
 // Console quiet mode disabled for Enhanced Player Analysis debugging
 // import './utils/consoleQuiet';
+
+// CRITICAL: Universal mobile glass header fixes for all cards
+import './components/cards/UniversalGlassHeaderMobileFix.css';
 import PlayerStats from './components/PlayerStats';
 import EnhancedPlayerAnalysis from './components/EnhancedPlayerAnalysis';
 import TeamStats from './components/TeamStats';

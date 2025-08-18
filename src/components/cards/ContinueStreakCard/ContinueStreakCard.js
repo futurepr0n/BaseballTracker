@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './ContinueStreakCard.css';
 import { createSafeId } from '../../utils/tooltipUtils';
 import { useTooltip } from '../../utils/TooltipContext';
 import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import '../../common/MobilePlayerCard.css';
+import '../../../styles/CollapsibleGlass.css';
 
 /**
  * ContinueStreakCard - Shows players who are likely to continue their hitting streaks
@@ -18,11 +20,25 @@ const ContinueStreakCard = ({
 }) => {
   const { openTooltip, closeTooltip } = useTooltip();
   const { shouldIncludePlayer } = useTeamFilter();
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
 
   // Close tooltips when date changes
   useEffect(() => {
     closeTooltip();
   }, [currentDate, closeTooltip]);
+
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'continue-streak-card'
+      );
+      return cleanup;
+    }
+  }, []);
 
   const handleTooltipClick = (player, event) => {
     const safeId = createSafeId(player.name, player.team);
@@ -38,10 +54,13 @@ const ContinueStreakCard = ({
   
   return (
     <div className="card continue-streak-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>Streaks Likely to Continue</h3>
         </div>
+        
+        {/* Collapsible Content */}
+        <div className="glass-content expanded">
         
         {/* Desktop View */}
         <div className="desktop-view">
@@ -283,7 +302,9 @@ const ContinueStreakCard = ({
           ) : (
             <p className="no-data">No notable streaks likely to continue</p>
           )}
-        </div>
+        </div> {/* End mobile-view */}
+        
+        </div> {/* End collapsible content */}
       </div>
     </div>
   );

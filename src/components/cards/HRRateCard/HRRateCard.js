@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import './HRRateCard.css';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import '../../common/MobilePlayerCard.css';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 
 /**
  * HRRateCard - Displays players with the highest HR rate this season
@@ -12,15 +13,30 @@ const HRRateCard = ({
   isLoading,
   teams
 }) => {
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'hr-rate-card'
+      );
+      return cleanup;
+    }
+  }, []);
   return (
     <div className="card hr-rate-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>🚀 Top HR Rate This Season</h3>
         </div>
         
-        {/* Desktop View */}
-        <div className="desktop-view">
+        <div className="glass-content expanded">
+          <div className="scrollable-container">
+            {/* Desktop View */}
+            <div className="desktop-view">
           {isLoading ? (
             <div className="loading-indicator">Loading stats...</div>
           ) : topHRRatePlayers.length > 0 ? (
@@ -81,13 +97,13 @@ const HRRateCard = ({
                 })}
               </ul>
             </div>
-          ) : (
-            <div className="no-data">No HR rate data available</div>
-          )}
-        </div>
+            ) : (
+              <div className="no-data">No HR rate data available</div>
+            )}
+            </div>
 
-        {/* Mobile View */}
-        <div className="mobile-view">
+            {/* Mobile View */}
+            <div className="mobile-view">
           {isLoading ? (
             <div className="loading-indicator">Loading stats...</div>
           ) : topHRRatePlayers.length > 0 ? (
@@ -204,9 +220,11 @@ const HRRateCard = ({
                 );
               })}
             </div>
-          ) : (
-            <div className="no-data">No HR rate data available</div>
-          )}
+            ) : (
+              <div className="no-data">No HR rate data available</div>
+            )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -146,11 +146,6 @@ const MatchupSelector = ({
 
   return (
     <div className="matchup-selector">
-      <div className="selector-header">
-        <h2>Select Date & Games</h2>
-        <p>Choose the date and games you want to analyze for weakspot opportunities</p>
-      </div>
-
       <div className="selector-form">
         <div className="form-row">
           <div className="form-group">
@@ -215,11 +210,16 @@ const MatchupSelector = ({
         {/* Games List */}
         {selectedGames.length > 0 && (
           <div className="games-list">
-            <h3>Scheduled Games for {new Date(selectedDate).toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}</h3>
+            <h3>Scheduled Games for {(() => {
+              // Parse date manually to avoid timezone issues
+              const [year, month, day] = selectedDate.split('-');
+              const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+              return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              });
+            })()}</h3>
             <div className="games-grid">
               {selectedGames.map((game, index) => {
                 const gameInfo = formatGameDisplay(game);
@@ -318,27 +318,6 @@ const MatchupSelector = ({
         </div>
       </div>
 
-      {/* Analysis Info */}
-      <div className="analysis-info">
-        <div className="info-grid">
-          <div className="info-item">
-            <h4>Weakspot Analysis</h4>
-            <p>Identifies pitcher vulnerabilities by lineup position and inning patterns</p>
-          </div>
-          <div className="info-item">
-            <h4>Predictability Scoring</h4>
-            <p>Measures how predictable a pitcher's sequences are for strategic advantage</p>
-          </div>
-          <div className="info-item">
-            <h4>Arsenal Matchups</h4>
-            <p>Analyzes hitter success rates against specific pitch types and arsenals</p>
-          </div>
-          <div className="info-item">
-            <h4>Confidence Levels</h4>
-            <p>Every opportunity includes confidence scoring based on sample sizes and reliability</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

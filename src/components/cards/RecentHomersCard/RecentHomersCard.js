@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import SimpleDesktopScratchpadIcon from '../../common/SimpleDesktopScratchpadIcon';
 import { getTeamLogoUrl } from '../../../utils/teamUtils';
 import { formatDateForDisplay, getDaysAgoText } from '../../../utils/dateUtils';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import './RecentHomersCard.css';
 import '../../common/MobilePlayerCard.css';
+import '../../../styles/CollapsibleGlass.css';
 
 /**
  * RecentHomersCard - Shows players with most recent home runs
@@ -17,6 +19,20 @@ const RecentHomersCard = ({
   teams 
 }) => {
   const { isFiltering, selectedTeam, getTeamName, shouldIncludePlayer } = useTeamFilter();
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
+
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'recent-homers-card'
+      );
+      return cleanup;
+    }
+  }, []);
 
   // Get appropriate display limit based on filtering
   const getDisplayLimit = () => {
@@ -47,8 +63,8 @@ const RecentHomersCard = ({
 
   return (
     <div className="card recent-homers-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>⚾ Most Recent Home Runs</h3>
           
           {/* Enhanced subtitle with team context */}
@@ -58,6 +74,9 @@ const RecentHomersCard = ({
             </div>
           )}
         </div>
+        
+        {/* Collapsible Content */}
+        <div className="glass-content expanded">
         
         {/* Desktop View */}
         <div className="desktop-view">
@@ -198,6 +217,8 @@ const RecentHomersCard = ({
             </p>
           )}
         </div>
+        
+        </div> {/* End collapsible content */}
       </div>
     </div>
   );

@@ -1,14 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import useTeamFilteredData from '../../useTeamFilter';
 import { useTooltip } from '../../utils/TooltipContext';
 import { createSafeId } from '../../utils/tooltipUtils';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import './PoorPerformanceCard.css';
 import '../../common/MobilePlayerCard.css';
 
 const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: teamData, maxItems = 15 }) => {
   const [error, setError] = useState(null);
   const { openTooltip } = useTooltip();
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
+
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'poor-performance-card'
+      );
+      return cleanup;
+    }
+  }, []);
 
   // Apply team filtering
   const filteredData = useTeamFilteredData(poorPerformancePredictions, 'team');
@@ -60,11 +75,15 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
   if (isLoading) {
     return (
       <div className="card poor-performance-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>⚠️ Poor Performance Risks</h3>
           </div>
-          <div className="loading-indicator">Loading performance risk analysis...</div>
+          <div className="glass-content expanded">
+            <div className="scrollable-container">
+              <div className="loading-indicator">Loading performance risk analysis...</div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -73,11 +92,15 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
   if (error) {
     return (
       <div className="card poor-performance-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>⚠️ Poor Performance Risks</h3>
           </div>
-          <div className="error-message">Error: {error}</div>
+          <div className="glass-content expanded">
+            <div className="scrollable-container">
+              <div className="error-message">Error: {error}</div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -88,11 +111,15 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
   if (displayData.length === 0) {
     return (
       <div className="card poor-performance-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>⚠️ Poor Performance Risks</h3>
           </div>
-          <div className="no-data">No significant performance risks identified for the selected teams.</div>
+          <div className="glass-content expanded">
+            <div className="scrollable-container">
+              <div className="no-data">No significant performance risks identified for the selected teams.</div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -100,13 +127,16 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
 
   return (
     <div className="card poor-performance-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>⚠️ Poor Performance Risks</h3>
           <div className="card-subtitle">
             {displayData.filter(p => p.riskLevel === 'HIGH').length} High Risk, {displayData.filter(p => p.riskLevel === 'MEDIUM').length} Medium Risk
           </div>
         </div>
+        
+        <div className="glass-content expanded">
+          <div className="scrollable-container">
         
         {/* Desktop View */}
         <div className="desktop-view">
@@ -321,6 +351,8 @@ const PoorPerformanceCard = ({ poorPerformancePredictions, isLoading, teams: tea
                 />
               );
             })}
+          </div>
+        </div>
           </div>
         </div>
       </div>

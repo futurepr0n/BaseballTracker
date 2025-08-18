@@ -112,8 +112,8 @@
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  /* Remove any border radius like working cards */
-  border-radius: 0 !important;
+  /* Keep proper border radius for glass effect */
+  border-radius: 12px 12px 0 0 !important;
   /* Reset any aggressive overrides */
   margin: 0 !important;
   width: auto !important;
@@ -123,6 +123,8 @@
   box-sizing: border-box !important;
   /* Standard z-index */
   z-index: 20 !important;
+  /* Ensure no bleed-through on mobile */
+  background-clip: padding-box !important;
 }
 
 /* Special fix for HR prediction card background bleeding */
@@ -168,6 +170,9 @@
   transform: none !important;
   /* Ensure it starts flush with parent */
   vertical-align: top !important;
+  /* Ensure proper clipping */
+  overflow: hidden !important;
+  border-radius: 12px !important;
 }
 
 /* Override Dashboard.css card h3 styles that might affect glass headers */
@@ -221,4 +226,45 @@
   will-change: scroll-position;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
+}
+
+/* MOBILE GLASS HEADER Z-INDEX FIXES */
+@media (max-width: 768px) {
+  /* Ensure glass headers are always on top */
+  .hellraiser-card .glass-header,
+  .hr-prediction .glass-header {
+    z-index: 25 !important;
+    position: absolute !important;
+    /* Ensure headers don't have margin gaps */
+    margin: 0 !important;
+    /* Perfect top alignment */
+    top: 0 !important;
+    /* Prevent any spacing issues */
+    transform: none !important;
+  }
+  
+  /* Ensure scrollable content has proper layering */
+  .hellraiser-card .scrollable-container,
+  .hr-prediction .scrollable-container {
+    z-index: 10 !important;
+    position: relative !important;
+    /* Ensure content starts below header */
+    margin-top: 0 !important;
+  }
+  
+  /* Ensure pick items and player items stay below header */
+  .hellraiser-card .pick-item,
+  .hr-prediction .player-item {
+    z-index: 5 !important;
+    position: relative !important;
+  }
+  
+  /* Ensure interactive elements in header work */
+  .glass-header .compact-filters,
+  .glass-header .filter-row,
+  .glass-header .filter-row button {
+    z-index: 30 !important;
+    position: relative !important;
+    pointer-events: auto !important;
+  }
 }

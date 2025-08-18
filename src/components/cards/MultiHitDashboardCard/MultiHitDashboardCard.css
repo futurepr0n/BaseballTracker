@@ -31,6 +31,18 @@
   min-height: 600px !important;
   /* CRITICAL: Override any global glass optimizations that limit height */
   max-height: none !important;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.multi-hit-dashboard .glass-card-container.collapsed {
+  height: 80px;
+  min-height: 80px !important;
+}
+
+.multi-hit-dashboard .glass-card-container.expanded {
+  height: 100%;
+  min-height: 600px !important;
 }
 
 /* Glass header that content scrolls behind */
@@ -46,7 +58,17 @@
   border-bottom: 1px solid rgba(31, 41, 55, 0.15);
   padding: 20px;
   pointer-events: auto; /* Enable pointer events for interactive elements */
+  cursor: pointer;
   box-shadow: 0 4px 16px rgba(31, 41, 55, 0.05);
+  transition: all 0.3s ease;
+}
+
+.multi-hit-dashboard .glass-header:hover {
+  background: rgba(31, 41, 55, 0.12);
+}
+
+.multi-hit-dashboard .glass-header.collapsed {
+  border-bottom: none;
 }
 
 /* Glass Effect Scrollable Container */

@@ -14,13 +14,37 @@
   box-shadow: 
     0 8px 32px rgba(16, 185, 129, 0.08),
     0 2px 8px rgba(16, 185, 129, 0.03);
+  /* Parent card height control */
+  height: auto;
+  min-height: auto;
+  max-height: none;
 }
 
 /* Glass card container for proper layering */
 .improved-rate-card .glass-card-container {
-  position: relative;
-  height: 100%;
-  min-height: 420px;
+  min-height: 500px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+/* Collapsible states for container */
+.improved-rate-card .glass-card-container.collapsed {
+  height: 84px;
+  min-height: 84px !important;
+}
+
+.improved-rate-card .glass-card-container.expanded {
+  min-height: 500px;
+}
+
+/* Hide content when container is collapsed */
+.improved-rate-card .glass-card-container.collapsed .glass-content {
+  display: none;
+}
+
+/* Compact header when collapsed */
+.improved-rate-card .glass-card-container.collapsed .glass-header {
+  padding: 15px 20px;
 }
 
 /* Glass header that content scrolls behind */
@@ -35,7 +59,8 @@
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(16, 185, 129, 0.15);
   padding: 20px;
-  pointer-events: none;
+  pointer-events: auto;
+  /* Allow header interactions for collapsible functionality */
   box-shadow: 0 4px 16px rgba(16, 185, 129, 0.05);
 }
 
@@ -46,21 +71,25 @@
   font-weight: 600;
 }
 
-/* Glass Effect Scrollable Container */
-.improved-rate-card .scrollable-container {
-  background: rgba(236, 252, 243, 0.4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 0 0 12px 12px;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+/* Glass content wrapper */
+.improved-rate-card .glass-content {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   padding-top: 100px; /* Space for header */
+  background: rgba(236, 252, 243, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+}
+
+/* Glass Effect Scrollable Container */
+.improved-rate-card .scrollable-container {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: visible;
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 20px;
@@ -262,30 +291,123 @@
 @media (max-width: 768px) {
   .improved-rate-card {
     grid-column: 1 / -1;
+    padding: 0; /* Remove padding for glass card structure */
   }
   
-  /* Remove footer space in mobile */
+  /* Mobile glass header positioning */
+  .improved-rate-card .glass-header {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 25 !important;
+    margin: 0 !important;
+    padding: 15px 20px !important;
+    border-radius: 12px 12px 0 0 !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.1) !important;
+    cursor: pointer !important;
+  }
+  
+  /* Mobile glass card container proper setup */
   .improved-rate-card .glass-card-container {
-    min-height: auto;
-    height: auto;
+    min-height: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
   }
   
+  /* Mobile collapsed state - prevent super collapse */
+  .improved-rate-card .glass-card-container.collapsed {
+    height: 84px !important;
+    min-height: 84px !important;
+    max-height: 84px !important;
+  }
+  
+  /* Mobile expanded state */
+  .improved-rate-card .glass-card-container.expanded {
+    min-height: 60vh !important;
+    height: auto !important;
+  }
+  
+  /* Hide content when collapsed - fix super collapse issue */
+  .improved-rate-card .glass-card-container.collapsed .glass-content,
+  .improved-rate-card .glass-card-container.collapsed .scrollable-container,
+  .improved-rate-card .glass-card-container.collapsed .desktop-view,
+  .improved-rate-card .glass-card-container.collapsed .mobile-view {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+  
+  /* Show content when expanded - ensure visibility */
+  .improved-rate-card .glass-card-container.expanded .glass-content,
+  .improved-rate-card .glass-card-container.expanded .scrollable-container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Show appropriate view when expanded based on screen size */
+  .improved-rate-card .glass-card-container.expanded .desktop-view {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  .improved-rate-card .glass-card-container.expanded .mobile-view {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+  
+  /* Mobile responsive - switch views when expanded */
+  @media (max-width: 768px) {
+    .improved-rate-card .glass-card-container.expanded .desktop-view {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+    }
+    
+    .improved-rate-card .glass-card-container.expanded .mobile-view {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+  }
+  
+  /* Mobile glass content setup */
+  .improved-rate-card .glass-content {
+    position: relative !important;
+    height: auto !important;
+    max-height: 60vh !important;
+    padding-top: 100px !important; /* Space for simple header */
+    padding-bottom: 10px !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Mobile scrollable container */
   .improved-rate-card .scrollable-container {
-    position: relative;
-    height: auto;
-    max-height: 60vh;
-    padding-bottom: 10px;
-    padding-top: 80px; /* Less top padding on mobile */
+    position: relative !important;
+    height: auto !important;
+    max-height: none !important;
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    overflow-y: visible !important;
   }
   
   /* Mobile view windowed behavior */
   .improved-rate-card .mobile-view {
-    max-height: 60vh;
-    overflow-y: auto;
+    max-height: none !important; /* Remove max-height constraint */
+    overflow-y: visible !important; /* Allow natural flow */
+    padding-top: 0 !important;
   }
   
   .improved-rate-card .mobile-cards {
-    padding-bottom: 10px;
+    padding-bottom: 10px !important;
+    z-index: 5 !important;
   }
   
   .improved-rate-card .player-item {
@@ -308,5 +430,15 @@
   
   .improved-rate-card .stat-highlight {
     font-size: 1rem !important;
+  }
+  
+  /* Ensure proper z-index layering */
+  .improved-rate-card .glass-content {
+    z-index: 10 !important;
+  }
+  
+  .improved-rate-card .desktop-view,
+  .improved-rate-card .mobile-view {
+    z-index: 5 !important;
   }
 }

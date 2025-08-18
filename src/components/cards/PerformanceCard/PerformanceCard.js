@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import '../../common/MobilePlayerCard.css';
 import './PerformanceCard.css';
 
@@ -16,6 +17,8 @@ const PerformanceCard = ({
     underPerforming: []
   });
   const [isLoading, setIsLoading] = React.useState(true);
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
   
   // Load performance data
   React.useEffect(() => {
@@ -57,6 +60,18 @@ const PerformanceCard = ({
     
     loadPerformanceData();
   }, [currentDate]);
+
+  // Initialize collapsible functionality
+  React.useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'under-performing-card'
+      );
+      return cleanup;
+    }
+  }, []);
   
   const getTeamLogo = (teamCode) => {
     if (!teamData[teamCode]) return null;
@@ -66,12 +81,14 @@ const PerformanceCard = ({
   if (isLoading) {
     return (
       <div className="card under-performing-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>📉 Top Under-Performing Players</h3>
           </div>
-          <div className="scrollable-container">
-            <div className="loading-indicator">Loading performance data...</div>
+          <div className="glass-content expanded">
+            <div className="scrollable-container">
+              <div className="loading-indicator">Loading performance data...</div>
+            </div>
           </div>
         </div>
       </div>
@@ -83,12 +100,14 @@ const PerformanceCard = ({
   if (displayData.length === 0) {
     return (
       <div className="card under-performing-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>📉 Top Under-Performing Players</h3>
           </div>
-          <div className="scrollable-container">
-            <div className="no-data">No under-performing player data available</div>
+          <div className="glass-content expanded">
+            <div className="scrollable-container">
+              <div className="no-data">No under-performing player data available</div>
+            </div>
           </div>
         </div>
       </div>
@@ -97,15 +116,15 @@ const PerformanceCard = ({
   
   return (
     <div className="card under-performing-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>📉 Top Under-Performing Players</h3>
           <div className="card-subtitle">
             {displayData.length} players performing below expected levels
           </div>
         </div>
         
-        <>
+        <div className="glass-content expanded">
           {/* Desktop View */}
           <div className="scrollable-container desktop-view">
             <ul className="player-list">
@@ -240,7 +259,7 @@ const PerformanceCard = ({
               })}
             </div>
           </div>
-        </>
+        </div>
       </div>
     </div>
   );

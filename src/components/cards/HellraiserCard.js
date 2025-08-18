@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import hellraiserAnalysisService from '../../services/hellraiserAnalysisService';
 import { useTeamFilter } from '../TeamFilterContext';
+import { initializeCollapsibleGlass } from '../../utils/collapsibleGlass';
 import MobilePlayerCard from '../common/MobilePlayerCard';
 import './HellraiserCard.css';
 import '../common/MobilePlayerCard.css';
+import '../../styles/CollapsibleGlass.css';
 
 const HellraiserCard = ({ currentDate }) => {
   const [analysisData, setAnalysisData] = useState(null);
@@ -14,10 +16,24 @@ const HellraiserCard = ({ currentDate }) => {
   const [showDetails, setShowDetails] = useState({});
   const [mobileAnalysisTab, setMobileAnalysisTab] = useState({});
   const { selectedTeam, includeMatchup, matchupTeam, shouldIncludePlayer } = useTeamFilter();
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     loadHellraiserAnalysis();
   }, [currentDate, selectedTeam, includeMatchup]);
+
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'hellraiser-card'
+      );
+      return cleanup;
+    }
+  }, []);
 
   const loadHellraiserAnalysis = async () => {
     try {
@@ -167,8 +183,8 @@ const HellraiserCard = ({ currentDate }) => {
   if (loading) {
     return (
       <div className="card hellraiser-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>🔥 Pinheads HR Picks</h3>
           </div>
           <div className="loading-state">
@@ -183,8 +199,8 @@ const HellraiserCard = ({ currentDate }) => {
   if (error) {
     return (
       <div className="card hellraiser-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>🔥 Pinheads HR Picks</h3>
           </div>
           <div className="error-state">
@@ -205,8 +221,8 @@ const HellraiserCard = ({ currentDate }) => {
   if (!analysisData) {
     return (
       <div className="card hellraiser-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>🔥 Pinheads HR Picks</h3>
           </div>
           <div className="error-state">
@@ -227,12 +243,11 @@ const HellraiserCard = ({ currentDate }) => {
 
   return (
     <div className="card hellraiser-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>🔥 Pinheads HR Picks</h3>
-        </div>
-        
-        <div className="compact-filters">
+          
+          <div className="compact-filters">
             <div className="filter-row">
               <span className="filter-label">Value:</span>
               <button className={selectedValue === 'all' ? 'active' : ''} onClick={() => setSelectedValue('all')}>All</button>
@@ -249,6 +264,10 @@ const HellraiserCard = ({ currentDate }) => {
               <button className={selectedPathway === 'pitcherDriven' ? 'active' : ''} onClick={() => setSelectedPathway('pitcherDriven')}>Pitcher-Driven</button>
             </div>
           </div>
+        </div>
+        
+        {/* Collapsible Content */}
+        <div className="glass-content expanded">
 
           {/* Desktop View */}
           <div className="desktop-view">
@@ -982,6 +1001,8 @@ const HellraiserCard = ({ currentDate }) => {
               </div>
             )}
           </div>
+          
+        </div> {/* End collapsible content */}
       </div>
     </div>
   );

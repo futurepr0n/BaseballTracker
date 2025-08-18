@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import './ComprehensiveAnalysisDisplay.css';
 import pitchMatchupService from '../services/pitchMatchupService';
 import dashboardContextService from '../../../services/dashboardContextService';
+import { calculateEnhancedPropAnalysis } from '../../../services/playerAnalysisService';
+import { fetchPlayerData, fetchPlayerDataForDateRange, fetchFullSeasonPlayerData } from '../../../services/dataService';
 import { useTooltip } from '../../utils/TooltipContext';
 import { createSafeId } from '../../utils/tooltipUtils';
+import { normalizeToEnglish, createAllNameVariants, namesMatch, findPlayerInRoster } from '../../../utils/universalNameNormalizer';
 
 const ComprehensiveAnalysisDisplay = ({ analysis }) => {
   
@@ -25,6 +28,7 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
   const [lineupData, setLineupData] = useState(null);
   const [optimalMatchups, setOptimalMatchups] = useState({});
   const [playerContexts, setPlayerContexts] = useState({});
+  const [playerPropAnalyses, setPlayerPropAnalyses] = useState({});
   const [selectedPlayerTooltip, setSelectedPlayerTooltip] = useState(null);
   const { openTooltip } = useTooltip();
 
@@ -68,6 +72,264 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
 
   const closePlayerTooltip = () => {
     setSelectedPlayerTooltip(null);
+  };
+
+  // Load player prop analysis data for Over 0.5 Hits and Over 0.5 HRs
+  // Helper function to calculate recent performance stats for last N games
+  const calculateRecentPerformance = (playerHistory, gameCount = 3) => {
+    if (!playerHistory || playerHistory.length === 0) return null;
+    
+    const recentGames = playerHistory.slice(0, gameCount);
+    if (recentGames.length === 0) return null;
+    
+    let totalAB = 0, totalH = 0, totalHR = 0, totalRBI = 0;
+    const gameStats = recentGames.map(game => {
+      const ab = parseInt(game.AB) || 0;
+      const h = parseInt(game.H) || 0;
+      const hr = parseInt(game.HR) || 0;
+      const rbi = parseInt(game.RBI) || 0;
+      
+      totalAB += ab;
+      totalH += h;
+      totalHR += hr;
+      totalRBI += rbi;
+      
+      return {
+        date: game.gameDate,
+        AB: ab,
+        H: h,
+        HR: hr,
+        RBI: rbi,
+        AVG: ab > 0 ? (h / ab).toFixed(3) : '.000'
+      };
+    });
+    
+    const recentAvg = totalAB > 0 ? (totalH / totalAB).toFixed(3) : '.000';
+    
+    return {
+      games: gameStats,
+      totals: {
+        AB: totalAB,
+        H: totalH,
+        HR: totalHR,
+        RBI: totalRBI,
+        AVG: recentAvg
+      },
+      gameCount: recentGames.length
+    };
+  };
+
+  const loadPlayerPropAnalysis = async (playerName, team, currentDate) => {
+    try {
+      console.log(`🎯 PROP ANALYSIS: Loading data for ${playerName} (${team}) on ${currentDate}`);
+      
+      // Use today's date if currentDate is not provided or invalid
+      let targetDate;
+      if (currentDate && currentDate !== 'undefined') {
+        targetDate = currentDate;
+      } else {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        targetDate = `${year}-${month}-${day}`;
+      }
+      
+      console.log(`🎯 PROP ANALYSIS: Using target date ${targetDate} for ${playerName}`);
+      
+      // First, get the full name from rosters.json for better matching
+      let fullName = null;
+      let rosterData = null;
+      try {
+        const rosterResponse = await fetch('/data/rosters.json');
+        if (rosterResponse.ok) {
+          rosterData = await rosterResponse.json();
+          // Find player by name and optional team
+          const playerRoster = rosterData.find(p => 
+            namesMatch(playerName, p.name) && (!team || p.team === team)
+          );
+          if (playerRoster && playerRoster.fullName) {
+            fullName = playerRoster.fullName;
+            console.log(`🔍 Found full name in roster: ${fullName} for search name: ${playerName}`);
+          }
+        }
+      } catch (rosterError) {
+        console.log('Could not load roster data for full name lookup');
+      }
+      
+      // Convert targetDate string to Date object for data fetching
+      const targetDateObj = new Date(targetDate);
+      
+      // Calculate days from season start to ensure we get full season data
+      const seasonStart = new Date('2025-03-01');
+      const daysFromSeasonStart = Math.ceil((targetDateObj - seasonStart) / (1000 * 60 * 60 * 24));
+      const daysToLoad = Math.max(180, daysFromSeasonStart + 30); // At least 180 days or full season + buffer
+      
+      console.log(`🎯 PROP ANALYSIS: Loading ${daysToLoad} days of full season data for ${playerName}`);
+      
+      // Use fetchFullSeasonPlayerData for consistency with /players route
+      const dateRangeData = await fetchFullSeasonPlayerData(targetDateObj, daysToLoad);
+      
+      if (!dateRangeData || Object.keys(dateRangeData).length === 0) {
+        console.warn(`🎯 PROP ANALYSIS: No historical data found for ${playerName} - dateRangeData:`, dateRangeData);
+        return null;
+      }
+      
+      console.log(`🎯 PROP ANALYSIS: Found ${Object.keys(dateRangeData).length} days of data for analysis`);
+
+      // Create comprehensive search variants for matching
+      const searchVariants = new Set();
+      
+      // Add original player name variants
+      const playerNameVariants = createAllNameVariants(playerName);
+      playerNameVariants.forEach(variant => searchVariants.add(variant));
+      
+      // Add full name variants if found in roster
+      if (fullName) {
+        const fullNameVariants = createAllNameVariants(fullName);
+        fullNameVariants.forEach(variant => searchVariants.add(variant));
+        
+        // Add CSV format variants for full name
+        const nameParts = fullName.split(' ');
+        if (nameParts.length >= 2) {
+          const lastName = nameParts[nameParts.length - 1];
+          const firstName = nameParts.slice(0, -1).join(' ');
+          const csvFormat = `${lastName}, ${firstName}`;
+          const csvVariants = createAllNameVariants(csvFormat);
+          csvVariants.forEach(variant => searchVariants.add(variant));
+        }
+      }
+      
+      console.log(`🔍 Using comprehensive search variants for ${playerName}:`, Array.from(searchVariants).slice(0, 8));
+
+      // Extract player history from the date range data with comprehensive matching
+      const playerHistory = [];
+      console.log(`🎯 PROP ANALYSIS: Searching for player "${playerName}" in historical data using comprehensive matching...`);
+      
+      for (const [date, playersArray] of Object.entries(dateRangeData)) {
+        if (Array.isArray(playersArray)) {
+          const playerData = playersArray.find(p => {
+            if (!p.name && !p.Name) return false;
+            
+            const dataPlayerName = p.name || p.Name;
+            
+            // Use comprehensive name matching
+            if (namesMatch(playerName, dataPlayerName)) {
+              return true;
+            }
+            
+            // Try full name matching if available
+            if (fullName && namesMatch(fullName, dataPlayerName)) {
+              return true;
+            }
+            
+            // Additional fallback: try direct normalized comparison
+            const normalizedSearch = normalizeToEnglish(playerName).toLowerCase();
+            const normalizedData = normalizeToEnglish(dataPlayerName).toLowerCase();
+            if (normalizedSearch === normalizedData) {
+              return true;
+            }
+            
+            // Final fallback: partial matching for cases where one name contains the other
+            if (normalizedSearch.length > 3 && normalizedData.includes(normalizedSearch)) {
+              return true;
+            }
+            if (normalizedData.length > 3 && normalizedSearch.includes(normalizedData)) {
+              return true;
+            }
+            
+            return false;
+          });
+          
+          if (playerData) {
+            console.log(`🎯 PROP ANALYSIS: Found data for ${playerName} on ${date}:`, {
+              matchedName: playerData.name || playerData.Name,
+              searchName: playerName,
+              fullName: fullName,
+              hits: playerData.H,
+              homeRuns: playerData.HR,
+              rbis: playerData.RBI,
+              runs: playerData.R
+            });
+            playerHistory.push({ 
+              ...playerData, 
+              H: playerData.H, 
+              HR: playerData.HR, 
+              RBI: playerData.RBI, 
+              R: playerData.R, 
+              gameDate: date 
+            });
+          }
+        }
+      }
+
+      if (playerHistory.length === 0) {
+        console.warn(`🎯 PROP ANALYSIS: No player history found for "${playerName}"`);
+        console.warn(`🎯 PROP ANALYSIS: Available players in first day:`, 
+          dateRangeData[Object.keys(dateRangeData)[0]]?.slice(0, 3).map(p => p.name || p.Name)
+        );
+        return null;
+      }
+      
+      console.log(`🎯 PROP ANALYSIS: Built history for ${playerName}: ${playerHistory.length} games`);
+
+      // Calculate prop analysis using the same service as the players component
+      console.log(`🎯 PROP ANALYSIS: Calling calculateEnhancedPropAnalysis for ${playerName} with ${playerHistory.length} games`);
+      
+      // Log sample game data for debugging
+      if (playerHistory.length > 0) {
+        const sampleGame = playerHistory[0];
+        console.log(`🎯 PROP ANALYSIS: Sample game data for ${playerName}:`, {
+          date: sampleGame.gameDate,
+          hits: sampleGame.H,
+          hrs: sampleGame.HR,
+          rbis: sampleGame.RBI,
+          runs: sampleGame.R,
+          strikeouts: sampleGame.K,
+          rawData: sampleGame
+        });
+      }
+      
+      const propAnalysis = calculateEnhancedPropAnalysis(playerHistory, null);
+      
+      if (propAnalysis) {
+        // The propAnalysis object has nested structure with season2025 property
+        const season2025Props = propAnalysis.season2025 || {};
+        // Calculate recent performance for last 3 games
+        const recentPerformance = calculateRecentPerformance(playerHistory, 3);
+        
+        const result = {
+          hitsOver05: season2025Props.hits?.over05 || null,
+          hrsOver05: season2025Props.homeRuns?.over05 || null,
+          sampleSize: playerHistory.length,
+          dataQuality: playerHistory.length >= 10 ? 'good' : 'limited',
+          recentPerformance: recentPerformance,
+          playerHistory: playerHistory  // Include for potential future use
+        };
+        
+        console.log(`🎯 PROP ANALYSIS SUCCESS: Calculated for ${playerName}:`, {
+          hitsOver05Percentage: result.hitsOver05?.percentage,
+          hitsOver05Success: result.hitsOver05?.success,
+          hitsOver05Total: result.hitsOver05?.total,
+          hrsOver05Percentage: result.hrsOver05?.percentage,
+          hrsOver05Success: result.hrsOver05?.success,
+          hrsOver05Total: result.hrsOver05?.total,
+          sampleSize: result.sampleSize,
+          dataQuality: result.dataQuality,
+          rawPropAnalysis: propAnalysis
+        });
+        
+        return result;
+      } else {
+        console.error(`🎯 PROP ANALYSIS: calculateEnhancedPropAnalysis returned null for ${playerName}, playerHistory:`, playerHistory.slice(0, 2));
+      }
+      
+      console.warn(`🎯 PROP ANALYSIS: calculateEnhancedPropAnalysis returned null for ${playerName}`);
+      return null;
+    } catch (error) {
+      console.error(`🎯 PROP ANALYSIS ERROR: Failed to load data for ${playerName}:`, error);
+      return null;
+    }
   };
 
   // Load lineup data when analysis changes
@@ -212,6 +474,111 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
     };
 
     loadPlayerContexts();
+  }, [lineupData, analysis]);
+
+  // Load player prop analyses when lineup data is available
+  useEffect(() => {
+    const loadPlayerPropAnalyses = async () => {
+      try {
+        if (!lineupData || !analysis) {
+          console.log(`🎯 PROP ANALYSIS EFFECT: Skipping - lineupData:`, !!lineupData, 'analysis:', !!analysis);
+          return;
+        }
+
+        console.log(`🎯 PROP ANALYSIS EFFECT: Starting to load prop analyses with lineupData games:`, lineupData.games?.length);
+        const allMatchups = Object.values(analysis.matchup_analysis);
+        const playerPropMap = {};
+        let totalPlayersToProcess = 0;
+
+        for (const matchupData of allMatchups) {
+          const date = matchupData.matchup?.date || new Date().toISOString().split('T')[0];
+          
+          // Process both teams
+          const teams = [
+            { name: matchupData.away_pitcher_analysis?.opposing_team, side: 'away' },
+            { name: matchupData.home_pitcher_analysis?.opposing_team, side: 'home' }
+          ];
+
+          for (const team of teams) {
+            if (!team.name) continue;
+
+            // Find the game for this team
+            const game = lineupData.games?.find(g => 
+              g.teams?.away?.abbr === team.name || g.teams?.home?.abbr === team.name
+            );
+            
+            if (!game) continue;
+
+            // Get lineup for this team
+            const isAway = game.teams?.away?.abbr === team.name;
+            const lineup = isAway ? game.lineups?.away : game.lineups?.home;
+            
+            if (!lineup) continue;
+
+            // Handle both 'batters' and 'batting_order' data structures
+            let batters = [];
+            if (lineup.batters) {
+              batters = lineup.batters;
+            } else if (lineup.batting_order) {
+              batters = lineup.batting_order.map(batter => ({
+                name: batter.name,
+                batting_order: batter.position,
+                season_stats: batter.season_stats,
+                status: batter.status || 'confirmed'
+              }));
+            }
+
+            // Load prop analysis for each player (with error handling per player)
+            for (const batter of batters) {
+              totalPlayersToProcess++;
+              const playerKey = `${batter.name}-${team.name}`;
+              console.log(`🎯 PROP ANALYSIS EFFECT: Processing player ${totalPlayersToProcess}: ${batter.name} (${team.name})`);
+              console.log(`🎯 PROP ANALYSIS EFFECT: Creating player key: "${playerKey}"`);
+              
+              if (!playerPropMap[playerKey]) {
+                try {
+                  const propAnalysis = await loadPlayerPropAnalysis(
+                    batter.name, 
+                    team.name, 
+                    date
+                  );
+                  playerPropMap[playerKey] = propAnalysis;
+                  console.log(`🎯 PROP ANALYSIS EFFECT: Stored result for "${playerKey}":`, propAnalysis ? 'SUCCESS' : 'NULL');
+                  if (propAnalysis) {
+                    console.log(`🎯 PROP ANALYSIS EFFECT: Stored data structure for "${playerKey}":`, {
+                      hitsOver05: !!propAnalysis.hitsOver05,
+                      hrsOver05: !!propAnalysis.hrsOver05,
+                      sampleSize: propAnalysis.sampleSize
+                    });
+                  }
+                } catch (error) {
+                  console.error(`🎯 PROP ANALYSIS EFFECT: Error for ${batter.name}:`, error);
+                  playerPropMap[playerKey] = null; // Set to null to prevent retries
+                }
+              } else {
+                console.log(`🎯 PROP ANALYSIS EFFECT: Already have data for ${playerKey}`);
+              }
+            }
+          }
+        }
+        
+        console.log(`🎯 PROP ANALYSIS: Loaded ${Object.keys(playerPropMap).length} player prop analyses`);
+        console.log('🎯 PROP ANALYSIS: Final playerPropMap keys:', Object.keys(playerPropMap));
+        setPlayerPropAnalyses(playerPropMap);
+        
+      } catch (error) {
+        console.error('🎯 PROP ANALYSIS: Critical error in loadPlayerPropAnalyses:', error);
+        // Don't fail the entire component, just set empty prop analyses
+        setPlayerPropAnalyses({});
+      }
+    };
+
+    // Add a small delay to prevent blocking the main render
+    const timeoutId = setTimeout(() => {
+      loadPlayerPropAnalyses();
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
   }, [lineupData, analysis]);
 
   // Helper function to get lineup hitter for a specific position
@@ -421,7 +788,7 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
     );
   };
 
-  const renderPositionVulnerabilities = (positions, opposingTeam, pitcherSide) => {
+  const renderPositionVulnerabilities = (positions, opposingTeam, pitcherSide, pitcherData = null) => {
     if (!positions || Object.keys(positions).length === 0) {
       return <div className="no-data">No position vulnerability data available</div>;
     }
@@ -445,11 +812,21 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
             // Get actual lineup hitter for this position
             const lineupHitter = getLineupHitterForPosition(posNum, opposingTeam);
             
-            // Get dashboard context for this player
+            // Get dashboard context and prop analysis for this player
             let playerContext = null;
+            let playerPropAnalysis = null;
             if (lineupHitter) {
               const playerKey = `${lineupHitter.name}-${opposingTeam}`;
               playerContext = playerContexts[playerKey];
+              playerPropAnalysis = playerPropAnalyses[playerKey];
+              
+              // Debug: Log prop analysis lookup
+              console.log(`🎯 RENDER: Looking up prop analysis for key: "${playerKey}"`);
+              console.log(`🎯 RENDER: Available prop keys (${Object.keys(playerPropAnalyses).length}):`, Object.keys(playerPropAnalyses));
+              console.log(`🎯 RENDER: Found prop analysis:`, !!playerPropAnalysis, playerPropAnalysis);
+              
+              // Additional debug: Show the player name being looked up
+              console.log(`🔧 Rendering badge: { playerName: '${lineupHitter.name}', team: '${opposingTeam}', lookupKey: '${playerKey}' }`);
             }
             
             // Keep original vulnerability class (no color changes)
@@ -548,6 +925,52 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
                   </div>
                 )}
 
+                {/* Recent Performance Banner - Last 3 Games */}
+                {playerPropAnalysis && playerPropAnalysis.recentPerformance && (() => {
+                  // Determine performance level based on average
+                  const avg = parseFloat(playerPropAnalysis.recentPerformance.totals.AVG);
+                  let performanceClass = 'recent-performance-average'; // default
+                  
+                  if (avg >= .300) {
+                    performanceClass = 'recent-performance-excellent'; // .300+ is excellent (green)
+                  } else if (avg >= .250) {
+                    performanceClass = 'recent-performance-above-average'; // .250-.299 is above average (light green)
+                  } else if (avg >= .200) {
+                    performanceClass = 'recent-performance-average'; // .200-.249 is average (orange)
+                  } else {
+                    performanceClass = 'recent-performance-below-average'; // below .200 is below average (red)
+                  }
+                  
+                  return (
+                    <div className={`recent-performance-banner ${performanceClass}`}>
+                      <div className="recent-performance-header">
+                        <span className="recent-label">Last {playerPropAnalysis.recentPerformance.gameCount} Games</span>
+                        <span className="recent-avg">AVG: {playerPropAnalysis.recentPerformance.totals.AVG}</span>
+                      </div>
+                    <div className="recent-games-grid">
+                      {playerPropAnalysis.recentPerformance.games.map((game, idx) => (
+                        <div key={idx} className="recent-game-stat">
+                          <div className="game-date">{game.date.split('-').slice(1).join('/')}</div>
+                          <div className="game-stats">
+                            <span className="stat-item">AB: {game.AB}</span>
+                            <span className="stat-item">H: {game.H}</span>
+                            <span className="stat-item">HR: {game.HR}</span>
+                            <span className="stat-item">AVG: {game.AVG}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="recent-totals">
+                      <span>Totals:</span>
+                      <span>AB: {playerPropAnalysis.recentPerformance.totals.AB}</span>
+                      <span>H: {playerPropAnalysis.recentPerformance.totals.H}</span>
+                      <span>HR: {playerPropAnalysis.recentPerformance.totals.HR}</span>
+                      <span>RBI: {playerPropAnalysis.recentPerformance.totals.RBI}</span>
+                    </div>
+                  </div>
+                  );
+                })()}
+
                 <div className="position-stats">
                   <div className="stat">
                     <span className="label">Vuln:</span>
@@ -565,6 +988,58 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
                     <span className="label">AB:</span>
                     <span className="value">{data.sample_size}</span>
                   </div>
+                  
+                  {/* Enhanced Player Prop Analysis */}
+                  {playerPropAnalysis ? (
+                    <>
+                      <div className="stat prop-stat">
+                        <span className="label" title={`Player's probability of getting over 0.5 hits (${playerPropAnalysis.hitsOver05?.success || 0}/${playerPropAnalysis.hitsOver05?.total || 0} recent games)`}>
+                          Over 0.5 H:
+                        </span>
+                        <span className="value prop-value">
+                          {playerPropAnalysis.hitsOver05?.percentage || 'N/A'}%
+                        </span>
+                      </div>
+                      <div className="stat prop-stat">
+                        <span className="label" title={`Player's probability of hitting over 0.5 home runs (${playerPropAnalysis.hrsOver05?.success || 0}/${playerPropAnalysis.hrsOver05?.total || 0} recent games)`}>
+                          Over 0.5 HR:
+                        </span>
+                        <span className="value prop-value">
+                          {playerPropAnalysis.hrsOver05?.percentage || 'N/A'}%
+                        </span>
+                      </div>
+                      {/* Separate Pitcher and Batter Sample Stats */}
+                      <div className="stat sample-stat">
+                        <span className="label">Batter Sample:</span>
+                        <span className="value">
+                          {playerPropAnalysis.sampleSize} games
+                        </span>
+                      </div>
+                      {pitcherData && pitcherData.recent_form && (
+                        <div className="stat sample-stat">
+                          <span className="label">Pitcher Sample:</span>
+                          <span className="value">
+                            {pitcherData.recent_form.games_analyzed || 0} games
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="stat warning-stat">
+                      <span className="label" title="Prop analysis data not yet loaded or unavailable">
+                        🔄 Loading Prop Data...
+                      </span>
+                    </div>
+                  )}
+                  
+                  {/* Show data quality indicator */}
+                  {playerPropAnalysis && playerPropAnalysis.dataQuality === 'limited' && (
+                    <div className="stat warning-stat">
+                      <span className="label warning" title="Limited data - less than 10 recent games">
+                        ⚠️ Limited Data
+                      </span>
+                    </div>
+                  )}
                   {lineupHitter && lineupHitter.status && (
                     <div className="hitter-status">
                       <span className={`status ${lineupHitter.status.toLowerCase()}`}>
@@ -730,7 +1205,7 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
 
           <div className="analysis-category">
             <h5>🎯 Position Vulnerabilities</h5>
-            {renderPositionVulnerabilities(pitcherData.position_vulnerabilities, pitcherData.opposing_team, side)}
+            {renderPositionVulnerabilities(pitcherData.position_vulnerabilities, pitcherData.opposing_team, side, pitcherData)}
           </div>
 
           <div className="analysis-category">

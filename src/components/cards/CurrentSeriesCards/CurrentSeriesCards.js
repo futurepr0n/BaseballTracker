@@ -1,5 +1,5 @@
 // src/components/cards/CurrentSeriesCards/CurrentSeriesCard.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { debugLog } from '../../../utils/debugConfig';
 import { 
   fetchPlayerDataForDateRange, 
@@ -7,9 +7,11 @@ import {
   fetchGameData
 } from '../../../services/dataService';
 import { teamsMatch } from '../../../utils/teamNormalizationUtils';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import '../../common/MobilePlayerCard.css';
 import './CurrentSeriesCards.css';
+import '../../../styles/CollapsibleGlass.css';
 
 /**
  * Find current series statistics for a team vs opponent
@@ -178,6 +180,20 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [debugInfo, setDebugInfo] = useState('');
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
+
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'current-series-hits-card'
+      );
+      return cleanup;
+    }
+  }, []);
 
   useEffect(() => {
     const analyzeCurrentSeries = async () => {
@@ -299,16 +315,20 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
   if (loading) {
     return (
       <div className="card current-series-hits-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>📊 Current Series Hits</h3>
           </div>
-          <div className="loading-indicator">
-            Analyzing current series performance...
-            <br />
-            <small style={{ fontSize: '0.8em', color: '#666', marginTop: '5px' }}>
-              {debugInfo}
-            </small>
+          <div className="glass-content expanded">
+            <div className="scrollable-container">
+              <div className="loading-indicator">
+                Analyzing current series performance...
+                <br />
+                <small style={{ fontSize: '0.8em', color: '#666', marginTop: '5px' }}>
+                  {debugInfo}
+                </small>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -318,16 +338,20 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
   if (error) {
     return (
       <div className="card current-series-hits-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>📊 Current Series Hits</h3>
           </div>
-          <div className="no-data">
-            Error: {error}
-            <br />
-            <small style={{ fontSize: '0.8em', color: '#666' }}>
-              Debug: {debugInfo}
-            </small>
+          <div className="glass-content expanded">
+            <div className="scrollable-container">
+              <div className="no-data">
+                Error: {error}
+                <br />
+                <small style={{ fontSize: '0.8em', color: '#666' }}>
+                  Debug: {debugInfo}
+                </small>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -336,8 +360,8 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
 
   return (
     <div className="card current-series-hits-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>📊 Current Series Hits</h3>
           <p className="card-subtitle">
             Best hitters in current series vs opponent
@@ -347,18 +371,20 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
           </p>
         </div>
         
-        {seriesData.length === 0 ? (
-          <div className="no-data">
-            No current series data available
-            <br />
-            <small style={{ fontSize: '0.8em', color: '#999' }}>
-              Debug: {debugInfo}
-            </small>
-          </div>
-        ) : (
-          <>
-            {/* Desktop View */}
-            <div className="scrollable-container desktop-view">
+        <div className="glass-content expanded">
+          <div className="scrollable-container">
+            {seriesData.length === 0 ? (
+              <div className="no-data">
+                No current series data available
+                <br />
+                <small style={{ fontSize: '0.8em', color: '#999' }}>
+                  Debug: {debugInfo}
+                </small>
+              </div>
+            ) : (
+              <>
+                {/* Desktop View */}
+                <div className="desktop-view">
             <ul className="player-list">
             {seriesData.map((player, index) => {
               const teamInfo = getTeamInfo(player.team);
@@ -496,12 +522,14 @@ const CurrentSeriesHitsCard = ({ gameData, currentDate, teams }) => {
           </>
         )}
         
-        {/* Debug info at bottom when no data */}
-        {seriesData.length === 0 && (
-          <div style={{ fontSize: '0.7em', color: '#999', marginTop: '10px', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
-            <strong>Debug Info:</strong> {debugInfo}
+            {/* Debug info at bottom when no data */}
+            {seriesData.length === 0 && (
+              <div style={{ fontSize: '0.7em', color: '#999', marginTop: '10px', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
+                <strong>Debug Info:</strong> {debugInfo}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
@@ -514,6 +542,20 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [debugInfo, setDebugInfo] = useState('');
+  const headerRef2 = useRef(null);
+  const containerRef2 = useRef(null);
+
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (headerRef2.current && containerRef2.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef2.current, 
+        containerRef2.current,
+        'current-series-hr-card'
+      );
+      return cleanup;
+    }
+  }, []);
 
   useEffect(() => {
     const analyzeCurrentSeriesHRs = async () => {
@@ -614,16 +656,20 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
   if (loading) {
     return (
       <div className="card current-series-hr-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef2}>
+          <div className="glass-header" ref={headerRef2}>
             <h3>🚀 Current Series HRs</h3>
           </div>
-          <div className="loading-indicator">
-            Analyzing current series HR performance...
-            <br />
-            <small style={{ fontSize: '0.8em', color: '#666', marginTop: '5px' }}>
-              {debugInfo}
-            </small>
+          <div className="glass-content expanded">
+            <div className="scrollable-container">
+              <div className="loading-indicator">
+                Analyzing current series HR performance...
+                <br />
+                <small style={{ fontSize: '0.8em', color: '#666', marginTop: '5px' }}>
+                  {debugInfo}
+                </small>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -633,16 +679,20 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
   if (error) {
     return (
       <div className="card current-series-hr-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef2}>
+          <div className="glass-header" ref={headerRef2}>
             <h3>🚀 Current Series HRs</h3>
           </div>
-          <div className="no-data">
-            Error: {error}
-            <br />
-            <small style={{ fontSize: '0.8em', color: '#666' }}>
-              Debug: {debugInfo}
-            </small>
+          <div className="glass-content expanded">
+            <div className="scrollable-container">
+              <div className="no-data">
+                Error: {error}
+                <br />
+                <small style={{ fontSize: '0.8em', color: '#666' }}>
+                  Debug: {debugInfo}
+                </small>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -651,8 +701,8 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
 
   return (
     <div className="card current-series-hr-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef2}>
+        <div className="glass-header" ref={headerRef2}>
           <h3>🚀 Current Series HRs</h3>
           <p className="card-subtitle">
             Home run leaders in current series vs opponent
@@ -662,10 +712,12 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
           </p>
         </div>
         
-        {seriesData.length === 0 ? (
-          <div className="no-data">
-            No home runs hit in current series yet
-            <br />
+        <div className="glass-content expanded">
+          <div className="scrollable-container">
+            {seriesData.length === 0 ? (
+              <div className="no-data">
+                No home runs hit in current series yet
+                <br />
             <small style={{ fontSize: '0.8em', color: '#999' }}>
               Debug: {debugInfo}
               <br />
@@ -812,15 +864,18 @@ const CurrentSeriesHRCard = ({ gameData, currentDate, teams }) => {
               })}
             </div>
           </div>
+          
+          {/* Debug info */}
+          {seriesData.length === 0 && (
+            <div style={{ fontSize: '0.7em', color: '#999', marginTop: '10px', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
+              <strong>Debug Info:</strong> {debugInfo}
+            </div>
+          )}
           </>
         )}
         
-        {/* Debug info */}
-        {seriesData.length === 0 && (
-          <div style={{ fontSize: '0.7em', color: '#999', marginTop: '10px', padding: '10px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
-            <strong>Debug Info:</strong> {debugInfo}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

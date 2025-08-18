@@ -28,7 +28,29 @@
 .poor-performance-card .glass-card-container {
   position: relative;
   height: 100%;
-  min-height: 420px;
+  min-height: 500px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+/* Collapsible states for container */
+.poor-performance-card .glass-card-container.collapsed {
+  height: 84px;
+  min-height: 84px !important;
+}
+
+.poor-performance-card .glass-card-container.expanded {
+  min-height: 500px;
+}
+
+/* Hide content when container is collapsed */
+.poor-performance-card .glass-card-container.collapsed .glass-content {
+  display: none;
+}
+
+/* Compact header when collapsed */
+.poor-performance-card .glass-card-container.collapsed .glass-header {
+  padding: 15px 20px;
 }
 
 /* Glass header that content scrolls behind */
@@ -43,8 +65,12 @@
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(220, 38, 38, 0.15);
   padding: 20px;
-  pointer-events: none;
+  pointer-events: auto;
   box-shadow: 0 4px 16px rgba(220, 38, 38, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .poor-performance-card .glass-header h3 {
@@ -54,21 +80,25 @@
   font-weight: 600;
 }
 
-/* Glass Effect Scrollable Container */
-.poor-performance-card .scrollable-container {
-  background: rgba(254, 242, 242, 0.4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 0 0 12px 12px;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+/* Glass content wrapper */
+.poor-performance-card .glass-content {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  padding-top: 100px; /* Space for header */
+  padding-top: 120px; /* Space for header with subtitle */
+  background: rgba(254, 242, 242, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+}
+
+/* Glass Effect Scrollable Container */
+.poor-performance-card .scrollable-container {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: visible;
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 20px;
@@ -115,7 +145,7 @@
   border-radius: 8px;
   transition: all 0.2s ease;
   position: relative;
-  overflow: visible;
+  overflow: hidden; /* CRITICAL FIX: Contain team logo background */
   max-width: 100%;
   width: 100%;
 }
@@ -270,19 +300,20 @@
   white-space: nowrap;
 }
 
-/* Enhanced background logo */
+/* Enhanced background logo - FIXED: Properly contained within player-item */
 .poor-performance-card .risk-item .team-logo-bg {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 800px;
-  height: 800px;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 66%;
   opacity: 0.06;
   z-index: -1;
   pointer-events: none;
   transition: opacity 0.2s ease;
-  object-fit: contain;
-  transform: translate(-50%, -50%);
+  object-fit: cover;
+  object-position: center;
+  transform: translate(20%, -10%) scale(2.2);
 }
 
 .poor-performance-card .risk-item:hover .team-logo-bg {
@@ -390,19 +421,81 @@
 @media (max-width: 768px) {
   .poor-performance-card {
     grid-column: 1 / -1;
+    padding: 0; /* Remove padding for glass card structure */
   }
   
+  /* Mobile glass header positioning */
+  .poor-performance-card .glass-header {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 25 !important;
+    margin: 0 !important;
+    padding: 15px 20px !important;
+    border-radius: 12px 12px 0 0 !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    cursor: pointer !important;
+  }
+  
+  /* Mobile glass card container proper setup */
   .poor-performance-card .glass-card-container {
-    min-height: auto;
-    height: auto;
+    min-height: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
   }
   
+  /* Mobile collapsed state - enable mobile collapse response */
+  .poor-performance-card .glass-card-container.collapsed {
+    height: 84px !important;
+    min-height: 84px !important;
+    max-height: 84px !important;
+  }
+  
+  /* Mobile expanded state */
+  .poor-performance-card .glass-card-container.expanded {
+    min-height: 60vh !important;
+    height: auto !important;
+  }
+  
+  /* Hide content when collapsed - fix non-responsive collapse */
+  .poor-performance-card .glass-card-container.collapsed .glass-content,
+  .poor-performance-card .glass-card-container.collapsed .scrollable-container {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+  
+  /* Show content when expanded - ensure mobile visibility */
+  .poor-performance-card .glass-card-container.expanded .glass-content,
+  .poor-performance-card .glass-card-container.expanded .scrollable-container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Mobile glass content setup */
+  .poor-performance-card .glass-content {
+    position: relative !important;
+    height: auto !important;
+    max-height: 60vh !important;
+    padding-top: 110px !important; /* Space for header */
+    padding-bottom: 10px !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Mobile scrollable container */
   .poor-performance-card .scrollable-container {
-    position: relative;
-    height: auto;
-    max-height: 60vh;
-    padding-bottom: 10px;
-    padding-top: 80px;
+    position: relative !important;
+    height: auto !important;
+    max-height: none !important;
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    overflow-y: visible !important;
   }
   
   /* Mobile view windowed behavior */
@@ -459,6 +552,11 @@
   .poor-performance-card .player-rank .rank-number {
     font-size: 1rem;
   }
+  
+  /* Ensure proper z-index layering */
+  .poor-performance-card .glass-content {
+    z-index: 10 !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -485,4 +583,47 @@
   .poor-performance-card .risk-badge-overlay {
     right: 6px;
   }
+}
+
+/* Collapsible functionality */
+.poor-performance-card .collapse-toggle {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  margin-left: 10px;
+}
+
+.poor-performance-card .collapse-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.poor-performance-card .collapsible-content {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+/* Collapsed state */
+.poor-performance-card.collapsed .glass-card-container {
+  min-height: 80px;
+  height: 80px;
+}
+
+.poor-performance-card.collapsed .collapsible-content {
+  opacity: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.poor-performance-card.collapsed .glass-header {
+  border-bottom: none;
+}
+
+.poor-performance-card.collapsed .collapse-icon {
+  transform: rotate(90deg);
 }

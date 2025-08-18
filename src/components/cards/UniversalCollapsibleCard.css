@@ -1,0 +1,237 @@
+/* UniversalCollapsibleCard.css - Styles for universal collapsible card wrapper */
+
+/* Import existing collapsible styles */
+@import url('../CollapsibleCard.css');
+
+/* Universal collapsible card container */
+.collapsible-card {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.collapsible-card.collapsed {
+  /* Maintain card visibility when collapsed to show header */
+  opacity: 1;
+}
+
+.collapsible-card.expanded {
+  opacity: 1;
+}
+
+/* Enhanced glass header integration */
+.collapsible-card .glass-header.collapsible-header {
+  /* Ensure proper z-index for clickable header */
+  z-index: 30;
+  /* Add visual feedback for interactivity */
+  transition: all 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.collapsible-card .glass-header.collapsible-header:hover {
+  /* Subtle hover effect on glass headers */
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.collapsible-card .glass-header.collapsible-header:active {
+  transform: translateY(0);
+}
+
+/* Header content layout */
+.collapsible-card .header-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.collapsible-card .header-content h3 {
+  margin: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Additional header content (filters, controls, etc.) */
+.collapsible-card .header-additional-content {
+  /* Prevent collapse when clicking on filters/controls */
+  pointer-events: auto;
+  /* Ensure proper spacing */
+  margin-left: auto;
+  margin-right: 12px;
+}
+
+/* Enhanced toggle button */
+.collapsible-card .collapse-toggle-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: inherit;
+  opacity: 0.8;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.collapsible-card .collapse-toggle-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.collapsible-card .collapse-toggle-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+/* Chevron animation enhancement */
+.collapsible-card .chevron-icon {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+}
+
+.collapsible-card .chevron-icon.expanded {
+  transform: rotate(0deg);
+}
+
+.collapsible-card .chevron-icon.collapsed {
+  transform: rotate(-90deg);
+}
+
+/* Content wrapper adjustments */
+.collapsible-card .card-content-wrapper {
+  /* Override any existing padding-top for glass headers */
+  padding-top: 0 !important;
+}
+
+.collapsible-card .card-content-wrapper.expanded {
+  /* Add proper spacing when expanded */
+  padding-top: 0;
+}
+
+.collapsible-card .card-content-wrapper.collapsed {
+  /* Completely hide content when collapsed */
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Integration with existing card content */
+.collapsible-card .scrollable-container,
+.collapsible-card .mobile-view,
+.collapsible-card .desktop-view {
+  /* Remove padding-top that accounts for header since we're managing it */
+  padding-top: 20px !important;
+}
+
+/* Collapsed state optimizations */
+.collapsible-card.collapsed .scrollable-container,
+.collapsible-card.collapsed .mobile-view,
+.collapsible-card.collapsed .desktop-view {
+  /* Ensure content is fully hidden when collapsed */
+  display: none;
+}
+
+/* Theme-specific enhancements */
+.theme-glass .collapsible-card .glass-header.collapsible-header:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.theme-classic .collapsible-card .glass-header.collapsible-header:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .collapsible-card .glass-header.collapsible-header {
+    padding: 15px 20px;
+  }
+  
+  .collapsible-card .collapse-toggle-btn {
+    padding: 8px;
+  }
+  
+  .collapsible-card .chevron-icon {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .collapsible-card .header-additional-content {
+    margin-right: 8px;
+  }
+}
+
+/* Integration with existing card patterns */
+.collapsible-card .compact-filters {
+  /* Ensure filters remain interactive when part of collapsible header */
+  pointer-events: auto;
+}
+
+.collapsible-card .filter-row button {
+  /* Prevent filter buttons from triggering card collapse */
+  pointer-events: auto;
+}
+
+/* Enhanced visual feedback */
+.collapsible-card .glass-header.collapsible-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.collapsible-card .glass-header.collapsible-header:hover::before {
+  opacity: 1;
+}
+
+/* Accessibility enhancements */
+.collapsible-card .glass-header.collapsible-header[aria-expanded="false"] {
+  /* Visual indication when collapsed */
+  opacity: 0.9;
+}
+
+.collapsible-card .glass-header.collapsible-header[aria-expanded="true"] {
+  /* Visual indication when expanded */
+  opacity: 1;
+}
+
+/* Smooth state transitions */
+.collapsible-card.collapsed {
+  /* Maintain minimum height for collapsed cards */
+  min-height: auto;
+}
+
+.collapsible-card.expanded {
+  /* Restore full functionality when expanded */
+  min-height: 420px;
+}
+
+/* Performance optimizations */
+.collapsible-card .card-content-wrapper.collapsed * {
+  /* Disable interactions for collapsed content */
+  pointer-events: none;
+  user-select: none;
+}
+
+.collapsible-card .card-content-wrapper.expanded * {
+  /* Restore interactions for expanded content */
+  pointer-events: auto;
+  user-select: auto;
+}

@@ -20,6 +20,36 @@
   position: relative;
   height: 100%;
   min-height: 420px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+/* Collapsible states for container */
+.hellraiser-card .glass-card-container.collapsed {
+  max-height: 80px; /* Just enough for basic header */
+  min-height: 80px !important; /* Override the default min-height */
+  height: 80px; /* Force specific height when collapsed */
+}
+
+.hellraiser-card .glass-card-container.expanded {
+  max-height: 2000px; /* Large enough for full content */
+  min-height: 720px; /* Enough for full content */
+  height: auto; /* Allow natural height when expanded */
+}
+
+/* Hide content when container is collapsed */
+.hellraiser-card .glass-card-container.collapsed .glass-content {
+  display: none;
+}
+
+/* Compact header when collapsed */
+.hellraiser-card .glass-card-container.collapsed .glass-header {
+  padding: 15px 20px;
+}
+
+/* Reduce header elements when collapsed */
+.hellraiser-card .glass-card-container.collapsed .compact-filters {
+  margin-top: 5px;
 }
 
 /* Glass header with fire gradient that content scrolls behind */
@@ -1247,10 +1277,33 @@
     grid-column: 1 / -1;
   }
   
+  /* ENSURE: Proper glass header positioning on mobile */
+  .hellraiser-card .glass-header {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 20 !important;
+    /* Maintain consistent top positioning */
+    margin: 0 !important;
+    border-radius: 12px 12px 0 0 !important;
+    /* Mobile-optimized glass effect */
+    background: linear-gradient(135deg, rgba(211, 47, 47, 0.28) 0%, rgba(245, 124, 0, 0.22) 100%) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    border-bottom: 1px solid rgba(211, 47, 47, 0.2) !important;
+    /* Ensure filters remain interactive */
+    pointer-events: auto !important;
+  }
+  
   /* Remove footer space in mobile */
   .hellraiser-card .glass-card-container {
     min-height: auto;
     height: auto;
+    /* Ensure container starts at absolute top */
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
   }
   
   .hellraiser-card .scrollable-container {
@@ -1258,16 +1311,38 @@
     height: auto;
     max-height: 60vh;
     padding-bottom: 10px;
+    /* Maintain consistent buffer spacing with filters */
+    padding-top: 180px !important;
+    /* Ensure content scrolls behind the glass header */
+    margin-top: 0 !important;
   }
   
-  /* Mobile view windowed behavior */
+  /* Mobile view windowed behavior with proper layering */
   .hellraiser-card .mobile-view {
     max-height: 60vh;
     overflow-y: auto;
+    /* Ensure mobile cards start below glass header with filters */
+    padding-top: 180px !important;
+    /* Position relative to allow scrolling behind header */
+    position: relative !important;
+    z-index: 10 !important;
   }
   
   .hellraiser-card .mobile-cards {
     padding-bottom: 10px;
+    /* Ensure cards can scroll behind header and filters */
+    z-index: 5 !important;
+  }
+  
+  /* Ensure compact filters remain accessible on mobile */
+  .hellraiser-card .compact-filters {
+    pointer-events: auto !important;
+    z-index: 25 !important;
+  }
+  
+  .hellraiser-card .filter-row button {
+    pointer-events: auto !important;
+    z-index: 26 !important;
   }
   
   .hellraiser-card .header-stats {

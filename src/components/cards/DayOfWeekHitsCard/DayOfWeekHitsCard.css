@@ -15,13 +15,29 @@
     0 8px 32px rgba(255, 193, 7, 0.08),
     0 2px 8px rgba(255, 193, 7, 0.03),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  height: auto;
+  min-height: auto;
+  max-height: none;
 }
 
 /* Glass card container for proper layering */
 .day-of-week-hits-card .glass-card-container {
-  position: relative;
-  height: 100%;
-  min-height: 420px;
+  min-height: 500px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.day-of-week-hits-card .glass-card-container.collapsed {
+  height: 84px;
+  min-height: 84px !important;
+}
+
+.day-of-week-hits-card .glass-card-container.expanded {
+  min-height: 500px;
+}
+
+.day-of-week-hits-card .glass-card-container.collapsed .glass-content {
+  display: none;
 }
 
 /* Glass header that content scrolls behind */
@@ -36,8 +52,22 @@
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(255, 193, 7, 0.15);
   padding: 20px;
-  pointer-events: none;
+  pointer-events: auto;
   box-shadow: 0 4px 16px rgba(255, 193, 7, 0.05);
+}
+
+/* Glass content wrapper */
+.day-of-week-hits-card .glass-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 80px; /* Space for header */
+  background: rgba(255, 248, 220, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
 }
 
 .day-of-week-hits-card .glass-header h3 {
@@ -49,19 +79,9 @@
 
 /* Glass Effect Scrollable Container */
 .day-of-week-hits-card .scrollable-container {
-  background: rgba(255, 252, 230, 0.4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 0 0 12px 12px;
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding-top: 80px; /* Space for header */
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 20px;

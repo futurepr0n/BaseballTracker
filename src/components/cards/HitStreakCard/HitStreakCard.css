@@ -15,13 +15,29 @@
     0 8px 32px rgba(24, 144, 255, 0.08),
     0 2px 8px rgba(24, 144, 255, 0.03),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  height: auto;
+  min-height: auto;
+  max-height: none;
 }
 
 /* Glass card container for proper layering */
 .hit-streak-card .glass-card-container {
-  position: relative;
-  height: 100%;
-  min-height: 420px;
+  min-height: 500px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.hit-streak-card .glass-card-container.collapsed {
+  height: 84px;
+  min-height: 84px !important;
+}
+
+.hit-streak-card .glass-card-container.expanded {
+  min-height: 500px;
+}
+
+.hit-streak-card .glass-card-container.collapsed .glass-content {
+  display: none;
 }
 
 /* Glass header that content scrolls behind */
@@ -36,8 +52,22 @@
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(24, 144, 255, 0.15);
   padding: 20px;
-  pointer-events: none;
+  pointer-events: auto;
   box-shadow: 0 4px 16px rgba(24, 144, 255, 0.05);
+}
+
+/* Glass content wrapper */
+.hit-streak-card .glass-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 80px; /* Space for header */
+  background: rgba(230, 247, 255, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
 }
 
 .hit-streak-card .glass-header h3 {
@@ -49,19 +79,9 @@
 
 /* Glass Effect Scrollable Container */
 .hit-streak-card .scrollable-container {
-  background: rgba(230, 247, 255, 0.4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 0 0 12px 12px;
   height: 100%;
   overflow-y: auto;
   overflow-x: visible;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding-top: 80px; /* Space for header */
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 20px;
@@ -405,4 +425,46 @@ body .streak-tooltip {
   .hit-streak-card .mobile-cards {
     padding-bottom: 10px;
   }
+}
+
+/* Collapsible functionality */
+.hit-streak-card .collapse-toggle {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.hit-streak-card .collapse-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.hit-streak-card .collapsible-content {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+/* Collapsed state */
+.hit-streak-card.collapsed .glass-card-container {
+  min-height: 80px;
+  height: 80px;
+}
+
+.hit-streak-card.collapsed .collapsible-content {
+  opacity: 0;
+  height: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.hit-streak-card.collapsed .glass-header {
+  border-bottom: none;
+}
+
+.hit-streak-card.collapsed .collapse-icon {
+  transform: rotate(90deg);
 }

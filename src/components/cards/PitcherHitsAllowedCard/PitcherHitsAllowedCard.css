@@ -16,13 +16,37 @@
     0 8px 32px rgba(139, 92, 246, 0.08),
     0 2px 8px rgba(139, 92, 246, 0.03),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  /* Parent card height control */
+  height: auto;
+  min-height: auto;
+  max-height: none;
 }
 
 /* Glass card container for proper layering */
 .pitcher-hits-allowed-card .glass-card-container {
-  position: relative;
-  height: 100%;
-  min-height: 420px;
+  min-height: 500px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+/* Collapsible states for container */
+.pitcher-hits-allowed-card .glass-card-container.collapsed {
+  height: 84px;
+  min-height: 84px !important;
+}
+
+.pitcher-hits-allowed-card .glass-card-container.expanded {
+  min-height: 500px;
+}
+
+/* Hide content when container is collapsed */
+.pitcher-hits-allowed-card .glass-card-container.collapsed .glass-content {
+  display: none;
+}
+
+/* Compact header when collapsed */
+.pitcher-hits-allowed-card .glass-card-container.collapsed .glass-header {
+  padding: 15px 20px;
 }
 
 /* Glass header that content scrolls behind */
@@ -37,13 +61,38 @@
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(139, 92, 246, 0.15);
   padding: 20px;
-  pointer-events: none;
+  pointer-events: auto;
+  /* Allow header interactions for collapsible functionality */
   box-shadow: 0 4px 16px rgba(139, 92, 246, 0.05);
 }
 
 .pitcher-hits-allowed-card .glass-header h3 {
   margin: 0;
   color: var(--text-primary, #1a202c);
+}
+
+/* Glass content wrapper */
+.pitcher-hits-allowed-card .glass-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 120px; /* Space for header with subtitle */
+  background: rgba(229, 222, 255, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+}
+
+/* Glass Effect Scrollable Container */
+.pitcher-hits-allowed-card .scrollable-container {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: visible;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
   font-size: 1.1rem;
   font-weight: 600;
 }
@@ -298,18 +347,81 @@
 @media (max-width: 768px) {
   .pitcher-hits-allowed-card {
     grid-column: 1 / -1;
+    padding: 0; /* Remove padding for glass card structure */
   }
   
+  /* Mobile glass header positioning */
+  .pitcher-hits-allowed-card .glass-header {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 25 !important;
+    margin: 0 !important;
+    padding: 15px 20px !important;
+    border-radius: 12px 12px 0 0 !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    cursor: pointer !important;
+  }
+  
+  /* Mobile glass card container proper setup */
   .pitcher-hits-allowed-card .glass-card-container {
-    min-height: auto;
-    height: auto;
+    min-height: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
   }
   
+  /* Mobile collapsed state - enable mobile collapse response */
+  .pitcher-hits-allowed-card .glass-card-container.collapsed {
+    height: 84px !important;
+    min-height: 84px !important;
+    max-height: 84px !important;
+  }
+  
+  /* Mobile expanded state */
+  .pitcher-hits-allowed-card .glass-card-container.expanded {
+    min-height: 60vh !important;
+    height: auto !important;
+  }
+  
+  /* Hide content when collapsed - fix non-responsive collapse */
+  .pitcher-hits-allowed-card .glass-card-container.collapsed .glass-content,
+  .pitcher-hits-allowed-card .glass-card-container.collapsed .scrollable-container {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+  
+  /* Show content when expanded - ensure mobile visibility */
+  .pitcher-hits-allowed-card .glass-card-container.expanded .glass-content,
+  .pitcher-hits-allowed-card .glass-card-container.expanded .scrollable-container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Mobile glass content setup */
+  .pitcher-hits-allowed-card .glass-content {
+    position: relative !important;
+    height: auto !important;
+    max-height: 60vh !important;
+    padding-top: 110px !important; /* Space for header */
+    padding-bottom: 10px !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Mobile scrollable container */
   .pitcher-hits-allowed-card .scrollable-container {
-    position: relative;
-    height: auto;
-    max-height: 60vh;
-    padding-bottom: 10px;
+    position: relative !important;
+    height: auto !important;
+    max-height: none !important;
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    overflow-y: visible !important;
   }
   
   /* Mobile view windowed behavior */
@@ -348,4 +460,11 @@
     width: 28px;
     height: 28px;
   }
+  
+  /* Ensure proper z-index layering */
+  .pitcher-hits-allowed-card .glass-content {
+    z-index: 10 !important;
+  }
 }
+
+/* Legacy collapse functionality removed - now using collapsible glass */

@@ -2,9 +2,9 @@
 
 .hr-leaders-card {
   grid-column: span 1;
-  background: rgba(230, 57, 70, 0.05);
-  border: 1px solid rgba(230, 57, 70, 0.2);
-  border-left: 4px solid #e63946;
+  background: rgba(59, 130, 246, 0.05);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-left: 4px solid #3b82f6;
   border-radius: 12px;
   backdrop-filter: blur(35px);
   -webkit-backdrop-filter: blur(35px);
@@ -12,16 +12,49 @@
   position: relative;
   padding: 0;
   box-shadow: 
-    0 8px 32px rgba(230, 57, 70, 0.08),
-    0 2px 8px rgba(230, 57, 70, 0.03),
+    0 8px 32px rgba(59, 130, 246, 0.08),
+    0 2px 8px rgba(59, 130, 246, 0.03),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Parent card height control */
+.hr-leaders-card {
+  height: auto;
+  min-height: auto;
+  max-height: none;
 }
 
 /* Glass card container for proper layering */
 .hr-leaders-card .glass-card-container {
-  position: relative;
-  height: 100%;
-  min-height: 420px;
+  min-height: 600px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+/* Collapsible states for container */
+.hr-leaders-card .glass-card-container.collapsed {
+  height: 84px;
+  min-height: 84px !important;
+}
+
+.hr-leaders-card .glass-card-container.expanded {
+  min-height: 600px;
+}
+
+/* Hide content when container is collapsed */
+.hr-leaders-card .glass-card-container.collapsed .glass-content {
+  display: none;
+}
+
+/* Compact header when collapsed */
+.hr-leaders-card .glass-card-container.collapsed .glass-header {
+  padding: 15px 20px;
+}
+
+/* Reduce header elements when collapsed */
+.hr-leaders-card .glass-card-container.collapsed .team-hr-summary,
+.hr-leaders-card .glass-card-container.collapsed .card-subtitle.team-context {
+  margin-bottom: 5px;
 }
 
 /* Glass header that content scrolls behind */
@@ -36,8 +69,23 @@
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(230, 57, 70, 0.15);
   padding: 20px;
-  pointer-events: none;
+  pointer-events: auto;
+  /* Allow header interactions for collapsible functionality */
   box-shadow: 0 4px 16px rgba(230, 57, 70, 0.05);
+}
+
+/* Glass content wrapper */
+.hr-leaders-card .glass-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: 140px; /* Space for header */
+  background: rgba(255, 235, 238, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
 }
 
 .hr-leaders-card .glass-header h3 {
@@ -60,19 +108,9 @@
 
 /* Glass Effect Scrollable Container */
 .hr-leaders-card .scrollable-container {
-  background: rgba(255, 235, 238, 0.4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 0 0 12px 12px;
   height: 100%;
   overflow-y: auto;
   overflow-x: visible;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding-top: 140px; /* Extra space for complex header with team summary */
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 20px;

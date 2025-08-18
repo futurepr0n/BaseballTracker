@@ -1,0 +1,259 @@
+/* UniversalGlassHeaderMobileFix.css - Universal mobile fixes for all glass-header cards */
+
+/* 
+ * UNIVERSAL MOBILE GLASS HEADER FIXES
+ * Applies to all cards using glass-header pattern to ensure proper mobile behavior:
+ * - Glass headers stay fixed at top
+ * - Mobile content scrolls behind headers
+ * - Proper buffer spacing for mobile cards
+ */
+
+@media (max-width: 768px) {
+  
+  /* UNIVERSAL: All glass headers - enhanced mobile positioning */
+  .glass-header {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 25 !important;
+    margin: 0 !important;
+    padding: 15px 20px !important;
+    border-radius: 12px 12px 0 0 !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    /* Ensure headers stay at absolute top */
+    transform: none !important;
+    /* Allow interaction with header elements */
+    pointer-events: auto !important;
+  }
+  
+  /* UNIVERSAL: All glass card containers - proper mobile setup */
+  .glass-card-container {
+    min-height: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
+  }
+  
+  /* UNIVERSAL: All scrollable containers - mobile buffer spacing */
+  .scrollable-container {
+    position: relative !important;
+    height: auto !important;
+    max-height: 60vh !important;
+    padding-top: 110px !important; /* Standard buffer for basic headers */
+    margin-top: 0 !important;
+    padding-bottom: 10px !important;
+  }
+  
+  /* UNIVERSAL: All mobile views - proper layering */
+  .mobile-view {
+    max-height: 60vh !important;
+    overflow-y: auto !important;
+    padding-top: 110px !important; /* Match scrollable container */
+    position: relative !important;
+    z-index: 10 !important;
+  }
+  
+  /* UNIVERSAL: All mobile cards - scroll behind headers */
+  .mobile-cards {
+    padding-bottom: 10px !important;
+    z-index: 5 !important;
+  }
+  
+  /* SPECIFIC: Cards with filters or complex headers need extra space */
+  .hellraiser-card .scrollable-container,
+  .hellraiser-card .mobile-view {
+    padding-top: 180px !important; /* Extra space for compact-filters */
+  }
+  
+  .hellraiser-card .glass-header {
+    z-index: 30 !important; /* Higher z-index for interactive filters */
+  }
+  
+  /* SPECIFIC: Cards with longer titles or subtitles need extra space */
+  .mlb-weather-card .scrollable-container,
+  .mlb-weather-card .mobile-view,
+  .strategic-intelligence-card .scrollable-container,
+  .strategic-intelligence-card .mobile-view,
+  .multi-hit-dashboard-card .scrollable-container,
+  .multi-hit-dashboard-card .mobile-view {
+    padding-top: 120px !important; /* Slightly more space for complex headers */
+  }
+  
+  /* SPECIFIC: Cards with very compact headers can use less space */
+  .hr-rate-card .scrollable-container,
+  .hr-rate-card .mobile-view,
+  .hit-rate-card .scrollable-container,
+  .hit-rate-card .mobile-view {
+    padding-top: 100px !important; /* Less space for simple headers */
+  }
+  
+  /* SPECIFIC: Enhanced background opacity for mobile visibility */
+  .top-hitters-card .glass-header {
+    background: rgba(33, 150, 243, 0.12) !important;
+    border-bottom: 1px solid rgba(33, 150, 243, 0.2) !important;
+  }
+  
+  .hr-leaders-card .glass-header,
+  .recent-homers-card .glass-header {
+    background: rgba(230, 57, 70, 0.12) !important;
+    border-bottom: 1px solid rgba(230, 57, 70, 0.2) !important;
+  }
+  
+  .hit-streak-card .glass-header,
+  .continue-streak-card .glass-header {
+    background: rgba(250, 140, 22, 0.12) !important;
+    border-bottom: 1px solid rgba(250, 140, 22, 0.2) !important;
+  }
+  
+  .day-of-week-hits-card .glass-header,
+  .hr-rate-card .glass-header,
+  .improved-rate-card .glass-header {
+    background: rgba(103, 58, 183, 0.12) !important;
+    border-bottom: 1px solid rgba(103, 58, 183, 0.2) !important;
+  }
+  
+  .likely-to-hit-card .glass-header {
+    background: rgba(76, 175, 80, 0.12) !important;
+    border-bottom: 1px solid rgba(76, 175, 80, 0.2) !important;
+  }
+  
+  .opponent-matchup-hits-card .glass-header,
+  .opponent-matchup-hr-card .glass-header {
+    background: rgba(156, 39, 176, 0.12) !important;
+    border-bottom: 1px solid rgba(156, 39, 176, 0.2) !important;
+  }
+  
+  .pitcher-hrs-allowed-card .glass-header,
+  .pitcher-hits-allowed-card .glass-header {
+    background: rgba(255, 87, 34, 0.12) !important;
+    border-bottom: 1px solid rgba(255, 87, 34, 0.2) !important;
+  }
+  
+  .positive-momentum-card .glass-header {
+    background: rgba(76, 175, 80, 0.12) !important;
+    border-bottom: 1px solid rgba(76, 175, 80, 0.2) !important;
+  }
+  
+  .poor-performance-card .glass-header {
+    background: rgba(244, 67, 54, 0.12) !important;
+    border-bottom: 1px solid rgba(244, 67, 54, 0.2) !important;
+  }
+  
+  .time-slot-hits-card .glass-header {
+    background: rgba(63, 81, 181, 0.12) !important;
+    border-bottom: 1px solid rgba(63, 81, 181, 0.2) !important;
+  }
+  
+  .barrel-matchup-card .glass-header,
+  .launch-angle-masters-card .glass-header {
+    background: rgba(47, 79, 79, 0.12) !important;
+    border-bottom: 1px solid rgba(47, 79, 79, 0.2) !important;
+  }
+  
+  .mlb-weather-card .glass-header {
+    background: rgba(96, 125, 139, 0.12) !important;
+    border-bottom: 1px solid rgba(96, 125, 139, 0.2) !important;
+  }
+  
+  .player-props-ladder-card .glass-header {
+    background: rgba(156, 39, 176, 0.12) !important;
+    border-bottom: 1px solid rgba(156, 39, 176, 0.2) !important;
+  }
+  
+  .multi-hit-dashboard-card .glass-header {
+    background: rgba(255, 193, 7, 0.12) !important;
+    border-bottom: 1px solid rgba(255, 193, 7, 0.2) !important;
+  }
+  
+  .strategic-intelligence-card .glass-header {
+    background: rgba(63, 81, 181, 0.12) !important;
+    border-bottom: 1px solid rgba(63, 81, 181, 0.2) !important;
+  }
+  
+  .hit-drought-bounce-back-card .glass-header {
+    background: rgba(255, 152, 0, 0.12) !important;
+    border-bottom: 1px solid rgba(255, 152, 0, 0.2) !important;
+  }
+  
+  /* UNIVERSAL: Ensure all card titles are visible */
+  .glass-header h3,
+  .glass-header h4 {
+    color: #333 !important;
+    margin: 0 0 10px 0 !important;
+    font-weight: 600 !important;
+  }
+  
+  /* UNIVERSAL: Mobile card item spacing */
+  .mobile-cards .mobile-player-card {
+    margin-bottom: 8px !important;
+  }
+  
+  /* UNIVERSAL: Prevent content from appearing above glass headers */
+  .desktop-view,
+  .mobile-view {
+    z-index: 10 !important;
+  }
+  
+  .desktop-view .scrollable-container {
+    z-index: 5 !important;
+  }
+  
+  /* UNIVERSAL: Enhanced scrollbars for all glass cards */
+  .scrollable-container::-webkit-scrollbar {
+    width: 6px !important;
+  }
+  
+  .scrollable-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 3px !important;
+  }
+  
+  .scrollable-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border-radius: 3px !important;
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
+  }
+  
+  .scrollable-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3) !important;
+  }
+}
+
+/* UNIVERSAL: Override any existing mobile responsive rules that might conflict */
+@media (max-width: 768px) {
+  
+  /* Ensure our universal rules take precedence */
+  .card .glass-header {
+    position: absolute !important;
+    top: 0 !important;
+    z-index: 25 !important;
+  }
+  
+  .card .glass-card-container {
+    position: relative !important;
+    min-height: auto !important;
+  }
+  
+  .card .scrollable-container {
+    position: relative !important;
+    max-height: 60vh !important;
+  }
+  
+  .card .mobile-view {
+    max-height: 60vh !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Ensure all mobile cards have proper spacing */
+  .card .mobile-cards .mobile-player-card {
+    margin-bottom: 8px !important;
+    z-index: 5 !important;
+  }
+  
+  /* Debug indicator removed - fixes confirmed working */
+}
