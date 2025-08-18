@@ -344,12 +344,38 @@
   
   /* Show content when expanded - ensure visibility */
   .improved-rate-card .glass-card-container.expanded .glass-content,
-  .improved-rate-card .glass-card-container.expanded .scrollable-container,
-  .improved-rate-card .glass-card-container.expanded .desktop-view,
-  .improved-rate-card .glass-card-container.expanded .mobile-view {
+  .improved-rate-card .glass-card-container.expanded .scrollable-container {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
+  }
+  
+  /* Show appropriate view when expanded based on screen size */
+  .improved-rate-card .glass-card-container.expanded .desktop-view {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  .improved-rate-card .glass-card-container.expanded .mobile-view {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+  
+  /* Mobile responsive - switch views when expanded */
+  @media (max-width: 768px) {
+    .improved-rate-card .glass-card-container.expanded .desktop-view {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+    }
+    
+    .improved-rate-card .glass-card-container.expanded .mobile-view {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
   }
   
   /* Mobile glass content setup */

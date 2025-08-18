@@ -489,7 +489,7 @@
     opacity: 0 !important;
   }
   
-  /* Show content when expanded - ensure mobile visibility */
+  /* Show content when expanded - ensure visibility */
   .opponent-matchup-hits-card .glass-card-container.expanded .glass-content,
   .opponent-matchup-hits-card .glass-card-container.expanded .scrollable-container,
   .opponent-matchup-hr-card .glass-card-container.expanded .glass-content,
@@ -497,6 +497,38 @@
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
+  }
+  
+  /* Show appropriate view when expanded based on screen size */
+  .opponent-matchup-hits-card .glass-card-container.expanded .desktop-view,
+  .opponent-matchup-hr-card .glass-card-container.expanded .desktop-view {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  .opponent-matchup-hits-card .glass-card-container.expanded .mobile-view,
+  .opponent-matchup-hr-card .glass-card-container.expanded .mobile-view {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+  
+  /* Mobile responsive - switch views when expanded */
+  @media (max-width: 768px) {
+    .opponent-matchup-hits-card .glass-card-container.expanded .desktop-view,
+    .opponent-matchup-hr-card .glass-card-container.expanded .desktop-view {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+    }
+    
+    .opponent-matchup-hits-card .glass-card-container.expanded .mobile-view,
+    .opponent-matchup-hr-card .glass-card-container.expanded .mobile-view {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
   }
   
   /* Mobile glass content setup */

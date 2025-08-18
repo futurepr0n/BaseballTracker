@@ -506,7 +506,7 @@
     opacity: 0 !important;
   }
   
-  /* Show content when expanded - ensure mobile visibility */
+  /* Show content when expanded - ensure visibility */
   .current-series-hits-card .glass-card-container.expanded .glass-content,
   .current-series-hits-card .glass-card-container.expanded .scrollable-container,
   .current-series-hr-card .glass-card-container.expanded .glass-content,
@@ -514,6 +514,38 @@
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
+  }
+  
+  /* Show appropriate view when expanded based on screen size */
+  .current-series-hits-card .glass-card-container.expanded .desktop-view,
+  .current-series-hr-card .glass-card-container.expanded .desktop-view {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  .current-series-hits-card .glass-card-container.expanded .mobile-view,
+  .current-series-hr-card .glass-card-container.expanded .mobile-view {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+  
+  /* Mobile responsive - switch views when expanded */
+  @media (max-width: 768px) {
+    .current-series-hits-card .glass-card-container.expanded .desktop-view,
+    .current-series-hr-card .glass-card-container.expanded .desktop-view {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+    }
+    
+    .current-series-hits-card .glass-card-container.expanded .mobile-view,
+    .current-series-hr-card .glass-card-container.expanded .mobile-view {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
   }
   
   /* Mobile glass content setup */
