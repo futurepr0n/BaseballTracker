@@ -65,35 +65,31 @@
   font-weight: 600;
 }
 
-/* Glass content states for collapsible functionality */
+/* Collapsible glass content */
 .under-performing-card .glass-content {
-  opacity: 1;
-  transition: opacity 0.3s ease;
-}
-
-.under-performing-card .glass-content.collapsed {
-  opacity: 0;
-}
-
-.under-performing-card .glass-content.expanded {
-  opacity: 1;
-}
-
-/* Glass Effect Scrollable Container */
-.under-performing-card .scrollable-container {
-  background: rgba(248, 245, 250, 0.4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 0 0 12px 12px;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   padding-top: 100px; /* Space for header */
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+  background: rgba(248, 245, 250, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Glass Effect Scrollable Container */
+.under-performing-card .scrollable-container {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 20px;
@@ -296,11 +292,66 @@
 @media (max-width: 768px) {
   .under-performing-card {
     grid-column: 1 / -1;
+    padding: 0; /* Remove padding for glass card structure */
   }
   
+  /* Mobile glass header positioning */
+  .under-performing-card .glass-header {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 25 !important;
+    margin: 0 !important;
+    padding: 15px 20px !important;
+    border-radius: 12px 12px 0 0 !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    cursor: pointer !important;
+  }
+  
+  /* Mobile glass card container proper setup */
   .under-performing-card .glass-card-container {
-    min-height: auto;
-    height: auto;
+    min-height: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
+  }
+  
+  /* Mobile collapsed state - enable mobile collapse response */
+  .under-performing-card .glass-card-container.collapsed {
+    height: 84px !important;
+    min-height: 84px !important;
+    max-height: 84px !important;
+  }
+  
+  /* Mobile expanded state */
+  .under-performing-card .glass-card-container.expanded {
+    min-height: 60vh !important;
+    height: auto !important;
+  }
+  
+  /* Hide content when collapsed - fix non-responsive collapse */
+  .under-performing-card .glass-card-container.collapsed .glass-content {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+  
+  /* Show content when expanded - ensure mobile visibility */
+  .under-performing-card .glass-card-container.expanded .glass-content {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Mobile glass content setup */
+  .under-performing-card .glass-content {
+    padding-top: 110px !important;
+    max-height: 60vh !important;
+    z-index: 10 !important;
   }
   
   .under-performing-card .scrollable-container {

@@ -527,9 +527,86 @@
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .milestone-tracking-card {
-    padding: 16px;
+    padding: 0; /* Remove padding for glass card structure */
   }
   
+  /* Mobile glass header positioning */
+  .milestone-tracking-card .glass-header {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 30 !important; /* Higher for interactive filters */
+    margin: 0 !important;
+    padding: 15px 20px !important;
+    border-radius: 12px 12px 0 0 !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    box-shadow: 0 4px 16px rgba(139, 69, 19, 0.1) !important;
+    cursor: pointer !important;
+  }
+  
+  /* Mobile glass card container proper setup */
+  .milestone-tracking-card .glass-card-container {
+    min-height: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative !important;
+  }
+  
+  /* Mobile collapsed state */
+  .milestone-tracking-card .glass-card-container.collapsed {
+    height: 84px !important;
+    min-height: 84px !important;
+    max-height: 84px !important;
+  }
+  
+  /* Mobile expanded state */
+  .milestone-tracking-card .glass-card-container.expanded {
+    min-height: 60vh !important;
+    height: auto !important;
+  }
+  
+  /* Hide all content when collapsed */
+  .milestone-tracking-card .glass-card-container.collapsed .glass-content,
+  .milestone-tracking-card .glass-card-container.collapsed .scrollable-container,
+  .milestone-tracking-card .glass-card-container.collapsed .milestones-container {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+  
+  /* Show content when expanded */
+  .milestone-tracking-card .glass-card-container.expanded .glass-content,
+  .milestone-tracking-card .glass-card-container.expanded .scrollable-container,
+  .milestone-tracking-card .glass-card-container.expanded .milestones-container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Mobile glass content setup */
+  .milestone-tracking-card .glass-content {
+    position: relative !important;
+    height: auto !important;
+    max-height: 60vh !important;
+    padding-top: 320px !important; /* Extra space for complex header with filters */
+    padding-bottom: 10px !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Mobile scrollable container */
+  .milestone-tracking-card .scrollable-container {
+    position: relative !important;
+    height: auto !important;
+    max-height: none !important;
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+    overflow-y: visible !important;
+  }
+  
+  /* Mobile filter adjustments */
   .filters-row {
     flex-direction: column;
     gap: 12px;
@@ -558,6 +635,20 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
+  }
+  
+  /* Mobile cards spacing */
+  .milestone-tracking-card .milestone-item {
+    margin-bottom: 8px !important;
+  }
+  
+  /* Ensure proper z-index layering */
+  .milestone-tracking-card .glass-content {
+    z-index: 10 !important;
+  }
+  
+  .milestone-tracking-card .milestones-container {
+    z-index: 5 !important;
   }
 }
 
