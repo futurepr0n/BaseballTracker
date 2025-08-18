@@ -6,6 +6,7 @@ import ExportTools from './components/ExportTools';
 import { useBaseballAnalysis } from '../../services/baseballAnalysisService';
 import { weakspotService } from './services/weakspotService';
 import { normalizeGamesVenues } from '../../utils/venueNormalizer';
+import { normalizeToEnglish, findPlayerInRoster } from '../../utils/universalNameNormalizer';
 import GlobalTooltip from '../utils/GlobalTooltip';
 import './DailyWeakspotAnalysis.css';
 
@@ -38,6 +39,7 @@ const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) 
   const [classificationMode, setClassificationMode] = useState('confidence');
   const [filteredOpportunities, setFilteredOpportunities] = useState([]);
   const [currentMatchups, setCurrentMatchups] = useState([]);
+  const [rostersData, setRostersData] = useState([]);
   
   // Baseball API integration
   const { 
@@ -48,6 +50,25 @@ const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) 
     // batchAnalysis,
     service
   } = useBaseballAnalysis();
+
+  // Load rosters data for name normalization
+  useEffect(() => {
+    const loadRostersData = async () => {
+      try {
+        const response = await fetch('/data/rosters.json');
+        if (response.ok) {
+          const rosters = await response.json();
+          setRostersData(rosters);
+        } else {
+          console.warn('Failed to load rosters data for name normalization');
+        }
+      } catch (error) {
+        console.error('Error loading rosters data:', error);
+      }
+    };
+
+    loadRostersData();
+  }, []);
 
   // Sync with currentDate changes from app-level date selector
   useEffect(() => {
@@ -91,15 +112,40 @@ const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) 
     loadScheduledGames();
   }, [selectedDate, gameData]);
 
+  // Normalize pitcher name using universal name normalizer
+  const normalizePitcherName = useCallback((pitcherName) => {
+    if (!pitcherName || !rostersData.length) {
+      return pitcherName;
+    }
+
+    console.log(`🎯 DAILY WEAKSPOT: Normalizing pitcher name "${pitcherName}"`);
+    
+    // Try to find the player in roster data for accurate name
+    const rosterMatch = findPlayerInRoster(pitcherName, rostersData);
+    if (rosterMatch) {
+      console.log(`🎯 DAILY WEAKSPOT: Found roster match for "${pitcherName}" -> "${rosterMatch.fullName || rosterMatch.name}"`);
+      return rosterMatch.fullName || rosterMatch.name;
+    }
+
+    // If no roster match, use universal name normalizer
+    const normalized = normalizeToEnglish(pitcherName);
+    console.log(`🎯 DAILY WEAKSPOT: Normalized "${pitcherName}" -> "${normalized}"`);
+    return normalized;
+  }, [rostersData]);
+
   // Enhance results with Baseball API
   const enhanceWithBaseballAPI = useCallback(async (weakspotResults) => {
     const enhancedOpportunities = [];
 
     for (const opportunity of weakspotResults.opportunities || []) {
       try {
+        // Normalize pitcher name for BaseballAPI call
+        const normalizedPitcherName = normalizePitcherName(opportunity.pitcher);
+        console.log(`🎯 DAILY WEAKSPOT API ENHANCE: Using normalized pitcher name "${normalizedPitcherName}" for API call`);
+        
         // Call Baseball API for this pitcher vs opposing team
         const apiResult = await analyzePitcherVsTeam(
-          opportunity.pitcher,
+          normalizedPitcherName,
           opportunity.opposing_team
         );
 
@@ -127,7 +173,7 @@ const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) 
       opportunities: enhancedOpportunities,
       enhanced_with_api: true
     };
-  }, [analyzePitcherVsTeam]);
+  }, [analyzePitcherVsTeam, normalizePitcherName]);
 
   // Main analysis function
   const runWeakspotAnalysis = useCallback(async (games = selectedGames) => {
@@ -156,29 +202,41 @@ const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) 
       const matchups = games.map(game => {
         // Handle lineup data format
         if (game.teams && game.pitchers) {
+          const rawAwayPitcher = game.pitchers.away?.name;
+          const rawHomePitcher = game.pitchers.home?.name;
+          
           const matchup = {
-            awayPitcher: game.pitchers.away?.name,
+            awayPitcher: normalizePitcherName(rawAwayPitcher),
             awayTeam: game.teams.away?.abbr,
-            homePitcher: game.pitchers.home?.name,
+            homePitcher: normalizePitcherName(rawHomePitcher),
             homeTeam: game.teams.home?.abbr,
             gameId: game.gameId,
             venue: game.venue?.name || game.venue,
-            gameTime: game.gameTime
+            gameTime: game.gameTime,
+            // Keep original names for debugging
+            originalAwayPitcher: rawAwayPitcher,
+            originalHomePitcher: rawHomePitcher
           };
-          console.log('🎯 DAILY WEAKSPOT: Lineup format matchup:', matchup);
+          console.log('🎯 DAILY WEAKSPOT: Lineup format matchup (normalized):', matchup);
           return matchup;
         } else {
           // Handle fallback game data format
+          const rawAwayPitcher = game.away_pitcher || game.awayPitcher;
+          const rawHomePitcher = game.home_pitcher || game.homePitcher;
+          
           const matchup = {
-            awayPitcher: game.away_pitcher || game.awayPitcher,
+            awayPitcher: normalizePitcherName(rawAwayPitcher),
             awayTeam: game.away_team || game.awayTeam,
-            homePitcher: game.home_pitcher || game.homePitcher,
+            homePitcher: normalizePitcherName(rawHomePitcher),
             homeTeam: game.home_team || game.homeTeam,
             gameId: game.id || game.gameId,
             venue: game.venue,
-            gameTime: game.time || game.gameTime
+            gameTime: game.time || game.gameTime,
+            // Keep original names for debugging
+            originalAwayPitcher: rawAwayPitcher,
+            originalHomePitcher: rawHomePitcher
           };
-          console.log('🎯 DAILY WEAKSPOT: Fallback format matchup:', matchup);
+          console.log('🎯 DAILY WEAKSPOT: Fallback format matchup (normalized):', matchup);
           return matchup;
         }
       });
@@ -218,7 +276,7 @@ const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) 
     } finally {
       setAnalysisLoading(false);
     }
-  }, [selectedGames, selectedDate, initialized, service, enhanceWithBaseballAPI]);
+  }, [selectedGames, selectedDate, initialized, service, enhanceWithBaseballAPI, normalizePitcherName]);
 
 
   // Handle classification mode change

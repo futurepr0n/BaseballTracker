@@ -215,11 +215,16 @@ const MatchupSelector = ({
         {/* Games List */}
         {selectedGames.length > 0 && (
           <div className="games-list">
-            <h3>Scheduled Games for {new Date(selectedDate).toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}</h3>
+            <h3>Scheduled Games for {(() => {
+              // Parse date manually to avoid timezone issues
+              const [year, month, day] = selectedDate.split('-');
+              const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+              return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              });
+            })()}</h3>
             <div className="games-grid">
               {selectedGames.map((game, index) => {
                 const gameInfo = formatGameDisplay(game);

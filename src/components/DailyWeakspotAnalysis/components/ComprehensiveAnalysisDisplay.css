@@ -1513,3 +1513,82 @@
   color: #555;
   font-style: italic;
 }
+
+/* Enhanced Position Stats with Prop Analysis */
+.position-stats .prop-stat {
+  background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+  border: 1px solid #c8e6c9;
+  border-radius: 4px;
+  margin: 2px 0;
+}
+
+.position-stats .prop-stat .label {
+  color: #2e7d32;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.position-stats .prop-stat .prop-value {
+  color: #1b5e20;
+  font-weight: 700;
+  background: #4caf50;
+  color: white;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-size: 0.7rem;
+}
+
+.position-stats .sample-stat {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  font-size: 0.7rem;
+}
+
+.position-stats .sample-stat .label,
+.position-stats .sample-stat .value {
+  color: #6c757d;
+  font-size: 0.65rem;
+}
+
+.position-stats .warning-stat {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 3px;
+  margin: 2px 0;
+}
+
+.position-stats .warning-stat .warning {
+  color: #856404;
+  font-size: 0.6rem;
+  font-weight: 600;
+}
+
+/* Enhance the position stats grid */
+.position-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.position-stats .stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 6px;
+  background: #f8f9fa;
+  border-radius: 3px;
+  border: 1px solid #e9ecef;
+}
+
+.position-stats .stat .label {
+  font-size: 0.7rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.position-stats .stat .value {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #333;
+}
