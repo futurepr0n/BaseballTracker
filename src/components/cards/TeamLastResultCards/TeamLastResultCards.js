@@ -1,7 +1,8 @@
 // TeamLastResultCards.js
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useTeamFilter } from '../../TeamFilterContext';
 import { fetchPlayerDataForDateRange, fetchGameData, formatDateString } from '../../../services/dataService';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import './TeamLastResultCards.css';
 
 /**
@@ -208,6 +209,20 @@ const TeamComingOffWinCard = ({ teamData, currentDate }) => {
   const [loading, setLoading] = useState(true);
   const [historicalGameData, setHistoricalGameData] = useState({});
   const [historicalPlayerData, setHistoricalPlayerData] = useState({});
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
+
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'last-result-card win-card'
+      );
+      return cleanup;
+    }
+  }, []);
 
   // Fetch historical data
   useEffect(() => {
@@ -275,12 +290,14 @@ const TeamComingOffWinCard = ({ teamData, currentDate }) => {
   if (loading) {
     return (
       <div className="card last-result-card win-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>🟢 Teams Coming Off Win</h3>
           </div>
-          <div className="loading-indicator">
-            Loading recent game results...
+          <div className="glass-content expanded">
+            <div className="loading-indicator">
+              Loading recent game results...
+            </div>
           </div>
         </div>
       </div>
@@ -290,14 +307,16 @@ const TeamComingOffWinCard = ({ teamData, currentDate }) => {
   if (filteredWinTeams.length === 0) {
     return (
       <div className="card last-result-card win-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>🟢 Teams Coming Off Win</h3>
           </div>
-          <div className="no-data">
-            {selectedTeam ? 'No filtered teams coming off a win' : 'No teams coming off a win'}
-            <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '8px' }}>
-              Debug: Found {winTeams.length} total win teams, {filteredWinTeams.length} after filtering
+          <div className="glass-content expanded">
+            <div className="no-data">
+              {selectedTeam ? 'No filtered teams coming off a win' : 'No teams coming off a win'}
+              <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '8px' }}>
+                Debug: Found {winTeams.length} total win teams, {filteredWinTeams.length} after filtering
+              </div>
             </div>
           </div>
         </div>
@@ -307,13 +326,14 @@ const TeamComingOffWinCard = ({ teamData, currentDate }) => {
 
   return (
     <div className="card last-result-card win-card full-width-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>🟢 Teams Coming Off Win</h3>
           <span className="team-count">{filteredWinTeams.length} team(s)</span>
         </div>
         
-        <div className="scrollable-container">
+        <div className="glass-content expanded">
+          <div className="scrollable-container">
         {filteredWinTeams.map(team => (
           <div key={team.teamCode} className="team-result-item">
             {/* Team logo background */}
@@ -420,6 +440,7 @@ const TeamComingOffWinCard = ({ teamData, currentDate }) => {
             </div>
           </div>
         ))}
+          </div>
         </div>
       </div>
     </div>
@@ -434,6 +455,20 @@ const TeamComingOffLossCard = ({ teamData, currentDate }) => {
   const [loading, setLoading] = useState(true);
   const [historicalGameData, setHistoricalGameData] = useState({});
   const [historicalPlayerData, setHistoricalPlayerData] = useState({});
+  const headerRef2 = useRef(null);
+  const containerRef2 = useRef(null);
+
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (headerRef2.current && containerRef2.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef2.current, 
+        containerRef2.current,
+        'last-result-card loss-card'
+      );
+      return cleanup;
+    }
+  }, []);
 
   // Fetch historical data
   useEffect(() => {
@@ -501,12 +536,14 @@ const TeamComingOffLossCard = ({ teamData, currentDate }) => {
   if (loading) {
     return (
       <div className="card last-result-card loss-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef2}>
+          <div className="glass-header" ref={headerRef2}>
             <h3>🔴 Teams Coming Off Loss</h3>
           </div>
-          <div className="loading-indicator">
-            Loading recent game results...
+          <div className="glass-content expanded">
+            <div className="loading-indicator">
+              Loading recent game results...
+            </div>
           </div>
         </div>
       </div>
@@ -516,14 +553,16 @@ const TeamComingOffLossCard = ({ teamData, currentDate }) => {
   if (filteredLossTeams.length === 0) {
     return (
       <div className="card last-result-card loss-card">
-        <div className="glass-card-container">
-          <div className="glass-header">
+        <div className="glass-card-container" ref={containerRef2}>
+          <div className="glass-header" ref={headerRef2}>
             <h3>🔴 Teams Coming Off Loss</h3>
           </div>
-          <div className="no-data">
-            {selectedTeam ? 'No filtered teams coming off a loss' : 'No teams coming off a loss'}
-            <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '8px' }}>
-              Debug: Found {lossTeams.length} total loss teams, {filteredLossTeams.length} after filtering
+          <div className="glass-content expanded">
+            <div className="no-data">
+              {selectedTeam ? 'No filtered teams coming off a loss' : 'No teams coming off a loss'}
+              <div style={{ fontSize: '0.8rem', color: '#666', marginTop: '8px' }}>
+                Debug: Found {lossTeams.length} total loss teams, {filteredLossTeams.length} after filtering
+              </div>
             </div>
           </div>
         </div>
@@ -533,13 +572,14 @@ const TeamComingOffLossCard = ({ teamData, currentDate }) => {
 
   return (
     <div className="card last-result-card loss-card full-width-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef2}>
+        <div className="glass-header" ref={headerRef2}>
           <h3>🔴 Teams Coming Off Loss</h3>
           <span className="team-count">{filteredLossTeams.length} team(s)</span>
         </div>
         
-        <div className="scrollable-container">
+        <div className="glass-content expanded">
+          <div className="scrollable-container">
         {filteredLossTeams.map(team => (
           <div key={team.teamCode} className="team-result-item">
             {/* Team logo background */}
@@ -646,6 +686,7 @@ const TeamComingOffLossCard = ({ teamData, currentDate }) => {
             </div>
           </div>
         ))}
+          </div>
         </div>
       </div>
     </div>

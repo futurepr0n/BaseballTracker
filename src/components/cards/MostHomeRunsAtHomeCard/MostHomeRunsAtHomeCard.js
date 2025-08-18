@@ -1,7 +1,8 @@
 // src/components/cards/MostHomeRunsAtHome/MostHomeRunsAtHome.js
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import { useTeamFilter } from '../../TeamFilterContext';
 import './MostHomeRunsAtHomeCard.css';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 
 /**
  * MostHomeRunsAtHome - Shows stadiums with the most home runs
@@ -20,6 +21,20 @@ const MostHomeRunsAtHomeCard = ({
     matchupTeam, 
     isFiltering 
   } = useTeamFilter();
+
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'most-home-runs-at-home-card'
+      );
+      return cleanup;
+    }
+  }, []);
 
   // Filter stadium data based on team selection
   const filteredStadiumData = useMemo(() => {
@@ -173,8 +188,8 @@ const MostHomeRunsAtHomeCard = ({
 
   return (
     <div className="card most-home-runs-at-home-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>{getCardTitle()}</h3>
           {getCardSubtitle() && (
             <div className="card-subtitle" style={{ 
@@ -189,10 +204,12 @@ const MostHomeRunsAtHomeCard = ({
           )}
         </div>
         
-        {isLoading ? (
-          <div className="loading-indicator">Loading stadium data...</div>
-        ) : filteredStadiumData && filteredStadiumData.summary && filteredStadiumData.summary.topStadiumsByTotalHRs ? (
+        <div className="glass-content expanded">
           <div className="scrollable-container">
+            {isLoading ? (
+              <div className="loading-indicator">Loading stadium data...</div>
+            ) : filteredStadiumData && filteredStadiumData.summary && filteredStadiumData.summary.topStadiumsByTotalHRs ? (
+              <>
           <div className="stadium-summary">
             <div className="summary-stats">
               <div className="stat-item">
@@ -290,10 +307,12 @@ const MostHomeRunsAtHomeCard = ({
               </div>
             </div>
           )}
+              </>
+            ) : (
+              <p className="no-data">No stadium home run data available</p>
+            )}
           </div>
-        ) : (
-          <p className="no-data">No stadium home run data available</p>
-        )}
+        </div>
       </div>
     </div>
   );

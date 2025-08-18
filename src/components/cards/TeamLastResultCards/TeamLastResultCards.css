@@ -45,6 +45,18 @@
   position: relative;
   height: 100%;
   min-height: 420px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.last-result-card .glass-card-container.collapsed {
+  height: 84px;
+  min-height: 84px;
+}
+
+.last-result-card .glass-card-container.expanded {
+  height: 100%;
+  min-height: 420px;
 }
 
 /* Glass header that content scrolls behind */
@@ -56,12 +68,14 @@
   z-index: 20;
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   padding: 20px;
-  pointer-events: none;
+  pointer-events: all;
+  cursor: pointer;
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: all 0.3s ease;
 }
 
 /* Win card glass header */
@@ -76,6 +90,29 @@
   background: rgba(239, 68, 68, 0.08);
   border-bottom: 1px solid rgba(239, 68, 68, 0.15);
   box-shadow: 0 4px 16px rgba(239, 68, 68, 0.05);
+}
+
+/* Header hover effects */
+.last-result-card.win-card .glass-header:hover {
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.last-result-card.loss-card .glass-header:hover {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+/* Glass content states for collapsible functionality */
+.last-result-card .glass-content {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.last-result-card .glass-content.collapsed {
+  opacity: 0;
+}
+
+.last-result-card .glass-content.expanded {
+  opacity: 1;
 }
 
 .last-result-card .glass-header h3 {

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import './ImprovedRateCard.css';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import '../../common/MobilePlayerCard.css';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 
 /**
  * ImprovedRateCard - Shows players with the most improved HR rate compared to historical
@@ -12,15 +13,30 @@ const ImprovedRateCard = ({
   isLoading,
   teams
 }) => {
+  const headerRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'improved-rate-card'
+      );
+      return cleanup;
+    }
+  }, []);
   return (
     <div className="card improved-rate-card">
-      <div className="glass-card-container">
-        <div className="glass-header">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>📈 Most Improved HR Rate</h3>
         </div>
         
-        {/* Desktop View */}
-        <div className="desktop-view">
+        <div className="glass-content expanded">
+          <div className="scrollable-container">
+            {/* Desktop View */}
+            <div className="desktop-view">
           {isLoading ? (
             <div className="loading-indicator">Loading stats...</div>
           ) : improvedPlayers && improvedPlayers.length > 0 ? (
@@ -82,13 +98,13 @@ const ImprovedRateCard = ({
                 })}
               </ul>
             </div>
-          ) : (
-            <div className="no-data">No improved rate data available</div>
-          )}
-        </div>
+            ) : (
+              <div className="no-data">No improved rate data available</div>
+            )}
+            </div>
 
-        {/* Mobile View */}
-        <div className="mobile-view">
+            {/* Mobile View */}
+            <div className="mobile-view">
           {isLoading ? (
             <div className="loading-indicator">Loading stats...</div>
           ) : improvedPlayers && improvedPlayers.length > 0 ? (
@@ -215,9 +231,11 @@ const ImprovedRateCard = ({
                 );
               })}
             </div>
-          ) : (
-            <div className="no-data">No improved rate data available</div>
-          )}
+            ) : (
+              <div className="no-data">No improved rate data available</div>
+            )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

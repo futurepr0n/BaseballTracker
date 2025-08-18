@@ -30,6 +30,7 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
       return cleanup;
     }
   }, []);
+  
 
   useEffect(() => {
     const loadMatchupData = async () => {
@@ -317,80 +318,79 @@ const OpponentMatchupHitsCard = ({ gameData, currentDate, teams }) => {
               </div>
             ) : (
               <ul className="player-list">
-                {matchupData.map((player, index) => {
-                  const teamInfo = getTeamInfo(player.playerTeam);
-                  const opponentInfo = getTeamInfo(player.opponentTeam);
-                  // Use same approach as working DayOfWeekHitsCard
-                  const teamData = teams && player.playerTeam ? teams[player.playerTeam] : null;
-                  const logoUrl = teamData ? teamData.logoUrl : null;
-                  
-                  return (
-                    <li key={`${player.playerName}_${player.playerTeam}_${index}`} className="player-item">
-                      <div className="player-rank" style={{ backgroundColor: teams[player.playerTeam]?.colors?.primary || '#007bff' }}>
-                        {logoUrl && (
-                          <>
-                            <img 
-                              src={logoUrl} 
-                              alt="" 
-                              className="rank-logo"
-                              loading="lazy"
-                              aria-hidden="true"
-                            />
-                            <div className="rank-overlay"></div>
-                          </>
-                        )}
-                        <span className="rank-number">{index + 1}</span>
-                      </div>
-                      
-                      <div className="player-info">
-                        <div className="player-name">{getPlayerDisplayName(player)}</div>
-                        <div className="player-team">vs {player.opponentTeam}</div>
-                      </div>
-                      
-                      <div className="player-stat">
-                        <div className="stat-highlight" style={{ color: teams[player.playerTeam]?.colors?.primary || '#007bff' }}>
-                          {player.hitsPerGame} H/G
-                        </div>
-                        <small>{player.totalHits}H in {player.gamesVsOpponent}G vs {player.opponentTeam}</small>
-                        <small>({player.battingAvg} AVG){player.recentForm && ` | ${player.recentForm}`}</small>
-                        {player.opponentHistory && player.opponentHistory.length > 0 && (
-                          <small style={{ fontSize: '10px', color: '#777' }}>
-                            Recent: {player.opponentHistory.slice(0, 5).map(game => game.value || 0).join('-')}
-                          </small>
-                        )}
-                      </div>
-                      
-                      {/* Enhanced background logo */}
-                      {logoUrl && (
+            {matchupData.map((player, index) => {
+              const teamInfo = getTeamInfo(player.playerTeam);
+              const opponentInfo = getTeamInfo(player.opponentTeam);
+              // Use same approach as working DayOfWeekHitsCard
+              const teamData = teams && player.playerTeam ? teams[player.playerTeam] : null;
+              const logoUrl = teamData ? teamData.logoUrl : null;
+              
+              return (
+                <li key={`${player.playerName}_${player.playerTeam}_${index}`} className="player-item">
+                  <div className="player-rank" style={{ backgroundColor: teams[player.playerTeam]?.colors?.primary || '#007bff' }}>
+                    {logoUrl && (
+                      <>
                         <img 
                           src={logoUrl} 
                           alt="" 
-                          className="team-logo-bg" 
+                          className="rank-logo"
                           loading="lazy"
                           aria-hidden="true"
                         />
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-            
-            {/* Debug info when in development */}
-            {process.env.NODE_ENV === 'development' && (
-              <div style={{ 
-                fontSize: '0.7em', 
-                color: '#999', 
-                marginTop: '10px', 
-                padding: '10px', 
-                backgroundColor: '#f5f5f5', 
-                borderRadius: '4px' 
-              }}>
-                <strong>Debug:</strong> {debugInfo}
-              </div>
-            )}
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
+                    <span className="rank-number">{index + 1}</span>
+                  </div>
+                  
+                  <div className="player-info">
+                    <div className="player-name">{getPlayerDisplayName(player)}</div>
+                    <div className="player-team">vs {player.opponentTeam}</div>
+                  </div>
+                  
+                  <div className="player-stat">
+                    <div className="stat-highlight" style={{ color: teams[player.playerTeam]?.colors?.primary || '#007bff' }}>
+                      {player.hitsPerGame} H/G
+                    </div>
+                    <small>{player.totalHits}H in {player.gamesVsOpponent}G vs {player.opponentTeam}</small>
+                    <small>({player.battingAvg} AVG){player.recentForm && ` | ${player.recentForm}`}</small>
+                    {player.opponentHistory && player.opponentHistory.length > 0 && (
+                      <small style={{ fontSize: '10px', color: '#777' }}>
+                        Recent: {player.opponentHistory.slice(0, 5).map(game => game.value || 0).join('-')}
+                      </small>
+                    )}
+                  </div>
+                  
+                  {/* Enhanced background logo */}
+                  {logoUrl && (
+                    <img 
+                      src={logoUrl} 
+                      alt="" 
+                      className="team-logo-bg" 
+                      loading="lazy"
+                      aria-hidden="true"
+                    />
+                  )}
+                </li>
+              );
+            })}
+          </ul>
           </div>
-        </div>
+        )}
+        
+        {/* Debug info when in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <div style={{ 
+            fontSize: '0.7em', 
+            color: '#999', 
+            marginTop: '10px', 
+            padding: '10px', 
+            backgroundColor: '#f5f5f5', 
+            borderRadius: '4px' 
+          }}>
+            <strong>Debug:</strong> {debugInfo}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -402,20 +402,6 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [debugInfo, setDebugInfo] = useState('');
-  const headerRef = useRef(null);
-  const containerRef = useRef(null);
-
-  // Initialize collapsible functionality
-  useEffect(() => {
-    if (headerRef.current && containerRef.current) {
-      const cleanup = initializeCollapsibleGlass(
-        headerRef.current, 
-        containerRef.current,
-        'opponent-matchup-hr-card'
-      );
-      return cleanup;
-    }
-  }, []);
   
   // Helper function to get actual opponent HR matchup statistics
   const getPlayerVsOpponentHRStats = async (playerName, playerTeam, opponentTeam) => {
@@ -636,6 +622,18 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
     loadMatchupData();
   }, [gameData, currentDate]);
 
+  // Initialize collapsible functionality
+  useEffect(() => {
+    if (containerRef.current) {
+      const glassHeader = containerRef.current.querySelector('.glass-header');
+      const glassCardContainer = containerRef.current.querySelector('.glass-card-container');
+      
+      if (glassHeader && glassCardContainer) {
+        return initializeCollapsibleGlass(glassHeader, glassCardContainer, 'opponent-matchup-hits-card');
+      }
+    }
+  }, []);
+
   const getTeamInfo = (teamAbbr) => {
     return teams[teamAbbr] || { 
       name: teamAbbr, 
@@ -652,20 +650,16 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
   if (loading) {
     return (
       <div className="card opponent-matchup-hr-card">
-        <div className="glass-card-container" ref={containerRef}>
-          <div className="glass-header" ref={headerRef}>
+        <div className="glass-card-container">
+          <div className="glass-header">
             <h3>💥 HRs vs Current Opponent</h3>
           </div>
-          <div className="glass-content expanded">
-            <div className="scrollable-container">
-              <div className="loading-indicator">
-                Analyzing opponent matchups...
-                <br />
-                <small style={{ fontSize: '0.8em', color: '#666' }}>
-                  {debugInfo}
-                </small>
-              </div>
-            </div>
+          <div className="loading-indicator">
+            Analyzing opponent matchups...
+            <br />
+            <small style={{ fontSize: '0.8em', color: '#666' }}>
+              {debugInfo}
+            </small>
           </div>
         </div>
       </div>
@@ -675,20 +669,16 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
   if (error) {
     return (
       <div className="card opponent-matchup-hr-card">
-        <div className="glass-card-container" ref={containerRef}>
-          <div className="glass-header" ref={headerRef}>
+        <div className="glass-card-container">
+          <div className="glass-header">
             <h3>💥 HRs vs Current Opponent</h3>
           </div>
-          <div className="glass-content expanded">
-            <div className="scrollable-container">
-              <div className="no-data">
-                Error: {error}
-                <br />
-                <small style={{ fontSize: '0.8em', color: '#666' }}>
-                  {debugInfo}
-                </small>
-              </div>
-            </div>
+          <div className="no-data">
+            Error: {error}
+            <br />
+            <small style={{ fontSize: '0.8em', color: '#666' }}>
+              {debugInfo}
+            </small>
           </div>
         </div>
       </div>
@@ -696,101 +686,99 @@ const OpponentMatchupHRCard = ({ gameData, currentDate, teams }) => {
   }
 
   return (
-    <div className="card opponent-matchup-hr-card">
-      <div className="glass-card-container" ref={containerRef}>
-        <div className="glass-header" ref={headerRef}>
+    <div className="card opponent-matchup-hr-card" ref={containerRef}>
+      <div className="glass-card-container">
+        <div className="glass-header">
           <h3>💥 HRs vs Current Opponent</h3>
           <p className="card-subtitle">
             Home run performance vs today's opponent (min. 3 games)
           </p>
         </div>
         
-        <div className="glass-content expanded">
+        {matchupData.length === 0 ? (
+          <div className="no-data">
+            No sufficient HR matchup history for today's games
+            <br />
+            <small style={{ fontSize: '0.8em', color: '#999' }}>
+              {debugInfo}
+            </small>
+          </div>
+        ) : (
           <div className="scrollable-container">
-            {matchupData.length === 0 ? (
-              <div className="no-data">
-                No sufficient HR matchup history for today's games
-                <br />
-                <small style={{ fontSize: '0.8em', color: '#999' }}>
-                  {debugInfo}
-                </small>
-              </div>
-            ) : (
-              <ul className="player-list">
-                {matchupData.map((player, index) => {
-                  const teamInfo = getTeamInfo(player.playerTeam);
-                  const opponentInfo = getTeamInfo(player.opponentTeam);
-                  // Use same approach as working DayOfWeekHitsCard
-                  const teamData = teams && player.playerTeam ? teams[player.playerTeam] : null;
-                  const logoUrl = teamData ? teamData.logoUrl : null;
-                  
-                  return (
-                    <li key={`${player.playerName}_${player.playerTeam}_${index}`} className="player-item">
-                      <div className="player-rank" style={{ backgroundColor: teams[player.playerTeam]?.colors?.primary || '#e63946' }}>
-                        {logoUrl && (
-                          <>
-                            <img 
-                              src={logoUrl} 
-                              alt="" 
-                              className="rank-logo"
-                              loading="lazy"
-                              aria-hidden="true"
-                            />
-                            <div className="rank-overlay"></div>
-                          </>
-                        )}
-                        <span className="rank-number">{index + 1}</span>
-                      </div>
-                      
-                      <div className="player-info">
-                        <div className="player-name">{getPlayerDisplayName(player)}</div>
-                        <div className="player-team">vs {player.opponentTeam}</div>
-                      </div>
-                      
-                      <div className="player-stat">
-                        <div className="stat-highlight" style={{ color: teams[player.playerTeam]?.colors?.primary || '#e63946' }}>
-                          {player.hrsPerGame} HR/G
-                        </div>
-                        <small>{player.totalHRs} HRs in {player.gamesVsOpponent}G vs {player.opponentTeam}</small>
-                        {player.recentForm && <small>{player.recentForm}</small>}
-                        {player.opponentHistory && player.opponentHistory.length > 0 && (
-                          <small style={{ fontSize: '10px', color: '#777' }}>
-                            Recent: {player.opponentHistory.slice(0, 5).map(game => game.value || 0).join('-')}
-                          </small>
-                        )}
-                      </div>
-                      
-                      {/* Enhanced background logo */}
-                      {logoUrl && (
+          <ul className="player-list">
+            {matchupData.map((player, index) => {
+              const teamInfo = getTeamInfo(player.playerTeam);
+              const opponentInfo = getTeamInfo(player.opponentTeam);
+              // Use same approach as working DayOfWeekHitsCard
+              const teamData = teams && player.playerTeam ? teams[player.playerTeam] : null;
+              const logoUrl = teamData ? teamData.logoUrl : null;
+              
+              return (
+                <li key={`${player.playerName}_${player.playerTeam}_${index}`} className="player-item">
+                  <div className="player-rank" style={{ backgroundColor: teams[player.playerTeam]?.colors?.primary || '#e63946' }}>
+                    {logoUrl && (
+                      <>
                         <img 
                           src={logoUrl} 
                           alt="" 
-                          className="team-logo-bg" 
+                          className="rank-logo"
                           loading="lazy"
                           aria-hidden="true"
                         />
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-            
-            {/* Debug info when in development */}
-            {process.env.NODE_ENV === 'development' && (
-              <div style={{ 
-                fontSize: '0.7em', 
-                color: '#999', 
-                marginTop: '10px', 
-                padding: '10px', 
-                backgroundColor: '#f5f5f5', 
-                borderRadius: '4px' 
-              }}>
-                <strong>Debug:</strong> {debugInfo}
-              </div>
-            )}
+                        <div className="rank-overlay"></div>
+                      </>
+                    )}
+                    <span className="rank-number">{index + 1}</span>
+                  </div>
+                  
+                  <div className="player-info">
+                    <div className="player-name">{getPlayerDisplayName(player)}</div>
+                    <div className="player-team">vs {player.opponentTeam}</div>
+                  </div>
+                  
+                  <div className="player-stat">
+                    <div className="stat-highlight" style={{ color: teams[player.playerTeam]?.colors?.primary || '#e63946' }}>
+                      {player.hrsPerGame} HR/G
+                    </div>
+                    <small>{player.totalHRs} HRs in {player.gamesVsOpponent}G vs {player.opponentTeam}</small>
+                    {player.recentForm && <small>{player.recentForm}</small>}
+                    {player.opponentHistory && player.opponentHistory.length > 0 && (
+                      <small style={{ fontSize: '10px', color: '#777' }}>
+                        Recent: {player.opponentHistory.slice(0, 5).map(game => game.value || 0).join('-')}
+                      </small>
+                    )}
+                  </div>
+                  
+                  {/* Enhanced background logo */}
+                  {logoUrl && (
+                    <img 
+                      src={logoUrl} 
+                      alt="" 
+                      className="team-logo-bg" 
+                      loading="lazy"
+                      aria-hidden="true"
+                    />
+                  )}
+                </li>
+              );
+            })}
+          </ul>
           </div>
-        </div>
+        )}
+        
+        {/* Debug info when in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <div style={{ 
+            fontSize: '0.7em', 
+            color: '#999', 
+            marginTop: '10px', 
+            padding: '10px', 
+            backgroundColor: '#f5f5f5', 
+            borderRadius: '4px' 
+          }}>
+            <strong>Debug:</strong> {debugInfo}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -28,7 +28,29 @@
 .poor-performance-card .glass-card-container {
   position: relative;
   height: 100%;
-  min-height: 420px;
+  min-height: 500px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+/* Collapsible states for container */
+.poor-performance-card .glass-card-container.collapsed {
+  height: 84px;
+  min-height: 84px !important;
+}
+
+.poor-performance-card .glass-card-container.expanded {
+  min-height: 500px;
+}
+
+/* Hide content when container is collapsed */
+.poor-performance-card .glass-card-container.collapsed .glass-content {
+  display: none;
+}
+
+/* Compact header when collapsed */
+.poor-performance-card .glass-card-container.collapsed .glass-header {
+  padding: 15px 20px;
 }
 
 /* Glass header that content scrolls behind */
@@ -58,21 +80,25 @@
   font-weight: 600;
 }
 
-/* Glass Effect Scrollable Container */
-.poor-performance-card .scrollable-container {
-  background: rgba(254, 242, 242, 0.4);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-radius: 0 0 12px 12px;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+/* Glass content wrapper */
+.poor-performance-card .glass-content {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  padding-top: 100px; /* Space for header */
+  padding-top: 120px; /* Space for header with subtitle */
+  background: rgba(254, 242, 242, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 0 0 12px 12px;
+}
+
+/* Glass Effect Scrollable Container */
+.poor-performance-card .scrollable-container {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: visible;
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 20px;

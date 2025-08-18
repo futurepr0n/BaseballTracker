@@ -28,8 +28,8 @@
 }
 
 .opponent-matchup-hits-card .glass-card-container.collapsed {
-  height: 80px;
-  min-height: 80px;
+  height: 84px;
+  min-height: 84px;
 }
 
 .opponent-matchup-hits-card .glass-card-container.expanded {
@@ -74,6 +74,20 @@
   font-size: 0.85rem;
   color: #666;
   margin-top: 5px;
+}
+
+/* Glass content states for collapsible functionality */
+.opponent-matchup-hits-card .glass-content {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.opponent-matchup-hits-card .glass-content.collapsed {
+  opacity: 0;
+}
+
+.opponent-matchup-hits-card .glass-content.expanded {
+  opacity: 1;
 }
 
 /* Glass Effect Scrollable Container */
@@ -124,8 +138,8 @@
 }
 
 .opponent-matchup-hr-card .glass-card-container.collapsed {
-  height: 80px;
-  min-height: 80px;
+  height: 84px;
+  min-height: 84px;
 }
 
 .opponent-matchup-hr-card .glass-card-container.expanded {
@@ -170,6 +184,20 @@
   font-size: 0.85rem;
   color: #666;
   margin-top: 5px;
+}
+
+/* Glass content states for collapsible functionality */
+.opponent-matchup-hr-card .glass-content {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.opponent-matchup-hr-card .glass-content.collapsed {
+  opacity: 0;
+}
+
+.opponent-matchup-hr-card .glass-content.expanded {
+  opacity: 1;
 }
 
 /* Glass Effect Scrollable Container */

@@ -5,7 +5,7 @@ import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import SimpleDesktopScratchpadIcon from '../../common/SimpleDesktopScratchpadIcon';
 import { getTeamLogoUrl } from '../../../utils/teamUtils';
-// import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import '../../common/MobilePlayerCard.css';
 
 /**
@@ -20,14 +20,20 @@ const LikelyToHitCard = ({
 }) => {
   const [activeTooltip, setActiveTooltip] = useState(null);
   const { shouldIncludePlayer } = useTeamFilter();
+  const headerRef = useRef(null);
   const containerRef = useRef(null);
 
   // Initialize collapsible functionality
-  // useEffect(() => {
-  //   if (containerRef.current) {
-  //     initializeCollapsibleGlass(containerRef.current, 'likely-to-hit-card');
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'likely-to-hit-card'
+      );
+      return cleanup;
+    }
+  }, []);
 
   // Close tooltips when date changes
   useEffect(() => {
@@ -62,17 +68,16 @@ const LikelyToHitCard = ({
   };
 
   return (
-    <div className="card likely-to-hit-card" ref={containerRef}>
-      <div className="glass-card-container">
-        <div className="glass-header">
+    <div className="card likely-to-hit-card">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>Players Due for a Hit</h3>
-          <button className="collapse-toggle" aria-label="Toggle section">
-            <span className="collapse-icon">−</span>
-          </button>
         </div>
-        <div className="collapsible-content">
-        {/* Desktop View */}
-        <div className="desktop-view">
+        
+        <div className="glass-content expanded">
+          <div className="scrollable-container">
+            {/* Desktop View */}
+            <div className="desktop-view">
           {isLoading ? (
             <div className="loading-indicator">Loading stats...</div>
           ) : filteredPlayers.length > 0 ? (
@@ -153,13 +158,13 @@ const LikelyToHitCard = ({
               })}
             </ul>
             </div>
-          ) : (
-            <p className="no-data">No players currently predicted for hits</p>
-          )}
-        </div>
+            ) : (
+              <p className="no-data">No players currently predicted for hits</p>
+            )}
+            </div>
 
-        {/* Mobile View */}
-        <div className="mobile-view">
+            {/* Mobile View */}
+            <div className="mobile-view">
           {isLoading ? (
             <div className="loading-indicator">Loading stats...</div>
           ) : filteredPlayers.length > 0 ? (
@@ -226,11 +231,12 @@ const LikelyToHitCard = ({
                 );
               })}
             </div>
-          ) : (
-            <p className="no-data">No players currently predicted for hits</p>
-          )}
+            ) : (
+              <p className="no-data">No players currently predicted for hits</p>
+            )}
+            </div>
+          </div>
         </div>
-      </div>
       </div>
 
       {/* Tooltips rendered outside card to avoid clipping - keep as is */}

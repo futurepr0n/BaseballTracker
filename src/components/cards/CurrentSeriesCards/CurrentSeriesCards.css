@@ -23,6 +23,18 @@
   position: relative;
   height: 100%;
   min-height: 420px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.current-series-hits-card .glass-card-container.collapsed {
+  height: 84px;
+  min-height: 84px;
+}
+
+.current-series-hits-card .glass-card-container.expanded {
+  height: 100%;
+  min-height: 420px;
 }
 
 /* Glass header that content scrolls behind */
@@ -37,8 +49,14 @@
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(99, 102, 241, 0.15);
   padding: 20px;
-  pointer-events: none;
+  pointer-events: all;
+  cursor: pointer;
   box-shadow: 0 4px 16px rgba(99, 102, 241, 0.05);
+  transition: all 0.3s ease;
+}
+
+.current-series-hits-card .glass-header:hover {
+  background: rgba(99, 102, 241, 0.12);
 }
 
 .current-series-hits-card .glass-header h3 {
@@ -52,6 +70,20 @@
   font-size: 0.85rem;
   color: #666;
   margin-top: 5px;
+}
+
+/* Glass content states for collapsible functionality */
+.current-series-hits-card .glass-content {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.current-series-hits-card .glass-content.collapsed {
+  opacity: 0;
+}
+
+.current-series-hits-card .glass-content.expanded {
+  opacity: 1;
 }
 
 /* Glass Effect Scrollable Container */
@@ -97,6 +129,18 @@
   position: relative;
   height: 100%;
   min-height: 420px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.current-series-hr-card .glass-card-container.collapsed {
+  height: 84px;
+  min-height: 84px;
+}
+
+.current-series-hr-card .glass-card-container.expanded {
+  height: 100%;
+  min-height: 420px;
 }
 
 /* Glass header that content scrolls behind */
@@ -111,8 +155,14 @@
   -webkit-backdrop-filter: blur(30px);
   border-bottom: 1px solid rgba(245, 158, 11, 0.15);
   padding: 20px;
-  pointer-events: none;
+  pointer-events: all;
+  cursor: pointer;
   box-shadow: 0 4px 16px rgba(245, 158, 11, 0.05);
+  transition: all 0.3s ease;
+}
+
+.current-series-hr-card .glass-header:hover {
+  background: rgba(245, 158, 11, 0.12);
 }
 
 .current-series-hr-card .glass-header h3 {
@@ -126,6 +176,20 @@
   font-size: 0.85rem;
   color: #666;
   margin-top: 5px;
+}
+
+/* Glass content states for collapsible functionality */
+.current-series-hr-card .glass-content {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.current-series-hr-card .glass-content.collapsed {
+  opacity: 0;
+}
+
+.current-series-hr-card .glass-content.expanded {
+  opacity: 1;
 }
 
 /* Glass Effect Scrollable Container */
@@ -380,6 +444,7 @@
   justify-content: center;
   flex-direction: column;
 }
+
 
 /* Mobile Responsive */
 @media (max-width: 768px) {

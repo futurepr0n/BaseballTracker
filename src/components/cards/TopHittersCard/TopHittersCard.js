@@ -3,7 +3,7 @@ import { useTeamFilter } from '../../TeamFilterContext';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import SimpleDesktopScratchpadIcon from '../../common/SimpleDesktopScratchpadIcon';
 import { getTeamLogoUrl } from '../../../utils/teamUtils';
-// import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import './TopHittersCard.css';
 import '../../common/MobilePlayerCard.css';
 import '../../../styles/CollapsibleGlass.css';
@@ -70,16 +70,16 @@ const TopHittersCard = ({
   const teamSummary = getTeamSummary();
 
   // Initialize collapsible functionality
-  // useEffect(() => {
-  //   if (headerRef.current && containerRef.current) {
-  //     const cleanup = initializeCollapsibleGlass(
-  //       headerRef.current, 
-  //       containerRef.current, // Use the glass-card-container ref
-  //       'top-hitters-card'
-  //     );
-  //     return cleanup;
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current, // Use the glass-card-container ref
+        'top-hitters-card'
+      );
+      return cleanup;
+    }
+  }, []);
 
   return (
     <div className="card top-hitters-card">

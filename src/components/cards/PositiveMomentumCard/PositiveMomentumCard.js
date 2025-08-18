@@ -4,7 +4,7 @@ import { useTooltip } from '../../utils/TooltipContext';
 import { createSafeId } from '../../utils/tooltipUtils';
 import { debugLog } from '../../../utils/debugConfig';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
-// import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
+import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import './PositiveMomentumCard.css';
 import '../../common/MobilePlayerCard.css';
 
@@ -17,14 +17,20 @@ const PositiveMomentumCard = ({ currentDate, teams, maxItems = 25 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
   const { openTooltip } = useTooltip();
+  const headerRef = useRef(null);
   const containerRef = useRef(null);
 
   // Initialize collapsible functionality
-  // useEffect(() => {
-  //   if (containerRef.current) {
-  //     initializeCollapsibleGlass(containerRef.current, 'positive-momentum-card');
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (headerRef.current && containerRef.current) {
+      const cleanup = initializeCollapsibleGlass(
+        headerRef.current, 
+        containerRef.current,
+        'positive-momentum-card'
+      );
+      return cleanup;
+    }
+  }, []);
 
   // Apply team filtering
   const filteredData = useTeamFilteredData(momentumData, 'team');
@@ -124,17 +130,16 @@ const PositiveMomentumCard = ({ currentDate, teams, maxItems = 25 }) => {
 
   if (isLoading) {
     return (
-      <div className="card positive-momentum-card" ref={containerRef}>
-        <div className="glass-card-container">
-          <div className="glass-header">
+      <div className="card positive-momentum-card">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>🚀 Positive Momentum Players</h3>
-            <button className="collapse-toggle" aria-label="Toggle section">
-              <span className="collapse-icon">−</span>
-            </button>
           </div>
-          <div className="collapsible-content">
-            <div className="loading-indicator">
-              Loading momentum analysis...
+          <div className="glass-content expanded">
+            <div className="scrollable-container">
+              <div className="loading-indicator">
+                Loading momentum analysis...
+              </div>
             </div>
           </div>
         </div>
@@ -144,17 +149,16 @@ const PositiveMomentumCard = ({ currentDate, teams, maxItems = 25 }) => {
 
   if (displayData.length === 0) {
     return (
-      <div className="card positive-momentum-card" ref={containerRef}>
-        <div className="glass-card-container">
-          <div className="glass-header">
+      <div className="card positive-momentum-card">
+        <div className="glass-card-container" ref={containerRef}>
+          <div className="glass-header" ref={headerRef}>
             <h3>🚀 Positive Momentum Players</h3>
-            <button className="collapse-toggle" aria-label="Toggle section">
-              <span className="collapse-icon">−</span>
-            </button>
           </div>
-          <div className="collapsible-content">
-            <div className="no-data">
-              No positive momentum players found for the selected teams.
+          <div className="glass-content expanded">
+            <div className="scrollable-container">
+              <div className="no-data">
+                No positive momentum players found for the selected teams.
+              </div>
             </div>
           </div>
         </div>
@@ -163,24 +167,22 @@ const PositiveMomentumCard = ({ currentDate, teams, maxItems = 25 }) => {
   }
 
   return (
-    <div className="card positive-momentum-card" ref={containerRef}>
-      <div className="glass-card-container">
-        <div className="glass-header">
+    <div className="card positive-momentum-card">
+      <div className="glass-card-container" ref={containerRef}>
+        <div className="glass-header" ref={headerRef}>
           <h3>🚀 Positive Momentum Players</h3>
           {lastUpdated && (
             <div className="card-subtitle">
               {formatLastUpdated()}
             </div>
           )}
-          <button className="collapse-toggle" aria-label="Toggle section">
-            <span className="collapse-icon">−</span>
-          </button>
         </div>
-        <div className="collapsible-content">
         
-        {/* Desktop View */}
-        <div className="desktop-view">
+        <div className="glass-content expanded">
           <div className="scrollable-container">
+        
+            {/* Desktop View */}
+            <div className="desktop-view">
           <ul className="player-list">
             {displayData.map((player, index) => {
               const playerKey = `${player.playerName}_${player.team}`;
