@@ -7,6 +7,8 @@ import { fetchPlayerData, fetchPlayerDataForDateRange, fetchFullSeasonPlayerData
 import { useTooltip } from '../../utils/TooltipContext';
 import { createSafeId } from '../../utils/tooltipUtils';
 import { normalizeToEnglish, createAllNameVariants, namesMatch, findPlayerInRoster } from '../../../utils/universalNameNormalizer';
+import { getAnalysisCellColor } from '../../../utils/colorThresholds';
+import leagueAverageService from '../../../services/leagueAverageService';
 
 const ComprehensiveAnalysisDisplay = ({ analysis }) => {
   
@@ -16,6 +18,14 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
       return fallback;
     }
     return Number(value).toFixed(decimals);
+  };
+
+  // Helper function to get color class for analysis cells
+  const getCellColorClass = (cellType, value, options = {}) => {
+    return getAnalysisCellColor(cellType, value, {
+      leagueAverages,
+      ...options
+    });
   };
   
   const [expandedSections, setExpandedSections] = useState({
@@ -31,6 +41,7 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
   const [playerPropAnalyses, setPlayerPropAnalyses] = useState({});
   const [selectedPlayerTooltip, setSelectedPlayerTooltip] = useState(null);
   const [rosterData, setRosterData] = useState([]);
+  const [leagueAverages, setLeagueAverages] = useState(null);
   const { openTooltip } = useTooltip();
 
   // Load roster data for handedness information
@@ -48,6 +59,23 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
     };
 
     loadRosterData();
+  }, []);
+
+  // Load league averages for color-coding thresholds
+  useEffect(() => {
+    const loadLeagueAverages = async () => {
+      try {
+        console.log('[ComprehensiveAnalysisDisplay] Loading league averages for color-coding...');
+        const averages = await leagueAverageService.loadLeagueAverages();
+        setLeagueAverages(averages);
+        console.log('[ComprehensiveAnalysisDisplay] League averages loaded:', averages);
+      } catch (error) {
+        console.error('[ComprehensiveAnalysisDisplay] Error loading league averages:', error);
+        // Component will fall back to default color thresholds
+      }
+    };
+
+    loadLeagueAverages();
   }, []);
 
   const toggleSection = (section) => {
@@ -1217,19 +1245,19 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
                 })()}
 
                 <div className="position-stats">
-                  <div className="stat">
+                  <div className={`stat vulnerability-score ${getCellColorClass('vuln', data.vulnerability_score)}`}>
                     <span className="label">Vuln:</span>
                     <span className="value">{safeToFixed(data.vulnerability_score, 1)}</span>
                   </div>
-                  <div className="stat">
+                  <div className={`stat performance-rate ${getCellColorClass('hr_rate', data.hr_rate)}`}>
                     <span className="label">HR:</span>
                     <span className="value">{safeToFixed(data.hr_rate * 100, 1)}%</span>
                   </div>
-                  <div className="stat">
+                  <div className={`stat performance-rate ${getCellColorClass('hit_rate', data.hit_rate)}`}>
                     <span className="label">Hit:</span>
                     <span className="value">{safeToFixed(data.hit_rate * 100, 1)}%</span>
                   </div>
-                  <div className="stat">
+                  <div className={`stat sample-size-indicator ${getCellColorClass('ab', data.sample_size)}`}>
                     <span className="label">AB:</span>
                     <span className="value">{data.sample_size}</span>
                   </div>
@@ -1237,7 +1265,7 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
                   {/* Enhanced Player Prop Analysis */}
                   {playerPropAnalysis ? (
                     <>
-                      <div className="stat prop-stat">
+                      <div className={`stat prop-stat prop-comparison ${getCellColorClass('over_05_hits', playerPropAnalysis.hitsOver05?.percentage)}`}>
                         <span className="label" title={`Player's probability of getting over 0.5 hits (${playerPropAnalysis.hitsOver05?.success || 0}/${playerPropAnalysis.hitsOver05?.total || 0} recent games)`}>
                           Over 0.5 H:
                         </span>
@@ -1245,7 +1273,7 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
                           {playerPropAnalysis.hitsOver05?.percentage || 'N/A'}%
                         </span>
                       </div>
-                      <div className="stat prop-stat">
+                      <div className={`stat prop-stat prop-comparison ${getCellColorClass('over_05_hr', playerPropAnalysis.hrsOver05?.percentage)}`}>
                         <span className="label" title={`Player's probability of hitting over 0.5 home runs (${playerPropAnalysis.hrsOver05?.success || 0}/${playerPropAnalysis.hrsOver05?.total || 0} recent games)`}>
                           Over 0.5 HR:
                         </span>
@@ -1254,7 +1282,7 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
                         </span>
                       </div>
                       {/* Separate Pitcher and Batter Sample Stats */}
-                      <div className="stat sample-stat">
+                      <div className={`stat sample-stat sample-size-indicator ${getCellColorClass('batter_sample', playerPropAnalysis.sampleSize)}`}>
                         <span className="label">Batter Sample:</span>
                         <span className="value">
                           {playerPropAnalysis.sampleSize} games
