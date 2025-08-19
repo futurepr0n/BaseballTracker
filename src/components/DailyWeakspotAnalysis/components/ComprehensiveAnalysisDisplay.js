@@ -9,6 +9,7 @@ import { createSafeId } from '../../utils/tooltipUtils';
 import { normalizeToEnglish, createAllNameVariants, namesMatch, findPlayerInRoster } from '../../../utils/universalNameNormalizer';
 import { getAnalysisCellColor } from '../../../utils/colorThresholds';
 import leagueAverageService from '../../../services/leagueAverageService';
+import realOddsService from '../services/realOddsService';
 
 const ComprehensiveAnalysisDisplay = ({ analysis }) => {
   
@@ -42,6 +43,7 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
   const [selectedPlayerTooltip, setSelectedPlayerTooltip] = useState(null);
   const [rosterData, setRosterData] = useState([]);
   const [leagueAverages, setLeagueAverages] = useState(null);
+  const [playerOdds, setPlayerOdds] = useState({});
   const { openTooltip } = useTooltip();
 
   // Load roster data for handedness information
@@ -790,6 +792,101 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
     return () => clearTimeout(timeoutId);
   }, [lineupData, analysis]);
 
+  // Load odds data for players
+  useEffect(() => {
+    const loadPlayerOdds = async () => {
+      try {
+        console.log('🎯 Loading real odds data for players...', { analysis, lineupData });
+        const oddsMap = {};
+        
+        // Get player names from lineup data instead of analysis.picks
+        if (lineupData && lineupData.games) {
+          const allPlayers = [];
+          lineupData.games.forEach(game => {
+            if (game.lineups?.home?.batting_order) {
+              game.lineups.home.batting_order.forEach(player => {
+                if (player.name) allPlayers.push(player.name);
+              });
+            }
+            if (game.lineups?.away?.batting_order) {
+              game.lineups.away.batting_order.forEach(player => {
+                if (player.name) allPlayers.push(player.name);
+              });
+            }
+          });
+          
+          console.log(`🎯 ODDS: Found ${allPlayers.length} players from lineup data:`, allPlayers);
+          
+          // Load odds for all lineup players
+          for (const playerName of allPlayers) {
+            if (!playerName) continue;
+            
+            try {
+              // Get both HR and Hit odds for this player
+              const [hrOddsResult, hitOddsResult] = await Promise.all([
+                realOddsService.getRealOdds(playerName, 'HR'),
+                realOddsService.getRealOdds(playerName, 'Hit')
+              ]);
+              
+              oddsMap[playerName] = {
+                hr: hrOddsResult,
+                hit: hitOddsResult
+              };
+              
+              console.log(`🎯 Loaded odds for ${playerName}:`, {
+                HR: hrOddsResult.found ? hrOddsResult.odds : 'Not found',
+                Hit: hitOddsResult.found ? hitOddsResult.odds : 'Not found'
+              });
+            } catch (error) {
+              console.warn(`Failed to load odds for ${playerName}:`, error);
+              oddsMap[playerName] = {
+                hr: { found: false },
+                hit: { found: false }
+              };
+            }
+          }
+        }
+        
+        // Fallback: Load odds from analysis.picks if available
+        if (analysis?.picks && Object.keys(oddsMap).length === 0) {
+          console.log('🎯 ODDS: Falling back to analysis.picks...');
+          for (const pick of analysis.picks) {
+            const playerName = pick.player_name || pick.playerName;
+            if (!playerName) continue;
+            
+            try {
+              const [hrOddsResult, hitOddsResult] = await Promise.all([
+                realOddsService.getRealOdds(playerName, 'HR'),
+                realOddsService.getRealOdds(playerName, 'Hit')
+              ]);
+              
+              oddsMap[playerName] = {
+                hr: hrOddsResult,
+                hit: hitOddsResult
+              };
+            } catch (error) {
+              console.warn(`Failed to load odds for ${playerName}:`, error);
+            }
+          }
+        }
+        
+        console.log(`🎯 ODDS: Loaded odds for ${Object.keys(oddsMap).length} players`);
+        setPlayerOdds(oddsMap);
+        
+      } catch (error) {
+        console.error('🎯 ODDS: Critical error loading player odds:', error);
+        setPlayerOdds({});
+      }
+    };
+
+    // Add a delay to prevent blocking
+    const timeoutId = setTimeout(() => {
+      loadPlayerOdds();
+    }, 300);
+    
+    return () => clearTimeout(timeoutId);
+  }, [analysis, lineupData]);
+
   // Helper function to get lineup hitter for a specific position
   const getLineupHitterForPosition = (position, opposingTeam) => {
     if (!lineupData || !opposingTeam) return null;
@@ -1271,6 +1368,16 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
                         </span>
                         <span className="value prop-value">
                           {playerPropAnalysis.hitsOver05?.percentage || 'N/A'}%
+                          {(() => {
+                            const playerName = lineupHitter?.name;
+                            const playerOddsData = playerOdds[playerName];
+                            console.log(`🎯 ODDS DEBUG: Looking for Hit odds for "${playerName}":`, playerOddsData?.hit);
+                            return playerOddsData?.hit?.found && (
+                              <span className="odds-display" title="Real market odds">
+                                {playerOddsData.hit.odds}
+                              </span>
+                            );
+                          })()}
                         </span>
                       </div>
                       <div className={`stat prop-stat prop-comparison ${getCellColorClass('over_05_hr', playerPropAnalysis.hrsOver05?.percentage)}`}>
@@ -1279,6 +1386,16 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
                         </span>
                         <span className="value prop-value">
                           {playerPropAnalysis.hrsOver05?.percentage || 'N/A'}%
+                          {(() => {
+                            const playerName = lineupHitter?.name;
+                            const playerOddsData = playerOdds[playerName];
+                            console.log(`🎯 ODDS DEBUG: Looking for HR odds for "${playerName}":`, playerOddsData?.hr);
+                            return playerOddsData?.hr?.found && (
+                              <span className="odds-display" title="Real market odds">
+                                {playerOddsData.hr.odds}
+                              </span>
+                            );
+                          })()}
                         </span>
                       </div>
                       {/* Separate Pitcher and Batter Sample Stats */}

@@ -194,7 +194,14 @@ class BaseballAnalysisService {
       hr: safeNumber(outcome_probabilities.homerun || prediction.hr_probability, 0), // Alias for sorting
       
       // Keep any additional fields that might exist
-      ...prediction
+      ...prediction,
+      
+      // Ensure details object includes arsenal_analysis for Arsenal components
+      details: {
+        ...details,
+        // Arsenal analysis comes from prediction.details.arsenal_analysis in API response
+        arsenal_analysis: prediction.details?.arsenal_analysis || prediction.arsenal_analysis
+      }
     };
     
     // Calculate pitcher trend direction based on recent vs season ERA

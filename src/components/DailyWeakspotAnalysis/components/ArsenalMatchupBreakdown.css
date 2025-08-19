@@ -1,0 +1,347 @@
+/* Arsenal Matchup Breakdown Styling */
+.arsenal-matchup-breakdown {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 12px 0;
+  border: 1px solid #dee2e6;
+}
+
+.arsenal-header {
+  margin-bottom: 16px;
+}
+
+.matchup-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.matchup-title h4 {
+  margin: 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.data-quality-indicator {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.confidence-badge {
+  background: #007bff;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.data-source {
+  background: #e9ecef;
+  color: #6c757d;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.overall-advantage {
+  display: flex;
+  gap: 20px;
+  padding: 12px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.advantage-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metric-label {
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.advantage-value {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pitch-breakdown {
+  margin: 16px 0;
+}
+
+.pitch-breakdown h5 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pitch-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pitch-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pitch-card:hover {
+  background: #f8f9fa;
+  border-color: #007bff;
+}
+
+.pitch-card.significant-pitch {
+  border-left: 4px solid #28a745;
+}
+
+.pitch-card.expanded {
+  border-color: #007bff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+}
+
+.pitch-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pitch-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pitch-type {
+  background: #007bff;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 32px;
+  text-align: center;
+}
+
+.pitch-name {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.usage-badge {
+  background: #e9ecef;
+  color: #495057;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.quick-metrics {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quick-metric {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.quick-metric .label {
+  font-size: 11px;
+  color: #6c757d;
+}
+
+.quick-metric .value {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.quick-metric .value.advantage {
+  color: #28a745;
+}
+
+.quick-metric .value.disadvantage {
+  color: #dc3545;
+}
+
+.quick-metric .value.neutral {
+  color: #6c757d;
+}
+
+.expand-indicator {
+  color: #6c757d;
+  font-size: 12px;
+}
+
+.pitch-details {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #dee2e6;
+}
+
+.hitter-vs-pitcher {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.comparison-section h6 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 0;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 8px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 11px;
+  font-weight: 600;
+  color: #333;
+}
+
+.matchup-insight {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.insight-box h6 {
+  margin: 0 0 6px 0;
+  color: #333;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.insight-box p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #495057;
+}
+
+.arsenal-summary {
+  margin-top: 16px;
+  padding: 12px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.summary-insight h6 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.summary-insight p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #495057;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .overall-advantage {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .hitter-vs-pitcher {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .data-quality-indicator {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .pitch-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .quick-metrics {
+    align-self: flex-end;
+  }
+}
+
+/* Special highlighting for key matchups */
+.arsenal-matchup-breakdown .pitch-card.significant-pitch.expanded {
+  background: linear-gradient(to right, #f8fff9, #ffffff);
+}
+
+/* Confidence level color coding */
+.confidence-badge[style*="rgb(40, 167, 69)"] {
+  /* High confidence - Green already set inline */
+}
+
+.confidence-badge[style*="rgb(0, 123, 255)"] {
+  /* Medium confidence - Blue already set inline */  
+}
+
+.confidence-badge[style*="rgb(255, 193, 7)"] {
+  /* Lower confidence - Yellow already set inline */
+}
+
+.confidence-badge[style*="rgb(253, 126, 20)"] {
+  /* Low confidence - Orange already set inline */
+}
+
+/* Data source styling */
+.data-source {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Arsenal placeholder for when no detailed data available */
+.arsenal-breakdown-placeholder {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+  font-style: italic;
+}

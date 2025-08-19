@@ -78,6 +78,7 @@ const AnalysisTabs = ({ analysis, opportunities, loading, enhanced, matchups }) 
             matchups={matchups}
             loading={loading}
             enhanced={enhanced}
+            comprehensiveAnalysis={analysis}
           />
         );
       
