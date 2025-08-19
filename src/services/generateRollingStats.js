@@ -238,6 +238,88 @@ function calculateMultiHitPerformance(playerEntries) {
 }
 
 /**
+ * Calculate league-wide averages for Over 0.5 props
+ * @param {Array} allPlayerStats - All player statistics
+ * @returns {Object} League average percentages
+ */
+function calculateLeagueAverages(allPlayerStats) {
+  console.log('[calculateLeagueAverages] Calculating league averages for Over 0.5 props...');
+  
+  // Filter to qualified players (minimum 20 games played)
+  const qualifiedPlayers = allPlayerStats.filter(p => p.gamesPlayed >= 20);
+  console.log(`[calculateLeagueAverages] Found ${qualifiedPlayers.length} qualified players (20+ games)`);
+  
+  let totalGames = 0;
+  let over05HitsGames = 0;
+  let over05HRGames = 0;
+  let totalPlayers = qualifiedPlayers.length;
+  
+  // Aggregate game-by-game data from qualified players
+  qualifiedPlayers.forEach(player => {
+    if (player.gameLog && Array.isArray(player.gameLog)) {
+      player.gameLog.forEach(game => {
+        const hits = game.hits || 0;
+        const hrs = game.hrs || 0;
+        
+        totalGames++;
+        
+        // Over 0.5 Hits (1+ hits in a game)
+        if (hits >= 1) {
+          over05HitsGames++;
+        }
+        
+        // Over 0.5 HR (1+ HR in a game)
+        if (hrs >= 1) {
+          over05HRGames++;
+        }
+      });
+    }
+  });
+  
+  const leagueAverages = {
+    generatedAt: new Date().toISOString(),
+    dataSource: 'rolling_stats_qualified_players',
+    minimumGames: 20,
+    
+    // League-wide Over 0.5 percentages
+    over05HitsPercentage: totalGames > 0 ? parseFloat((over05HitsGames / totalGames * 100).toFixed(1)) : 0,
+    over05HRPercentage: totalGames > 0 ? parseFloat((over05HRGames / totalGames * 100).toFixed(1)) : 0,
+    
+    // Sample size information
+    qualifiedPlayers: totalPlayers,
+    totalGamesSampled: totalGames,
+    over05HitsGames: over05HitsGames,
+    over05HRGames: over05HRGames,
+    
+    // Additional context for thresholds
+    avgHitsPerGame: totalGames > 0 ? parseFloat((over05HitsGames / totalGames).toFixed(3)) : 0,
+    avgHRPerGame: totalGames > 0 ? parseFloat((over05HRGames / totalGames).toFixed(3)) : 0,
+    
+    // Thresholds for color coding (can be used by components)
+    thresholds: {
+      over05Hits: {
+        excellent: over05HitsGames > 0 ? parseFloat((over05HitsGames / totalGames * 1.25 * 100).toFixed(1)) : 80,
+        good: over05HitsGames > 0 ? parseFloat((over05HitsGames / totalGames * 1.10 * 100).toFixed(1)) : 70,
+        average: over05HitsGames > 0 ? parseFloat((over05HitsGames / totalGames * 0.90 * 100).toFixed(1)) : 60,
+        poor: over05HitsGames > 0 ? parseFloat((over05HitsGames / totalGames * 0.75 * 100).toFixed(1)) : 50
+      },
+      over05HR: {
+        excellent: over05HRGames > 0 ? parseFloat((over05HRGames / totalGames * 1.50 * 100).toFixed(1)) : 4.2,
+        good: over05HRGames > 0 ? parseFloat((over05HRGames / totalGames * 1.25 * 100).toFixed(1)) : 3.5,
+        average: over05HRGames > 0 ? parseFloat((over05HRGames / totalGames * 0.90 * 100).toFixed(1)) : 2.5,
+        poor: over05HRGames > 0 ? parseFloat((over05HRGames / totalGames * 0.75 * 100).toFixed(1)) : 2.1
+      }
+    }
+  };
+  
+  console.log(`[calculateLeagueAverages] League Over 0.5 Hits: ${leagueAverages.over05HitsPercentage}%`);
+  console.log(`[calculateLeagueAverages] League Over 0.5 HR: ${leagueAverages.over05HRPercentage}%`);
+  console.log(`[calculateLeagueAverages] Sample: ${totalGames} games from ${totalPlayers} qualified players`);
+  
+  return leagueAverages;
+}
+
+/**
  * Generate comprehensive multi-hit performance data
  */
 function generateMultiHitStats(seasonData, targetDate = new Date()) {
@@ -659,11 +741,17 @@ function generateRollingStats(seasonData, targetDate = new Date()) {
   });
 
   console.log(`[generateRollingStats] Generated stats for ${allPlayerStats.length} total players`);
+  
+  // Calculate league averages for Over 0.5 props
+  const leagueAverages = calculateLeagueAverages(allPlayerStats);
 
   return {
     generatedAt: new Date().toISOString(),
     targetDate: targetDateStr,
     totalPlayers: allPlayerStats.length,
+    
+    // League-wide averages for color-coding thresholds
+    leagueAverages,
     
     // Top performers for display
     topHitters: topHitters.map(player => ({

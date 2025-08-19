@@ -1731,3 +1731,133 @@
   font-weight: 600;
   color: #333;
 }
+
+/* Color-Coded Analysis Cell Styles */
+.position-stats .stat.stat-red {
+  background: linear-gradient(135deg, #fdeaea 0%, #faf2f2 100%);
+  border: 1px solid #f8d7da;
+}
+
+.position-stats .stat.stat-red .value {
+  color: #d32f2f;
+  font-weight: 700;
+}
+
+.position-stats .stat.stat-yellow {
+  background: linear-gradient(135deg, #fff9e6 0%, #fefbf0 100%);
+  border: 1px solid #ffeaa7;
+}
+
+.position-stats .stat.stat-yellow .value {
+  color: #f39c12;
+  font-weight: 700;
+}
+
+.position-stats .stat.stat-light-green {
+  background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+  border: 1px solid #c8e6c9;
+}
+
+.position-stats .stat.stat-light-green .value {
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.position-stats .stat.stat-dark-green {
+  background: linear-gradient(135deg, #d4edda 0%, #e8f5e8 100%);
+  border: 1px solid #27ae60;
+}
+
+.position-stats .stat.stat-dark-green .value {
+  color: #155724;
+  font-weight: 700;
+}
+
+.position-stats .stat.stat-default {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+}
+
+.position-stats .stat.stat-default .value {
+  color: #6c757d;
+  font-weight: 600;
+}
+
+/* Enhanced styling for different cell types */
+
+/* Sample size indicators (AB, Batter Sample) */
+.position-stats .stat.sample-size-indicator {
+  position: relative;
+}
+
+.position-stats .stat.sample-size-indicator::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.3;
+}
+
+/* Performance rate indicators (HR%, Hit%) */
+.position-stats .stat.performance-rate {
+  font-family: 'Monaco', 'Menlo', monospace;
+}
+
+/* Vulnerability score indicators */
+.position-stats .stat.vulnerability-score {
+  font-weight: 700;
+  border-width: 2px;
+}
+
+.position-stats .stat.vulnerability-score .value {
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+/* Over 0.5 prop indicators */
+.position-stats .stat.prop-comparison {
+  position: relative;
+  overflow: hidden;
+}
+
+.position-stats .stat.prop-comparison::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+/* Hover effects for better interactivity */
+.position-stats .stat:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+/* Mobile responsiveness for colored cells */
+@media (max-width: 768px) {
+  .position-stats .stat {
+    padding: 6px 8px;
+    margin: 2px 0;
+  }
+  
+  .position-stats .stat .label {
+    font-size: 0.65rem;
+  }
+  
+  .position-stats .stat .value {
+    font-size: 0.7rem;
+  }
+  
+  .position-stats .stat.vulnerability-score .value {
+    font-size: 0.75rem;
+  }
+}
