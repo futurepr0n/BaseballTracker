@@ -224,18 +224,18 @@
 }
 
 .vulnerability-badge.high {
-  background: #ffe0e0;
-  color: #d32f2f;
+  background: #e8f5e8;
+  color: #2e7d32;
 }
 
 .vulnerability-badge.medium {
-  background: #fff3cd;
-  color: #f57c00;
+  background: #e3f2fd;
+  color: #1976d2;
 }
 
 .vulnerability-badge.low {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: #ffe0e0;
+  color: #d32f2f;
 }
 
 .pitch-stats {
@@ -275,15 +275,15 @@
 }
 
 .inning-card.high-vuln {
-  border-left: 4px solid #e74c3c;
+  border-left: 4px solid #27ae60; /* Green - High vulnerability = Good opportunity for hitters */
 }
 
 .inning-card.med-vuln {
-  border-left: 4px solid #f39c12;
+  border-left: 4px solid #f39c12; /* Orange - Medium vulnerability = Moderate opportunity */
 }
 
 .inning-card.low-vuln {
-  border-left: 4px solid #27ae60;
+  border-left: 4px solid #e74c3c; /* Red - Low vulnerability = Poor opportunity for hitters */
 }
 
 .inning-header {
@@ -328,15 +328,15 @@
 }
 
 .position-card.high-vuln {
-  border-left: 4px solid #e74c3c;
+  border-left: 4px solid #27ae60; /* Green - High vulnerability = Good opportunity for hitters */
 }
 
 .position-card.med-vuln {
-  border-left: 4px solid #f39c12;
+  border-left: 4px solid #f39c12; /* Orange - Medium vulnerability = Moderate opportunity */
 }
 
 .position-card.low-vuln {
-  border-left: 4px solid #27ae60;
+  border-left: 4px solid #e74c3c; /* Red - Low vulnerability = Poor opportunity for hitters */
 }
 
 .position-header {
@@ -785,15 +785,15 @@
 }
 
 .timing-card.high-vuln {
-  border-left: 4px solid #e74c3c;
+  border-left: 4px solid #27ae60; /* Green - High vulnerability = Good opportunity for hitters */
 }
 
 .timing-card.med-vuln {
-  border-left: 4px solid #f39c12;
+  border-left: 4px solid #f39c12; /* Orange - Medium vulnerability = Moderate opportunity */
 }
 
 .timing-card.low-vuln {
-  border-left: 4px solid #27ae60;
+  border-left: 4px solid #e74c3c; /* Red - Low vulnerability = Poor opportunity for hitters */
 }
 
 .timing-header {
@@ -1082,26 +1082,26 @@
   transform: translateY(-1px);
 }
 
-/* Opportunity score color coding */
+/* Opportunity score color coding - Flipped for hitter perspective */
 .matchup-card.opportunity-5 {
-  border-left-color: #dc3545; /* Red - Excellent */
+  border-left-color: #28a745; /* Green - Excellent opportunity for hitters */
 }
 
 .matchup-card.opportunity-4 {
-  border-left-color: #fd7e14; /* Orange - Very Good */
+  border-left-color: #20c997; /* Teal - Very Good opportunity */
 }
 
 .matchup-card.opportunity-3 {
-  border-left-color: #ffc107; /* Yellow - Good */
+  border-left-color: #ffc107; /* Yellow - Good opportunity */
 }
 
 .matchup-card.opportunity-2 {
-  border-left-color: #28a745; /* Green - Moderate */
+  border-left-color: #fd7e14; /* Orange - Moderate opportunity */
 }
 
 .matchup-card.opportunity-1,
 .matchup-card.opportunity-0 {
-  border-left-color: #6c757d; /* Gray - Low */
+  border-left-color: #dc3545; /* Red - Poor opportunity for hitters */
 }
 
 .matchup-card .matchup-header {
@@ -1265,11 +1265,11 @@
   color: #dc3545;
 }
 
-.sequence-item.3-pitch {
+.sequence-item.pitch-3 {
   border-left-color: #28a745;
 }
 
-.sequence-item.2-pitch {
+.sequence-item.pitch-2 {
   border-left-color: #ffc107;
 }
 
@@ -1282,12 +1282,12 @@
   letter-spacing: 0.5px;
 }
 
-.sequence-type-badge.3-pitch {
+.sequence-type-badge.pitch-3 {
   background: #d4edda;
   color: #155724;
 }
 
-.sequence-type-badge.2-pitch {
+.sequence-type-badge.pitch-2 {
   background: #fff3cd;
   color: #856404;
 }

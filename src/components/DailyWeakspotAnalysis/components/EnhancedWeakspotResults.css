@@ -133,18 +133,18 @@
 }
 
 .window-vulnerability.high {
-  background: #ffe0e0;
-  color: #d32f2f;
+  background: #e8f5e8;
+  color: #2e7d32;
 }
 
 .window-vulnerability.moderate {
-  background: #fff3cd;
-  color: #f57c00;
+  background: #e3f2fd;
+  color: #1976d2;
 }
 
 .window-vulnerability.low {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: #ffe0e0;
+  color: #d32f2f;
 }
 
 .window-stats {
@@ -169,13 +169,13 @@
 }
 
 .timing-vulnerability.high {
-  background: #ffe0e0;
-  color: #d32f2f;
+  background: #e8f5e8;
+  color: #2e7d32;
 }
 
 .timing-vulnerability.moderate {
-  background: #fff3cd;
-  color: #f57c00;
+  background: #e3f2fd;
+  color: #1976d2;
 }
 
 /* Header */
@@ -1183,23 +1183,23 @@
 }
 
 .position-vulnerability.vulnerability-extreme {
-  background: #ffebee;
-  border-color: #f44336;
+  background: #e8f5e8;
+  border-color: #4caf50;
 }
 
 .position-vulnerability.vulnerability-high {
+  background: #e3f2fd;
+  border-color: #2196f3;
+}
+
+.position-vulnerability.vulnerability-moderate {
   background: #fff3e0;
   border-color: #ff9800;
 }
 
-.position-vulnerability.vulnerability-moderate {
-  background: #f3e5f5;
-  border-color: #9c27b0;
-}
-
 .position-vulnerability.vulnerability-low {
-  background: #e8f5e8;
-  border-color: #4caf50;
+  background: #ffebee;
+  border-color: #f44336;
 }
 
 .position-info {
