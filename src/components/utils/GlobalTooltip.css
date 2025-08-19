@@ -2556,6 +2556,29 @@
   box-sizing: border-box;
   padding: 16px;
   line-height: 1.4;
+  max-height: 450px !important; /* Limit height for scrolling - more aggressive */
+  overflow-y: auto !important; /* Enable vertical scrolling */
+  overflow-x: hidden !important; /* Prevent horizontal scroll */
+  position: relative;
+}
+
+/* Custom scrollbar for milestone content */
+.milestone-tracking-details::-webkit-scrollbar {
+  width: 8px;
+}
+
+.milestone-tracking-details::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.milestone-tracking-details::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.milestone-tracking-details::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 /* Force white background and dark text for all milestone tooltip elements */
@@ -2576,21 +2599,38 @@
 
 /* Compact milestone tooltips with increased width */
 .global-tooltip[data-tooltip-id*="milestone_tracking"] {
-  min-width: 400px !important;
-  max-width: 450px !important;
-  width: 420px !important;
-  max-height: 90vh;
-  overflow-y: auto;
+  min-width: 480px !important;
+  max-width: 520px !important;
+  width: 500px !important;
+  max-height: 550px !important; /* Fixed max height for consistency */
+  overflow: hidden !important; /* Let the inner content handle scrolling */
   background-color: #ffffff !important;
   color: #1a202c !important;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure tooltip content fills available space */
+.global-tooltip[data-tooltip-id*="milestone_tracking"] .tooltip-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Card header with heat emojis and player info */
 .milestone-card-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  background-color: #ffffff;
+  z-index: 1;
 }
 
 .heat-emoji {
@@ -2616,6 +2656,16 @@
   font-weight: 500;
 }
 
+.milestone-count {
+  background-color: #4299e1;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 /* Milestone target display */
 .milestone-target {
   display: flex;
@@ -2625,6 +2675,11 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: #1a202c;
+}
+
+.milestone-target .heat-emoji {
+  font-size: 1rem;
+  margin-right: 4px;
 }
 
 .current-stat {
@@ -2677,24 +2732,32 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  padding: 8px;
+  background-color: #f7fafc;
+  border-radius: 4px;
 }
 
 .pace-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  white-space: nowrap;
 }
 
 .pace-label {
   font-size: 0.85rem;
   color: #4a5568;
   font-weight: 500;
+  flex-shrink: 0;
+  margin-right: 12px;
 }
 
 .pace-value {
   font-size: 0.85rem;
   color: #1a202c;
   font-weight: 500;
+  text-align: right;
+  flex-grow: 1;
 }
 
 /* Indicator sections */
@@ -2738,14 +2801,43 @@
   border-radius: 4px;
 }
 
+/* Multiple milestones support */
+.milestone-item {
+  margin-bottom: 16px;
+}
+
+.milestone-item.milestone-separator {
+  padding-top: 16px;
+  border-top: 2px solid #e2e8f0;
+}
+
+.milestone-count {
+  font-size: 0.85rem;
+  color: #4a5568;
+  font-weight: 600;
+  background-color: #edf2f7;
+  padding: 4px 8px;
+  border-radius: 12px;
+  margin-left: auto;
+}
+
+.milestone-card-header {
+  justify-content: space-between;
+}
+
 /* Mobile responsive adjustments for milestone tooltip */
 @media (max-width: 768px) {
   .global-tooltip[data-tooltip-id*="milestone_tracking"] {
-    min-width: 350px !important;
-    max-width: 380px !important;
-    width: 365px !important;
+    min-width: 380px !important;
+    max-width: 420px !important;
+    width: 400px !important;
+    max-height: 70vh !important;
     background-color: #ffffff !important;
     color: #1a202c !important;
+  }
+  
+  .milestone-tracking-details {
+    max-height: calc(70vh - 60px) !important; /* Account for header */
   }
   
   .milestone-card-header {
