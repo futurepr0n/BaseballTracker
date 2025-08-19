@@ -1,0 +1,330 @@
+/* Arsenal Betting Insights Styling */
+.arsenal-betting-insights {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 2px solid #007bff;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.insights-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.insights-header h5 {
+  margin: 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.confidence-indicator {
+  background: #007bff;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.key-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.metric-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.metric-label {
+  display: block;
+  font-size: 11px;
+  color: #6c757d;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.metric-value {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.metric-value.positive {
+  color: #28a745;
+}
+
+.metric-value.negative {
+  color: #dc3545;
+}
+
+.metric-value.neutral {
+  color: #6c757d;
+}
+
+.metric-unit {
+  display: block;
+  font-size: 10px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.betting-recommendations {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.betting-recommendations h6 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.recommendations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recommendation-item {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.recommendation-item.hr {
+  border-left: 4px solid #28a745;
+}
+
+.recommendation-item.hit {
+  border-left: 4px solid #007bff;
+}
+
+.recommendation-item.total_bases {
+  border-left: 4px solid #ffc107;
+}
+
+.recommendation-item.avoid {
+  border-left: 4px solid #dc3545;
+}
+
+.rec-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.rec-icon {
+  font-size: 16px;
+}
+
+.rec-type {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.rec-reason {
+  margin: 0;
+  font-size: 12px;
+  color: #495057;
+  line-height: 1.4;
+}
+
+.pitch-exposure-chart {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.pitch-exposure-chart h6 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.exposure-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.exposure-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pitch-info {
+  min-width: 100px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pitch-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #333;
+}
+
+.usage-percent {
+  font-size: 11px;
+  color: #6c757d;
+  background: #e9ecef;
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.advantage-bar {
+  flex: 1;
+  height: 24px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  position: relative;
+  border: 1px solid #dee2e6;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: width 0.3s ease;
+}
+
+.bar-fill.positive {
+  background: linear-gradient(90deg, #28a745, #20c997);
+}
+
+.bar-fill.negative {
+  background: linear-gradient(90deg, #dc3545, #fd7e14);
+}
+
+.bar-fill.neutral {
+  background: linear-gradient(90deg, #6c757d, #adb5bd);
+}
+
+.bar-label {
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.betting-context {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.context-item {
+  margin-bottom: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.context-item:last-child {
+  margin-bottom: 0;
+}
+
+.context-item strong {
+  color: #333;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .insights-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .key-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .exposure-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  
+  .pitch-info {
+    min-width: auto;
+    justify-content: space-between;
+  }
+}
+
+/* Animation for bars */
+@keyframes barGrow {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--target-width);
+  }
+}
+
+.bar-fill {
+  animation: barGrow 0.8s ease-out;
+}
+
+/* Hover effects */
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
+}
+
+.recommendation-item:hover {
+  background: #ffffff;
+  border-color: #007bff;
+  transition: all 0.2s ease;
+}
+
+/* Special highlighting for strong recommendations */
+.recommendation-item.hr .rec-type {
+  background: rgba(40, 167, 69, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.recommendation-item.hit .rec-type {
+  background: rgba(0, 123, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.recommendation-item.avoid .rec-type {
+  background: rgba(220, 53, 69, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}

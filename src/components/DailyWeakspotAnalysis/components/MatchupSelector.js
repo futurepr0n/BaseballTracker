@@ -12,14 +12,9 @@ const MatchupSelector = ({
 }) => {
   const [selectedGameIds, setSelectedGameIds] = React.useState([]);
 
-  // Initialize all games as selected when games change
+  // Initialize with no games selected by default (user must manually select to prevent intensive processing)
   React.useEffect(() => {
-    if (selectedGames.length > 0) {
-      const gameIds = selectedGames.map((game, index) => game.id || game.gameId || index);
-      setSelectedGameIds(gameIds);
-    } else {
-      setSelectedGameIds([]);
-    }
+    setSelectedGameIds([]);
   }, [selectedGames]);
 
   const handleDateChange = (e) => {
