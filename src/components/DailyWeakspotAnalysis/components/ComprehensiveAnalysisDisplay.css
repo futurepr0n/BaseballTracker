@@ -405,6 +405,19 @@
   gap: 4px;
 }
 
+/* Handedness Matchup Display */
+.handedness-matchup {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: #495057;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
 /* Dashboard Indicator */
 .dashboard-indicator {
   cursor: pointer;

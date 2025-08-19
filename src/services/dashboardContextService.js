@@ -22,10 +22,13 @@ class DashboardContextService {
       const cacheBuster = Date.now();
       
       // Try latest file first (most reliable)
-      let response = await fetch(`/data/predictions/${type}_latest.json?cb=${cacheBuster}`);
+      const url = `/data/predictions/${type}_latest.json?cb=${cacheBuster}`;
+      console.log(`📡 Fetching ${type} data from: ${url}`);
+      let response = await fetch(url);
       
       if (response.ok) {
         const jsonData = await response.json();
+        console.log(`✅ Successfully loaded ${type} data:`, jsonData ? `${Object.keys(jsonData).length} keys` : 'null');
         return jsonData;
       }
       
@@ -57,11 +60,15 @@ class DashboardContextService {
   async getPlayerContext(playerName, team, date = null) {
     const cacheKey = `${playerName}-${team}-${date || 'today'}`;
     
+    console.log(`🔄 GET PLAYER CONTEXT for ${playerName} (${team})`);
     
     // Check cache first
     if (this.cache.has(cacheKey)) {
       const cached = this.cache.get(cacheKey);
       if (Date.now() - cached.timestamp < this.cacheTimeout) {
+        console.log(`📦 RETURNING CACHED CONTEXT for ${playerName}`, {
+          hasMilestoneData: !!cached.data.milestoneTrackingData
+        });
         return cached.data;
       }
     }
@@ -86,7 +93,10 @@ class DashboardContextService {
         positivePerformance,
         poorPerformanceRisk,
         timeSlotAdvantage,
-        opponentHistory
+        opponentHistory,
+        milestoneTracking,
+        recentHomers,
+        extendedHitStreak
       ] = await Promise.all([
         this.checkHitStreakCard(playerName, team, date),
         this.checkHRPredictionCard(playerName, team, date),
@@ -94,7 +104,10 @@ class DashboardContextService {
         this.checkPositivePerformanceCard(playerName, team, date),
         this.checkPoorPerformanceCard(playerName, team, date),
         this.checkTimeSlotCards(playerName, team, date),
-        this.checkOpponentMatchupCards(playerName, team, date)
+        this.checkOpponentMatchupCards(playerName, team, date),
+        this.checkMilestoneTrackingCard(playerName, team, date),
+        this.checkRecentHomersCard(playerName, team, date),
+        this.checkExtendedHitStreakCard(playerName, team, date)
       ]);
 
       // Store raw data for tooltips
@@ -105,6 +118,22 @@ class DashboardContextService {
       context.poorPerformanceData = poorPerformanceRisk;
       context.timeSlotData = timeSlotAdvantage;
       context.opponentMatchupData = opponentHistory;
+      context.milestoneTrackingData = milestoneTracking;
+      context.recentHomersData = recentHomers;
+      context.extendedHitStreakData = extendedHitStreak;
+      
+      // Debug milestone data being stored
+      console.log('📦 STORING MILESTONE DATA IN CONTEXT:', {
+        playerName,
+        team,
+        milestoneTrackingDataIsNull: milestoneTracking === null,
+        milestoneTrackingDataIsUndefined: milestoneTracking === undefined,
+        milestoneTrackingData: milestoneTracking,
+        hasMilestone: !!milestoneTracking?.milestone,
+        hasTimeline: !!milestoneTracking?.timeline,
+        hasMomentum: !!milestoneTracking?.momentum,
+        milestoneDataKeys: milestoneTracking ? Object.keys(milestoneTracking) : []
+      });
 
       // Process each card result and build context
       this.processHitStreakData(context, hitStreakStatus);
@@ -114,6 +143,9 @@ class DashboardContextService {
       this.processPoorPerformanceData(context, poorPerformanceRisk);
       this.processTimeSlotData(context, timeSlotAdvantage);
       this.processOpponentMatchupData(context, opponentHistory);
+      this.processMilestoneTrackingData(context, milestoneTracking);
+      this.processRecentHomersData(context, recentHomers);
+      this.processExtendedHitStreakData(context, extendedHitStreak);
 
       // Calculate final confidence boost and context summary
       this.calculateFinalContext(context);
@@ -124,6 +156,12 @@ class DashboardContextService {
         timestamp: Date.now()
       });
 
+      console.log(`✅ RETURNING CONTEXT for ${playerName}:`, {
+        hasMilestoneData: !!context.milestoneTrackingData,
+        milestoneData: context.milestoneTrackingData,
+        badges: context.badges.length,
+        confidenceBoost: context.confidenceBoost
+      });
 
       return context;
 
@@ -350,6 +388,152 @@ class DashboardContextService {
   }
 
   /**
+   * Check if player appears in Milestone Tracking card data
+   */
+  async checkMilestoneTrackingCard(playerName, team, date) {
+    try {
+      console.log('🔍 MILESTONE CHECK: Looking for', playerName, team, date);
+      const data = await this.loadPredictionData('milestone_tracking', date);
+      console.log('🔍 MILESTONE DATA loaded:', !!data, 'has milestones:', !!(data?.milestones));
+      
+      if (!data || !data.milestones) {
+        console.log('🔍 MILESTONE: No data or milestones found');
+        return null;
+      }
+
+      // Convert full name to abbreviated format for milestone lookup
+      // "Bryce Harper" -> "B. Harper"
+      const abbreviatedName = this.convertToAbbreviatedName(playerName);
+      console.log(`🔍 MILESTONE: Looking for "${playerName}" as "${abbreviatedName}" in team ${team}`);
+
+      // EFFICIENT LOOKUP: Create an index map for O(1) lookups
+      // Index by "player-team" key for direct access
+      const milestoneIndex = {};
+      data.milestones.forEach(milestone => {
+        const key = `${milestone.player}-${milestone.team}`.toUpperCase();
+        milestoneIndex[key] = milestone;
+      });
+
+      // Try direct lookup with abbreviated name first
+      let lookupKey = `${abbreviatedName}-${team}`.toUpperCase();
+      let found = milestoneIndex[lookupKey];
+      
+      if (!found) {
+        // Try with original name
+        lookupKey = `${playerName}-${team}`.toUpperCase();
+        found = milestoneIndex[lookupKey];
+      }
+      
+      // If still not found, try just the first initial + last name
+      if (!found && playerName.includes(' ')) {
+        const parts = playerName.split(' ');
+        const firstInitial = parts[0].charAt(0).toUpperCase();
+        const lastName = parts[parts.length - 1];
+        const initialFormat = `${firstInitial}. ${lastName}`;
+        lookupKey = `${initialFormat}-${team}`.toUpperCase();
+        found = milestoneIndex[lookupKey];
+      }
+
+      // Debug output
+      if (found) {
+        console.log(`✅ MILESTONE: Found milestone for ${playerName} (${team}) with key: ${lookupKey}`);
+        console.log(`   Milestone: ${found.milestone.current}/${found.milestone.target} ${found.milestone.stat}`);
+        console.log(`   Full milestone structure:`, {
+          player: found.player,
+          team: found.team,
+          hasMilestone: !!found.milestone,
+          hasTimeline: !!found.timeline,
+          hasMomentum: !!found.momentum
+        });
+      } else {
+        console.log(`❌ MILESTONE: No milestone found for ${playerName} (${team})`);
+        console.log(`   Tried keys: ${abbreviatedName}-${team}, ${playerName}-${team}`);
+        // Show what IS available for this team for debugging
+        const teamKeys = Object.keys(milestoneIndex).filter(k => k.endsWith(`-${team}`));
+        if (teamKeys.length > 0) {
+          console.log(`   Available milestones for ${team}:`, teamKeys);
+        }
+      }
+
+      // Return the found milestone - this becomes context.milestoneTrackingData
+      console.log(`🔄 RETURNING milestone data to context:`, found ? 'Data found' : 'null');
+      return found;
+    } catch (error) {
+      console.error('Error checking milestone tracking card:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Check if player appears in Recent Homers card data  
+   */
+  async checkRecentHomersCard(playerName, team, date) {
+    try {
+      // Recent homers might be in hr_predictions or a separate recent_homers file
+      const hrData = await this.loadPredictionData('hr_predictions', date);
+      const recentData = await this.loadPredictionData('recent_homers', date);
+      
+      // Check both data sources
+      const dataToCheck = recentData || hrData;
+      if (!dataToCheck) return null;
+
+      // Look for recent homers in the predictions data
+      const predictions = dataToCheck.predictions || dataToCheck.recentHomers || [];
+      
+      const foundPlayer = predictions.find(player => 
+        this.matchPlayerName(player.name || player.playerName, playerName) && 
+        this.matchTeam(player.team, team)
+      );
+
+      // Only consider players who have hit recent home runs (last 3-5 games)
+      if (foundPlayer && (foundPlayer.recentHRs || foundPlayer.last3HR || foundPlayer.hotStreak)) {
+        return foundPlayer;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error checking recent homers card:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Check if player appears in Extended Hit Streak card data
+   */
+  async checkExtendedHitStreakCard(playerName, team, date) {
+    try {
+      const data = await this.loadPredictionData('hit_streak_analysis', date);
+      if (!data) return null;
+
+      // Check for extended hit streaks (8+ games or special streak categories)
+      const hitStreaks = data.hitStreaks || data.players || [];
+      
+      const foundPlayer = hitStreaks.find(player => 
+        this.matchPlayerName(player.name, playerName) && 
+        this.matchTeam(player.team, team)
+      );
+
+      // Only return if this is an extended streak (different from basic hit streak)
+      if (foundPlayer) {
+        const streak = foundPlayer.currentStreak || foundPlayer.streak || 0;
+        const isExtended = streak >= 8 || foundPlayer.streakType === 'extended' || foundPlayer.category === 'extended';
+        
+        if (isExtended) {
+          return {
+            ...foundPlayer,
+            extendedStreak: true
+          };
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error checking extended hit streak card:', error);
+      return null;
+    }
+  }
+
+  /**
    * Process hit streak data and update context
    */
   processHitStreakData(context, hitStreakData) {
@@ -538,6 +722,117 @@ class DashboardContextService {
   }
 
   /**
+   * Process milestone tracking data and update context
+   */
+  processMilestoneTrackingData(context, milestoneData) {
+    if (!milestoneData) {
+      console.log('📊 No milestone data to process for', context.playerName);
+      return;
+    }
+
+    // Validate that milestone data has the required structure
+    if (!milestoneData.milestone || !milestoneData.timeline || !milestoneData.momentum) {
+      console.log('⚠️ Invalid milestone data structure for', context.playerName, '- missing required properties');
+      return;
+    }
+
+    const milestone = milestoneData.milestone;
+    const heatLevel = milestone?.heatLevel || 'WARM';
+    const urgencyScore = milestone?.urgencyScore || 0;
+    const targetStat = milestone?.stat || 'unknown';
+    const awayFromTarget = milestone?.target - milestone?.current || 0;
+
+    // Different badges based on heat level and proximity
+    if (heatLevel === 'BLAZING' || awayFromTarget <= 1) {
+      context.badges.push({
+        emoji: '🎯',
+        text: 'Milestone Alert',
+        fullText: '🎯 Milestone Alert',
+        type: 'milestone_tracking'
+      });
+      context.confidenceBoost += 15;
+      context.standoutReasons.push(`${awayFromTarget} ${targetStat} away from milestone (${milestone?.target})`);
+    } else if (heatLevel === 'HOT' || awayFromTarget <= 2) {
+      context.badges.push({
+        emoji: '🔥',
+        text: 'Milestone Watch',
+        fullText: '🔥 Milestone Watch',
+        type: 'milestone_tracking'
+      });
+      context.confidenceBoost += 10;
+      context.standoutReasons.push(`${awayFromTarget} ${targetStat} from ${milestone?.target} milestone`);
+    } else if (heatLevel === 'WARM' || awayFromTarget <= 3) {
+      context.badges.push({
+        emoji: '🎯',
+        text: 'Milestone Near',
+        fullText: '🎯 Milestone Near',
+        type: 'milestone_tracking'
+      });
+      context.confidenceBoost += 5;
+      context.standoutReasons.push(`Approaching ${milestone?.target} ${targetStat} milestone`);
+    }
+  }
+
+  /**
+   * Process recent homers data and update context
+   */
+  processRecentHomersData(context, recentHomersData) {
+    if (!recentHomersData) return;
+
+    const recentHRs = recentHomersData.recentHRs || recentHomersData.last3HR || recentHomersData.last5HR || 0;
+    const hotStreak = recentHomersData.hotStreak || false;
+
+    if (recentHRs >= 2 || hotStreak) {
+      context.badges.push({
+        emoji: '⚡',
+        text: 'Power Surge',
+        fullText: '⚡ Power Surge',
+        type: 'recent_homers'
+      });
+      context.confidenceBoost += 12;
+      context.standoutReasons.push(`${recentHRs} HRs in recent games - power surge`);
+    } else if (recentHRs >= 1) {
+      context.badges.push({
+        emoji: '💥',
+        text: 'Recent Power',
+        fullText: '💥 Recent Power',
+        type: 'recent_homers'
+      });
+      context.confidenceBoost += 8;
+      context.standoutReasons.push('Recent home run - power showing');
+    }
+  }
+
+  /**
+   * Process extended hit streak data and update context
+   */
+  processExtendedHitStreakData(context, extendedHitStreakData) {
+    if (!extendedHitStreakData) return;
+
+    const streak = extendedHitStreakData.currentStreak || extendedHitStreakData.streak || 0;
+
+    if (streak >= 12) {
+      context.badges.push({
+        emoji: '🔥',
+        text: 'Elite Streak',
+        fullText: '🔥 Elite Streak',
+        type: 'hit_streak_extended'
+      });
+      context.confidenceBoost += 20;
+      context.standoutReasons.push(`${streak}-game hitting streak (elite level)`);
+    } else if (streak >= 8) {
+      context.badges.push({
+        emoji: '🔥',
+        text: 'Extended Streak',
+        fullText: '🔥 Extended Streak',
+        type: 'hit_streak_extended'
+      });
+      context.confidenceBoost += 15;
+      context.standoutReasons.push(`${streak}-game hitting streak (extended)`);
+    }
+  }
+
+  /**
    * Calculate final context summary
    */
   calculateFinalContext(context) {
@@ -567,19 +862,58 @@ class DashboardContextService {
   }
 
   /**
+   * Convert full name to abbreviated format
+   * "Bryce Harper" -> "B. Harper"
+   * "Nick Castellanos" -> "N. Castellanos"
+   * "J.T. Realmuto" -> "J.T. Realmuto" (already abbreviated)
+   */
+  convertToAbbreviatedName(fullName) {
+    if (!fullName) return fullName;
+    
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length < 2) return fullName;
+    
+    const firstName = parts[0];
+    const lastName = parts[parts.length - 1];
+    
+    // If first name is already an initial or abbreviated (contains period or is single letter)
+    if (firstName.includes('.') || firstName.length === 1) {
+      return fullName; // Already abbreviated
+    }
+    
+    // Convert to initial format
+    const initial = firstName.charAt(0).toUpperCase();
+    
+    // Handle middle names/initials
+    if (parts.length > 2) {
+      const middleParts = parts.slice(1, -1);
+      return `${initial}. ${middleParts.join(' ')} ${lastName}`;
+    }
+    
+    return `${initial}. ${lastName}`;
+  }
+
+  /**
    * Helper method to match player names (handles variations)
    */
   matchPlayerName(name1, name2) {
     if (!name1 || !name2) return false;
     
     // Clean both names - remove punctuation and extra spaces
-    const clean1 = name1.toLowerCase().replace(/[^a-z\s]/g, '').trim();
-    const clean2 = name2.toLowerCase().replace(/[^a-z\s]/g, '').trim();
+    // This will convert "J.T." to "JT" and handle other punctuation
+    const clean1 = name1.toLowerCase()
+      .replace(/\./g, '') // Remove periods first (J.T. -> JT)
+      .replace(/[^a-z\s]/g, '') // Remove other punctuation
+      .trim();
+    const clean2 = name2.toLowerCase()
+      .replace(/\./g, '') // Remove periods first (J.T. -> JT)  
+      .replace(/[^a-z\s]/g, '') // Remove other punctuation
+      .trim();
     
     // Direct match
     if (clean1 === clean2) return true;
     
-    // Handle abbreviated names (e.g., "L. Sosa" vs "Lenyn Sosa")
+    // Handle abbreviated names (e.g., "N. Castellanos" vs "Nick Castellanos")
     const parts1 = clean1.split(/\s+/);
     const parts2 = clean2.split(/\s+/);
     
@@ -594,9 +928,17 @@ class DashboardContextService {
       const firstName1 = parts1[0];
       const firstName2 = parts2[0];
       
-      // Check if one is an initial of the other (case: "L" matches "Lenyn")
-      if (firstName1.length === 1 && firstName2.startsWith(firstName1.toLowerCase())) return true;
-      if (firstName2.length === 1 && firstName1.startsWith(firstName2.toLowerCase())) return true;
+      // If both are single letters (initials), they must match exactly
+      // This prevents "J.T. Realmuto" from matching "T. Ward"
+      if (firstName1.length === 1 && firstName2.length === 1) {
+        return firstName1 === firstName2;
+      }
+      
+      // Check if one is an initial of the other (case: "N" matches "Nick")
+      // firstName1 = "n" (from "N. Castellanos"), firstName2 = "nick" (from "Nick Castellanos")
+      if (firstName1.length === 1 && firstName2.startsWith(firstName1)) return true;
+      // firstName1 = "nick", firstName2 = "n"
+      if (firstName2.length === 1 && firstName1.startsWith(firstName2)) return true;
       
       // Handle middle names/initials - just check if first names match
       if (firstName1 === firstName2) return true;

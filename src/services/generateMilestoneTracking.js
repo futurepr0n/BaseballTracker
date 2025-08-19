@@ -381,10 +381,51 @@ class MilestoneTracker {
       return a.timeline.bestEstimate.games - b.timeline.bestEstimate.games;
     });
     
+    // Create a player lookup map for easier access in tooltips
+    const playerLookup = {};
+    for (const milestone of this.milestones) {
+      const fullName = milestone.player;
+      const team = milestone.team;
+      
+      // Create multiple lookup keys for better matching
+      // 1. Full name + team (e.g., "Bryce Harper-PHI")
+      playerLookup[`${fullName}-${team}`.toUpperCase()] = milestone;
+      
+      // 2. If the name doesn't have a period, create abbreviated version
+      if (!fullName.includes('.')) {
+        const nameParts = fullName.split(' ');
+        if (nameParts.length >= 2) {
+          // Create "B. Harper" format
+          const abbreviated = `${nameParts[0].charAt(0)}. ${nameParts[nameParts.length - 1]}`;
+          playerLookup[`${abbreviated}-${team}`.toUpperCase()] = milestone;
+          
+          // Store both versions in the milestone for reference
+          milestone.fullName = fullName;
+          milestone.abbreviatedName = abbreviated;
+        }
+      } else {
+        // Name is already abbreviated, create full name version if possible
+        milestone.abbreviatedName = fullName;
+        // Try to expand "B. Harper" to possible full names (would need roster lookup)
+      }
+      
+      // 3. Last name only + team (e.g., "Harper-PHI") for fallback
+      const nameParts = fullName.split(' ');
+      if (nameParts.length >= 2) {
+        const lastName = nameParts[nameParts.length - 1];
+        // Only add if it doesn't conflict with another player
+        const lastNameKey = `${lastName}-${team}`.toUpperCase();
+        if (!playerLookup[lastNameKey]) {
+          playerLookup[lastNameKey] = milestone;
+        }
+      }
+    }
+    
     const output = {
       date: today,
       lastUpdated: new Date().toISOString(),
       milestones: this.milestones,
+      playerLookup: playerLookup,
       summary: this.generateSummary()
     };
     

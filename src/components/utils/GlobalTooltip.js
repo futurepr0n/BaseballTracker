@@ -1553,6 +1553,240 @@ const GlobalTooltip = () => {
       );
     }
 
+    if (type === 'milestone_tracking' && player) {
+      // Extract player info for lookup
+      const playerName = player.playerName || player.name || player.player || '';
+      const team = player.team || '';
+      
+      console.log('🎯 MILESTONE TOOLTIP - Looking up:', playerName, team);
+      
+      // Check if player object already has milestone data
+      let hasMilestoneData = player.milestone && player.timeline && player.momentum;
+      let milestoneData = player;
+      
+      // If not, fetch it directly from the file
+      if (!hasMilestoneData && playerName && team) {
+        console.log('📁 Fetching milestone data from file...');
+        
+        // Create a synchronous request to get the data
+        // Note: This is not ideal but works for the tooltip use case
+        try {
+          const xhr = new XMLHttpRequest();
+          xhr.open('GET', '/data/predictions/milestone_tracking_latest.json', false);
+          xhr.send();
+          
+          if (xhr.status === 200) {
+            const data = JSON.parse(xhr.responseText);
+            
+            // First try to use the playerLookup if available
+            if (data.playerLookup) {
+              console.log('📚 Using playerLookup for fast access');
+              
+              // Try different key formats
+              const keys = [
+                `${playerName}-${team}`.toUpperCase(),
+                `${playerName.split(' ').pop()}-${team}`.toUpperCase(), // Last name only
+              ];
+              
+              // Also try abbreviated format
+              const nameParts = playerName.split(' ');
+              if (nameParts.length >= 2) {
+                const abbreviated = `${nameParts[0].charAt(0)}. ${nameParts[nameParts.length - 1]}`;
+                keys.push(`${abbreviated}-${team}`.toUpperCase());
+              }
+              
+              console.log('🔍 Trying lookup keys:', keys);
+              
+              for (const key of keys) {
+                if (data.playerLookup[key]) {
+                  console.log('✅ Found milestone via lookup:', key);
+                  milestoneData = data.playerLookup[key];
+                  hasMilestoneData = true;
+                  break;
+                }
+              }
+            }
+            
+            // Fallback to searching through milestones array if lookup didn't work
+            if (!hasMilestoneData && data.milestones) {
+              console.log('🔍 Fallback: Searching through milestones array');
+              
+              const namePartsForFallback = playerName.split(' ');
+              const abbreviatedName = namePartsForFallback.length >= 2 
+                ? `${namePartsForFallback[0].charAt(0)}. ${namePartsForFallback[namePartsForFallback.length - 1]}`
+                : playerName;
+              
+              const foundMilestone = data.milestones?.find(m => {
+                const nameMatch = m.player === playerName || 
+                                 m.player === abbreviatedName ||
+                                 m.fullName === playerName ||
+                                 m.player.toLowerCase() === playerName.toLowerCase();
+                const teamMatch = m.team === team || m.team === team.toUpperCase();
+                return nameMatch && teamMatch;
+              });
+              
+              if (foundMilestone) {
+                console.log('✅ Found milestone via array search');
+                milestoneData = foundMilestone;
+                hasMilestoneData = true;
+              }
+            }
+            
+            if (!hasMilestoneData) {
+              console.log('❌ No milestone found for', playerName, team);
+              // Show available milestones for debugging
+              if (data.milestones) {
+                const teamMilestones = data.milestones.filter(m => m.team === team);
+                if (teamMilestones.length > 0) {
+                  console.log('   Available milestones for', team, ':', teamMilestones.map(m => m.player));
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching milestone data:', error);
+        }
+      }
+
+      if (!hasMilestoneData) {
+        console.log('❌ No milestone data available');
+        
+        return (
+          <div className="tooltip-content milestone-tracking-details">
+            <div className="milestone-header">
+              <strong>{playerName}</strong> {team && `(${team})`}
+            </div>
+            <div className="milestone-status">
+              <p style={{ margin: '10px 0', color: '#999' }}>
+                No current milestone tracking data
+              </p>
+              <small style={{ color: '#666', fontSize: '12px' }}>
+                Player may not be close to any milestones at this time
+              </small>
+            </div>
+          </div>
+        );
+      }
+
+      console.log('✅ Milestone data found, processing...');
+      
+      // milestoneData now contains the full milestone structure 
+
+      // Access milestone data from the correct nested structure
+      const milestoneObj = milestoneData.milestone || {};
+      const timelineObj = milestoneData.timeline || {};
+      const momentumObj = milestoneData.momentum || {};
+
+      // Extract from the nested milestone object structure
+      const heatLevel = milestoneObj.heatLevel || 'WARM';
+      const urgencyScore = milestoneObj.urgencyScore || 0;
+      const targetStat = milestoneObj.stat || 'HR';
+      const currentValue = milestoneObj.current ?? 0;
+      const targetValue = milestoneObj.target ?? (targetStat === 'HR' ? 5 : 10);
+      const awayFromTarget = Math.max(0, targetValue - currentValue);
+
+      // Extract timeline data from the timeline object
+      const seasonPaceGames = timelineObj.seasonPace?.gamesNeeded;
+      const recentPaceGames = timelineObj.recentPace?.gamesNeeded;
+      const bestEstimateGames = timelineObj.bestEstimate?.games;
+      const estimateConfidence = timelineObj.bestEstimate?.confidence || 70;
+      const recentTrend = timelineObj.recentPace?.trend || '➡️ STEADY';
+
+      // Extract momentum data
+      const last3Games = momentumObj.last3Games ?? 0;
+      const percentAboveSeason = momentumObj.percentAboveSeason ?? 0;
+
+      // Enhanced milestone context with better name extraction
+      const extractedPlayerName = milestoneData.player || milestoneData.playerName || milestoneData.name || playerName || 'Player';
+      const playerTeam = milestoneData.team || milestoneData.Team || team || 'Unknown';
+      
+      // Use the alerts array if available
+      const alerts = player.alerts || [];
+      const hasTonight = alerts.some(a => a.includes('tonight'));
+      const hasWeekend = alerts.some(a => a.includes('weekend'));
+      
+      // Format recent performance
+      const recentPerformance = `Last 3: ${last3Games} ${targetStat}`;
+
+      // Heat level emoji mapping
+      const heatEmojis = {
+        'BLAZING': '🔥🔥🔥',
+        'HOT': '🔥🔥', 
+        'WARM': '🔥'
+      };
+
+      // Format milestone information in compact card style
+      return (
+        <div className="tooltip-content milestone-tracking-details">
+          <div className="milestone-card-header">
+            <div className="heat-emoji">{heatEmojis[heatLevel]}</div>
+            <div className="player-info">
+              <div className="player-name">{extractedPlayerName}</div>
+              <div className="player-team">({playerTeam})</div>
+            </div>
+          </div>
+          
+          <div className="milestone-target">
+            <span className="current-stat">{currentValue}</span>
+            <span className="arrow">→</span>
+            <span className="target-stat">{targetValue} {targetStat.toUpperCase()}</span>
+          </div>
+          
+          <div className="milestone-details">
+            <div className="estimate-section">
+              <div className="section-label">Best Estimate:</div>
+              <div className="estimate-value">
+                {bestEstimateGames > 0 ? `${bestEstimateGames.toFixed(1)} games` : `${awayFromTarget} more needed`}
+                <span className="confidence">({estimateConfidence}% conf)</span>
+              </div>
+            </div>
+            
+            <div className="pace-section">
+              <div className="pace-row">
+                <span className="pace-label">Season:</span>
+                <span className="pace-value">{seasonPaceGames > 0 ? `${seasonPaceGames.toFixed(1)}g` : 'N/A'}</span>
+              </div>
+              <div className="pace-row">
+                <span className="pace-label">Recent:</span>
+                <span className="pace-value">
+                  {recentPaceGames > 0 ? `${recentPaceGames.toFixed(1)}g` : 'N/A'}
+                  {recentTrend}
+                </span>
+              </div>
+            </div>
+            
+            {awayFromTarget <= 1 && (
+              <div className="urgency-indicator">
+                🎯 One away from milestone!
+              </div>
+            )}
+            
+            {hasTonight && (
+              <div className="tonight-indicator">
+                ⚡ Could happen tonight!
+              </div>
+            )}
+            
+            {hasWeekend && (
+              <div className="weekend-indicator">
+                📅 This weekend potential
+              </div>
+            )}
+            
+            <div className="recent-performance">
+              {recentPerformance}
+            </div>
+            
+            {percentAboveSeason !== 0 && (
+              <div className="pace-comparison">
+                📈 {percentAboveSeason > 0 ? '+' : ''}{percentAboveSeason}% vs season avg
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
     // Default content
     return (
       <div className="tooltip-content">

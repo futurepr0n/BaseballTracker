@@ -30,7 +30,25 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
   const [playerContexts, setPlayerContexts] = useState({});
   const [playerPropAnalyses, setPlayerPropAnalyses] = useState({});
   const [selectedPlayerTooltip, setSelectedPlayerTooltip] = useState(null);
+  const [rosterData, setRosterData] = useState([]);
   const { openTooltip } = useTooltip();
+
+  // Load roster data for handedness information
+  useEffect(() => {
+    const loadRosterData = async () => {
+      try {
+        const response = await fetch('/data/rosters.json');
+        if (response.ok) {
+          const rosters = await response.json();
+          setRosterData(rosters);
+        }
+      } catch (error) {
+        console.error('Error loading roster data:', error);
+      }
+    };
+
+    loadRosterData();
+  }, []);
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
@@ -66,12 +84,150 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
     }
   };
 
+  // Helper function to match player names (handles variations like "Nick Castellanos" vs "N. Castellanos")
+  const matchPlayerNames = (name1, name2) => {
+    if (!name1 || !name2) return false;
+    
+    // Clean both names - remove periods and punctuation, but preserve the structure
+    const clean1 = name1.toLowerCase().replace(/\./g, '').replace(/[^a-z\s]/g, '').trim();
+    const clean2 = name2.toLowerCase().replace(/\./g, '').replace(/[^a-z\s]/g, '').trim();
+    
+    // Direct match
+    if (clean1 === clean2) return true;
+    
+    // Handle abbreviated names (e.g., "N. Castellanos" vs "Nick Castellanos")
+    const parts1 = clean1.split(/\s+/);
+    const parts2 = clean2.split(/\s+/);
+    
+    if (parts1.length >= 2 && parts2.length >= 2) {
+      const lastName1 = parts1[parts1.length - 1];
+      const lastName2 = parts2[parts2.length - 1];
+      
+      // Last names must match exactly - this is the CRITICAL check
+      if (lastName1 !== lastName2) return false;
+      
+      // For names with middle initials like "J.T. Realmuto" 
+      // Handle special case where first part might be compound like "jt"
+      const firstName1 = parts1[0];
+      const firstName2 = parts2[0];
+      
+      // If we have compound initials like "jt", handle specially
+      // "jt realmuto" should match "J.T. Realmuto" but NOT "T. Ward"
+      if (firstName1.length === 2 && firstName2.length === 1) {
+        // Check if the single initial matches the last character of the compound
+        // This prevents "jt" from matching just "t"
+        return false; // Don't match compound initials with single initials
+      }
+      if (firstName2.length === 2 && firstName1.length === 1) {
+        // Same check in reverse
+        return false; // Don't match compound initials with single initials
+      }
+      
+      // If both are single letters (initials), they must match exactly
+      if (firstName1.length === 1 && firstName2.length === 1) {
+        return firstName1 === firstName2;
+      }
+      
+      // Check if one is an initial of the other (but only for non-compound names)
+      if (firstName1.length === 1 && firstName2.length > 2 && firstName2.startsWith(firstName1)) return true;
+      if (firstName2.length === 1 && firstName1.length > 2 && firstName1.startsWith(firstName2)) return true;
+      
+      // Direct first name match
+      if (firstName1 === firstName2) return true;
+    }
+    
+    return false;
+  };
+
   const showPlayerSummary = (playerName, playerContext) => {
+    console.log('📋 SHOW PLAYER SUMMARY CALLED:', {
+      playerName,
+      hasContext: !!playerContext,
+      hasMilestoneData: !!playerContext?.milestoneTrackingData,
+      milestoneDataStructure: playerContext?.milestoneTrackingData,
+      contextKeys: playerContext ? Object.keys(playerContext) : []
+    });
     setSelectedPlayerTooltip({ playerName, playerContext });
   };
 
   const closePlayerTooltip = () => {
     setSelectedPlayerTooltip(null);
+  };
+
+  // Helper function to get player handedness from roster data
+  const getPlayerHandedness = (playerName, team) => {
+    if (!rosterData || !playerName) return null;
+
+    // Find player in roster data using name matching
+    const player = rosterData.find(p => {
+      // Try exact match first
+      if (p.name === playerName || p.fullName === playerName) return true;
+      
+      // Try normalized matching for various name formats
+      const normalizedSearchName = normalizeToEnglish(playerName.toLowerCase());
+      const normalizedRosterName = normalizeToEnglish((p.name || '').toLowerCase());
+      const normalizedFullName = normalizeToEnglish((p.fullName || '').toLowerCase());
+      
+      return normalizedRosterName === normalizedSearchName || 
+             normalizedFullName === normalizedSearchName;
+    });
+
+    if (player) {
+      return {
+        bats: player.bats || player.battingHand || 'R', // Default to R if not specified
+        throws: player.throws || player.pitchingHand || 'R'
+      };
+    }
+
+    return { bats: 'R', throws: 'R' }; // Default values
+  };
+
+  // Helper function to get pitcher handedness from analysis data
+  const getPitcherHandedness = (pitcherName) => {
+    // Try to extract from analysis data if available
+    if (analysis?.matchup_analysis) {
+      for (const matchup of Object.values(analysis.matchup_analysis)) {
+        if (matchup.away_pitcher_analysis?.pitcher_name === pitcherName) {
+          return matchup.away_pitcher_analysis.pitcher_hand || 'R';
+        }
+        if (matchup.home_pitcher_analysis?.pitcher_name === pitcherName) {
+          return matchup.home_pitcher_analysis.pitcher_hand || 'R';
+        }
+      }
+    }
+
+    // Try direct analysis format
+    if (analysis?.away_pitcher_analysis?.pitcher_name === pitcherName) {
+      return analysis.away_pitcher_analysis.pitcher_hand || 'R';
+    }
+    if (analysis?.home_pitcher_analysis?.pitcher_name === pitcherName) {
+      return analysis.home_pitcher_analysis.pitcher_hand || 'R';
+    }
+
+    // Fallback to roster data
+    const pitcherHandedness = getPlayerHandedness(pitcherName);
+    return pitcherHandedness?.throws || 'R';
+  };
+
+  // Helper function to format handedness matchup display
+  const formatHandednessMatchup = (batterHand, pitcherHand) => {
+    const bH = batterHand === 'S' ? 'S' : (batterHand || 'R');
+    const pH = pitcherHand || 'R';
+    
+    // Return formatted string with advantage indicator
+    const matchupText = `${pH}HP vs ${bH}HB`;
+    
+    // Determine matchup advantage
+    let advantage = '';
+    if (bH === 'S') {
+      advantage = '⚖️'; // Switch hitter - balanced
+    } else if ((bH === 'L' && pH === 'R') || (bH === 'R' && pH === 'L')) {
+      advantage = '⚔️'; // Favorable matchup
+    } else {
+      advantage = '🛡️'; // Same-handed (slight pitcher advantage)
+    }
+    
+    return `${advantage} ${matchupText}`;
   };
 
   // Load player prop analysis data for Over 0.5 Hits and Over 0.5 HRs
@@ -462,6 +618,17 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
                   team.name, 
                   date
                 );
+                
+                // Debug milestone data when storing context
+                if (context?.milestoneTrackingData) {
+                  console.log(`💾 STORING CONTEXT WITH MILESTONE for ${playerKey}:`, {
+                    playerName: context.playerName,
+                    team: context.team,
+                    milestoneData: context.milestoneTrackingData,
+                    milestoneKeys: Object.keys(context.milestoneTrackingData)
+                  });
+                }
+                
                 playerContextMap[playerKey] = context;
               } catch (error) {
                 playerContextMap[playerKey] = null;
@@ -470,6 +637,20 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
           }
         }
       }
+      // Debug what's being stored in playerContexts
+      console.log('📦 SETTING PLAYER CONTEXTS:', {
+        totalPlayers: Object.keys(playerContextMap).length,
+        samplePlayer: Object.keys(playerContextMap)[0],
+        sampleContext: playerContextMap[Object.keys(playerContextMap)[0]]
+      });
+      
+      // Check specifically for milestone data
+      Object.entries(playerContextMap).forEach(([key, context]) => {
+        if (context?.milestoneTrackingData) {
+          console.log(`✅ Player ${key} HAS milestone data:`, context.milestoneTrackingData);
+        }
+      });
+      
       setPlayerContexts(playerContextMap);
     };
 
@@ -815,15 +996,63 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
             // Get dashboard context and prop analysis for this player
             let playerContext = null;
             let playerPropAnalysis = null;
+            let handednessInfo = null;
             if (lineupHitter) {
               const playerKey = `${lineupHitter.name}-${opposingTeam}`;
+              
+              // Debug: Show all available keys for this team
+              const teamKeys = Object.keys(playerContexts).filter(k => k.endsWith(`-${opposingTeam}`));
+              console.log(`🔍 Looking for "${playerKey}" in playerContexts. Available keys for ${opposingTeam}:`, teamKeys);
+              
               playerContext = playerContexts[playerKey];
+              
+              // If not found, try to find by matching player name variations
+              if (!playerContext) {
+                console.log(`⚠️ No context found for key "${playerKey}", trying variations...`);
+                // Try to find a matching context by checking all stored contexts
+                for (const [key, context] of Object.entries(playerContexts)) {
+                  if (key.endsWith(`-${opposingTeam}`)) {
+                    const storedName = key.replace(`-${opposingTeam}`, '');
+                    // Debug the name comparison
+                    const isMatch = matchPlayerNames(storedName, lineupHitter.name);
+                    if (isMatch) {
+                      console.log(`✅ Found context match: "${key}" matches "${playerKey}"`);
+                      console.log(`   Stored name: "${storedName}" matches lineup name: "${lineupHitter.name}"`);
+                      playerContext = context;
+                      break;
+                    }
+                  }
+                }
+                
+                // If still not found, log what we tried
+                if (!playerContext) {
+                  console.log(`❌ Could not find context for "${lineupHitter.name}" (${opposingTeam})`);
+                  console.log(`   Tried key: "${playerKey}"`);
+                  console.log(`   Available keys for ${opposingTeam}:`, teamKeys);
+                }
+              } else {
+                console.log(`✅ Found direct context match for "${playerKey}"`);
+              }
+              
               playerPropAnalysis = playerPropAnalyses[playerKey];
+              
+              // Get handedness information for this matchup
+              const playerHandedness = getPlayerHandedness(lineupHitter.name, opposingTeam);
+              const pitcherHandedness = getPitcherHandedness(pitcherData?.pitcher_name);
+              
+              if (playerHandedness) {
+                handednessInfo = {
+                  batterHand: playerHandedness.bats,
+                  pitcherHand: pitcherHandedness,
+                  matchupDisplay: formatHandednessMatchup(playerHandedness.bats, pitcherHandedness)
+                };
+              }
               
               // Debug: Log prop analysis lookup
               console.log(`🎯 RENDER: Looking up prop analysis for key: "${playerKey}"`);
               console.log(`🎯 RENDER: Available prop keys (${Object.keys(playerPropAnalyses).length}):`, Object.keys(playerPropAnalyses));
               console.log(`🎯 RENDER: Found prop analysis:`, !!playerPropAnalysis, playerPropAnalysis);
+              console.log(`🎯 HANDEDNESS: ${lineupHitter.name} vs ${pitcherData?.pitcher_name}:`, handednessInfo);
               
               // Additional debug: Show the player name being looked up
               console.log(`🔧 Rendering badge: { playerName: '${lineupHitter.name}', team: '${opposingTeam}', lookupKey: '${playerKey}' }`);
@@ -842,6 +1071,11 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
                     <div className="actual-hitter">
                       <span className="hitter-name">
                         {lineupHitter.name}
+                        {handednessInfo && (
+                          <span className="handedness-matchup" title={`Handedness matchup: ${handednessInfo.batterHand} vs ${handednessInfo.pitcherHand}`}>
+                            {handednessInfo.matchupDisplay}
+                          </span>
+                        )}
                         {playerContext && playerContext.badges && playerContext.badges.length > 0 && (
                           <span 
                             className="dashboard-indicator" 
@@ -849,7 +1083,18 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
                               if (typeof badge === 'string') return badge;
                               return badge.fullText || badge.text || badge.emoji || 'Insight';
                             }).join(', ')}`}
-                            onClick={() => showPlayerSummary(lineupHitter.name, playerContext)}
+                            onClick={() => {
+                              // Debug what we're passing to showPlayerSummary
+                              console.log('🚀 BADGE CLICK DEBUG:', {
+                                lineupHitterName: lineupHitter.name,
+                                contextPlayerName: playerContext.playerName,
+                                hasMilestoneData: !!playerContext.milestoneTrackingData,
+                                milestoneDataKeys: playerContext.milestoneTrackingData ? Object.keys(playerContext.milestoneTrackingData) : [],
+                                badges: playerContext.badges,
+                                fullContext: playerContext
+                              });
+                              showPlayerSummary(lineupHitter.name, playerContext);
+                            }}
                           >
                             🚀
                           </span>
@@ -1424,17 +1669,78 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
                         if (badgeText.includes('Risk')) return 'poor_performance';
                         if (badgeText.includes('Likely Hit')) return 'likely_hit';
                         if (badgeText.includes('Multi-Hit')) return 'multi_hit';
+                        if (badgeText.includes('Milestone Alert') || badgeText.includes('Milestone Watch') || badgeText.includes('Milestone Near')) return 'milestone_tracking';
+                        if (badgeText.includes('Power Surge') || badgeText.includes('Recent Power')) return 'recent_homers';
+                        if (badgeText.includes('Elite Streak') || badgeText.includes('Extended Streak')) return 'hit_streak_extended';
                         return 'positive_momentum'; // default
                       })();
-                      const playerData = {
+                      // Debug milestone data specifically
+                      const milestoneData = selectedPlayerTooltip.playerContext?.milestoneTrackingData;
+                      console.log('🎯 COMPREHENSIVE DEBUG - Milestone tooltip:', {
                         playerName: selectedPlayerTooltip.playerName,
-                        // Include all raw data from dashboard context
-                        ...selectedPlayerTooltip.playerContext.positivePerformanceData,
-                        ...selectedPlayerTooltip.playerContext.poorPerformanceData,
-                        ...selectedPlayerTooltip.playerContext.hitStreakData,
-                        ...selectedPlayerTooltip.playerContext.hrPredictionData,
-                        ...selectedPlayerTooltip.playerContext.likelyToHitData
-                      };
+                        tooltipType,
+                        hasMilestoneTrackingData: !!milestoneData,
+                        milestoneTrackingData: milestoneData,
+                        milestoneKeys: milestoneData ? Object.keys(milestoneData) : [],
+                        contextPlayerName: selectedPlayerTooltip.playerContext?.playerName,
+                        contextTeam: selectedPlayerTooltip.playerContext?.team,
+                        allContextKeys: selectedPlayerTooltip.playerContext ? Object.keys(selectedPlayerTooltip.playerContext) : [],
+                        fullContext: selectedPlayerTooltip.playerContext
+                      });
+                      
+                      // Verify player name consistency
+                      if (selectedPlayerTooltip.playerContext?.playerName !== selectedPlayerTooltip.playerName) {
+                        console.warn('⚠️ MISMATCH: Tooltip player name does not match context player name!');
+                        console.warn(`   Tooltip says: "${selectedPlayerTooltip.playerName}"`);
+                        console.warn(`   Context says: "${selectedPlayerTooltip.playerContext?.playerName}"`);
+                      }
+                      
+                      let playerData;
+                      if (tooltipType === 'milestone_tracking') {
+                        if (milestoneData) {
+                          // For milestone tooltips, pass the milestone data directly
+                          playerData = milestoneData;
+                          console.log('🎯 PASSING MILESTONE DATA DIRECTLY:', playerData);
+                        } else {
+                          // Try to find milestone data in the playerContexts map as a fallback
+                          console.log('⚠️ NO MILESTONE DATA in selectedPlayerTooltip for', selectedPlayerTooltip.playerName);
+                          
+                          // Try to get it from the stored contexts
+                          const playerKey = `${selectedPlayerTooltip.playerName}-${selectedPlayerTooltip.playerContext?.team || ''}`;
+                          const storedContext = playerContexts[playerKey];
+                          console.log('🔍 Looking for stored context with key:', playerKey);
+                          console.log('🔍 Found stored context:', !!storedContext);
+                          console.log('🔍 Stored context has milestone data:', !!storedContext?.milestoneTrackingData);
+                          
+                          if (storedContext?.milestoneTrackingData) {
+                            playerData = storedContext.milestoneTrackingData;
+                            console.log('✅ FOUND MILESTONE DATA IN STORED CONTEXT:', playerData);
+                          } else {
+                            console.log('❌ NO MILESTONE DATA FOUND ANYWHERE');
+                            playerData = {
+                              playerName: selectedPlayerTooltip.playerName,
+                              team: selectedPlayerTooltip.playerContext?.team || '',
+                              // Empty milestone structure to avoid confusion
+                              milestone: null,
+                              timeline: null,
+                              momentum: null
+                            };
+                          }
+                        }
+                      } else {
+                        // For other tooltips, spread the appropriate data
+                        playerData = {
+                          playerName: selectedPlayerTooltip.playerName,
+                          // Include all raw data from dashboard context
+                          ...selectedPlayerTooltip.playerContext.positivePerformanceData,
+                          ...selectedPlayerTooltip.playerContext.poorPerformanceData,
+                          ...selectedPlayerTooltip.playerContext.hitStreakData,
+                          ...selectedPlayerTooltip.playerContext.hrPredictionData,
+                          ...selectedPlayerTooltip.playerContext.likelyToHitData,
+                          ...selectedPlayerTooltip.playerContext.recentHomersData,
+                          ...selectedPlayerTooltip.playerContext.extendedHitStreakData
+                        };
+                      }
                       
                       return (
                         <span 
