@@ -10,6 +10,9 @@ import { normalizeToEnglish, createAllNameVariants, namesMatch, findPlayerInRost
 import { getAnalysisCellColor } from '../../../utils/colorThresholds';
 import leagueAverageService from '../../../services/leagueAverageService';
 import realOddsService from '../services/realOddsService';
+import enhancedTravelService from '../../../services/enhancedTravelService';
+import weatherContextService from '../../../services/weatherContextService';
+import stadiumContextService from '../../../services/stadiumContextService';
 
 const ComprehensiveAnalysisDisplay = ({ analysis }) => {
   
@@ -44,6 +47,9 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
   const [rosterData, setRosterData] = useState([]);
   const [leagueAverages, setLeagueAverages] = useState(null);
   const [playerOdds, setPlayerOdds] = useState({});
+  const [travelImpacts, setTravelImpacts] = useState({});
+  const [weatherContexts, setWeatherContexts] = useState({});
+  const [stadiumContexts, setStadiumContexts] = useState({});
   const { openTooltip } = useTooltip();
 
   // Load roster data for handedness information
@@ -887,6 +893,319 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
     return () => clearTimeout(timeoutId);
   }, [analysis, lineupData]);
 
+  // Load travel impact data for teams
+  useEffect(() => {
+    const loadTravelImpacts = async () => {
+      try {
+        if (!analysis?.matchup_analysis) return;
+
+        console.log('🛫 Loading travel impact data for analysis...');
+        const travelMap = {};
+        const allMatchups = Object.values(analysis.matchup_analysis);
+        
+        for (const matchupData of allMatchups) {
+          const matchup = matchupData.matchup;
+          if (!matchup) continue;
+          
+          const currentDate = new Date(matchup.date);
+          const venue = matchup.venue;
+          
+          // Load travel impact for both teams
+          const teams = [
+            { code: matchup.away_team, name: 'away' },
+            { code: matchup.home_team, name: 'home' }
+          ];
+          
+          for (const team of teams) {
+            if (!team.code) continue;
+            
+            try {
+              console.log(`🛫 Analyzing travel impact for ${team.code} to ${venue}`);
+              const travelImpact = await enhancedTravelService.analyzeRealTravelImpact(
+                team.code, 
+                currentDate, 
+                venue
+              );
+              
+              const teamKey = `${team.code}-${matchup.date}`;
+              travelMap[teamKey] = travelImpact;
+              
+              console.log(`🛫 Travel impact for ${team.code}:`, {
+                distance: travelImpact.distance,
+                travelImpact: travelImpact.travelImpact,
+                classification: travelImpact.travelClassification,
+                description: travelImpact.description
+              });
+              
+            } catch (error) {
+              console.error(`🛫 Error loading travel impact for ${team.code}:`, error);
+              const teamKey = `${team.code}-${matchup.date}`;
+              travelMap[teamKey] = null;
+            }
+          }
+        }
+        
+        console.log(`🛫 Loaded travel impacts for ${Object.keys(travelMap).length} team-date combinations`);
+        setTravelImpacts(travelMap);
+        
+      } catch (error) {
+        console.error('🛫 Critical error loading travel impacts:', error);
+        setTravelImpacts({});
+      }
+    };
+
+    // Add a delay to prevent blocking
+    const timeoutId = setTimeout(() => {
+      loadTravelImpacts();
+    }, 400);
+    
+    return () => clearTimeout(timeoutId);
+  }, [analysis]);
+
+  // Load weather context data for venues
+  useEffect(() => {
+    const loadWeatherContexts = async () => {
+      try {
+        if (!analysis?.matchup_analysis) return;
+
+        console.log('🌤️ Loading weather context data for analysis...');
+        const weatherMap = {};
+        const allMatchups = Object.values(analysis.matchup_analysis);
+        
+        for (const matchupData of allMatchups) {
+          const matchup = matchupData.matchup;
+          if (!matchup) continue;
+          
+          // Create a game object for weather context service
+          const game = {
+            homeTeam: matchup.home_team,
+            awayTeam: matchup.away_team,
+            venue: matchup.venue,
+            date: matchup.date
+          };
+          
+          try {
+            console.log(`🌤️ Getting weather context for ${game.venue} (${game.homeTeam} vs ${game.awayTeam})`);
+            const weatherContext = await weatherContextService.getGameWeatherContext(game);
+            
+            const venueKey = `${matchup.venue}-${matchup.date}`;
+            weatherMap[venueKey] = weatherContext;
+            
+            console.log(`🌤️ Weather context for ${game.venue}:`, {
+              isDome: weatherContext?.isDome,
+              weatherImpact: weatherContext?.weatherImpact,
+              badge: weatherContext?.badge,
+              description: weatherContext?.description
+            });
+            
+          } catch (error) {
+            console.error(`🌤️ Error loading weather context for ${game.venue}:`, error);
+            const venueKey = `${matchup.venue}-${matchup.date}`;
+            weatherMap[venueKey] = null;
+          }
+        }
+        
+        console.log(`🌤️ Loaded weather contexts for ${Object.keys(weatherMap).length} venue-date combinations`);
+        setWeatherContexts(weatherMap);
+        
+      } catch (error) {
+        console.error('🌤️ Critical error loading weather contexts:', error);
+        setWeatherContexts({});
+      }
+    };
+
+    // Add a delay to prevent blocking
+    const timeoutId = setTimeout(() => {
+      loadWeatherContexts();
+    }, 500);
+    
+    return () => clearTimeout(timeoutId);
+  }, [analysis]);
+
+  // Load stadium context data for venues
+  useEffect(() => {
+    const loadStadiumContexts = async () => {
+      try {
+        if (!analysis?.matchup_analysis) return;
+
+        console.log('🏟️ Loading stadium context data for analysis...');
+        const stadiumMap = {};
+        const allMatchups = Object.values(analysis.matchup_analysis);
+        
+        for (const matchupData of allMatchups) {
+          const matchup = matchupData.matchup;
+          if (!matchup) continue;
+          
+          try {
+            console.log(`🏟️ Getting stadium context for ${matchup.venue}`);
+            const stadiumContext = await stadiumContextService.getStadiumContext(matchup.venue);
+            
+            const venueKey = `${matchup.venue}-${matchup.date}`;
+            stadiumMap[venueKey] = stadiumContext;
+            
+            if (stadiumContext) {
+              console.log(`🏟️ Stadium context for ${matchup.venue}:`, {
+                category: stadiumContext.category,
+                parkFactor: stadiumContext.parkFactor,
+                badge: stadiumContext.badge,
+                isHitterFriendly: stadiumContext.isHitterFriendly,
+                isPitcherFriendly: stadiumContext.isPitcherFriendly
+              });
+            } else {
+              console.log(`🏟️ No stadium context available for ${matchup.venue}`);
+            }
+            
+          } catch (error) {
+            console.error(`🏟️ Error loading stadium context for ${matchup.venue}:`, error);
+            const venueKey = `${matchup.venue}-${matchup.date}`;
+            stadiumMap[venueKey] = null;
+          }
+        }
+        
+        console.log(`🏟️ Loaded stadium contexts for ${Object.keys(stadiumMap).length} venue-date combinations`);
+        setStadiumContexts(stadiumMap);
+        
+      } catch (error) {
+        console.error('🏟️ Critical error loading stadium contexts:', error);
+        setStadiumContexts({});
+      }
+    };
+
+    // Add a delay to prevent blocking
+    const timeoutId = setTimeout(() => {
+      loadStadiumContexts();
+    }, 600);
+    
+    return () => clearTimeout(timeoutId);
+  }, [analysis]);
+
+  // Helper function to get travel impact for a team
+  const getTravelImpactForTeam = (teamCode, matchupDate) => {
+    if (!teamCode || !matchupDate) return null;
+    
+    const teamKey = `${teamCode}-${matchupDate}`;
+    const travelImpact = travelImpacts[teamKey];
+    
+    console.log(`🛫 Looking up travel impact for team key: "${teamKey}"`, {
+      found: !!travelImpact,
+      distance: travelImpact?.distance,
+      impact: travelImpact?.travelImpact,
+      classification: travelImpact?.travelClassification
+    });
+    
+    return travelImpact;
+  };
+
+  // Helper function to get weather context for a venue
+  const getWeatherContextForVenue = (venue, matchupDate) => {
+    if (!venue || !matchupDate) return null;
+    
+    const venueKey = `${venue}-${matchupDate}`;
+    const weatherContext = weatherContexts[venueKey];
+    
+    console.log(`🌤️ Looking up weather context for venue key: "${venueKey}"`, {
+      found: !!weatherContext,
+      isDome: weatherContext?.isDome,
+      weatherImpact: weatherContext?.weatherImpact,
+      badge: weatherContext?.badge
+    });
+    
+    return weatherContext;
+  };
+
+  // Helper function to get stadium context for a venue
+  const getStadiumContextForVenue = (venue, matchupDate) => {
+    if (!venue || !matchupDate) return null;
+    
+    const venueKey = `${venue}-${matchupDate}`;
+    const stadiumContext = stadiumContexts[venueKey];
+    
+    console.log(`🏟️ Looking up stadium context for venue key: "${venueKey}"`, {
+      found: !!stadiumContext,
+      category: stadiumContext?.category,
+      parkFactor: stadiumContext?.parkFactor,
+      badge: stadiumContext?.badge
+    });
+    
+    return stadiumContext;
+  };
+
+  // Helper function to calculate confidence score
+  const calculateConfidenceScore = (data, playerPropAnalysis, lineupHitter) => {
+    let confidenceScore = 0;
+    let dataQuality = 0;
+    const factors = [];
+
+    // Base vulnerability score confidence (0-40 points)
+    if (data && typeof data.vulnerability_score === 'number') {
+      const vulnScore = data.vulnerability_score;
+      if (vulnScore > 0) {
+        confidenceScore += Math.min(40, vulnScore * 2); // Higher vulnerability = higher confidence
+        factors.push(`Vuln: +${Math.min(40, Math.round(vulnScore * 2))}`);
+      }
+    }
+
+    // Sample size from prop analysis (0-25 points)
+    if (playerPropAnalysis?.hitsOver05?.total) {
+      const sampleSize = playerPropAnalysis.hitsOver05.total;
+      const samplePoints = Math.min(25, sampleSize * 2.5); // 10 games = 25 points
+      confidenceScore += samplePoints;
+      dataQuality += samplePoints;
+      factors.push(`Sample: +${Math.round(samplePoints)}`);
+    }
+
+    // Recent performance data quality (0-20 points)
+    if (playerPropAnalysis?.recentPerformance) {
+      const recentGames = playerPropAnalysis.recentPerformance.gameCount || 0;
+      const recentPoints = Math.min(20, recentGames * 4); // 5 games = 20 points
+      confidenceScore += recentPoints;
+      dataQuality += recentPoints;
+      factors.push(`Recent: +${Math.round(recentPoints)}`);
+    }
+
+    // Player context availability (0-15 points)
+    if (lineupHitter) {
+      confidenceScore += 10;
+      factors.push('Player: +10');
+      
+      if (lineupHitter.batting_avg) {
+        confidenceScore += 5;
+        dataQuality += 5;
+        factors.push('Stats: +5');
+      }
+    }
+
+    // Cap at 100
+    confidenceScore = Math.min(100, confidenceScore);
+    dataQuality = Math.min(70, dataQuality); // Data quality subset
+
+    return {
+      confidenceScore: Math.round(confidenceScore),
+      dataQuality: Math.round(dataQuality),
+      factors: factors,
+      classification: getConfidenceClassification(confidenceScore),
+      dataClassification: getDataQualityClassification(dataQuality)
+    };
+  };
+
+  // Helper function to classify confidence levels
+  const getConfidenceClassification = (score) => {
+    if (score >= 80) return { level: 'high', color: 'stat-dark-green', label: 'High' };
+    if (score >= 60) return { level: 'good', color: 'stat-light-green', label: 'Good' };
+    if (score >= 40) return { level: 'moderate', color: 'stat-yellow', label: 'Moderate' };
+    if (score >= 20) return { level: 'low', color: 'stat-default', label: 'Low' };
+    return { level: 'very-low', color: 'stat-red', label: 'Very Low' };
+  };
+
+  // Helper function to classify data quality levels
+  const getDataQualityClassification = (score) => {
+    if (score >= 50) return { level: 'excellent', color: 'stat-dark-green', label: 'Excellent' };
+    if (score >= 35) return { level: 'good', color: 'stat-light-green', label: 'Good' };
+    if (score >= 20) return { level: 'fair', color: 'stat-yellow', label: 'Fair' };
+    if (score >= 10) return { level: 'poor', color: 'stat-default', label: 'Poor' };
+    return { level: 'insufficient', color: 'stat-red', label: 'Insufficient' };
+  };
+
   // Helper function to get lineup hitter for a specific position
   const getLineupHitterForPosition = (position, opposingTeam) => {
     if (!lineupData || !opposingTeam) return null;
@@ -1118,10 +1437,17 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
             // Get actual lineup hitter for this position
             const lineupHitter = getLineupHitterForPosition(posNum, opposingTeam);
             
+            // Get venue context (available for all positions)
+            const matchupDate = currentMatchup?.matchup?.date;
+            const venue = currentMatchup?.matchup?.venue;
+
             // Get dashboard context and prop analysis for this player
             let playerContext = null;
             let playerPropAnalysis = null;
             let handednessInfo = null;
+            let teamTravelImpact = null;
+            let venueWeatherContext = null;
+            let venueStadiumContext = null;
             if (lineupHitter) {
               const playerKey = `${lineupHitter.name}-${opposingTeam}`;
               
@@ -1181,6 +1507,24 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
               
               // Additional debug: Show the player name being looked up
               console.log(`🔧 Rendering badge: { playerName: '${lineupHitter.name}', team: '${opposingTeam}', lookupKey: '${playerKey}' }`);
+              
+              // Get travel impact for this team
+              if (matchupDate) {
+                teamTravelImpact = getTravelImpactForTeam(opposingTeam, matchupDate);
+                console.log(`🛫 Travel impact for ${opposingTeam} on ${matchupDate}:`, teamTravelImpact);
+              }
+            }
+            
+            // Get weather context for this venue
+            if (venue && matchupDate) {
+              venueWeatherContext = getWeatherContextForVenue(venue, matchupDate);
+              console.log(`🌤️ Weather context for ${venue} on ${matchupDate}:`, venueWeatherContext);
+            }
+
+            // Get stadium context for this venue
+            if (venue && matchupDate) {
+              venueStadiumContext = getStadiumContextForVenue(venue, matchupDate);
+              console.log(`🏟️ Stadium context for ${venue} on ${matchupDate}:`, venueStadiumContext);
             }
             
             // Keep original vulnerability class (no color changes)
@@ -1222,6 +1566,86 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
                             }}
                           >
                             🚀
+                          </span>
+                        )}
+                        {teamTravelImpact && teamTravelImpact.travelImpact < 0 && (
+                          <span 
+                            className="travel-impact-badge negative" 
+                            data-tooltip-id={`travel_impact_${createSafeId(lineupHitter.name, lineupHitter.team)}`}
+                            onClick={(e) => {
+                              console.log('🚀 Travel Impact Badge clicked!', { player: lineupHitter.name, travelData: teamTravelImpact });
+                              openTooltip(
+                                `travel_impact_${createSafeId(lineupHitter.name, lineupHitter.team)}`, 
+                                e.currentTarget, 
+                                {
+                                  type: 'travel_impact',
+                                  player: {
+                                    name: lineupHitter.name,
+                                    team: lineupHitter.team,
+                                    ...teamTravelImpact
+                                  }
+                                }
+                              );
+                            }}
+                          >
+                            ✈️
+                          </span>
+                        )}
+                        {venueWeatherContext && (
+                          <span 
+                            className={`weather-context-badge ${venueWeatherContext.weatherImpact || 'neutral'}`}
+                            data-tooltip-id={`weather_context_${createSafeId(currentMatchup?.matchup?.venue || '', matchupDate)}`}
+                            onClick={(e) => {
+                              console.log('🌤️ Weather Context Badge clicked!', { venue: currentMatchup?.matchup?.venue, weatherData: venueWeatherContext });
+                              openTooltip(
+                                `weather_context_${createSafeId(currentMatchup?.matchup?.venue || '', matchupDate)}`, 
+                                e.currentTarget, 
+                                {
+                                  type: 'weather_context',
+                                  player: {
+                                    venue: currentMatchup?.matchup?.venue || venueWeatherContext.venue,
+                                    date: matchupDate,
+                                    isDome: venueWeatherContext.isDome,
+                                    hasWeatherData: venueWeatherContext.hasWeatherData,
+                                    weatherImpact: venueWeatherContext.weatherImpact,
+                                    badge: venueWeatherContext.badge,
+                                    description: venueWeatherContext.description,
+                                    category: venueWeatherContext.category,
+                                    // Enhanced weather details from real API data
+                                    currentWeather: venueWeatherContext.currentWeather,
+                                    windFactor: venueWeatherContext.windFactor,
+                                    temperatureAnalysis: venueWeatherContext.temperatureAnalysis,
+                                    details: venueWeatherContext.details,
+                                    parkData: venueWeatherContext.parkData
+                                  }
+                                }
+                              );
+                            }}
+                          >
+                            {venueWeatherContext.badge ? venueWeatherContext.badge.split(' ')[0] : '🌤️'}
+                          </span>
+                        )}
+                        {venueStadiumContext && (
+                          <span 
+                            className={`stadium-context-badge ${venueStadiumContext.isHitterFriendly ? 'hitter-friendly' : venueStadiumContext.isPitcherFriendly ? 'pitcher-friendly' : 'neutral'}`}
+                            data-tooltip-id={`stadium_context_${createSafeId(currentMatchup?.matchup?.venue || '', matchupDate)}`}
+                            onClick={(e) => {
+                              console.log('🏟️ Stadium Context Badge clicked!', { venue: currentMatchup?.matchup?.venue, stadiumData: venueStadiumContext });
+                              openTooltip(
+                                `stadium_context_${createSafeId(currentMatchup?.matchup?.venue || '', matchupDate)}`, 
+                                e.currentTarget, 
+                                {
+                                  type: 'stadium_context',
+                                  player: {
+                                    venue: currentMatchup?.matchup?.venue,
+                                    date: matchupDate,
+                                    ...venueStadiumContext
+                                  }
+                                }
+                              );
+                            }}
+                          >
+                            {venueStadiumContext.badge ? venueStadiumContext.badge.split(' ')[0] : '🏟️'}
                           </span>
                         )}
                       </span>
@@ -1437,6 +1861,25 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
                       </span>
                     </div>
                   )}
+
+                  {/* Confidence Scoring Cells */}
+                  {(() => {
+                    const confidenceData = calculateConfidenceScore(data, playerPropAnalysis, lineupHitter);
+                    return (
+                      <>
+                        <div className={`stat confidence-score ${confidenceData.classification.color}`} 
+                             title={`Prediction Confidence: ${confidenceData.classification.label} (${confidenceData.confidenceScore}%). Factors: ${confidenceData.factors.join(', ')}`}>
+                          <span className="label">Confidence:</span>
+                          <span className="value">{confidenceData.confidenceScore}%</span>
+                        </div>
+                        <div className={`stat data-quality ${confidenceData.dataClassification.color}`}
+                             title={`Data Quality: ${confidenceData.dataClassification.label} (${confidenceData.dataQuality}%). Based on sample size and data completeness.`}>
+                          <span className="label">Data Quality:</span>
+                          <span className="value">{confidenceData.dataQuality}%</span>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
 
                 {/* Player Highlights and Warnings */}
@@ -1666,6 +2109,54 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
           </div>
         )}
       </div>
+
+      {/* Stadium Context Summary */}
+      {currentMatchup && (
+        <div className="stadium-context-summary">
+          <div className="context-summary-header">
+            <h4>🏟️ Venue Context: {currentMatchup.matchup.venue}</h4>
+          </div>
+          <div className="context-summary-content">
+            <div className="context-badges-row">
+              {(() => {
+                const venue = currentMatchup.matchup.venue;
+                const matchupDate = currentMatchup.matchup.date;
+                const weatherContext = getWeatherContextForVenue(venue, matchupDate);
+                const stadiumContext = getStadiumContextForVenue(venue, matchupDate);
+                
+                return (
+                  <>
+                    {weatherContext && (
+                      <div className="context-summary-item">
+                        <span className="context-label">Weather:</span>
+                        <span className={`context-summary-badge weather ${weatherContext.weatherImpact || 'neutral'}`}>
+                          {weatherContext.badge || '🌤️ Outdoor Game'}
+                        </span>
+                      </div>
+                    )}
+                    {stadiumContext && (
+                      <div className="context-summary-item">
+                        <span className="context-label">Park Factor:</span>
+                        <span className={`context-summary-badge stadium ${stadiumContext.isHitterFriendly ? 'hitter-friendly' : stadiumContext.isPitcherFriendly ? 'pitcher-friendly' : 'neutral'}`}>
+                          {stadiumContext.badge || '🏟️ Neutral Park'} ({stadiumContext.parkFactor?.toFixed(2)}x)
+                        </span>
+                      </div>
+                    )}
+                    {!weatherContext && !stadiumContext && (
+                      <div className="context-summary-item">
+                        <span className="context-label">Venue:</span>
+                        <span className="context-summary-badge neutral">
+                          🏟️ {venue}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Away Pitcher Analysis */}
       <div className="analysis-section">

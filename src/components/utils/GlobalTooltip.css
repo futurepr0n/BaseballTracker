@@ -1048,6 +1048,51 @@
     font-weight: 500 !important;
   }
 
+  /* Enhanced weather context dark mode support */
+  .global-tooltip .weather-summary-item {
+    background-color: #374151 !important;
+    border-bottom-color: #4b5563 !important;
+  }
+
+  .global-tooltip .condition-grid {
+    background-color: #1f2937 !important;
+  }
+
+  .global-tooltip .condition-item {
+    border-color: #4b5563 !important;
+  }
+
+  .global-tooltip .condition-label {
+    color: #d1d5db !important;
+  }
+
+  .global-tooltip .condition-value {
+    color: #f9fafb !important;
+  }
+
+  .global-tooltip .wind-analysis,
+  .global-tooltip .temperature-analysis {
+    background-color: #374151 !important;
+  }
+
+  .global-tooltip .impact-favorable {
+    background-color: rgba(16, 185, 129, 0.2) !important;
+    border-color: #10b981 !important;
+    color: #ecfdf5 !important;
+  }
+
+  .global-tooltip .impact-unfavorable {
+    background-color: rgba(239, 68, 68, 0.2) !important;
+    border-color: #ef4444 !important;
+    color: #fef2f2 !important;
+  }
+
+  .global-tooltip .dome-info,
+  .global-tooltip .outdoor-info {
+    background-color: #374151 !important;
+    color: #e5e7eb !important;
+  }
+
   .global-tooltip .day-hit-date-item:hover {
     background-color: rgba(55, 65, 81, 0.8) !important;
   }
@@ -1060,6 +1105,70 @@
   .global-tooltip .no-date-data {
     color: #e5e7eb !important;
     font-weight: 500 !important;
+  }
+
+  /* Dark mode support for new tooltip types - system preference */
+  .global-tooltip .travel-summary,
+  .global-tooltip .weather-summary,
+  .global-tooltip .stadium-summary {
+    background-color: #374151;
+    color: #f9fafb;
+  }
+
+  .global-tooltip .travel-context h4,
+  .global-tooltip .weather-analysis h4,
+  .global-tooltip .stadium-analysis h4 {
+    color: #f9fafb;
+  }
+
+  .global-tooltip .travel-detail-item {
+    color: #e5e7eb;
+  }
+
+  .global-tooltip .dome-info {
+    background-color: rgba(108, 117, 125, 0.2);
+    color: #d1d5db;
+  }
+
+  .global-tooltip .outdoor-info {
+    background-color: rgba(0, 123, 255, 0.2);
+    color: #93c5fd;
+  }
+
+  .global-tooltip .favorable-weather {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #86efac;
+  }
+
+  .global-tooltip .unfavorable-weather {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #fca5a5;
+  }
+
+  .global-tooltip .factor-detail-item,
+  .global-tooltip .neutral-park-info {
+    background-color: rgba(108, 117, 125, 0.2);
+    color: #d1d5db;
+  }
+
+  .global-tooltip .hitter-friendly-info {
+    background-color: rgba(255, 165, 0, 0.2);
+    color: #fed7aa;
+  }
+
+  .global-tooltip .pitcher-friendly-info {
+    background-color: rgba(0, 123, 255, 0.2);
+    color: #93c5fd;
+  }
+
+  .global-tooltip .weather-badge-explanation h4,
+  .global-tooltip .stadium-badge-explanation h4 {
+    color: #f9fafb;
+  }
+
+  .global-tooltip .weather-badge-text,
+  .global-tooltip .stadium-badge-text {
+    color: #e5e7eb;
   }
 }
 
@@ -1167,6 +1276,70 @@
   font-weight: 500 !important;
 }
 
+/* Dark mode support for new tooltip types */
+.theme-dark .global-tooltip .travel-summary,
+.theme-dark .global-tooltip .weather-summary,
+.theme-dark .global-tooltip .stadium-summary {
+  background-color: #374151;
+  color: #f9fafb;
+}
+
+.theme-dark .global-tooltip .travel-context h4,
+.theme-dark .global-tooltip .weather-analysis h4,
+.theme-dark .global-tooltip .stadium-analysis h4 {
+  color: #f9fafb;
+}
+
+.theme-dark .global-tooltip .travel-detail-item {
+  color: #e5e7eb;
+}
+
+.theme-dark .global-tooltip .dome-info {
+  background-color: rgba(108, 117, 125, 0.2);
+  color: #d1d5db;
+}
+
+.theme-dark .global-tooltip .outdoor-info {
+  background-color: rgba(0, 123, 255, 0.2);
+  color: #93c5fd;
+}
+
+.theme-dark .global-tooltip .favorable-weather {
+  background-color: rgba(40, 167, 69, 0.2);
+  color: #86efac;
+}
+
+.theme-dark .global-tooltip .unfavorable-weather {
+  background-color: rgba(220, 53, 69, 0.2);
+  color: #fca5a5;
+}
+
+.theme-dark .global-tooltip .factor-detail-item,
+.theme-dark .global-tooltip .neutral-park-info {
+  background-color: rgba(108, 117, 125, 0.2);
+  color: #d1d5db;
+}
+
+.theme-dark .global-tooltip .hitter-friendly-info {
+  background-color: rgba(255, 165, 0, 0.2);
+  color: #fed7aa;
+}
+
+.theme-dark .global-tooltip .pitcher-friendly-info {
+  background-color: rgba(0, 123, 255, 0.2);
+  color: #93c5fd;
+}
+
+.theme-dark .global-tooltip .weather-badge-explanation h4,
+.theme-dark .global-tooltip .stadium-badge-explanation h4 {
+  color: #f9fafb;
+}
+
+.theme-dark .global-tooltip .weather-badge-text,
+.theme-dark .global-tooltip .stadium-badge-text {
+  color: #e5e7eb;
+}
+
 /* Removed failsafe rules that were overriding dark mode styles */
 
 /* High contrast mode fallback for accessibility */
@@ -1227,6 +1400,349 @@
 /* Force tooltip to always be on top of everything */
 .global-tooltip {
   z-index: 2147483647 !important; /* Maximum safe z-index value */
+}
+
+/* Enhanced Weather Context Tooltip Styling */
+.global-tooltip .weather-context-details {
+  min-width: 380px;
+  max-width: 480px;
+}
+
+.global-tooltip .weather-summary {
+  background-color: #f8fafc;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.global-tooltip .weather-summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.global-tooltip .weather-summary-item:last-child {
+  border-bottom: none;
+}
+
+.global-tooltip .summary-value.impact-very_favorable {
+  color: #059669;
+  font-weight: 600;
+}
+
+.global-tooltip .summary-value.impact-favorable {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.global-tooltip .summary-value.impact-unfavorable {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.global-tooltip .summary-value.impact-very_unfavorable {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.global-tooltip .weather-analysis {
+  margin-top: 12px;
+}
+
+.global-tooltip .detailed-weather {
+  margin-top: 12px;
+}
+
+.global-tooltip .weather-conditions {
+  background-color: #f1f5f9;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.global-tooltip .condition-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.global-tooltip .condition-item {
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  background-color: white;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+.global-tooltip .condition-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.global-tooltip .condition-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.global-tooltip .wind-analysis,
+.global-tooltip .temperature-analysis {
+  background-color: #f8fafc;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.global-tooltip .wind-info,
+.global-tooltip .temp-info {
+  margin-top: 6px;
+}
+
+.global-tooltip .wind-info p,
+.global-tooltip .temp-info p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.global-tooltip .impact-favorable {
+  background-color: rgba(16, 185, 129, 0.1);
+  border: 1px solid #10b981;
+  border-radius: 6px;
+  padding: 8px;
+  margin: 8px 0;
+  color: #065f46;
+}
+
+.global-tooltip .impact-unfavorable {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  padding: 8px;
+  margin: 8px 0;
+  color: #7f1d1d;
+}
+
+.global-tooltip .dome-info,
+.global-tooltip .outdoor-info {
+  background-color: #f1f5f9;
+  border-radius: 6px;
+  padding: 8px;
+  margin: 8px 0;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.global-tooltip .weather-note {
+  margin-top: 6px;
+  font-style: italic;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+/* Travel Impact Tooltip Styles */
+.travel-impact-details {
+  padding: 0;
+}
+
+.travel-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  background-color: var(--background-light, #f7fafc);
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.travel-summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.travel-context {
+  margin-top: 16px;
+}
+
+.travel-context h4 {
+  margin: 0 0 12px 0;
+  color: var(--text-primary, #1a202c);
+  font-size: 1rem;
+}
+
+.travel-details {
+  margin-top: 12px;
+}
+
+.travel-detail-item {
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #4a5568);
+}
+
+/* Weather Context Tooltip Styles */
+.weather-context-details {
+  padding: 0;
+}
+
+.weather-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  background-color: var(--background-light, #f7fafc);
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.weather-summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.weather-analysis {
+  margin-top: 16px;
+}
+
+.weather-analysis h4 {
+  margin: 0 0 12px 0;
+  color: var(--text-primary, #1a202c);
+  font-size: 1rem;
+}
+
+.dome-info,
+.outdoor-info,
+.favorable-weather,
+.unfavorable-weather {
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.dome-info {
+  background-color: rgba(108, 117, 125, 0.1);
+  color: #495057;
+}
+
+.outdoor-info {
+  background-color: rgba(0, 123, 255, 0.1);
+  color: #0056b3;
+}
+
+.favorable-weather {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #155724;
+}
+
+.unfavorable-weather {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #721c24;
+}
+
+.weather-badge-explanation {
+  margin-top: 16px;
+}
+
+.weather-badge-explanation h4 {
+  margin: 0 0 8px 0;
+  color: var(--text-primary, #1a202c);
+  font-size: 0.95rem;
+}
+
+.weather-badge-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #4a5568);
+}
+
+/* Stadium Context Tooltip Styles */
+.stadium-context-details {
+  padding: 0;
+}
+
+.stadium-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  background-color: var(--background-light, #f7fafc);
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.stadium-summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stadium-analysis {
+  margin-top: 16px;
+}
+
+.stadium-analysis h4 {
+  margin: 0 0 12px 0;
+  color: var(--text-primary, #1a202c);
+  font-size: 1rem;
+}
+
+.park-factor-explanation {
+  margin-top: 12px;
+}
+
+.factor-detail-item,
+.hitter-friendly-info,
+.pitcher-friendly-info,
+.neutral-park-info {
+  margin-bottom: 8px;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.factor-detail-item {
+  background-color: rgba(108, 117, 125, 0.1);
+  color: #495057;
+}
+
+.hitter-friendly-info {
+  background-color: rgba(255, 165, 0, 0.1);
+  color: #cc7a00;
+}
+
+.pitcher-friendly-info {
+  background-color: rgba(0, 123, 255, 0.1);
+  color: #0056b3;
+}
+
+.neutral-park-info {
+  background-color: rgba(108, 117, 125, 0.1);
+  color: #495057;
+}
+
+.stadium-badge-explanation {
+  margin-top: 16px;
+}
+
+.stadium-badge-explanation h4 {
+  margin: 0 0 8px 0;
+  color: var(--text-primary, #1a202c);
+  font-size: 0.95rem;
+}
+
+.stadium-badge-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #4a5568);
 }
 
 /* Streak tooltip specific styles */

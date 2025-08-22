@@ -432,6 +432,249 @@
   transform: scale(1.2);
 }
 
+/* Travel Impact Badge */
+.travel-impact-badge {
+  display: inline-block;
+  font-size: 0.9rem;
+  margin-left: 6px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.travel-impact-badge.negative {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #856404;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.travel-impact-badge:hover {
+  transform: scale(1.1);
+  background-color: rgba(255, 193, 7, 0.2);
+  border-color: rgba(255, 193, 7, 0.5);
+}
+
+/* Weather Context Badge */
+.weather-context-badge {
+  display: inline-block;
+  font-size: 0.9rem;
+  margin-left: 6px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.weather-context-badge.favorable {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #155724;
+  border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.weather-context-badge.very_favorable {
+  background-color: rgba(40, 167, 69, 0.2);
+  color: #155724;
+  border: 1px solid rgba(40, 167, 69, 0.5);
+}
+
+.weather-context-badge.unfavorable {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #721c24;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.weather-context-badge.very_unfavorable {
+  background-color: rgba(220, 53, 69, 0.2);
+  color: #721c24;
+  border: 1px solid rgba(220, 53, 69, 0.5);
+}
+
+.weather-context-badge.neutral,
+.weather-context-badge.none {
+  background-color: rgba(108, 117, 125, 0.1);
+  color: #495057;
+  border: 1px solid rgba(108, 117, 125, 0.3);
+}
+
+.weather-context-badge:hover {
+  transform: scale(1.1);
+}
+
+.weather-context-badge.favorable:hover,
+.weather-context-badge.very_favorable:hover {
+  background-color: rgba(40, 167, 69, 0.2);
+  border-color: rgba(40, 167, 69, 0.5);
+}
+
+.weather-context-badge.unfavorable:hover,
+.weather-context-badge.very_unfavorable:hover {
+  background-color: rgba(220, 53, 69, 0.2);
+  border-color: rgba(220, 53, 69, 0.5);
+}
+
+.weather-context-badge.neutral:hover,
+.weather-context-badge.none:hover {
+  background-color: rgba(108, 117, 125, 0.2);
+  border-color: rgba(108, 117, 125, 0.5);
+}
+
+/* Stadium Context Badge */
+.stadium-context-badge {
+  display: inline-block;
+  font-size: 0.9rem;
+  margin-left: 6px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.stadium-context-badge.hitter-friendly {
+  background-color: rgba(255, 165, 0, 0.1);
+  color: #cc7a00;
+  border: 1px solid rgba(255, 165, 0, 0.3);
+}
+
+.stadium-context-badge.pitcher-friendly {
+  background-color: rgba(0, 123, 255, 0.1);
+  color: #0056b3;
+  border: 1px solid rgba(0, 123, 255, 0.3);
+}
+
+.stadium-context-badge.neutral {
+  background-color: rgba(108, 117, 125, 0.1);
+  color: #495057;
+  border: 1px solid rgba(108, 117, 125, 0.3);
+}
+
+.stadium-context-badge:hover {
+  transform: scale(1.1);
+}
+
+.stadium-context-badge.hitter-friendly:hover {
+  background-color: rgba(255, 165, 0, 0.2);
+  border-color: rgba(255, 165, 0, 0.5);
+}
+
+.stadium-context-badge.pitcher-friendly:hover {
+  background-color: rgba(0, 123, 255, 0.2);
+  border-color: rgba(0, 123, 255, 0.5);
+}
+
+.stadium-context-badge.neutral:hover {
+  background-color: rgba(108, 117, 125, 0.2);
+  border-color: rgba(108, 117, 125, 0.5);
+}
+
+/* Stadium Context Summary Section */
+.stadium-context-summary {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.context-summary-header h4 {
+  margin: 0 0 12px 0;
+  color: #495057;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.context-badges-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.context-summary-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.context-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6c757d;
+  min-width: 70px;
+}
+
+.context-summary-badge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.context-summary-badge.weather.favorable,
+.context-summary-badge.weather.very_favorable {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: #155724;
+  border-color: rgba(40, 167, 69, 0.3);
+}
+
+.context-summary-badge.weather.unfavorable,
+.context-summary-badge.weather.very_unfavorable {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #721c24;
+  border-color: rgba(220, 53, 69, 0.3);
+}
+
+.context-summary-badge.weather.neutral,
+.context-summary-badge.weather.none {
+  background-color: rgba(108, 117, 125, 0.1);
+  color: #495057;
+  border-color: rgba(108, 117, 125, 0.3);
+}
+
+.context-summary-badge.stadium.hitter-friendly {
+  background-color: rgba(255, 165, 0, 0.1);
+  color: #cc7a00;
+  border-color: rgba(255, 165, 0, 0.3);
+}
+
+.context-summary-badge.stadium.pitcher-friendly {
+  background-color: rgba(0, 123, 255, 0.1);
+  color: #0056b3;
+  border-color: rgba(0, 123, 255, 0.3);
+}
+
+.context-summary-badge.stadium.neutral,
+.context-summary-badge.neutral {
+  background-color: rgba(108, 117, 125, 0.1);
+  color: #495057;
+  border-color: rgba(108, 117, 125, 0.3);
+}
+
+/* Responsive design for context summary */
+@media (max-width: 768px) {
+  .context-badges-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .context-summary-item {
+    width: 100%;
+  }
+  
+  .context-label {
+    min-width: 80px;
+  }
+}
+
 .hitter-avg {
   font-size: 10px;
   color: #6c757d;
@@ -1865,6 +2108,63 @@
   width: 3px;
   background: currentColor;
   opacity: 0.6;
+}
+
+/* Confidence Score indicators */
+.position-stats .stat.confidence-score {
+  border-width: 2px;
+  font-weight: 600;
+  position: relative;
+}
+
+.position-stats .stat.confidence-score .label {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  letter-spacing: 0.3px;
+}
+
+.position-stats .stat.confidence-score .value {
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.position-stats .stat.confidence-score::after {
+  content: '🎯';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 8px;
+  opacity: 0.7;
+}
+
+/* Data Quality indicators */
+.position-stats .stat.data-quality {
+  border-width: 1px;
+  border-style: dashed;
+  position: relative;
+}
+
+.position-stats .stat.data-quality .label {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  letter-spacing: 0.3px;
+}
+
+.position-stats .stat.data-quality .value {
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.position-stats .stat.data-quality::after {
+  content: '📊';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 8px;
+  opacity: 0.7;
 }
 
 /* Hover effects for better interactivity */

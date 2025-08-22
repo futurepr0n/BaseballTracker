@@ -1801,6 +1801,261 @@ const GlobalTooltip = () => {
       );
     }
 
+    if (type === 'travel_impact' && player) {
+      return (
+        <div className="travel-impact-details">
+          <div className="travel-summary">
+            <div className="travel-summary-item">
+              <span className="summary-label">Travel Distance:</span>
+              <span className="summary-value highlight">{player.distance} miles</span>
+            </div>
+            <div className="travel-summary-item">
+              <span className="summary-label">Travel Impact:</span>
+              <span className="summary-value">{player.travelImpact} points</span>
+            </div>
+            <div className="travel-summary-item">
+              <span className="summary-label">Travel Type:</span>
+              <span className="summary-value">{player.description}</span>
+            </div>
+            {player.restDays !== undefined && (
+              <div className="travel-summary-item">
+                <span className="summary-label">Rest Days:</span>
+                <span className="summary-value">{player.restDays}</span>
+              </div>
+            )}
+          </div>
+          
+          <div className="travel-context">
+            <h4>✈️ Travel Impact Analysis</h4>
+            <div className="context-info">
+              <p>Travel can impact player performance through fatigue and disrupted routines.</p>
+              <div className="travel-details">
+                <div className="travel-detail-item">
+                  <strong>Distance Factor:</strong> {player.distance >= 2000 ? 'Long distance travel' : player.distance >= 1000 ? 'Medium distance travel' : 'Short distance travel'}
+                </div>
+                {player.travelImpact < -2 && (
+                  <div className="travel-detail-item">
+                    <strong>Performance Impact:</strong> Significant negative impact expected
+                  </div>
+                )}
+                {player.travelImpact >= -2 && player.travelImpact < 0 && (
+                  <div className="travel-detail-item">
+                    <strong>Performance Impact:</strong> Moderate negative impact expected
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (type === 'weather_context' && player) {
+      return (
+        <div className="weather-context-details">
+          <div className="weather-summary">
+            <div className="weather-summary-item">
+              <span className="summary-label">Venue:</span>
+              <span className="summary-value highlight">{player.venue}</span>
+            </div>
+            <div className="weather-summary-item">
+              <span className="summary-label">Game Date:</span>
+              <span className="summary-value">{player.date}</span>
+            </div>
+            <div className="weather-summary-item">
+              <span className="summary-label">Stadium Type:</span>
+              <span className="summary-value">{player.isDome ? 'Indoor (Domed)' : 'Outdoor'}</span>
+            </div>
+            <div className="weather-summary-item">
+              <span className="summary-label">Weather Impact:</span>
+              <span className={`summary-value impact-${player.weatherImpact || 'neutral'}`}>
+                {player.weatherImpact === 'very_favorable' ? 'Very Favorable' :
+                 player.weatherImpact === 'favorable' ? 'Favorable' :
+                 player.weatherImpact === 'unfavorable' ? 'Unfavorable' :
+                 player.weatherImpact === 'very_unfavorable' ? 'Very Unfavorable' :
+                 'Neutral'}
+              </span>
+            </div>
+            {player.hasWeatherData && player.currentWeather && (
+              <div className="weather-summary-item">
+                <span className="summary-label">Data Source:</span>
+                <span className="summary-value">Live Weather API</span>
+              </div>
+            )}
+          </div>
+          
+          <div className="weather-analysis">
+            <h4>🌤️ Weather Analysis</h4>
+            <div className="context-info">
+              <p>{player.description || 'Weather conditions assessment for this venue and date.'}</p>
+              
+              {player.isDome && (
+                <div className="dome-info">
+                  <strong>🏟️ Indoor Stadium:</strong> Weather conditions are controlled and do not affect gameplay.
+                </div>
+              )}
+              
+              {!player.isDome && player.hasWeatherData && player.currentWeather && (
+                <div className="detailed-weather">
+                  <div className="weather-conditions">
+                    <h5>📊 Current Conditions</h5>
+                    <div className="condition-grid">
+                      <div className="condition-item">
+                        <span className="condition-label">Temperature:</span>
+                        <span className="condition-value">{player.currentWeather.temperature}°F (feels like {player.currentWeather.feelsLike}°F)</span>
+                      </div>
+                      <div className="condition-item">
+                        <span className="condition-label">Wind:</span>
+                        <span className="condition-value">{player.currentWeather.windSpeed}mph {player.windFactor?.text || ''}</span>
+                      </div>
+                      <div className="condition-item">
+                        <span className="condition-label">Precipitation:</span>
+                        <span className="condition-value">{player.currentWeather.precipitation}% chance</span>
+                      </div>
+                      <div className="condition-item">
+                        <span className="condition-label">Pressure:</span>
+                        <span className="condition-value">{player.currentWeather.pressure} hPa</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {player.windFactor && (
+                    <div className="wind-analysis">
+                      <h5>💨 Wind Impact Analysis</h5>
+                      <div className="wind-info">
+                        <p><strong>{player.windFactor.text}:</strong> {player.windFactor.description}</p>
+                        {player.parkData && (
+                          <p><strong>Park Orientation:</strong> {player.parkData.orientation} (Center field direction)</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {player.temperatureAnalysis && (
+                    <div className="temperature-analysis">
+                      <h5>🌡️ Temperature Impact</h5>
+                      <div className="temp-info">
+                        <p>{player.temperatureAnalysis.description}</p>
+                        <p><strong>Ball Flight Factor:</strong> {((player.temperatureAnalysis.factor - 1) * 100).toFixed(1)}% {player.temperatureAnalysis.factor >= 1 ? 'increase' : 'decrease'}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {!player.isDome && !player.hasWeatherData && (
+                <div className="outdoor-info">
+                  <strong>🌤️ Outdoor Stadium:</strong> Weather conditions may impact ball flight, visibility, and player comfort.
+                  <div className="weather-note">
+                    <em>Weather data temporarily unavailable. Check conditions closer to game time.</em>
+                  </div>
+                </div>
+              )}
+              
+              {player.weatherImpact === 'very_favorable' && (
+                <div className="impact-favorable">
+                  <strong>🚀 Excellent Conditions:</strong> Weather strongly favors offensive performance with enhanced ball flight.
+                </div>
+              )}
+              {player.weatherImpact === 'favorable' && (
+                <div className="impact-favorable">
+                  <strong>✅ Good Conditions:</strong> Weather conditions favor offensive performance.
+                </div>
+              )}
+              {player.weatherImpact === 'unfavorable' && (
+                <div className="impact-unfavorable">
+                  <strong>⚠️ Challenging Conditions:</strong> Weather may reduce offensive performance.
+                </div>
+              )}
+              {player.weatherImpact === 'very_unfavorable' && (
+                <div className="impact-unfavorable">
+                  <strong>🚫 Poor Conditions:</strong> Weather significantly hampers offensive performance.
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {player.badge && (
+            <div className="weather-badge-explanation">
+              <h4>🏷️ Badge Meaning</h4>
+              <div className="badge-info">
+                <span className="weather-badge-text">{player.badge}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    if (type === 'stadium_context' && player) {
+      return (
+        <div className="stadium-context-details">
+          <div className="stadium-summary">
+            <div className="stadium-summary-item">
+              <span className="summary-label">Venue:</span>
+              <span className="summary-value highlight">{player.venue}</span>
+            </div>
+            <div className="stadium-summary-item">
+              <span className="summary-label">Park Factor:</span>
+              <span className="summary-value">{player.parkFactor?.toFixed(3)}x</span>
+            </div>
+            <div className="stadium-summary-item">
+              <span className="summary-label">Category:</span>
+              <span className="summary-value">{player.category}</span>
+            </div>
+            <div className="stadium-summary-item">
+              <span className="summary-label">Hitting Environment:</span>
+              <span className="summary-value">
+                {player.isHitterFriendly ? 'Hitter Friendly' : 
+                 player.isPitcherFriendly ? 'Pitcher Friendly' : 'Neutral'}
+              </span>
+            </div>
+          </div>
+          
+          <div className="stadium-analysis">
+            <h4>🏟️ Stadium Factor Analysis</h4>
+            <div className="context-info">
+              <p>{player.description || 'Park factor and ballpark characteristics assessment.'}</p>
+              
+              <div className="park-factor-explanation">
+                <div className="factor-detail-item">
+                  <strong>Park Factor:</strong> {player.parkFactor > 1.0 ? 'Above average run scoring' : 
+                                                   player.parkFactor < 1.0 ? 'Below average run scoring' : 'Average run scoring'}
+                </div>
+                
+                {player.isHitterFriendly && (
+                  <div className="hitter-friendly-info">
+                    <strong>Hitter Friendly:</strong> Ballpark dimensions, wind patterns, or altitude favor offensive production.
+                  </div>
+                )}
+                
+                {player.isPitcherFriendly && (
+                  <div className="pitcher-friendly-info">
+                    <strong>Pitcher Friendly:</strong> Ballpark characteristics favor pitchers and suppress offensive numbers.
+                  </div>
+                )}
+                
+                {!player.isHitterFriendly && !player.isPitcherFriendly && (
+                  <div className="neutral-park-info">
+                    <strong>Neutral Park:</strong> Ballpark provides balanced conditions for both hitters and pitchers.
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          {player.badge && (
+            <div className="stadium-badge-explanation">
+              <h4>🏷️ Badge Meaning</h4>
+              <div className="badge-info">
+                <span className="stadium-badge-text">{player.badge}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
     // Default content
     return (
       <div className="tooltip-content">
