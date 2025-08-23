@@ -924,12 +924,43 @@ class FirstInningCashService {
   extractPitcherStats(pitcherAnalysis) {
     const inning1 = pitcherAnalysis.inning_patterns?.inning_1 || {};
     
+    // Debug logging to see the actual data structure
+    console.log(`🔍 DEBUG: Pitcher analysis structure for ${pitcherAnalysis.pitcher_name}:`, {
+      pitcher_era: pitcherAnalysis.pitcher_era,
+      era: pitcherAnalysis.era,
+      component_scores: pitcherAnalysis.component_scores,
+      topLevelKeys: Object.keys(pitcherAnalysis),
+      hasComponentScores: !!pitcherAnalysis.component_scores
+    });
+    
+    // Try multiple sources for ERA and WHIP data including component_scores structure
+    const era = pitcherAnalysis.pitcher_era || 
+                pitcherAnalysis.era || 
+                pitcherAnalysis.component_scores?.pitcher_analysis?.era ||
+                pitcherAnalysis.season_era || 
+                pitcherAnalysis.recent_era || 
+                pitcherAnalysis.overall_era ||
+                pitcherAnalysis.stats?.era ||
+                pitcherAnalysis.season_stats?.era ||
+                pitcherAnalysis.recent_form?.era ||
+                4.50; // Reasonable default instead of 0
+    
+    const whip = pitcherAnalysis.pitcher_whip || 
+                 pitcherAnalysis.whip || 
+                 pitcherAnalysis.component_scores?.pitcher_analysis?.whip ||
+                 pitcherAnalysis.season_whip || 
+                 pitcherAnalysis.recent_whip ||
+                 pitcherAnalysis.stats?.whip ||
+                 pitcherAnalysis.season_stats?.whip ||
+                 pitcherAnalysis.recent_form?.whip ||
+                 1.30; // Reasonable default instead of 0
+    
     return {
       name: pitcherAnalysis.pitcher_name,
-      era: pitcherAnalysis.era || 0,
-      whip: pitcherAnalysis.whip || 0,
+      era: era,
+      whip: whip,
       firstInningVuln: inning1.vulnerability_score || 0,
-      firstInningHitRate: inning1.hit_rate || 0,
+      firstInningHitRate: inning1.hit_frequency || inning1.hit_rate || 0,
       gamesAnalyzed: pitcherAnalysis.games_analyzed || pitcherAnalysis.recent_form?.games_analyzed || 0
     };
   }
