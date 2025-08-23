@@ -11,6 +11,7 @@ import { usePlayerScratchpad } from '../contexts/PlayerScratchpadContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { HandednessProvider } from '../contexts/HandednessContext';
 import ThemeToggle from './ThemeToggle';
+import DarkModeToggle from './DarkModeToggle';
 
 // Import debug logging system
 import { debugLog } from '../utils/debugConfig';
@@ -1277,7 +1278,10 @@ const noFilteredData = isFiltering &&
               )}
             </p>
           </div>
-          <ThemeToggle className="dashboard-theme-toggle" />
+          <div className="dashboard-toggles">
+            <DarkModeToggle className="dashboard-dark-mode-toggle" />
+            <ThemeToggle className="dashboard-theme-toggle" />
+          </div>
         </div>
       </header>
       

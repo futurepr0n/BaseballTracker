@@ -237,70 +237,69 @@
 }
 
 /* Dark mode theme variables */
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Dark mode text colors */
-    --text-primary: #ffffff;
-    --text-secondary: #cccccc;
-    --text-muted: #999999;
-    
-    /* Dark mode surface colors */
-    --surface-primary: #1a1a1a;
-    --surface-secondary: #2a2a2a;
-    --surface-hover: #333333;
-    --surface-active: #404040;
-    --border-color: #444444;
-    --border-light: #333333;
-    --accent-color: #4CAF50;
-    --accent-hover: #45a049;
-    --score-color: #4CAF50;
-    --primary-color: #2196f3;
-    --primary-dark: #1976d2;
-    --input-bg: #2a2a2a;
-    --hover-bg: #333333;
-    --stats-bg: #2a2a2a;
-    --item-bg: #2a2a2a;
-  }
+/* Dark Mode - JavaScript Controlled */
+.color-dark {
+  /* Dark mode text colors */
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-muted: #999999;
   
-  .theme-glass {
-    /* CRITICAL: Dark mode glass text colors - high contrast for glass backgrounds */
-    --text-primary: #ffffff;
-    --text-secondary: #e2e8f0;
-    --text-muted: #cbd5e0;
-    --accent-color: #60a5fa;
-    --accent-hover: #3b82f6;
-    
-    /* Dark mode glass adjustments */
-    --surface-primary: rgba(255, 255, 255, 0.05);
-    --surface-secondary: rgba(255, 255, 255, 0.1);
-    --surface-hover: rgba(255, 255, 255, 0.15);
-    --surface-active: rgba(255, 255, 255, 0.2);
-    --border-color: rgba(255, 255, 255, 0.15);
-    --border-light: rgba(255, 255, 255, 0.08);
-    --input-bg: rgba(255, 255, 255, 0.05);
-    --hover-bg: rgba(255, 255, 255, 0.1);
-    --stats-bg: rgba(255, 255, 255, 0.03);
-    --item-bg: rgba(255, 255, 255, 0.03);
-  }
+  /* Dark mode surface colors */
+  --surface-primary: #1a1a1a;
+  --surface-secondary: #2a2a2a;
+  --surface-hover: #333333;
+  --surface-active: #404040;
+  --border-color: #444444;
+  --border-light: #333333;
+  --accent-color: #4CAF50;
+  --accent-hover: #45a049;
+  --score-color: #4CAF50;
+  --primary-color: #2196f3;
+  --primary-dark: #1976d2;
+  --input-bg: #2a2a2a;
+  --hover-bg: #333333;
+  --stats-bg: #2a2a2a;
+  --item-bg: #2a2a2a;
+}
+
+.color-dark.theme-glass {
+  /* CRITICAL: Dark mode glass text colors - high contrast for glass backgrounds */
+  --text-primary: #ffffff;
+  --text-secondary: #e2e8f0;
+  --text-muted: #cbd5e0;
+  --accent-color: #60a5fa;
+  --accent-hover: #3b82f6;
   
-  .theme-classic {
-    /* Dark mode classic text colors - explicit override */
-    --text-primary: #ffffff;
-    --text-secondary: #cccccc;
-    --text-muted: #999999;
-    --accent-color: #4CAF50;
-    --accent-hover: #45a049;
-    
-    /* Dark mode classic adjustments */
-    --surface-primary: #1a1a1a;
-    --surface-secondary: #2a2a2a;
-    --surface-hover: #333333;
-    --surface-active: #404040;
-    --border-color: #444444;
-    --border-light: #333333;
-    --input-bg: #2a2a2a;
-    --hover-bg: #333333;
-    --stats-bg: #2a2a2a;
-    --item-bg: #2a2a2a;
-  }
+  /* Dark mode glass adjustments */
+  --surface-primary: rgba(255, 255, 255, 0.05);
+  --surface-secondary: rgba(255, 255, 255, 0.1);
+  --surface-hover: rgba(255, 255, 255, 0.15);
+  --surface-active: rgba(255, 255, 255, 0.2);
+  --border-color: rgba(255, 255, 255, 0.15);
+  --border-light: rgba(255, 255, 255, 0.08);
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --hover-bg: rgba(255, 255, 255, 0.1);
+  --stats-bg: rgba(255, 255, 255, 0.03);
+  --item-bg: rgba(255, 255, 255, 0.03);
+}
+
+.color-dark.theme-classic {
+  /* Dark mode classic text colors - explicit override */
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-muted: #999999;
+  --accent-color: #4CAF50;
+  --accent-hover: #45a049;
+  
+  /* Dark mode classic adjustments */
+  --surface-primary: #1a1a1a;
+  --surface-secondary: #2a2a2a;
+  --surface-hover: #333333;
+  --surface-active: #404040;
+  --border-color: #444444;
+  --border-light: #333333;
+  --input-bg: #2a2a2a;
+  --hover-bg: #333333;
+  --stats-bg: #2a2a2a;
+  --item-bg: #2a2a2a;
 }

@@ -1,0 +1,231 @@
+/* DarkModeToggle.css */
+
+.dark-mode-toggle-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.dark-mode-toggle-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  color: #333;
+  min-width: 120px;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.dark-mode-toggle-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dark-mode-toggle-button:active {
+  transform: translateY(0);
+}
+
+.dark-mode-toggle-button.transitioning {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.dark-mode-toggle-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Toggle Content */
+.toggle-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.toggle-icons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.icon {
+  font-size: 14px;
+  transition: all 0.3s ease;
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+
+.icon.active {
+  opacity: 1;
+  filter: grayscale(0%);
+  transform: scale(1.1);
+}
+
+.toggle-labels {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  opacity: 0.5;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.label.active {
+  opacity: 1;
+  color: #333;
+}
+
+/* Toggle Slider */
+.toggle-slider {
+  position: relative;
+  width: 40px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.slider-track {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e0e0e0 0%, #f0f0f0 100%);
+  border-radius: 12px;
+  position: relative;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.slider-track.light {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+}
+
+.slider-track.dark {
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  box-shadow: 0 2px 4px rgba(74, 85, 104, 0.3);
+}
+
+.slider-thumb {
+  position: absolute;
+  top: 2px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  left: 2px;
+}
+
+.slider-track.dark .slider-thumb {
+  left: calc(100% - 18px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dark-mode-toggle-button {
+    min-width: 100px;
+    padding: 6px 12px;
+    gap: 8px;
+  }
+  
+  .toggle-labels {
+    display: none;
+  }
+  
+  .toggle-icons {
+    gap: 6px;
+  }
+  
+  .icon {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dark-mode-toggle-button {
+    min-width: 80px;
+    padding: 4px 8px;
+  }
+  
+  .toggle-slider {
+    width: 32px;
+    height: 16px;
+  }
+  
+  .slider-thumb {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .slider-track.dark .slider-thumb {
+    left: calc(100% - 14px);
+  }
+}
+
+/* Theme-specific button styling - Light mode */
+.color-light .dark-mode-toggle-button {
+  background: rgba(255, 255, 255, 0.1);
+  color: #333;
+}
+
+.color-light .label.active {
+  color: #333;
+}
+
+/* Theme-specific button styling - Dark mode */
+.color-dark .dark-mode-toggle-button {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.color-dark .dark-mode-toggle-button:hover {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.color-dark .label {
+  color: #ccc;
+}
+
+.color-dark .label.active {
+  color: #fff;
+}
+
+/* Classic theme adjustments */
+.theme-classic .dark-mode-toggle-button {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.theme-classic.color-light .dark-mode-toggle-button {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.theme-classic.color-dark .dark-mode-toggle-button {
+  background: rgba(45, 55, 72, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}

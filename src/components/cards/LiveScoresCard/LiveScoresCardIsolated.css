@@ -838,6 +838,302 @@
   }
 }
 
+/* DARK MODE STYLING - Neon Light Blue Theme */
+
+/* Dark Mode Wrapper */
+.color-dark .live-scores-isolated-wrapper {
+  background: #0a0a0a !important;
+  border: 1px solid #00d4ff !important;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.2) !important;
+}
+
+/* Dark Mode Header */
+.color-dark .live-scores-isolated-header {
+  background: #0a0a0a !important;
+  border-bottom: 3px solid #00d4ff !important;
+}
+
+.color-dark .live-scores-isolated-header h3 {
+  color: #00d4ff !important;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3) !important;
+}
+
+/* Dark Mode Live Indicator */
+.color-dark .live-scores-isolated-live-indicator {
+  background: #00d4ff !important;
+  color: #000000 !important;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.5) !important;
+}
+
+/* Dark Mode Filter Controls */
+.color-dark .live-scores-isolated-filter-btn {
+  background: #1a1a1a !important;
+  border: 1px solid #00d4ff !important;
+  color: #e0e0e0 !important;
+}
+
+.color-dark .live-scores-isolated-filter-btn:hover:not(:disabled) {
+  background-color: #2a2a2a !important;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3) !important;
+}
+
+.color-dark .live-scores-isolated-filter-btn.active {
+  background-color: #00d4ff !important;
+  border-color: #00d4ff !important;
+  color: #000000 !important;
+}
+
+/* Dark Mode Refresh Button */
+.color-dark .live-scores-isolated-refresh-btn {
+  background: #00d4ff !important;
+  color: #000000 !important;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.5) !important;
+}
+
+.color-dark .live-scores-isolated-refresh-btn:hover {
+  background: #00b8e6 !important;
+  box-shadow: 0 0 25px rgba(0, 212, 255, 0.8) !important;
+}
+
+/* Dark Mode Last Updated */
+.color-dark .live-scores-isolated-last-updated {
+  color: #e0e0e0 !important;
+}
+
+/* Dark Mode Content */
+.color-dark .live-scores-isolated-content {
+  background: #0a0a0a !important;
+}
+
+/* Dark Mode Scrollbar */
+.color-dark .live-scores-isolated-games-container::-webkit-scrollbar-track {
+  background: #1a1a1a !important;
+}
+
+.color-dark .live-scores-isolated-games-container::-webkit-scrollbar-thumb {
+  background: #00d4ff !important;
+}
+
+.color-dark .live-scores-isolated-games-container::-webkit-scrollbar-thumb:hover {
+  background: #00b8e6 !important;
+}
+
+/* Dark Mode Game Cards */
+.color-dark .live-scores-isolated-game-card {
+  border: 2px solid #00d4ff !important;
+  background: #0a0a0a !important;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.2) !important;
+}
+
+.color-dark .live-scores-isolated-game-card.live {
+  border-color: #00d4ff !important;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.4) !important;
+}
+
+.color-dark .live-scores-isolated-game-summary {
+  background: #0a0a0a !important;
+}
+
+.color-dark .live-scores-isolated-game-summary:hover {
+  background-color: #1a1a1a !important;
+}
+
+/* Dark Mode Team Elements */
+.color-dark .live-scores-isolated-team-logo {
+  border: 2px solid #00d4ff !important;
+}
+
+.color-dark .live-scores-isolated-team-name {
+  color: #e0e0e0 !important;
+}
+
+.color-dark .live-scores-isolated-team-record {
+  color: #b0b0b0 !important;
+}
+
+.color-dark .live-scores-isolated-team-score {
+  color: #00d4ff !important;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3) !important;
+}
+
+.color-dark .live-scores-isolated-team-score.winning {
+  color: #00ff88 !important;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.3) !important;
+}
+
+.color-dark .live-scores-isolated-vs-divider {
+  color: #b0b0b0 !important;
+}
+
+/* Dark Mode Status Badges */
+.color-dark .live-scores-isolated-status-badge.live {
+  background: #00d4ff !important;
+  color: #000000 !important;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.5) !important;
+}
+
+.color-dark .live-scores-isolated-status-badge.final {
+  background: #555555 !important;
+  color: #e0e0e0 !important;
+}
+
+.color-dark .live-scores-isolated-status-badge.scheduled {
+  background: #00d4ff !important;
+  color: #000000 !important;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3) !important;
+}
+
+.color-dark .live-scores-isolated-live-details {
+  color: #b0b0b0 !important;
+}
+
+.color-dark .live-scores-isolated-expand-indicator {
+  color: #00d4ff !important;
+}
+
+/* Dark Mode Game Details */
+.color-dark .live-scores-isolated-game-details {
+  border-top: 1px solid #00d4ff !important;
+  background: #0d0d0d !important;
+}
+
+/* Dark Mode Tabs */
+.color-dark .live-scores-isolated-details-tabs {
+  border-bottom: 2px solid #00d4ff !important;
+}
+
+.color-dark .live-scores-isolated-tab-btn {
+  color: #b0b0b0 !important;
+}
+
+.color-dark .live-scores-isolated-tab-btn.active {
+  color: #00d4ff !important;
+  border-bottom-color: #00d4ff !important;
+}
+
+.color-dark .live-scores-isolated-tab-btn:hover:not(.active) {
+  color: #e0e0e0 !important;
+  background-color: rgba(0, 212, 255, 0.1) !important;
+}
+
+/* Dark Mode Live Situation */
+.color-dark .live-scores-isolated-live-situation {
+  background: linear-gradient(135deg, #1a1a00, #2a2a00) !important;
+  border: 2px solid #00d4ff !important;
+}
+
+.color-dark .live-scores-isolated-count-display {
+  color: #00d4ff !important;
+}
+
+/* Dark Mode Base Elements */
+.color-dark .live-scores-isolated-base {
+  background: #333 !important;
+}
+
+.color-dark .live-scores-isolated-base.occupied {
+  background: #00ff88 !important;
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.6) !important;
+}
+
+/* Dark Mode Due Up Players */
+.color-dark .live-scores-isolated-due-up-player {
+  background: #0d0d0d !important;
+  border: 1px solid #00d4ff !important;
+  color: #e0e0e0 !important;
+}
+
+.color-dark .live-scores-isolated-due-up-player:hover {
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3) !important;
+}
+
+.color-dark .live-scores-isolated-player-photo {
+  background: #1a1a1a !important;
+  border: 1px solid #00d4ff !important;
+}
+
+.color-dark .live-scores-isolated-player-name {
+  color: #e0e0e0 !important;
+}
+
+.color-dark .live-scores-isolated-player-stats {
+  color: #b0b0b0 !important;
+}
+
+/* Dark Mode Leaders Section */
+.color-dark .live-scores-isolated-leader-card {
+  background: #0d0d0d !important;
+  border-left: 4px solid #00d4ff !important;
+}
+
+.color-dark .live-scores-isolated-stat-category {
+  color: #00d4ff !important;
+}
+
+/* Dark Mode Play by Play */
+.color-dark .live-scores-isolated-play-item {
+  background: #0d0d0d !important;
+  border: 1px solid #333 !important;
+}
+
+.color-dark .live-scores-isolated-play-item.latest-play {
+  border-color: #00d4ff !important;
+  background: #001122 !important;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.2) !important;
+}
+
+.color-dark .live-scores-isolated-play-header {
+  color: #b0b0b0 !important;
+}
+
+.color-dark .live-scores-isolated-play-inning {
+  background: #1a1a1a !important;
+  color: #e0e0e0 !important;
+}
+
+.color-dark .live-scores-isolated-play-description {
+  color: #e0e0e0 !important;
+}
+
+/* Dark Mode Loading and Error States */
+.color-dark .live-scores-isolated-loading {
+  color: #b0b0b0 !important;
+}
+
+.color-dark .live-scores-isolated-error {
+  background: #330000 !important;
+  color: #ff6666 !important;
+  border: 1px solid #ff3333 !important;
+}
+
+.color-dark .live-scores-isolated-retry-btn {
+  background: #00d4ff !important;
+  color: #000000 !important;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3) !important;
+}
+
+.color-dark .live-scores-isolated-no-games {
+  color: #b0b0b0 !important;
+}
+
+/* Dark Mode Tab Content */
+.color-dark .live-scores-isolated-tab-content h4 {
+  color: #00d4ff !important;
+}
+
+.color-dark .live-scores-isolated-tab-content > div {
+  color: #e0e0e0 !important;
+}
+
+.color-dark .live-scores-isolated-tab-content > div strong {
+  color: #e0e0e0 !important;
+}
+
+/* Dark Mode Mobile Status Row */
+.color-dark .live-scores-isolated-mobile-status-row {
+  border-top: 1px solid #00d4ff !important;
+}
+
 /* Extra small screens (iPhone SE, etc.) */
 @media (max-width: 480px) {
   .live-scores-isolated-header {

@@ -5,7 +5,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 15px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color);
     margin-bottom: 20px;
   }
   
@@ -21,7 +21,7 @@
   .nav-item a {
     display: block;
     padding: 10px 15px;
-    color: #333;
+    color: var(--text-primary);
     text-decoration: none;
     font-weight: 500;
     border-radius: 4px;
@@ -29,11 +29,12 @@
   }
   
   .nav-item a:hover {
-    background-color: #f0f0f0;
+    background-color: var(--hover-bg);
+    color: var(--text-primary);
   }
   
   .nav-item a.active {
-    background-color: #0056b3;
+    background-color: var(--accent-color);
     color: white;
   }
   
@@ -56,7 +57,7 @@
   .menu-toggle .bar {
     height: 3px;
     width: 100%;
-    background-color: #333;
+    background-color: var(--text-primary);
     border-radius: 10px;
     transition: all 0.3s ease;
   }
@@ -100,7 +101,7 @@
     
     .nav-item a {
       padding: 12px 15px;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid var(--border-light);
     }
     
     .nav-item:last-child a {

@@ -33,7 +33,7 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: 20;
+  z-index: 999;
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
@@ -326,4 +326,168 @@
     text-align: center;
     gap: 10px;
   }
+}
+
+/* DARK MODE STYLING - Neon Light Blue Theme */
+
+/* Dark Mode Main Card */
+.color-dark .mlb-weather-card {
+  background: rgba(10, 10, 10, 0.9) !important;
+  border: 1px solid #00d4ff !important;
+  border-left: 4px solid #00d4ff !important;
+  box-shadow: 
+    0 0 15px rgba(0, 212, 255, 0.2),
+    0 2px 8px rgba(0, 212, 255, 0.1),
+    inset 0 1px 0 rgba(0, 212, 255, 0.3) !important;
+}
+
+/* Dark Mode Glass Header */
+.color-dark .mlb-weather-card .glass-header {
+  background: rgba(10, 10, 10, 0.8) !important;
+  backdrop-filter: blur(30px) !important;
+  -webkit-backdrop-filter: blur(30px) !important;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.3) !important;
+  box-shadow: 0 4px 16px rgba(0, 212, 255, 0.1) !important;
+}
+
+/* Override App.css styling - use clean card-header approach like Live Scores */
+.color-dark .mlb-weather-card .card-header h3,
+.color-dark .mlb-weather-card .glass-header h3 {
+  color: #00d4ff !important;
+  text-shadow: none !important;
+  background: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  -webkit-text-stroke: none !important;
+  text-stroke: none !important;
+  font-weight: 700 !important;
+  z-index: 999 !important;
+  position: relative !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: block !important;
+}
+
+
+.color-dark .card-subtitle {
+  color: #b0b0b0 !important;
+}
+
+/* Dark Mode Scrollable Container */
+.color-dark .mlb-weather-card .scrollable-container {
+  background: rgba(10, 10, 10, 0.7) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+/* Dark Mode Scrollbar */
+.color-dark .weather-cards-scroll-container::-webkit-scrollbar-track {
+  background: #1a1a1a !important;
+}
+
+.color-dark .weather-cards-scroll-container::-webkit-scrollbar-thumb {
+  background: #00d4ff !important;
+}
+
+.color-dark .weather-cards-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #00b8e6 !important;
+}
+
+/* Dark Mode Mini Weather Card */
+.color-dark .mini-weather-card {
+  background: #0d0d0d !important;
+  border: 1px solid #00d4ff !important;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.2) !important;
+}
+
+.color-dark .mini-weather-card:hover {
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Dark Mode Mini Card Header */
+.color-dark .mini-card-header {
+  border-bottom: 1px solid #00d4ff !important;
+}
+
+.color-dark .mini-card-header h4 {
+  color: #00d4ff !important;
+}
+
+.color-dark .venue-name {
+  color: #b0b0b0 !important;
+}
+
+/* Dark Mode Hour Slots */
+.color-dark .mini-hour-slot {
+  background: #0a0a0a !important;
+  border: 1px solid #00d4ff !important;
+}
+
+.color-dark .hour-time {
+  color: #b0b0b0 !important;
+}
+
+.color-dark .mini-hour-slot .temp {
+  color: #e0e0e0 !important;
+}
+
+.color-dark .mini-hour-slot .precip,
+.color-dark .mini-hour-slot .wind {
+  color: #b0b0b0 !important;
+}
+
+/* Dark Mode Wind Factor */
+.color-dark .mini-wind-factor {
+  background: #0a0a0a !important;
+  border: 1px solid #00d4ff !important;
+}
+
+.color-dark .mini-wind-factor .wind-factor-text strong {
+  color: #e0e0e0 !important;
+}
+
+.color-dark .mini-wind-factor .wind-factor-text span {
+  color: #b0b0b0 !important;
+}
+
+/* Dark Mode Weather Condition Colors - Enhanced for visibility */
+.color-dark .positive {
+  color: #00ff88 !important;
+  text-shadow: 0 0 5px rgba(0, 255, 136, 0.3) !important;
+}
+
+.color-dark .negative {
+  color: #ff4444 !important;
+  text-shadow: 0 0 5px rgba(255, 68, 68, 0.3) !important;
+}
+
+.color-dark .caution {
+  color: #ffaa00 !important;
+  text-shadow: 0 0 5px rgba(255, 170, 0, 0.3) !important;
+}
+
+/* Dark Mode Loading States */
+.color-dark .loading-state,
+.color-dark .error-state,
+.color-dark .empty-state {
+  color: #b0b0b0 !important;
+}
+
+.color-dark .loading-spinner {
+  border: 3px solid #333333 !important;
+  border-top: 3px solid #00d4ff !important;
+}
+
+.color-dark .error-message {
+  color: #ff6666 !important;
+}
+
+/* Dark Mode Dome Message */
+.color-dark .dome-message {
+  color: #b0b0b0 !important;
 }
