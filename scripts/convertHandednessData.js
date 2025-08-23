@@ -7,8 +7,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const INPUT_DIR = path.join(__dirname, '../public/data/stats');
-const OUTPUT_DIR = path.join(__dirname, '../public/data/handedness');
+const INPUT_DIR = path.join(__dirname, '../../BaseballData/data/stats');
+const OUTPUT_DIR = path.join(__dirname, '../../BaseballData/data/handedness');
 
 // Ensure output directory exists
 if (!fs.existsSync(OUTPUT_DIR)) {

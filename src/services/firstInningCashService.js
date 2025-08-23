@@ -17,29 +17,13 @@ class FirstInningCashService {
    * Main method to identify first inning cash opportunities
    */
   async identifyFirstInningOpportunities(analysis, opportunities, matchups, lineupData) {
-    console.log('🥇 Starting first inning cash analysis...');
-    console.log('📊 Analysis data available:', !!analysis);
-    console.log('🎯 Opportunities available:', !!opportunities, opportunities?.length || 0);
-    console.log('⚾ Matchups available:', !!matchups);
-    
-    // Debug data structure
-    if (analysis) {
-      console.log('📊 Analysis structure:', {
-        has_matchup_analysis: !!analysis.matchup_analysis,
-        matchup_analysis_keys: analysis.matchup_analysis ? Object.keys(analysis.matchup_analysis) : [],
-        has_weakspot_opportunities: !!analysis.weakspot_opportunities,
-        weakspot_opportunities_count: analysis.weakspot_opportunities?.length || 0,
-        analysis_keys: Object.keys(analysis),
-        debug_info: analysis.debug_info
-      });
-    }
+    // First inning cash analysis started
 
     const cacheKey = this.generateCacheKey(analysis, opportunities, matchups);
     
     if (this.cache.has(cacheKey)) {
       const cached = this.cache.get(cacheKey);
       if (Date.now() - cached.timestamp < this.cacheExpiry) {
-        console.log('📚 Returning cached first inning analysis');
         return cached.data;
       }
     }
@@ -49,25 +33,14 @@ class FirstInningCashService {
       let candidates = [];
       
       if (analysis?.matchup_analysis && Object.keys(analysis.matchup_analysis).length > 0) {
-        console.log('✅ Using comprehensive matchup analysis');
-        console.log('🔍 Available matchups:', Object.keys(analysis.matchup_analysis));
-        candidates = this.processFirstInningCandidates(analysis, opportunities, matchups, lineupData);
+        candidates = await this.processFirstInningCandidates(analysis, opportunities, matchups, lineupData);
       } else if (opportunities && opportunities.length > 0) {
-        console.log('🔄 Falling back to opportunities-based analysis');
         candidates = this.processOpportunitiesBasedCandidates(opportunities);
       } else if (analysis?.weakspot_opportunities && analysis.weakspot_opportunities.length > 0) {
-        console.log('🔄 Using weakspot opportunities for first inning analysis');
         candidates = this.processOpportunitiesBasedCandidates(analysis.weakspot_opportunities);
       } else {
-        console.log('❌ No suitable data for first inning analysis');
-        console.log('Available data sources:', {
-          matchup_analysis: !!analysis?.matchup_analysis,
-          matchup_analysis_count: analysis?.matchup_analysis ? Object.keys(analysis.matchup_analysis).length : 0,
-          opportunities: !!opportunities,
-          opportunities_count: opportunities?.length || 0,
-          weakspot_opportunities: !!analysis?.weakspot_opportunities,
-          weakspot_opportunities_count: analysis?.weakspot_opportunities?.length || 0
-        });
+        console.warn('No suitable data for first inning analysis');
+        return [];
       }
 
       const rankedCandidates = this.rankCandidates(candidates);
@@ -89,7 +62,7 @@ class FirstInningCashService {
         timestamp: Date.now()
       });
 
-      console.log(`✅ First inning analysis complete: ${rankedCandidates.length} candidates found`);
+      // Analysis complete
       return result;
     } catch (error) {
       console.error('❌ Error in first inning cash analysis:', error);
@@ -104,32 +77,26 @@ class FirstInningCashService {
   /**
    * Process all players across matchups to find first inning candidates
    */
-  processFirstInningCandidates(analysis, opportunities, matchups, lineupData) {
+  async processFirstInningCandidates(analysis, opportunities, matchups, lineupData) {
     const candidates = [];
     
     if (!analysis?.matchup_analysis) {
-      console.log('❌ No matchup_analysis found in analysis data');
       return candidates;
     }
 
-    console.log('🔍 Processing first inning candidates from matchup_analysis...');
-    console.log('📊 Available matchups:', Object.keys(analysis.matchup_analysis));
 
     // Process each matchup in the analysis
-    Object.entries(analysis.matchup_analysis).forEach(([matchupKey, matchupData]) => {
+    for (const [matchupKey, matchupData] of Object.entries(analysis.matchup_analysis)) {
       const { away_pitcher_analysis, home_pitcher_analysis, matchup } = matchupData;
       
-      console.log(`🎯 Processing matchup: ${matchupKey}`);
       console.log(`   Away pitcher: ${away_pitcher_analysis?.pitcher_name}`);
       console.log(`   Home pitcher: ${home_pitcher_analysis?.pitcher_name}`);
       
       // Process away team batting against home pitcher
       if (home_pitcher_analysis && matchup?.away_team) {
-        console.log(`⚾ Processing away team (${matchup.away_team}) vs home pitcher (${home_pitcher_analysis.pitcher_name})`);
         
         // Check for inning patterns qualification first
         if (this.evaluateInningPatterns(home_pitcher_analysis.inning_patterns)) {
-          console.log(`✅ ${home_pitcher_analysis.pitcher_name} has qualifying inning patterns`);
           
           // Get batters for away team from position vulnerabilities
           const awayBatters = this.extractBattersFromPositionVulnerabilities(
@@ -139,8 +106,8 @@ class FirstInningCashService {
             lineupData
           );
           
-          awayBatters.forEach(batter => {
-            const candidate = this.evaluateFirstInningCandidate(
+          for (const batter of awayBatters) {
+            const candidate = await this.evaluateFirstInningCandidate(
               batter,
               home_pitcher_analysis,
               matchupData,
@@ -149,19 +116,16 @@ class FirstInningCashService {
             if (candidate) {
               candidates.push(candidate);
             }
-          });
+          }
         } else {
-          console.log(`❌ ${home_pitcher_analysis.pitcher_name} doesn't have qualifying inning patterns`);
         }
       }
 
       // Process home team batting against away pitcher  
       if (away_pitcher_analysis && matchup?.home_team) {
-        console.log(`🏠 Processing home team (${matchup.home_team}) vs away pitcher (${away_pitcher_analysis.pitcher_name})`);
         
         // Check for inning patterns qualification first
         if (this.evaluateInningPatterns(away_pitcher_analysis.inning_patterns)) {
-          console.log(`✅ ${away_pitcher_analysis.pitcher_name} has qualifying inning patterns`);
           
           // Get batters for home team from position vulnerabilities
           const homeBatters = this.extractBattersFromPositionVulnerabilities(
@@ -171,8 +135,8 @@ class FirstInningCashService {
             lineupData
           );
           
-          homeBatters.forEach(batter => {
-            const candidate = this.evaluateFirstInningCandidate(
+          for (const batter of homeBatters) {
+            const candidate = await this.evaluateFirstInningCandidate(
               batter,
               away_pitcher_analysis,
               matchupData,
@@ -181,14 +145,12 @@ class FirstInningCashService {
             if (candidate) {
               candidates.push(candidate);
             }
-          });
+          }
         } else {
-          console.log(`❌ ${away_pitcher_analysis.pitcher_name} doesn't have qualifying inning patterns`);
         }
       }
-    });
+    }
 
-    console.log(`🎯 Found ${candidates.length} total first inning candidates across ${Object.keys(analysis.matchup_analysis).length} matchups`);
     return candidates;
   }
 
@@ -198,11 +160,8 @@ class FirstInningCashService {
   processOpportunitiesBasedCandidates(opportunities) {
     const candidates = [];
     
-    console.log('🔄 Processing opportunities-based first inning candidates...');
-    console.log('📊 Sample opportunity data:', opportunities?.[0]);
     
     if (!opportunities || !Array.isArray(opportunities)) {
-      console.log('❌ No opportunities data available');
       return candidates;
     }
 
@@ -212,7 +171,6 @@ class FirstInningCashService {
       const position = this.extractPlayerPosition(opp);
       const team = opp.team || opp.Team || 'Unknown';
       
-      console.log(`🔍 Checking opportunity ${index + 1}: ${playerName} (${team}) pos: ${position}`);
       
       // Check if this could be a first inning opportunity
       const isTopOrder = [1, 2, 3].includes(position);
@@ -223,7 +181,6 @@ class FirstInningCashService {
       const couldBeFirstInningCandidate = isTopOrder || hasHighScore || hasGoodAverage;
       
       if (couldBeFirstInningCandidate) {
-        console.log(`✅ ${playerName} qualifies for evaluation (pos: ${position}, hr_score: ${opp.hr_score}, avg: ${opp.recent_avg || opp.batting_average})`);
         
         // Use position if available, otherwise estimate based on performance
         let estimatedPosition = position;
@@ -244,11 +201,9 @@ class FirstInningCashService {
           candidates.push(candidate);
         }
       } else {
-        console.log(`❌ ${playerName} doesn't qualify (pos: ${position}, hr_score: ${opp.hr_score}, avg: ${opp.recent_avg || opp.batting_average})`);
       }
     });
 
-    console.log(`✅ Found ${candidates.length} opportunities-based candidates`);
     return candidates;
   }
 
@@ -257,7 +212,6 @@ class FirstInningCashService {
    */
   evaluateOpportunityBasedCandidate(opportunity, position) {
     const playerName = opportunity.player_name || opportunity.playerName || opportunity.name;
-    console.log(`🔍 Evaluating opportunity-based candidate: ${playerName} (pos ${position})`);
 
     // Simplified criteria based on available opportunity data
     const criteria = {
@@ -270,14 +224,12 @@ class FirstInningCashService {
     // Must meet at least 2 criteria for opportunities-based analysis
     const qualifyingCriteria = Object.values(criteria).filter(Boolean).length;
     if (qualifyingCriteria < 2) {
-      console.log(`❌ ${playerName} only meets ${qualifyingCriteria}/4 criteria (need 2+)`);
       return null;
     }
 
     // Calculate simplified score
     const score = this.calculateOpportunityBasedScore(opportunity, criteria, position);
 
-    console.log(`✅ ${playerName} qualifies with opportunity-based score: ${score.toFixed(1)}`);
 
     return {
       player: {
@@ -349,11 +301,9 @@ class FirstInningCashService {
     const batters = [];
     
     if (!positionVulnerabilities) {
-      console.log(`❌ No position vulnerabilities data for team ${teamAbbr}`);
       return batters;
     }
 
-    console.log(`🔍 Examining position vulnerabilities for ${teamAbbr}:`, Object.keys(positionVulnerabilities));
 
     // Look for positions 1, 2, 3 (first three batting positions)
     [1, 2, 3].forEach(position => {
@@ -361,16 +311,13 @@ class FirstInningCashService {
       const positionData = positionVulnerabilities[positionKey];
       
       if (positionData) {
-        console.log(`📊 Position ${position} data for ${teamAbbr}:`, positionData);
         
         if (this.evaluatePositionVulnerability(positionVulnerabilities, position)) {
-          console.log(`✅ Position ${position} has vulnerability for team ${teamAbbr}`);
           
           // PRIORITY 1: Try to get the actual player name from lineup data FIRST
           const lineupPlayer = this.getLineupHitterForPosition(position, teamAbbr, lineupData);
           
           if (lineupPlayer) {
-            console.log(`👤 Found lineup player: ${lineupPlayer.name} in position ${position} for team ${teamAbbr}`);
             
             // Try to find full player data from opportunities
             const playerData = opportunities?.find(opp => {
@@ -406,7 +353,6 @@ class FirstInningCashService {
                              positionData.batter_name;
             
             if (playerName) {
-              console.log(`👤 Found player name in position data: ${playerName}`);
               
               // Try to find full player data from opportunities
               const playerData = opportunities?.find(opp => {
@@ -438,7 +384,6 @@ class FirstInningCashService {
               const playerInPosition = this.findPlayerInPosition(opportunities, teamAbbr, position);
               
               if (playerInPosition) {
-                console.log(`👤 Found player ${playerInPosition.player_name || playerInPosition.playerName} in position ${position} from opportunities`);
                 batters.push({
                   ...playerInPosition,
                   position: position,
@@ -447,7 +392,6 @@ class FirstInningCashService {
               } else {
                 // LAST RESORT: Create placeholder only when all else fails
                 console.log(`❓ Creating placeholder for position ${position} on team ${teamAbbr} - no player name found despite trying lineup data, position data, and opportunities`);
-                console.log(`🔍 Lineup data structure:`, lineupData);
                 batters.push({
                   player_name: `Position ${position} Hitter (${teamAbbr})`,
                   playerName: `Position ${position} Hitter (${teamAbbr})`,
@@ -469,7 +413,6 @@ class FirstInningCashService {
       }
     });
 
-    console.log(`🎯 Found ${batters.length} qualifying batters for team ${teamAbbr} in positions 1-3`);
     return batters;
   }
 
@@ -507,17 +450,15 @@ class FirstInningCashService {
   /**
    * Evaluate a single batter for first inning candidacy
    */
-  evaluateFirstInningCandidate(batter, pitcherAnalysis, matchupData, side) {
+  async evaluateFirstInningCandidate(batter, pitcherAnalysis, matchupData, side) {
     // Get player position (1-9 batting order)
     const position = this.extractPlayerPosition(batter);
     
     // Temporarily allow all positions for testing (was 1,2,3 only)
     if (!position || position < 1 || position > 9) {
-      console.log(`❌ Invalid position ${position} for ${batter.player_name || batter.playerName}`);
       return null;
     }
 
-    console.log(`🔍 Evaluating ${batter.player_name || batter.playerName} (pos ${position}) vs ${pitcherAnalysis.pitcher_name}`);
 
     // Evaluate criteria
     const criteria = {
@@ -530,19 +471,16 @@ class FirstInningCashService {
       optimalMatchup: this.evaluateOptimalMatchup(batter, pitcherAnalysis)
     };
 
-    console.log(`📊 Criteria for ${batter.player_name || batter.playerName}:`, criteria);
 
     // Temporarily reduced requirement for testing: must meet at least 1 criterion (was 2)
     const qualifyingCriteria = Object.values(criteria).filter(Boolean).length;
     if (qualifyingCriteria < 1) {
-      console.log(`❌ ${batter.player_name || batter.playerName} only meets ${qualifyingCriteria}/4 criteria (need 1+)`);
       return null;
     }
 
     // Calculate composite score
     const score = this.calculateFirstInningScore(batter, pitcherAnalysis, criteria, position);
 
-    console.log(`✅ ${batter.player_name || batter.playerName} qualifies! Score: ${score.toFixed(1)}`);
 
     return {
       player: {
@@ -573,7 +511,7 @@ class FirstInningCashService {
       criteria: criteria,
       data: {
         batterStats: this.extractBatterStats(batter),
-        pitcherStats: this.extractPitcherStats(pitcherAnalysis),
+        pitcherStats: await this.extractPitcherStats(pitcherAnalysis),
         rawData: batter
       }
     };
@@ -621,11 +559,9 @@ class FirstInningCashService {
    */
   evaluateInningPatterns(inningPatterns) {
     if (!inningPatterns) {
-      console.log('❌ No inning patterns data available');
       return false;
     }
 
-    console.log('📊 Evaluating inning patterns:', inningPatterns);
 
     // Check first 3 innings for green/orange vulnerability
     const firstThreeInnings = [1, 2, 3];
@@ -643,12 +579,9 @@ class FirstInningCashService {
         // Green/orange threshold: 10%+ (was 15%+)
         if (vulnerabilityScore >= 10) {
           qualifyingInnings++;
-          console.log(`   ✅ Inning ${inning} qualifies (${vulnerabilityScore}%)`);
         } else {
-          console.log(`   ❌ Inning ${inning} doesn't qualify (${vulnerabilityScore}%)`);
         }
       } else {
-        console.log(`   ❌ No data for inning ${inning}`);
       }
     });
 
@@ -919,17 +852,54 @@ class FirstInningCashService {
   }
 
   /**
-   * Extract pitcher stats for display
+   * Extract pitcher stats for display - now loads real ERA from CSV data
    */
-  extractPitcherStats(pitcherAnalysis) {
+  async extractPitcherStats(pitcherAnalysis) {
     const inning1 = pitcherAnalysis.inning_patterns?.inning_1 || {};
+    const pitcherName = pitcherAnalysis.pitcher_name;
+    
+    // Try to get real pitcher data from CSV via baseballAnalysisService
+    let realERA = null;
+    let realWHIP = null;
+    let dataSource = 'analysis';
+    
+    if (pitcherName) {
+      try {
+        // Import the baseball analysis service to get real pitcher data
+        const { baseballAnalysisService } = await import('./baseballAnalysisService.js');
+        const pitcherStats = await baseballAnalysisService.findPitcherStatsFromCSV(pitcherName);
+        
+        if (pitcherStats) {
+          realERA = parseFloat(pitcherStats.era) || parseFloat(pitcherStats.ERA);
+          realWHIP = parseFloat(pitcherStats.whip) || parseFloat(pitcherStats.WHIP);
+          dataSource = 'csv';
+          console.log(`✅ Real pitcher stats loaded for ${pitcherName}: ERA ${realERA}, WHIP ${realWHIP}`);
+        }
+      } catch (error) {
+        console.warn(`Failed to load real pitcher data for ${pitcherName}:`, error.message);
+      }
+    }
+    
+    // Use real ERA/WHIP if available, otherwise fall back to analysis data, then defaults
+    const era = realERA || 
+                pitcherAnalysis.pitcher_era || 
+                pitcherAnalysis.era || 
+                pitcherAnalysis.component_scores?.pitcher_analysis?.era ||
+                4.50; // Final fallback
+    
+    const whip = realWHIP || 
+                 pitcherAnalysis.pitcher_whip || 
+                 pitcherAnalysis.whip || 
+                 pitcherAnalysis.component_scores?.pitcher_analysis?.whip ||
+                 1.30; // Final fallback
     
     return {
-      name: pitcherAnalysis.pitcher_name,
-      era: pitcherAnalysis.era || 0,
-      whip: pitcherAnalysis.whip || 0,
+      name: pitcherName,
+      era: era,
+      whip: whip,
+      dataSource: dataSource,
       firstInningVuln: inning1.vulnerability_score || 0,
-      firstInningHitRate: inning1.hit_rate || 0,
+      firstInningHitRate: inning1.hit_frequency || inning1.hit_rate || 0,
       gamesAnalyzed: pitcherAnalysis.games_analyzed || pitcherAnalysis.recent_form?.games_analyzed || 0
     };
   }
@@ -983,11 +953,8 @@ class FirstInningCashService {
    * Get lineup hitter for a specific position from lineup data
    */
   getLineupHitterForPosition(position, teamAbbr, lineupData) {
-    console.log(`🔍 Looking for position ${position} hitter for team ${teamAbbr}`);
-    console.log(`📊 Lineup data structure:`, lineupData);
     
     if (!lineupData) {
-      console.log(`❌ No lineup data provided for team ${teamAbbr}`);
       return null;
     }
 
@@ -998,11 +965,9 @@ class FirstInningCashService {
     }
     
     if (!games || !Array.isArray(games)) {
-      console.log(`❌ No games array found in lineup data for team ${teamAbbr}`);
       return null;
     }
 
-    console.log(`🎮 Found ${games.length} games in lineup data`);
 
     // Find the game for this team
     const game = games.find(game => {
@@ -1016,7 +981,6 @@ class FirstInningCashService {
     });
 
     if (!game) {
-      console.log(`❌ No game found for team ${teamAbbr} in lineup data`);
       console.log(`Available teams:`, games.map(g => ({
         away: g.teams?.away?.abbr || g.away_team || g.awayTeam,
         home: g.teams?.home?.abbr || g.home_team || g.homeTeam
@@ -1039,10 +1003,8 @@ class FirstInningCashService {
       lineup = isHomeTeam ? game.lineup.home : game.lineup.away;
     }
     
-    console.log(`📋 Lineup structure:`, lineup);
     
     if (!lineup || !Array.isArray(lineup)) {
-      console.log(`❌ No lineup found for ${isHomeTeam ? 'home' : 'away'} team ${teamAbbr}`);
       return null;
     }
 
@@ -1051,19 +1013,16 @@ class FirstInningCashService {
     // Find the player in the specified position
     const player = lineup.find(player => {
       const playerPosition = parseInt(player.batting_order || player.position || player.order || player.lineup_position);
-      console.log(`🔍 Checking player ${player.name}: position ${playerPosition} vs target ${position}`);
       return playerPosition === position;
     });
 
     if (player) {
-      console.log(`✅ Found player ${player.name} in position ${position} for team ${teamAbbr}`);
       return {
         name: player.name,
         position: position,
         team: teamAbbr
       };
     } else {
-      console.log(`❌ No player found in position ${position} for team ${teamAbbr}`);
       console.log(`Available positions:`, lineup.map(p => ({
         name: p.name, 
         position: parseInt(p.batting_order || p.position || p.order || p.lineup_position)
