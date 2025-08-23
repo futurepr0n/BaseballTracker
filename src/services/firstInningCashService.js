@@ -33,7 +33,7 @@ class FirstInningCashService {
       let candidates = [];
       
       if (analysis?.matchup_analysis && Object.keys(analysis.matchup_analysis).length > 0) {
-        candidates = this.processFirstInningCandidates(analysis, opportunities, matchups, lineupData);
+        candidates = await this.processFirstInningCandidates(analysis, opportunities, matchups, lineupData);
       } else if (opportunities && opportunities.length > 0) {
         candidates = this.processOpportunitiesBasedCandidates(opportunities);
       } else if (analysis?.weakspot_opportunities && analysis.weakspot_opportunities.length > 0) {
@@ -77,7 +77,7 @@ class FirstInningCashService {
   /**
    * Process all players across matchups to find first inning candidates
    */
-  processFirstInningCandidates(analysis, opportunities, matchups, lineupData) {
+  async processFirstInningCandidates(analysis, opportunities, matchups, lineupData) {
     const candidates = [];
     
     if (!analysis?.matchup_analysis) {
@@ -86,7 +86,7 @@ class FirstInningCashService {
 
 
     // Process each matchup in the analysis
-    Object.entries(analysis.matchup_analysis).forEach(([matchupKey, matchupData]) => {
+    for (const [matchupKey, matchupData] of Object.entries(analysis.matchup_analysis)) {
       const { away_pitcher_analysis, home_pitcher_analysis, matchup } = matchupData;
       
       console.log(`   Away pitcher: ${away_pitcher_analysis?.pitcher_name}`);
@@ -106,8 +106,8 @@ class FirstInningCashService {
             lineupData
           );
           
-          awayBatters.forEach(batter => {
-            const candidate = this.evaluateFirstInningCandidate(
+          for (const batter of awayBatters) {
+            const candidate = await this.evaluateFirstInningCandidate(
               batter,
               home_pitcher_analysis,
               matchupData,
@@ -116,7 +116,7 @@ class FirstInningCashService {
             if (candidate) {
               candidates.push(candidate);
             }
-          });
+          }
         } else {
         }
       }
@@ -135,8 +135,8 @@ class FirstInningCashService {
             lineupData
           );
           
-          homeBatters.forEach(batter => {
-            const candidate = this.evaluateFirstInningCandidate(
+          for (const batter of homeBatters) {
+            const candidate = await this.evaluateFirstInningCandidate(
               batter,
               away_pitcher_analysis,
               matchupData,
@@ -145,11 +145,11 @@ class FirstInningCashService {
             if (candidate) {
               candidates.push(candidate);
             }
-          });
+          }
         } else {
         }
       }
-    });
+    }
 
     return candidates;
   }
@@ -450,7 +450,7 @@ class FirstInningCashService {
   /**
    * Evaluate a single batter for first inning candidacy
    */
-  evaluateFirstInningCandidate(batter, pitcherAnalysis, matchupData, side) {
+  async evaluateFirstInningCandidate(batter, pitcherAnalysis, matchupData, side) {
     // Get player position (1-9 batting order)
     const position = this.extractPlayerPosition(batter);
     
@@ -511,7 +511,7 @@ class FirstInningCashService {
       criteria: criteria,
       data: {
         batterStats: this.extractBatterStats(batter),
-        pitcherStats: this.extractPitcherStats(pitcherAnalysis),
+        pitcherStats: await this.extractPitcherStats(pitcherAnalysis),
         rawData: batter
       }
     };
@@ -852,38 +852,52 @@ class FirstInningCashService {
   }
 
   /**
-   * Extract pitcher stats for display
+   * Extract pitcher stats for display - now loads real ERA from CSV data
    */
-  extractPitcherStats(pitcherAnalysis) {
+  async extractPitcherStats(pitcherAnalysis) {
     const inning1 = pitcherAnalysis.inning_patterns?.inning_1 || {};
+    const pitcherName = pitcherAnalysis.pitcher_name;
     
+    // Try to get real pitcher data from CSV via baseballAnalysisService
+    let realERA = null;
+    let realWHIP = null;
+    let dataSource = 'analysis';
     
-    // Try multiple sources for ERA and WHIP data including component_scores structure
-    const era = pitcherAnalysis.pitcher_era || 
+    if (pitcherName) {
+      try {
+        // Import the baseball analysis service to get real pitcher data
+        const { baseballAnalysisService } = await import('./baseballAnalysisService.js');
+        const pitcherStats = await baseballAnalysisService.findPitcherStatsFromCSV(pitcherName);
+        
+        if (pitcherStats) {
+          realERA = parseFloat(pitcherStats.era) || parseFloat(pitcherStats.ERA);
+          realWHIP = parseFloat(pitcherStats.whip) || parseFloat(pitcherStats.WHIP);
+          dataSource = 'csv';
+          console.log(`✅ Real pitcher stats loaded for ${pitcherName}: ERA ${realERA}, WHIP ${realWHIP}`);
+        }
+      } catch (error) {
+        console.warn(`Failed to load real pitcher data for ${pitcherName}:`, error.message);
+      }
+    }
+    
+    // Use real ERA/WHIP if available, otherwise fall back to analysis data, then defaults
+    const era = realERA || 
+                pitcherAnalysis.pitcher_era || 
                 pitcherAnalysis.era || 
                 pitcherAnalysis.component_scores?.pitcher_analysis?.era ||
-                pitcherAnalysis.season_era || 
-                pitcherAnalysis.recent_era || 
-                pitcherAnalysis.overall_era ||
-                pitcherAnalysis.stats?.era ||
-                pitcherAnalysis.season_stats?.era ||
-                pitcherAnalysis.recent_form?.era ||
-                4.50; // Reasonable default instead of 0
+                4.50; // Final fallback
     
-    const whip = pitcherAnalysis.pitcher_whip || 
+    const whip = realWHIP || 
+                 pitcherAnalysis.pitcher_whip || 
                  pitcherAnalysis.whip || 
                  pitcherAnalysis.component_scores?.pitcher_analysis?.whip ||
-                 pitcherAnalysis.season_whip || 
-                 pitcherAnalysis.recent_whip ||
-                 pitcherAnalysis.stats?.whip ||
-                 pitcherAnalysis.season_stats?.whip ||
-                 pitcherAnalysis.recent_form?.whip ||
-                 1.30; // Reasonable default instead of 0
+                 1.30; // Final fallback
     
     return {
-      name: pitcherAnalysis.pitcher_name,
+      name: pitcherName,
       era: era,
       whip: whip,
+      dataSource: dataSource,
       firstInningVuln: inning1.vulnerability_score || 0,
       firstInningHitRate: inning1.hit_frequency || inning1.hit_rate || 0,
       gamesAnalyzed: pitcherAnalysis.games_analyzed || pitcherAnalysis.recent_form?.games_analyzed || 0
