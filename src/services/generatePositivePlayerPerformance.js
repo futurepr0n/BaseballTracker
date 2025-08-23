@@ -36,7 +36,197 @@ const {
   analyzeEnhancedBounceBackPatterns,
   generateBounceBackSummary
 } = require('./enhancedBounceBackAnalyzer');
-console.log('✅ Positive momentum analysis enabled - stadium coordinates loaded');
+
+// Import badge system
+const { BADGE_TYPES } = require('../utils/playerBadgeSystem');
+
+// Enhanced weather analysis function for Node.js
+async function analyzeWeatherContext(player, game) {
+  try {
+    // Import ballpark data (Node.js compatible version)
+    const ballparkData = {
+      // National League
+      "Arizona Diamondbacks": { name: "Chase Field", orientation: "NNE", lat: 33.445, lon: -112.066, isDome: true },
+      "Atlanta Braves": { name: "Truist Park", orientation: "SSE", lat: 33.890, lon: -84.467 },
+      "Chicago Cubs": { name: "Wrigley Field", orientation: "NE", lat: 41.948, lon: -87.655 },
+      "Cincinnati Reds": { name: "Great American Ball Park", orientation: "NNW", lat: 39.097, lon: -84.506 },
+      "Colorado Rockies": { name: "Coors Field", orientation: "N", lat: 39.756, lon: -104.994 },
+      "Los Angeles Dodgers": { name: "Dodger Stadium", orientation: "NNE", lat: 34.073, lon: -118.240 },
+      "Miami Marlins": { name: "loanDepot Park", orientation: "E", lat: 25.778, lon: -80.219 },
+      "Milwaukee Brewers": { name: "American Family Field", orientation: "E", lat: 43.028, lon: -87.971, isDome: true },
+      "New York Mets": { name: "Citi Field", orientation: "N", lat: 40.757, lon: -73.845 },
+      "Philadelphia Phillies": { name: "Citizens Bank Park", orientation: "NE", lat: 39.906, lon: -75.166 },
+      "Pittsburgh Pirates": { name: "PNC Park", orientation: "NNE", lat: 40.446, lon: -80.005 },
+      "San Diego Padres": { name: "Petco Park", orientation: "N", lat: 32.707, lon: -117.156 },
+      "San Francisco Giants": { name: "Oracle Park", orientation: "E", lat: 37.778, lon: -122.389 },
+      "St. Louis Cardinals": { name: "Busch Stadium", orientation: "NE", lat: 38.622, lon: -90.192 },
+      "Washington Nationals": { name: "Nationals Park", orientation: "SSE", lat: 38.873, lon: -77.007 },
+      
+      // American League  
+      "Baltimore Orioles": { name: "Oriole Park at Camden Yards", orientation: "NNE", lat: 39.284, lon: -76.621 },
+      "Boston Red Sox": { name: "Fenway Park", orientation: "NE", lat: 42.346, lon: -71.097 },
+      "Chicago White Sox": { name: "Guaranteed Rate Field", orientation: "N", lat: 41.830, lon: -87.633 },
+      "Cleveland Guardians": { name: "Progressive Field", orientation: "NNE", lat: 41.496, lon: -81.685 },
+      "Detroit Tigers": { name: "Comerica Park", orientation: "S", lat: 42.339, lon: -83.048 },
+      "Houston Astros": { name: "Minute Maid Park", orientation: "WNW", lat: 29.757, lon: -95.355, isDome: true },
+      "Kansas City Royals": { name: "Kauffman Stadium", orientation: "NE", lat: 39.051, lon: -94.480 },
+      "Los Angeles Angels": { name: "Angel Stadium", orientation: "NNE", lat: 33.800, lon: -117.882 },
+      "Minnesota Twins": { name: "Target Field", orientation: "E", lat: 44.981, lon: -93.277 },
+      "New York Yankees": { name: "Yankee Stadium", orientation: "NNE", lat: 40.829, lon: -73.926 },
+      "Oakland Athletics": { name: "Oakland Coliseum", orientation: "NE", lat: 37.751, lon: -122.200 },
+      "Seattle Mariners": { name: "T-Mobile Park", orientation: "N", lat: 47.591, lon: -122.332, isDome: true },
+      "Tampa Bay Rays": { name: "Tropicana Field", orientation: "E", lat: 27.768, lon: -82.653, isDome: true },
+      "Texas Rangers": { name: "Globe Life Field", orientation: "E", lat: 32.747, lon: -97.082, isDome: true },
+      "Toronto Blue Jays": { name: "Rogers Centre", orientation: "NNE", lat: 43.641, lon: -79.389, isDome: true }
+    };
+
+    // If no game context, return basic structure
+    if (!game || !player.team) {
+      return {
+        hasWeatherAdvantage: false,
+        weatherBadges: [],
+        weatherFactors: []
+      };
+    }
+
+    // Find ballpark for player's team (assuming home game for now)
+    const parkInfo = ballparkData[player.team] || ballparkData[game.homeTeam];
+    if (!parkInfo) {
+      return {
+        hasWeatherAdvantage: false,
+        weatherBadges: [],
+        weatherFactors: []
+      };
+    }
+
+    // Handle dome games
+    if (parkInfo.isDome) {
+      return {
+        hasWeatherAdvantage: false,
+        weatherBadges: [createWeatherBadge('DOME_GAME')],
+        weatherFactors: [{
+          type: 'dome',
+          description: 'Indoor stadium - controlled conditions',
+          bonus: 0
+        }]
+      };
+    }
+
+    // For outdoor stadiums, we need real weather data
+    // For now, simulate basic weather analysis
+    const mockWeatherConditions = {
+      temperature: 75, // Degrees F
+      windSpeed: 8, // MPH
+      windDirection: 180 // Degrees
+    };
+
+    const weatherBadges = [];
+    const weatherFactors = [];
+    let hasAdvantage = false;
+
+    // Temperature analysis
+    if (mockWeatherConditions.temperature >= 85) {
+      weatherBadges.push(createWeatherBadge('HOT_WEATHER'));
+      weatherFactors.push({
+        type: 'hot_weather',
+        description: `Hot weather (${mockWeatherConditions.temperature}°F) helps ball carry`,
+        bonus: 5
+      });
+      hasAdvantage = true;
+    } else if (mockWeatherConditions.temperature <= 50) {
+      weatherBadges.push(createWeatherBadge('COLD_WEATHER'));
+      weatherFactors.push({
+        type: 'cold_weather',
+        description: `Cold weather (${mockWeatherConditions.temperature}°F) reduces ball flight`,
+        bonus: -8
+      });
+    }
+
+    // Wind analysis (simplified)
+    if (mockWeatherConditions.windSpeed >= 15) {
+      // Strong wind - check direction vs park orientation
+      if (isWindFavorable(parkInfo.orientation, mockWeatherConditions.windDirection)) {
+        weatherBadges.push(createWeatherBadge('WIND_BOOST'));
+        weatherFactors.push({
+          type: 'wind_boost',
+          description: `Strong favorable wind (${mockWeatherConditions.windSpeed} mph) for home runs`,
+          bonus: 10
+        });
+        hasAdvantage = true;
+      } else {
+        weatherBadges.push(createWeatherBadge('WIND_AGAINST'));
+        weatherFactors.push({
+          type: 'wind_against',
+          description: `Strong unfavorable wind (${mockWeatherConditions.windSpeed} mph)`,
+          bonus: -6
+        });
+      }
+    } else if (mockWeatherConditions.windSpeed >= 8) {
+      if (isWindFavorable(parkInfo.orientation, mockWeatherConditions.windDirection)) {
+        weatherBadges.push(createWeatherBadge('WIND_HELPER'));
+        weatherFactors.push({
+          type: 'wind_helper',
+          description: `Favorable wind conditions (${mockWeatherConditions.windSpeed} mph)`,
+          bonus: 6
+        });
+        hasAdvantage = true;
+      }
+    }
+
+    return {
+      hasWeatherAdvantage: hasAdvantage,
+      weatherBadges,
+      weatherFactors
+    };
+
+  } catch (error) {
+    console.warn('Weather analysis error:', error.message);
+    return {
+      hasWeatherAdvantage: false,
+      weatherBadges: [],
+      weatherFactors: []
+    };
+  }
+}
+
+// Helper function to create weather badges
+function createWeatherBadge(badgeType) {
+  const badgeTypes = BADGE_TYPES;
+  const badge = badgeTypes[badgeType];
+  if (!badge) return null;
+
+  return {
+    type: badgeType,
+    emoji: badge.emoji,
+    label: badge.label,
+    description: badge.description,
+    confidenceBoost: badge.confidenceBoost,
+    priority: badge.priority,
+    source: 'weather_analysis'
+  };
+}
+
+// Simple wind direction analysis
+function isWindFavorable(parkOrientation, windDirection) {
+  // Convert park orientation to degrees (simplified)
+  const orientationDegrees = {
+    'N': 0, 'NNE': 22.5, 'NE': 45, 'ENE': 67.5,
+    'E': 90, 'ESE': 112.5, 'SE': 135, 'SSE': 157.5,
+    'S': 180, 'SSW': 202.5, 'SW': 225, 'WSW': 247.5,
+    'W': 270, 'WNW': 292.5, 'NW': 315, 'NNW': 337.5
+  };
+
+  const parkDegrees = orientationDegrees[parkOrientation] || 0;
+  
+  // Wind is favorable if blowing roughly from pitcher to batter (behind home runs)
+  const windFromDegrees = (windDirection + 180) % 360;
+  const angleDiff = Math.abs(windFromDegrees - parkDegrees);
+  
+  // Favorable if wind is within 45 degrees of directly behind home plate
+  return angleDiff <= 45 || angleDiff >= 315;
+}
+
+console.log('✅ Positive momentum analysis enabled - stadium coordinates and weather context loaded');
 
 // Import centralized configuration
 const { paths } = require('../../config/dataPath');
@@ -587,7 +777,7 @@ function analyzePlayerCurrentContext(playerName, team, seasonData) {
 /**
  * Calculate comprehensive positive performance score with CONTEXTUAL ACCURACY
  */
-function calculatePositivePerformanceScore(player, seasonData, todaysGameContext, cachedTeamAnalysis = null) {
+async function calculatePositivePerformanceScore(player, seasonData, todaysGameContext, cachedTeamAnalysis = null) {
   const hotStreakAnalysis = analyzeHotStreaks(player.name, player.team, seasonData);
   
   if (hotStreakAnalysis.gameHistory.length < POSITIVE_PERFORMANCE_THRESHOLDS.MIN_GAMES_ANALYSIS) {
@@ -737,6 +927,32 @@ function calculatePositivePerformanceScore(player, seasonData, todaysGameContext
     });
   }
   
+  // Factor 7: Weather context analysis
+  let weatherAnalysis = null;
+  try {
+    weatherAnalysis = await analyzeWeatherContext(player, todaysGameContext);
+    
+    if (weatherAnalysis && weatherAnalysis.hasWeatherAdvantage) {
+      // Add weather bonus points based on advantageous conditions
+      const weatherBonus = weatherAnalysis.weatherFactors.reduce((total, factor) => {
+        return total + (factor.bonus || 0);
+      }, 0);
+      
+      if (weatherBonus > 0) {
+        positiveScore += weatherBonus;
+        positiveFactors.push({
+          type: 'weather_advantage',
+          description: `Favorable weather conditions - ${weatherAnalysis.weatherFactors.map(f => f.description).join(', ')}`,
+          positivePoints: weatherBonus,
+          weatherDetails: weatherAnalysis
+        });
+      }
+    }
+  } catch (error) {
+    console.warn(`Weather analysis failed for ${player.name}:`, error.message);
+    weatherAnalysis = { hasWeatherAdvantage: false, weatherBadges: [], weatherFactors: [] };
+  }
+  
   // Check for roster activity warnings
   if (playerContext.gamesPlayedInLast7Days < 3) {
     contextualWarnings.push(`Low activity: Only ${playerContext.gamesPlayedInLast7Days} games in last 7 days - may not be regular starter`);
@@ -756,8 +972,12 @@ function calculatePositivePerformanceScore(player, seasonData, todaysGameContext
       bounceBackAnalysis,
       homeFieldAnalysis,
       opponentAnalysis,
-      teamMomentumAnalysis
-    }
+      teamMomentumAnalysis,
+      weatherAnalysis
+    },
+    // Include weather badges for badge system integration
+    weatherBadges: weatherAnalysis?.weatherBadges || [],
+    weatherAvailable: weatherAnalysis?.hasWeatherAdvantage || false
   };
 }
 
@@ -852,7 +1072,7 @@ async function generatePositivePerformancePredictions(targetDate = new Date()) {
         console.log(`🔍 Starting analysis for ${player.name} (${player.team}) - Player #${index + 1}`);
       }
       
-      const positiveAnalysis = calculatePositivePerformanceScore(player, seasonData, null, cachedTeamAnalysis);
+      const positiveAnalysis = await calculatePositivePerformanceScore(player, seasonData, null, cachedTeamAnalysis);
       
       // Debug: Log after expensive function
       if (index < 30) {

@@ -1833,7 +1833,18 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
                         <div className="stat sample-stat">
                           <span className="label">Pitcher Sample:</span>
                           <span className="value">
-                            {pitcherData.recent_form.games_analyzed || 0} games
+                            {(() => {
+                              // Use the total games analyzed (entire season) instead of just recent form
+                              const totalGamesAnalyzed = pitcherData.games_analyzed || 0;
+                              const recentGamesAnalyzed = pitcherData.recent_form.games_analyzed || 0;
+                              
+                              // Show total sample with recent form context if both are available
+                              if (totalGamesAnalyzed > 0 && recentGamesAnalyzed > 0 && totalGamesAnalyzed !== recentGamesAnalyzed) {
+                                return `${totalGamesAnalyzed} games (${recentGamesAnalyzed} recent)`;
+                              } else {
+                                return `${totalGamesAnalyzed || recentGamesAnalyzed} games`;
+                              }
+                            })()}
                           </span>
                         </div>
                       )}

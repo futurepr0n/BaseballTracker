@@ -402,6 +402,7 @@ const DailyWeakspotAnalysis = ({ playerData, teamData, gameData, currentDate }) 
               loading={analysisLoading}
               enhanced={weakspotAnalysis.enhanced_with_api}
               matchups={currentMatchups}
+              lineupData={{ games: selectedGames }}
             />
 
             {/* Export Tools */}
