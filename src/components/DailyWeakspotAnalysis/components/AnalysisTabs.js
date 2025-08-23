@@ -3,9 +3,10 @@ import EnhancedWeakspotResults from './EnhancedWeakspotResults';
 import BatterOpportunitySection from './BatterOpportunitySection';
 import BestBetsAnalysis from './BestBetsAnalysis';
 import ComprehensiveAnalysisDisplay from './ComprehensiveAnalysisDisplay';
+import FirstInningCashAnalysis from './FirstInningCashAnalysis';
 import './AnalysisTabs.css';
 
-const AnalysisTabs = ({ analysis, opportunities, loading, enhanced, matchups }) => {
+const AnalysisTabs = ({ analysis, opportunities, loading, enhanced, matchups, lineupData }) => {
   const [activeTab, setActiveTab] = useState('comprehensive-display');
 
   const tabs = [
@@ -26,6 +27,12 @@ const AnalysisTabs = ({ analysis, opportunities, loading, enhanced, matchups }) 
       label: 'Batter Opportunities',
       icon: '🏏',
       description: 'Individual batter vs pitcher analysis and recommendations'
+    },
+    {
+      id: 'first-inning-cash',
+      label: '1st Inning Cash',
+      icon: '🥇',
+      description: 'Elite first inning opportunities based on inning patterns, position vulnerability, and recent performance'
     },
     {
       id: 'best-bets',
@@ -68,6 +75,17 @@ const AnalysisTabs = ({ analysis, opportunities, loading, enhanced, matchups }) 
             matchups={matchups}
             loading={loading}
             enhanced={enhanced}
+          />
+        );
+      
+      case 'first-inning-cash':
+        return (
+          <FirstInningCashAnalysis
+            analysis={analysis}
+            opportunities={opportunities}
+            matchups={matchups}
+            lineupData={lineupData}
+            loading={loading}
           />
         );
       

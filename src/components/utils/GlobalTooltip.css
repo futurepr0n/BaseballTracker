@@ -1402,6 +1402,147 @@
   z-index: 2147483647 !important; /* Maximum safe z-index value */
 }
 
+/* CRITICAL: Theme-glass tooltip fixes - FORCE white background with dark text for ALL tooltips */
+.theme-glass .global-tooltip,
+.global-tooltip.theme-glass {
+  background-color: #ffffff !important; /* Force white background for glass theme */
+  border: 1px solid var(--border-light, #e2e8f0) !important;
+  color: #1a202c !important; /* Dark text for contrast */
+  backdrop-filter: none !important; /* Remove any glass effects that could darken */
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-glass .global-tooltip .tooltip-header,
+.global-tooltip.theme-glass .tooltip-header {
+  background-color: var(--background-light, #f7fafc) !important;
+  color: #1a202c !important;
+  border-bottom: 1px solid var(--border-light, #e2e8f0) !important;
+}
+
+.theme-glass .global-tooltip .tooltip-title,
+.global-tooltip.theme-glass .tooltip-title {
+  color: #1a202c !important;
+}
+
+.theme-glass .global-tooltip .close-tooltip,
+.global-tooltip.theme-glass .close-tooltip {
+  color: #4a5568 !important;
+  background-color: transparent !important;
+}
+
+.theme-glass .global-tooltip .close-tooltip:hover,
+.global-tooltip.theme-glass .close-tooltip:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  color: #1a202c !important;
+}
+
+/* CRITICAL: Force white background for ALL tooltip content in glass theme */
+.theme-glass .global-tooltip .tooltip-content,
+.global-tooltip.theme-glass .tooltip-content {
+  background-color: #ffffff !important;
+  color: #1a202c !important;
+}
+
+/* CRITICAL: Ensure all text elements in glass theme tooltips are dark - MAXIMUM SPECIFICITY */
+.theme-glass .global-tooltip *,
+.global-tooltip.theme-glass *,
+.theme-glass .global-tooltip div,
+.global-tooltip.theme-glass div,
+.theme-glass .global-tooltip span,
+.global-tooltip.theme-glass span,
+.theme-glass .global-tooltip p,
+.global-tooltip.theme-glass p,
+.theme-glass .global-tooltip h4,
+.global-tooltip.theme-glass h4 {
+  color: #1a202c !important; /* Force dark text for ALL elements */
+  background-color: transparent !important; /* Remove any background that might interfere */
+}
+
+.theme-glass .global-tooltip .summary-label {
+  color: var(--text-secondary, #4a5568) !important;
+}
+
+.theme-glass .global-tooltip .summary-value {
+  color: var(--text-primary, #1a202c) !important;
+}
+
+.theme-glass .global-tooltip .summary-value.highlight {
+  color: #3182ce !important; /* Keep blue highlight for important values */
+}
+
+/* Theme-glass fixes for weather context tooltips */
+.theme-glass .global-tooltip[data-tooltip-id*="weather_context"] {
+  background-color: #ffffff !important;
+  color: #1a202c !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-glass .global-tooltip[data-tooltip-id*="weather_context"] * {
+  color: inherit !important;
+}
+
+.theme-glass .global-tooltip[data-tooltip-id*="weather_context"] .tooltip-content {
+  background-color: #ffffff !important;
+  color: #1a202c !important;
+}
+
+.theme-glass .global-tooltip[data-tooltip-id*="weather_context"] .tooltip-header {
+  background-color: #f7fafc !important;
+  color: #1a202c !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+/* Theme-glass fixes for travel context tooltips */
+.theme-glass .global-tooltip[data-tooltip-id*="travel_context"] {
+  background-color: #ffffff !important;
+  color: #1a202c !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-glass .global-tooltip[data-tooltip-id*="travel_context"] * {
+  color: inherit !important;
+}
+
+.theme-glass .global-tooltip[data-tooltip-id*="travel_context"] .tooltip-content {
+  background-color: #ffffff !important;
+  color: #1a202c !important;
+}
+
+.theme-glass .global-tooltip[data-tooltip-id*="travel_context"] .tooltip-header {
+  background-color: #f7fafc !important;
+  color: #1a202c !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+/* Theme-glass fixes for pitcher tooltips */
+.theme-glass .global-tooltip[data-tooltip-id*="pitcher_hrs"],
+.theme-glass .global-tooltip[data-tooltip-id*="pitcher_hits"] {
+  background-color: #ffffff !important;
+  color: #1a202c !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.theme-glass .global-tooltip[data-tooltip-id*="pitcher_hrs"] *,
+.theme-glass .global-tooltip[data-tooltip-id*="pitcher_hits"] * {
+  color: inherit !important;
+}
+
+.theme-glass .global-tooltip[data-tooltip-id*="pitcher_hrs"] .tooltip-content,
+.theme-glass .global-tooltip[data-tooltip-id*="pitcher_hits"] .tooltip-content {
+  background-color: #ffffff !important;
+  color: #1a202c !important;
+}
+
+.theme-glass .global-tooltip[data-tooltip-id*="pitcher_hrs"] .tooltip-header,
+.theme-glass .global-tooltip[data-tooltip-id*="pitcher_hits"] .tooltip-header {
+  background-color: #f7fafc !important;
+  color: #1a202c !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
 /* Enhanced Weather Context Tooltip Styling */
 .global-tooltip .weather-context-details {
   min-width: 380px;
@@ -1422,6 +1563,62 @@
   align-items: center;
   padding: 6px 0;
   border-bottom: 1px solid #e2e8f0;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.weather-summary-item .summary-label {
+  white-space: nowrap;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.weather-summary-item .summary-value {
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Mobile responsive adjustments for weather tooltip */
+@media (max-width: 768px) {
+  .global-tooltip[data-tooltip-id*="weather_context"] {
+    min-width: 360px !important;
+    max-width: 400px !important;
+    width: 380px !important;
+    max-height: 70vh !important;
+    background-color: #ffffff !important;
+    color: #1a202c !important;
+  }
+  
+  .weather-context-details {
+    max-height: calc(70vh - 60px) !important;
+    padding: 14px;
+  }
+  
+  .weather-summary {
+    padding: 10px;
+    margin-bottom: 16px;
+    gap: 8px;
+  }
+  
+  .weather-summary-item {
+    font-size: 0.9rem;
+    padding: 5px 0;
+  }
+  
+  .weather-summary-item .summary-label {
+    font-size: 0.85rem;
+  }
+  
+  .weather-summary-item .summary-value {
+    font-size: 0.85rem;
+  }
+  
+  .weather-analysis h4 {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+  }
 }
 
 .global-tooltip .weather-summary-item:last-child {
@@ -1553,6 +1750,58 @@
   padding: 0;
 }
 
+/* Travel Context Tooltip Container - Enhanced with proper width constraints */
+.global-tooltip[data-tooltip-id*="travel_context"] {
+  min-width: 460px !important;
+  max-width: 500px !important;
+  width: 480px !important;
+  max-height: 500px !important;
+  overflow: hidden !important;
+  background-color: #ffffff !important;
+  color: #1a202c !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.global-tooltip[data-tooltip-id*="travel_context"] .tooltip-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Travel context details container */
+.travel-context-details {
+  color: #1a202c !important;
+  background-color: #ffffff !important;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  line-height: 1.4;
+  max-height: 420px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  position: relative;
+}
+
+.travel-context-details::-webkit-scrollbar {
+  width: 8px;
+}
+
+.travel-context-details::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.travel-context-details::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.travel-context-details::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 .travel-summary {
   display: flex;
   flex-direction: column;
@@ -1561,16 +1810,35 @@
   background-color: var(--background-light, #f7fafc);
   padding: 12px;
   border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .travel-summary-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.travel-summary-item .summary-label {
+  white-space: nowrap;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.travel-summary-item .summary-value {
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .travel-context {
   margin-top: 16px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .travel-context h4 {
@@ -1587,11 +1855,105 @@
   margin-bottom: 8px;
   font-size: 0.9rem;
   color: var(--text-secondary, #4a5568);
+  word-wrap: break-word;
+  box-sizing: border-box;
 }
 
-/* Weather Context Tooltip Styles */
+/* Mobile responsive adjustments for travel tooltip */
+@media (max-width: 768px) {
+  .global-tooltip[data-tooltip-id*="travel_context"] {
+    min-width: 360px !important;
+    max-width: 400px !important;
+    width: 380px !important;
+    max-height: 70vh !important;
+    background-color: #ffffff !important;
+    color: #1a202c !important;
+  }
+  
+  .travel-context-details {
+    max-height: calc(70vh - 60px) !important;
+    padding: 14px;
+  }
+  
+  .travel-summary {
+    padding: 10px;
+    margin-bottom: 16px;
+    gap: 8px;
+  }
+  
+  .travel-summary-item {
+    font-size: 0.9rem;
+  }
+  
+  .travel-summary-item .summary-label {
+    font-size: 0.85rem;
+  }
+  
+  .travel-summary-item .summary-value {
+    font-size: 0.85rem;
+  }
+  
+  .travel-context h4 {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+  }
+  
+  .travel-detail-item {
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+  }
+}
+
+/* Weather Context Tooltip Styles - Enhanced with proper width constraints */
+/* Weather tooltip container - similar to stadium tooltip approach */
+.global-tooltip[data-tooltip-id*="weather_context"] {
+  min-width: 460px !important;
+  max-width: 500px !important;
+  width: 480px !important;
+  max-height: 500px !important;
+  overflow: hidden !important;
+  background-color: #ffffff !important;
+  color: #1a202c !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.global-tooltip[data-tooltip-id*="weather_context"] .tooltip-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 .weather-context-details {
-  padding: 0;
+  color: #1a202c !important;
+  background-color: #ffffff !important;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  line-height: 1.4;
+  max-height: 420px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  position: relative;
+}
+
+.weather-context-details::-webkit-scrollbar {
+  width: 8px;
+}
+
+.weather-context-details::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.weather-context-details::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.weather-context-details::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 .weather-summary {
@@ -1602,6 +1964,8 @@
   background-color: var(--background-light, #f7fafc);
   padding: 12px;
   border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .weather-summary-item {
@@ -1665,9 +2029,58 @@
   color: var(--text-secondary, #4a5568);
 }
 
-/* Stadium Context Tooltip Styles */
+/* Stadium Context Tooltip Styles - Enhanced with proper width constraints */
+/* Stadium tooltip container - similar to milestone tooltip approach */
+.global-tooltip[data-tooltip-id*="stadium_context"] {
+  min-width: 460px !important;
+  max-width: 500px !important;
+  width: 480px !important;
+  max-height: 500px !important; /* Fixed max height for consistency */
+  overflow: hidden !important; /* Let the inner content handle scrolling */
+  background-color: #ffffff !important;
+  color: #1a202c !important;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure tooltip content fills available space */
+.global-tooltip[data-tooltip-id*="stadium_context"] .tooltip-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 .stadium-context-details {
-  padding: 0;
+  color: #1a202c !important;
+  background-color: #ffffff !important;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  line-height: 1.4;
+  max-height: 420px !important; /* Limit height for scrolling */
+  overflow-y: auto !important; /* Enable vertical scrolling */
+  overflow-x: hidden !important; /* Prevent horizontal scroll */
+  position: relative;
+}
+
+/* Custom scrollbar for stadium content */
+.stadium-context-details::-webkit-scrollbar {
+  width: 8px;
+}
+
+.stadium-context-details::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.stadium-context-details::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.stadium-context-details::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 .stadium-summary {
@@ -1678,16 +2091,35 @@
   background-color: var(--background-light, #f7fafc);
   padding: 12px;
   border-radius: 6px;
+  width: 100%; /* Ensure it doesn't overflow */
+  box-sizing: border-box;
 }
 
 .stadium-summary-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: nowrap; /* Prevent wrapping */
+  overflow: hidden; /* Handle long venue names */
+}
+
+.stadium-summary-item .summary-label {
+  white-space: nowrap;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.stadium-summary-item .summary-value {
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .stadium-analysis {
   margin-top: 16px;
+  width: 100%; /* Constrain width */
+  box-sizing: border-box;
 }
 
 .stadium-analysis h4 {
@@ -1708,6 +2140,8 @@
   padding: 8px;
   border-radius: 4px;
   font-size: 0.9rem;
+  word-wrap: break-word; /* Handle long text */
+  box-sizing: border-box;
 }
 
 .factor-detail-item {
@@ -1732,6 +2166,8 @@
 
 .stadium-badge-explanation {
   margin-top: 16px;
+  width: 100%; /* Constrain width */
+  box-sizing: border-box;
 }
 
 .stadium-badge-explanation h4 {
@@ -1743,6 +2179,80 @@
 .stadium-badge-text {
   font-size: 0.9rem;
   color: var(--text-secondary, #4a5568);
+  word-wrap: break-word; /* Handle long badge text */
+}
+
+/* Force white background and dark text for all stadium tooltip elements */
+.global-tooltip[data-tooltip-id*="stadium_context"] * {
+  color: #1a202c !important;
+}
+
+.global-tooltip[data-tooltip-id*="stadium_context"] .tooltip-content {
+  background-color: #ffffff !important;
+  color: #1a202c !important;
+}
+
+.global-tooltip[data-tooltip-id*="stadium_context"] .tooltip-header {
+  background-color: #f7fafc !important;
+  color: #1a202c !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+/* Mobile responsive adjustments for stadium tooltip */
+@media (max-width: 768px) {
+  .global-tooltip[data-tooltip-id*="stadium_context"] {
+    min-width: 360px !important;
+    max-width: 400px !important;
+    width: 380px !important;
+    max-height: 70vh !important;
+    background-color: #ffffff !important;
+    color: #1a202c !important;
+  }
+  
+  .stadium-context-details {
+    max-height: calc(70vh - 60px) !important; /* Account for header */
+    padding: 14px;
+  }
+  
+  .stadium-summary {
+    padding: 10px;
+    margin-bottom: 16px;
+    gap: 8px;
+  }
+  
+  .stadium-summary-item {
+    font-size: 0.9rem;
+  }
+  
+  .stadium-summary-item .summary-label {
+    font-size: 0.85rem;
+  }
+  
+  .stadium-summary-item .summary-value {
+    font-size: 0.85rem;
+  }
+  
+  .stadium-analysis h4 {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+  }
+  
+  .factor-detail-item,
+  .hitter-friendly-info,
+  .pitcher-friendly-info,
+  .neutral-park-info {
+    font-size: 0.85rem;
+    padding: 6px;
+    margin-bottom: 6px;
+  }
+  
+  .stadium-badge-explanation h4 {
+    font-size: 0.9rem;
+  }
+  
+  .stadium-badge-text {
+    font-size: 0.85rem;
+  }
 }
 
 /* Streak tooltip specific styles */
