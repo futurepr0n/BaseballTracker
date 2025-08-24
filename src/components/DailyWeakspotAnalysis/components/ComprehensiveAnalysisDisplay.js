@@ -13,6 +13,7 @@ import realOddsService from '../services/realOddsService';
 import enhancedTravelService from '../../../services/enhancedTravelService';
 import weatherContextService from '../../../services/weatherContextService';
 import stadiumContextService from '../../../services/stadiumContextService';
+import teamStandingsService from '../../../services/teamStandingsService';
 
 const ComprehensiveAnalysisDisplay = ({ analysis }) => {
   
@@ -50,6 +51,7 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
   const [travelImpacts, setTravelImpacts] = useState({});
   const [weatherContexts, setWeatherContexts] = useState({});
   const [stadiumContexts, setStadiumContexts] = useState({});
+  const [playoffContexts, setPlayoffContexts] = useState({});
   const { openTooltip } = useTooltip();
 
   // Load roster data for handedness information
@@ -1079,6 +1081,96 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
     return () => clearTimeout(timeoutId);
   }, [analysis]);
 
+  // Load playoff context data for teams
+  useEffect(() => {
+    const loadPlayoffContexts = async () => {
+      try {
+        if (!analysis?.matchup_analysis) return;
+
+        console.log('🏆 Loading playoff context data for analysis...');
+        const playoffMap = {};
+        const allMatchups = Object.values(analysis.matchup_analysis);
+        
+        // Extract unique teams from all matchups
+        const uniqueTeams = new Set();
+        for (const matchupData of allMatchups) {
+          const matchup = matchupData.matchup;
+          if (!matchup) continue;
+          
+          // Handle both possible field name formats
+          const homeTeam = matchup.home_team || matchup.homeTeam;
+          const awayTeam = matchup.away_team || matchup.awayTeam;
+          
+          if (homeTeam) uniqueTeams.add(homeTeam);
+          if (awayTeam) uniqueTeams.add(awayTeam);
+          
+          // CRITICAL FIX: Also add opposing_team from pitcher analysis data
+          // This is what renderPlayoffContext() will be looking for
+          if (matchupData.home_pitcher_analysis?.opposing_team) {
+            uniqueTeams.add(matchupData.home_pitcher_analysis.opposing_team);
+            console.log(`🏆 ADDED: Home pitcher opposing team: ${matchupData.home_pitcher_analysis.opposing_team}`);
+          }
+          if (matchupData.away_pitcher_analysis?.opposing_team) {
+            uniqueTeams.add(matchupData.away_pitcher_analysis.opposing_team);
+            console.log(`🏆 ADDED: Away pitcher opposing team: ${matchupData.away_pitcher_analysis.opposing_team}`);
+          }
+        }
+        
+        console.log(`🏆 DEBUG: All unique teams found:`, Array.from(uniqueTeams));
+        
+        // Load playoff context for each unique team
+        for (const teamCode of uniqueTeams) {
+          try {
+            const context = await teamStandingsService.getTeamPlayoffContext(teamCode);
+            if (context) {
+              playoffMap[teamCode] = context;
+            }
+          } catch (error) {
+            console.error(`🏆 Error loading playoff context for ${teamCode}:`, error);
+          }
+        }
+        
+        console.log(`🏆 Loaded playoff contexts for ${Object.keys(playoffMap).length} teams`);
+        setPlayoffContexts(playoffMap);
+        
+      } catch (error) {
+        console.error('🏆 Critical error loading playoff contexts:', error);
+        setPlayoffContexts({});
+      }
+    };
+
+    // Add a delay to prevent blocking
+    const timeoutId = setTimeout(() => {
+      loadPlayoffContexts();
+    }, 700);
+    
+    return () => clearTimeout(timeoutId);
+  }, [analysis]);
+
+  // Helper function to get playoff context for a team
+  const getPlayoffContextForTeam = (teamCode) => {
+    if (!teamCode || !playoffContexts[teamCode]) return null;
+    return playoffContexts[teamCode];
+  };
+
+  // Helper function to get motivational factors for a matchup
+  const getMatchupMotivationalFactors = (homeTeam, awayTeam) => {
+    if (!homeTeam || !awayTeam || Object.keys(playoffContexts).length === 0) {
+      return [];
+    }
+    
+    try {
+      return teamStandingsService.getMatchupMotivationalFactors(
+        homeTeam, 
+        awayTeam, 
+        playoffContexts
+      );
+    } catch (error) {
+      console.error('Error getting motivational factors:', error);
+      return [];
+    }
+  };
+
   // Helper function to get travel impact for a team
   const getTravelImpactForTeam = (teamCode, matchupDate) => {
     if (!teamCode || !matchupDate) return null;
@@ -2013,7 +2105,118 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
     );
   };
 
-  const renderPitcherAnalysis = (pitcherData, pitcherName, side) => {
+  // Helper function to render motivational factors
+  const renderMotivationalFactors = (homeTeam, awayTeam) => {
+    const factors = getMatchupMotivationalFactors(homeTeam, awayTeam);
+    
+    if (!factors || factors.length === 0) {
+      return null;
+    }
+    
+    const getFactorIcon = (type) => {
+      switch (type) {
+        case 'DIVISION_RIVAL': return '🔥';
+        case 'PLAYOFF_BATTLE': return '⚔️';
+        case 'PLAYOFF_IMPLICATIONS': return '🎯';
+        case 'WILD_CARD_RACE': return '🏃';
+        case 'HOT_TEAM': return '🌟';
+        default: return '💪';
+      }
+    };
+    
+    const getIntensityClass = (intensity) => {
+      switch (intensity) {
+        case 'high': return 'high-intensity';
+        case 'medium': return 'medium-intensity';
+        case 'low': return 'low-intensity';
+        default: return 'medium-intensity';
+      }
+    };
+    
+    return (
+      <div className="motivational-factors">
+        <div className="factors-label">Motivational Factors:</div>
+        <div className="factors-list">
+          {factors.map((factor, index) => (
+            <div key={index} className={`factor-badge ${getIntensityClass(factor.intensity)}`}>
+              <span className="factor-icon">{getFactorIcon(factor.type)}</span>
+              <span className="factor-description">{factor.description}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // Helper function to render playoff context for a team
+  const renderPlayoffContext = (teamCode) => {
+    console.log(`🏆 UI DEBUG: renderPlayoffContext called for team: ${teamCode}`);
+    console.log(`🏆 UI DEBUG: Available playoff contexts:`, Object.keys(playoffContexts));
+    console.log(`🏆 UI DEBUG: Full playoffContexts state:`, playoffContexts);
+    
+    if (!teamCode) {
+      console.log(`🏆 UI DEBUG: No teamCode provided`);
+      return null;
+    }
+    
+    const context = getPlayoffContextForTeam(teamCode);
+    console.log(`🏆 UI DEBUG: Context for ${teamCode}:`, context);
+    
+    if (!context) {
+      console.log(`🏆 UI DEBUG: No playoff context found for ${teamCode}. Available teams:`, Object.keys(playoffContexts));
+      console.log(`🏆 UI DEBUG: Checking if team standings service is working...`);
+      // Try to manually fetch context to debug the issue
+      teamStandingsService.getTeamPlayoffContext(teamCode).then(debugContext => {
+        console.log(`🏆 UI DEBUG: Direct service call result for ${teamCode}:`, debugContext);
+      }).catch(debugError => {
+        console.error(`🏆 UI DEBUG: Direct service call failed for ${teamCode}:`, debugError);
+      });
+      return null;
+    }
+    
+    // Get status badge and color
+    const getStatusBadge = (status) => {
+      switch (status) {
+        case 'DIVISION_LEADER': return { emoji: '👑', text: 'Division Leader', color: '#4CAF50' };
+        case 'WILD_CARD_POSITION': return { emoji: '🎯', text: 'Wild Card', color: '#2196F3' };
+        case 'IN_PLAYOFFS': return { emoji: '✅', text: 'In Playoffs', color: '#4CAF50' };
+        case 'IN_HUNT': return { emoji: '🔥', text: 'In Hunt', color: '#FF9800' };
+        case 'LONGSHOT': return { emoji: '📈', text: 'Longshot', color: '#FFC107' };
+        case 'FADING': return { emoji: '❄️', text: 'Fading', color: '#9E9E9E' };
+        default: return { emoji: '⚾', text: 'Unknown', color: '#757575' };
+      }
+    };
+    
+    const statusInfo = getStatusBadge(context.status);
+    const record = `${context.wins}-${context.losses}`;
+    const winPct = (context.winPct * 100).toFixed(1);
+    
+    return (
+      <div className="playoff-context">
+        <div className="playoff-status" style={{ color: statusInfo.color }}>
+          <span className="status-badge">
+            {statusInfo.emoji} {statusInfo.text}
+          </span>
+          <span className="team-record">{record} ({winPct}%)</span>
+        </div>
+        <div className="playoff-details">
+          {context.gamesBack > 0 && (
+            <span className="games-back">{context.gamesBack.toFixed(1)} GB</span>
+          )}
+          {context.gamesBackFromPlayoffs > 0 && (
+            <span className="playoff-gap">{context.gamesBackFromPlayoffs.toFixed(1)} back from playoffs</span>
+          )}
+          {context.recentForm && (
+            <span className={`recent-form ${context.recentForm.toLowerCase().replace(' ', '-')}`}>
+              Recent: {context.recentForm}
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderPitcherAnalysis = (pitcherData, pitcherName, side, matchupData) => {
     if (!pitcherData || pitcherData.games_analyzed === 0) {
       return (
         <div className="pitcher-no-data">
@@ -2033,6 +2236,12 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
               Overall Vulnerability: {pitcherData.overall_vulnerability_score ? pitcherData.overall_vulnerability_score.toFixed(1) : 'N/A'}
             </span>
             <span className="opposing-team">vs {pitcherData.opposing_team || 'Unknown'}</span>
+            {(() => {
+              // Determine the pitcher's actual team based on side
+              const pitcherTeam = side === 'home' ? matchupData?.home_team : matchupData?.away_team;
+              console.log(`🏆 PITCHER TEAM DEBUG: ${pitcherName} (${side}) -> Team: ${pitcherTeam}, Opposing: ${pitcherData.opposing_team}`);
+              return renderPlayoffContext(pitcherTeam);
+            })()}
           </div>
         </div>
 
@@ -2111,12 +2320,15 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
         </div>
         {matchup && (
           <div className="matchup-info">
-            <span className="teams">{matchup.away_team} @ {matchup.home_team}</span>
-            <span className="venue">{matchup.venue}</span>
-            <span className="date">{matchup.date}</span>
-            {allMatchups.length > 1 && (
-              <span className="matchup-counter">Matchup {selectedMatchupIndex + 1} of {allMatchups.length}</span>
-            )}
+            <div className="matchup-details">
+              <span className="teams">{matchup.away_team || matchup.awayTeam} @ {matchup.home_team || matchup.homeTeam}</span>
+              <span className="venue">{matchup.venue}</span>
+              <span className="date">{matchup.date}</span>
+              {allMatchups.length > 1 && (
+                <span className="matchup-counter">Matchup {selectedMatchupIndex + 1} of {allMatchups.length}</span>
+              )}
+            </div>
+            {renderMotivationalFactors(matchup.home_team || matchup.homeTeam, matchup.away_team || matchup.awayTeam)}
           </div>
         )}
       </div>
@@ -2177,7 +2389,7 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
         </div>
         {expandedSections.away && (
           <div className="section-content">
-            {renderPitcherAnalysis(away_pitcher_analysis, matchup?.away_pitcher, 'away')}
+            {renderPitcherAnalysis(away_pitcher_analysis, matchup?.away_pitcher, 'away', matchup)}
           </div>
         )}
       </div>
@@ -2190,7 +2402,7 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
         </div>
         {expandedSections.home && (
           <div className="section-content">
-            {renderPitcherAnalysis(home_pitcher_analysis, matchup?.home_pitcher, 'home')}
+            {renderPitcherAnalysis(home_pitcher_analysis, matchup?.home_pitcher, 'home', matchup)}
           </div>
         )}
       </div>
