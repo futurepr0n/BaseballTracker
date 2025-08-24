@@ -2193,3 +2193,202 @@
     font-size: 0.75rem;
   }
 }
+
+/* Playoff Context Styles */
+.playoff-context {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #007bff;
+  font-size: 13px;
+}
+
+.playoff-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.status-badge {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.team-record {
+  font-weight: 500;
+  color: #6c757d;
+}
+
+.playoff-details {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.games-back, .playoff-gap {
+  background: #e9ecef;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.recent-form {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.recent-form.hot {
+  background: #d4edda;
+  color: #155724;
+}
+
+.recent-form.good-form {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.recent-form.average {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.recent-form.struggling {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.recent-form.poor-form {
+  background: #f5c6cb;
+  color: #721c24;
+}
+
+.recent-form.limited-recent-games {
+  background: #e2e3e5;
+  color: #495057;
+}
+
+/* Mobile responsiveness for playoff context */
+@media (max-width: 768px) {
+  .playoff-context {
+    font-size: 12px;
+  }
+  
+  .playoff-details {
+    font-size: 11px;
+    gap: 8px;
+  }
+  
+  .playoff-status {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+/* Motivational Factors Styles */
+.motivational-factors {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #28a745;
+}
+
+.factors-label {
+  font-weight: 600;
+  color: #495057;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.factors-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.factor-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.factor-badge.high-intensity {
+  background: #d4edda;
+  color: #155724;
+  border-color: #28a745;
+}
+
+.factor-badge.medium-intensity {
+  background: #fff3cd;
+  color: #856404;
+  border-color: #ffc107;
+}
+
+.factor-badge.low-intensity {
+  background: #cce5ff;
+  color: #004085;
+  border-color: #2196f3;
+}
+
+.factor-icon {
+  font-size: 14px;
+}
+
+.factor-description {
+  font-weight: 500;
+}
+
+/* Update matchup-info to accommodate new structure */
+.matchup-info {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+  border: 1px solid #dee2e6;
+}
+
+.matchup-details {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Mobile responsiveness for motivational factors */
+@media (max-width: 768px) {
+  .factors-list {
+    gap: 6px;
+  }
+  
+  .factor-badge {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+  
+  .factor-icon {
+    font-size: 12px;
+  }
+  
+  .matchup-details {
+    gap: 12px;
+  }
+  
+  .motivational-factors {
+    margin-top: 8px;
+    padding: 8px;
+  }
+}
