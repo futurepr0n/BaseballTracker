@@ -66,7 +66,7 @@ export const checkDataExists = async (dateStr) => {
     const response = await fetch(filePath, { method: 'HEAD' });
     return response.ok;
   } catch (error) {
-    console.error(`Error checking if data exists for ${dateStr}:`, error);
+    debugLog.error('DATA_SERVICE', `Error checking if data exists for ${dateStr}:`, error);
     return false;
   }
 };
@@ -180,7 +180,7 @@ export const fetchPlayerData = async (dateStr) => {
     
     return dataCache.players[dateStr];
   } catch (error) {
-    console.error(`Error fetching player data for ${dateStr}:`, error);
+    debugLog.error('DATA_SERVICE', `Error fetching player data for ${dateStr}:`, error);
     // Return empty array instead of throwing to prevent app crash
     return DEFAULT_PLAYER_DATA;
   }
@@ -269,11 +269,8 @@ export const fetchFullSeasonPlayerData = async (startDate, maxDaysToLookBack = 1
   
   debugLog.dataService(`🏟️ Generated ${validDates.length} valid game dates for full season fetch`);
   
-  // Debug: Show first 10 dates being processed
-  console.log('📅 DEBUG: First 10 valid dates being processed:');
-  validDates.slice(0, 10).forEach((date, index) => {
-    console.log(`  ${index + 1}. ${date}`);
-  });
+  // Debug: Show first 10 dates being processed - use conditional for performance
+  debugLog.dataService('📅 Valid dates being processed:', validDates.length, 'total dates');
   
   // Batch process to avoid overwhelming browser (larger batches for player analysis)
   const batchSize = 15;
@@ -308,8 +305,8 @@ export const fetchFullSeasonPlayerData = async (startDate, maxDaysToLookBack = 1
   
   debugLog.dataService(`🏟️ FULL SEASON COMPLETE: ${successCount} dates with data from ${validDates.length} checked`);
   
-  // Debug: Show which dates actually have data
-  console.log('📅 DEBUG: Dates that successfully loaded data:', Object.keys(result).slice(0, 10));
+  // Debug: Show which dates actually have data - use conditional for performance  
+  debugLog.dataService('📅 Successfully loaded data for', Object.keys(result).length, 'dates');
   
   return result;
 };
@@ -328,14 +325,13 @@ const isValidMLBGameDate = (dateStr) => {
   const dateOnly = new Date(date);
   dateOnly.setHours(0, 0, 0, 0); // Set to start of date being checked
   
-  // Debug specific dates we're interested in
-  if (dateStr === '2025-07-21' || dateStr === '2025-07-22') {
-    console.log(`📅 DEBUG: Checking ${dateStr}:`);
-    console.log(`  date: ${date}`);
-    console.log(`  today: ${today}`);
-    console.log(`  dateOnly: ${dateOnly}`);
-    console.log(`  dateOnly > today: ${dateOnly > today}`);
-    console.log(`  result: ${!(dateOnly > today)}`);
+  // Debug specific dates we're interested in - use conditional for performance
+  if ((dateStr === '2025-07-21' || dateStr === '2025-07-22')) {
+    debugLog.dataService(`📅 Date validation for ${dateStr}:`, {
+      dateOnly: dateOnly.toISOString().split('T')[0],
+      today: today.toISOString().split('T')[0], 
+      isValid: !(dateOnly > today)
+    });
   }
   
   if (dateOnly > today) return false;
@@ -477,7 +473,7 @@ export const fetchTeamData = async () => {
   
   try {
     // Fetch the data
-    console.log('Loading team data from: /data/teams.json');
+    debugLog.dataService('Loading team data from: /data/teams.json');
     const response = await fetch('/data/teams.json');
     
     if (!response.ok) {
@@ -491,7 +487,7 @@ export const fetchTeamData = async () => {
     
     return data;
   } catch (error) {
-    console.error('Error fetching team data:', error);
+    debugLog.error('DATA_SERVICE', 'Error fetching team data:', error);
     // Return empty object instead of throwing to prevent app crash
     return {};
   }
@@ -513,9 +509,9 @@ export const fetchGameData = async (dateStr) => {
     const monthName = date.toLocaleString('default', { month: 'long' }).toLowerCase();
     const filePath = `/data/${year}/${monthName}/${monthName}_${day}_${year}.json`;
 
-    console.log(`Loading game data from: ${filePath}`);
+    debugLog.dataService(`Loading game data from: ${filePath}`);
     const response = await fetch(filePath);
-    console.log(`📅 FETCH Response: ${response.status} ${response.statusText}`);
+    debugLog.dataService(`📅 FETCH Response: ${response.status} ${response.statusText}`);
 
     if (!response.ok) {
       // Only warn if it's within expected data range
@@ -523,15 +519,15 @@ export const fetchGameData = async (dateStr) => {
       const seasonStart = new Date('2025-03-18'); // Earliest data we have
       
       if (requestDate >= seasonStart) {
-        console.log(`📅 No game data available for ${dateStr} (file not found)`);
+        debugLog.dataService(`📅 No game data available for ${dateStr} (file not found)`);
       }
       dataCache.games[dateStr] = DEFAULT_GAME_DATA;
       return DEFAULT_GAME_DATA;
     }
 
     const data = await response.json();
-    console.log(`📅 FETCHED DATA: ${JSON.stringify(data).substring(0, 200)}...`);
-    console.log(`📅 GAMES COUNT: ${data?.games?.length || 0}`);
+    // Expensive JSON.stringify operation - use conditional for performance
+    debugLog.dataService(`📅 FETCHED DATA: ${data?.games?.length || 0} games for ${dateStr}`);
     
     // Store the games array directly as existing code expects
     const games = data.games || [];
@@ -544,7 +540,7 @@ export const fetchGameData = async (dateStr) => {
     const seasonStart = new Date('2025-03-18'); // Earliest data we have
     
     if (requestDate >= seasonStart) {
-      console.error(`Error fetching game data for ${dateStr}:`, error);
+      debugLog.error('DATA_SERVICE', `Error fetching game data for ${dateStr}:`, error);
     }
     return DEFAULT_GAME_DATA;
   }
@@ -582,11 +578,11 @@ export const savePlayerData = async (dateStr, playerData) => {
     dataCache.players[dateStr] = updatedPlayersData;
     
     // In a real app, you would save to server here
-    console.log(`Player data for ${dateStr} updated successfully`);
+    debugLog.dataService(`Player data for ${dateStr} updated successfully`);
     
     return true;
   } catch (error) {
-    console.error(`Error saving player data for ${dateStr}:`, error);
+    debugLog.error('DATA_SERVICE', `Error saving player data for ${dateStr}:`, error);
     return false;
   }
 };
@@ -597,18 +593,18 @@ export const savePlayerData = async (dateStr, playerData) => {
  */
 export const fetchRosterData = async () => {
   try {
-    console.log('Loading roster data from: /data/rosters.json');
+    debugLog.dataService('Loading roster data from: /data/rosters.json');
     const response = await fetch('/data/rosters.json');
     
     if (!response.ok) {
-      console.error(`Failed to load roster data: ${response.status} ${response.statusText}`);
+      debugLog.error('DATA_SERVICE', `Failed to load roster data: ${response.status} ${response.statusText}`);
       return [];
     }
     
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error fetching roster data:', error);
+    debugLog.error('DATA_SERVICE', 'Error fetching roster data:', error);
     return [];
   }
 };
@@ -674,7 +670,7 @@ export const analyzePlayerVsOpponent = async (playerName, playerTeam, opponentTe
           );
           
           if (!gameExists) {
-            console.log(`[analyzePlayerVsOpponent] ${dateStr}: Teams did not play each other`);
+            debugLog.dataService(`[analyzePlayerVsOpponent] ${dateStr}: Teams did not play each other`);
             continue;
           }
         }
@@ -701,7 +697,7 @@ export const analyzePlayerVsOpponent = async (playerName, playerTeam, opponentTe
   }
   
   if (totalGames === 0) {
-    console.log(`[analyzePlayerVsOpponent] No games found for ${playerName} vs ${opponentTeam}`);
+    debugLog.dataService(`[analyzePlayerVsOpponent] No games found for ${playerName} vs ${opponentTeam}`);
     return {
       games: 0,
       AB: 0,
@@ -773,7 +769,7 @@ export const analyzePlayerVsOpponentLegacy = async (playerName, playerTeam, oppo
     }
     
     if (!actuallyPlayed) {
-      console.log(`[analyzePlayerVsOpponent] ${dateStr}: Teams did not play each other`);
+      debugLog.dataService(`[analyzePlayerVsOpponent] ${dateStr}: Teams did not play each other`);
       continue;
     }
     
@@ -794,7 +790,7 @@ export const analyzePlayerVsOpponentLegacy = async (playerName, playerTeam, oppo
   }
   
   if (gamesVsOpponent.length === 0) {
-    console.log(`[analyzePlayerVsOpponent] No games found for ${playerName} vs ${opponentTeam}`);
+    debugLog.dataService(`[analyzePlayerVsOpponent] No games found for ${playerName} vs ${opponentTeam}`);
     return null;
   }
   
@@ -979,7 +975,7 @@ export const generateMatchupAnalysis = async (gameData, dateRangeData, rosterDat
   const currentDate = new Date();
   const currentTimeSlot = classifyTimeSlot(currentDate);
   
-  console.log(`[generateMatchupAnalysis] Analyzing ${activePlayers.length} active players for ${todaysMatchups.length} matchups`);
+  debugLog.dataService(`[generateMatchupAnalysis] Analyzing ${activePlayers.length} active players for ${todaysMatchups.length} matchups`);
   
   // Analyze each active player
   for (const player of activePlayers) {
@@ -992,7 +988,7 @@ export const generateMatchupAnalysis = async (gameData, dateRangeData, rosterDat
       const opponent = playerMatchup.homeTeam === player.team ? 
         playerMatchup.awayTeam : playerMatchup.homeTeam;
       
-      console.log(`[generateMatchupAnalysis] Analyzing ${player.name} (${player.team}) vs ${opponent}`);
+      debugLog.dataService(`[generateMatchupAnalysis] Analyzing ${player.name} (${player.team}) vs ${opponent}`);
       
       // Analyze vs opponent with improved logic (now async)
       const vsOpponentStats = await analyzePlayerVsOpponent(
@@ -1003,7 +999,7 @@ export const generateMatchupAnalysis = async (gameData, dateRangeData, rosterDat
       );
       
       if (vsOpponentStats && vsOpponentStats.gamesVsOpponent >= 3) {
-        console.log(`[generateMatchupAnalysis] Found valid matchup data: ${vsOpponentStats.gamesVsOpponent} games`);
+        debugLog.dataService(`[generateMatchupAnalysis] Found valid matchup data: ${vsOpponentStats.gamesVsOpponent} games`);
         opponentMatchupHits.push(vsOpponentStats);
         if (vsOpponentStats.totalHRs > 0) {
           opponentMatchupHRs.push(vsOpponentStats);
@@ -1027,7 +1023,7 @@ export const generateMatchupAnalysis = async (gameData, dateRangeData, rosterDat
     }
   }
   
-  console.log(`[generateMatchupAnalysis] Found ${opponentMatchupHits.length} hit matchups and ${opponentMatchupHRs.length} HR matchups`);
+  debugLog.dataService(`[generateMatchupAnalysis] Found ${opponentMatchupHits.length} hit matchups and ${opponentMatchupHRs.length} HR matchups`);
   
   return {
     opponentMatchupHits: opponentMatchupHits
@@ -1172,7 +1168,7 @@ export const findPlayersInTimeSlot = (targetDayOfWeek, targetTimeBlock, dateRang
     const isDayMatch = (gameDayName === targetDayOfWeek);
     
     if (isDayMatch) {
-      console.log(`[findPlayersInTimeSlot] Found ${gameDayName} game on ${dateStr}`);
+      debugLog.dataService(`[findPlayersInTimeSlot] Found ${gameDayName} game on ${dateStr}`);
       
       const playersForDate = dateRangeData[dateStr];
       
@@ -1216,7 +1212,7 @@ export const findPlayersInTimeSlot = (targetDayOfWeek, targetTimeBlock, dateRang
     }
   });
   
-  console.log(`[findPlayersInTimeSlot] Found ${playerStats.size} players with ${targetDayOfWeek} games`);
+  debugLog.dataService(`[findPlayersInTimeSlot] Found ${playerStats.size} players with ${targetDayOfWeek} games`);
   
   // Convert to array and calculate per-game stats
   return Array.from(playerStats.values())
