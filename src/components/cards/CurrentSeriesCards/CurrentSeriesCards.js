@@ -1,6 +1,6 @@
 // src/components/cards/CurrentSeriesCards/CurrentSeriesCard.js
 import React, { useState, useEffect, useRef } from 'react';
-import { debugLog } from '../../../utils/debugConfig';
+import { debugLog, getDebugConfig } from '../../../utils/debugConfig';
 import { 
   fetchPlayerDataForDateRange, 
   fetchRosterData,
@@ -28,7 +28,11 @@ const findCurrentSeriesStats = async (playerTeam, opponentTeam, dateRangeData, c
   const playerSeriesStats = new Map();
   const sortedDates = Object.keys(dateRangeData).sort().reverse(); // Start from most recent
   
-  debugLog.log('CARDS', `[findCurrentSeriesStats] Available dates: ${sortedDates.join(', ')}`);
+  // Only join dates array if debug is enabled
+  const config = getDebugConfig();
+  if (config.ENABLED && config.CARDS) {
+    debugLog.log('CARDS', `[findCurrentSeriesStats] Available dates: ${sortedDates.join(', ')}`);
+  }
   
   let seriesGames = [];
   let foundSeriesEnd = false;

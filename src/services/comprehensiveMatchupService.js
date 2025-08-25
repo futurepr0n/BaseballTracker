@@ -13,7 +13,7 @@ import enhancedTravelService from './enhancedTravelService.js';
 import comprehensiveWeatherService from './comprehensiveWeatherService.js';
 import advancedPitcherIntelligence from './advancedPitcherIntelligence.js';
 import enhancedPitcherIntelligenceService from './enhancedPitcherIntelligenceService.js';
-import { debugLog } from '../utils/debugConfig';
+import { debugLog, getDebugConfig } from '../utils/debugConfig';
 import { normalizeToEnglish, createAllNameVariants, namesMatch } from '../utils/universalNameNormalizer';
 
 class ComprehensiveMatchupService {
@@ -877,9 +877,14 @@ class ComprehensiveMatchupService {
       const awayTeamPlayers = await this.extractTeamPlayers(hrPredictions, awayTeam, gameLineupData, currentDate);
       
       debugLog.log('SERVICES', `Final player counts: ${homeTeam}=${homeTeamPlayers.length}, ${awayTeam}=${awayTeamPlayers.length}`);
-      debugLog.log('SERVICES', `Home team players:`, homeTeamPlayers.map(p => `${p.name} (${p.source})`));
-      debugLog.log('SERVICES', `Away team players:`, awayTeamPlayers.map(p => `${p.name} (${p.source})`));
-      debugLog.log('SERVICES', `Players with HR context: Home=${homeTeamPlayers.filter(p => p.hrContextAvailable).length}, Away=${awayTeamPlayers.filter(p => p.hrContextAvailable).length}`);
+      
+      // Only execute expensive operations if debug is enabled
+      const config = getDebugConfig();
+      if (config.ENABLED && config.SERVICES) {
+        debugLog.log('SERVICES', `Home team players:`, homeTeamPlayers.map(p => `${p.name} (${p.source})`));
+        debugLog.log('SERVICES', `Away team players:`, awayTeamPlayers.map(p => `${p.name} (${p.source})`));
+        debugLog.log('SERVICES', `Players with HR context: Home=${homeTeamPlayers.filter(p => p.hrContextAvailable).length}, Away=${awayTeamPlayers.filter(p => p.hrContextAvailable).length}`);
+      }
 
       // Find pitcher matchup data and generate advanced pitcher intelligence first
       const matchupData = this.findPitcherMatchupData(pitcherMatchups, homeTeam, awayTeam);

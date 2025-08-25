@@ -7,6 +7,7 @@ import SeasonOverviewChart from './PlayerPropsLadderCard/SeasonOverviewChart';
 import Recent5GamesChart from './PlayerPropsLadderCard/Recent5GamesChart';
 import OpponentHistoryChart from './PlayerPropsLadderCard/OpponentHistoryChart';
 import enhancedGameDataService from '../../services/enhancedGameDataService';
+import { debugLog, getDebugConfig } from '../../utils/debugConfig';
 import './PlayerPropsLadderCard.css';
 import './PlayerPropsLadderCard/PlayerPropsCharts.css';
 import '../common/MobilePlayerCard.css';
@@ -29,7 +30,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
   // Memoize the date string to prevent unnecessary re-renders
   const currentDateString = useMemo(() => {
     if (!currentDate) {
-      console.log('📅 No currentDate provided, using today');
+      debugLog.card('PlayerPropsLadder', '📅 No currentDate provided, using today');
       // Fallback to today's date if none provided
       const today = new Date();
       return today.toISOString().split('T')[0];
@@ -37,17 +38,18 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
     
     // Validate that currentDate is actually a Date object and valid
     if (!(currentDate instanceof Date)) {
-      console.warn('📅 currentDate is not a Date object:', typeof currentDate, currentDate);
+      debugLog.card('PlayerPropsLadder', '📅 currentDate is not a Date object:', typeof currentDate, currentDate);
       // Try to convert it to a Date
       try {
         const convertedDate = new Date(currentDate);
         if (!isNaN(convertedDate.getTime())) {
           const dateString = convertedDate.toISOString().split('T')[0];
-          console.log('📅 Converted and generated date string:', dateString);
+          debugLog.card('PlayerPropsLadder', '📅 Converted and generated date string:', dateString);
           return dateString;
         }
       } catch (conversionError) {
         console.error('📅 Failed to convert currentDate:', conversionError);
+        debugLog.error('PlayerPropsLadder', 'Failed to convert currentDate', conversionError);
       }
       // Fall back to today
       const today = new Date();
@@ -56,6 +58,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
     
     if (isNaN(currentDate.getTime())) {
       console.warn('📅 currentDate is an invalid Date:', currentDate);
+      debugLog.warn('PlayerPropsLadder', 'currentDate is an invalid Date', currentDate);
       // Fall back to today
       const today = new Date();
       return today.toISOString().split('T')[0];
@@ -63,10 +66,11 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
     
     try {
       const dateString = currentDate.toISOString().split('T')[0];
-      console.log('📅 Generated date string:', dateString);
+      debugLog.card('PlayerPropsLadder', '📅 Generated date string:', dateString);
       return dateString;
     } catch (error) {
       console.error('📅 Error generating date string:', error);
+      debugLog.error('PlayerPropsLadder', 'Error generating date string', error);
       // Fall back to today
       const today = new Date();
       return today.toISOString().split('T')[0];
@@ -76,8 +80,11 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
   // Specialized data loading that bypasses SharedDataManager's 30-date limit
   const loadPlayerDataUnlimited = useCallback(async (endDate, playerName, playerTeam) => {
     try {
-      console.log(`🔍 UNLIMITED: Loading comprehensive data for ${playerName} (${playerTeam})`);
-      console.log(`📅 FIXED: Using app selected date for consistency with other components: ${endDate.toISOString().split('T')[0]}`);
+      debugLog.card('PlayerPropsLadder', `🔍 UNLIMITED: Loading comprehensive data for ${playerName} (${playerTeam})`);
+      const config = getDebugConfig();
+      if (config.ENABLED && config.CARDS) {
+        debugLog.card('PlayerPropsLadder', `📅 FIXED: Using app selected date for consistency with other components: ${endDate.toISOString().split('T')[0]}`);
+      }
       
       // Phase 1: Try to get recent data (last 30 days) with higher priority
       const recentData = {};
@@ -110,7 +117,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
             const data = await response.json();
             if (data.players && Array.isArray(data.players) && data.players.length > 0) {
               recentData[dateStr] = data.players;
-              console.log(`📅 UNLIMITED: Loaded ${data.players.length} players for ${dateStr}`);
+              debugLog.card('PlayerPropsLadder', `📅 UNLIMITED: Loaded ${data.players.length} players for ${dateStr}`);
             }
           }
         } catch (error) {
@@ -121,10 +128,10 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
       
       // Phase 2: If we need more historical data (for opponent matching), load additional dates
       const recentCount = Object.keys(recentData).length;
-      console.log(`📊 UNLIMITED: Phase 1 complete - loaded ${recentCount} recent dates`);
+      debugLog.card('PlayerPropsLadder', `📊 UNLIMITED: Phase 1 complete - loaded ${recentCount} recent dates`);
       
       if (recentCount < 30) {
-        console.log(`📅 UNLIMITED: Loading additional historical data...`);
+        debugLog.card('PlayerPropsLadder', `📅 UNLIMITED: Loading additional historical data...`);
         
         // Load additional 90 days for historical context
         for (let daysBack = 60; daysBack < 150; daysBack++) {
@@ -164,12 +171,13 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
       }
       
       const totalCount = Object.keys(recentData).length;
-      console.log(`📊 UNLIMITED: Complete - loaded ${totalCount} total dates with data`);
+      debugLog.card('PlayerPropsLadder', `📊 UNLIMITED: Complete - loaded ${totalCount} total dates with data`);
       
       return recentData;
       
     } catch (error) {
       console.error('❌ UNLIMITED: Error loading player data:', error);
+      debugLog.error('PlayerPropsLadder', 'Error loading unlimited player data', error);
       return {};
     }
   }, []);
@@ -191,7 +199,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
     // Check cache first
     const cacheKey = `${targetProp}_${currentDateString}`;
     if (propDataCache[cacheKey]) {
-      console.log(`🎯 Using cached data for ${targetProp}`, cacheKey);
+      debugLog.card('PlayerPropsLadder', `🎯 Using cached data for ${targetProp}`, cacheKey);
       setPropAnalysisData(propDataCache[cacheKey]);
       setLoading(false);
       return;
@@ -201,7 +209,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
       setLoading(true);
       setError(null);
       
-      console.log(`🎯 Loading prop-specific data for ${targetProp}...`, { 
+      debugLog.card('PlayerPropsLadder', `🎯 Loading prop-specific data for ${targetProp}...`, { 
         currentDate, 
         currentDateString,
         targetProp,
@@ -217,7 +225,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
       
       if (currentDateString) {
         const dateSpecificUrl = `/data/prop_analysis/${targetProp}_analysis_${currentDateString}.json`;
-        console.log('📅 Trying date-specific prop URL:', dateSpecificUrl);
+        debugLog.card('PlayerPropsLadder', '📅 Trying date-specific prop URL:', dateSpecificUrl);
         
         // Add fetch timeout and better error handling
         const controller = new AbortController();
@@ -246,9 +254,9 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
         
         if (!propAnalysisResponse.ok || isHtml) {
           if (isHtml) {
-            console.log(`📅 Date-specific ${targetProp} file returned HTML (missing), using latest`);
+            debugLog.card('PlayerPropsLadder', `📅 Date-specific ${targetProp} file returned HTML (missing), using latest`);
           } else {
-            console.log(`📅 Date-specific ${targetProp} analysis not found, using latest`);
+            debugLog.card('PlayerPropsLadder', `📅 Date-specific ${targetProp} analysis not found, using latest`);
           }
           // Apply same timeout and cache control to latest file
           const latestController = new AbortController();
@@ -274,7 +282,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
           dateSpecificFound = true;
         }
       } else {
-        console.log(`📅 No currentDate provided, using latest for ${targetProp}`);
+        debugLog.card('PlayerPropsLadder', `📅 No currentDate provided, using latest for ${targetProp}`);
         // Apply same timeout and cache control to initial latest fetch
         const initialController = new AbortController();
         const initialTimeoutId = setTimeout(() => initialController.abort(), 10000);
@@ -297,7 +305,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
         }
       }
       
-      console.log('📡 Fetch response status:', propAnalysisResponse.status, propAnalysisResponse.statusText);
+      debugLog.card('PlayerPropsLadder', '📡 Fetch response status:', propAnalysisResponse.status, propAnalysisResponse.statusText);
       
       // Check for HTML response again (could happen with latest file too)
       const finalContentType = propAnalysisResponse.headers.get('content-type');
@@ -313,6 +321,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
           targetProp
         };
         console.error('❌ HTTP Error details:', errorDetails);
+        debugLog.error('PlayerPropsLadder', 'HTTP Error loading prop data', errorDetails);
         
         if (isFinalHtml) {
           throw new Error(`${targetProp} prop analysis files not found (server returned HTML). Please run: node src/services/generatePropAnalysis.js`);
@@ -324,7 +333,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
       }
       
       const propData = await propAnalysisResponse.json();
-      console.log(`✅ Pre-computed ${targetProp} analysis loaded:`, {
+      debugLog.card('PlayerPropsLadder', `✅ Pre-computed ${targetProp} analysis loaded:`, {
         date: propData.date,
         propType: propData.propType,
         totalPlayers: propData.totalPlayers,
@@ -342,7 +351,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
       
     } catch (err) {
       console.error(`❌ Error loading ${targetProp} prop analysis:`, err);
-      console.error('Error details:', {
+      debugLog.error('PlayerPropsLadder', `Error loading ${targetProp} prop analysis`, {
         message: err.message,
         stack: err.stack,
         currentDate: currentDate,
@@ -360,7 +369,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
         err.message.includes('timed out') ||
         err.message.includes('Unexpected token')
       )) {
-        console.log(`🔄 Retrying ${targetProp} in ${retryDelay}ms... (attempt ${retryCount + 1}/${maxRetries + 1})`);
+        debugLog.card('PlayerPropsLadder', `🔄 Retrying ${targetProp} in ${retryDelay}ms... (attempt ${retryCount + 1}/${maxRetries + 1})`);
         setLoading(false); // Allow UI to show retry state briefly
         
         setTimeout(() => {
@@ -391,7 +400,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
   // Load recent games and opponent history from historical data  
   const loadPlayerRecentGames = useCallback(async (player, propKey) => {
     try {
-      console.log(`🔍 Loading games for ${player.name} (${player.team}) - ${propKey}`);
+      debugLog.card('PlayerPropsLadder', `🔍 Loading games for ${player.name} (${player.team}) - ${propKey}`);
       
       // Get comprehensive data using specialized unlimited approach
       // FIXED: Use app's selected date for consistency with other components like EnhancedPlayerAnalysis
@@ -400,14 +409,14 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
       
       const propOption = propOptions.find(p => p.key === propKey);
       
-      console.log(`📅 Loaded historical data:`, Object.keys(historicalData || {}).length, 'dates');
+      debugLog.card('PlayerPropsLadder', `📅 Loaded historical data:`, Object.keys(historicalData || {}).length, 'dates');
       
       // Get today's opponent by looking at current team filter
       let opponentTeam = null;
       if (selectedTeam && includeMatchup && matchupTeam) {
         // If we're in matchup mode, the opponent is the other team
         opponentTeam = selectedTeam === player.team ? matchupTeam : selectedTeam;
-        console.log(`🆚 Found opponent from matchup context: ${opponentTeam}`);
+        debugLog.card('PlayerPropsLadder', `🆚 Found opponent from matchup context: ${opponentTeam}`);
       }
       
       // FIRST PASS: Collect ALL games for this player
@@ -474,13 +483,13 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
         for (const game of allGames.slice(0, 5)) {
           if (game.opponent && game.opponent !== player.team) {
             opponentTeam = game.opponent;
-            console.log(`🆚 Found opponent from game data: ${opponentTeam}`);
+            debugLog.card('PlayerPropsLadder', `🆚 Found opponent from game data: ${opponentTeam}`);
             break;
           }
         }
       }
       
-      console.log(`📊 Found ${allGames.length} total games for ${player.name}`);
+      debugLog.card('PlayerPropsLadder', `📊 Found ${allGames.length} total games for ${player.name}`);
       
       // SECOND PASS: Separate into categories (FIXED - return proper structure)
       const recentGames = allGames.slice(0, 5).map(game => ({
@@ -496,7 +505,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
           gameType: 'opponent'  
         }));
       
-      console.log(`📊 Separated: ${recentGames.length} recent games, ${opponentHistory.length} opponent history games`);
+      debugLog.card('PlayerPropsLadder', `📊 Separated: ${recentGames.length} recent games, ${opponentHistory.length} opponent history games`);
       
       // FIXED: Return structured data instead of combined array
       // This prevents Recent5GamesChart from receiving mixed data
@@ -509,11 +518,12 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
         } : null
       };
       
-      console.log(`📊 Returning structured data: ${recentGames.length} recent, ${opponentHistory.length} opponent vs ${opponentTeam}`);
+      debugLog.card('PlayerPropsLadder', `📊 Returning structured data: ${recentGames.length} recent, ${opponentHistory.length} opponent vs ${opponentTeam}`);
       
       return structuredData;
     } catch (err) {
       console.error('Error loading recent games:', err);
+      debugLog.error('PlayerPropsLadder', 'Error loading recent games', err);
       return [];
     }
   }, [currentDate, propOptions, selectedTeam, includeMatchup, matchupTeam]);
@@ -521,15 +531,15 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
   // Load player details when a player is selected (enhanced for separate charts)
   const loadPlayerDetails = useCallback(async (player) => {
     try {
-      console.log(`📊 Loading enhanced chart data for ${player.name}...`);
+      debugLog.card('PlayerPropsLadder', `📊 Loading enhanced chart data for ${player.name}...`);
       
       // Check if player has pre-computed chart data
       if (player.chartData) {
-        console.log(`✅ Using pre-computed chart data for ${player.name}`);
+        debugLog.card('PlayerPropsLadder', `✅ Using pre-computed chart data for ${player.name}`);
         setPlayerChartData(player.chartData);
         setRecentGamesData(player.chartData.recent3Games || []);
       } else {
-        console.log(`⚠️ No pre-computed data, falling back to dynamic loading for ${player.name}`);
+        debugLog.card('PlayerPropsLadder', `⚠️ No pre-computed data, falling back to dynamic loading for ${player.name}`);
         
         // Fallback: Generate basic chart data structure
         const fallbackChartData = {
@@ -561,6 +571,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
       
     } catch (err) {
       console.error('Error loading player details:', err);
+      debugLog.error('PlayerPropsLadder', 'Error loading player details', err);
       setPlayerChartData(null);
       setRecentGamesData([]);
     }
@@ -569,14 +580,14 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
   // Enhanced opponent history loading when team matchup context is available
   const loadEnhancedOpponentHistory = useCallback(async (player, targetOpponent, statKey) => {
     if (!player || !targetOpponent || !statKey) {
-      console.log('🆚 Enhanced opponent loading: Missing required parameters');
+      debugLog.card('PlayerPropsLadder', '🆚 Enhanced opponent loading: Missing required parameters');
       setEnhancedOpponentData(null);
       return;
     }
 
     try {
       setOpponentHistoryLoading(true);
-      console.log(`🔍 ENHANCED: Loading opponent history for ${player.name} vs ${targetOpponent} (${statKey})`);
+      debugLog.card('PlayerPropsLadder', `🔍 ENHANCED: Loading opponent history for ${player.name} vs ${targetOpponent} (${statKey})`);
       
       // Use enhanced game data service to get proper opponent history
       const opponentAnalysis = await enhancedGameDataService.getPlayerVsOpponentAnalysis(
@@ -586,11 +597,12 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
         statKey
       );
       
-      console.log(`✅ ENHANCED: Found opponent data:`, opponentAnalysis);
+      debugLog.card('PlayerPropsLadder', `✅ ENHANCED: Found opponent data:`, opponentAnalysis);
       setEnhancedOpponentData(opponentAnalysis);
       
     } catch (error) {
       console.error('❌ Enhanced opponent history loading failed:', error);
+      debugLog.error('PlayerPropsLadder', 'Enhanced opponent history loading failed', error);
       setEnhancedOpponentData(null);
     } finally {
       setOpponentHistoryLoading(false);
@@ -611,11 +623,11 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
         ? todaysGame.awayTeam 
         : todaysGame.homeTeam;
       
-      console.log(`🎯 Auto-detected opponent for ${playerTeam}: ${opponent} (from today's schedule)`);
+      debugLog.card('PlayerPropsLadder', `🎯 Auto-detected opponent for ${playerTeam}: ${opponent} (from today's schedule)`);
       return opponent;
     }
     
-    console.log(`🎯 No game found for ${playerTeam} in today's schedule`);
+    debugLog.card('PlayerPropsLadder', `🎯 No game found for ${playerTeam} in today's schedule`);
     return null;
   }, [gameData]);
 
@@ -678,7 +690,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
     
     if (selectedPlayer && currentOpponent) {
       // Load opponent history automatically when current opponent is detected
-      console.log(`🎯 Auto-loading enhanced opponent history for ${selectedPlayer.name} vs ${currentOpponent}`);
+      debugLog.card('PlayerPropsLadder', `🎯 Auto-loading enhanced opponent history for ${selectedPlayer.name} vs ${currentOpponent}`);
       
       // Get the stat key for current prop
       const propOption = propOptions.find(p => p.key === selectedProp);
@@ -688,7 +700,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
     } else {
       // Clear enhanced opponent data when no opponent detected
       if (!currentOpponent) {
-        console.log('🎯 No current opponent detected: Clearing enhanced opponent data');
+        debugLog.card('PlayerPropsLadder', '🎯 No current opponent detected: Clearing enhanced opponent data');
       }
       setEnhancedOpponentData(null);
     }
@@ -697,19 +709,19 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
   // Get base player data for selected prop (updated for individual prop files)
   const getBasePlayerData = useMemo(() => {
     if (!propAnalysisData || !selectedProp) {
-      console.log('No prop analysis data or selected prop');
+      debugLog.card('PlayerPropsLadder', 'No prop analysis data or selected prop');
       return [];
     }
     
     // New structure: data is directly at root level for individual prop files
     if (propAnalysisData.propType !== selectedProp) {
-      console.log(`Prop data mismatch: expected ${selectedProp}, got ${propAnalysisData.propType}`);
+      debugLog.card('PlayerPropsLadder', `Prop data mismatch: expected ${selectedProp}, got ${propAnalysisData.propType}`);
       return [];
     }
     
     // Always use topPlayers as base data, team filtering will be applied separately
     const topPlayers = propAnalysisData.topPlayers || [];
-    console.log(`Base data: ${topPlayers.length} players available for ${selectedProp}`);
+    debugLog.card('PlayerPropsLadder', `Base data: ${topPlayers.length} players available for ${selectedProp}`);
     return topPlayers;
   }, [propAnalysisData, selectedProp]);
   
@@ -774,7 +786,7 @@ const PlayerPropsLadderCard = ({ currentDate, gameData }) => {
   const displayLimit = selectedTeam ? (includeMatchup && matchupTeam ? 50 : 50) : 25;
   const displayPlayers = filteredPlayers.slice(0, displayLimit);
   
-  console.log(`Team filtering: ${filteredPlayers.length} filtered, showing ${displayPlayers.length}`);
+  debugLog.card('PlayerPropsLadder', `Team filtering: ${filteredPlayers.length} filtered, showing ${displayPlayers.length}`);
 
   return (
     <GlassCard className="player-props-ladder-card" variant="default">

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTeamFilter } from '../../TeamFilterContext';
 import hrCombinationService from './HRCombinationService';
+import { debugLog } from '../../../utils/debugConfig';
 import '../GlassCard/GlassCard.css';
 import './HRCombinationTrackerCard.css';
 
@@ -25,21 +26,21 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
   // Player search filtering function
   const filterCombinationsByPlayer = useCallback((combinations, searchTerm) => {
     if (!searchTerm.trim()) {
-      console.log('🔍 No search term, returning all combinations:', combinations?.length || 0);
+      debugLog.card('HRCombinationTracker', '🔍 No search term, returning all combinations:', combinations?.length || 0);
       return combinations || [];
     }
     
     if (!combinations || !Array.isArray(combinations)) {
-      console.log('🔍 No valid combinations array provided:', combinations);
+      debugLog.card('HRCombinationTracker', '🔍 No valid combinations array provided:', combinations);
       return [];
     }
     
     const normalizedSearch = searchTerm.toLowerCase().trim();
-    console.log('🔍 Filtering with normalized search:', normalizedSearch);
+    debugLog.card('HRCombinationTracker', '🔍 Filtering with normalized search:', normalizedSearch);
     
     const filtered = combinations.filter(combo => {
       if (!combo || !combo.players || !Array.isArray(combo.players)) {
-        console.log('🔍 Invalid combo structure:', combo);
+        debugLog.card('HRCombinationTracker', '🔍 Invalid combo structure:', combo);
         return false;
       }
       
@@ -58,7 +59,7 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
         const matches = firstNameMatches || fullNameContains;
         
         if (matches) {
-          console.log(`🔍 Found match: "${playerName}" matches search "${searchTerm}"`);
+          debugLog.card('HRCombinationTracker', `🔍 Found match: "${playerName}" matches search "${searchTerm}"`);
         }
         
         return matches;
@@ -67,7 +68,7 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
       return hasMatch;
     });
     
-    console.log('🔍 Filtering complete:', {
+    debugLog.card('HRCombinationTracker', '🔍 Filtering complete:', {
       originalCount: combinations.length,
       filteredCount: filtered.length,
       searchTerm
@@ -78,14 +79,14 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
 
   // Apply player search filter when search term changes
   useEffect(() => {
-    console.log('🔍 Player search filter effect triggered:', {
+    debugLog.card('HRCombinationTracker', 'Player search filter triggered', {
       searchTerm: playerSearch,
       combinationsCount: combinations?.length || 0,
       combinationsSample: combinations?.[0]?.players?.map(p => p.name) || 'none'
     });
     
     const filtered = filterCombinationsByPlayer(combinations, playerSearch);
-    console.log('🔍 Filter result:', {
+    debugLog.card('HRCombinationTracker', 'Filter result', {
       originalCount: combinations?.length || 0,
       filteredCount: filtered?.length || 0,
       searchTerm: playerSearch
@@ -100,23 +101,26 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
     setError(null);
     
     try {
-      console.log(`🚀 Loading HR combinations for group size: ${groupSize}`);
+      debugLog.card('HRCombinationTracker', `Loading HR combinations for group size: ${groupSize}`);
       
       // Load combinations directly from pre-generated data
       const rawCombinations = await hrCombinationService.analyzeHRCombinations([], groupSize, showAllResults);
       
-      console.log(`🚀 Loaded ${rawCombinations.length} combinations for group size ${groupSize}`);
+      debugLog.card('HRCombinationTracker', `Loaded ${rawCombinations.length} combinations for group size ${groupSize}`);
       
       // Apply team filtering if active using standardized pattern
       let filteredCombinations = rawCombinations;
       if (selectedTeam || includeMatchup) {
-        console.log(`🚀 Filtering combinations using team filter context`);
-        console.log(`🚀 Selected team: ${selectedTeam}, Include matchup: ${includeMatchup}, Matchup team: ${matchupTeam}`);
+        debugLog.card('HRCombinationTracker', 'Applying team filter', {
+          selectedTeam,
+          includeMatchup,
+          matchupTeam
+        });
         
         // Debug: Show sample combination before filtering
         if (rawCombinations.length > 0) {
           const sample = rawCombinations[0];
-          console.log(`🚀 Sample combination before filtering:`, {
+          debugLog.card('HRCombinationTracker', 'Sample before filtering', {
             players: sample.players.map(p => `${p.name} (${p.team})`),
             playersTeams: sample.players.map(p => p.team)
           });
@@ -126,12 +130,12 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
           rawCombinations,
           shouldIncludePlayer
         );
-        console.log(`🚀 After filtering: ${filteredCombinations.length} combinations`);
+        debugLog.card('HRCombinationTracker', `After filtering: ${filteredCombinations.length} combinations`);
         
         // Debug: Show sample combination after filtering
         if (filteredCombinations.length > 0) {
           const sample = filteredCombinations[0];
-          console.log(`🚀 Sample combination after filtering:`, {
+          debugLog.card('HRCombinationTracker', 'Sample after filtering', {
             players: sample.players.map(p => `${p.name} (${p.team})`)
           });
         }
@@ -146,6 +150,7 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
       
     } catch (err) {
       console.error('🚀 Error loading HR combination data:', err);
+      debugLog.error('HRCombinationTracker', 'Failed to load combination data', err);
       setError('Failed to load combination data');
     } finally {
       setLoading(false);
@@ -161,23 +166,24 @@ const HRCombinationTrackerCard = ({ gameData, playerData, currentDate }) => {
   };
 
   const handleCombinationClick = (combination, event) => {
-    console.log('🔍 HR Combination clicked:', combination);
-    console.log('🔍 Click event:', event);
-    console.log('🔍 Window width:', window.innerWidth);
+    debugLog.card('HRCombinationTracker', 'Combination clicked', {
+      combination: combination?.players?.length || 0,
+      windowWidth: window.innerWidth
+    });
     
     // Check if mobile view (typically < 768px)
     const isMobile = window.innerWidth < 768;
-    console.log('🔍 Is mobile?', isMobile);
+    debugLog.card('HRCombinationTracker', `Device type: ${isMobile ? 'mobile' : 'desktop'}`);
     
     setSelectedCombination(combination);
     
     if (isMobile) {
       // Mobile: Show modal
-      console.log('🔍 Setting showModal = true');
+      debugLog.card('HRCombinationTracker', 'Showing mobile modal');
       setShowModal(true);
     } else {
       // Desktop: Show centered modal (like mobile but with different styling)
-      console.log('🔍 Setting up desktop modal');
+      debugLog.card('HRCombinationTracker', 'Showing desktop modal');
       setShowDetailTooltip(true);
     }
   };

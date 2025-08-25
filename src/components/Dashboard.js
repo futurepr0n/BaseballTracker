@@ -13,7 +13,7 @@ import { HandednessProvider } from '../contexts/HandednessContext';
 import ThemeToggle from './ThemeToggle';
 
 // Import debug logging system
-import { debugLog } from '../utils/debugConfig';
+import { debugLog, getDebugConfig } from '../utils/debugConfig';
 
 // Import tooltip system
 import { TooltipProvider } from './utils/TooltipContext';
@@ -206,7 +206,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
         const response = await fetch('/data/stadium/stadium_hr_analysis.json');
         
         if (!response.ok) {
-          console.warn('No stadium HR analysis data found');
+          debugLog.warn('COMPONENTS', 'No stadium HR analysis data found');
           setStadiumData(null);
         } else {
           const data = await response.json();
@@ -214,7 +214,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
           setStadiumData(data);
         }
       } catch (error) {
-        console.error('Error loading stadium data:', error);
+        debugLog.error('COMPONENTS', 'Error loading stadium data:', error);
         setStadiumData(null);
       } finally {
         setStadiumLoading(false);
@@ -257,7 +257,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
       }
       
       if (!response.ok) {
-        console.warn('No poor performance predictions found');
+        debugLog.warn('COMPONENTS', 'No poor performance predictions found');
         setPoorPerformancePredictions([]);
       } else {
         const data = await response.json();
@@ -275,7 +275,7 @@ function Dashboard({ playerData, teamData, gameData, currentDate }) {
         debugLog.card('Dashboard', `Loaded ${predictions.length} poor performance predictions`);
       }
     } catch (error) {
-      console.error('Error loading poor performance predictions:', error);
+      debugLog.error('COMPONENTS', 'Error loading poor performance predictions:', error);
       setPoorPerformancePredictions([]);
     } finally {
       setPoorPerformanceLoading(false);
@@ -305,7 +305,7 @@ useEffect(() => {
       }
       
       if (!response.ok) {
-        console.warn('No positive momentum predictions found');
+        debugLog.warn('COMPONENTS', 'No positive momentum predictions found');
         setPositiveMomentumPredictions([]);
       } else {
         const data = await response.json();
@@ -323,7 +323,7 @@ useEffect(() => {
         debugLog.card('Dashboard', `Loaded ${predictions.length} positive momentum predictions`);
       }
     } catch (error) {
-      console.error('Error loading positive momentum predictions:', error);
+      debugLog.error('COMPONENTS', 'Error loading positive momentum predictions:', error);
       setPositiveMomentumPredictions([]);
     } finally {
       setPositiveMomentumLoading(false);
@@ -412,62 +412,62 @@ useEffect(() => {
             setVisitCount(data.totalPageLoads);
             debugLog.info('COMPONENTS', `📈 Page load tracked! Total loads: ${data.totalPageLoads}`);
           } else {
-            console.warn('❌ API response success was false:', data);
+            debugLog.warn('COMPONENTS', '❌ API response success was false:', data);
           }
         } else {
-          console.warn('❌ Page load tracking server not responding, status:', response.status);
+          debugLog.warn('COMPONENTS', '❌ Page load tracking server not responding, status:', response.status);
           // Get current count even if increment failed
-          console.log('🔄 Trying to get current count...');
+          debugLog.log('COMPONENTS', '🔄 Trying to get current count...');
           try {
             const getResponse = await fetch('https://visits.capping.pro/visits');
-            console.log('📥 GET Response status:', getResponse.status);
+            debugLog.log('COMPONENTS', '📥 GET Response status:', getResponse.status);
             if (getResponse.ok) {
               const getData = await getResponse.json();
-              console.log('📊 Current count data:', getData);
+              debugLog.log('COMPONENTS', '📊 Current count data:', getData);
               if (getData.success) {
-                console.log('🔄 Setting visitCount from GET request:', getData.totalPageLoads);
+                debugLog.log('COMPONENTS', '🔄 Setting visitCount from GET request:', getData.totalPageLoads);
                 setVisitCount(getData.totalPageLoads);
               }
             }
           } catch (getError) {
-            console.error('❌ Failed to get current count:', getError);
+            debugLog.error('COMPONENTS', '❌ Failed to get current count:', getError);
           }
         }
       } catch (error) {
-        console.error('❌ Page load tracking error:', error);
-        console.error('Error details - message:', error.message);
+        debugLog.error('COMPONENTS', '❌ Page load tracking error:', error);
+        debugLog.error('COMPONENTS', 'Error details - message:', error.message);
         
         // If POST fails, try to at least get the current count
-        console.log('🔄 POST failed, attempting to get current count...');
+        debugLog.card('Dashboard', '🔄 POST failed, attempting to get current count...');
         try {
           const getResponse = await fetch('https://visits.capping.pro/visits');
           if (getResponse.ok) {
             const getData = await getResponse.json();
-            console.log('📊 Fallback count data:', getData);
+            debugLog.card('Dashboard', '📊 Fallback count data:', getData);
             if (getData.success) {
               setVisitCount(getData.totalPageLoads);
-              console.log(`📊 Retrieved current count: ${getData.totalPageLoads}`);
+              debugLog.card('Dashboard', `📊 Retrieved current count: ${getData.totalPageLoads}`);
             }
           }
         } catch (fallbackError) {
           console.error('❌ Fallback GET also failed:', fallbackError);
         }
       } finally {
-        console.log('🔚 Setting visitLoading to false');
+        debugLog.card('Dashboard', '🔚 Setting visitLoading to false');
         setVisitLoading(false);
-        console.log('✅ Visit tracking completed');
+        debugLog.card('Dashboard', '✅ Visit tracking completed');
       }
     };
     
-    console.log('⏰ Setting up visit tracking timer...');
+    debugLog.card('Dashboard', '⏰ Setting up visit tracking timer...');
     // Track page load after a small delay to ensure page is fully loaded
     const timer = setTimeout(() => {
-      console.log('⏰ Timer fired, executing trackVisit...');
+      debugLog.card('Dashboard', '⏰ Timer fired, executing trackVisit...');
       trackVisit();
     }, 1000);
     
     return () => {
-      console.log('🧹 Cleaning up visit tracking timer');
+      debugLog.card('Dashboard', '🧹 Cleaning up visit tracking timer');
       clearTimeout(timer);
     };
   }, []); // Only run once on mount
@@ -714,7 +714,7 @@ useEffect(() => {
   useEffect(() => {
     const loadPlayerPerformance = async () => {
       try {
-        console.log("Loading performance data for date:", currentDate.toISOString());
+        debugLog.card('Dashboard', 'Loading performance data for date:', currentDate.toISOString());
         
         // Force cache bypass with a random query parameter
         const timestamp = new Date().getTime() + Math.random();
@@ -723,20 +723,15 @@ useEffect(() => {
         if (response.ok) {
           const data = await response.json();
           
-          // Debug the raw data
-          console.log("Raw data lastHRDates:", 
-            data.recentHRs?.slice(0, 5).map(p => ({ 
-              name: p.name, 
-              date: p.lastHRDate 
-            }))
-          );
+          // Debug the raw data - use conditional for performance in render cycle
+          debugLog.card('Dashboard', 'Raw data loaded with', data.recentHRs?.length || 0, 'recent HR players');
           
           // Apply team filtering if needed
           let filteredData = data;
           
           if (isFiltering) {
             // FOR TEAM FILTERING, GET COMPREHENSIVE RECENT HR DATA
-            console.log("[Dashboard] Team filtering active for performance data - generating comprehensive recent HR list");
+            debugLog.card('Dashboard', '[Dashboard] Team filtering active for performance data - generating comprehensive recent HR list');
             
             // Get all players from the filtered teams with HR data
             const allTeamPlayersWithHRs = data.players ? data.players.filter(player => {
@@ -752,7 +747,7 @@ useEffect(() => {
               return b.homeRunsThisSeason - a.homeRunsThisSeason;
             });
             
-            console.log(`[Dashboard] Found ${comprehensiveRecentHRs.length} players with HRs from filtered team(s)`);
+            debugLog.card('Dashboard', `[Dashboard] Found ${comprehensiveRecentHRs.length} players with HRs from filtered team(s)`);
             
             filteredData = {
               ...data,
@@ -781,13 +776,8 @@ useEffect(() => {
                 return b.homeRunsThisSeason - a.homeRunsThisSeason;
               })];
             
-            // Debug the processed data
-            console.log("Processed recent HRs:", 
-              recent.slice(0, 5).map(p => ({ 
-                name: p.name, 
-                date: p.lastHRDate 
-              }))
-            );
+            // Debug the processed data - use conditional for performance
+            debugLog.card('Dashboard', 'Processed recent HRs:', recent.length, 'total players');
             
             // Rest of your code for other categories - enhanced for team filtering
             const hrRate = [...filteredData.players]
@@ -838,7 +828,7 @@ useEffect(() => {
     try {
       setStatsLoading(true);
       
-      console.log(`[Dashboard] Loading rolling stats for type: ${rollingStatsType}, team filtering: ${isFiltering}`);
+      debugLog.card('Dashboard', `[Dashboard] Loading rolling stats for type: ${rollingStatsType}, team filtering: ${isFiltering}`);
       
       // FORMAT DATE FOR FILE NAME
       const year = currentDate.getFullYear();
@@ -851,7 +841,7 @@ useEffect(() => {
       
       // If specific date not found, try latest
       if (!rollingStatsResponse.ok) {
-        console.log(`[Dashboard] Specific date rolling stats not found, trying latest for ${rollingStatsType}`);
+        debugLog.card('Dashboard', `[Dashboard] Specific date rolling stats not found, trying latest for ${rollingStatsType}`);
         rollingStatsResponse = await fetch(`/data/rolling_stats/rolling_stats_${rollingStatsType}_latest.json`);
       }
       
@@ -861,18 +851,18 @@ useEffect(() => {
         // Check if it's actually JSON
         if (text.trim().startsWith('{') || text.trim().startsWith('[')) {
           const rollingStatsData = JSON.parse(text);
-          console.log(`[Dashboard] Successfully loaded rolling stats from file`);
+          debugLog.card('Dashboard', `[Dashboard] Successfully loaded rolling stats from file`);
           
           // ENHANCED: Use comprehensive data for team filtering or scratchpad filtering
           if (isFiltering) {
-            console.log(`[Dashboard] Filtering active (team or scratchpad) - using comprehensive data`);
+            debugLog.card('Dashboard', `[Dashboard] Filtering active (team or scratchpad) - using comprehensive data`);
             
             // Use comprehensive data (allHitters, allHRLeaders) for team filtering
             const allHitters = rollingStatsData.allHitters || rollingStatsData.topHitters || [];
             const allHRLeaders = rollingStatsData.allHRLeaders || rollingStatsData.topHRLeaders || [];
             const allStrikeouts = rollingStatsData.allStrikeoutPitchers || rollingStatsData.topStrikeoutPitchers || [];
             
-            console.log(`[Dashboard] Available comprehensive data: ${allHitters.length} hitters, ${allHRLeaders.length} HR leaders, ${allStrikeouts.length} strikeout pitchers`);
+            debugLog.card('Dashboard', `[Dashboard] Available comprehensive data: ${allHitters.length} hitters, ${allHRLeaders.length} HR leaders, ${allStrikeouts.length} strikeout pitchers`);
             
             // Filter by team using comprehensive data
             const filteredHitters = allHitters.filter(player => {
@@ -890,7 +880,7 @@ useEffect(() => {
               return shouldIncludePlayer(player.team, playerName);
             });
             
-            console.log(`[Dashboard] After team filtering: ${filteredHitters.length} hitters, ${filteredHomers.length} HR leaders, ${filteredStrikeouts.length} strikeout pitchers`);
+            debugLog.card('Dashboard', `After team filtering: ${filteredHitters.length} hitters, ${filteredHomers.length} HR leaders, ${filteredStrikeouts.length} strikeout pitchers`);
             
             setRollingStats({
               hitters: filteredHitters.slice(0, 50), // Show up to 50 for team filtering
@@ -900,7 +890,7 @@ useEffect(() => {
             
           } else {
             // NOT filtering by team - use regular top performers for global display
-            console.log(`[Dashboard] No team filtering - using top performers for global display`);
+            debugLog.card('Dashboard', `No team filtering - using top performers for global display`);
             
             let filteredHitters = rollingStatsData.topHitters || [];
             let filteredHomers = rollingStatsData.topHRLeaders || [];
@@ -921,7 +911,7 @@ useEffect(() => {
           await loadLegacyRollingStats();
         }
       } else {
-        console.log(`[Dashboard] No rolling stats file found, falling back to legacy method`);
+        debugLog.card('Dashboard', `No rolling stats file found, falling back to legacy method`);
         await loadLegacyRollingStats();
       }
       
@@ -935,7 +925,7 @@ useEffect(() => {
   
   // LEGACY FALLBACK METHOD - ENHANCED FOR COMPREHENSIVE TEAM FILTERING
   const loadLegacyRollingStats = async () => {
-    console.log(`[Dashboard] Using legacy rolling stats method`);
+    debugLog.card('Dashboard', `Using legacy rolling stats method`);
     
     // Check if there's data for today
     const hasDataForToday = filteredPlayerData && filteredPlayerData.length > 0;
@@ -968,7 +958,7 @@ useEffect(() => {
               player.playerType === 'pitcher');
             
             if (isFiltering) {
-              console.log(`[Dashboard] Legacy method with team filtering - processing ALL team players`);
+              debugLog.card('Dashboard', `Legacy method with team filtering - processing ALL team players`);
               
               // Filter all players by team (not just top performers)
               allBatters = allBatters.filter(player => {
@@ -1007,7 +997,7 @@ useEffect(() => {
             setDataDate(yesterday);
             setDateStatus('previous');
             
-            console.log(`[Dashboard] Legacy previous day with team filtering: ${topHitters.length} hitters, ${topHomers.length} homers, ${topStrikeoutPitchers.length} strikeout pitchers`);
+            debugLog.card('Dashboard', `Legacy previous day with team filtering: ${topHitters.length} hitters, ${topHomers.length} homers, ${topStrikeoutPitchers.length} strikeout pitchers`);
             
             return; // Exit early since we found yesterday's data
           }
@@ -1024,14 +1014,14 @@ useEffect(() => {
 
   // Helper function to process current data (enhanced for comprehensive team filtering)
   const processCurrentData = () => {
-    console.log(`[Dashboard] Processing current data, team filtering: ${isFiltering}`);
+    debugLog.card('Dashboard', `Processing current data, team filtering: ${isFiltering}`);
     
     let batters = filteredBatterData;
     let pitchers = filteredPitcherData;
     
     // If team filtering and we have comprehensive data, use ALL team players
     if (isFiltering && playerData && playerData.length > 0) {
-      console.log(`[Dashboard] Team filtering active - processing ALL team players from current data`);
+      debugLog.card('Dashboard', `Team filtering active - processing ALL team players from current data`);
       
       // Get ALL team players (not pre-filtered)
       const allTeamBatters = playerData
@@ -1048,7 +1038,7 @@ useEffect(() => {
       batters = allTeamBatters;
       pitchers = allTeamPitchers;
       
-      console.log(`[Dashboard] Found ${batters.length} team batters and ${pitchers.length} team pitchers in current data`);
+      debugLog.card('Dashboard', `Found ${batters.length} team batters and ${pitchers.length} team pitchers in current data`);
     }
     
     // Find top performers in current data
@@ -1073,7 +1063,7 @@ useEffect(() => {
       strikeouts: topStrikeoutPitchers.map(player => ({...player, games: 1}))
     });
     
-    console.log(`[Dashboard] Current data processing complete: ${topHitters.length} hitters, ${topHomers.length} homers, ${topStrikeoutPitchers.length} strikeout pitchers`);
+    debugLog.card('Dashboard', `Current data processing complete: ${topHitters.length} hitters, ${topHomers.length} homers, ${topStrikeoutPitchers.length} strikeout pitchers`);
   };
   
   loadEnhancedRollingStats();
@@ -1081,7 +1071,7 @@ useEffect(() => {
 
 // Also update the generateTeamSpecificStats function to be more comprehensive
 const generateTeamSpecificStats = (playerData, selectedTeam, includeMatchup, matchupTeam, shouldIncludePlayer) => {
-  console.log(`[generateTeamSpecificStats] Generating comprehensive stats for team filter`);
+  debugLog.card('Dashboard', `[generateTeamSpecificStats] Generating comprehensive stats for team filter`);
   
   // Filter ALL players for the selected team(s) - this ensures we get everyone
   const teamFilteredPlayers = playerData.filter(player => {
@@ -1089,7 +1079,7 @@ const generateTeamSpecificStats = (playerData, selectedTeam, includeMatchup, mat
     return shouldIncludePlayer(player.team, playerName);
   });
   
-  console.log(`[generateTeamSpecificStats] Found ${teamFilteredPlayers.length} total team players`);
+  debugLog.card('Dashboard', `[generateTeamSpecificStats] Found ${teamFilteredPlayers.length} total team players`);
   
   // Separate batters and pitchers
   const teamBatters = teamFilteredPlayers.filter(player => 
@@ -1099,7 +1089,7 @@ const generateTeamSpecificStats = (playerData, selectedTeam, includeMatchup, mat
     player.playerType === 'pitcher'
   );
   
-  console.log(`[generateTeamSpecificStats] Team breakdown: ${teamBatters.length} batters, ${teamPitchers.length} pitchers`);
+  debugLog.card('Dashboard', `[generateTeamSpecificStats] Team breakdown: ${teamBatters.length} batters, ${teamPitchers.length} pitchers`);
   
   // Generate comprehensive hitters list (ALL team players with hits)
   const comprehensiveHitters = [...teamBatters]
@@ -1119,7 +1109,7 @@ const generateTeamSpecificStats = (playerData, selectedTeam, includeMatchup, mat
     .sort((a, b) => (Number(b.K) || 0) - (Number(a.K) || 0))
     .map(player => ({...player, games: 1}));
   
-  console.log(`[generateTeamSpecificStats] Generated comprehensive team stats: ${comprehensiveHitters.length} hitters with hits, ${comprehensiveHomers.length} players with HRs, ${comprehensiveStrikeouts.length} pitchers with Ks`);
+  debugLog.card('Dashboard', `[generateTeamSpecificStats] Generated comprehensive team stats: ${comprehensiveHitters.length} hitters with hits, ${comprehensiveHomers.length} players with HRs, ${comprehensiveStrikeouts.length} pitchers with Ks`);
   
   return {
     hitters: comprehensiveHitters,
