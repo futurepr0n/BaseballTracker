@@ -225,20 +225,24 @@ const ComprehensiveAnalysisDisplay = ({ analysis }) => {
     // Try to extract from analysis data if available
     if (analysis?.matchup_analysis) {
       for (const matchup of Object.values(analysis.matchup_analysis)) {
-        if (matchup.away_pitcher_analysis?.pitcher_name === pitcherName) {
+        if (matchup.away_pitcher_analysis?.pitcher_name && 
+            namesMatch(matchup.away_pitcher_analysis.pitcher_name, pitcherName)) {
           return matchup.away_pitcher_analysis.pitcher_hand || 'R';
         }
-        if (matchup.home_pitcher_analysis?.pitcher_name === pitcherName) {
+        if (matchup.home_pitcher_analysis?.pitcher_name && 
+            namesMatch(matchup.home_pitcher_analysis.pitcher_name, pitcherName)) {
           return matchup.home_pitcher_analysis.pitcher_hand || 'R';
         }
       }
     }
 
     // Try direct analysis format
-    if (analysis?.away_pitcher_analysis?.pitcher_name === pitcherName) {
+    if (analysis?.away_pitcher_analysis?.pitcher_name && 
+        namesMatch(analysis.away_pitcher_analysis.pitcher_name, pitcherName)) {
       return analysis.away_pitcher_analysis.pitcher_hand || 'R';
     }
-    if (analysis?.home_pitcher_analysis?.pitcher_name === pitcherName) {
+    if (analysis?.home_pitcher_analysis?.pitcher_name && 
+        namesMatch(analysis.home_pitcher_analysis.pitcher_name, pitcherName)) {
       return analysis.home_pitcher_analysis.pitcher_hand || 'R';
     }
 
