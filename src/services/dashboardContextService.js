@@ -4,6 +4,8 @@
  * for enhanced baseball analysis and predictions
  */
 
+import { debugLog, getDebugConfig } from '../utils/debugConfig.js';
+
 // Dashboard Context Service - aggregates all dashboard card data
 
 class DashboardContextService {
@@ -23,12 +25,12 @@ class DashboardContextService {
       
       // Try latest file first (most reliable)
       const url = `/data/predictions/${type}_latest.json?cb=${cacheBuster}`;
-      console.log(`📡 Fetching ${type} data from: ${url}`);
+      debugLog.service('DashboardContext', `Fetching ${type} data from: ${url}`);
       let response = await fetch(url);
       
       if (response.ok) {
         const jsonData = await response.json();
-        console.log(`✅ Successfully loaded ${type} data:`, jsonData ? `${Object.keys(jsonData).length} keys` : 'null');
+        debugLog.service('DashboardContext', `Successfully loaded ${type} data:`, jsonData ? `${Object.keys(jsonData).length} keys` : 'null');
         return jsonData;
       }
       
@@ -46,6 +48,7 @@ class DashboardContextService {
       
     } catch (error) {
       console.error(`Error loading ${type} data:`, error);
+      debugLog.error('DashboardContext', `Error loading ${type} data`, error);
       return null;
     }
   }
@@ -60,15 +63,18 @@ class DashboardContextService {
   async getPlayerContext(playerName, team, date = null) {
     const cacheKey = `${playerName}-${team}-${date || 'today'}`;
     
-    console.log(`🔄 GET PLAYER CONTEXT for ${playerName} (${team})`);
+    debugLog.service('DashboardContext', `GET PLAYER CONTEXT for ${playerName} (${team})`);
     
     // Check cache first
     if (this.cache.has(cacheKey)) {
       const cached = this.cache.get(cacheKey);
       if (Date.now() - cached.timestamp < this.cacheTimeout) {
-        console.log(`📦 RETURNING CACHED CONTEXT for ${playerName}`, {
-          hasMilestoneData: !!cached.data.milestoneTrackingData
-        });
+        const config = getDebugConfig();
+        if (config.ENABLED && config.SERVICES) {
+          debugLog.service('DashboardContext', `RETURNING CACHED CONTEXT for ${playerName}`, {
+            hasMilestoneData: !!cached.data.milestoneTrackingData
+          });
+        }
         return cached.data;
       }
     }
@@ -122,18 +128,21 @@ class DashboardContextService {
       context.recentHomersData = recentHomers;
       context.extendedHitStreakData = extendedHitStreak;
       
-      // Debug milestone data being stored
-      console.log('📦 STORING MILESTONE DATA IN CONTEXT:', {
-        playerName,
-        team,
-        milestoneTrackingDataIsNull: milestoneTracking === null,
-        milestoneTrackingDataIsUndefined: milestoneTracking === undefined,
-        milestoneTrackingData: milestoneTracking,
-        hasMilestone: !!milestoneTracking?.milestone,
-        hasTimeline: !!milestoneTracking?.timeline,
-        hasMomentum: !!milestoneTracking?.momentum,
-        milestoneDataKeys: milestoneTracking ? Object.keys(milestoneTracking) : []
-      });
+      // Debug milestone data being stored (only if debug enabled)
+      const config = getDebugConfig();
+      if (config.ENABLED && config.SERVICES) {
+        debugLog.service('DashboardContext', 'STORING MILESTONE DATA IN CONTEXT:', {
+          playerName,
+          team,
+          milestoneTrackingDataIsNull: milestoneTracking === null,
+          milestoneTrackingDataIsUndefined: milestoneTracking === undefined,
+          milestoneTrackingData: milestoneTracking,
+          hasMilestone: !!milestoneTracking?.milestone,
+          hasTimeline: !!milestoneTracking?.timeline,
+          hasMomentum: !!milestoneTracking?.momentum,
+          milestoneDataKeys: milestoneTracking ? Object.keys(milestoneTracking) : []
+        });
+      }
 
       // Process each card result and build context
       this.processHitStreakData(context, hitStreakStatus);
@@ -156,17 +165,20 @@ class DashboardContextService {
         timestamp: Date.now()
       });
 
-      console.log(`✅ RETURNING CONTEXT for ${playerName}:`, {
-        hasMilestoneData: !!context.milestoneTrackingData,
-        milestoneData: context.milestoneTrackingData,
-        badges: context.badges.length,
-        confidenceBoost: context.confidenceBoost
-      });
+      if (config.ENABLED && config.SERVICES) {
+        debugLog.service('DashboardContext', `RETURNING CONTEXT for ${playerName}:`, {
+          hasMilestoneData: !!context.milestoneTrackingData,
+          milestoneData: context.milestoneTrackingData,
+          badges: context.badges.length,
+          confidenceBoost: context.confidenceBoost
+        });
+      }
 
       return context;
 
     } catch (error) {
       console.error('Error getting player context:', error);
+      debugLog.error('DashboardContext', 'Error getting player context', error);
       return {
         playerName,
         team,
@@ -392,19 +404,19 @@ class DashboardContextService {
    */
   async checkMilestoneTrackingCard(playerName, team, date) {
     try {
-      console.log('🔍 MILESTONE CHECK: Looking for', playerName, team, date);
+      debugLog.service('DashboardContext', 'MILESTONE CHECK: Looking for', { playerName, team, date });
       const data = await this.loadPredictionData('milestone_tracking', date);
-      console.log('🔍 MILESTONE DATA loaded:', !!data, 'has milestones:', !!(data?.milestones));
+      debugLog.service('DashboardContext', 'MILESTONE DATA loaded:', { hasData: !!data, hasMilestones: !!(data?.milestones) });
       
       if (!data || !data.milestones) {
-        console.log('🔍 MILESTONE: No data or milestones found');
+        debugLog.service('DashboardContext', 'MILESTONE: No data or milestones found');
         return null;
       }
 
       // Convert full name to abbreviated format for milestone lookup
       // "Bryce Harper" -> "B. Harper"
       const abbreviatedName = this.convertToAbbreviatedName(playerName);
-      console.log(`🔍 MILESTONE: Looking for "${playerName}" as "${abbreviatedName}" in team ${team}`);
+      debugLog.service('DashboardContext', `MILESTONE: Looking for "${playerName}" as "${abbreviatedName}" in team ${team}`);
 
       // EFFICIENT LOOKUP: Create an index map for O(1) lookups
       // Index by "player-team" key for direct access
@@ -436,9 +448,9 @@ class DashboardContextService {
 
       // Debug output
       if (found) {
-        console.log(`✅ MILESTONE: Found milestone for ${playerName} (${team}) with key: ${lookupKey}`);
-        console.log(`   Milestone: ${found.milestone.current}/${found.milestone.target} ${found.milestone.stat}`);
-        console.log(`   Full milestone structure:`, {
+        debugLog.service('DashboardContext', `MILESTONE: Found milestone for ${playerName} (${team})`, {
+          key: lookupKey,
+          milestone: `${found.milestone.current}/${found.milestone.target} ${found.milestone.stat}`,
           player: found.player,
           team: found.team,
           hasMilestone: !!found.milestone,
@@ -446,20 +458,18 @@ class DashboardContextService {
           hasMomentum: !!found.momentum
         });
       } else {
-        console.log(`❌ MILESTONE: No milestone found for ${playerName} (${team})`);
-        console.log(`   Tried keys: ${abbreviatedName}-${team}, ${playerName}-${team}`);
-        // Show what IS available for this team for debugging
-        const teamKeys = Object.keys(milestoneIndex).filter(k => k.endsWith(`-${team}`));
-        if (teamKeys.length > 0) {
-          console.log(`   Available milestones for ${team}:`, teamKeys);
-        }
+        debugLog.service('DashboardContext', `MILESTONE: No milestone found for ${playerName} (${team})`, {
+          triedKeys: [`${abbreviatedName}-${team}`, `${playerName}-${team}`],
+          availableForTeam: Object.keys(milestoneIndex).filter(k => k.endsWith(`-${team}`))
+        });
       }
 
       // Return the found milestone - this becomes context.milestoneTrackingData
-      console.log(`🔄 RETURNING milestone data to context:`, found ? 'Data found' : 'null');
+      debugLog.service('DashboardContext', `RETURNING milestone data to context:`, found ? 'Data found' : 'null');
       return found;
     } catch (error) {
       console.error('Error checking milestone tracking card:', error);
+      debugLog.error('DashboardContext', 'Error checking milestone tracking card', error);
       return null;
     }
   }
@@ -726,13 +736,13 @@ class DashboardContextService {
    */
   processMilestoneTrackingData(context, milestoneData) {
     if (!milestoneData) {
-      console.log('📊 No milestone data to process for', context.playerName);
+      debugLog.service('DashboardContext', 'No milestone data to process for', context.playerName);
       return;
     }
 
     // Validate that milestone data has the required structure
     if (!milestoneData.milestone || !milestoneData.timeline || !milestoneData.momentum) {
-      console.log('⚠️ Invalid milestone data structure for', context.playerName, '- missing required properties');
+      debugLog.service('DashboardContext', 'Invalid milestone data structure for', context.playerName, '- missing required properties');
       return;
     }
 

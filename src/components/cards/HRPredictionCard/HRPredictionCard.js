@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import Papa from 'papaparse';
-import { debugLog } from '../../../utils/debugConfig';
+import { debugLog, getDebugConfig } from '../../../utils/debugConfig';
 import { initializeCollapsibleGlass } from '../../../utils/collapsibleGlass';
 import MobilePlayerCard from '../../common/MobilePlayerCard';
 import './HRPredictionCard.css';
@@ -51,9 +51,12 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
         const csvText = await response.text();
         debugLog.log('CARDS', `[HRPredictionCard] CSV content length: ${csvText.length} characters`);
         
-        // Show first few lines of CSV for debugging
-        const lines = csvText.split('\n').slice(0, 3);
-        debugLog.log('CARDS', '[HRPredictionCard] First few lines of CSV:', lines);
+        // Show first few lines of CSV for debugging (only if debug enabled)
+        const config = getDebugConfig();
+        if (config.ENABLED && config.CARDS) {
+          const lines = csvText.split('\n').slice(0, 3);
+          debugLog.log('CARDS', '[HRPredictionCard] First few lines of CSV:', lines);
+        }
         
         // Parse CSV data
         Papa.parse(csvText, {
@@ -70,8 +73,8 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
               const odds = row.odds?.trim();
               const propType = row.prop_type?.trim();
               
-              // Debug first few rows
-              if (index < 3) {
+              // Debug first few rows (only if debug enabled)
+              if (index < 3 && config.ENABLED && config.CARDS) {
                 debugLog.log('CARDS', `[HRPredictionCard] Row ${index}:`, {
                   player_name: playerName,
                   odds: odds,
@@ -136,10 +139,13 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
             debugLog.log('CARDS', `[HRPredictionCard] Created ${oddsMap.size} total name variations`);
             
             // Show some sample entries with shortened names
-            const sampleEntries = Array.from(oddsMap.entries())
-              .filter(([key, value]) => key.includes('.') || key.length < value.originalName.length)
-              .slice(0, 10);
-            debugLog.log('CARDS', '[HRPredictionCard] Sample shortened name entries:', sampleEntries);
+            const config = getDebugConfig();
+            if (config.ENABLED && config.CARDS) {
+              const sampleEntries = Array.from(oddsMap.entries())
+                .filter(([key, value]) => key.includes('.') || key.length < value.originalName.length)
+                .slice(0, 10);
+              debugLog.log('CARDS', '[HRPredictionCard] Sample shortened name entries:', sampleEntries);
+            }
             
             setOddsData(oddsMap);
           },
@@ -174,8 +180,8 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
     }
   }, []);
 
-  // Function to find odds for a player
-  const getPlayerOdds = (playerName) => {
+  // Memoized function to find odds for a player
+  const getPlayerOdds = useCallback((playerName) => {
     if (!playerName || oddsData.size === 0) {
       return null;
     }
@@ -203,19 +209,22 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
     // If no exact matches, show what names are available for debugging
     if (playerName === "N. Hoerner" || playerName === "K. Tucker" || playerName === "P. Alonso") {
       debugLog.log('CARDS', `[HRPredictionCard] 🔍 Debug for "${playerName}" - checking available names starting with same letter:`);
-      const firstLetter = playerName.charAt(0).toLowerCase();
-      const availableNames = Array.from(oddsData.keys())
-        .filter(name => name.toLowerCase().startsWith(firstLetter))
-        .slice(0, 10);
-      debugLog.log('CARDS', `[HRPredictionCard] Available names starting with "${firstLetter}":`, availableNames);
+      const config = getDebugConfig();
+      if (config.ENABLED && config.CARDS) {
+        const firstLetter = playerName.charAt(0).toLowerCase();
+        const availableNames = Array.from(oddsData.keys())
+          .filter(name => name.toLowerCase().startsWith(firstLetter))
+          .slice(0, 10);
+        debugLog.log('CARDS', `[HRPredictionCard] Available names starting with "${firstLetter}":`, availableNames);
+      }
     }
     
     debugLog.log('CARDS', `[HRPredictionCard] ❌ No odds found for: "${playerName}"`);
     return null;
-  };
+  }, [oddsData]);
 
-  // Function to format odds display
-  const formatOdds = (odds) => {
+  // Memoized function to format odds display
+  const formatOdds = useCallback((odds) => {
     if (!odds) return null;
     
     // Ensure odds start with + or -
@@ -224,10 +233,10 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
     }
     
     return odds;
-  };
+  }, []);
 
-  // Function to get odds color based on value
-  const getOddsColor = (odds) => {
+  // Memoized function to get odds color based on value
+  const getOddsColor = useCallback((odds) => {
     if (!odds) return '#666';
     
     const numericOdds = parseInt(odds.replace('+', '').replace('-', ''));
@@ -239,7 +248,22 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
     } else {
       return '#2e7d32'; // Green for long shots
     }
-  };
+  }, []);
+
+  // Memoized filtered players with odds - prevents re-filtering on every render
+  // If no players have odds, show all players as fallback
+  const playersWithOdds = useMemo(() => {
+    if (!playersWithHomeRunPrediction) return [];
+    const playersWithMatchingOdds = playersWithHomeRunPrediction.filter(player => getPlayerOdds(player.name) !== null);
+    
+    // If no players match odds (CSV loading failed or no matches), show all players
+    if (playersWithMatchingOdds.length === 0) {
+      debugLog.log('CARDS', '[HRPredictionCard] No players matched odds data, showing all players as fallback');
+      return playersWithHomeRunPrediction;
+    }
+    
+    return playersWithMatchingOdds;
+  }, [playersWithHomeRunPrediction, getPlayerOdds]);
 
   if (isLoading) {
     return (
@@ -290,9 +314,7 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
         <div className="desktop-view">
           <div className="scrollable-container">
             <ul className="player-list">
-              {playersWithHomeRunPrediction
-                .filter(player => getPlayerOdds(player.name) !== null) // Filter out players without odds
-                .map((player, index) => {
+              {playersWithOdds.map((player, index) => {
                   const team = teams[player.team];
                   const playerOdds = getPlayerOdds(player.name);
                   const formattedOdds = formatOdds(playerOdds?.odds);
@@ -369,10 +391,7 @@ const HRPredictionCard = ({ playersWithHomeRunPrediction, isLoading, teams }) =>
         {/* Mobile View */}
         <div className="mobile-view">
           <div className="mobile-cards">
-            {playersWithHomeRunPrediction
-              .filter(player => getPlayerOdds(player.name) !== null) // Filter out players without odds
-              .slice(0, 15)
-              .map((player, index) => {
+            {playersWithOdds.slice(0, 15).map((player, index) => {
                 const team = teams[player.team];
                 const playerOdds = getPlayerOdds(player.name);
                 const formattedOdds = formatOdds(playerOdds?.odds);

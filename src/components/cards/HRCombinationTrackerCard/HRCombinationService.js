@@ -8,6 +8,7 @@
 
 import { fetchPlayerData } from '../../../services/dataService';
 import dynamicGameDateService from '../../../services/dynamicGameDateService';
+import { debugLog } from '../../../utils/debugConfig';
 
 class HRCombinationService {
   constructor() {
@@ -20,7 +21,7 @@ class HRCombinationService {
    * Get all players scheduled for today's games
    */
   async getTodaysScheduledPlayers(gameData, playerData, dateStr) {
-    console.log('🏟️ getTodaysScheduledPlayers called with:', { 
+    debugLog.service('HRCombinationService', '🏟️ getTodaysScheduledPlayers called with:', { 
       gameDataLength: gameData?.length, 
       playerDataLength: playerData?.length,
       dateStr,

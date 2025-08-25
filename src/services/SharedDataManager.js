@@ -13,7 +13,7 @@
  */
 
 import { formatDateString, formatDateForDisplay } from './dataService.js';
-import { debugLog } from '../utils/debugConfig.js';
+import { debugLog, getDebugConfig } from '../utils/debugConfig.js';
 
 class SharedDataManager {
   constructor() {
@@ -74,7 +74,11 @@ class SharedDataManager {
       }
     }
     
-    debugLog.log('SHARED_DATA_MANAGER', `Filtered ${maxDays} days to ${validDates.length} valid game dates`);
+    // High-frequency operation - use conditional for performance
+    const config = getDebugConfig();
+    if (config.ENABLED && config.SHARED_DATA_MANAGER) {
+      debugLog.log('SHARED_DATA_MANAGER', `Filtered ${maxDays} days to ${validDates.length} valid game dates`);
+    }
     return validDates;
   }
 
@@ -91,14 +95,22 @@ class SharedDataManager {
     // Check cache first
     if (this.cache.has(cacheKey)) {
       this.requestStats.cacheHits++;
-      debugLog.log('SHARED_DATA_MANAGER', `Cache hit for ${cacheKey}`);
+      // Very high-frequency operation - cache hits happen constantly
+      const config = getDebugConfig();
+      if (config.ENABLED && config.SHARED_DATA_MANAGER) {
+        debugLog.log('SHARED_DATA_MANAGER', `Cache hit for ${cacheKey}`);
+      }
       return this.cache.get(cacheKey);
     }
     
     // Check if request is already pending
     if (this.pendingRequests.has(cacheKey)) {
       this.requestStats.dedupedRequests++;
-      debugLog.log('SHARED_DATA_MANAGER', `Deduplicating request for ${cacheKey}`);
+      // High-frequency operation - request deduplication happens frequently  
+      const config = getDebugConfig();
+      if (config.ENABLED && config.SHARED_DATA_MANAGER) {
+        debugLog.log('SHARED_DATA_MANAGER', `Deduplicating request for ${cacheKey}`);
+      }
       return await this.pendingRequests.get(cacheKey);
     }
     
@@ -123,6 +135,7 @@ class SharedDataManager {
     const result = {};
     const validDates = this.generateSmartDateList(startDate, maxDays);
     
+    // Medium-frequency operation - optimize for performance
     debugLog.log('SHARED_DATA_MANAGER', `Fetching data for ${validDates.length} valid dates (reduced from ${maxDays})`);
     
     // Batch process dates to avoid overwhelming the browser
@@ -150,11 +163,13 @@ class SharedDataManager {
       
       // Stop early if we have enough data
       if (successCount >= 30) {
+        // Low-frequency operation - early stopping is rare
         debugLog.log('SHARED_DATA_MANAGER', `Found sufficient data (${successCount} dates), stopping early`);
         break;
       }
     }
     
+    // Medium-frequency operation - completion logging
     debugLog.log('SHARED_DATA_MANAGER', `Completed fetch: ${successCount} dates with data out of ${validDates.length} requested`);
     return result;
   }
@@ -188,6 +203,7 @@ class SharedDataManager {
     } catch (error) {
       // Only log unexpected errors, not missing files
       if (error.message !== 'timeout' && !error.message.includes('404')) {
+        // Error logging should remain active for debugging
         debugLog.warn('SHARED_DATA_MANAGER', `Unexpected error for ${dateStr}:`, error.message);
       }
       return null;
@@ -226,6 +242,7 @@ class SharedDataManager {
   clearCacheIfNeeded() {
     const now = Date.now();
     if (now - this.lastClearTime > 15 * 60 * 1000) { // 15 minutes
+      // Low-frequency operation - cache clearing happens every 15 minutes
       debugLog.log('SHARED_DATA_MANAGER', 'Clearing cache after 15 minutes');
       this.cache.clear();
       this.lastClearTime = now;

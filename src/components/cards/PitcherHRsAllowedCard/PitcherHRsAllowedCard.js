@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import useTeamFilteredData from '../../useTeamFilter';
 import { fetchPlayerData, fetchGameData } from '../../../services/dataService';
 import { useTooltip } from '../../utils/TooltipContext';
@@ -26,6 +26,11 @@ const PitcherHRsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
   // Apply team filtering
   const filteredData = useTeamFilteredData(pitcherHRData, 'team');
 
+  // Memoize the current date string to prevent unnecessary re-renders when date object changes
+  const currentDateString = useMemo(() => {
+    return currentDate ? currentDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+  }, [currentDate?.getTime()]); // Only re-compute when actual date value changes
+
   useEffect(() => {
     const analyzePitcherHRs = async () => {
       setIsLoading(true);
@@ -33,8 +38,8 @@ const PitcherHRsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
       try {
         debugLog.log('CARDS', '[PitcherHRsAllowedCard] Starting pitcher HR analysis...');
         
-        // Get current date string for dynamic discovery
-        const currentDateStr = currentDate ? currentDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+        // Use memoized current date string
+        const currentDateStr = currentDateString;
         
         // Use dynamic file discovery to find actual game dates
         debugLog.log('CARDS', '[PitcherHRsAllowedCard] Discovering actual game dates from data files...');
@@ -220,7 +225,7 @@ const PitcherHRsAllowedCard = ({ currentDate, teams, maxItems = 15 }) => {
     };
 
     analyzePitcherHRs();
-  }, [currentDate]);
+  }, [currentDateString]); // Use memoized date string instead of date object
 
   // Initialize collapsible functionality
   useEffect(() => {

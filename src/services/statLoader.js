@@ -23,6 +23,9 @@ const playerMappingService = require('./playerMappingService');
 const { detectEnhancedDuplicatesWithPrevention } = require('./enhancedDuplicateDetection');
 const { acquireProcessingLock, releaseProcessingLock, cleanupStaleLocks } = require('./processingLockManager');
 
+// Import debug logging system
+const { debugLog, getDebugConfig } = require('../utils/debugConfig');
+
 // Import centralized data path configuration
 const { DATA_PATH } = require('../../config/dataPath');
 
@@ -73,7 +76,7 @@ function logSuspiciousTeamChange(teamChange) {
                 const logData = JSON.parse(fs.readFileSync(SUSPICIOUS_CHANGES_LOG_FILE, 'utf8'));
                 suspiciousChanges = logData.suspiciousChanges || [];
             } catch (error) {
-                console.warn('Could not load suspicious changes log:', error.message);
+                debugLog.warn('STAT_LOADER', 'Could not load suspicious changes log:', error.message);
             }
         }
         
@@ -93,9 +96,9 @@ function logSuspiciousTeamChange(teamChange) {
         };
         
         fs.writeFileSync(SUSPICIOUS_CHANGES_LOG_FILE, JSON.stringify(logData, null, 2), 'utf8');
-        console.log(`📝 Logged suspicious team change to: ${SUSPICIOUS_CHANGES_LOG_FILE}`);
+        debugLog.service('StatLoader', `📝 Logged suspicious team change to: ${SUSPICIOUS_CHANGES_LOG_FILE}`);
     } catch (error) {
-        console.error('Error logging suspicious team change:', error);
+        debugLog.error('STAT_LOADER', 'Error logging suspicious team change:', error);
     }
 }
 
@@ -113,7 +116,7 @@ function logTeamChangeForReview(teamChange) {
                 const logData = JSON.parse(fs.readFileSync(TEAM_CHANGES_LOG_FILE, 'utf8'));
                 teamChanges = logData.teamChanges || [];
             } catch (error) {
-                console.warn('Could not load team changes log:', error.message);
+                debugLog.warn('STAT_LOADER', 'Could not load team changes log:', error.message);
             }
         }
         
@@ -133,9 +136,9 @@ function logTeamChangeForReview(teamChange) {
         };
         
         fs.writeFileSync(TEAM_CHANGES_LOG_FILE, JSON.stringify(logData, null, 2), 'utf8');
-        console.log(`📝 Logged team change for review: ${TEAM_CHANGES_LOG_FILE}`);
+        debugLog.service('StatLoader', `📝 Logged team change for review: ${TEAM_CHANGES_LOG_FILE}`);
     } catch (error) {
-        console.error('Error logging team change for review:', error);
+        debugLog.error('STAT_LOADER', 'Error logging team change for review:', error);
     }
 }
 
@@ -152,7 +155,7 @@ function loadProcessingLog() {
       return logData;
     }
   } catch (error) {
-    console.warn('Warning: Could not load processing log:', error.message);
+    debugLog.warn('STAT_LOADER', 'Warning: Could not load processing log:', error.message);
   }
   
   return {
@@ -189,7 +192,7 @@ function saveProcessingLog(logData, csvFilePath, gameId) {
     
     fs.writeFileSync(ENHANCED_CONFIG.PROCESSING_LOG_FILE, JSON.stringify(logData, null, 2));
   } catch (error) {
-    console.warn('Warning: Could not save processing log:', error.message);
+    debugLog.warn('STAT_LOADER', 'Warning: Could not save processing log:', error.message);
   }
 }
 
@@ -249,10 +252,10 @@ function createJsonBackup(jsonFilePath) {
     const backupPath = path.join(ENHANCED_CONFIG.BACKUP_DIR, backupFileName);
     
     fs.copyFileSync(jsonFilePath, backupPath);
-    console.log(`📄 Created backup: ${backupPath}`);
+    debugLog.service('StatLoader', `📄 Created backup: ${backupPath}`);
     return backupPath;
   } catch (error) {
-    console.warn('Warning: Could not create backup:', error.message);
+    debugLog.warn('STAT_LOADER', 'Warning: Could not create backup:', error.message);
     return null;
   }
 }
@@ -420,7 +423,7 @@ function createShortName(fullName) {
  * Now integrates with playerMappingService for team change detection
  */
 function updateRostersFile(playersData, gameDate) {
-    console.log('Checking for new players to add to rosters...');
+    debugLog.service('StatLoader', 'Checking for new players to add to rosters...');
     
     // Read existing rosters
     let rosters = [];
@@ -428,12 +431,12 @@ function updateRostersFile(playersData, gameDate) {
         if (fs.existsSync(ROSTERS_FILE_PATH)) {
             const rostersContent = fs.readFileSync(ROSTERS_FILE_PATH, 'utf8');
             rosters = JSON.parse(rostersContent);
-            console.log(`Loaded ${rosters.length} existing players from rosters file`);
+            debugLog.service('StatLoader', `Loaded ${rosters.length} existing players from rosters file`);
         } else {
-            console.log('Rosters file not found, will create new one');
+            debugLog.service('StatLoader', 'Rosters file not found, will create new one');
         }
     } catch (error) {
-        console.error(`Error reading rosters file: ${error.message}`);
+        debugLog.error('STAT_LOADER', `Error reading rosters file: ${error.message}`);
         return;
     }
     
@@ -450,7 +453,7 @@ function updateRostersFile(playersData, gameDate) {
         );
         
         if (!mappedPlayer) {
-            console.warn(`Failed to create player mapping for ${player.name}`);
+            debugLog.warn('STAT_LOADER', `Failed to create player mapping for ${player.name}`);
             continue;
         }
         
@@ -482,7 +485,7 @@ function updateRostersFile(playersData, gameDate) {
             if (!existingRoster.playerId) {
                 existingRoster.playerId = mappedPlayer.playerId;
                 playersUpdated++;
-                console.log(`Added playerId ${mappedPlayer.playerId} to existing roster entry: ${player.name}`);
+                debugLog.service('StatLoader', `Added playerId ${mappedPlayer.playerId} to existing roster entry: ${player.name}`);
             }
             
             // Enhanced team change validation - PREVENT UNAUTHORIZED CHANGES
@@ -510,6 +513,7 @@ function updateRostersFile(playersData, gameDate) {
                 );
                 
                 if (isSuspicious) {
+                    // Keep as console.error for production visibility of blocked changes
                     console.error(`🚨 BLOCKED SUSPICIOUS TEAM CHANGE: ${teamChange.playerName} (${teamChange.playerId}) ${teamChange.fromTeam} → ${teamChange.toTeam}`);
                     console.error(`   CSV File: ${teamChange.csvFile}`);
                     console.error(`   This change matches known corruption patterns and has been blocked.`);
@@ -523,6 +527,7 @@ function updateRostersFile(playersData, gameDate) {
                 }
                 
                 // For non-suspicious changes, require explicit validation
+                // Keep as console.warn for production visibility of team changes
                 console.warn(`⚠️  TEAM CHANGE DETECTED (requires manual validation): ${teamChange.playerName} ${teamChange.fromTeam} → ${teamChange.toTeam}`);
                 console.warn(`   CSV File: ${teamChange.csvFile}`);
                 console.warn(`   This change has been logged for manual review. Roster not updated automatically.`);
@@ -539,7 +544,7 @@ function updateRostersFile(playersData, gameDate) {
                 // Only set if missing or same as short name
                 existingRoster.fullName = player.name;
                 playersUpdated++;
-                console.log(`Updated fullName for ${existingRoster.name}: '${existingRoster.fullName}' → '${player.name}'`);
+                debugLog.service('StatLoader', `Updated fullName for ${existingRoster.name}: '${existingRoster.fullName}' → '${player.name}'`);
             } else if (existingRoster.fullName !== player.name) {
                 // VALIDATION: Check if names are logically compatible
                 const existingLastName = getLastName(existingRoster.fullName);
@@ -552,12 +557,12 @@ function updateRostersFile(playersData, gameDate) {
                     
                     if (incomingMatches && !existingMatches) {
                         // Incoming name is compatible, existing is not - update
-                        console.log(`🔧 CORRECTING fullName for ${existingRoster.name}: '${existingRoster.fullName}' → '${player.name}' (name validation passed)`);
+                        debugLog.service('StatLoader', `🔧 CORRECTING fullName for ${existingRoster.name}: '${existingRoster.fullName}' → '${player.name}' (name validation passed)`);
                         existingRoster.fullName = player.name;
                         playersUpdated++;
                     } else if (!incomingMatches) {
                         // Incoming name is NOT compatible - log warning and reject
-                        console.warn(`🚨 REJECTED fullName update for ${existingRoster.name}: attempted '${existingRoster.fullName}' → '${player.name}' (last names don't match)`);
+                        debugLog.warn('STAT_LOADER', `🚨 REJECTED fullName update for ${existingRoster.name}: attempted '${existingRoster.fullName}' → '${player.name}' (last names don't match)`);
                     }
                 }
             }
@@ -599,7 +604,7 @@ function updateRostersFile(playersData, gameDate) {
             
             rosters.push(newRosterEntry);
             newPlayersAdded++;
-            console.log(`Added new player to roster: ${player.name} (${player.team}, ${player.playerType}) with ID ${mappedPlayer.playerId}`);
+            debugLog.service('StatLoader', `Added new player to roster: ${player.name} (${player.team}, ${player.playerType}) with ID ${mappedPlayer.playerId}`);
         }
     }
     
@@ -613,12 +618,12 @@ function updateRostersFile(playersData, gameDate) {
             createDirectoryIfNotExists(rostersDir);
             
             fs.writeFileSync(ROSTERS_FILE_PATH, JSON.stringify(rosters, null, 2));
-            console.log(`Successfully updated rosters file: ${newPlayersAdded} new players, ${playersUpdated} updated`);
+            debugLog.service('StatLoader', `Successfully updated rosters file: ${newPlayersAdded} new players, ${playersUpdated} updated`);
         } catch (error) {
-            console.error(`Error writing updated rosters file: ${error.message}`);
+            debugLog.error('STAT_LOADER', `Error writing updated rosters file: ${error.message}`);
         }
     } else {
-        console.log('No changes needed for rosters file');
+        debugLog.service('StatLoader', 'No changes needed for rosters file');
     }
 }
 
@@ -637,7 +642,7 @@ function processHittingStats(csvRecords, teamAbbreviation, gameId) {
         
         const playerName = cleanPlayerName(rawPlayerName);
         if (!playerName) {
-            console.warn(`Could not extract player name from: "${rawPlayerName}". Skipping row.`);
+            debugLog.warn('STAT_LOADER', `Could not extract player name from: "${rawPlayerName}". Skipping row.`);
             continue;
         }
         
@@ -679,7 +684,7 @@ function processPitchingStats(csvRecords, teamAbbreviation, gameId) {
         
         const playerName = cleanPlayerName(rawPlayerName);
         if (!playerName) {
-            console.warn(`Could not extract player name from: "${rawPlayerName}". Skipping row.`);
+            debugLog.warn('STAT_LOADER', `Could not extract player name from: "${rawPlayerName}". Skipping row.`);
             continue;
         }
         
@@ -717,7 +722,7 @@ function calculateTeamRunsForGame(players, teamAbbreviation, gameId) {
     const teamHitters = teamPlayers.filter(player => player.playerType === 'hitter');
     
     if (teamHitters.length > 0) {
-        console.log(`Found ${teamHitters.length} hitters for team ${teamAbbreviation} in game ${gameId}`);
+        debugLog.service('StatLoader', `Found ${teamHitters.length} hitters for team ${teamAbbreviation} in game ${gameId}`);
     }
     
     const totalRuns = teamHitters.reduce((sum, player) => {
@@ -726,7 +731,7 @@ function calculateTeamRunsForGame(players, teamAbbreviation, gameId) {
         return sum + runs;
     }, 0);
     
-    console.log(`Calculated ${totalRuns} total runs for team ${teamAbbreviation} in game ${gameId}`);
+    debugLog.service('StatLoader', `Calculated ${totalRuns} total runs for team ${teamAbbreviation} in game ${gameId}`);
     
     return totalRuns;
 }
@@ -736,7 +741,7 @@ function calculateTeamRunsForGame(players, teamAbbreviation, gameId) {
  */
 function updateGameScores(jsonData, allPlayers, gameId) {
     if (!jsonData.games || !Array.isArray(jsonData.games) || jsonData.games.length === 0) {
-        console.warn("No games found in JSON data to update scores.");
+        debugLog.warn('STAT_LOADER', 'No games found in JSON data to update scores.');
         return jsonData;
     }
     
@@ -744,11 +749,11 @@ function updateGameScores(jsonData, allPlayers, gameId) {
     const game = jsonData.games.find(g => g.originalId === parseInt(gameId));
     
     if (!game) {
-        console.warn(`No game found with originalId matching gameId ${gameId}`);
+        debugLog.warn('STAT_LOADER', `No game found with originalId matching gameId ${gameId}`);
         return jsonData;
     }
     
-    console.log(`Found game: ${game.awayTeam} @ ${game.homeTeam} (gameId: ${gameId})`);
+    debugLog.service('StatLoader', `Found game: ${game.awayTeam} @ ${game.homeTeam} (gameId: ${gameId})`);
     
     // Calculate runs for this specific game
     const homeRuns = calculateTeamRunsForGame(allPlayers, game.homeTeam, gameId);
@@ -757,12 +762,12 @@ function updateGameScores(jsonData, allPlayers, gameId) {
     // Update scores
     if (homeRuns >= 0) {
         game.homeScore = homeRuns;
-        console.log(`Updated ${game.homeTeam} score to ${homeRuns}`);
+        debugLog.service('StatLoader', `Updated ${game.homeTeam} score to ${homeRuns}`);
     }
     
     if (awayRuns >= 0) {
         game.awayScore = awayRuns;
-        console.log(`Updated ${game.awayTeam} score to ${awayRuns}`);
+        debugLog.service('StatLoader', `Updated ${game.awayTeam} score to ${awayRuns}`);
     }
     
     // Update status if we have both scores
@@ -770,7 +775,7 @@ function updateGameScores(jsonData, allPlayers, gameId) {
         (game.homeScore > 0 || game.awayScore > 0) && 
         game.status === "Scheduled") {
         game.status = "Final";
-        console.log(`Updated game status to Final: ${game.awayTeam} ${game.awayScore} @ ${game.homeTeam} ${game.homeScore}`);
+        debugLog.service('StatLoader', `Updated game status to Final: ${game.awayTeam} ${game.awayScore} @ ${game.homeTeam} ${game.homeScore}`);
     }
     
     return jsonData;
@@ -783,9 +788,9 @@ function createDirectoryIfNotExists(dirPath) {
     if (!fs.existsSync(dirPath)) {
         try {
             fs.mkdirSync(dirPath, { recursive: true });
-            console.log(`Created directory: ${dirPath}`);
+            debugLog.service('StatLoader', `Created directory: ${dirPath}`);
         } catch (error) {
-            console.error(`Failed to create directory ${dirPath}: ${error.message}`);
+            debugLog.error('STAT_LOADER', `Failed to create directory ${dirPath}: ${error.message}`);
             throw error;
         }
     }
@@ -795,22 +800,22 @@ function createDirectoryIfNotExists(dirPath) {
  * Main function to process the CSV and update the JSON with enhanced validation.
  */
 async function processStatsFile(csvFilePath) {
-    console.log(`🔄 Processing stats file: ${csvFilePath}`);
+    debugLog.service('StatLoader', `🔄 Processing stats file: ${csvFilePath}`);
 
     // Load processing log (needed for various validations)
     let processingLog = null;
 
     // 0. Enhanced Pre-Processing Validation
     if (ENHANCED_CONFIG.ENABLE_ENHANCED_VALIDATION) {
-        console.log('🛡️  Enhanced validation enabled');
+        debugLog.service('StatLoader', '🛡️  Enhanced validation enabled');
         
         // Load processing log
         processingLog = loadProcessingLog();
         
         // Check if file already processed
         if (isFileAlreadyProcessed(processingLog, csvFilePath)) {
-            console.log(`⏭️  File already processed and unchanged: ${csvFilePath}`);
-            console.log('   To reprocess, delete or modify the CSV file');
+            debugLog.service('StatLoader', `⏭️  File already processed and unchanged: ${csvFilePath}`);
+            debugLog.service('StatLoader', '   To reprocess, delete or modify the CSV file');
             return;
         }
     }
@@ -821,6 +826,7 @@ async function processStatsFile(csvFilePath) {
     const nameParts = csvFileName.match(/^([A-Z]{2,3})_(hitting|pitching)_(\w+)_(\d{1,2})_(\d{4})_(\d+)\.csv$/i);
 
     if (!nameParts) {
+        // Keep as console.error for production visibility of critical filename errors
         console.error(`❌ Error: Invalid CSV filename format: "${csvFileName}". Expected format: TEAM_[hitting|pitching]_month_day_year_gameId.csv`);
         process.exit(1);
     }
@@ -830,43 +836,44 @@ async function processStatsFile(csvFilePath) {
     const dayPadded = day.padStart(2, '0');
     const gameDate = `${year}-${month.padStart(2, '0')}-${dayPadded}`;
 
-    console.log(`📊 Parsed info: Team=${teamAbbreviation}, Type=${statType}, Year=${year}, Month=${monthLower}, Day=${dayPadded}, GameId=${gameId}, Date=${gameDate}`);
+    debugLog.service('StatLoader', `📊 Parsed info: Team=${teamAbbreviation}, Type=${statType}, Year=${year}, Month=${monthLower}, Day=${dayPadded}, GameId=${gameId}, Date=${gameDate}`);
 
     // 1.5. Enhanced Game ID Validation (relaxed for edge cases)
     if (ENHANCED_CONFIG.ENABLE_ENHANCED_VALIDATION) {
         const gameIdValidation = validateGameId(gameId, gameDate);
         
         if (!gameIdValidation.isValid) {
-            console.warn(`⚠️  Game ID validation warning: ${gameId} - ${gameIdValidation.warnings.join(', ')}`);
-            console.warn('   Continuing processing (validation relaxed for edge cases)');
+            debugLog.warn('STAT_LOADER', `⚠️  Game ID validation warning: ${gameId} - ${gameIdValidation.warnings.join(', ')}`);
+            debugLog.warn('STAT_LOADER', '   Continuing processing (validation relaxed for edge cases)');
             // Continue processing instead of exiting - some games have unusual circumstances
         }
         
         if (gameIdValidation.isSuspicious) {
-            console.warn(`⚠️  Suspicious game ID detected: ${gameId}`);
+            debugLog.warn('STAT_LOADER', `⚠️  Suspicious game ID detected: ${gameId}`);
             gameIdValidation.warnings.forEach(warning => 
-                console.warn(`   - ${warning}`)
+                debugLog.warn('STAT_LOADER', `   - ${warning}`)
             );
             
             if (gameIdValidation.recommendation === 'investigate') {
-                console.warn('   Proceeding with caution...');
+                debugLog.warn('STAT_LOADER', '   Proceeding with caution...');
             }
         }
         
         // Check for suspicious date ranges
         const suspiciousDate = checkSuspiciousDate(gameDate);
         if (suspiciousDate) {
-            console.warn(`⚠️  Processing file in known problem period: ${suspiciousDate.reason}`);
-            console.warn('   Enhanced duplicate detection will be applied');
+            debugLog.warn('STAT_LOADER', `⚠️  Processing file in known problem period: ${suspiciousDate.reason}`);
+            debugLog.warn('STAT_LOADER', '   Enhanced duplicate detection will be applied');
         }
     }
 
     // 2. Construct Target JSON File Path
     const jsonFilePath = path.join(BASE_DATA_DIR, year, monthLower, `${monthLower}_${dayPadded}_${year}.json`);
-    console.log(`📁 Target JSON file: ${jsonFilePath}`);
+    debugLog.service('StatLoader', `📁 Target JSON file: ${jsonFilePath}`);
 
     // 3. Check if JSON File Exists
     if (!fs.existsSync(jsonFilePath)) {
+        // Keep as console.error for production visibility of critical file errors
         console.error(`❌ Error: Target JSON file not found: "${jsonFilePath}". Please ensure the schedule generator has run for this date.`);
         process.exit(1);
     }
@@ -881,7 +888,7 @@ async function processStatsFile(csvFilePath) {
             trim: true
         });
     } catch (error) {
-        console.error(`Error reading or parsing CSV file "${csvFilePath}": ${error.message}`);
+        debugLog.error('STAT_LOADER', `Error reading or parsing CSV file "${csvFilePath}": ${error.message}`);
         process.exit(1);
     }
 
@@ -892,14 +899,14 @@ async function processStatsFile(csvFilePath) {
     } else if (statType.toLowerCase() === 'pitching') {
         playersData = processPitchingStats(csvRecords, teamAbbreviation, gameId);
     } else {
-        console.error(`Unknown stat type: ${statType}`);
+        debugLog.error('STAT_LOADER', `Unknown stat type: ${statType}`);
         process.exit(1);
     }
 
     if (playersData.length === 0) {
-        console.warn(`Warning: No valid player data found in CSV file "${csvFileName}".`);
+        debugLog.warn('STAT_LOADER', `Warning: No valid player data found in CSV file "${csvFileName}".`);
     } else {
-        console.log(`Extracted ${statType} stats for ${playersData.length} players.`);
+        debugLog.service('StatLoader', `Extracted ${statType} stats for ${playersData.length} players.`);
     }
 
     // 6. Update Rosters File with New Players
@@ -911,7 +918,7 @@ async function processStatsFile(csvFilePath) {
         const jsonContent = fs.readFileSync(jsonFilePath, 'utf8');
         jsonData = JSON.parse(jsonContent);
     } catch (error) {
-        console.error(`Error reading or parsing JSON file "${jsonFilePath}": ${error.message}`);
+        debugLog.error('STAT_LOADER', `Error reading or parsing JSON file "${jsonFilePath}": ${error.message}`);
         process.exit(1);
     }
 
@@ -931,15 +938,15 @@ async function processStatsFile(csvFilePath) {
     let playersSkipped = 0;
     const validationWarnings = [];
     
-    console.log(`🔍 Processing ${playersData.length} players with enhanced duplicate detection...`);
+    debugLog.service('StatLoader', `🔍 Processing ${playersData.length} players with enhanced duplicate detection...`);
     
     for (const newPlayer of playersData) {
         // Enhanced player statistics validation
         if (ENHANCED_CONFIG.ENABLE_ENHANCED_VALIDATION) {
             const statsWarnings = validatePlayerStats(newPlayer);
             if (statsWarnings.length > 0) {
-                console.warn(`⚠️  Player stats validation warnings for ${newPlayer.name}:`);
-                statsWarnings.forEach(warning => console.warn(`   - ${warning}`));
+                debugLog.warn('STAT_LOADER', `⚠️  Player stats validation warnings for ${newPlayer.name}:`);
+                statsWarnings.forEach(warning => debugLog.warn('STAT_LOADER', `   - ${warning}`));
                 validationWarnings.push({
                     player: newPlayer.name,
                     warnings: statsWarnings
@@ -963,14 +970,14 @@ async function processStatsFile(csvFilePath) {
         // Log warnings from duplicate analysis
         if (duplicateAnalysis.warnings.length > 0) {
             duplicateAnalysis.warnings.forEach(warning => 
-                console.warn(`⚠️  ${newPlayer.name}: ${warning}`)
+                debugLog.warn('STAT_LOADER', `⚠️  ${newPlayer.name}: ${warning}`)
             );
         }
         
         // Take action based on duplicate analysis
         switch (duplicateAnalysis.action) {
             case 'update':
-                console.log(`🔄 Updating existing player: ${newPlayer.name} (game ${gameId})`);
+                debugLog.service('StatLoader', `🔄 Updating existing player: ${newPlayer.name} (game ${gameId})`);
                 existingPlayers[duplicateAnalysis.duplicateIndex] = { 
                     ...existingPlayers[duplicateAnalysis.duplicateIndex], 
                     ...newPlayer 
@@ -979,20 +986,20 @@ async function processStatsFile(csvFilePath) {
                 break;
                 
             case 'add':
-                console.log(`➕ Adding new player: ${newPlayer.name} (game ${gameId})`);
+                debugLog.service('StatLoader', `➕ Adding new player: ${newPlayer.name} (game ${gameId})`);
                 existingPlayers.push(newPlayer);
                 playersAdded++;
                 break;
                 
             case 'skip':
-                console.warn(`🚫 DUPLICATE PREVENTED: ${newPlayer.name} (${duplicateAnalysis.duplicateType})`);
-                console.warn(`   📋 Reason: ${duplicateAnalysis.warnings.join(', ')}`);
-                console.warn(`   🎯 Confidence: ${(duplicateAnalysis.confidence * 100).toFixed(1)}%`);
+                debugLog.warn('STAT_LOADER', `🚫 DUPLICATE PREVENTED: ${newPlayer.name} (${duplicateAnalysis.duplicateType})`);
+                debugLog.warn('STAT_LOADER', `   📋 Reason: ${duplicateAnalysis.warnings.join(', ')}`);
+                debugLog.warn('STAT_LOADER', `   🎯 Confidence: ${(duplicateAnalysis.confidence * 100).toFixed(1)}%`);
                 playersSkipped++;
                 break;
                 
             default:
-                console.warn(`❓ Unknown action for player: ${newPlayer.name} - adding by default`);
+                debugLog.warn('STAT_LOADER', `❓ Unknown action for player: ${newPlayer.name} - adding by default`);
                 existingPlayers.push(newPlayer);
                 playersAdded++;
         }
@@ -1000,24 +1007,23 @@ async function processStatsFile(csvFilePath) {
     
     jsonData.players = existingPlayers;
     
-    // Enhanced processing summary
-    console.log(`✅ Enhanced processing complete:`);
-    console.log(`   📊 Total players in JSON: ${jsonData.players.length}`);
-    console.log(`   ➕ Players added: ${playersAdded}`);
-    console.log(`   🔄 Players updated: ${playersUpdated}`);
-    console.log(`   ⏭️  Players skipped: ${playersSkipped}`);
+    // Enhanced processing summary - use single debug call for better performance
+    const config = getDebugConfig();
+    if (config.ENABLED && config.SERVICES) {
+        debugLog.service('StatLoader', `✅ Enhanced processing complete: ${jsonData.players.length} total, +${playersAdded} added, ${playersUpdated} updated, ${playersSkipped} skipped`);
+    }
     
     if (validationWarnings.length > 0) {
-        console.log(`   ⚠️  Validation warnings: ${validationWarnings.length}`);
+        debugLog.service('StatLoader', `   ⚠️  Validation warnings: ${validationWarnings.length}`);
     }
     
     if (playersSkipped > 0) {
-        console.warn(`   🚨 ${playersSkipped} players were skipped due to suspected duplicates`);
-        console.warn(`   This may indicate data quality issues requiring investigation`);
+        debugLog.warn('STAT_LOADER', `   🚨 ${playersSkipped} players were skipped due to suspected duplicates`);
+        debugLog.warn('STAT_LOADER', '   This may indicate data quality issues requiring investigation');
     }
 
     // 9. Update game scores based on player statistics
-    console.log("Starting game score update process...");
+    debugLog.service('StatLoader', 'Starting game score update process...');
     
     // First, update originalId to use gameId if not already done
     const gameToUpdate = jsonData.games.find(g => 
@@ -1026,7 +1032,7 @@ async function processStatsFile(csvFilePath) {
     );
     
     if (gameToUpdate && gameToUpdate.originalId !== parseInt(gameId)) {
-        console.log(`Updating originalId from ${gameToUpdate.originalId} to ${gameId}`);
+        debugLog.service('StatLoader', `Updating originalId from ${gameToUpdate.originalId} to ${gameId}`);
         gameToUpdate.originalId = parseInt(gameId);
     }
     
@@ -1036,9 +1042,9 @@ async function processStatsFile(csvFilePath) {
     // 10. Write Updated JSON Data Back to File
     try {
         fs.writeFileSync(jsonFilePath, JSON.stringify(jsonData, null, 2));
-        console.log(`✅ Successfully updated JSON file: "${jsonFilePath}"`);
+        debugLog.service('StatLoader', `✅ Successfully updated JSON file: "${jsonFilePath}"`);
     } catch (error) {
-        console.error(`❌ Error writing updated JSON file "${jsonFilePath}": ${error.message}`);
+        debugLog.error('STAT_LOADER', `❌ Error writing updated JSON file "${jsonFilePath}": ${error.message}`);
         process.exit(1);
     }
     
@@ -1049,23 +1055,20 @@ async function processStatsFile(csvFilePath) {
             processingLog = loadProcessingLog();
         }
         saveProcessingLog(processingLog, csvFilePath, gameId);
-        console.log(`📝 Updated processing log`);
+        debugLog.service('StatLoader', `📝 Updated processing log`);
     }
     
-    // Final enhanced summary
-    console.log(`🎯 Processing Summary for ${csvFileName}:`);
-    console.log(`   📅 Date: ${gameDate}`);
-    console.log(`   🆔 Game ID: ${gameId}`);
-    console.log(`   🏃 Players Added: ${playersAdded}`);
-    console.log(`   🔄 Players Updated: ${playersUpdated}`);
-    console.log(`   ⏭️  Players Skipped: ${playersSkipped}`);
+    // Final enhanced summary - use single debug call for better performance
+    if (config.ENABLED && config.SERVICES) {
+        debugLog.service('StatLoader', `🎯 Processing Summary for ${csvFileName}: ${gameDate} (${gameId}) - Added:${playersAdded} Updated:${playersUpdated} Skipped:${playersSkipped}`);
+    }
     
     if (validationWarnings.length > 0) {
-        console.log(`   ⚠️  Validation Issues: ${validationWarnings.length} players had warnings`);
+        debugLog.service('StatLoader', `   ⚠️  Validation Issues: ${validationWarnings.length} players had warnings`);
     }
     
     if (playersSkipped > 0 || validationWarnings.length > 0) {
-        console.log(`💡 Recommendation: Review processing logs and consider running duplicate detection analysis`);
+        debugLog.service('StatLoader', `💡 Recommendation: Review processing logs and consider running duplicate detection analysis`);
     }
 }
 
@@ -1073,6 +1076,7 @@ async function processStatsFile(csvFilePath) {
 
 const args = process.argv.slice(2);
 if (args.length !== 1) {
+    // Keep usage errors as console.error for production visibility
     console.error('Usage: node statLoader.js <path_to_csv_file>');
     process.exit(1);
 }
@@ -1081,10 +1085,12 @@ const csvFilePath = args[0];
 
 try {
     if (!fs.existsSync(csvFilePath) || !fs.statSync(csvFilePath).isFile()) {
+         // Keep file not found errors as console.error for production visibility
          console.error(`Error: CSV file not found or is not a file: "${csvFilePath}"`);
          process.exit(1);
     }
 } catch (error) {
+     // Keep file access errors as console.error for production visibility
      console.error(`Error accessing CSV file "${csvFilePath}": ${error.message}`);
      process.exit(1);
 }
@@ -1098,6 +1104,7 @@ async function main() {
         // Acquire processing lock to prevent concurrent processing
         const lockAcquired = await acquireProcessingLock(csvFilePath);
         if (!lockAcquired) {
+            // Keep processing lock errors as console.error for production visibility
             console.error('❌ Could not acquire processing lock - file may be currently processing');
             process.exit(1);
         }
@@ -1105,9 +1112,10 @@ async function main() {
         // Process the file
         await processStatsFile(csvFilePath);
         
-        console.log('✅ Stat loading process finished successfully.');
+        debugLog.service('StatLoader', '✅ Stat loading process finished successfully.');
         
     } catch (error) {
+        // Keep main process errors as console.error for production visibility
         console.error('❌ Error during stat loading:', error.message);
         process.exit(1);
     } finally {
@@ -1132,6 +1140,7 @@ function getLastName(fullName) {
 
 // Run the enhanced main function
 main().catch(error => {
+    // Keep fatal errors as console.error for production visibility
     console.error('❌ Fatal error:', error.message);
     releaseProcessingLock(csvFilePath);
     process.exit(1);
