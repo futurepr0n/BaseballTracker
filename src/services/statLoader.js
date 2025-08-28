@@ -465,15 +465,14 @@ function updateRostersFile(playersData, gameDate) {
             existingRosterIndex = rosters.findIndex(r => r.playerId === mappedPlayer.playerId);
         }
         
-        // If not found by playerId, try name+team match (legacy lookup)
+        // If not found by playerId, try EXACT name+team match ONLY (legacy lookup)
+        // CRITICAL FIX: Removed dangerous fuzzy matching that caused data corruption
         if (existingRosterIndex === -1) {
             existingRosterIndex = rosters.findIndex(r => {
                 const teamMatch = r.team === player.team;
-                const nameMatch = r.fullName === player.name || 
-                                 r.name === createShortName(player.name) ||
-                                 r.fullName === createShortName(player.name) ||
-                                 r.name === player.name;
-                return teamMatch && nameMatch;
+                // ONLY exact name matches - no fuzzy logic that can corrupt data
+                const exactNameMatch = r.name === player.name;
+                return teamMatch && exactNameMatch;
             });
         }
         
@@ -546,24 +545,18 @@ function updateRostersFile(playersData, gameDate) {
                 playersUpdated++;
                 debugLog.service('StatLoader', `Updated fullName for ${existingRoster.name}: '${existingRoster.fullName}' → '${player.name}'`);
             } else if (existingRoster.fullName !== player.name) {
-                // VALIDATION: Check if names are logically compatible
-                const existingLastName = getLastName(existingRoster.fullName);
-                const incomingLastName = getLastName(player.name);
-                const shortLastName = getLastName(existingRoster.name);
+                // ENHANCED VALIDATION: Check BOTH first initial AND last name compatibility
+                const isCompatibleName = validateNameCompatibility(existingRoster.name, player.name, existingRoster.fullName);
                 
-                if (existingLastName && incomingLastName && shortLastName) {
-                    const existingMatches = existingLastName.toLowerCase() === shortLastName.toLowerCase();
-                    const incomingMatches = incomingLastName.toLowerCase() === shortLastName.toLowerCase();
-                    
-                    if (incomingMatches && !existingMatches) {
-                        // Incoming name is compatible, existing is not - update
-                        debugLog.service('StatLoader', `🔧 CORRECTING fullName for ${existingRoster.name}: '${existingRoster.fullName}' → '${player.name}' (name validation passed)`);
-                        existingRoster.fullName = player.name;
-                        playersUpdated++;
-                    } else if (!incomingMatches) {
-                        // Incoming name is NOT compatible - log warning and reject
-                        debugLog.warn('STAT_LOADER', `🚨 REJECTED fullName update for ${existingRoster.name}: attempted '${existingRoster.fullName}' → '${player.name}' (last names don't match)`);
-                    }
+                if (isCompatibleName.isValid) {
+                    // Names are compatible - safe to update
+                    debugLog.service('StatLoader', `🔧 UPDATING fullName for ${existingRoster.name}: '${existingRoster.fullName}' → '${player.name}' (${isCompatibleName.reason})`);
+                    existingRoster.fullName = player.name;
+                    playersUpdated++;
+                } else {
+                    // Names are NOT compatible - BLOCK the update and log critical warning
+                    console.error(`🚨 BLOCKED DANGEROUS fullName update for ${existingRoster.name}: attempted '${existingRoster.fullName}' → '${player.name}' (${isCompatibleName.reason})`);
+                    debugLog.error('STAT_LOADER', `🚨 BLOCKED fullName corruption: ${existingRoster.name} - ${isCompatibleName.reason}`);
                 }
             }
         } else {
@@ -1136,6 +1129,54 @@ function getLastName(fullName) {
     // Handle "First Last" or "F. Last" format
     const parts = fullName.trim().split(' ');
     return parts.length > 1 ? parts[parts.length - 1] : '';
+}
+
+/**
+ * CRITICAL SECURITY FUNCTION: Validates name compatibility to prevent data corruption
+ * Both first initial AND last name must match to prevent catastrophic misassignments
+ */
+function validateNameCompatibility(shortName, incomingFullName, existingFullName) {
+    // Extract components
+    const shortFirstInitial = shortName.charAt(0).toLowerCase();
+    const shortLastName = getLastName(shortName).toLowerCase();
+    
+    const incomingFirstInitial = incomingFullName.charAt(0).toLowerCase();
+    const incomingLastName = getLastName(incomingFullName).toLowerCase();
+    
+    // RULE 1: First initials MUST match
+    if (shortFirstInitial !== incomingFirstInitial) {
+        return {
+            isValid: false,
+            reason: `First initial mismatch: ${shortName} (${shortFirstInitial}) vs ${incomingFullName} (${incomingFirstInitial})`
+        };
+    }
+    
+    // RULE 2: Last names MUST match  
+    if (shortLastName !== incomingLastName) {
+        return {
+            isValid: false,
+            reason: `Last name mismatch: ${shortName} (${shortLastName}) vs ${incomingFullName} (${incomingLastName})`
+        };
+    }
+    
+    // RULE 3: Check for suspicious cross-contamination patterns
+    if (existingFullName && existingFullName !== shortName) {
+        const existingFirstInitial = existingFullName.charAt(0).toLowerCase();
+        const existingLastName = getLastName(existingFullName).toLowerCase();
+        
+        // If existing fullName has different first initial or last name, flag it
+        if (existingFirstInitial !== shortFirstInitial || existingLastName !== shortLastName) {
+            return {
+                isValid: true,  // Allow update to fix corruption
+                reason: `Correcting corrupted fullName: ${existingFullName} → ${incomingFullName}`
+            };
+        }
+    }
+    
+    return {
+        isValid: true,
+        reason: 'Names are compatible'
+    };
 }
 
 // Run the enhanced main function
