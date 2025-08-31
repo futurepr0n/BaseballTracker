@@ -2,7 +2,8 @@
  * Debug Configuration - Centralized control for all console logging
  * 
  * PROBLEM: 91 files with console.log statements causing message overload
- * SOLUTION: Centralized debug toggles with easy production mode
+ * SOLUTION: Centralized debug toggles with easy production mode 
+ * something needed to update it 
  */
 
 const debugConfig = {

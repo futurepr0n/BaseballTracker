@@ -10,9 +10,9 @@
  *
  * Target JSON File: <DATA_PATH>/<year>/<month>/<month>_<day>_<year>.json
  * Rosters File: <DATA_PATH>/rosters.json
- *
+ * adding comment bec i need new file to be deployed
  * Usage: node statLoader.js <path_to_csv_file>
- */
+*/
 
 const fs = require('fs');
 const path = require('path');
