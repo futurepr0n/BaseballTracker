@@ -1,10 +1,13 @@
 const fs = require('fs');
 
+// Use centralized data path configuration
+const { resolveDataPath } = require('./config/dataPath');
+
 // Load August 9 data
-const aug9Data = JSON.parse(fs.readFileSync('/Users/futurepr0n/Development/Capping.Pro/Claude-Code/BaseballData/data/2025/august/august_09_2025.json', 'utf8'));
+const aug9Data = JSON.parse(fs.readFileSync(resolveDataPath('2025/august/august_09_2025.json'), 'utf8'));
 
 // Load performance data
-const perfData = JSON.parse(fs.readFileSync('/Users/futurepr0n/Development/Capping.Pro/Claude-Code/BaseballData/data/predictions/player_performance_latest.json', 'utf8'));
+const perfData = JSON.parse(fs.readFileSync(resolveDataPath('predictions/player_performance_latest.json'), 'utf8'));
 
 // Find players with HRs on Aug 9
 const aug9HRPlayers = [];

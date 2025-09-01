@@ -60,8 +60,11 @@ function getFilePath(date) {
     const monthName = getMonthName(date.getMonth());
     const day = String(date.getDate()).padStart(2, '0');
     
+    // Use centralized data path configuration
+    const { DATA_PATH } = require('./config/dataPath');
+    
     return path.join(
-        '/Users/futurepr0n/Development/Capping.Pro/Claude-Code/BaseballTracker/public/data',
+        DATA_PATH,
         year.toString(),
         monthName,
         `${monthName}_${day}_${year}.json`

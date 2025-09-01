@@ -10,10 +10,13 @@ const path = require('path');
 const csv = require('csv-parser');
 
 class ProfessionalDataLoader {
-    constructor(basePath = '/Users/futurepr0n/Development/Capping.Pro/Claude-Code/BaseballTracker') {
-        this.basePath = basePath;
-        this.statsPath = path.join(basePath, 'public/data/stats');
-        this.dataPath = path.join(basePath, 'public/data');
+    constructor(basePath = null) {
+        // Use centralized data path configuration
+        const { DATA_PATH, paths } = require('../../config/dataPath');
+        
+        this.basePath = basePath || path.dirname(DATA_PATH);
+        this.statsPath = paths.stats;
+        this.dataPath = DATA_PATH;
         
         // Intelligent caching system
         this.cache = new Map();
